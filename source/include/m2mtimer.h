@@ -2,7 +2,7 @@
 #define M2M_TIMER_H
 
 #include <stdint.h>
-#include "m2mtimerobserver.h"
+#include "lwm2m-client/m2mtimerobserver.h"
 
 //FORWARD DECLARATION
 class M2MTimerImpl;
