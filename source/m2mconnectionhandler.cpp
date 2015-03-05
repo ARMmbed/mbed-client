@@ -1,6 +1,6 @@
 #include "include/m2mconnectionhandler.h"
 #ifdef USE_LINUX
-    #include "m2mconnectionhandlerimpl_linux.h"
+    #include "include/m2mconnectionhandlerimpl_linux.h"
 #else
     #include "include/m2mconnectionhandlerimpl_mbed.h"
 #endif

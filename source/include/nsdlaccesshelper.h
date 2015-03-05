@@ -1,7 +1,7 @@
 #ifndef NSDL_ACCESS_HELPER_H
 #define NSDL_ACCESS_HELPER_H
 
-#include "include/m2mnsdlinterface.h"
+#include "m2mnsdlinterface.h"
 
 #ifdef USE_LINUX
 #include "m2mtimerimpl_linux.h"

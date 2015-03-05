@@ -1,6 +1,6 @@
 #include "include/m2mtimer.h"
 #ifdef USE_LINUX
-    #include "m2mtimerimpl_linux.h"
+    #include "include/m2mtimerimpl_linux.h"
 #else
     #include "include/m2mtimerimpl_mbed.h"
 #endif

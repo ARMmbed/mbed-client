@@ -3,8 +3,8 @@
 
 #include "lwm2m-client/m2mvector.h"
 #include "lwm2m-client/m2mconfig.h"
-#include "include/nsdllinker.h"
-#include "include/m2mtimer.h"
+#include "nsdllinker.h"
+#include "m2mtimer.h"
 #include "lwm2m-client/m2mobservationhandler.h"
 
 //FORWARD DECLARARTION

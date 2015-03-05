@@ -3,8 +3,8 @@
 
 #include "lwm2m-client/m2mconfig.h"
 #include "lwm2m-client/m2minterface.h"
-#include "include/nsdllinker.h"
-#include "include/m2mconnectionobserver.h"
+#include "nsdllinker.h"
+#include "m2mconnectionobserver.h"
 
 class M2MConnectionHandlerImpl;
 
