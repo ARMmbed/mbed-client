@@ -17,13 +17,13 @@ M2MDevice::M2MDevice()
             res->set_operation(M2MBase::POST_ALLOWED);
         }
 
-        res = _device_instance->create_dynamic_resource(DEVICE_ERROR_CODE,DEVICE_TYPE,true);
+        res = _device_instance->create_dynamic_resource(DEVICE_ERROR_CODE,DEVICE_TYPE,false,true);
         if(res) {
             res->set_operation(M2MBase::GET_PUT_ALLOWED);
             res->set_value((const uint8_t*)ERROR_CODE_VALUE.c_str(),
                            (uint32_t)ERROR_CODE_VALUE.length());
         }
-        res = _device_instance->create_dynamic_resource(DEVICE_SUPPORTED_BINDING_MODE,DEVICE_TYPE,true);
+        res = _device_instance->create_dynamic_resource(DEVICE_SUPPORTED_BINDING_MODE,DEVICE_TYPE,false);
         if(res) {
             res->set_operation(M2MBase::GET_PUT_ALLOWED);
             res->set_value((const uint8_t*)BINDING_MODE_UDP.c_str(),
@@ -75,15 +75,17 @@ M2MResource* M2MDevice::create_resource(DeviceResource resource, const String &v
     }    
     if(!device_id.empty()) {
         if(_device_instance) {
-            res = _device_instance->create_dynamic_resource(device_id,DEVICE_TYPE,true);
+            res = _device_instance->create_dynamic_resource(device_id,DEVICE_TYPE,false);
+
             if(res ) {
-                res->set_value((const uint8_t*)value.c_str(),(uint32_t)value.length());
-                if((0 == device_id.compare(0, DEVICE_UTC_OFFSET.size(),DEVICE_UTC_OFFSET)) ||
-                   (0 == device_id.compare(0, DEVICE_TIMEZONE.size(),DEVICE_TIMEZONE))) {
+                if((device_id == DEVICE_UTC_OFFSET) ||
+                   (device_id == DEVICE_TIMEZONE)) {
                     res->set_operation(M2MBase::GET_PUT_POST_ALLOWED);
                 } else {
                     res->set_operation(M2MBase::GET_PUT_ALLOWED);
                 }
+                res->set_value((const uint8_t*)value.c_str(),
+                               (uint32_t)value.length());
             }
         }
     }
@@ -113,12 +115,14 @@ M2MResource* M2MDevice::create_resource(DeviceResource resource, uint32_t value)
             break;
         case CurrentTime: {
             if(_device_instance) {
-                res = _device_instance->create_dynamic_resource(DEVICE_CURRENT_TIME,DEVICE_TYPE,true);
+                res = _device_instance->create_dynamic_resource(DEVICE_CURRENT_TIME,DEVICE_TYPE,false);
+
                 if(res) {
-                    res->set_operation(M2MBase::GET_PUT_POST_ALLOWED);
                     char buffer[20];
                     int size = sprintf(buffer,"%ld",value);
-                    res->set_value((const uint8_t*)buffer,(const uint32_t)size);
+                    res->set_operation(M2MBase::GET_PUT_POST_ALLOWED);
+                    res->set_value((const uint8_t*)buffer,
+                                   (const uint32_t)size);
                 }
             }
         }
@@ -138,13 +142,15 @@ M2MResource* M2MDevice::create_resource(DeviceResource resource, uint32_t value)
     }
 
     if(!device_id.empty()) {
-        char buffer[20];
-        int size = sprintf(buffer,"%ld",value);
         if(_device_instance) {
-            res = _device_instance->create_dynamic_resource(device_id,DEVICE_TYPE,true);
+            res = _device_instance->create_dynamic_resource(device_id,DEVICE_TYPE,false);
+
             if(res) {
-                res->set_value((const uint8_t*)buffer,(const uint32_t)size);
+                char buffer[20];
+                int size = sprintf(buffer,"%ld",value);
                 res->set_operation(M2MBase::GET_PUT_ALLOWED);
+                res->set_value((const uint8_t*)buffer,
+                               (const uint32_t)size);
             }
         }
     }

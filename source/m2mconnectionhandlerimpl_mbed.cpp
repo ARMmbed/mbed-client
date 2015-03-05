@@ -13,6 +13,9 @@ M2MConnectionHandlerImpl::M2MConnectionHandlerImpl(M2MConnectionObserver &observ
  _dns_irq(this),
  _resolved(true)
 {
+    _socket_address = (M2MConnectionObserver::SocketAddress *)malloc(sizeof(M2MConnectionObserver::SocketAddress));
+    memset(_socket_address, 0, sizeof(M2MConnectionObserver::SocketAddress));
+
     switch(stack) {
         case M2MInterface::Uninitialized:
             _socket_stack = SOCKET_STACK_UNINIT;
@@ -56,6 +59,7 @@ M2MConnectionHandlerImpl::~M2MConnectionHandlerImpl()
         delete _socket;
         _socket = NULL;
     }
+    free(_socket_address);
 }
 
 bool M2MConnectionHandlerImpl::bind_connection(const uint16_t listen_port)
@@ -152,18 +156,15 @@ void M2MConnectionHandlerImpl::receive_handler(void */*arg*/)
         _buffer_received.set(&(event->i.r.buf));
         uint16_t size = _buffer_received.copyOut(_receive_buffer, sizeof(_receive_buffer));
 
-        M2MConnectionObserver::SocketAddress *address =
-                (M2MConnectionObserver::SocketAddress*)malloc(sizeof(M2MConnectionObserver::SocketAddress));
-        memset(address,0,sizeof(M2MConnectionObserver::SocketAddress));
+        memset(_socket_address,0,sizeof(M2MConnectionObserver::SocketAddress));
 
-        address->_address =&event->i.r.src.impl;
-        address->_stack = get_network_stack(event->i.r.src.type);
-        address->_port = event->i.r.port;
+        _socket_address->_address =&event->i.r.src.impl;
+        _socket_address->_stack = get_network_stack(event->i.r.src.type);
+        _socket_address->_port = event->i.r.port;
 
         // Send data for processing.
         _observer.data_available((uint8_t*)_receive_buffer,
-                                 size, *address);
-        free(address);
+                                 size, *_socket_address);
     } else {
         // Socket error in receiving
         _observer.socket_error(1);
@@ -175,16 +176,14 @@ void M2MConnectionHandlerImpl::dns_handler(void */*arg*/)
     _resolved = true;
     socket_event_t *event = _socket->getEvent();
     if(event_result(event)) {
-        M2MConnectionObserver::SocketAddress *resolved_address =
-                (M2MConnectionObserver::SocketAddress*)malloc(sizeof(M2MConnectionObserver::SocketAddress));
-        memset(resolved_address,0,sizeof(M2MConnectionObserver::SocketAddress));
-        resolved_address->_address =&event->i.d.addr.impl;
-        resolved_address->_stack = get_network_stack(event->i.d.addr.type);
+        memset(_socket_address,0,sizeof(M2MConnectionObserver::SocketAddress));
+        _socket_address->_address =&event->i.d.addr.impl;
+        _socket_address->_stack = get_network_stack(event->i.d.addr.type);
+        _socket_address->_port = event->i.r.port;
 
-        _observer.address_ready(*resolved_address,
+        _observer.address_ready(*_socket_address,
                                 _server_type,
                                 _server_port);
-        free(resolved_address);
     } else {
         // Socket error in dns resolving
         _observer.socket_error(2);

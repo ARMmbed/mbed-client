@@ -54,12 +54,15 @@ public:
      * @param resource_type, Type of the resource.
      * @param value, pointer to the value of the resource.
      * @param value_length, length to the value in pointer.
+     * @param multiple_instance, Resource can have
+     *        multiple instances,default is false.
      * @return M2MResource, Resource to manage other LWM2M operations.
      */
     M2MResource* create_static_resource(const String &resource_name,
                                         const String &resource_type,
                                         const uint8_t *value,
-                                        const uint8_t value_length);
+                                        const uint8_t value_length,
+                                        bool multiple_instance = false);
 
     /**
      * @brief Creates dynamic resource for a given object LWM2M Inteface using which
@@ -68,11 +71,14 @@ public:
      * @param resource_name, Name of the resource.
      * @param resource_type, Type of the resource.
      * @param observable, whether resource is observable or not.
+     * @param multiple_instance, Resource can have
+     *        multiple instances, default is false.
      * @return M2MResource, Resource to manage other LWM2M operations.
      */
     M2MResource* create_dynamic_resource(const String &resource_name,
                                          const String &resource_type,
-                                         bool observable);
+                                         bool observable,
+                                         bool multiple_instance =false);
 
     /**
      * @brief Removes the resource with given name.

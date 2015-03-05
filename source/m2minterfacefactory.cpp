@@ -3,8 +3,9 @@
 #include "lwm2m-client/m2mdevice.h"
 #include "lwm2m-client/m2mobject.h"
 #include "lwm2m-client/m2mconstants.h"
+#include "include/m2minterfaceimpl.h"
 
-M2MInterfaceImpl* M2MInterfaceFactory::create_interface(M2MInterfaceObserver &observer,
+M2MInterface* M2MInterfaceFactory::create_interface(M2MInterfaceObserver &observer,
                                                     const String &endpoint_name,
                                                     const String &endpoint_type,
                                                     const uint32_t life_time,
@@ -14,9 +15,9 @@ M2MInterfaceImpl* M2MInterfaceFactory::create_interface(M2MInterfaceObserver &ob
                                                     const String &context_address)
 {
     M2MInterfaceImpl *interface = new M2MInterfaceImpl(observer, endpoint_name,
-                                                       endpoint_type, life_time,
-                                                       domain, mode,
-                                                       stack, context_address);
+                                                   endpoint_type, life_time,
+                                                   domain, mode,
+                                                   stack, context_address);
     return interface;
 }
 

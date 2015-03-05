@@ -273,10 +273,13 @@ void M2MNsdlInterface::bootstrap_done_callback(sn_nsdl_oma_server_info_t *server
         sprintf(buffer,"%d",port);
 
         uint8_t* server_address = (uint8_t*) malloc(server_info->omalw_address_ptr->addr_len);
+        memset(server_address,0,server_info->omalw_address_ptr->addr_len);
         memcpy(server_address, server_info->omalw_address_ptr->addr_ptr, server_info->omalw_address_ptr->addr_len);
 
+        String server = String((char*)server_address);
+
         String server_uri(COAP);
-        server_uri += String((char*)server_address);
+        server_uri += server;
         server_uri +=String(":");
         server_uri += String(buffer);
 
@@ -403,64 +406,24 @@ bool M2MNsdlInterface::create_nsdl_object_instance_structure(M2MObjectInstance *
 {
     bool success = false;
     if( object_instance) {
-        char inst_id[10];
-        sprintf(inst_id,"%d",object_instance->instance_id());
 
-        // Append object instance id to the object name.
-        String object_name = object_instance->name();
-        object_name += String("/");
-        object_name += String(inst_id);;
+    char inst_id[10];
+    sprintf(inst_id,"%d",object_instance->instance_id());
 
-        if(_resource) {
-            _resource->path = ((uint8_t*)memory_alloc(sizeof(object_name.length())));
-            memset(_resource->path, 0, sizeof(uint8_t));
-            if(_resource->path) {
-                memcpy(_resource->path, (uint8_t*)object_name.c_str(), object_name.length());
-                _resource->pathlen = (uint16_t)object_name.length();
-            }
-            _resource->access = (sn_grs_resource_acl_e)object_instance->operation();
+    // Append object instance id to the object name.
+    String object_name = object_instance->name();
+    object_name += String("/");
+    object_name += String(inst_id);;
 
-            _resource->resource = 0;
-            _resource->resourcelen = 0;
+    object_instance->set_under_observation(false,this);
 
-            if(_resource->resource_parameters_ptr) {
-
-                if(!object_instance->resource_type().empty()) {
-                    _resource->resource_parameters_ptr->resource_type_ptr =
-                            ((uint8_t*)memory_alloc(sizeof(object_instance->resource_type().length())));
-                    memcpy(_resource->path,
-                           (uint8_t*)object_instance->resource_type().c_str(),
-                           object_instance->resource_type().length());
-                    _resource->resource_parameters_ptr->resource_type_len =
-                            (uint16_t)object_instance->resource_type().length();
-                }
-                if(!object_instance->interface_description().empty()) {
-                    _resource->resource_parameters_ptr->interface_description_ptr =
-                            ((uint8_t*)memory_alloc(sizeof(object_instance->interface_description().length())));
-                    memcpy(_resource->path,
-                           (uint8_t*)object_instance->interface_description().c_str(),
-                           object_instance->resource_type().length());
-                    _resource->resource_parameters_ptr->interface_description_len =
-                            (uint16_t)object_instance->interface_description().length();
-                }
-
-                _resource->resource_parameters_ptr->coap_content_type = object_instance->coap_content_type();
-                _resource->resource_parameters_ptr->observable = (uint8_t)object_instance->is_observable();
-            }
-
-            M2MResourceList res_list = object_instance->resources();
-            if(!res_list.empty()) {
-                M2MResourceList::const_iterator it;
-                it = res_list.begin();
-                for ( ; it != res_list.end(); it++ ) {
-                    // Create NSDL structure for all resources inside
-                    success = create_nsdl_resource_structure(*it,object_name);
-                }
-            } else {
-                (sn_nsdl_create_resource(_resource) == 0) ? success = true : success = false;
-                if(success) {
-                    object_instance->set_under_observation(false,this);
-                }
+        M2MResourceList res_list = object_instance->resources();
+        if(!res_list.empty()) {
+            M2MResourceList::const_iterator it;
+            it = res_list.begin();
+            for ( ; it != res_list.end(); it++ ) {
+                // Create NSDL structure for all resources inside
+                success = create_nsdl_resource_structure(*it,object_name);
             }
         }
     }
@@ -481,27 +444,22 @@ bool M2MNsdlInterface::create_nsdl_resource_structure(M2MResource *res,
            uint8_t* buffer = 0;
            uint32_t length = 0;
 
-           M2MResource::Mode mode = res->mode();
+           M2MBase::Mode mode = res->mode();
 
-           if(M2MResource::Static == mode) {
+           if(M2MBase::Static == mode) {
                // Static resource is updated
                _resource->mode = SN_GRS_STATIC;
-               M2MResource *res_ptr = const_cast<M2MResource*>(res);
-               res_ptr->get_value(buffer,length);
-           } else if(M2MResource::Dynamic ){
+               res->get_value(buffer,length);
+           } else if(M2MBase::Dynamic == mode){
               // Dynamic resource is updated
                _resource->mode = SN_GRS_DYNAMIC;
-               //_resource->sn_grs_dyn_res_callback = res->callback;
+               _resource->sn_grs_dyn_res_callback = __nsdl_c_callback;
            } else {
                _resource->mode = SN_GRS_DIRECTORY;
            }
 
-           _resource->resource = (uint8_t *)buffer;
+           _resource->resource = buffer;
            _resource->resourcelen = length;
-
-           if(buffer) {
-               free(buffer);
-           }
 
            // Append object name to the resource.
            // Take out the instance Id and append to the
@@ -510,8 +468,16 @@ bool M2MNsdlInterface::create_nsdl_resource_structure(M2MResource *res,
            sprintf(inst_id,"%d",res->instance_id());
 
            String res_name = object_name;
-           res_name+= "/";
-           res_name+= inst_id;
+           res_name+= String("/") ;
+           res_name+= res->name();
+
+           // if there are multiple instances supported
+           // then add instance Id into creating resource path
+           // else normal /object_id/object_instance/resource_id format.
+           if(res->supports_multiple_instances()) {
+               res_name+= String("/") ;
+               res_name+= String(inst_id);
+            }
 
            _resource->path = ((uint8_t*)memory_alloc(sizeof(res_name.length())));
            memset(_resource->path, 0, sizeof(uint8_t));
@@ -520,32 +486,33 @@ bool M2MNsdlInterface::create_nsdl_resource_structure(M2MResource *res,
                _resource->pathlen = res_name.length();
            }
 
-           if(_resource->resource_parameters_ptr) {
-
-               if(!res->resource_type().empty()) {
-                   _resource->resource_parameters_ptr->resource_type_ptr =
-                           ((uint8_t*)memory_alloc(sizeof(res->resource_type().length())));
-                   memcpy(_resource->path,
-                          (uint8_t*)res->resource_type().c_str(),
-                          res->resource_type().length());
-                   _resource->resource_parameters_ptr->resource_type_len =
-                           res->resource_type().length();
-               }
-               if(!res->interface_description().empty()) {
-                   _resource->resource_parameters_ptr->interface_description_ptr =
-                           ((uint8_t*)memory_alloc(sizeof(res->interface_description().length())));
-                   memcpy(_resource->path,
-                          (uint8_t*)res->interface_description().c_str(),
-                          res->resource_type().length());
-                   _resource->resource_parameters_ptr->interface_description_len =
-                           res->interface_description().length();
-               }
-
-               _resource->resource_parameters_ptr->coap_content_type = res->coap_content_type();
-               _resource->resource_parameters_ptr->observable = (uint8_t)res->is_observable();
+           if(!res->resource_type().empty()) {
+               _resource->resource_parameters_ptr->resource_type_ptr =
+                       ((uint8_t*)memory_alloc(sizeof(res->resource_type().length())));
+               memcpy(_resource->resource_parameters_ptr->resource_type_ptr,
+                      (uint8_t*)res->resource_type().c_str(),
+                      res->resource_type().length());
+               _resource->resource_parameters_ptr->resource_type_len =
+                       res->resource_type().length();
+           }
+           if(!res->interface_description().empty()) {
+               _resource->resource_parameters_ptr->interface_description_ptr =
+                       ((uint8_t*)memory_alloc(sizeof(res->interface_description().length())));
+               memcpy(_resource->resource_parameters_ptr->interface_description_ptr,
+                      (uint8_t*)res->interface_description().c_str(),
+                      res->resource_type().length());
+               _resource->resource_parameters_ptr->interface_description_len =
+                       res->interface_description().length();
            }
 
+           _resource->resource_parameters_ptr->coap_content_type = res->coap_content_type();
+           _resource->resource_parameters_ptr->observable = (uint8_t)res->is_observable();
+
            (sn_nsdl_create_resource(_resource) == 0) ? success = true : success = false;
+
+           //Clear up the filled resource to fill up new resource.
+           clear_resource(_resource);
+
            if(success) {
                res->set_under_observation(false,this);
            }
@@ -585,8 +552,8 @@ bool M2MNsdlInterface::delete_nsdl_object_instance_structure(const M2MObjectInst
         sprintf(inst_id,"%d",object_instance.instance_id());
 
         object_name = object_instance.name();
-        object_name+= "/";
-        object_name+= inst_id;
+        object_name+= String("/");
+        object_name+= String(inst_id);
         delete_result = sn_nsdl_delete_resource(object_name.length(), (uint8_t *)object_name.c_str());
     } else {
        // Delete all resources without object name
@@ -600,8 +567,8 @@ bool M2MNsdlInterface::delete_nsdl_object_instance_structure(const M2MObjectInst
                char inst_id[10];
                sprintf(inst_id,"%d",(*it)->instance_id());
                res_name = (*it)->name();
-               res_name+= "/";
-               res_name+= inst_id;
+               res_name+= String("/");
+               res_name+= String(inst_id);
                delete_result = sn_nsdl_delete_resource(res_name.length(),(uint8_t *)res_name.c_str());
            }
        }
@@ -615,8 +582,8 @@ bool M2MNsdlInterface::delete_nsdl_resource_structure(const M2MResource &resourc
     char inst_id[10];
     sprintf(inst_id,"%d",resource.instance_id());
     String res_name = resource.name();
-    res_name+= "/";
-    res_name+= inst_id;
+    res_name+= String("/");
+    res_name+= String(inst_id);
 
     delete_result = sn_nsdl_delete_resource(res_name.length(),(uint8_t *)res_name.c_str());
     return ((0 == delete_result) ? true : false);
@@ -659,7 +626,7 @@ M2MBase* M2MNsdlInterface::find_resource(const String &object_name)
         it = _object_list.begin();
         for ( ; it != _object_list.end(); it++ ) {
             object = find_resource((*it),object_name);
-            if(object){
+            if(object != NULL){
                 break;
             }
         }
@@ -682,14 +649,14 @@ M2MBase* M2MNsdlInterface::find_resource(const M2MObject *object,
 
                 // Append object instance id to the object name.
                 String name = (*it)->name();
-                name+= "/";
-                name+= inst_id;
-                if(name.compare(0, object_instance.size(), object_instance) ==0){
+                name+= String("/");
+                name+= String(inst_id);
+                if(name == object_instance){
                     instance = (*it);
                     break;
                 }
                 instance = find_resource((*it),object_instance);
-                if(instance){
+                if(instance != NULL){
                     break;
                 }
             }
@@ -704,27 +671,35 @@ M2MBase* M2MNsdlInterface::find_resource(const M2MObjectInstance *object_instanc
     M2MBase *resource = NULL;
     if(object_instance) {
 
-        String name = object_instance->name();
-        char obj_inst_id[10];
-        sprintf(obj_inst_id,"%d",object_instance->instance_id());
-
-        // Append object instance id to the object name.
-        name+= "/";
-        name+= obj_inst_id;
 
         M2MResourceList list = object_instance->resources();
         if(!list.empty()) {
             M2MResourceList::const_iterator it;
             it = list.begin();
             for ( ; it != list.end(); it++ ) {
+                String name = object_instance->name();
+                char obj_inst_id[10];
+                sprintf(obj_inst_id,"%d",object_instance->instance_id());
+
+                // Append object instance id to the object name.
+                name+= String("/");
+                name+= String(obj_inst_id);
+
                 char inst_id[10];
                 sprintf(inst_id,"%d",(*it)->instance_id());
 
                 // Append object instance id to the object name.
+                name+= String("/");
                 name+= (*it)->name();
-                name+= "/";
-                name+= inst_id;
-                if(name.compare(0, resource_instance.size(),resource_instance) ==0){
+                // if there are multiple instances supported
+                // then add instance Id into creating resource path
+                // else normal /object_id/object_instance/resource_id format.
+
+                if((*it)->supports_multiple_instances()) {
+                    name+= String("/") ;
+                    name+= String(inst_id);
+                 }
+                if(name == resource_instance){
                     resource = (*it);
                     break;
                 }
@@ -789,7 +764,7 @@ uint8_t M2MNsdlInterface::handle_get_request(sn_coap_hdr_s *received_coap_header
     uint8_t result = 1;
     sn_coap_hdr_s * coap_response = NULL;
     // process the GET if we have registered a callback for it
-    if ((object->operation() & SN_GRS_GET_ALLOWED) != 0) {
+    if (object && ((object->operation() & SN_GRS_GET_ALLOWED) != 0)) {
         coap_response = sn_coap_build_response(received_coap_header, COAP_MSG_CODE_RESPONSE_CONTENT);
         if(coap_response) {
             char content_type[10];
@@ -826,10 +801,8 @@ uint8_t M2MNsdlInterface::handle_get_request(sn_coap_hdr_s *received_coap_header
                     free(token_buffer);
                 }
             }
-            if(received_coap_header->options_list_ptr &&
-               received_coap_header->options_list_ptr->observe) {
-                uint8_t observe_option;
-                observe_option = *received_coap_header->options_list_ptr->observe_ptr;
+            if(received_coap_header->options_list_ptr) {
+                uint8_t observe_option = received_coap_header->options_list_ptr->observe;
                 if(START_OBSERVATION == observe_option) {
                     object->set_under_observation(true,this);
                     uint8_t observation_number = object->observation_number();
@@ -902,4 +875,13 @@ uint8_t M2MNsdlInterface::handle_post_request(sn_coap_hdr_s */*received_coap_hea
     // Need new JIRA ticket for implementation on C side.
     uint8_t result = 1;
     return result;
+}
+
+void M2MNsdlInterface::clear_resource(sn_nsdl_resource_info_s *&resource)
+{
+    //Clear up the filled resource to fill up new resource.
+    sn_nsdl_resource_parameters_s *temp_resource_parameter = resource->resource_parameters_ptr;
+    memset(resource->resource_parameters_ptr, 0, sizeof(sn_nsdl_resource_parameters_s));
+    memset(resource,0, sizeof(sn_nsdl_resource_info_s));
+    resource->resource_parameters_ptr = temp_resource_parameter;
 }

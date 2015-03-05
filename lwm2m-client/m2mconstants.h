@@ -1,12 +1,12 @@
 #ifndef M2MCONSTANTS_H
 #define M2MCONSTANTS_H
 
+#include <stdint.h>
 #include "m2mconfig.h"
-
 
 const int MAX_VALUE_LENGTH = 256;
 const int BUFFER_LENGTH = 1024;
-const String COAP = "coap://";
+extern const String COAP;
 const uint64_t MINIMUM_REGISTRATION_TIME = 60; //in seconds
 const uint64_t ONE_SECOND_TIMER = 1;
 
@@ -16,87 +16,86 @@ const uint64_t ONE_SECOND_TIMER = 1;
 #define STOP_OBSERVATION 1
 
 // PUT attributes to be checked from server
-const String EQUAL = "=";
-const String AMP = "&";
-const String PMIN = "pmin";
-const String PMAX = "pmax";
-const String CANCEL = "cancel";
+extern const String EQUAL;
+extern const String AMP;
+extern const String PMIN;
+extern const String PMAX;
+extern const String CANCEL;
 
 
 //LWM2MOBJECT NAME/ID
-const String M2M_SECURITY_ID = "0";
-const String M2M_SERVER_ID = "1";
-const String M2M_ACCESS_CONTROL_ID = "2";
-const String M2M_DEVICE_ID = "3";
+extern const String M2M_SECURITY_ID;
+extern const String M2M_SERVER_ID;
+extern const String M2M_ACCESS_CONTROL_ID;
+extern const String M2M_DEVICE_ID;
 
-const String M2M_CONNECTIVITY_MONITOR_ID = "4";
-const String M2M_FIRMWARE_ID = "5";
-const String M2M_LOCATION_ID = "6";
-const String M2M_CONNECTIVITY_STATISTICS_ID = "7";
-const String RESERVED_ID = "8";
+extern const String M2M_CONNECTIVITY_MONITOR_ID;
+extern const String M2M_FIRMWARE_ID;
+extern const String M2M_LOCATION_ID;
+extern const String M2M_CONNECTIVITY_STATISTICS_ID;
+extern const String RESERVED_ID;
 
 //OBJECT RESOURCE TYPE
-const String DEVICE_TYPE = "device_type";
-const String SECURITY_TYPE = "security_type";
-const String SERVER_TYPE = "server_type";
+extern const String DEVICE_TYPE;
+extern const String SECURITY_TYPE;
+extern const String SERVER_TYPE;
 
 //DEVICE RESOURCES
-const String DEVICE_MANUFACTURER = "0";
-const String DEVICE_DEVICE_TYPE = "17";
-const String DEVICE_MODEL_NUMBER = "1";
-const String DEVICE_SERIAL_NUMBER = "2";
-const String DEVICE_HARDWARE_VERSION = "18";
-const String DEVICE_FIRMWARE_VERSION = "3";
-const String DEVICE_SOFTWARE_VERSION = "19";
-const String DEVICE_REBOOT = "4";
-const String DEVICE_FACTORY_RESET = "5";
-const String DEVICE_AVAILABLE_POWER_SOURCES = "6";
-const String DEVICE_POWER_SOURCE_VOLTAGE = "7";
-const String DEVICE_POWER_SOURCE_CURRENT = "8";
-const String DEVICE_BATTERY_LEVEL = "9";
-const String DEVICE_BATTERY_STATUS = "20";
-const String DEVICE_MEMORY_FREE = "10";
-const String DEVICE_MEMORY_TOTAL = "21";
-const String DEVICE_ERROR_CODE = "11";
-const String DEVICE_RESET_ERROR_CODE = "12";
-const String DEVICE_CURRENT_TIME = "13";
-const String DEVICE_UTC_OFFSET = "14";
-const String DEVICE_TIMEZONE = "15";
-const String DEVICE_SUPPORTED_BINDING_MODE = "16";
+extern const String DEVICE_MANUFACTURER;
+extern const String DEVICE_DEVICE_TYPE;
+extern const String DEVICE_MODEL_NUMBER;
+extern const String DEVICE_SERIAL_NUMBER;
+extern const String DEVICE_HARDWARE_VERSION;
+extern const String DEVICE_FIRMWARE_VERSION;
+extern const String DEVICE_SOFTWARE_VERSION;
+extern const String DEVICE_REBOOT;
+extern const String DEVICE_FACTORY_RESET;
+extern const String DEVICE_AVAILABLE_POWER_SOURCES;
+extern const String DEVICE_POWER_SOURCE_VOLTAGE;
+extern const String DEVICE_POWER_SOURCE_CURRENT;
+extern const String DEVICE_BATTERY_LEVEL;
+extern const String DEVICE_BATTERY_STATUS;
+extern const String DEVICE_MEMORY_FREE;
+extern const String DEVICE_MEMORY_TOTAL;
+extern const String DEVICE_ERROR_CODE;
+extern const String DEVICE_RESET_ERROR_CODE;
+extern const String DEVICE_CURRENT_TIME;
+extern const String DEVICE_UTC_OFFSET;
+extern const String DEVICE_TIMEZONE;
+extern const String DEVICE_SUPPORTED_BINDING_MODE;
 
-const String BINDING_MODE_UDP = "U";
-const String BINDING_MODE_UDP_QUEUE = "UQ";
-const String BINDING_MODE_SMS = "S";
-const String BINDING_MODE_SMS_QUEUE = "SQ";
+extern const String BINDING_MODE_UDP;
+extern const String BINDING_MODE_UDP_QUEUE;
+extern const String BINDING_MODE_SMS;
+extern const String BINDING_MODE_SMS_QUEUE;
 
-const String ERROR_CODE_VALUE = "0";
+extern const String ERROR_CODE_VALUE;
 
 
 
 //SECURITY RESOURCES
-const String SECURITY_M2M_SERVER_URI = "0";
-const String SECURITY_BOOTSTRAP_SERVER = "1";
-const String SECURITY_SECURITY_MODE = "2";
-const String SECURITY_PUBLIC_KEY = "3";
-const String SECURITY_SERVER_PUBLIC_KEY = "4";
-const String SECURITY_SECRET_KEY = "5";
-const String SECURITY_SMS_SECURITY_MODE = "6";
-const String SECURITY_SMS_BINDING_KEY = "7";
-const String SECURITY_SMS_BINDING_SECRET_KEY = "8";
-const String SECURITY_M2M_SERVER_SMS_NUMBER = "9";
-const String SECURITY_SHORT_SERVER_ID = "10";
-const String SECURITY_CLIENT_HOLD_OFF_TIME = "11";
+extern const String SECURITY_M2M_SERVER_URI;
+extern const String SECURITY_BOOTSTRAP_SERVER;
+extern const String SECURITY_SECURITY_MODE;
+extern const String SECURITY_PUBLIC_KEY;
+extern const String SECURITY_SERVER_PUBLIC_KEY;
+extern const String SECURITY_SECRET_KEY;
+extern const String SECURITY_SMS_SECURITY_MODE;
+extern const String SECURITY_SMS_BINDING_KEY;
+extern const String SECURITY_SMS_BINDING_SECRET_KEY;
+extern const String SECURITY_M2M_SERVER_SMS_NUMBER;
+extern const String SECURITY_SHORT_SERVER_ID;
+extern const String SECURITY_CLIENT_HOLD_OFF_TIME;
 
 //SERVER RESOURCES
-const String SERVER_SHORT_SERVER_ID= "0";
-const String SERVER_LIFETIME = "1";
-const String SERVER_DEFAULT_MIN_PERIOD = "2";
-const String SERVER_DEFAULT_MAX_PERIOD = "3";
-const String SERVER_DISABLE = "4";
-const String SERVER_DISABLE_TIMEOUT = "5";
-const String SERVER_NOTIFICATION_STORAGE = "6";
-const String SERVER_BINDING = "7";
-const String SERVER_REGISTRATION_UPDATE= "8";
+extern const String SERVER_SHORT_SERVER_ID;
+extern const String SERVER_LIFETIME;
+extern const String SERVER_DEFAULT_MIN_PERIOD;
+extern const String SERVER_DEFAULT_MAX_PERIOD;
+extern const String SERVER_DISABLE;
+extern const String SERVER_DISABLE_TIMEOUT;
+extern const String SERVER_NOTIFICATION_STORAGE;
+extern const String SERVER_BINDING;
+extern const String SERVER_REGISTRATION_UPDATE;
 
 #endif // M2MCONSTANTS_H
-

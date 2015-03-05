@@ -100,21 +100,22 @@ private:
 
 private:
 
-    M2MConnectionObserver               &_observer;
-    UDPaSocket                          *_socket;            //owned
-    socket_stack_t                      _socket_stack;
-    String                              _server_address;
-    char                                _receive_buffer[1024];
-    char                                _send_buffer[1024];
-    CThunk<M2MConnectionHandlerImpl>        _default_irq;
-    CThunk<M2MConnectionHandlerImpl>        _recv_irq;
-    CThunk<M2MConnectionHandlerImpl>        _send_irq;
-    CThunk<M2MConnectionHandlerImpl>        _dns_irq;
-    socket_allocator_t                  _socket_alloc;
-    SocketBuffer                        _buffer_received;
-    M2MConnectionObserver::ServerType   _server_type;
-    uint16_t                            _server_port;
-    bool                                _resolved;
+    M2MConnectionObserver                       &_observer;
+    UDPaSocket                                  *_socket;            //owned
+    socket_stack_t                              _socket_stack;
+    String                                      _server_address;
+    char                                        _receive_buffer[1024];
+    char                                        _send_buffer[1024];
+    CThunk<M2MConnectionHandlerImpl>            _default_irq;
+    CThunk<M2MConnectionHandlerImpl>            _recv_irq;
+    CThunk<M2MConnectionHandlerImpl>            _send_irq;
+    CThunk<M2MConnectionHandlerImpl>            _dns_irq;
+    socket_allocator_t                          _socket_alloc;
+    SocketBuffer                                _buffer_received;
+    M2MConnectionObserver::SocketAddress        *_socket_address;
+    M2MConnectionObserver::ServerType           _server_type;
+    uint16_t                                    _server_port;
+    bool                                        _resolved;
 
 friend class Test_M2MConnectionHandler;
 

@@ -2,14 +2,14 @@
 #define M2M_INTERFACE_FACTORY_H
 
 #include <stdlib.h>
-#include "include/m2minterfaceimpl.h"
 #include "m2msecurity.h"
 #include "m2mresource.h"
+#include "m2minterfaceobserver.h"
 
 //FORWARD DECLARATION
-class M2MInterfaceObserver;
 class M2MDevice;
 class M2MServer;
+class M2MInterfaceImpl;
 
 /**
  *  @brief M2MInterfaceFactory.
@@ -34,7 +34,7 @@ public:
      * @param context_address, Context address for M2M-HTTP, not used currently.
      * @return M2MInterfaceImpl , Object to manage other LWM2M operations.
      */
-    static M2MInterfaceImpl *create_interface(M2MInterfaceObserver &observer,
+    static M2MInterface *create_interface(M2MInterfaceObserver &observer,
                                               const String &endpoint_name,
                                               const String &endpoint_type,
                                               const uint32_t life_time,

@@ -47,10 +47,11 @@ M2MObjectInstance::~M2MObjectInstance()
 M2MResource* M2MObjectInstance::create_static_resource(const String &resource_name,
                                                const String &resource_type,
                                                const uint8_t *value,
-                                               const uint8_t value_length)
+                                               const uint8_t value_length,
+                                               bool multiple_instance)
 {
     M2MResource *resource = new M2MResource(resource_name, resource_type,
-                                            M2MResource::Static);
+                                            M2MResource::Static,multiple_instance);
     resource->set_operation(M2MBase::GET_ALLOWED);
     resource->set_observable(false);
 
@@ -66,10 +67,11 @@ M2MResource* M2MObjectInstance::create_static_resource(const String &resource_na
 
 M2MResource* M2MObjectInstance::create_dynamic_resource(const String &resource_name,
                                                 const String &resource_type,
-                                                bool observable)
+                                                bool observable,
+                                                bool multiple_instance)
 {
     M2MResource *resource = new M2MResource(resource_name, resource_type,
-                                            M2MResource::Dynamic);
+                                            M2MResource::Dynamic,multiple_instance);
     resource->set_operation(M2MBase::GET_PUT_ALLOWED);
     resource->set_observable(observable);
     add_resource(resource);
@@ -86,8 +88,8 @@ bool M2MObjectInstance::remove_resource(const String &resource_name, uint16_t in
         res = *it;
         int pos = 0;
         for ( ; it != _resource_list.end(); it++, pos++ ) {
-            if(((*it)->name().compare(0,resource_name.size(),resource_name) == 0 &&
-              (*it)->instance_id() == inst_id)) {
+            if(((*it)->name() == resource_name) &&
+               ((*it)->instance_id() == inst_id)) {
                 // Resource found and deleted.
                 //res = *it;
                 delete res;
@@ -108,7 +110,7 @@ M2MResource* M2MObjectInstance::resource(const String &resource_name, uint16_t i
         M2MResourceList::const_iterator it;
         it = _resource_list.begin();
         for ( ; it != _resource_list.end(); it++ ) {
-            if(((*it)->name().compare(0,resource_name.size(),resource_name) == 0 &&
+            if(((*it)->name() == resource_name &&
               (*it)->instance_id() == inst_id)) {
                 // Resource found.
                 res = *it;
@@ -136,7 +138,7 @@ uint16_t M2MObjectInstance::resource_count(const String& resource) const
         M2MResourceList::const_iterator it;
         it = _resource_list.begin();
         for ( ; it != _resource_list.end(); it++ ) {
-            if(((*it)->name().compare(0,resource.size(),resource) == 0 )) {
+            if((*it)->name() == resource) {
                 count++;
             }
         }
@@ -156,7 +158,7 @@ void M2MObjectInstance::add_resource(M2MResource *res)
             M2MResourceList::const_iterator it;
             it = _resource_list.begin();
             for ( ; it != _resource_list.end(); ++it ) {
-                if((*it)->name().compare(0,res->name().size(),res->name()) == 0) {
+                if((*it)->name() == res->name()) {
                     // Resource with same name exists,
                     // this is a new instance of resource.
                     // increment instance ID.

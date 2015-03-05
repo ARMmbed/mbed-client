@@ -219,6 +219,8 @@ private:
                                M2MBase *object,
                                sn_nsdl_addr_s *address);
 
+    void clear_resource(sn_nsdl_resource_info_s *&resource);
+
 private:
 
     M2MNsdlObserver                   &_observer;

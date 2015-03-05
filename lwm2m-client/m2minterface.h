@@ -57,7 +57,7 @@ public:
 
 public:
 
-    //virtual ~M2MInterface();
+    virtual ~M2MInterface(){}
 
     /**
      * @brief Initiates bootstrapping of the client with the provided Bootstrap

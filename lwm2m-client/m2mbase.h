@@ -4,11 +4,11 @@
 // Support for std args
 #include <stdint.h>
 #include "m2mconfig.h"
-#include "include/m2mtimer.h"
-#include "include/nsdllinker.h"
+#include "lwm2m-client/m2mtimerobserver.h"
 
 //FORWARD DECLARATION
 class M2MObservationHandler;
+class M2MTimer;
 
 /**
  *  @brief M2MBase.

@@ -2,30 +2,10 @@
 #define M2M_TIMER_H
 
 #include <stdint.h>
+#include "m2mtimerobserver.h"
 
 //FORWARD DECLARATION
 class M2MTimerImpl;
-
-/**
- *  Observer class for informing timer expiry to the parent class
- */
-class M2MTimerObserver
-{
-public:
-    typedef enum {
-        Notdefined,
-        Registration,
-        NsdlExecution,
-        PMinTimer,
-        PMaxTimer
-    }Type;
-
-    /**
-    * Indicates that the time has expired.
-    */
-    virtual void timer_expired(M2MTimerObserver::Type type =
-                               M2MTimerObserver::Notdefined) = 0;
-};
 
 /**
 * M2MTimer.

@@ -198,8 +198,8 @@ void M2MInterfaceImpl::client_unregistered()
 
 void M2MInterfaceImpl::bootstrap_done(M2MSecurity *security_object)
 {
-    _observer.bootstrap_done(security_object);
     internal_event(STATE_BOOTSTRAPPED);
+    _observer.bootstrap_done(security_object);
 }
 
 void M2MInterfaceImpl::bootstrap_error()
@@ -273,10 +273,12 @@ void M2MInterfaceImpl::state_bootstrap( EventData *data)
                 String server_address = security->resource_value_string(M2MSecurity::M2MServerUri);
                 String ip_address;
                 uint16_t port;
+                //TODO: provide API to set listen port
                 uint16_t listen_port = 8000;
                 if(server_address.compare(0,COAP.size(),COAP) == 0) {
                     server_address = server_address.substr(COAP.size(),
                                                            server_address.size()-COAP.size());
+                    //TODO: Implement function for find_last_of()
                     int colonFound = 10;//server_address.find_last_of( ":" );
                     if(colonFound != -1) {
                        ip_address = server_address.substr(0,colonFound);
@@ -351,10 +353,12 @@ void M2MInterfaceImpl::state_register( EventData *data)
                     String server_address = security->resource_value_string(M2MSecurity::M2MServerUri);
                     String ip_address;
                     uint16_t port;
+                    //TODO: provide API to set listen port
                     uint16_t listen_port = 8000;
                     if(server_address.compare(0,COAP.size(),COAP) == 0) {
                         server_address = server_address.substr(COAP.size(),
                                                                server_address.size()-COAP.size());
+                        //TODO: Implement function for find_last_of()
                         int colonFound = 10;//server_address.find_last_of( ":" );
                         if(colonFound != -1) {
                            ip_address = server_address.substr(0,colonFound);

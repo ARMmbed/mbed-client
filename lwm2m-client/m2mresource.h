@@ -21,10 +21,13 @@ private: // Constructor and destructor are private
      * @param name, name of the resource
      * @param resource_type, Resource Type.
      * @param resource_mode, Static or Dynamic.
+     * @param multiple_instance, Resource can have
+     *        multiple instances.
      */
     M2MResource(const String &resource_name,
                 const String &resource_type,
-                M2MBase::Mode resource_mode);
+                M2MBase::Mode resource_mode,
+                bool multiple_instances = false);
 
     // Prevents the use of default constructor.
     M2MResource();
@@ -43,6 +46,12 @@ public:
     virtual ~M2MResource();
 
     virtual M2MBase::BaseType base_type() const;
+
+    bool supports_multiple_instances() const;
+
+private:
+
+    bool        _has_multiple_instances;
 
     friend class Test_M2MResource;
     friend class Test_M2MObjectInstance;

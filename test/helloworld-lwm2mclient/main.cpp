@@ -6,15 +6,21 @@
 #include "lwm2m-client/m2minterfacefactory.h"
 #include "lwm2m-client/m2mdevice.h"
 #include "lwm2m-client/m2minterfaceobserver.h"
+#include "lwm2m-client/m2minterface.h"
 
 // TODO: Remove when yotta supports init.
 #include "lwipv4_init.h"
 
-const String &BOOTSTRAP_SERVER_ADDRESS = "coap://10.45.3.42:5685";
+const String &BOOTSTRAP_SERVER_ADDRESS = "coap://10.45.3.10:5693";
+const String &M2M_SERVER_ADDRESS = "coap://10.45.3.10:5683";
 
 class M2MLWClient: public M2MInterfaceObserver {
 public:
-    M2MLWClient(){}
+    M2MLWClient(){
+        _security = NULL;
+        _interface = NULL;
+        _device = NULL;
+    }
 
     ~M2MLWClient() {
         if(_interface) {
@@ -30,9 +36,9 @@ public:
 
     bool create_interface() {
         _interface = M2MInterfaceFactory::create_interface(*this,
-                                                  "node-001",
-                                                  "test",
-                                                  60,
+                                                  "lwm2m-endpoint",
+                                                  "yogesh",
+                                                  10,
                                                   "",
                                                   M2MInterface::UDP,
                                                   M2MInterface::LwIP_IPv4,
@@ -68,13 +74,34 @@ public:
         return _registration_updated;
     }
 
-    bool create_security_object() {
+    bool create_bootstrap_object() {
         bool success = false;
+        if(_security) {
+            delete _security;
+        }
         _security = M2MInterfaceFactory::create_security(M2MSecurity::Bootstrap);
         if(_security) {
             if(_security->set_resource_value(M2MSecurity::M2MServerUri, BOOTSTRAP_SERVER_ADDRESS) &&
             _security->set_resource_value(M2MSecurity::BootstrapServer, 1) &&
             _security->set_resource_value(M2MSecurity::SecurityMode, M2MSecurity::NoSecurity)) {
+                success = true;
+                /* Not used now because there is no TLS or DTLS implementation available for stack.
+                security->set_resource_value(M2MSecurity::ServerPublicKey,certificates->certificate_ptr[0],certificates->certificate_len[0]);
+                security->set_resource_value(M2MSecurity::PublicKey,certificates->certificate_ptr[1],certificates->certificate_len[1]);
+                security->set_resource_value(M2MSecurity::Secretkey,certificates->own_private_key_ptr,certificates->own_private_key_len);
+                */
+            }
+        }
+        return success;
+    }
+
+    bool create_register_object() {
+        bool success = false;
+        _register_security = M2MInterfaceFactory::create_security(M2MSecurity::M2MServer);
+        if(_register_security) {
+            if(_register_security->set_resource_value(M2MSecurity::M2MServerUri, M2M_SERVER_ADDRESS) &&
+            _register_security->set_resource_value(M2MSecurity::BootstrapServer, 0) &&
+            _register_security->set_resource_value(M2MSecurity::SecurityMode, M2MSecurity::NoSecurity)) {
                 success = true;
                 /* Not used now because there is no TLS or DTLS implementation available for stack.
                 security->set_resource_value(M2MSecurity::ServerPublicKey,certificates->certificate_ptr[0],certificates->certificate_len[0]);
@@ -97,8 +124,7 @@ public:
             if(_device->create_resource(M2MDevice::Manufacturer,"test_manufacturer")     &&
                _device->create_resource(M2MDevice::DeviceType,"test_device_type")        &&
                _device->create_resource(M2MDevice::ModelNumber,"test_model_number")      &&
-               _device->create_resource(M2MDevice::SerialNumber,"test_serial_number")    &&
-               _device->create_resource(M2MDevice::Manufacturer,"test_manufacturer")) {
+               _device->create_resource(M2MDevice::SerialNumber,"test_serial_number")) {
                 success = true;
             }
         }
@@ -128,32 +154,38 @@ public:
             _register_security = server_object;
             _bootstrapped = true;
             _error = false;
+            printf("\nBootstrapped\n");
         }
     }
 
     void object_registered(/*M2MSecurity *security_object, const M2MServer &server_object*/){
         _registered = true;
         _unregistered = false;
-
+        printf("\nRegistered\n");
     }
+
     void object_unregistered(M2MSecurity */*server_object*/){
         _unregistered = true;
         _registered = false;
+        printf("\nUnregistered\n");
     }
 
     void registration_updated(M2MSecurity */*security_object*/, const M2MServer & /*server_object*/){
         _registration_updated = true;
         _unregistered = false;
+        printf("\nregistration updated\n");
+
     }
 
     void error(M2MInterface::Error /*error*/){
         _error = true;
         _bootstrapped = false;
+        printf("\nError occured\n");
     }
 
 private:
 
-    M2MInterfaceImpl    *_interface;
+    M2MInterface    	*_interface;
     M2MSecurity         *_security;
     M2MSecurity         *_register_security;
     M2MDevice           *_device;
@@ -179,8 +211,8 @@ int main() {
     notify_completion_str(lwm2mclient.create_interface(),result);
     printf("Interface creation test case  %s !!", result);
 
-    notify_completion_str(lwm2mclient.create_security_object(),result);
-    printf("Security object creation test case  %s !!", result);
+    notify_completion_str(lwm2mclient.create_bootstrap_object(),result);
+    printf("Bootstrap object creation test case  %s !!", result);
 
     lwm2mclient.test_bootstrap();
     notify_completion_str(lwm2mclient.bootstrap_successful(),result);

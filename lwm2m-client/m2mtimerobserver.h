@@ -22,5 +22,4 @@ public:
                                M2MTimerObserver::Notdefined) = 0;
 };
 
-
 #endif // M2M_TIMER_OBSERVER_H

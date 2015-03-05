@@ -1,10 +1,10 @@
 {
-  "name": "lwm2m-socket",
+  "name": "lwm2m-client",
   "version": "0.0.0",
   "description": "LWM2M mbed Client API",
   "keywords": [],
   "author": "Yogesh Pande <yogesh.pande@arm.com>",
-  "homepage": "https://github.com/ARMmbed/lwm2m-socket",
+  "homepage": "https://github.com/ARMmbed/lwm2m-client",
   "licenses": [
     {
       "url": "https://spdx.org/licenses/Apache-2.0",
