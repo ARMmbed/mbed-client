@@ -1,6 +1,6 @@
-#include "m2mbase.h"
-#include "m2mobservationhandler.h"
-#include "m2mconstants.h"
+#include "lwm2m-client/m2mbase.h"
+#include "lwm2m-client/m2mobservationhandler.h"
+#include "lwm2m-client/m2mconstants.h"
 
 M2MBase& M2MBase::operator=(const M2MBase& other)
 {

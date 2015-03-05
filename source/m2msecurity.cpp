@@ -1,9 +1,9 @@
 #include <cstdio>
-#include "m2msecurity.h"
-#include "m2mconstants.h"
-#include "m2mobject.h"
-#include "m2mobjectinstance.h"
-#include "m2mresource.h"
+#include "lwm2m-client/m2msecurity.h"
+#include "lwm2m-client/m2mconstants.h"
+#include "lwm2m-client/m2mobject.h"
+#include "lwm2m-client/m2mobjectinstance.h"
+#include "lwm2m-client/m2mresource.h"
 
 
 M2MSecurity::M2MSecurity(ServerType ser_type)

@@ -1,10 +1,10 @@
-#include "nsdlaccesshelper.h"
-#include "m2mnsdlobserver.h"
-#include "m2msecurity.h"
-#include "m2mobject.h"
-#include "m2mobjectinstance.h"
-#include "m2mresource.h"
-#include "m2mconstants.h"
+#include "include/nsdlaccesshelper.h"
+#include "include/m2mnsdlobserver.h"
+#include "lwm2m-client/m2msecurity.h"
+#include "lwm2m-client/m2mobject.h"
+#include "lwm2m-client/m2mobjectinstance.h"
+#include "lwm2m-client/m2mresource.h"
+#include "lwm2m-client/m2mconstants.h"
 
 M2MNsdlInterface::M2MNsdlInterface(M2MNsdlObserver &observer)
 : _observer(observer),

@@ -1,5 +1,5 @@
-#include "m2mresource.h"
-#include "m2mconstants.h"
+#include "lwm2m-client/m2mresource.h"
+#include "lwm2m-client/m2mconstants.h"
 
 M2MResource& M2MResource::operator=(const M2MResource& other)
 {

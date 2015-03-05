@@ -1,5 +1,5 @@
-#include "m2mobjectinstance.h"
-#include "m2mresource.h"
+#include "lwm2m-client/m2mobjectinstance.h"
+#include "lwm2m-client/m2mresource.h"
 
 M2MObjectInstance& M2MObjectInstance::operator=(const M2MObjectInstance& other)
 {

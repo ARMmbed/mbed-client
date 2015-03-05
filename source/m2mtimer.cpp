@@ -1,8 +1,8 @@
-#include "m2mtimer.h"
+#include "include/m2mtimer.h"
 #ifdef USE_LINUX
     #include "m2mtimerimpl_linux.h"
 #else
-    #include "m2mtimerimpl_mbed.h"
+    #include "include/m2mtimerimpl_mbed.h"
 #endif
 
 // Prevents the use of assignment operator

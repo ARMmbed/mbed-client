@@ -1,7 +1,7 @@
-#include "m2mconnectionhandlerimpl_mbed.h"
-#include "m2mconnectionhandler.h"
-#include "nsdlaccesshelper.h"
-#include "m2mconstants.h"
+#include "include/m2mconnectionhandlerimpl_mbed.h"
+#include "include/m2mconnectionhandler.h"
+#include "include/nsdlaccesshelper.h"
+#include "lwm2m-client/m2mconstants.h"
 
 M2MConnectionHandlerImpl::M2MConnectionHandlerImpl(M2MConnectionObserver &observer,
                                                    M2MInterface::NetworkStack stack)

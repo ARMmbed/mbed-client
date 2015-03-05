@@ -1,4 +1,4 @@
-#include "m2mstring.h"
+#include "lwm2m-client/m2mstring.h"
 #include <string.h> // strlen
 #include <stdlib.h> // malloc, realloc
 #include <assert.h>

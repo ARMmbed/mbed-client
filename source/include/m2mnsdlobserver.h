@@ -1,7 +1,7 @@
 #ifndef M2M_NSDL_OBSERVER_H
 #define M2M_NSDL_OBSERVER_H
 
-#include "nsdllinker.h"
+#include "include/nsdllinker.h"
 
 //FORWARD DECLARATION
 class M2MSecurity;

@@ -1,11 +1,11 @@
 #include <assert.h>
-#include "m2minterfaceimpl.h"
-#include "eventdata.h"
-#include "m2minterfaceobserver.h"
-#include "m2mconnectionhandler.h"
-#include "m2mnsdlinterface.h"
-#include "m2msecurity.h"
-#include "m2mconstants.h"
+#include "include/m2minterfaceimpl.h"
+#include "include/eventdata.h"
+#include "lwm2m-client/m2minterfaceobserver.h"
+#include "include/m2mconnectionhandler.h"
+#include "include/m2mnsdlinterface.h"
+#include "lwm2m-client/m2msecurity.h"
+#include "lwm2m-client/m2mconstants.h"
 
 M2MInterfaceImpl::M2MInterfaceImpl(M2MInterfaceObserver& observer,
                                    const String &ep_name,

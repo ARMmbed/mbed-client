@@ -1,11 +1,11 @@
 #ifndef M2MNSDLINTERFACE_H
 #define M2MNSDLINTERFACE_H
 
-#include "m2mvector.h"
-#include "m2mconfig.h"
-#include "nsdllinker.h"
-#include "m2mtimer.h"
-#include "m2mobservationhandler.h"
+#include "lwm2m-client/m2mvector.h"
+#include "lwm2m-client/m2mconfig.h"
+#include "include/nsdllinker.h"
+#include "include/m2mtimer.h"
+#include "lwm2m-client/m2mobservationhandler.h"
 
 //FORWARD DECLARARTION
 class M2MSecurity;

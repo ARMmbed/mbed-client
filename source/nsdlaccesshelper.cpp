@@ -1,5 +1,5 @@
-#include "nsdlaccesshelper.h"
-#include "m2mnsdlinterface.h"
+#include "include/nsdlaccesshelper.h"
+#include "include/m2mnsdlinterface.h"
 
 #ifdef USE_LINUX
 M2MTimerImpl  *__timer_impl = NULL;

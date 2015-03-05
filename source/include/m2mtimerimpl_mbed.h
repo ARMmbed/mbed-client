@@ -3,7 +3,7 @@
 
 #ifndef USE_LINUX
 
-#include "m2mtimer.h"
+#include "include/m2mtimer.h"
 #include "Ticker.h"
 
 /**

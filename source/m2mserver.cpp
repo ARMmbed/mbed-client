@@ -1,9 +1,9 @@
 #include <cstdio>
-#include "m2mserver.h"
-#include "m2mconstants.h"
-#include "m2mobject.h"
-#include "m2mobjectinstance.h"
-#include "m2mresource.h"
+#include "lwm2m-client/m2mserver.h"
+#include "lwm2m-client/m2mconstants.h"
+#include "lwm2m-client/m2mobject.h"
+#include "lwm2m-client/m2mobjectinstance.h"
+#include "lwm2m-client/m2mresource.h"
 
 
 M2MServer::M2MServer()

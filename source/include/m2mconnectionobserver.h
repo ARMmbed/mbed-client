@@ -1,7 +1,7 @@
 #ifndef M2M_CONNECTION_OBSERVER_H__
 #define M2M_CONNECTION_OBSERVER_H__
 
-#include "m2minterface.h"
+#include "lwm2m-client/m2minterface.h"
 
 /**
  * @brief Observer class for informing socket activity to the state machine

@@ -2,7 +2,7 @@
 #define M2M_INTERFACE_FACTORY_H
 
 #include <stdlib.h>
-#include "m2minterfaceimpl.h"
+#include "include/m2minterfaceimpl.h"
 #include "m2msecurity.h"
 #include "m2mresource.h"
 

@@ -3,9 +3,9 @@
 #include "socket_types.h"
 #include "EthernetInterface.h"
 #include "test_env.h"
-#include "m2minterfacefactory.h"
-#include "m2mdevice.h"
-#include "m2minterfaceobserver.h"
+#include "lwm2m-client/m2minterfacefactory.h"
+#include "lwm2m-client/m2mdevice.h"
+#include "lwm2m-client/m2minterfaceobserver.h"
 
 // TODO: Remove when yotta supports init.
 #include "lwipv4_init.h"

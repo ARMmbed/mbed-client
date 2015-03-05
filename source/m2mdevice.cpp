@@ -1,9 +1,9 @@
 #include <cstdio>
-#include "m2mdevice.h"
-#include "m2mconstants.h"
-#include "m2mobject.h"
-#include "m2mobjectinstance.h"
-#include "m2mresource.h"
+#include "lwm2m-client/m2mdevice.h"
+#include "lwm2m-client/m2mconstants.h"
+#include "lwm2m-client/m2mobject.h"
+#include "lwm2m-client/m2mobjectinstance.h"
+#include "lwm2m-client/m2mresource.h"
 
 
 M2MDevice::M2MDevice()

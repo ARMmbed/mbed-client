@@ -1,9 +1,9 @@
 #ifndef M2M_INTERFACE_IMPL_H
 #define M2M_INTERFACE_IMPL_H
 
-#include "m2minterface.h"
-#include "m2mnsdlobserver.h"
-#include "m2mconnectionobserver.h"
+#include "lwm2m-client/m2minterface.h"
+#include "include/m2mnsdlobserver.h"
+#include "include/m2mconnectionobserver.h"
 
 //FORWARD DECLARATION
 class M2MNsdlInterface;

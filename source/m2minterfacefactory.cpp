@@ -1,8 +1,8 @@
-#include "m2minterfacefactory.h"
-#include "m2mserver.h"
-#include "m2mdevice.h"
-#include "m2mobject.h"
-#include "m2mconstants.h"
+#include "lwm2m-client/m2minterfacefactory.h"
+#include "lwm2m-client/m2mserver.h"
+#include "lwm2m-client/m2mdevice.h"
+#include "lwm2m-client/m2mobject.h"
+#include "lwm2m-client/m2mconstants.h"
 
 M2MInterfaceImpl* M2MInterfaceFactory::create_interface(M2MInterfaceObserver &observer,
                                                     const String &endpoint_name,

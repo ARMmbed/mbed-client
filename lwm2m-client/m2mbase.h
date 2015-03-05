@@ -4,8 +4,8 @@
 // Support for std args
 #include <stdint.h>
 #include "m2mconfig.h"
-#include "m2mtimer.h"
-#include "nsdllinker.h"
+#include "include/m2mtimer.h"
+#include "include/nsdllinker.h"
 
 //FORWARD DECLARATION
 class M2MObservationHandler;

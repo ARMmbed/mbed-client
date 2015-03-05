@@ -1,5 +1,5 @@
-#include "m2mobject.h"
-#include "m2mobjectinstance.h"
+#include "lwm2m-client/m2mobject.h"
+#include "lwm2m-client/m2mobjectinstance.h"
 
 M2MObject::M2MObject(const String &object_name)
 : M2MBase(object_name,M2MBase::Dynamic),

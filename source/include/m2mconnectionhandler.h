@@ -1,10 +1,10 @@
 #ifndef M2M_CONNECTION_HANDLER_H__
 #define M2M_CONNECTION_HANDLER_H__
 
-#include "m2mconfig.h"
-#include "m2minterface.h"
-#include "nsdllinker.h"
-#include "m2mconnectionobserver.h"
+#include "lwm2m-client/m2mconfig.h"
+#include "lwm2m-client/m2minterface.h"
+#include "include/nsdllinker.h"
+#include "include/m2mconnectionobserver.h"
 
 class M2MConnectionHandlerImpl;
 
