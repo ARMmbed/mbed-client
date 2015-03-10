@@ -10,17 +10,29 @@ M2MObject::M2MObject(const String &object_name)
 M2MObject::~M2MObject()
 {
     if(!_instance_list.empty()) {
-        M2MObjectInstance* ins = NULL;
         M2MObjectInstanceList::const_iterator it;
         it = _instance_list.begin();
-        for (; it!=_instance_list.end(); it++ ) {
+        M2MObjectInstance* obj = NULL;
+        uint16_t index = 0;
+        for (; it!=_instance_list.end(); it++, index++ ) {
             //Free allocated memory for object instances.
-            ins = *it;
-            delete ins;
-            ins = NULL;
+            obj = *it;
+
+            char obj_inst_id[10];
+            sprintf(obj_inst_id,"%d",index);
+
+            String obj_name = name();
+            obj_name += String("/");
+            obj_name += String(obj_inst_id);
+
+            remove_resource_from_coap(obj_name);
+
+            delete obj;
+            obj = NULL;
         }
+        remove_object_from_coap();
         _instance_list.clear();
-    }
+    }    
 }
 
 M2MObject& M2MObject::operator=(const M2MObject& other)
@@ -66,11 +78,20 @@ bool M2MObject::remove_object_instance(uint16_t inst_id)
             if((*it)->instance_id() == inst_id) {
                 // Instance found and deleted.
                 obj = *it;
+
+                char obj_inst_id[10];
+                sprintf(obj_inst_id,"%d",obj->instance_id());
+
+                String obj_name = name();
+                obj_name += String("/");
+                obj_name += String(obj_inst_id);
+
+                remove_resource_from_coap(obj_name);
+
                 delete obj;
                 obj = NULL;
                 _instance_list.erase(pos);
                 success = true;
-                _instance_index--;
                 break;
             }
         }

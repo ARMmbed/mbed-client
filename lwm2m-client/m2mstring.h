@@ -89,6 +89,8 @@ namespace m2m
     int     compare( size_type pos, size_type len, const String& str ) const;
     int     compare( size_type pos, size_type len, const char*   str ) const;
 
+    int     find_last_of(char c) const;
+
   private:
     // reallocate the internal memory
     void  new_realloc( size_type n);

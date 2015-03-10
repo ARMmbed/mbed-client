@@ -1,4 +1,5 @@
 #include <unistd.h>
+#include <pthread.h>
 #include "m2minterfacefactory.h"
 #include "m2minterface.h"
 #include "m2mdevice.h"
@@ -9,7 +10,7 @@
 const String &BOOTSTRAP_SERVER_ADDRESS = "coap://10.45.3.10:5693";
 const String &M2M_SERVER_ADDRESS = "coap://10.45.3.10:5683";
 const String &MANUFACTURER = "arm";
-const String &DEVICE_TYPE = "pressure";
+const String &TYPE = "pressure";
 const String &MODEL_NUMBER = "2015";
 const String &SERIAL_NUMBER = "12345";
 
@@ -21,6 +22,11 @@ public:
         _security = NULL;
         _interface = NULL;
         _device = NULL;
+        _bootstrapped = false;
+        _error = false;
+        _registered = false;
+        _unregistered = false;
+        _registration_updated = false;
     }
 
     ~M2MLWClient() {
@@ -40,6 +46,7 @@ public:
                                                   "lwm2m-endpoint",
                                                   "yogesh",
                                                   3600,
+                                                  8000,
                                                   "",
                                                   M2MInterface::UDP,
                                                   M2MInterface::LwIP_IPv4,
@@ -49,18 +56,24 @@ public:
 
     bool bootstrap_successful() {
         while(!_bootstrapped && !_error) {
+            printf("Waiting for bootstrap_successful callback\n");
+            sleep(1);
         }
         return _bootstrapped;
     }
 
     bool register_successful() {
         while(!_registered && !_error) {
+            printf("Waiting for register_successful callback\n");
+            sleep(1);
         }
         return _registered;
     }
 
     bool unregister_successful() {
         while(!_unregistered && !_error) {
+            sleep(1);
+            printf("Waiting for unregister_successful callback\n");
         }
         return _unregistered;
     }
@@ -119,7 +132,7 @@ public:
         _device = M2MInterfaceFactory::create_device();
         if(_device) {
             if(_device->create_resource(M2MDevice::Manufacturer,MANUFACTURER)     &&
-               _device->create_resource(M2MDevice::DeviceType,DEVICE_TYPE)        &&
+               _device->create_resource(M2MDevice::DeviceType,TYPE)        &&
                _device->create_resource(M2MDevice::ModelNumber,MODEL_NUMBER)      &&
                _device->create_resource(M2MDevice::SerialNumber,SERIAL_NUMBER)) {
                 success = true;
@@ -165,38 +178,30 @@ public:
     if(server_object) {
             _register_security = server_object;
             _bootstrapped = true;
-            _error = false;            
-            printf("\nBootstrapped\n");            
-            test_register();
+            printf("\nBootstrapped\n");
         }
     }
 
     void object_registered(/*M2MSecurity *security_object, const M2MServer &server_object*/){
         _registered = true;
-        _unregistered = false;
         printf("\nRegistered\n");
-//        sleep(3);
-//        test_unregister();
-
     }
 
     void object_unregistered(M2MSecurity */*server_object*/){
         _unregistered = true;
-        _registered = false;
         printf("\nUnregistered\n");
     }
 
     void registration_updated(M2MSecurity */*security_object*/, const M2MServer & /*server_object*/){
         _registration_updated = true;
-        _unregistered = false;
         printf("\nregistration updated\n");
 
     }
 
-    void error(M2MInterface::Error /*error*/){
+    void error(M2MInterface::Error error){
         _error = true;
-        _bootstrapped = false;
-        printf("\nError occured\n");
+        printf("\nError occured Error Code : %d\n", (int8_t)error);
+
     }
 
 private:
@@ -213,8 +218,40 @@ private:
     bool                _registration_updated;
 };
 
+void* wait_for_bootstrap(void* arg) {
+    M2MLWClient *client;
+    client = (M2MLWClient*) arg;
+    if(client->bootstrap_successful()) {
+        printf("Calling test_register\n");
+        client->test_register();
+    }
+    return NULL;
+}
+
+void* wait_for_register(void* arg) {
+    M2MLWClient *client;
+    client = (M2MLWClient*) arg;
+    if(client->register_successful()) {
+        printf("Calling test_unregister\n");
+        client->test_unregister();
+    }
+    return NULL;
+}
+
+void* wait_for_unregister(void* arg) {
+    M2MLWClient *client;
+    client = (M2MLWClient*) arg;
+    if(client->unregister_successful()) {
+        printf("unregister done\n");
+    }
+    return NULL;
+}
+
 int main() {
 
+    pthread_t bootstrap_thread;
+    pthread_t register_thread;
+    pthread_t unregister_thread;
     M2MLWClient lwm2mclient;
 
 
@@ -238,36 +275,16 @@ int main() {
         printf("\nGeneric object created\n");
     }
 
-
     lwm2mclient.test_bootstrap();
-//    char result[20];
 
-//    notify_completion_str(lwm2mclient.bootstrap_successful(),result);
-//    printf("Bootstrap test case  %s !!", result);
+    pthread_create(&bootstrap_thread, NULL, &wait_for_bootstrap, (void*) &lwm2mclient);
+    pthread_create(&register_thread, NULL, &wait_for_register, (void*) &lwm2mclient);
+    pthread_create(&unregister_thread, NULL, &wait_for_unregister, (void*) &lwm2mclient);
 
-//    notify_completion_str(lwm2mclient.create_device_object(),result);
+    pthread_join(bootstrap_thread, NULL);
+    pthread_join(register_thread, NULL);
+    pthread_join(unregister_thread, NULL);
 
-
-//    result = lwm2mclient.create_register_object();
-//    if(true == result) {
-//        printf("\nRegister object created\n");
-//    }
-
-//    lwm2mclient.test_register();
-//    notify_completion_str(lwm2mclient.register_successful(),result);
-//    printf("Register test case  %s !!", result);
-
-//    lwm2mclient.test_update_register();
-//    notify_completion_str(lwm2mclient.registration_update_successful(),result);
-//    printf("Update Registration test case  %s !!", result);
-
-//    lwm2mclient.test_unregister();
-//    notify_completion_str(lwm2mclient.unregister_successful(),result);
-//    printf("Unregister test case  %s !!", result);
-
-    while(1)
-    {
-    }
     return 0;
 }
 

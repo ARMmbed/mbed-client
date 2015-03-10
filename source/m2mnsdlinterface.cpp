@@ -42,6 +42,7 @@ M2MNsdlInterface::~M2MNsdlInterface()
 
 bool M2MNsdlInterface::initialize()
 {
+    bool success = false;
     __nsdl_interface = this;
     // Initialize the libNsdl    
     __sn_nsdl_memory.sn_nsdl_alloc = &(__nsdl_c_memory_alloc);
@@ -56,17 +57,8 @@ bool M2MNsdlInterface::initialize()
     _nsdl_exceution_timer->start_timer(ONE_SECOND_TIMER * 1000,
                                        M2MTimerObserver::NsdlExecution,
                                        false);
-    bool success = false;
-    // If memory is already allocated
-    // free it and allocate again.
-    if(_resource) {
-        if(_resource->resource_parameters_ptr) {
-            memory_free(_resource->resource_parameters_ptr);
-            _resource->resource_parameters_ptr = NULL;
-        }
-       memory_free(_resource);
-       _resource = NULL;
-    }
+
+
     // Allocate the memory for resources
     _resource = (sn_nsdl_resource_info_s*)memory_alloc(sizeof(sn_nsdl_resource_info_s));
     if(_resource) {
@@ -74,17 +66,9 @@ bool M2MNsdlInterface::initialize()
         _resource->resource_parameters_ptr = (sn_nsdl_resource_parameters_s*)memory_alloc(sizeof(sn_nsdl_resource_parameters_s));
         if(_resource->resource_parameters_ptr) {
             memset(_resource->resource_parameters_ptr, 0, sizeof(sn_nsdl_resource_parameters_s));
-        } else {
-            memory_free(_resource);
         }
     }
 
-    // If memory is already allocated
-    // free it and allocate again.
-    if(_endpoint) {
-       memory_free(_endpoint);
-       _endpoint = NULL;
-    }
     //Allocate the memory for endpoint
     _endpoint = (sn_nsdl_ep_parameters_s*)memory_alloc(sizeof(sn_nsdl_ep_parameters_s));
     if(_endpoint) {
@@ -106,15 +90,19 @@ void M2MNsdlInterface::create_endpoint(const String &name,
         _endpoint->endpoint_name_len = name.length();
         _endpoint->type_ptr = (uint8_t*)type.c_str();
         _endpoint->type_len =  type.length();
-        _endpoint->domain_name_ptr = (uint8_t*)domain.c_str();
-        _endpoint->domain_name_len = domain.length();
+        if(!domain.empty()) {
+            _endpoint->domain_name_ptr = (uint8_t*)domain.c_str();
+            _endpoint->domain_name_len = domain.length();
+        }
         _endpoint->binding_and_mode = (sn_nsdl_oma_binding_and_mode_t)mode;
 
         char buffer[20];
-        int size = sprintf(buffer,"%ld",life_time);
-        _endpoint->lifetime_ptr = (uint8_t*)malloc(sizeof(size));
-        memcpy(_endpoint->lifetime_ptr,buffer,size);
-        _endpoint->lifetime_len =  size;
+        int size = sprintf(buffer,"%d",life_time);
+        _endpoint->lifetime_ptr = (uint8_t*)memory_alloc(sizeof(size));
+        if(_endpoint->lifetime_ptr) {
+            memcpy(_endpoint->lifetime_ptr,buffer,size);
+            _endpoint->lifetime_len =  size;
+        }
     }
 }
 
@@ -145,18 +133,9 @@ bool M2MNsdlInterface::create_nsdl_list_structure(const M2MObjectList &object_li
     return success;
 }
 
-bool M2MNsdlInterface::delete_nsdl_list_structure(const M2MObjectList &object_list)
+bool M2MNsdlInterface::delete_nsdl_resource(const String &resource_name)
 {
-    bool success = false;
-    if(!object_list.empty()) {
-        M2MObjectList::const_iterator it;
-        it = object_list.begin();
-        M2MObject* object = *it;
-        for ( ; it != object_list.end(); it++ ) {
-            success = delete_nsdl_object_structure(*object);
-        }
-    }
-    return success;
+    return (sn_nsdl_delete_resource(resource_name.length(),(uint8_t *)resource_name.c_str()) == 0) ? true : false;
 }
 
 bool M2MNsdlInterface::create_bootstrap_resource(sn_nsdl_addr_s *address)
@@ -266,26 +245,31 @@ uint8_t M2MNsdlInterface::resource_callback(sn_coap_hdr_s *received_coap_header,
 void M2MNsdlInterface::bootstrap_done_callback(sn_nsdl_oma_server_info_t *server_info)
 {
     M2MSecurity* security = NULL;
-    if(server_info && server_info->omalw_address_ptr->addr_ptr) {
+    if(server_info && server_info->omalw_address_ptr->addr_ptr &&
+       (SN_NSDL_ADDRESS_TYPE_IPV4 == server_info->omalw_address_ptr->type)) {
         security = new M2MSecurity(M2MSecurity::M2MServer);
         uint16_t port = server_info->omalw_address_ptr->port;
         char buffer[10];
         sprintf(buffer,"%d",port);
 
-        uint8_t* server_address = (uint8_t*) malloc(server_info->omalw_address_ptr->addr_len);
-        memset(server_address,0,server_info->omalw_address_ptr->addr_len);
-        memcpy(server_address, server_info->omalw_address_ptr->addr_ptr, server_info->omalw_address_ptr->addr_len);
+        //TODO: currently only supports IPV4 Mapping, fix to support IPV6 as well
 
-        String server = String((char*)server_address);
+        String server_address;
+        int val = 0;
+        for(int index = 0; index < server_info->omalw_address_ptr->addr_len; index++) {
+            char server_buffer[3];
+            val = (int)server_info->omalw_address_ptr->addr_ptr[index];
+            sprintf(server_buffer,"%d",val);
+            server_address +=String(server_buffer);
+            if(index < server_info->omalw_address_ptr->addr_len-1) {
+                server_address += String(".");
+            }
+        }
 
         String server_uri(COAP);
-        server_uri += server;
+        server_uri += server_address;
         server_uri +=String(":");
         server_uri += String(buffer);
-
-        if(server_address){
-            free(server_address);
-        }
 
         security->set_resource_value(M2MSecurity::M2MServerUri, server_uri);
         security->set_resource_value(M2MSecurity::BootstrapServer, 0);
@@ -296,13 +280,17 @@ void M2MNsdlInterface::bootstrap_done_callback(sn_nsdl_oma_server_info_t *server
             case SEC_NOT_SET:
                 security_mode = M2MSecurity::SecurityNotSet;
                 break;
+            case PSK:
+                //Not supported at the moment
+                break;
+            case RPK:
+                //Not supported at the moment
+                break;
             case CERTIFICATE:
                 security_mode = M2MSecurity::Certificate;
                 break;
             case NO_SEC:
                 security_mode = M2MSecurity::NoSecurity;
-                break;
-            default:
                 break;
             }
         security->set_resource_value(M2MSecurity::SecurityMode,security_mode);
@@ -374,21 +362,35 @@ void M2MNsdlInterface::observation_to_be_sent(M2MBase *object)
     }
 }
 
-void M2MNsdlInterface::resource_to_be_deleted(const M2MBase &object)
+void M2MNsdlInterface::resource_to_be_deleted(const String &resource_name)
 {
-    if(M2MBase::Object == object.base_type()){
-        delete_nsdl_object_structure((const M2MObject&)object);
-    } else if(M2MBase::ObjectInstance == object.base_type()) {
-        delete_nsdl_object_instance_structure((const M2MObjectInstance&)object);
-    } else if(M2MBase::Resource == object.base_type()){
-        delete_nsdl_resource_structure((const M2MResource&)object);
+    delete_nsdl_resource(resource_name);
+}
+
+void M2MNsdlInterface::remove_object(M2MBase *object)
+{
+    M2MObject* rem_object = (M2MObject*)object;
+    if(rem_object && !_object_list.empty()) {
+        M2MObjectList::const_iterator it;
+        it = _object_list.begin();
+        int index = 0;
+        for ( ; it != _object_list.end(); it++, index++ ) {
+            if((*it) == rem_object) {
+                _object_list.erase(index);
+                break;
+            }
+        }
+    }
+    if(_object_list.empty()) {
+        _object_list.clear();
     }
 }
 
-bool M2MNsdlInterface::create_nsdl_object_structure(const M2MObject *object)
+bool M2MNsdlInterface::create_nsdl_object_structure(M2MObject *object)
 {    
     bool success = false;
     if(object) {
+        object->set_under_observation(false,this);
         M2MObjectInstanceList instance_list = object->instances();
         if(!instance_list.empty()) {
            M2MObjectInstanceList::const_iterator it;
@@ -486,7 +488,7 @@ bool M2MNsdlInterface::create_nsdl_resource_structure(M2MResource *res,
                _resource->pathlen = res_name.length();
            }
 
-           if(!res->resource_type().empty()) {
+           if(!res->resource_type().empty() && _resource->resource_parameters_ptr) {
                _resource->resource_parameters_ptr->resource_type_ptr =
                        ((uint8_t*)memory_alloc(sizeof(res->resource_type().length())));
                memcpy(_resource->resource_parameters_ptr->resource_type_ptr,
@@ -495,7 +497,7 @@ bool M2MNsdlInterface::create_nsdl_resource_structure(M2MResource *res,
                _resource->resource_parameters_ptr->resource_type_len =
                        res->resource_type().length();
            }
-           if(!res->interface_description().empty()) {
+           if(!res->interface_description().empty() && _resource->resource_parameters_ptr) {
                _resource->resource_parameters_ptr->interface_description_ptr =
                        ((uint8_t*)memory_alloc(sizeof(res->interface_description().length())));
                memcpy(_resource->resource_parameters_ptr->interface_description_ptr,
@@ -504,11 +506,18 @@ bool M2MNsdlInterface::create_nsdl_resource_structure(M2MResource *res,
                _resource->resource_parameters_ptr->interface_description_len =
                        res->interface_description().length();
            }
+           if(_resource->resource_parameters_ptr) {
+                _resource->resource_parameters_ptr->coap_content_type = res->coap_content_type();
+                _resource->resource_parameters_ptr->observable = (uint8_t)res->is_observable();
+           }
 
-           _resource->resource_parameters_ptr->coap_content_type = res->coap_content_type();
-           _resource->resource_parameters_ptr->observable = (uint8_t)res->is_observable();
-
-           (sn_nsdl_create_resource(_resource) == 0) ? success = true : success = false;
+           int8_t result = sn_nsdl_create_resource(_resource);
+           // Either the resource is created or it already
+           // exists , then result is success.
+            if (result == 0 ||
+               result == -2){
+                success = true;
+            }
 
            //Clear up the filled resource to fill up new resource.
            clear_resource(_resource);
@@ -522,83 +531,17 @@ bool M2MNsdlInterface::create_nsdl_resource_structure(M2MResource *res,
     return success;
 }
 
-bool M2MNsdlInterface::delete_nsdl_object_structure(const M2MObject &object)
-{
-    bool success = false;
-    M2MObjectInstanceList instance_list = object.instances();
-    if(!instance_list.empty()) {
-        M2MObjectInstanceList::const_iterator it;
-        it = instance_list.begin();
-        M2MObjectInstance* instance = *it;
-        for ( ; it != instance_list.end(); it++ ) {
-            success = delete_nsdl_object_instance_structure(*instance);
-        }
-    }
-    const M2MObject *obj = &object;
-    remove_object_from_list(obj);
-    return success;
-}
-
-bool M2MNsdlInterface::delete_nsdl_object_instance_structure(const M2MObjectInstance &object_instance)
-{
-    int8_t delete_result = -1;
-
-    String object_name = "";
-    if(!object_instance.name().empty()) {
-
-        // Take out the instance Id and append to the
-        // object name like "object + / + 0"
-        char inst_id[10];
-        sprintf(inst_id,"%d",object_instance.instance_id());
-
-        object_name = object_instance.name();
-        object_name+= String("/");
-        object_name+= String(inst_id);
-        delete_result = sn_nsdl_delete_resource(object_name.length(), (uint8_t *)object_name.c_str());
-    } else {
-       // Delete all resources without object name
-       // Should this be even possible ?
-       M2MResourceList res_list = object_instance.resources();
-       if(!res_list.empty()) {
-           M2MResourceList::const_iterator it;
-           it = res_list.begin();
-           String res_name = "";
-           for ( ; it != res_list.end(); it++ ) {
-               char inst_id[10];
-               sprintf(inst_id,"%d",(*it)->instance_id());
-               res_name = (*it)->name();
-               res_name+= String("/");
-               res_name+= String(inst_id);
-               delete_result = sn_nsdl_delete_resource(res_name.length(),(uint8_t *)res_name.c_str());
-           }
-       }
-    }
-    return ((0 == delete_result) ? true : false);
-}
-
-bool M2MNsdlInterface::delete_nsdl_resource_structure(const M2MResource &resource)
-{
-    int8_t delete_result = false;
-    char inst_id[10];
-    sprintf(inst_id,"%d",resource.instance_id());
-    String res_name = resource.name();
-    res_name+= String("/");
-    res_name+= String(inst_id);
-
-    delete_result = sn_nsdl_delete_resource(res_name.length(),(uint8_t *)res_name.c_str());
-    return ((0 == delete_result) ? true : false);
-}
-
 // convenience method to get the URI from its buffer field...
 String M2MNsdlInterface::coap_to_string(uint8_t *coap_data,int coap_data_length)
 {
+    String value = "";
     if (coap_data != NULL && coap_data_length > 0) {
         char buf[256+1];
         memset(buf,0,256+1);
         memcpy(buf,(char *)coap_data,coap_data_length);
-        return String(buf);
+        value = String(buf);
     }
-    return String("");
+    return value;
 }
 
 uint64_t M2MNsdlInterface::registration_time()
@@ -625,8 +568,12 @@ M2MBase* M2MNsdlInterface::find_resource(const String &object_name)
         M2MObjectList::const_iterator it;
         it = _object_list.begin();
         for ( ; it != _object_list.end(); it++ ) {
+            if((*it)->name() == object_name) {
+                object = (*it);
+                break;
+            }
             object = find_resource((*it),object_name);
-            if(object != NULL){
+            if(object != NULL) {
                 break;
             }
         }
@@ -735,28 +682,6 @@ bool M2MNsdlInterface::add_object_to_list(M2MObject* object)
     return success;
 }
 
-bool M2MNsdlInterface::remove_object_from_list(const M2MObject *object)
-{
-    bool success = false;
-    if(object && !_object_list.empty()) {
-        M2MObjectList::const_iterator it;
-        it = _object_list.begin();
-        int index = 0;
-        for ( ; it != _object_list.end(); it++, index++ ) {
-            if((*it) == object) {
-                _object_list.erase(index);
-                success = true;
-                break;
-            }
-        }
-    }
-    if(_object_list.empty()) {
-        _object_list.clear();
-    }
-    return success;
-}
-
-
 uint8_t M2MNsdlInterface::handle_get_request(sn_coap_hdr_s *received_coap_header,
                                           M2MBase *object,
                                           sn_nsdl_addr_s *address)
@@ -789,11 +714,12 @@ uint8_t M2MNsdlInterface::handle_get_request(sn_coap_hdr_s *received_coap_header
             memset(coap_response->options_list_ptr, 0, sizeof(sn_coap_options_list_s));
 
             if(received_coap_header->token_ptr) {
-                char *token_buffer = (char*)malloc(received_coap_header->token_len);
-                memcpy(token_buffer,
-                       (char*)received_coap_header->token_ptr,
-                       received_coap_header->token_len);
-
+                char *token_buffer = (char*)memory_alloc(received_coap_header->token_len);
+                if(token_buffer) {
+                    memcpy(token_buffer,
+                           (char*)received_coap_header->token_ptr,
+                           received_coap_header->token_len);
+                }
                 String token(token_buffer);
 
                 object->set_observation_token(token);
@@ -816,8 +742,10 @@ uint8_t M2MNsdlInterface::handle_get_request(sn_coap_hdr_s *received_coap_header
     }else {
         // Operation is not allowed.
         coap_response = sn_coap_build_response(received_coap_header, COAP_MSG_CODE_RESPONSE_BAD_REQUEST);
-        coap_response->options_list_ptr = 0;
-        coap_response->content_type_ptr = 0;
+        if(coap_response) {
+            coap_response->options_list_ptr = 0;
+            coap_response->content_type_ptr = 0;
+        }
      }
     if(coap_response) {
         // build response and send
@@ -837,7 +765,7 @@ uint8_t M2MNsdlInterface::handle_put_request(sn_coap_hdr_s *received_coap_header
     uint8_t result = 1;
     sn_coap_hdr_s * coap_response = NULL;
     // process the PUT if we have registered a callback for it
-    if(object) {
+    if(object && received_coap_header) {
         if ((object->operation() & SN_GRS_PUT_ALLOWED) != 0) {        
             object->set_value(received_coap_header->payload_ptr, received_coap_header->payload_len);
 
@@ -849,12 +777,11 @@ uint8_t M2MNsdlInterface::handle_put_request(sn_coap_hdr_s *received_coap_header
                         received_coap_header->options_list_ptr->uri_query_len);
                     memset(query + received_coap_header->options_list_ptr->uri_query_len,'\0',1);//String terminator
                     // if anything was updated, re-initialize the stored notification attributes
+                    sn_coap_msg_code_e msg_code = COAP_MSG_CODE_RESPONSE_BAD_REQUEST; // 4.00
                     if (object->parse_notification_attribute(query)){
-                        coap_response = sn_coap_build_response(received_coap_header, COAP_MSG_CODE_RESPONSE_CHANGED); // 2.04
-                    } else {
-                        // if query options are sent but no notification attribute names were found, it's an error
-                        coap_response = sn_coap_build_response(received_coap_header, COAP_MSG_CODE_RESPONSE_BAD_REQUEST);// 4.00
+                        msg_code = COAP_MSG_CODE_RESPONSE_CHANGED; // 2.04
                     }
+                    coap_response = sn_coap_build_response(received_coap_header, msg_code);
                     memory_free(query);
                 }
             }
@@ -881,7 +808,9 @@ void M2MNsdlInterface::clear_resource(sn_nsdl_resource_info_s *&resource)
 {
     //Clear up the filled resource to fill up new resource.
     sn_nsdl_resource_parameters_s *temp_resource_parameter = resource->resource_parameters_ptr;
-    memset(resource->resource_parameters_ptr, 0, sizeof(sn_nsdl_resource_parameters_s));
-    memset(resource,0, sizeof(sn_nsdl_resource_info_s));
-    resource->resource_parameters_ptr = temp_resource_parameter;
+    if(resource) {
+        memset(resource->resource_parameters_ptr, 0, sizeof(sn_nsdl_resource_parameters_s));
+        memset(resource,0, sizeof(sn_nsdl_resource_info_s));
+        resource->resource_parameters_ptr = temp_resource_parameter;
+    }
 }

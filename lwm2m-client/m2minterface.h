@@ -29,6 +29,7 @@ public:
      * which can occur during various LWM2M operations.
      */
     typedef enum {
+        ErrorNone = 0,
         AlreadyExists,
         BootstrapFailed,
         InvalidParameters,
@@ -36,7 +37,8 @@ public:
         Timeout,
         NetworkError,
         ResponseParseFailed,
-        UnknownError
+        UnknownError,
+        MemoryFail
     }Error;
 
     typedef enum {

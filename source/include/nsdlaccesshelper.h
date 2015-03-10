@@ -7,7 +7,7 @@
 #include "m2mtimerimpl_linux.h"
 class M2MConnectionHandlerImpl;
 extern M2MTimerImpl  *__timer_impl;
-extern M2MConnectionHandlerImpl  *__connection_impl;
+extern M2MConnectionHandlerImpl *__connection_impl;
 #endif
 
 extern sn_nsdl_mem_s  __sn_nsdl_memory;
@@ -34,7 +34,7 @@ void __socket_free(void * context, void * ptr);
 
 #ifdef USE_LINUX
     void* __thread_poll_function(void*);
-    void* __data_listen_poll_function(void*);
+    void* __listen_data_function(void*);
 #endif
 
 #ifdef __cplusplus

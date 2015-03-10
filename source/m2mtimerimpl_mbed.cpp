@@ -1,4 +1,5 @@
 #include "include/m2mtimerimpl_mbed.h"
+#include "lwm2m-client/m2mtimerobserver.h"
 
 M2MTimerImpl& M2MTimerImpl::operator=(const M2MTimerImpl& other)
 {

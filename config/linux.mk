@@ -1,0 +1,2 @@
+FLAGS += \
+	USE_LINUX

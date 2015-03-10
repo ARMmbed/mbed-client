@@ -7,12 +7,20 @@
 #include "lwm2m-client/m2mdevice.h"
 #include "lwm2m-client/m2minterfaceobserver.h"
 #include "lwm2m-client/m2minterface.h"
+#include "lwm2m-client/m2mobjectinstance.h"
+
 
 // TODO: Remove when yotta supports init.
 #include "lwipv4_init.h"
 
 const String &BOOTSTRAP_SERVER_ADDRESS = "coap://10.45.3.10:5693";
 const String &M2M_SERVER_ADDRESS = "coap://10.45.3.10:5683";
+const String &MANUFACTURER = "arm";
+const String &TYPE = "pressure";
+const String &MODEL_NUMBER = "2015";
+const String &SERIAL_NUMBER = "12345";
+
+const uint8_t value[] = "MyValue";
 
 class M2MLWClient: public M2MInterfaceObserver {
 public:
@@ -20,6 +28,11 @@ public:
         _security = NULL;
         _interface = NULL;
         _device = NULL;
+        _bootstrapped = false;
+        _error = false;
+        _registered = false;
+        _unregistered = false;
+        _registration_updated = false;
     }
 
     ~M2MLWClient() {
@@ -38,7 +51,8 @@ public:
         _interface = M2MInterfaceFactory::create_interface(*this,
                                                   "lwm2m-endpoint",
                                                   "yogesh",
-                                                  10,
+                                                  3600,
+						  8000,
                                                   "",
                                                   M2MInterface::UDP,
                                                   M2MInterface::LwIP_IPv4,
@@ -121,12 +135,25 @@ public:
         bool success = false;
         _device = M2MInterfaceFactory::create_device();
         if(_device) {
-            if(_device->create_resource(M2MDevice::Manufacturer,"test_manufacturer")     &&
-               _device->create_resource(M2MDevice::DeviceType,"test_device_type")        &&
-               _device->create_resource(M2MDevice::ModelNumber,"test_model_number")      &&
-               _device->create_resource(M2MDevice::SerialNumber,"test_serial_number")) {
+            if(_device->create_resource(M2MDevice::Manufacturer,MANUFACTURER)     &&
+               _device->create_resource(M2MDevice::DeviceType,TYPE)        	  &&
+               _device->create_resource(M2MDevice::ModelNumber,MODEL_NUMBER)      &&
+               _device->create_resource(M2MDevice::SerialNumber,SERIAL_NUMBER)) {
                 success = true;
             }
+        }
+        return success;
+    }
+
+    bool create_generic_object() {
+        bool success = false;
+        _object = M2MInterfaceFactory::create_object("Yogesh");
+        if(_object) {
+            M2MObjectInstance* inst = _object->create_object_instance();
+            if(inst) {
+                    inst->create_static_resource("Test","R_test",value, sizeof(value)-1);
+                    success = true;
+                }
         }
         return success;
     }
@@ -134,6 +161,7 @@ public:
     void test_register(){
         M2MObjectList object_list;
         object_list.push_back(_device);
+	object_list.push_back(_object);
 
         _interface->register_object(_register_security,object_list);
     }
@@ -189,6 +217,7 @@ private:
     M2MSecurity         *_security;
     M2MSecurity         *_register_security;
     M2MDevice           *_device;
+    M2MObject           *_object;
     bool                _bootstrapped;
     bool                _error;
     bool                _registered;
@@ -225,9 +254,9 @@ int main() {
     notify_completion_str(lwm2mclient.register_successful(),result);
     printf("Register test case  %s !!", result);
 
-    lwm2mclient.test_update_register();
+   /* lwm2mclient.test_update_register();
     notify_completion_str(lwm2mclient.registration_update_successful(),result);
-    printf("Update Registration test case  %s !!", result);
+    printf("Update Registration test case  %s !!", result);*/
 
     lwm2mclient.test_unregister();
     notify_completion_str(lwm2mclient.unregister_successful(),result);

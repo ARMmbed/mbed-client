@@ -6,6 +6,7 @@
 #include "m2mconnectionobserver.h"
 #include "nsdllinker.h"
 
+#include <pthread.h>
 #include <arpa/inet.h>
 #include <netinet/in.h>
 #include <stdio.h>
@@ -82,10 +83,7 @@ public:
     */
     bool listen_for_data();
 
-    /**
-    * Callback function for listen thread handling.
-    */
-    void listen_thread();
+    void data_receive();
 
 private:
 
@@ -112,7 +110,7 @@ private:
     uint8_t                                 _received_address[4];
     uint8_t                                 _received_buffer[1024];
     uint8_t                                 _resolved_address[16];
-    pthread_t                               _listen_thread; /* Thread for data_listening*/
+    pthread_t                               _listen_thread; /* Thread for Listen data function */
 
 
 friend class Test_M2MConnectionHandler;

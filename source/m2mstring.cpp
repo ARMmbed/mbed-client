@@ -273,6 +273,21 @@ namespace m2m {
     return r;
   }
 
+ int
+ String::find_last_of(char c) const {
+    int r = -1;
+    char *v;
+    v = strrchr(p,c);
+    if (v != NULL){
+        r = 0;
+        char* i = p;
+        while (v != i){
+            i++;
+            r++;
+        }
+    }
+    return r;
+ }
 
   void
   String::new_realloc( size_type n) {

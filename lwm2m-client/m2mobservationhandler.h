@@ -25,10 +25,16 @@ class M2MObservationHandler
 
     /**
      * @brief NSDL resource needs to be deleted.
-     * @param object, Reference of the observed object whose information
+     * @param resource_name, Name of the observed object whose information
      * needs to be deleted.
      */
-    virtual void resource_to_be_deleted(const M2MBase &object) = 0;
+    virtual void resource_to_be_deleted(const String &resource_name) = 0;
+
+    /**
+     * @brief Object to be removed from list.
+     * @param object, M2MObject to be removed.
+     */
+    virtual void remove_object(M2MBase *object) = 0;
 
 };
 

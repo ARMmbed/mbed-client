@@ -4,7 +4,7 @@
 #ifdef USE_LINUX
 #include "include/m2mconnectionhandlerimpl_linux.h"
 M2MTimerImpl  *__timer_impl = NULL;
-M2MConnectionHandlerImpl  *__connection_impl = NULL;
+M2MConnectionHandlerImpl *__connection_impl = NULL;
 #endif
 
 // callback function for NSDL library to call into
@@ -86,12 +86,14 @@ void* __thread_poll_function(void*)
     if(__timer_impl) {
        __timer_impl->thread_function();
     }
+    return NULL;
 }
 
-void* __data_listen_poll_function(void*)
+void* __listen_data_function(void*)
 {
     if(__connection_impl) {
-       __connection_impl->listen_thread();
+       __connection_impl->data_receive();
     }
+    return NULL;
 }
 #endif

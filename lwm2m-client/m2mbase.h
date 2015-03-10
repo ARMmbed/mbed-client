@@ -228,22 +228,34 @@ public:
      */
     virtual bool parse_notification_attribute(char *&query);
 
+protected : // from M2MTimerObserver
+
+    virtual void timer_expired(M2MTimerObserver::Type type =
+                               M2MTimerObserver::Notdefined);
+
+protected:
+
+    /**
+     * @brief Removes resource from coap structure.
+     * @param resource_name, Name of the resource.
+     */
+    virtual void remove_resource_from_coap(const String &resource_name);
+
+    /**
+     * @brief Removes object from NSDL list.
+     */
+    virtual void remove_object_from_coap();
+
+private:
+
+    bool set_notification_attribute(char* option);
+
     /**
      * @brief Schedule a report, if the pmin is exceeded
      * then report immediately else store the state to be
      * reported once the time fires.
      */
     void schedule_report();
-
-
-protected : // from M2MTimerObserver
-
-    virtual void timer_expired(M2MTimerObserver::Type type =
-                               M2MTimerObserver::Notdefined);
-
-private:
-
-    bool set_notification_attribute(char* option);
 
     /**
     * @brief Reports a sample that satisfies the reporting criteria.

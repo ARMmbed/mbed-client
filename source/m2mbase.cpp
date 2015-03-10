@@ -30,7 +30,9 @@ M2MBase& M2MBase::operator=(const M2MBase& other)
         _value_length = other._value_length;
         if(other._value) {
             _value = (uint8_t *)malloc(other._value_length);
-            memcpy((uint8_t *)_value, (uint8_t *)other._value, other._value_length);
+            if(_value) {
+                memcpy((uint8_t *)_value, (uint8_t *)other._value, other._value_length);
+            }
         }
     }
     return *this;
@@ -68,9 +70,6 @@ M2MBase::~M2MBase()
     if(_value) {
         free(_value);
         _value = NULL;
-    }
-    if(_observation_handler) {
-        _observation_handler->resource_to_be_deleted(*this);
     }
     if(_pmax_timer) {
         delete _pmax_timer;
@@ -144,8 +143,10 @@ bool M2MBase::set_value(const uint8_t *value, const uint32_t value_length)
     if( value != NULL && value_length > 0 ) {
         success = true;
        _value = (uint8_t *)malloc(value_length);
-        memcpy((uint8_t *)_value, (uint8_t *)value, value_length);
-        _value_length = value_length;
+       if(_value) {
+            memcpy((uint8_t *)_value, (uint8_t *)value, value_length);
+            _value_length = value_length;
+        }
         // schedule reporting
         schedule_report();
     }
@@ -195,8 +196,10 @@ void M2MBase::get_value(uint8_t *&value, uint32_t &value_length)
         value = NULL;
     }
     value = (uint8_t *)malloc(_value_length);
-    value_length = _value_length;
-    memcpy((uint8_t *)value, (uint8_t *)_value, value_length);
+    if(value) {
+        value_length = _value_length;
+        memcpy((uint8_t *)value, (uint8_t *)_value, value_length);
+    }
 }
 
 bool M2MBase::is_under_observation() const
@@ -241,6 +244,20 @@ bool M2MBase::parse_notification_attribute(char *&query)
         report();
     }
     return success;
+}
+
+void M2MBase::remove_resource_from_coap(const String &resource_name)
+{
+    if(_observation_handler) {
+        _observation_handler->resource_to_be_deleted(resource_name);
+    }
+}
+
+void M2MBase::remove_object_from_coap()
+{
+    if(_observation_handler) {
+        _observation_handler->remove_object(this);
+    }
 }
 
 void M2MBase::timer_expired(M2MTimerObserver::Type type)

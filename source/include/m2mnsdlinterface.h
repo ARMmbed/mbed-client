@@ -62,11 +62,11 @@ public:
     bool create_nsdl_list_structure(const M2MObjectList &object_list);
 
     /**
-     * @brief Deletes the NSDL structure for the registered objectlist.
-     * @param object_list, List of objects to be deleted.
-     * @return true if deleted successfully else false.
+     * @brief Removed the NSDL resource for the given resource.
+     * @param resource_name, Resource name to be removed.
+     * @return true if removed successfully else false.
     */
-    bool delete_nsdl_list_structure(const M2MObjectList &object_list);
+    bool delete_nsdl_resource(const String &resource_name);
 
     /**
      * @brief Creates the bootstrap object.
@@ -162,7 +162,9 @@ protected: // from M2MObservationHandler
 
     virtual void observation_to_be_sent(M2MBase *object);
 
-    virtual void resource_to_be_deleted(const M2MBase &object);
+    virtual void resource_to_be_deleted(const String &resource_name);
+
+    virtual void remove_object(M2MBase *object);
 
 private:
 
@@ -172,18 +174,19 @@ private:
     */
     bool initialize();
 
-    bool create_nsdl_object_structure(const M2MObject *object);
+    /**
+     * @brief Adds object to the observation list
+     * @param object, Object to be added
+     * @return true if added else false if already exists.
+     */
+    bool add_object_to_list(M2MObject *object);
+
+    bool create_nsdl_object_structure(M2MObject *object);
 
     bool create_nsdl_object_instance_structure(M2MObjectInstance *object_instance);
 
     bool create_nsdl_resource_structure(M2MResource *resource,
                                         const String &object_name = "");
-
-    bool delete_nsdl_object_structure(const M2MObject &object);
-
-    bool delete_nsdl_object_instance_structure(const M2MObjectInstance &object_instance);
-
-    bool delete_nsdl_resource_structure(const M2MResource &resource);
 
     String coap_to_string(uint8_t *coap_data_ptr,
                           int coap_data_ptr_length);
@@ -201,10 +204,6 @@ private:
                            const String &resource_instance);
 
     bool object_present(M2MObject * object) const;
-
-    bool add_object_to_list(M2MObject *object);
-
-    bool remove_object_from_list(const M2MObject *object);
 
     uint8_t handle_get_request(sn_coap_hdr_s *received_coap_header,
                                M2MBase *object,

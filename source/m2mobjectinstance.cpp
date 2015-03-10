@@ -85,13 +85,30 @@ bool M2MObjectInstance::remove_resource(const String &resource_name, uint16_t in
         M2MResource* res = NULL;
         M2MResourceList::const_iterator it;
         it = _resource_list.begin();
-        res = *it;
         int pos = 0;
         for ( ; it != _resource_list.end(); it++, pos++ ) {
             if(((*it)->name() == resource_name) &&
                ((*it)->instance_id() == inst_id)) {
                 // Resource found and deleted.
-                //res = *it;
+                res = *it;
+
+                char obj_inst_id[10];
+                sprintf(obj_inst_id,"%d",instance_id());
+
+                String obj_name = name();
+                obj_name += String("/");
+                obj_name += String(obj_inst_id);
+                obj_name += String("/");
+                obj_name += (*it)->name();
+
+                if((*it)->supports_multiple_instances() == true) {
+                    char res_inst_id[10];
+                    sprintf(res_inst_id,"%d",(*it)->instance_id());
+                    obj_name += String("/");
+                    obj_name += String(res_inst_id);
+                }
+
+                remove_resource_from_coap(obj_name);
                 delete res;
                 res = NULL;
                 _resource_list.erase(pos);

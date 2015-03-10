@@ -113,9 +113,11 @@ private:
     socket_allocator_t                          _socket_alloc;
     SocketBuffer                                _buffer_received;
     M2MConnectionObserver::SocketAddress        *_socket_address;
+    uint8_t                                     _received_address[4];
     M2MConnectionObserver::ServerType           _server_type;
     uint16_t                                    _server_port;
     bool                                        _resolved;
+    SocketAddr                                  _resolvedAddr;
 
 friend class Test_M2MConnectionHandler;
 

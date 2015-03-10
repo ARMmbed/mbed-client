@@ -257,16 +257,18 @@ String M2MDevice::resource_value_string(DeviceResource resource,
             res->get_value(buffer,length);
 
             char *char_buffer = (char*)malloc(length+1);
-            memset(char_buffer,0,length+1);
-            memcpy(char_buffer,(char*)buffer,length);
-
-            String s_name(char_buffer);
-            value = s_name;
-            if(buffer) {
-                free(buffer);
-            }
             if(char_buffer) {
-                free(char_buffer);
+                memset(char_buffer,0,length+1);
+                memcpy(char_buffer,(char*)buffer,length);
+
+                String s_name(char_buffer);
+                value = s_name;
+                if(buffer) {
+                    free(buffer);
+                }
+                if(char_buffer) {
+                    free(char_buffer);
+                }
             }
         }
     }

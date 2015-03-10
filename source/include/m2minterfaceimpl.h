@@ -34,6 +34,7 @@ private:
      * @param endpoint_name, Endpoint name of the client.
      * @param endpoint_type, Endpoint type of the client.
      * @param life_time, Life time of the client in seconds
+     * @param listen_port, Listening port for the endpoint, default is 8000.
      * @param domain, Domain of the client.
      * @param mode, Binding mode of the client, default is UDP
      * @param stack, Network Stack to be used for connection, default is LwIP_IPv4
@@ -43,6 +44,7 @@ private:
                      const String &endpoint_name,
                      const String &endpoint_type,
                      const uint32_t life_time,
+                     const uint16_t listen_port,
                      const String &domain = "",
                      BindingMode mode = M2MInterface::UDP,
                      M2MInterface::NetworkStack stack = M2MInterface::LwIP_IPv4,
@@ -279,6 +281,18 @@ private: // state machine state functions
     */
     void internal_event(uint8_t, EventData* = NULL);
 
+    /**
+     * @brief Memory Allocation required for libCoap.
+     * @param size, Size of memory to be reserved.
+    */
+    void* memory_alloc(uint16_t size);
+
+    /**
+     * @brief Memory free functions required for libCoap
+     * @param ptr, Object whose memory needs to be freed.
+    */
+    void memory_free(void *ptr);
+
     enum
     {
         EVENT_IGNORED = 0xFE,
@@ -301,7 +315,7 @@ private:
     uint32_t                    _life_time;
     BindingMode                 _binding_mode;
     String                      _context_address;
-
+    uint16_t                    _listen_port;
 
    friend class Test_M2MInterfaceImpl;
 

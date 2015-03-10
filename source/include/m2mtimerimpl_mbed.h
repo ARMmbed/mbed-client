@@ -3,9 +3,10 @@
 
 #ifndef USE_LINUX
 
-#include "include/m2mtimer.h"
+#include <stdint.h>
 #include "Ticker.h"
 
+class M2MTimerObserver;
 /**
  * @brief M2MTimerImpl
  * Private implementation class for timer, this can be

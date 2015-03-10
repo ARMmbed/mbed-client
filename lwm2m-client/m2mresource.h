@@ -38,12 +38,12 @@ private: // Constructor and destructor are private
     // Prevents the use of copy constructor
     M2MResource( const M2MResource& /*other*/ );
 
-public:
-
     /**
      * Destructor
      */
     virtual ~M2MResource();
+
+public:
 
     virtual M2MBase::BaseType base_type() const;
 

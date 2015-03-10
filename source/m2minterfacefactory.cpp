@@ -9,6 +9,7 @@ M2MInterface* M2MInterfaceFactory::create_interface(M2MInterfaceObserver &observ
                                                     const String &endpoint_name,
                                                     const String &endpoint_type,
                                                     const uint32_t life_time,
+                                                    const uint16_t listen_port,
                                                     const String &domain,
                                                     M2MInterface::BindingMode mode,
                                                     M2MInterface::NetworkStack stack,
@@ -16,7 +17,7 @@ M2MInterface* M2MInterfaceFactory::create_interface(M2MInterfaceObserver &observ
 {
     M2MInterfaceImpl *interface = new M2MInterfaceImpl(observer, endpoint_name,
                                                    endpoint_type, life_time,
-                                                   domain, mode,
+                                                   listen_port, domain, mode,
                                                    stack, context_address);
     return interface;
 }

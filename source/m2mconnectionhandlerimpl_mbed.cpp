@@ -15,6 +15,7 @@ M2MConnectionHandlerImpl::M2MConnectionHandlerImpl(M2MConnectionObserver &observ
 {
     _socket_address = (M2MConnectionObserver::SocketAddress *)malloc(sizeof(M2MConnectionObserver::SocketAddress));
     memset(_socket_address, 0, sizeof(M2MConnectionObserver::SocketAddress));
+    _socket_address->_address = _received_address;
 
     switch(stack) {
         case M2MInterface::Uninitialized:
@@ -123,11 +124,17 @@ bool M2MConnectionHandlerImpl::send_data(uint8_t *data,
     SocketAddr send_address;
     send_address.setAddr(&addr);
 
-    socket_error_t error = _socket->start_send_to(&send_address, address->port,
+   /* socket_error_t error = _socket->start_send_to(&send_address, address->port,
+                                                  _send_buffer, strlen(_send_buffer),
+                                                  0, send_handler); */
+
+    socket_error_t error = _socket->start_send_to(&_resolvedAddr, address->port,
                                                   _send_buffer, strlen(_send_buffer),
                                                   0, send_handler);
+
+
     if(error != SOCKET_ERROR_NONE) {
-        success =false;
+        success = false;
     }
     return success;
 }
@@ -181,6 +188,7 @@ void M2MConnectionHandlerImpl::dns_handler(void */*arg*/)
         _socket_address->_stack = get_network_stack(event->i.d.addr.type);
         _socket_address->_port = event->i.r.port;
 
+        _resolvedAddr.setAddr(&event->i.d.addr);
         _observer.address_ready(*_socket_address,
                                 _server_type,
                                 _server_port);
