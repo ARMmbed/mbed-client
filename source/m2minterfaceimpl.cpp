@@ -458,37 +458,28 @@ void M2MInterfaceImpl::state_receiving_coap_data( EventData */*data*/)
 void M2MInterfaceImpl::state_coap_data_received( EventData *data)
 {
     if(data) {
-        M2MInterface::Error error = M2MInterface::ErrorNone;
         ReceivedData *event = (ReceivedData*)data;
-        sn_nsdl_addr_s *address = (sn_nsdl_addr_s *)memory_alloc(sizeof(sn_nsdl_addr_s));
-        if(address) {
-            memset(address,0,sizeof(sn_nsdl_addr_s));
+        sn_nsdl_addr_s address;
 
-            M2MInterface::NetworkStack stack = event->_address->_stack;
+        M2MInterface::NetworkStack stack = event->_address->_stack;
 
-            if(M2MInterface::LwIP_IPv4 == stack) {
-                address->type = SN_NSDL_ADDRESS_TYPE_IPV4;
-                address->addr_len = 4;
-            } else if((M2MInterface::LwIP_IPv6 == stack) ||
-                      (M2MInterface::Nanostack_IPv6 == stack)) {
-                address->type = SN_NSDL_ADDRESS_TYPE_IPV6;
-                address->addr_len = 16;
-            }
-            address->port = event->_address->_port;
-            address->addr_ptr = (uint8_t*)event->_address->_address;
-
-            // Process received data
-            internal_event(STATE_PROCESSING_COAP_DATA);
-            if(!_nsdl_interface->process_received_data(event->_data,
-                                                      event->_size,
-                                                      address)) {
-                error = M2MInterface::ResponseParseFailed;
-            }
-        } else {
-            error = M2MInterface::MemoryFail;
+        if(M2MInterface::LwIP_IPv4 == stack) {
+            address.type = SN_NSDL_ADDRESS_TYPE_IPV4;
+            address.addr_len = 4;
+        } else if((M2MInterface::LwIP_IPv6 == stack) ||
+                  (M2MInterface::Nanostack_IPv6 == stack)) {
+            address.type = SN_NSDL_ADDRESS_TYPE_IPV6;
+            address.addr_len = 16;
         }
-        if(error != M2MInterface::ErrorNone) {
-            internal_event(STATE_IDLE);
+        address.port = event->_address->_port;
+        address.addr_ptr = (uint8_t*)event->_address->_address;
+
+        // Process received data
+        internal_event(STATE_PROCESSING_COAP_DATA);
+        if(!_nsdl_interface->process_received_data(event->_data,
+                                                  event->_size,
+                                                  &address)) {
+            _observer.error(M2MInterface::ResponseParseFailed);
         }
     }
 }

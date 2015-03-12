@@ -97,7 +97,7 @@ void M2MNsdlInterface::create_endpoint(const String &name,
         _endpoint->binding_and_mode = (sn_nsdl_oma_binding_and_mode_t)mode;
 
         char buffer[20];
-        int size = sprintf(buffer,"%d",life_time);
+        int size = sprintf(buffer,"%ld",life_time);
         _endpoint->lifetime_ptr = (uint8_t*)memory_alloc(sizeof(size));
         if(_endpoint->lifetime_ptr) {
             memcpy(_endpoint->lifetime_ptr,buffer,size);
@@ -335,7 +335,7 @@ void M2MNsdlInterface::timer_expired(M2MTimerObserver::Type type)
     if(M2MTimerObserver::NsdlExecution == type) {
         sn_nsdl_exec(_counter_for_nsdl);
         _counter_for_nsdl++;
-    } else if( M2MTimerObserver::Registration == type){
+    } else if( M2MTimerObserver::Registration == type && _endpoint) {
         sn_nsdl_update_registration(_endpoint->lifetime_ptr,
                                     _endpoint->lifetime_len);
     }
@@ -617,8 +617,6 @@ M2MBase* M2MNsdlInterface::find_resource(const M2MObjectInstance *object_instanc
 {
     M2MBase *resource = NULL;
     if(object_instance) {
-
-
         M2MResourceList list = object_instance->resources();
         if(!list.empty()) {
             M2MResourceList::const_iterator it;
@@ -713,6 +711,8 @@ uint8_t M2MNsdlInterface::handle_get_request(sn_coap_hdr_s *received_coap_header
             coap_response->options_list_ptr = (sn_coap_options_list_s*)memory_alloc(sizeof(sn_coap_options_list_s));
             memset(coap_response->options_list_ptr, 0, sizeof(sn_coap_options_list_s));
 
+            coap_response->options_list_ptr->observe_ptr = 0;
+
             if(received_coap_header->token_ptr) {
                 char *token_buffer = (char*)memory_alloc(received_coap_header->token_len);
                 if(token_buffer) {
@@ -725,6 +725,7 @@ uint8_t M2MNsdlInterface::handle_get_request(sn_coap_hdr_s *received_coap_header
                 object->set_observation_token(token);
                 if(token_buffer) {
                     free(token_buffer);
+                    token_buffer = NULL;
                 }
             }
             if(received_coap_header->options_list_ptr) {
@@ -750,9 +751,8 @@ uint8_t M2MNsdlInterface::handle_get_request(sn_coap_hdr_s *received_coap_header
     if(coap_response) {
         // build response and send
         (sn_nsdl_send_coap_message(address, coap_response) == 0) ? result = 0 : result = 1;
-        memory_free(coap_response->options_list_ptr);
-        memory_free(coap_response->content_type_ptr);
-
+        coap_response->options_list_ptr->observe_ptr = 0;
+        coap_response->options_list_ptr->observe_len = 0;
         sn_coap_parser_release_allocated_coap_msg_mem(coap_response);
     }
     return result;

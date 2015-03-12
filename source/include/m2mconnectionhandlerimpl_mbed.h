@@ -65,11 +65,6 @@ public:
 private:
 
     /**
-    * @brief Callback handler for socket object creation
-    */
-    void default_handler(void* arg);
-
-    /**
     * @brief Callback handler for sending data over socket.
     */
     void send_handler(void *arg);
@@ -83,6 +78,11 @@ private:
     * @brief Callback handler for dns resolving of address
     */
     void dns_handler(void *arg);
+
+    /**
+    * @brief Callback handler for dns resolving of address
+    */
+    void error_handler(void *arg);
 
     /**
     * @brief Helper function to return NetworkStack for the stack type
@@ -105,19 +105,16 @@ private:
     socket_stack_t                              _socket_stack;
     String                                      _server_address;
     char                                        _receive_buffer[1024];
-    char                                        _send_buffer[1024];
-    CThunk<M2MConnectionHandlerImpl>            _default_irq;
     CThunk<M2MConnectionHandlerImpl>            _recv_irq;
-    CThunk<M2MConnectionHandlerImpl>            _send_irq;
     CThunk<M2MConnectionHandlerImpl>            _dns_irq;
-    socket_allocator_t                          _socket_alloc;
-    SocketBuffer                                _buffer_received;
+    CThunk<M2MConnectionHandlerImpl>            _send_irq;
+    CThunk<M2MConnectionHandlerImpl>            _error_irq;
+    SocketAddr                                  *_resolved_Address;
     M2MConnectionObserver::SocketAddress        *_socket_address;
-    uint8_t                                     _received_address[4];
+    uint8_t                                      _received_address[4];
     M2MConnectionObserver::ServerType           _server_type;
     uint16_t                                    _server_port;
     bool                                        _resolved;
-    SocketAddr                                  _resolvedAddr;
 
 friend class Test_M2MConnectionHandler;
 

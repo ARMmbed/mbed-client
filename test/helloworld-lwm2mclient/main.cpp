@@ -15,8 +15,8 @@
 
 const String &BOOTSTRAP_SERVER_ADDRESS = "coap://10.45.3.10:5693";
 const String &M2M_SERVER_ADDRESS = "coap://10.45.3.10:5683";
-const String &MANUFACTURER = "arm";
-const String &TYPE = "pressure";
+const String &MANUFACTURER = "manufacturer";
+const String &TYPE = "type";
 const String &MODEL_NUMBER = "2015";
 const String &SERIAL_NUMBER = "12345";
 
@@ -45,14 +45,17 @@ public:
         if( _register_security){
             delete _register_security;
         }
+        if(_object) {
+                delete _object;
+        }
     }
 
     bool create_interface() {
         _interface = M2MInterfaceFactory::create_interface(*this,
                                                   "lwm2m-endpoint",
-                                                  "yogesh",
+                                                  "test",
                                                   3600,
-						  8000,
+                                                  8000,
                                                   "",
                                                   M2MInterface::UDP,
                                                   M2MInterface::LwIP_IPv4,
@@ -61,30 +64,18 @@ public:
     }
 
     bool bootstrap_successful() {
-        while(!_bootstrapped && !_error) {
-            __WFI();
-        }
         return _bootstrapped;
     }
 
     bool register_successful() {
-        while(!_registered && !_error) {
-            __WFI();
-        }
         return _registered;
     }
 
     bool unregister_successful() {
-        while(!_unregistered && !_error) {
-            __WFI();
-        }
         return _unregistered;
     }
 
     bool registration_update_successful() {
-        while(!_registration_updated && !_error) {
-            __WFI();
-        }
         return _registration_updated;
     }
 
@@ -161,7 +152,6 @@ public:
     void test_register(){
         M2MObjectList object_list;
         object_list.push_back(_device);
-	object_list.push_back(_object);
 
         _interface->register_object(_register_security,object_list);
     }
@@ -218,11 +208,11 @@ private:
     M2MSecurity         *_register_security;
     M2MDevice           *_device;
     M2MObject           *_object;
-    bool                _bootstrapped;
-    bool                _error;
-    bool                _registered;
-    bool                _unregistered;
-    bool                _registration_updated;
+    volatile bool       _bootstrapped;
+    volatile bool       _error;
+    volatile bool       _registered;
+    volatile bool       _unregistered;
+    volatile bool       _registration_updated;
 };
 
 int main() {
@@ -235,32 +225,23 @@ int main() {
 
     M2MLWClient lwm2mclient;
 
-    char result[20];
+    lwm2mclient.create_interface();
 
-    notify_completion_str(lwm2mclient.create_interface(),result);
-    printf("Interface creation test case  %s !!", result);
-
-    notify_completion_str(lwm2mclient.create_bootstrap_object(),result);
-    printf("Bootstrap object creation test case  %s !!", result);
+    lwm2mclient.create_bootstrap_object();
 
     lwm2mclient.test_bootstrap();
-    notify_completion_str(lwm2mclient.bootstrap_successful(),result);
-    printf("Bootstrap test case  %s !!", result);
+    while (!lwm2mclient.bootstrap_successful()) { __WFI(); }
 
-    notify_completion_str(lwm2mclient.create_device_object(),result);
-    printf("Device object creation test case  %s !!", result);
+    lwm2mclient.create_device_object();
 
     lwm2mclient.test_register();
-    notify_completion_str(lwm2mclient.register_successful(),result);
-    printf("Register test case  %s !!", result);
-
-   /* lwm2mclient.test_update_register();
-    notify_completion_str(lwm2mclient.registration_update_successful(),result);
-    printf("Update Registration test case  %s !!", result);*/
+    while (!lwm2mclient.register_successful()) { __WFI(); }
 
     lwm2mclient.test_unregister();
-    notify_completion_str(lwm2mclient.unregister_successful(),result);
-    printf("Unregister test case  %s !!", result);
+    while (!lwm2mclient.unregister_successful()) { __WFI(); }
+    notify_completion(lwm2mclient.unregister_successful() &&
+                      lwm2mclient.register_successful() &&
+                      lwm2mclient.bootstrap_successful());
 
     eth.disconnect();
 

@@ -46,6 +46,7 @@ bool M2MConnectionHandlerImpl::resolve_server_address(const String& server_addre
 
     if(_received_packet_address) {
         success = true;
+        //TODO: Currently only handling IPv4 address, add support for IPv6 also
         _received_packet_address->_port = ntohs(server_port);
         memcpy(_received_packet_address->_address, _resolved_address, 4);
         _received_packet_address->_stack = _stack;

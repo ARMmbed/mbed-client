@@ -9,8 +9,8 @@
 
 const String &BOOTSTRAP_SERVER_ADDRESS = "coap://10.45.3.10:5693";
 const String &M2M_SERVER_ADDRESS = "coap://10.45.3.10:5683";
-const String &MANUFACTURER = "arm";
-const String &TYPE = "pressure";
+const String &MANUFACTURER = "manufacturer";
+const String &TYPE = "type";
 const String &MODEL_NUMBER = "2015";
 const String &SERIAL_NUMBER = "12345";
 
@@ -44,7 +44,7 @@ public:
     bool create_interface() {
         _interface = M2MInterfaceFactory::create_interface(*this,
                                                   "lwm2m-endpoint",
-                                                  "yogesh",
+                                                  "test",
                                                   3600,
                                                   8000,
                                                   "",
@@ -143,7 +143,7 @@ public:
 
     bool create_generic_object() {
         bool success = false;
-        _object = M2MInterfaceFactory::create_object("Yogesh");
+        _object = M2MInterfaceFactory::create_object("Test");
         if(_object) {
             M2MObjectInstance* inst = _object->create_object_instance();
             if(inst) {
