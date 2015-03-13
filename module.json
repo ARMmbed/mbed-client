@@ -15,7 +15,7 @@
     "mbed": "ARMmbed/mbed-sdk",
     "mbed-cpputest" : "ARMmbed/mbed-cpputest#master",
     "mbed-net-sockets" : "ARMmbed/mbed-net-sockets#master",
-    "nsdl-c" : "ARMmbed/nanomesh-nsdl-c#master"
+    "mbed-client" : "ARMmbed/mbed-client#~0.0.6"
   },
   "targetDependencies": {}
 }
