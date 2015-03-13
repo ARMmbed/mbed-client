@@ -182,7 +182,7 @@ public:
         }
     }
 
-    void object_registered(/*M2MSecurity *security_object, const M2MServer &server_object*/){
+    void object_registered(M2MSecurity */*security_object*/, const M2MServer &/*server_object*/){
         _registered = true;
         printf("\nRegistered\n");
     }

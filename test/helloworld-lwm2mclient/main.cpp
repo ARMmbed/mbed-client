@@ -11,8 +11,9 @@
 // TODO: Remove when yotta supports init.
 #include "lwipv4_init.h"
 
+// Enter your mbed Device Server's IPv4 address and Port number in
+// mentioned format like 192.168.0.1:5693
 const String &BOOTSTRAP_SERVER_ADDRESS = "coap://10.45.3.10:5693";
-const String &M2M_SERVER_ADDRESS = "coap://10.45.3.10:5683";
 const String &MANUFACTURER = "manufacturer";
 const String &TYPE = "type";
 const String &MODEL_NUMBER = "2015";

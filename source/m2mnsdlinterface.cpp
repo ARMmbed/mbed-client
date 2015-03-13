@@ -735,13 +735,13 @@ uint8_t M2MNsdlInterface::handle_get_request(sn_coap_hdr_s *received_coap_header
                     memcpy(token_buffer,
                            (char*)received_coap_header->token_ptr,
                            received_coap_header->token_len);
-                }
-                String token(token_buffer);
+                    String token(token_buffer);
 
-                object->set_observation_token(token);
-                if(token_buffer) {
-                    free(token_buffer);
-                    token_buffer = NULL;
+                    object->set_observation_token(token);
+                    if(token_buffer) {
+                        free(token_buffer);
+                        token_buffer = NULL;
+                    }
                 }
             }
             if(received_coap_header->options_list_ptr) {
@@ -767,8 +767,10 @@ uint8_t M2MNsdlInterface::handle_get_request(sn_coap_hdr_s *received_coap_header
     if(coap_response) {
         // build response and send
         (sn_nsdl_send_coap_message(address, coap_response) == 0) ? result = 0 : result = 1;
-        coap_response->options_list_ptr->observe_ptr = 0;
-        coap_response->options_list_ptr->observe_len = 0;
+        if(coap_response->options_list_ptr) {
+            coap_response->options_list_ptr->observe_ptr = 0;
+            coap_response->options_list_ptr->observe_len = 0;
+        }
         sn_coap_parser_release_allocated_coap_msg_mem(coap_response);
     }
     return result;
