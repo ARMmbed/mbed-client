@@ -14,7 +14,7 @@ public :
 
     typedef enum {
         Bootstrap,
-        M2MServer
+        LWM2MServer
     }ServerType;
 
     /**

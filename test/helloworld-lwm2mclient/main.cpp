@@ -1,6 +1,4 @@
-#include "mbed.h"
 #include "UDPaSocket.h"
-#include "socket_types.h"
 #include "EthernetInterface.h"
 #include "test_env.h"
 #include "lwm2m-client/m2minterfacefactory.h"
@@ -20,37 +18,33 @@ const String &TYPE = "type";
 const String &MODEL_NUMBER = "2015";
 const String &SERIAL_NUMBER = "12345";
 
-const uint8_t value[] = "MyValue";
+#if defined(TARGET_K64F)
+#define APP_BUTTON SW2
+#endif
 
 class M2MLWClient: public M2MInterfaceObserver {
 public:
     M2MLWClient(){
-        _security = NULL;
         _interface = NULL;
-        _device = NULL;
         _bootstrapped = false;
         _error = false;
         _registered = false;
         _unregistered = false;
-        _registration_updated = false;
     }
 
     ~M2MLWClient() {
         if(_interface) {
             delete _interface;
         }
-        if(_security) {
-            delete _security;
-        }
         if( _register_security){
             delete _register_security;
         }
-        if(_object) {
-                delete _object;
-        }
     }
 
-    bool create_interface() {
+    void create_interface() {
+        // Creates M2MInterface using which endpoint can
+        // setup its name, resource type, life time, connection mode,
+        // Currently only LwIPv4 is supported.
         _interface = M2MInterfaceFactory::create_interface(*this,
                                                   "lwm2m-endpoint",
                                                   "test",
@@ -60,7 +54,6 @@ public:
                                                   M2MInterface::UDP,
                                                   M2MInterface::LwIP_IPv4,
                                                   "");
-        return (_interface == NULL) ? false : true;
     }
 
     bool bootstrap_successful() {
@@ -75,98 +68,56 @@ public:
         return _unregistered;
     }
 
-    bool registration_update_successful() {
-        return _registration_updated;
-    }
-
-    bool create_bootstrap_object() {
-        bool success = false;
-        if(_security) {
-            delete _security;
+    M2MSecurity* create_bootstrap_object() {
+        // Creates bootstrap server object with Bootstrap server address and other parameters
+        // required for client to connect to bootstrap server.
+        M2MSecurity *security = M2MInterfaceFactory::create_security(M2MSecurity::Bootstrap);
+        if(security) {
+            security->set_resource_value(M2MSecurity::M2MServerUri, BOOTSTRAP_SERVER_ADDRESS);
+            security->set_resource_value(M2MSecurity::BootstrapServer, 1);
+            security->set_resource_value(M2MSecurity::SecurityMode, M2MSecurity::NoSecurity);
         }
-        _security = M2MInterfaceFactory::create_security(M2MSecurity::Bootstrap);
-        if(_security) {
-            if(_security->set_resource_value(M2MSecurity::M2MServerUri, BOOTSTRAP_SERVER_ADDRESS) &&
-            _security->set_resource_value(M2MSecurity::BootstrapServer, 1) &&
-            _security->set_resource_value(M2MSecurity::SecurityMode, M2MSecurity::NoSecurity)) {
-                success = true;
-                /* Not used now because there is no TLS or DTLS implementation available for stack.
-                security->set_resource_value(M2MSecurity::ServerPublicKey,certificates->certificate_ptr[0],certificates->certificate_len[0]);
-                security->set_resource_value(M2MSecurity::PublicKey,certificates->certificate_ptr[1],certificates->certificate_len[1]);
-                security->set_resource_value(M2MSecurity::Secretkey,certificates->own_private_key_ptr,certificates->own_private_key_len);
-                */
-            }
+        return security;
+    }
+
+    void test_bootstrap(M2MSecurity *security) {
+        if(_interface) {
+             // Bootstrap function.
+            _interface->bootstrap(security);
         }
-        return success;
     }
 
-    bool create_register_object() {
-        bool success = false;
-        _register_security = M2MInterfaceFactory::create_security(M2MSecurity::M2MServer);
-        if(_register_security) {
-            if(_register_security->set_resource_value(M2MSecurity::M2MServerUri, M2M_SERVER_ADDRESS) &&
-            _register_security->set_resource_value(M2MSecurity::BootstrapServer, 0) &&
-            _register_security->set_resource_value(M2MSecurity::SecurityMode, M2MSecurity::NoSecurity)) {
-                success = true;
-                /* Not used now because there is no TLS or DTLS implementation available for stack.
-                security->set_resource_value(M2MSecurity::ServerPublicKey,certificates->certificate_ptr[0],certificates->certificate_len[0]);
-                security->set_resource_value(M2MSecurity::PublicKey,certificates->certificate_ptr[1],certificates->certificate_len[1]);
-                security->set_resource_value(M2MSecurity::Secretkey,certificates->own_private_key_ptr,certificates->own_private_key_len);
-                */
-            }
+    M2MDevice* create_device_object() {
+        // Creates device object which contains mandatory resources linked with
+        // device endpoint.
+        M2MDevice *device = M2MInterfaceFactory::create_device();
+        if(device) {
+            device->create_resource(M2MDevice::Manufacturer,MANUFACTURER);
+            device->create_resource(M2MDevice::DeviceType,TYPE);
+            device->create_resource(M2MDevice::ModelNumber,MODEL_NUMBER);
+            device->create_resource(M2MDevice::SerialNumber,SERIAL_NUMBER);
         }
-        return success;
+        return device;
     }
 
-    void test_bootstrap() {
-        _interface->bootstrap(_security);
-    }
-
-    bool create_device_object() {
-        bool success = false;
-        _device = M2MInterfaceFactory::create_device();
-        if(_device) {
-            if(_device->create_resource(M2MDevice::Manufacturer,MANUFACTURER)     &&
-               _device->create_resource(M2MDevice::DeviceType,TYPE)        	  &&
-               _device->create_resource(M2MDevice::ModelNumber,MODEL_NUMBER)      &&
-               _device->create_resource(M2MDevice::SerialNumber,SERIAL_NUMBER)) {
-                success = true;
-            }
+    void test_register(M2MObjectList object_list){
+        if(_interface) {
+            // Register function
+            _interface->register_object(_register_security, object_list);
         }
-        return success;
-    }
-
-    bool create_generic_object() {
-        bool success = false;
-        _object = M2MInterfaceFactory::create_object("Yogesh");
-        if(_object) {
-            M2MObjectInstance* inst = _object->create_object_instance();
-            if(inst) {
-                    inst->create_static_resource("Test","R_test",value, sizeof(value)-1);
-                    success = true;
-                }
-        }
-        return success;
-    }
-
-    void test_register(){
-        M2MObjectList object_list;
-        object_list.push_back(_device);
-
-        _interface->register_object(_register_security,object_list);
-    }
-
-    void test_update_register() {
-        uint32_t updated_lifetime = 120;
-        _registered = false;
-        _unregistered = false;
-        _interface->update_registration(updated_lifetime);
     }
 
     void test_unregister() {
-        _interface->unregister_object(NULL);
+        if(_interface) {
+            // Unregister function
+            _interface->unregister_object(NULL);
+        }
     }
 
+    //Callback from mbed client stack when the bootstrap
+    // is successful, it returns the mbed Device Server object
+    // which will be used for registering the resources to
+    // mbed Device server.
     void bootstrap_done(M2MSecurity *server_object){
     if(server_object) {
             _register_security = server_object;
@@ -176,12 +127,18 @@ public:
         }
     }
 
-    void object_registered(/*M2MSecurity *security_object, const M2MServer &server_object*/){
+    //Callback from mbed client stack when the registration
+    // is successful, it returns the mbed Device Server object
+    // to which the resources are registered and registered objects.
+    void object_registered(M2MSecurity */*security_object*/, const M2MServer &/*server_object*/){
         _registered = true;
         _unregistered = false;
         printf("\nRegistered\n");
     }
 
+    //Callback from mbed client stack when the unregistration
+    // is successful, it returns the mbed Device Server object
+    // to which the resources were unregistered.
     void object_unregistered(M2MSecurity */*server_object*/){
         _unregistered = true;
         _registered = false;
@@ -189,60 +146,102 @@ public:
     }
 
     void registration_updated(M2MSecurity */*security_object*/, const M2MServer & /*server_object*/){
-        _registration_updated = true;
-        _unregistered = false;
-        printf("\nregistration updated\n");
-
     }
 
+    //Callback from mbed client stack if any error is encountered
+    // during any of the LWM2M operations. Error type is passed in
+    // the callback.
     void error(M2MInterface::Error /*error*/){
         _error = true;
-        _bootstrapped = false;
         printf("\nError occured\n");
     }
 
 private:
 
     M2MInterface    	*_interface;
-    M2MSecurity         *_security;
     M2MSecurity         *_register_security;
-    M2MDevice           *_device;
-    M2MObject           *_object;
     volatile bool       _bootstrapped;
     volatile bool       _error;
     volatile bool       _registered;
     volatile bool       _unregistered;
-    volatile bool       _registration_updated;
 };
 
 int main() {
+
+    // This sets up the network interface configuration which will be used
+    // by LWM2M Client API to communicate with mbed Device server.
     EthernetInterface eth;
     eth.init(); //Use DHCP
     eth.connect();
 
-    // TODO: Remove when yotta supports init
     lwipv4_socket_init();
 
+
+    // Instantiate the class which implements
+    // LWM2M Client API
     M2MLWClient lwm2mclient;
 
+    // Set up Hardware interrupt button.
+    InterruptIn button(APP_BUTTON);
+
+    // On press of SW2 button on K64F board, example application
+    // will call unregister API towards mbed Device Server
+    button.fall(&lwm2mclient,&M2MLWClient::test_unregister);
+
+    // Create LWM2M Client API interface to manage bootstrap,
+    // register and unregister
     lwm2mclient.create_interface();
 
-    lwm2mclient.create_bootstrap_object();
+    // Create LWM2M bootstrap object specifying bootstrap server
+    // information.
+    M2MSecurity* security_object = lwm2mclient.create_bootstrap_object();
 
-    lwm2mclient.test_bootstrap();
+    // Issue bootstrap command.
+    lwm2mclient.test_bootstrap(security_object);
+
+    // Wait till the bootstrap callback is called successfully.
+    // Callback comes in bootstrap_done()
     while (!lwm2mclient.bootstrap_successful()) { __WFI(); }
 
-    lwm2mclient.create_device_object();
+    // Create LWM2M device object specifying device resources
+    // as per OMA LWM2M specification.
+    M2MDevice* device_object = lwm2mclient.create_device_object();
 
-    lwm2mclient.test_register();
+    // Add all the objects that you would like to register
+    // into the list and pass the list for register API.
+    M2MObjectList object_list;
+    object_list.push_back(device_object);
+
+    // Issue register command.
+    lwm2mclient.test_register(object_list);
+
+    // Wait till the register callback is called successfully.
+    // Callback comes in object_registered()
     while (!lwm2mclient.register_successful()) { __WFI(); }
 
-    lwm2mclient.test_unregister();
+    // Wait for the unregister successful callback,
+    // Callback comes in object_unregsitered(), this will be
+    // waiting for user to press SW2 button on K64F board.
     while (!lwm2mclient.unregister_successful()) { __WFI(); }
+
+    // This will turn on the LED on the board specifying that
+    // the application has run successfully.
     notify_completion(lwm2mclient.unregister_successful() &&
                       lwm2mclient.register_successful() &&
                       lwm2mclient.bootstrap_successful());
 
+    // Delete security object created for bootstrapping
+    if(security_object) {
+        delete security_object;
+    }
+
+    // Delete device object created for registering device
+    // resources.
+    if(device_object) {
+        delete device_object;
+    }
+
+    // Disconnect the connect and teardown the network interface
     eth.disconnect();
 
     return 0;

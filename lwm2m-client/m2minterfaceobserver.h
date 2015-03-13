@@ -33,7 +33,7 @@ public:
      * @param server_object, Object containing information about LWM2M server.
      * Client maintains the object.
      */
-    virtual void object_registered(/*M2MSecurity *security_object, const M2MServer &server_object*/) = 0;
+    virtual void object_registered(M2MSecurity *security_object, const M2MServer &server_object) = 0;
 
     /**
      * @brief Callback informing that the device object has been unregistered

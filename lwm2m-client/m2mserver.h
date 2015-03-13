@@ -17,12 +17,13 @@ class M2MServer : public M2MObject
 {
 
 friend class M2MInterfaceFactory;
+friend class M2MNsdlInterface;
 
 public:
 
     /**
      * @brief Enum defining all the resources associdated with
-     * Security Object in LWM2M framework.
+     * Server Object in LWM2M framework.
      */
     typedef enum {
         ShortServerID,

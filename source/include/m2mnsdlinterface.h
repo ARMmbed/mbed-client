@@ -14,8 +14,10 @@ class M2MObjectInstance;
 class M2MResource;
 class M2MNsdlObserver;
 class M2MBase;
+class M2MServer;
 
 typedef Vector<M2MObject *> M2MObjectList;
+typedef Vector<M2MServer *> M2MServerList;
 
 class M2MNsdlInterface : public M2MTimerObserver,
                          public M2MObservationHandler
@@ -224,6 +226,7 @@ private:
 
     M2MNsdlObserver                   &_observer;
     M2MObjectList                      _object_list;
+    M2MServerList                      _server_list;
     M2MTimer                          *_nsdl_exceution_timer;
     M2MTimer                          *_registration_timer;
     sn_nsdl_ep_parameters_s           *_endpoint;

@@ -2,6 +2,7 @@
 #define M2M_INTERFACE_IMPL_H
 
 #include "lwm2m-client/m2minterface.h"
+#include "lwm2m-client/m2mserver.h"
 #include "m2mnsdlobserver.h"
 #include "m2mconnectionobserver.h"
 
@@ -105,7 +106,7 @@ protected: // From M2MNsdlObserver
                                     uint16_t data_len,
                                     sn_nsdl_addr_s *address_ptr);
 
-    virtual void client_registered();
+    virtual void client_registered(M2MServer *server_object);
 
     virtual void registration_error(uint8_t error_code);
 
@@ -316,6 +317,7 @@ private:
     BindingMode                 _binding_mode;
     String                      _context_address;
     uint16_t                    _listen_port;
+    M2MSecurity                 *_register_server; //TODO: to be the list not owned
 
    friend class Test_M2MInterfaceImpl;
 

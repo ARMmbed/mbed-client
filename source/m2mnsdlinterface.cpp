@@ -1,6 +1,7 @@
 #include "include/nsdlaccesshelper.h"
 #include "include/m2mnsdlobserver.h"
 #include "lwm2m-client/m2msecurity.h"
+#include "lwm2m-client/m2mserver.h"
 #include "lwm2m-client/m2mobject.h"
 #include "lwm2m-client/m2mobjectinstance.h"
 #include "lwm2m-client/m2mresource.h"
@@ -38,6 +39,18 @@ M2MNsdlInterface::~M2MNsdlInterface()
     delete _nsdl_exceution_timer;
     delete _registration_timer;
     _object_list.clear();
+    if(!_server_list.empty()) {
+        M2MServer* ser = NULL;
+        M2MServerList::const_iterator it;
+        it = _server_list.begin();
+        for (; it!=_server_list.end(); it++ ) {
+            //Free allocated memory for server objects.
+            ser = *it;
+            delete ser;
+            ser = NULL;
+        }
+        _server_list.clear();
+    }
 }
 
 bool M2MNsdlInterface::initialize()
@@ -211,7 +224,10 @@ uint8_t M2MNsdlInterface::received_from_server_callback(sn_coap_hdr_s *coap_head
              //TODO: Currently this is assumption that only callback coming here
              // is for registration however this same callback is also coming for
              // Update registration , need some mechanism to identify these two separately.
-             _observer.client_registered();
+             //TODO: create M2MServer object for registration against given LWM2M server.
+             M2MServer *server = new M2MServer();
+             server->set_resource_value(M2MServer::ShortServerID,1);
+             _observer.client_registered(server);
              _registration_timer->start_timer(registration_time() * 1000,
                                               M2MTimerObserver::Registration,
                                               false);

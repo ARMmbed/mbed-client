@@ -29,7 +29,8 @@ M2MInterfaceImpl::M2MInterfaceImpl(M2MInterfaceObserver& observer,
   _life_time(l_time),
   _binding_mode(mode),
   _context_address(con_addr),
-  _listen_port(listen_port)
+  _listen_port(listen_port),
+  _register_server(NULL)
 {    
     _nsdl_interface->create_endpoint(_endpoint_name,
                                      _endpoint_type,
@@ -87,6 +88,7 @@ void M2MInterfaceImpl::register_object(M2MSecurity *security, const M2MObjectLis
 {
     // Transition to a new state based upon
     // the current state of the state machine
+    _register_server = security;
     M2MRegisterData *data = new M2MRegisterData();
     data->_object = security;
     data->_object_list = object_list;
@@ -181,11 +183,11 @@ void M2MInterfaceImpl::coap_message_ready(uint8_t *data_ptr,
     }
 }
 
-void M2MInterfaceImpl::client_registered()
+void M2MInterfaceImpl::client_registered(M2MServer *server_object)
 {
     internal_event(STATE_REGISTERED);
-    //Inform client is registered.
-    _observer.object_registered();    
+    //Inform client is registered.    
+    _observer.object_registered(_register_server,*server_object);
 }
 
 void M2MInterfaceImpl::registration_error(uint8_t /*error_code*/)
@@ -362,7 +364,7 @@ void M2MInterfaceImpl::state_register( EventData *data)
                            // return error to the application and go to Idle state.
                            if(_connection_handler->resolve_server_address(ip_address,
                                                                           port,
-                                                                          M2MConnectionObserver::M2MServer)) {
+                                                                          M2MConnectionObserver::LWM2MServer)) {
                                success = true;
                            }
                         }

@@ -5,6 +5,7 @@
 
 //FORWARD DECLARATION
 class M2MSecurity;
+class M2MServer;
 
 /**
  * @brief Observer class for informing NSDL callback to the state machine
@@ -24,8 +25,10 @@ public :
 
     /**
     * @brief Informs that client is registered successfully.
+    * @param server_object, Server object associated with
+    * registered server.
     */
-    virtual void client_registered() = 0;
+    virtual void client_registered(M2MServer *server_object) = 0;
 
     /**
     * @brief Informs that some error occured during
