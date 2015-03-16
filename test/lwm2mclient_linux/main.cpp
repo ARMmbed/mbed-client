@@ -167,7 +167,7 @@ public:
         uint32_t updated_lifetime = 20;
         _registered = false;
         _unregistered = false;
-        _interface->update_registration(updated_lifetime);
+        _interface->update_registration(_register_security,updated_lifetime);
     }
 
     void test_unregister() {
