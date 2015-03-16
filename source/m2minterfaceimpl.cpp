@@ -88,6 +88,7 @@ void M2MInterfaceImpl::register_object(M2MSecurity *security, const M2MObjectLis
 {
     // Transition to a new state based upon
     // the current state of the state machine
+    //TODO: manage register object in a list.
     _register_server = security;
     M2MRegisterData *data = new M2MRegisterData();
     data->_object = security;
@@ -115,11 +116,12 @@ void M2MInterfaceImpl::register_object(M2MSecurity *security, const M2MObjectLis
     END_TRANSITION_MAP(data)
 }
 
-void M2MInterfaceImpl::update_registration(const uint32_t lifetime)
+void M2MInterfaceImpl::update_registration(M2MSecurity *security_object, const uint32_t lifetime)
 {
     // Transition to a new state based upon
     // the current state of the state machine
     M2MUpdateRegisterData *data = new M2MUpdateRegisterData();
+    data->_object = security_object;
     data->_lifetime = lifetime;
     BEGIN_TRANSITION_MAP                                    // - Current State -
         TRANSITION_MAP_ENTRY (EVENT_IGNORED)               // state_idle
@@ -187,6 +189,7 @@ void M2MInterfaceImpl::client_registered(M2MServer *server_object)
 {
     internal_event(STATE_REGISTERED);
     //Inform client is registered.    
+    //TODO: manage register object in a list.
     _observer.object_registered(_register_server,*server_object);
 }
 
@@ -199,7 +202,8 @@ void M2MInterfaceImpl::registration_error(uint8_t /*error_code*/)
 void M2MInterfaceImpl::client_unregistered()
 {
     internal_event(STATE_UNREGSITERED);
-    _observer.object_unregistered(NULL);    
+    //TODO: manage register object in a list.
+    _observer.object_unregistered(_register_server);
 }
 
 void M2MInterfaceImpl::bootstrap_done(M2MSecurity *security_object)

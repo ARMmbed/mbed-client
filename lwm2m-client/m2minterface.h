@@ -91,9 +91,12 @@ public:
     /**
      * @brief Updates or refreshes the client's registration on the LWM2M
      * server.
+     * @param security_object, Security object from which the device object
+     * needs to update registration, if there is only one LWM2M server registered
+     * then this parameter can be NULL.
      * @param lifetime, Lifetime for the endpoint client in seconds.
      */
-    virtual void update_registration(const uint32_t lifetime) = 0;
+    virtual void update_registration(M2MSecurity *security_object, const uint32_t lifetime) = 0;
 
     /**
      * @brief Unregisters the registered object from the LWM2M server.

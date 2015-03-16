@@ -7,10 +7,10 @@ M2MConnectionHandlerImpl::M2MConnectionHandlerImpl(M2MConnectionObserver &observ
                                                    M2MInterface::NetworkStack stack)
 :_observer(observer),
  _socket_stack(SOCKET_STACK_UNINIT),
- _recv_irq(this),
+/* _recv_irq(this),
  _dns_irq(this),
  _send_irq(this),
- _error_irq(this),
+ _error_irq(this),*/
  _resolved_Address(new SocketAddr()),
  _resolved(true)
 {
@@ -40,20 +40,22 @@ M2MConnectionHandlerImpl::M2MConnectionHandlerImpl(M2MConnectionObserver &observ
         default:
             break;
     }
-    _recv_irq.callback(&M2MConnectionHandlerImpl::receive_handler);
-    _dns_irq.callback(&M2MConnectionHandlerImpl::dns_handler);
-    _send_irq.callback(&M2MConnectionHandlerImpl::send_handler);
-    _error_irq.callback(&M2MConnectionHandlerImpl::error_handler);
+//    _recv_irq.callback(&M2MConnectionHandlerImpl::receive_handler);
+//    _dns_irq.callback(&M2MConnectionHandlerImpl::dns_handler);
+//    _send_irq.callback(&M2MConnectionHandlerImpl::send_handler);
+//    _error_irq.callback(&M2MConnectionHandlerImpl::error_handler);
 
     memset(_receive_buffer,0,sizeof(_receive_buffer));
 
-    _socket = new UDPaSocket(_socket_stack);
+    _socket = new UDPSocket(_socket_stack);
 
     //TODO: select socket_address_family based on Network stack
     socket_address_family_t socket_family = SOCKET_AF_INET4;
     _socket->open(socket_family);
-    _socket->setOnSent((handler_t)_send_irq.entry());
-    _socket->setOnError((handler_t)_error_irq.entry());
+//    _socket->setOnSent((handler_t)_send_irq.entry());
+//    _socket->setOnError((handler_t)_error_irq.entry());
+    _socket->setOnSent(handler_t(this, &M2MConnectionHandlerImpl::send_handler));
+    _socket->setOnError(handler_t(this, &M2MConnectionHandlerImpl::error_handler));
 }
 
 M2MConnectionHandlerImpl::~M2MConnectionHandlerImpl()
@@ -73,7 +75,7 @@ M2MConnectionHandlerImpl::~M2MConnectionHandlerImpl()
 
 bool M2MConnectionHandlerImpl::bind_connection(const uint16_t /*listen_port*/)
 {
-    //Not needed in mbed Socket but required for other platforms
+    //TODO: Use bind in mbed Socket
     return true;
 }
 
@@ -88,7 +90,9 @@ bool M2MConnectionHandlerImpl::resolve_server_address(const String& server_addre
         _server_port = server_port;
         _server_type = server_type;
 
-        socket_error_t error = _socket->resolve(_server_address.c_str(),(handler_t)_dns_irq.entry());
+        socket_error_t error = _socket->resolve(_server_address.c_str(),
+                                                handler_t(this, &M2MConnectionHandlerImpl::dns_handler));
+//        socket_error_t error = _socket->resolve(_server_address.c_str(),(handler_t)_dns_irq.entry());
         if(SOCKET_ERROR_UNKNOWN == error   || SOCKET_ERROR_NULL_PTR == error        ||
            SOCKET_ERROR_BAD_FAMILY == error|| SOCKET_ERROR_TIMEOUT == error         ||
            SOCKET_ERROR_BAD_ALLOC == error || SOCKET_ERROR_NO_CONNECTION == error   ||
@@ -106,7 +110,8 @@ bool M2MConnectionHandlerImpl::listen_for_data()
     // Boolean return required for other platforms,
     // not needed in mbed Socket.
     bool success = true;
-    _socket->setOnReadable((handler_t)_recv_irq.entry());
+//    _socket->setOnReadable((handler_t)_recv_irq.entry());
+    _socket->setOnReadable(handler_t(this, &M2MConnectionHandlerImpl::receive_handler));
     return success;
 }
 
@@ -122,10 +127,9 @@ bool M2MConnectionHandlerImpl::send_data(uint8_t *data,
     return success;
 }
 
-void M2MConnectionHandlerImpl::send_handler(void */*arg*/)
+void M2MConnectionHandlerImpl::send_handler(socket_error_t error)
 {
-    socket_event_t *event = _socket->getEvent();
-    if(event_result(event)) {
+    if(SOCKET_ERROR_NONE == error) {
         _observer.data_sent();
     } else {
         // TODO:Socket error in sending data
@@ -134,14 +138,12 @@ void M2MConnectionHandlerImpl::send_handler(void */*arg*/)
     }
 }
 
-void M2MConnectionHandlerImpl::receive_handler(void */*arg*/)
+void M2MConnectionHandlerImpl::receive_handler(socket_error_t error)
 {
     memset(_receive_buffer, 0, BUFFER_LENGTH);
     size_t receive_length = sizeof(_receive_buffer);
-    socket_error_t err = _socket->recv(_receive_buffer, &receive_length);
-    socket_event_t *event = _socket->getEvent();
-    if (err == SOCKET_ERROR_NONE &&
-        event_result(event)) {
+    _socket->recv(_receive_buffer, &receive_length);
+    if (SOCKET_ERROR_NONE == error) {
 
         //Hold the network_stack temporarily
         M2MInterface::NetworkStack network_stack = _socket_address->_stack;
@@ -163,11 +165,11 @@ void M2MConnectionHandlerImpl::receive_handler(void */*arg*/)
     }
 }
 
-void M2MConnectionHandlerImpl::dns_handler(void */*arg*/)
+void M2MConnectionHandlerImpl::dns_handler(socket_error_t error)
 {
     _resolved = true;
-    socket_event_t *event = _socket->getEvent();
-    if(event_result(event)) {
+    if(SOCKET_ERROR_NONE == error) {
+        socket_event_t *event = _socket->getEvent();
         memset(_socket_address,0,sizeof(M2MConnectionObserver::SocketAddress));
 
         _resolved_Address->setAddr(&event->i.d.addr);
@@ -187,11 +189,13 @@ void M2MConnectionHandlerImpl::dns_handler(void */*arg*/)
     }
 }
 
-void M2MConnectionHandlerImpl::error_handler(void */*arg*/)
+void M2MConnectionHandlerImpl::error_handler(socket_error_t error)
 {
     //TODO: Socket error in dns resolving,
     // Define error code.
-    _observer.socket_error(2);
+    if(SOCKET_ERROR_NONE != error) {
+        _observer.socket_error(2);
+    }
 }
 
 M2MInterface::NetworkStack M2MConnectionHandlerImpl::get_network_stack(socket_stack_t stack_type)

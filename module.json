@@ -1,6 +1,6 @@
 {
   "name": "lwm2m-client",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "LWM2M mbed Client API",
   "keywords": [],
   "author": "Yogesh Pande <yogesh.pande@arm.com>",

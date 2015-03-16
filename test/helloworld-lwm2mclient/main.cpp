@@ -1,4 +1,4 @@
-#include "UDPaSocket.h"
+#include "mbed-net-sockets/UDPSocket.h"
 #include "EthernetInterface.h"
 #include "test_env.h"
 #include "lwm2m-client/m2minterfacefactory.h"

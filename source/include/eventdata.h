@@ -60,6 +60,7 @@ class M2MUpdateRegisterData : public EventData
 public:
     M2MUpdateRegisterData() {}
     ~M2MUpdateRegisterData() {}
+    M2MSecurity     *_object;
     uint32_t        _lifetime;
 };
 

@@ -3,11 +3,13 @@
 
 #ifndef USE_LINUX
 
-#include <UDPaSocket.h>
+#include "mbed-net-sockets/UDPSocket.h"
 #include "lwm2m-client/m2mconfig.h"
 #include "lwm2m-client/m2minterface.h"
 #include "include/nsdllinker.h"
 #include "include/m2mconnectionobserver.h"
+
+using namespace mbed;
 
 /**
  * @brief M2MConnectionHandlerImpl.
@@ -67,22 +69,22 @@ private:
     /**
     * @brief Callback handler for sending data over socket.
     */
-    void send_handler(void *arg);
+    void send_handler(socket_error_t error);
 
     /**
     * @brief Callback handler for receiving data over socket.
     */
-    void receive_handler(void *arg);
+    void receive_handler(socket_error_t error);
 
     /**
     * @brief Callback handler for dns resolving of address
     */
-    void dns_handler(void *arg);
+    void dns_handler(socket_error_t error);
 
     /**
     * @brief Callback handler for dns resolving of address
     */
-    void error_handler(void *arg);
+    void error_handler(socket_error_t error);
 
     /**
     * @brief Helper function to return NetworkStack for the stack type
@@ -101,14 +103,14 @@ private:
 private:
 
     M2MConnectionObserver                       &_observer;
-    UDPaSocket                                  *_socket;            //owned
+    UDPSocket                                   *_socket;            //owned
     socket_stack_t                              _socket_stack;
     String                                      _server_address;
     char                                        _receive_buffer[1024];
-    CThunk<M2MConnectionHandlerImpl>            _recv_irq;
-    CThunk<M2MConnectionHandlerImpl>            _dns_irq;
-    CThunk<M2MConnectionHandlerImpl>            _send_irq;
-    CThunk<M2MConnectionHandlerImpl>            _error_irq;
+//    CThunk<M2MConnectionHandlerImpl>            _recv_irq;
+//    CThunk<M2MConnectionHandlerImpl>            _dns_irq;
+//    CThunk<M2MConnectionHandlerImpl>            _send_irq;
+//    CThunk<M2MConnectionHandlerImpl>            _error_irq;
     SocketAddr                                  *_resolved_Address;
     M2MConnectionObserver::SocketAddress        *_socket_address;
     uint8_t                                      _received_address[4];
