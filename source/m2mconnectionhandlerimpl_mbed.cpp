@@ -7,10 +7,6 @@ M2MConnectionHandlerImpl::M2MConnectionHandlerImpl(M2MConnectionObserver &observ
                                                    M2MInterface::NetworkStack stack)
 :_observer(observer),
  _socket_stack(SOCKET_STACK_UNINIT),
-/* _recv_irq(this),
- _dns_irq(this),
- _send_irq(this),
- _error_irq(this),*/
  _resolved_Address(new SocketAddr()),
  _resolved(true)
 {
@@ -40,10 +36,6 @@ M2MConnectionHandlerImpl::M2MConnectionHandlerImpl(M2MConnectionObserver &observ
         default:
             break;
     }
-//    _recv_irq.callback(&M2MConnectionHandlerImpl::receive_handler);
-//    _dns_irq.callback(&M2MConnectionHandlerImpl::dns_handler);
-//    _send_irq.callback(&M2MConnectionHandlerImpl::send_handler);
-//    _error_irq.callback(&M2MConnectionHandlerImpl::error_handler);
 
     memset(_receive_buffer,0,sizeof(_receive_buffer));
 
@@ -52,8 +44,6 @@ M2MConnectionHandlerImpl::M2MConnectionHandlerImpl(M2MConnectionObserver &observ
     //TODO: select socket_address_family based on Network stack
     socket_address_family_t socket_family = SOCKET_AF_INET4;
     _socket->open(socket_family);
-//    _socket->setOnSent((handler_t)_send_irq.entry());
-//    _socket->setOnError((handler_t)_error_irq.entry());
     _socket->setOnSent(handler_t(this, &M2MConnectionHandlerImpl::send_handler));
     _socket->setOnError(handler_t(this, &M2MConnectionHandlerImpl::error_handler));
 }
@@ -92,7 +82,6 @@ bool M2MConnectionHandlerImpl::resolve_server_address(const String& server_addre
 
         socket_error_t error = _socket->resolve(_server_address.c_str(),
                                                 handler_t(this, &M2MConnectionHandlerImpl::dns_handler));
-//        socket_error_t error = _socket->resolve(_server_address.c_str(),(handler_t)_dns_irq.entry());
         if(SOCKET_ERROR_UNKNOWN == error   || SOCKET_ERROR_NULL_PTR == error        ||
            SOCKET_ERROR_BAD_FAMILY == error|| SOCKET_ERROR_TIMEOUT == error         ||
            SOCKET_ERROR_BAD_ALLOC == error || SOCKET_ERROR_NO_CONNECTION == error   ||
@@ -110,7 +99,6 @@ bool M2MConnectionHandlerImpl::listen_for_data()
     // Boolean return required for other platforms,
     // not needed in mbed Socket.
     bool success = true;
-//    _socket->setOnReadable((handler_t)_recv_irq.entry());
     _socket->setOnReadable(handler_t(this, &M2MConnectionHandlerImpl::receive_handler));
     return success;
 }

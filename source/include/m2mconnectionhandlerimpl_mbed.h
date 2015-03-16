@@ -107,10 +107,6 @@ private:
     socket_stack_t                              _socket_stack;
     String                                      _server_address;
     char                                        _receive_buffer[1024];
-//    CThunk<M2MConnectionHandlerImpl>            _recv_irq;
-//    CThunk<M2MConnectionHandlerImpl>            _dns_irq;
-//    CThunk<M2MConnectionHandlerImpl>            _send_irq;
-//    CThunk<M2MConnectionHandlerImpl>            _error_irq;
     SocketAddr                                  *_resolved_Address;
     M2MConnectionObserver::SocketAddress        *_socket_address;
     uint8_t                                      _received_address[4];
