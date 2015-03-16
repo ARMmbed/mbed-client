@@ -172,17 +172,23 @@ When a LWM2M Client determines that it no longer requires to be available to a L
 This is how you can de-register your endpoint client. 
 In case, endpoint has multiple server regsitration  then you need to provide the server_object of the server where you would like to de-register your endpoint. Otherwise if there is only one registration then you can pass NULL and client will unregister the default registration from endpoint.
 
-`M2MInterface::unregister_object(M2MSecurity *object);`
+```
+M2MInterface::unregister_object(M2MSecurity *object);
+```
 
 Since, this is an asynchronous operation, you will receive the result of this operation through callback defined in `m2minterfaceobserver.h` which you should be handling in your application.
 
 If the de-register operation is successful and client is successfully unregistered from mbed Device Server information , your application will receive following callback 
-`void object_unregistered(M2MSecurity *server_object)`
+```
+void object_unregistered(M2MSecurity *server_object)
+```
 
 The `M2MSecurity *server_object` informs to which mbed Device Server the client has just de-registered.
 
 In case, the de-registration  operation fails for some reason , then you will receive following callback
-`void error(M2MInterface::Error error)`
+```
+void error(M2MInterface::Error error)
+```
 
 You can get to know more about the  error from the `error` parameter which is passed with the callback and then act accordingly.
 
