@@ -12,10 +12,10 @@
     }
   ],
   "dependencies": {
-    "mbed": "ARMmbed/mbed-sdk",
+    "mbed" : "ARMmbed/mbed-sdk-private",
     "mbed-cpputest" : "ARMmbed/mbed-cpputest#master",
     "mbed-net-sockets" : "ARMmbed/mbed-net-sockets#master",
-    "mbed-client" : "ARMmbed/mbed-client#~0.0.6"
+    "mbed-client" : "ARMmbed/mbed-client#alpha2-release"
   },
   "targetDependencies": {}
 }
