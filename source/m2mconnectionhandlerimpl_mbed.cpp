@@ -88,7 +88,7 @@ bool M2MConnectionHandlerImpl::resolve_server_address(const String& server_addre
         if(SOCKET_ERROR_UNKNOWN == error   || SOCKET_ERROR_NULL_PTR == error        ||
            SOCKET_ERROR_BAD_FAMILY == error|| SOCKET_ERROR_TIMEOUT == error         ||
            SOCKET_ERROR_BAD_ALLOC == error || SOCKET_ERROR_NO_CONNECTION == error   ||
-           SOCKET_ERROR_SIZE == error      || SOCKET_ERROR_BAD_BUFFER == error      ||
+           SOCKET_ERROR_SIZE == error      ||
            SOCKET_ERROR_BAD_STACK == error || SOCKET_ERROR_BAD_ADDRESS == error     ||
            SOCKET_ERROR_DNS_FAILED == error) {
             success = false;
