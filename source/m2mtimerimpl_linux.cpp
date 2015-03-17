@@ -1,3 +1,6 @@
+/*
+ * Copyright (c) 2015 ARM. All rights reserved.
+ */
 #include <unistd.h>
 #include "include/m2mtimerimpl_linux.h"
 #include "lwm2m-client/m2mtimerobserver.h"

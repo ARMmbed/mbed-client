@@ -1,3 +1,6 @@
+/*
+ * Copyright (c) 2015 ARM. All rights reserved.
+ */
 #include "include/m2mconnectionhandlerimpl_linux.h"
 #include "include/nsdlaccesshelper.h"
 #include "lwm2m-client/m2mconstants.h"

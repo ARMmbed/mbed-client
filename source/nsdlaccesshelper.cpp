@@ -1,3 +1,6 @@
+/*
+ * Copyright (c) 2015 ARM. All rights reserved.
+ */
 #include "include/nsdlaccesshelper.h"
 #include "include/m2mnsdlinterface.h"
 

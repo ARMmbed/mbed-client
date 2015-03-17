@@ -1,3 +1,6 @@
+/*
+ * Copyright (c) 2015 ARM. All rights reserved.
+ */
 #ifndef NSDL_LINKER_H
 #define NSDL_LINKER_H
 

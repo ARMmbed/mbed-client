@@ -1,3 +1,6 @@
+/*
+ * Copyright (c) 2015 ARM. All rights reserved.
+ */
 #ifndef M2M_RESOURCE_H
 #define M2M_RESOURCE_H
 

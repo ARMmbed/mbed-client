@@ -1,3 +1,6 @@
+/*
+ * Copyright (c) 2015 ARM. All rights reserved.
+ */
 #include "lwm2m-client/m2mconstants.h"
 const String COAP = "coap://";
 

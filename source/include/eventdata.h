@@ -1,3 +1,6 @@
+/*
+ * Copyright (c) 2015 ARM. All rights reserved.
+ */
 #ifndef EVENT_DATA_H
 #define EVENT_DATA_H
 

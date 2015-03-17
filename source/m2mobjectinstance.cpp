@@ -1,3 +1,6 @@
+/*
+ * Copyright (c) 2015 ARM. All rights reserved.
+ */
 #include "lwm2m-client/m2mobjectinstance.h"
 #include "lwm2m-client/m2mresource.h"
 

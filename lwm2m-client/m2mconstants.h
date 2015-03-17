@@ -1,3 +1,6 @@
+/*
+ * Copyright (c) 2015 ARM. All rights reserved.
+ */
 #ifndef M2MCONSTANTS_H
 #define M2MCONSTANTS_H
 

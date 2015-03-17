@@ -1,3 +1,6 @@
+/*
+ * Copyright (c) 2015 ARM. All rights reserved.
+ */
 #include "include/m2mtimerimpl_mbed.h"
 #include "lwm2m-client/m2mtimerobserver.h"
 

@@ -1,3 +1,6 @@
+/*
+ * Copyright (c) 2015 ARM. All rights reserved.
+ */
 #include <sys/types.h> // size_t
 #include <stdexcept>
 

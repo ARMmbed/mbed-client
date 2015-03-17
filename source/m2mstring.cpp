@@ -1,3 +1,6 @@
+/*
+ * Copyright (c) 2015 ARM. All rights reserved.
+ */
 #include "lwm2m-client/m2mstring.h"
 #include <string.h> // strlen
 #include <stdlib.h> // malloc, realloc

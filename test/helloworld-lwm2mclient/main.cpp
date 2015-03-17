@@ -1,3 +1,6 @@
+/*
+ * Copyright (c) 2015 ARM. All rights reserved.
+ */
 #include "mbed-net-sockets/UDPSocket.h"
 #include "EthernetInterface.h"
 #include "test_env.h"

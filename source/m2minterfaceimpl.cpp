@@ -1,3 +1,6 @@
+/*
+ * Copyright (c) 2015 ARM. All rights reserved.
+ */
 #include <assert.h>
 #include "include/m2minterfaceimpl.h"
 #include "include/eventdata.h"

@@ -1,3 +1,6 @@
+/*
+ * Copyright (c) 2015 ARM. All rights reserved.
+ */
 #include "lwm2m-client/m2minterfacefactory.h"
 #include "lwm2m-client/m2mserver.h"
 #include "lwm2m-client/m2mdevice.h"

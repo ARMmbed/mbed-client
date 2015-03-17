@@ -1,3 +1,6 @@
+/*
+ * Copyright (c) 2015 ARM. All rights reserved.
+ */
 #ifndef M2M_CONNECTION_OBSERVER_H__
 #define M2M_CONNECTION_OBSERVER_H__
 

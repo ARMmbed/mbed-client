@@ -1,3 +1,6 @@
+/*
+ * Copyright (c) 2015 ARM. All rights reserved.
+ */
 #include "include/m2mconnectionhandlerimpl_mbed.h"
 #include "include/m2mconnectionhandler.h"
 #include "include/nsdlaccesshelper.h"

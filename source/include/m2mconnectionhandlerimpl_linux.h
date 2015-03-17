@@ -1,3 +1,6 @@
+/*
+ * Copyright (c) 2015 ARM. All rights reserved.
+ */
 #ifndef M2M_CONNECTION_HANDLER_LINUX_H__
 #define M2M_CONNECTION_HANDLER_LINUX_H__
 

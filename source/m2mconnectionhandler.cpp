@@ -1,3 +1,6 @@
+/*
+ * Copyright (c) 2015 ARM. All rights reserved.
+ */
 #include "include/m2mconnectionhandler.h"
 #ifdef USE_LINUX
     #include "include/m2mconnectionhandlerimpl_linux.h"

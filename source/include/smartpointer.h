@@ -1,3 +1,6 @@
+/*
+ * Copyright (c) 2015 ARM. All rights reserved.
+ */
 #ifndef SMART_POINTER_H
 #define SMART_POINTER_H
 

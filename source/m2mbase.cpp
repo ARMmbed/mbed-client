@@ -1,3 +1,6 @@
+/*
+ * Copyright (c) 2015 ARM. All rights reserved.
+ */
 #include "lwm2m-client/m2mbase.h"
 #include "lwm2m-client/m2mobservationhandler.h"
 #include "lwm2m-client/m2mconstants.h"

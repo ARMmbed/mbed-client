@@ -1,3 +1,6 @@
+/*
+ * Copyright (c) 2015 ARM. All rights reserved.
+ */
 #include <unistd.h>
 #include <pthread.h>
 #include "m2minterfacefactory.h"
