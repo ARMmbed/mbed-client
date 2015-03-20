@@ -1,0 +1,104 @@
+<h1 id="lwm2m-client">LWM2M-Client</h1>
+<h2 id="introduction">Introduction</h2>
+<p>This API provides functionality to use LWM2M features from mbed device client which are described in Lightweight Machine to Machine Technical Specification. Using this API mbed OS developers can develop their own application utilizing LWM2M features.</p>
+<p>This API provides enabler which defines the application layer communication protocol between a LWM2M Server and a LWM2M Client, which is located in a LWM2M Device. The OMA Lightweight M2M enabler includes device management and service enablement for LWM2M Devices. The target LWM2M Devices for this enabler are mainly resource constrained devices. Therefore, this enabler makes use of a light and compact protocol as well as an efficient resource data model. A Client-Server architecture is introduced for the LWM2M Enabler, where the LWM2M Device acts as a LWNM2M Client and the M2M service, platform or application acts as the LWM2M Server. There are four interfaces between these two components as shown below: - Bootstrap - Client Registration - <em>Device management and service enablement</em> - <em>Information Reporting</em></p>
+<p>This API currently covers Bootstrap and Client Registration, the other two features will be added in future releases of this API.</p>
+<h2 id="lwm2m-features">LWM2M Features</h2>
+<p>The API provides interface to the application developer to define their applications's endpoint infomation which will be delivered to the bootstrap server and mbed Device Server during bootstrap and registration operations respectively, This is how you can create your interface for your endpoint.</p>
+<pre><code>#include &quot;lwm2m-client/m2minterfacefactory.h&quot;
+#include &quot;lwm2m-client/m2minterface.h&quot;
+
+M2MInterface* interface = M2MInterfaceFactory::create_interface(*this,
+                                                  &quot;lwm2m-endpoint&quot;,
+                                                  &quot;test&quot;,
+                                                  3600,
+                                                  8000,
+                                                  &quot;&quot;,
+                                                  M2MInterface::UDP,
+                                                  M2MInterface::LwIP_IPv4,
+                                                  &quot;&quot;);</code></pre>
+<p>Once you have created an interface, you can now proceed to execute operation using this interface. ####Bootstrap feature The Bootstrap Interface is used to provision essential information into the LWM2M Client to enable the LWM2M Client to perform the operation “Register” with one or more LWM2M Servers.</p>
+<p>In this release only one bootstrap mode is supported: #####Client Initiated Bootstrap Client Initiated Bootstrap mode provides a mechanism for the LWM2M Client to retrieve the Bootstrap Information from a LWM2M Bootstrap Server. The Client Initiated Bootstrap mode requires having a LWM2M Boostrap Server Account. This API enables client initiated bootstrap functionality. User can provide the bootstrap server information and issue bootstrap command in following way.</p>
+<p>First you need to create your bootstrap server object which contains information about bootstrap server like server address, security mode used by server etc.</p>
+<pre><code>#include &quot;lwm2m-client/m2msecurity.h&quot;
+ M2MSecurity *security = M2MInterfaceFactory::create_security(M2MSecurity::Bootstrap);
+        if(security) {
+            security-&gt;set_resource_value(M2MSecurity::M2MServerUri, BOOTSTRAP_SERVER_ADDRESS);
+            security-&gt;set_resource_value(M2MSecurity::BootstrapServer, 1);
+            security-&gt;set_resource_value(M2MSecurity::SecurityMode, M2MSecurity::NoSecurity);
+        }</code></pre>
+<ul>
+<li>Please note, currently this API supports only non-secure mode operations. Security features will be added in upcoming releases.</li>
+</ul>
+<p>Once you have the bootstrap object ready, all you need to do is to call bootstrap API by passing this object as parameter.</p>
+<pre><code>M2MInterface::bootstrap(M2MSecurity* bootstrap_object);</code></pre>
+<p>Since, this is an asynchronous operation, you will receive the result of this operation through callback defined in <code>m2minterfaceobserver.h</code> which you should be handling in your application. If the bootstrap operation is successful and client is able to fecth the mbed Device Server information from bootstrap server, your application will receive following callback</p>
+<pre><code>void bootstrap_done(M2MSecurity *server_object)</code></pre>
+<p>The <code>server_object</code> contains the data for mbed Device Server including serevr Uri, security mode etc. Using this object you can execute registration operation for this client.</p>
+<p>In case, the bootstrap operation fails for some reason , then you will receive following callback</p>
+<pre><code>void error(M2MInterface::Error error)</code></pre>
+<p>You can get to know more about the error from the <code>error</code> parameter which is passed with the callback and then act accordingly.</p>
+<h4 id="client-registration-interface">Client Registration Interface</h4>
+<p>The Client Registration Interface is used by a LWM2M Client to register with LWM2M Servers, maintain registration and de-register from a LWM2M Server. Currently, only one-to-one client server regisration is supported. But, in upcoming releases client API will support one-to many client-server registrations.</p>
+<p>Client registration interface includes multiple sub-features and currently supported are: - Register - Update - De-register</p>
+<h5 id="register">Register</h5>
+<p>When registering, the LWM2M Client performs the “Register” operation and provides the properties the LWM2M Server requires to contact the LWM2M Client (e.g., End Point Name); maintain the registration and session (e.g., Lifetime, Queue Mode) between the LWM2M Client and LWM2M Server as well as knowledge of the Objects the LWM2M Client supports and existing Object Instances in the LWM2M Client</p>
+<p>This API enables clientregistration functionality. User can provide the mbed Device server server information and issue register command in following way.</p>
+<p>First you need to create your mbed Device server object which contains information about bootstrap server like server address, security mode used by server etc. If you have done bootstrap operation first, then this object is automatically created and available through <code>bootstrap_done()</code> callback which you can use directly.</p>
+<pre><code>#include &quot;lwm2m-client/m2msecurity.h&quot;
+ M2MSecurity *security = M2MInterfaceFactory::create_security(M2MSecurity::LWM2M);
+        if(security) {
+            security-&gt;set_resource_value(M2MSecurity::M2MServerUri, LWM2M_SERVER_ADDRESS);
+            security-&gt;set_resource_value(M2MSecurity::BootstrapServer, 0);
+            security-&gt;set_resource_value(M2MSecurity::SecurityMode, M2MSecurity::NoSecurity);
+        }</code></pre>
+<ul>
+<li>Please note, currently this API supports only non-secure mode operations. Security features will be added in upcoming releases.</li>
+</ul>
+<p>During registering your endpoint, you will also need to register all your resources that you would like to monitor or follow from mbed Deivce Server. This can be easily achieved by creating resource objects and passing them to register API for registration purposes.</p>
+<p>For example, if you want to register your OMW M2M Device object , you need to simply create the device object and set the values for manadatory resources like this.</p>
+<pre><code>#include &quot;lwm2m-client/m2mdevice.h&quot;
+M2MDevice *device = M2MInterfaceFactory::create_device();
+if(device) {
+    device-&gt;create_resource(M2MDevice::Manufacturer,MANUFACTURER);
+    device-&gt;create_resource(M2MDevice::DeviceType,TYPE);
+    device-&gt;create_resource(M2MDevice::ModelNumber,MODEL_NUMBER);
+    device-&gt;create_resource(M2MDevice::SerialNumber,SERIAL_NUMBER);
+    }</code></pre>
+<p>You can register other resources as well, please check detailed API documenttion for that.</p>
+<p>Apart from manadatory device obejct, if you would like to register your own customized resources , you can create them and set their values accordingly. For doing that, please check the API documentation for M2MObject, M2MObjectInstance and M2MResource classes.</p>
+<p>Once you have the registration server object and resources, which you want to register, ready, all you need to do is to call register API by passing these object as parameters.</p>
+<pre><code>M2MInterface::register_object(M2MSecurity* register_object, M2MObjectList object_list);</code></pre>
+<p>Since, this is an asynchronous operation, you will receive the result of this operation through callback defined in <code>m2minterfaceobserver.h</code> which you should be handling in your application. If the register operation is successful and client is able to register all your resources to the mbed Device Server information , your application will receive following callback</p>
+<pre><code>void object_registered(M2MSecurity *server_object, const M2MServer&amp; server)</code></pre>
+<p>The <code>M2MSecurity *server_object</code> informs to which mbed Device Server the client has just registered and <code>M2MServer &amp;server</code> contains the data related with mbed Device Server including Short ServerID, client registration period etc.</p>
+<p>In case, the registration operation fails for some reason , then you will receive following callback</p>
+<pre><code>void error(M2MInterface::Error error)</code></pre>
+<p>You can get to know more about the error from the <code>error</code> parameter which is passed with the callback and then act accordingly.</p>
+<h5 id="update">Update</h5>
+<p>Periodically or based on certain events within the LWM2M Client or initiated by the LWM2M Server, the LWM2M Client updates its registration information with a LWM2M Server by sending an “Update” operation to the LWM2M Server. This is how you can de-update your registration.</p>
+<pre><code>M2MInterface::update_registration(M2MSecurity* security_object, const uint32_t lifetime)</code></pre>
+<p>Normally, the enabler will take care of updating the registration automatically but if you want to renew the regisrtaion before that , you can use this API.</p>
+<p>If the update operation is successful, your application will receive following callback</p>
+<pre><code>void registration_updated(M2MSecurity *const M2MServer&amp; server)</code></pre>
+<p>The <code>M2MSecurity *server_object</code> informs to which mbed Device Server the client has just updated the registration and <code>M2MServer &amp;server</code> contains the data related with mbed Device Server including Short ServerID, client registration period etc.</p>
+<p>In case, the updation operation fails for some reason , then you will receive following callback</p>
+<pre><code>void error(M2MInterface::Error error)</code></pre>
+<h5 id="de-register">De-register</h5>
+<p>When a LWM2M Client determines that it no longer requires to be available to a LWM2M Server (e.g., LWM2M Device factory reset), the LWM2M Client de-register from the LWM2M Server. Upon receiving this message, the LWM2M Server removes the registration information from the LWM2M Server. This is how you can de-register your endpoint client. In case, endpoint has multiple server regsitration then you need to provide the server_object of the server where you would like to de-register your endpoint. Otherwise if there is only one registration then you can pass NULL and client will unregister the default registration from endpoint.</p>
+<pre><code>M2MInterface::unregister_object(M2MSecurity *object);</code></pre>
+<p>Since, this is an asynchronous operation, you will receive the result of this operation through callback defined in <code>m2minterfaceobserver.h</code> which you should be handling in your application.</p>
+<p>If the de-register operation is successful and client is successfully unregistered from mbed Device Server information , your application will receive following callback</p>
+<pre><code>void object_unregistered(M2MSecurity *server_object)</code></pre>
+<p>The <code>M2MSecurity *server_object</code> informs to which mbed Device Server the client has just de-registered.</p>
+<p>In case, the de-registration operation fails for some reason , then you will receive following callback</p>
+<pre><code>void error(M2MInterface::Error error)</code></pre>
+<p>You can get to know more about the error from the <code>error</code> parameter which is passed with the callback and then act accordingly.</p>
+<h5 id="device-management-and-service-enablement-interface">Device Management and Service Enablement Interface</h5>
+<p><em>Not yet supported.</em> #####Information Reporting Interface <em>Not yet supported.</em></p>
+<h2 id="more-information">More Information</h2>
+<p>This API is based on OMA LWM2M specification. You can get specification from <a href="">here</a></p>
+<h2 id="api-documentation">API documentation</h2>
+<p>You can generate Doxygen API documentation for these APIs from doxy file which is present in <code>cd doxygen</code> folder . You need to run <code>doxygen</code> command from the <code>doxygen/</code> folder and it will generate <code>docs</code> folder at API source directory root level where you can find the detailed documentation for each API.</p>
+<h2 id="example-application">Example application</h2>
+<p>In order to use these API, there is an example application available in <code>lwm2m-client-example</code> directory.</p>
