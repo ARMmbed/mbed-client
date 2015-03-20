@@ -13,7 +13,7 @@
   ],
   "dependencies": {
     "mbed" : "ARMmbed/mbed-sdk-private",
-    "mbed-cpputest" : "ARMmbed/mbed-cpputest#master",
+    "mbed-cpputest" : "ARMmbed/mbed-cpputest-private#master",
     "mbed-net-sockets" : "ARMmbed/mbed-net-sockets#master",
     "mbed-client" : "ARMmbed/mbed-client#alpha2-release"
   },
