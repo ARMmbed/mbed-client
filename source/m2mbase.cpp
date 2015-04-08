@@ -308,18 +308,21 @@ bool M2MBase::set_notification_attribute(char* option)
 
 void M2MBase::report()
 {
-    uint64_t time_interval = (uint64_t)(_pmin * 1000);
-    _pmin_timer->stop_timer();
-    _pmin_timer->start_timer(time_interval,
-                             M2MTimerObserver::PMinTimer,
-                             true);
-
-    time_interval = (uint64_t)(_pmax * 1000);
-    _pmax_timer->stop_timer();
-    _pmax_timer->start_timer(time_interval,
-                             M2MTimerObserver::PMaxTimer,
-                             true);
-
+    uint64_t time_interval = 0;
+    if(_pmin != 0) {
+        time_interval = (uint64_t)(_pmin * 1000);
+        _pmin_timer->stop_timer();
+        _pmin_timer->start_timer(time_interval,
+                                 M2MTimerObserver::PMinTimer,
+                                 true);
+    }
+    if(_pmax != 0) {
+        time_interval = (uint64_t)(_pmax * 1000);
+        _pmax_timer->stop_timer();
+        _pmax_timer->start_timer(time_interval,
+                                 M2MTimerObserver::PMaxTimer,
+                                 true);
+    }
     if(_under_observation) {
         if (_pmax_exceeded) {
             _pmax_exceeded = false;

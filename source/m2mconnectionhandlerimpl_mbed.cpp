@@ -66,9 +66,12 @@ M2MConnectionHandlerImpl::~M2MConnectionHandlerImpl()
     }
 }
 
-bool M2MConnectionHandlerImpl::bind_connection(const uint16_t /*listen_port*/)
+bool M2MConnectionHandlerImpl::bind_connection(const uint16_t listen_port)
 {
     //TODO: Use bind in mbed Socket
+    if(_socket) {
+        _socket->bind("0.0.0.0", listen_port);
+    }
     return true;
 }
 
@@ -133,7 +136,10 @@ void M2MConnectionHandlerImpl::receive_handler(socket_error_t error)
 {
     memset(_receive_buffer, 0, BUFFER_LENGTH);
     size_t receive_length = sizeof(_receive_buffer);
-    _socket->recv(_receive_buffer, &receive_length);
+    SocketAddr remote_address;
+    uint16_t remote_port;
+
+    _socket->recv_from(_receive_buffer, &receive_length,&remote_address,&remote_port);
     if (SOCKET_ERROR_NONE == error) {
 
         //Hold the network_stack temporarily
@@ -141,10 +147,10 @@ void M2MConnectionHandlerImpl::receive_handler(socket_error_t error)
 
         memset(_socket_address,0,sizeof(M2MConnectionObserver::SocketAddress));
 
-        _socket_address->_address =_resolved_Address->getImpl();
+        _socket_address->_address =remote_address.getImpl();
         //TODO: Current support only for IPv4, add IPv6 support
         _socket_address->_length = 4;
-        _socket_address->_port = _server_port;
+        _socket_address->_port = remote_port;
         _socket_address->_stack = network_stack;
 
         // Send data for processing.
