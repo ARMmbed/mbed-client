@@ -126,9 +126,11 @@ public:
 
     /**
      * @brief Sets observation token value.
-     * @param token, Value of the token.
+     * @param token, Pointer to the token of the resource.
+     * @param length , Length of the token pointer.
      */
-    virtual void set_observation_token(const String &token);
+    virtual void set_observation_token(const uint8_t *token,
+                                       const uint8_t length);
 
     /**
      * Sets instance ID of the object
@@ -143,6 +145,12 @@ public:
      * @return True if successfully set else false.
      */
     virtual bool set_value(const uint8_t *value, const uint32_t value_length);
+
+    /**
+     * Sets Observation number of the object
+     * @param observation_number of the object.
+     */
+    virtual void set_observation_number(const uint16_t observation_number);
 
     /**
      * Returns object type
@@ -201,9 +209,10 @@ public:
 
     /**
      * @brief Returns the observation token of the object
-     * @return Observation token
+     * @param value[OUT], pointer to the value of token.
+     * @param value_length[OUT], length to the token pointer.
      */
-    virtual const String& observation_token() const;
+    virtual void get_observation_token(uint8_t *&token, uint32_t &token_length);
 
     /**
      * @brief Returns the mode of the resource
@@ -222,7 +231,7 @@ public:
      * @brief Returns the observation number.
      * @return observation number for the object
      */
-    virtual uint8_t observation_number() const;
+    virtual uint16_t observation_number() const;
 
     /**
      * @brief Parses the received query for notification
@@ -277,8 +286,7 @@ private:
     uint16_t                    _instance_id;
     bool                        _observable;
     bool                        _under_observation;
-    String                      _token;
-    uint8_t                     _observation_number;
+    uint16_t                    _observation_number;
     float                       _pmax;
     float                       _pmin;
     bool                        _pmin_exceeded;
@@ -288,6 +296,8 @@ private:
     M2MTimer                    *_pmax_timer;
     uint8_t                     *_value;
     uint32_t                    _value_length;
+    uint8_t                     *_token;
+    uint8_t                     _token_length;
 
 
 friend class Test_M2MBase;

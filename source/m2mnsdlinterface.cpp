@@ -365,19 +365,32 @@ void M2MNsdlInterface::observation_to_be_sent(M2MBase *object)
     if(object) {
         uint8_t *value = 0;
         uint32_t length = 0;
-        uint8_t observation_number = 0;
+        uint8_t *token = 0;
+        uint32_t token_length = 0;
+        uint8_t observation_number[2];
+        uint8_t observation_number_length = 1;
+
+        uint16_t number = object->observation_number();
+
+        observation_number[0] = ((number>>8) & 0xFF);
+        observation_number[1] = (number & 0xFF);
+
+        if(number > 0xFF) {
+            observation_number_length = 2;
+        }
 
         object->get_value(value,length);
-        observation_number = object->observation_number();
+        object->get_observation_token(token,token_length);
 
-        sn_nsdl_send_observation_notification((uint8_t*)object->observation_token().c_str(),
-                                              (uint8_t)object->observation_token().length(),
+        uint8_t message_id = sn_nsdl_send_observation_notification(token,
+                                              token_length,
                                               value,length,
-                                              &observation_number,
-                                              sizeof(observation_number),
+                                              observation_number,
+                                              observation_number_length,
                                               COAP_MSG_TYPE_CONFIRMABLE,
                                               object->coap_content_type());
         memory_free(value);
+        memory_free(token);
     }
 }
 
@@ -733,27 +746,46 @@ uint8_t M2MNsdlInterface::handle_get_request(sn_coap_hdr_s *received_coap_header
             coap_response->options_list_ptr->observe_ptr = 0;
 
             if(received_coap_header->token_ptr) {
-                char *token_buffer = (char*)memory_alloc(received_coap_header->token_len);
-                if(token_buffer) {
-                    memcpy(token_buffer,
-                           (char*)received_coap_header->token_ptr,
-                           received_coap_header->token_len);
-                    String token(token_buffer);
-
-                    object->set_observation_token(token);
-                    if(token_buffer) {
-                        free(token_buffer);
-                        token_buffer = NULL;
-                    }
-                }
+                object->set_observation_token(received_coap_header->token_ptr,
+                                              received_coap_header->token_len);
             }
+
             if(received_coap_header->options_list_ptr) {
                 uint8_t observe_option = received_coap_header->options_list_ptr->observe;
+                uint32_t number = 0;
                 if(START_OBSERVATION == observe_option) {
-                    object->set_under_observation(true,this);
-                    uint8_t observation_number = object->observation_number();
-                    coap_response->options_list_ptr->observe_ptr = &observation_number;
-                    coap_response->options_list_ptr->observe_len = sizeof(observation_number);
+
+                    // If the observe length is 0 means register for observation.
+                    if(received_coap_header->options_list_ptr->observe_len == 0) {
+                        object->set_under_observation(true,this);
+                    }
+                    else {
+                    for(int i=0;i < received_coap_header->options_list_ptr->observe_len; i++) {
+                        number = (*(received_coap_header->options_list_ptr->observe_ptr + i) & 0xff) <<
+                                 8*(received_coap_header->options_list_ptr->observe_len- 1 - i);
+                        }
+                    }
+                    // If the observe value is 0 means register for observation.
+                    if(number == 0) {
+                        object->set_under_observation(true,this);
+                        uint8_t observation_number[2];
+                        uint8_t observation_number_length = 1;
+
+                        uint16_t number = object->observation_number();
+
+                        observation_number[0] = ((number>>8) & 0xFF);
+                        observation_number[1] = (number & 0xFF);
+
+                        if(number > 0xFF) {
+                            observation_number_length = 2;
+                        }
+                        coap_response->options_list_ptr->observe_ptr = observation_number;
+                        coap_response->options_list_ptr->observe_len = observation_number_length;
+                    } else if(number == 1) {
+                        // If the observe value is 1 means de-register from observation.
+                        object->set_under_observation(false,NULL);
+                    }
+
                 } else if (STOP_OBSERVATION == observe_option) {
                     object->set_under_observation(false,NULL);
                 }

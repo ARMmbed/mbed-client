@@ -3,6 +3,7 @@
  */
 #include <unistd.h>
 #include <pthread.h>
+#include <signal.h> /* For SIGIGN and SIGINT */
 #include "m2minterfacefactory.h"
 #include "m2minterface.h"
 #include "m2mdevice.h"
@@ -19,28 +20,39 @@ const String &SERIAL_NUMBER = "12345";
 
 const uint8_t value[] = "MyValue";
 
+static void ctrl_c_handle_function(void);
+typedef void (*signalhandler_t)(int); /* Function pointer type for ctrl-c */
+
 class M2MLWClient: public M2MInterfaceObserver {
 public:
     M2MLWClient(){
         _security = NULL;
         _interface = NULL;
         _device = NULL;
+        _object = NULL;
         _bootstrapped = false;
         _error = false;
         _registered = false;
         _unregistered = false;
         _registration_updated = false;
+        _value = 0;
     }
 
     ~M2MLWClient() {
-        if(_interface) {
-            delete _interface;
-        }
         if(_security) {
             delete _security;
         }
         if( _register_security){
             delete _register_security;
+        }
+        if(_device) {
+            delete _device;
+        }
+        if(_object) {
+            delete _object;
+        }
+        if(_interface) {
+            delete _interface;
         }
     }
 
@@ -49,17 +61,17 @@ public:
                                                   "lwm2m-endpoint",
                                                   "test",
                                                   3600,
-                                                  8000,
+                                                  5683,
                                                   "",
                                                   M2MInterface::UDP,
                                                   M2MInterface::LwIP_IPv4,
                                                   "");
+        printf("Endpoint Name : yogesh-endpoint\n");
         return (_interface == NULL) ? false : true;
     }
 
     bool bootstrap_successful() {
         while(!_bootstrapped && !_error) {
-            printf("Waiting for bootstrap_successful callback\n");
             sleep(1);
         }
         return _bootstrapped;
@@ -67,7 +79,6 @@ public:
 
     bool register_successful() {
         while(!_registered && !_error) {
-            printf("Waiting for register_successful callback\n");
             sleep(1);
         }
         return _registered;
@@ -76,7 +87,6 @@ public:
     bool unregister_successful() {
         while(!_unregistered && !_error) {
             sleep(1);
-            printf("Waiting for unregister_successful callback\n");
         }
         return _unregistered;
     }
@@ -105,6 +115,7 @@ public:
                 */
             }
         }
+        printf("Bootstrap Server Address %s\n", BOOTSTRAP_SERVER_ADDRESS.c_str());
         return success;
     }
 
@@ -150,13 +161,32 @@ public:
         if(_object) {
             M2MObjectInstance* inst = _object->create_object_instance();
             if(inst) {
-                    inst->create_static_resource("Test","R_test",value, sizeof(value));
-                    success = true;
+                    M2MResource* res = inst->create_dynamic_resource("Test","ResourceTest",true);
+                    char buffer[20];
+                    int size = sprintf(buffer,"%d",_value);
+                    res->set_operation(M2MBase::GET_PUT_POST_ALLOWED);
+                    res->set_value((const uint8_t*)buffer,
+                                   (const uint32_t)size);
+                    _value++;
                 }
         }
         return success;
     }
 
+    void update_resource() {
+        if(_object) {
+            M2MObjectInstance* inst = _object->object_instance();
+            if(inst) {
+                    M2MResource* res = inst->resource("Test");
+                    printf(" Value sent %d\n", _value);
+                    char buffer[20];
+                    int size = sprintf(buffer,"%d",_value);
+                    res->set_value((const uint8_t*)buffer,
+                                   (const uint32_t)size);
+                    _value++;
+                }
+        }
+    }
 
     void test_register(){
         M2MObjectList object_list;
@@ -182,6 +212,8 @@ public:
             _register_security = server_object;
             _bootstrapped = true;
             printf("\nBootstrapped\n");
+            printf("mDS Address %s\n",
+                   _register_security->resource_value_string(M2MSecurity::M2MServerUri).c_str());
         }
     }
 
@@ -219,24 +251,15 @@ private:
     bool                _registered;
     bool                _unregistered;
     bool                _registration_updated;
+    int                 _value;
 };
 
 void* wait_for_bootstrap(void* arg) {
     M2MLWClient *client;
     client = (M2MLWClient*) arg;
     if(client->bootstrap_successful()) {
-        printf("Calling test_register\n");
+        printf("Registering endpoint\n");
         client->test_register();
-    }
-    return NULL;
-}
-
-void* wait_for_register(void* arg) {
-    M2MLWClient *client;
-    client = (M2MLWClient*) arg;
-    if(client->register_successful()) {
-        printf("Calling test_unregister\n");
-        client->test_unregister();
     }
     return NULL;
 }
@@ -245,17 +268,49 @@ void* wait_for_unregister(void* arg) {
     M2MLWClient *client;
     client = (M2MLWClient*) arg;
     if(client->unregister_successful()) {
-        printf("unregister done\n");
+        printf("Unregistered done --> exiting\n");
+        exit(1);
     }
     return NULL;
+}
+
+void* send_observation(void* arg) {
+    M2MLWClient *client;
+    client = (M2MLWClient*) arg;
+    static uint8_t counter = 0;
+    while(1) {
+        sleep(1);
+        if(counter >= 10) {
+            printf("Sending observation\n");
+            client->update_resource();
+            counter = 0;
+        }
+        else
+            counter++;
+    }
+    return NULL;
+}
+
+static M2MLWClient *m2mclient = NULL;
+
+static void ctrl_c_handle_function(void)
+{
+    if(m2mclient && m2mclient->register_successful()) {
+        printf("Unregistering endpoint\n");
+        m2mclient->test_unregister();
+    }
 }
 
 int main() {
 
     pthread_t bootstrap_thread;
-    pthread_t register_thread;
     pthread_t unregister_thread;
+    pthread_t observation_thread;
     M2MLWClient lwm2mclient;
+
+    m2mclient = &lwm2mclient;
+
+    signal(SIGINT, (signalhandler_t)ctrl_c_handle_function);
 
 
     bool result = lwm2mclient.create_interface();
@@ -278,14 +333,14 @@ int main() {
         printf("\nGeneric object created\n");
     }
 
+    printf("Bootstrapping endpoint\n");
     lwm2mclient.test_bootstrap();
 
     pthread_create(&bootstrap_thread, NULL, &wait_for_bootstrap, (void*) &lwm2mclient);
-    pthread_create(&register_thread, NULL, &wait_for_register, (void*) &lwm2mclient);
+    pthread_create(&observation_thread, NULL, &send_observation, (void*) &lwm2mclient);
     pthread_create(&unregister_thread, NULL, &wait_for_unregister, (void*) &lwm2mclient);
 
     pthread_join(bootstrap_thread, NULL);
-    pthread_join(register_thread, NULL);
     pthread_join(unregister_thread, NULL);
 
     return 0;

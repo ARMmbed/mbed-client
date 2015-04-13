@@ -13,7 +13,7 @@
 // TODO: Remove when yotta supports init.
 #include "lwipv4_init.h"
 
-#undef BOOTSTRAP_ENABLED
+#define BOOTSTRAP_ENABLED
 
 // Enter your mbed Device Server's IPv4 address and Port number in
 // mentioned format like 192.168.0.1:5693
@@ -25,7 +25,8 @@ const String &MODEL_NUMBER = "2015";
 const String &SERIAL_NUMBER = "12345";
 
 #if defined(TARGET_K64F)
-#define APP_BUTTON SW2
+#define OBS_BUTTON SW2
+#define UNREG_BUTTON SW3
 #endif
 
 class M2MLWClient: public M2MInterfaceObserver {
@@ -37,6 +38,8 @@ public:
         _registered = false;
         _unregistered = false;
         _register_security = NULL;
+        _value = 0;
+        _object = NULL;
     }
 
     ~M2MLWClient() {
@@ -53,7 +56,7 @@ public:
         // setup its name, resource type, life time, connection mode,
         // Currently only LwIPv4 is supported.
         _interface = M2MInterfaceFactory::create_interface(*this,
-                                                  "lwm2m",
+                                                  "lwm2m-endpoint",
                                                   "test",
                                                   3600,
                                                   5683,
@@ -118,20 +121,35 @@ public:
     }
 
     M2MObject* create_generic_object() {
-        M2MObject *object = M2MInterfaceFactory::create_object("Test");
-        if(object) {
-            M2MObjectInstance* inst = object->create_object_instance();
+        _object = M2MInterfaceFactory::create_object("Test");
+        if(_object) {
+            M2MObjectInstance* inst = _object->create_object_instance();
             if(inst) {
                     M2MResource* res = inst->create_dynamic_resource("Test","ResourceTest",true);
-                    int value = 1;
                     char buffer[20];
-                    int size = sprintf(buffer,"%d",value);
+                    int size = sprintf(buffer,"%d",_value);
                     res->set_operation(M2MBase::GET_PUT_POST_ALLOWED);
                     res->set_value((const uint8_t*)buffer,
                                    (const uint32_t)size);
+                    _value++;
                 }
         }
-        return object;
+        return _object;
+    }
+
+    void update_resource() {
+        if(_object) {
+            M2MObjectInstance* inst = _object->object_instance();
+            if(inst) {
+                    M2MResource* res = inst->resource("Test");
+
+                    char buffer[20];
+                    int size = sprintf(buffer,"%d",_value);
+                    res->set_value((const uint8_t*)buffer,
+                                   (const uint32_t)size);
+                    _value++;
+                }
+        }
     }
 
     void test_register(M2MObjectList object_list){
@@ -203,10 +221,12 @@ private:
 
     M2MInterface    	*_interface;
     M2MSecurity         *_register_security;
+    M2MObject           *_object;
     volatile bool       _bootstrapped;
     volatile bool       _error;
     volatile bool       _registered;
     volatile bool       _unregistered;
+    int                 _value;
 };
 
 int main() {
@@ -225,11 +245,17 @@ int main() {
     M2MLWClient lwm2mclient;
 
     // Set up Hardware interrupt button.
-    InterruptIn button(APP_BUTTON);
+    InterruptIn obs_button(OBS_BUTTON);
+
+    InterruptIn unreg_button(UNREG_BUTTON);
+
+    // On press of SW3 button on K64F board, example application
+    // will call unregister API towards mbed Device Server
+    unreg_button.fall(&lwm2mclient,&M2MLWClient::test_unregister);
 
     // On press of SW2 button on K64F board, example application
-    // will call unregister API towards mbed Device Server
-    button.fall(&lwm2mclient,&M2MLWClient::test_unregister);
+    // will send observation towards mbed Device Server
+    obs_button.fall(&lwm2mclient,&M2MLWClient::update_resource);
 
     // Create LWM2M Client API interface to manage bootstrap,
     // register and unregister

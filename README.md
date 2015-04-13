@@ -8,9 +8,13 @@ The OMA Lightweight M2M enabler includes device management and service enablemen
 Therefore, this enabler makes use of a light and compact protocol as well as an efficient resource data model.
 A Client-Server architecture is introduced for the LWM2M Enabler, where the LWM2M Device acts as a LWNM2M Client and the M2M service, platform or application acts as the LWM2M Server. 
 There are four interfaces between these two components as shown below:
+
 - Bootstrap
+
 - Client Registration
+
 - *Device management and service enablement*
+
 - *Information Reporting*
 
 This API currently covers Bootstrap and Client Registration, the other two features will be added in future releases of this API.
@@ -34,11 +38,15 @@ M2MInterface* interface = M2MInterfaceFactory::create_interface(*this,
                                                   "");
 ```
 Once you have created an interface, you can now proceed to execute operation using this interface.
-####Bootstrap feature
+
+###Bootstrap feature
+
 The Bootstrap Interface is used to provision essential information into the LWM2M Client to enable the LWM2M Client to perform the operation “Register” with one or more LWM2M Servers. 
 
 In this release only one bootstrap mode is supported:
-#####Client Initiated Bootstrap
+
+###Client Initiated Bootstrap
+
 Client Initiated Bootstrap mode provides a mechanism for the LWM2M Client to retrieve the Bootstrap Information from a LWM2M Bootstrap Server.
 The Client Initiated Bootstrap mode requires having a LWM2M Boostrap Server Account. 
 This API enables client initiated bootstrap functionality.
@@ -77,16 +85,22 @@ void error(M2MInterface::Error error)
 
 You can get to know more about the  error from the `error` parameter which is passed with the callback and then act accordingly.
 
-####Client Registration Interface
+###Client Registration Interface
+
 The Client Registration Interface is used by a LWM2M Client to register with  LWM2M Servers, maintain  registration and de-register from a LWM2M Server. 
 Currently, only one-to-one client server regisration is supported. But, in upcoming releases client API will support one-to many client-server registrations.
 
 Client registration interface includes multiple sub-features and currently supported are:
+
 - Register
+
 - Update 
+
 - De-register
 
-#####Register
+
+###Register
+
 When registering, the LWM2M Client performs the “Register” operation and provides the properties the LWM2M Server requires to contact the LWM2M Client (e.g., End Point Name); maintain the registration and session (e.g., Lifetime, Queue Mode) between the LWM2M Client and LWM2M Server as well as knowledge of the Objects the LWM2M Client supports and existing Object Instances in the LWM2M Client
 
 This API enables clientregistration functionality.
@@ -146,9 +160,10 @@ void error(M2MInterface::Error error)
 
 You can get to know more about the  error from the `error` parameter which is passed with the callback and then act accordingly.
 
-#####Update
+###Update
+
 Periodically or based on certain events within the LWM2M Client or initiated by the LWM2M Server, the LWM2M Client updates its registration information with a LWM2M Server by sending an “Update” operation to the LWM2M Server.
-This is how you can de-update your registration.  
+This is how you can de-update your registration.
 ```
 M2MInterface::update_registration(M2MSecurity* security_object, const uint32_t lifetime)
 ```
@@ -167,7 +182,8 @@ In case, the updation  operation fails for some reason , then you will receive f
 void error(M2MInterface::Error error)
 ```
 
-#####De-register
+###De-register
+
 When a LWM2M Client determines that it no longer requires to be available to a LWM2M Server (e.g., LWM2M Device factory reset), the LWM2M Client de-register from the LWM2M Server. Upon receiving this message, the LWM2M Server removes the registration information from the LWM2M Server.
 This is how you can de-register your endpoint client. 
 In case, endpoint has multiple server regsitration  then you need to provide the server_object of the server where you would like to de-register your endpoint. Otherwise if there is only one registration then you can pass NULL and client will unregister the default registration from endpoint.
@@ -192,15 +208,20 @@ void error(M2MInterface::Error error)
 
 You can get to know more about the  error from the `error` parameter which is passed with the callback and then act accordingly.
 
-#####Device Management and Service Enablement Interface
+###Device Management and Service Enablement Interface
+
 *Not yet supported.*
-#####Information Reporting Interface
+
+###Information Reporting Interface
+
 *Not yet supported.*
 
 ##More Information
+
 This API is based on OMA LWM2M specification. You can get specification from [here]()
 
 ##API documentation
+
 You can generate Doxygen API documentation for these APIs from doxy file which is present in `cd doxygen` folder . You need to run `doxygen` command from the `doxygen/` folder and it will generate `docs` folder at API source directory root level where you can find the detailed documentation for each API.
 
 ##Example application

@@ -37,6 +37,14 @@ M2MBase& M2MBase::operator=(const M2MBase& other)
                 memcpy((uint8_t *)_value, (uint8_t *)other._value, other._value_length);
             }
         }
+        _token_length = other._token_length;
+        if(other._token) {
+            _token = (uint8_t *)malloc(other._token_length);
+            if(_token) {
+                memcpy((uint8_t *)_token, (uint8_t *)other._token, other._token_length);
+            }
+        }
+
     }
     return *this;
 }
@@ -52,6 +60,7 @@ M2MBase::M2MBase(const String & resource_name,
   _mode(mde),
   _observation_handler(NULL),
   _name(resource_name),
+  _coap_content_type(0),
   _instance_id(0),
   _observable(false),
   _under_observation(false),
@@ -64,7 +73,9 @@ M2MBase::M2MBase(const String & resource_name,
   _pmin_timer(new M2MTimer(*this)),
   _pmax_timer(new M2MTimer(*this)),
   _value(NULL),
-  _value_length(0)
+  _value_length(0),
+  _token(NULL),
+  _token_length(0)
 { 
 }
 
@@ -73,6 +84,10 @@ M2MBase::~M2MBase()
     if(_value) {
         free(_value);
         _value = NULL;
+    }
+    if(_token) {
+        free(_token);
+        _token = NULL;
     }
     if(_pmax_timer) {
         delete _pmax_timer;
@@ -124,9 +139,21 @@ void M2MBase::set_under_observation(bool observed,
     }
 }
 
-void M2MBase::set_observation_token(const String &token)
+void M2MBase::set_observation_token(const uint8_t *token, const uint8_t length)
 {
-    _token = token;
+    if(_token) {
+         free(_token);
+         _token = NULL;
+         _token_length = 0;
+    }
+
+    if( token != NULL && length > 0 ) {
+        _token = (uint8_t *)malloc(length);
+       if(_token) {
+            memcpy((uint8_t *)_token, (uint8_t *)token, length);
+            _token_length = length;
+        }
+    }
 }
 
 void M2MBase::set_instance_id(const uint16_t inst_id)
@@ -154,6 +181,11 @@ bool M2MBase::set_value(const uint8_t *value, const uint32_t value_length)
         schedule_report();
     }
     return success;
+}
+
+void M2MBase::set_observation_number(const uint16_t observation_number)
+{
+    _observation_number = observation_number;
 }
 
 M2MBase::Operation M2MBase::operation() const
@@ -210,9 +242,18 @@ bool M2MBase::is_under_observation() const
     return _under_observation;
 }
 
-const String& M2MBase::observation_token() const
+void M2MBase::get_observation_token(uint8_t *&token, uint32_t &token_length)
 {
-    return _token;
+    token_length = 0;
+    if(token) {
+        free(token);
+        token = NULL;
+    }
+    token = (uint8_t *)malloc(_token_length);
+    if(token) {
+        token_length = _token_length;
+        memcpy((uint8_t *)token, (uint8_t *)_token, token_length);
+    }
 }
 
 M2MBase::Mode M2MBase::mode() const
@@ -220,7 +261,7 @@ M2MBase::Mode M2MBase::mode() const
     return _mode;
 }
 
-uint8_t M2MBase::observation_number() const
+uint16_t M2MBase::observation_number() const
 {
     return _observation_number;
 }
@@ -342,8 +383,8 @@ void M2MBase::schedule_report()
 {
     if(_under_observation) {
         _report_scheduled = true;
-        if (_pmin_exceeded || _pmax_exceeded) {
+//        if (_pmin_exceeded || _pmax_exceeded) {
             report();
-        }
+//        }
     }
 }

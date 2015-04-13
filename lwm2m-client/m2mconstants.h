@@ -15,8 +15,8 @@ const uint64_t ONE_SECOND_TIMER = 1;
 
 // values per: draft-ietf-core-observe-16
 // OMA LWM2M CR ref.
-#define START_OBSERVATION 0
-#define STOP_OBSERVATION 1
+#define START_OBSERVATION 1
+#define STOP_OBSERVATION 0
 
 // PUT attributes to be checked from server
 extern const String EQUAL;
