@@ -382,7 +382,7 @@ void M2MNsdlInterface::observation_to_be_sent(M2MBase *object)
         object->get_value(value,length);
         object->get_observation_token(token,token_length);
 
-        uint8_t message_id = sn_nsdl_send_observation_notification(token,
+        sn_nsdl_send_observation_notification(token,
                                               token_length,
                                               value,length,
                                               observation_number,
