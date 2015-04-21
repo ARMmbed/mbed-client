@@ -26,6 +26,9 @@ M2MConnectionHandlerImpl::~M2MConnectionHandlerImpl()
         free(_received_packet_address);
         _received_packet_address = NULL;
     }
+
+    pthread_cancel(_listen_thread);
+    shutdown(_socket_server,SHUT_RDWR);
 }
 
 bool M2MConnectionHandlerImpl::bind_connection(const uint16_t listen_port)
@@ -66,7 +69,7 @@ bool M2MConnectionHandlerImpl::resolve_server_address(const String& server_addre
 bool M2MConnectionHandlerImpl::listen_for_data()
 {
     bool success = true;
-    pthread_cancel(_listen_thread);
+    //pthread_cancel(_listen_thread);
     pthread_create(&_listen_thread, NULL,__listen_data_function, NULL);
     return success;
 }

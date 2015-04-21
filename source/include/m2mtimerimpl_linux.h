@@ -58,26 +58,16 @@ public:
      * Uses POSIX nanosleep() to sleep specific number of "slots"
      * May wake up by signal, if requested, to get value for remaining sleep counter.
      */
-    void thread_function();
-
-private:
-
-    /**
-     * @brief Internal function for timer
-     * @return remaining slots.
-     */
-    uint16_t platform_timer_get_remaining_slots(void);
+    void thread_function(void *object);
 
 private:
 
     M2MTimerObserver&   _observer;
     bool                _single_shot;
     uint64_t            _interval;
-    pthread_t           _timer_th; /* Thread for coap_exec-function */
+    pthread_t           _timer_th;
     pthread_mutex_t     _mtx;
     pthread_mutex_t     _rem_mtx;
-    struct timespec     _slot_sleep;
-    volatile uint16_t   _remaining;
     volatile int        _started;
 
 

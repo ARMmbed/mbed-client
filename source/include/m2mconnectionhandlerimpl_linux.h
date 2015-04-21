@@ -102,8 +102,6 @@ private:
     String                                  _server_address;
     char                                    _receive_buffer[1024];
     char                                    _send_buffer[1024];
-    M2MConnectionObserver::ServerType       _server_type;
-    uint16_t                                _server_port;
     M2MInterface::NetworkStack              _stack;
     int                                     _socket_server;
     struct sockaddr_in                      _sa_dst;

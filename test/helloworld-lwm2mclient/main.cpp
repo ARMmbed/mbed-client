@@ -24,6 +24,8 @@ const String &TYPE = "type";
 const String &MODEL_NUMBER = "2015";
 const String &SERIAL_NUMBER = "12345";
 
+const uint8_t STATIC_VALUE[] = "Static value";
+
 #if defined(TARGET_K64F)
 #define OBS_BUTTON SW2
 #define UNREG_BUTTON SW3
@@ -56,9 +58,9 @@ public:
         // setup its name, resource type, life time, connection mode,
         // Currently only LwIPv4 is supported.
         _interface = M2MInterfaceFactory::create_interface(*this,
-                                                  "lwm2m-endpoint",
+                                                  "mbed-endpoint",
                                                   "test",
-                                                  3600,
+                                                  60,
                                                   5683,
                                                   "",
                                                   M2MInterface::UDP,
@@ -125,14 +127,20 @@ public:
         if(_object) {
             M2MObjectInstance* inst = _object->create_object_instance();
             if(inst) {
-                    M2MResource* res = inst->create_dynamic_resource("Test","ResourceTest",true);
+                    M2MResource* res = inst->create_dynamic_resource("D","ResourceTest",true);
                     char buffer[20];
                     int size = sprintf(buffer,"%d",_value);
                     res->set_operation(M2MBase::GET_PUT_POST_ALLOWED);
                     res->set_value((const uint8_t*)buffer,
-                                   (const uint32_t)size);
+                                   (const uint32_t)size,
+                                   true);
                     _value++;
-                }
+
+                    inst->create_static_resource("S",
+                                                 "ResourceTest",
+                                                 STATIC_VALUE,
+                                                 sizeof(STATIC_VALUE)-1);
+            }
         }
         return _object;
     }
@@ -141,12 +149,13 @@ public:
         if(_object) {
             M2MObjectInstance* inst = _object->object_instance();
             if(inst) {
-                    M2MResource* res = inst->resource("Test");
+                    M2MResource* res = inst->resource("D");
 
                     char buffer[20];
                     int size = sprintf(buffer,"%d",_value);
                     res->set_value((const uint8_t*)buffer,
-                                   (const uint32_t)size);
+                                   (const uint32_t)size,
+                                   true);
                     _value++;
                 }
         }

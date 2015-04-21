@@ -18,38 +18,38 @@ M2MSecurity::M2MSecurity(ServerType ser_type)
 
     if(_server_instance) {
 
-        M2MResource* res = _server_instance->create_dynamic_resource(SECURITY_M2M_SERVER_URI,SECURITY_TYPE,
+        M2MResource* res = _server_instance->create_dynamic_resource(SECURITY_M2M_SERVER_URI,OMA_RESOURCE_TYPE,
                                                                      false);
         if(res) {
             res->set_operation(M2MBase::NOT_ALLOWED);
         }
-        res = _server_instance->create_dynamic_resource(SECURITY_BOOTSTRAP_SERVER,SECURITY_TYPE,
+        res = _server_instance->create_dynamic_resource(SECURITY_BOOTSTRAP_SERVER,OMA_RESOURCE_TYPE,
                                                         false);
         if(res) {
             res->set_operation(M2MBase::NOT_ALLOWED);
         }
-        res = _server_instance->create_dynamic_resource(SECURITY_SECURITY_MODE,SECURITY_TYPE,
+        res = _server_instance->create_dynamic_resource(SECURITY_SECURITY_MODE,OMA_RESOURCE_TYPE,
                                                         false);
         if(res) {
             res->set_operation(M2MBase::NOT_ALLOWED);
         }
-        res = _server_instance->create_dynamic_resource(SECURITY_PUBLIC_KEY,SECURITY_TYPE,
+        res = _server_instance->create_dynamic_resource(SECURITY_PUBLIC_KEY,OMA_RESOURCE_TYPE,
                                                         false);
         if(res) {
             res->set_operation(M2MBase::NOT_ALLOWED);
         }
-        res = _server_instance->create_dynamic_resource(SECURITY_SERVER_PUBLIC_KEY,SECURITY_TYPE,
+        res = _server_instance->create_dynamic_resource(SECURITY_SERVER_PUBLIC_KEY,OMA_RESOURCE_TYPE,
                                                         false);
         if(res) {
             res->set_operation(M2MBase::NOT_ALLOWED);
         }
-        res = _server_instance->create_dynamic_resource(SECURITY_SECRET_KEY,SECURITY_TYPE,
+        res = _server_instance->create_dynamic_resource(SECURITY_SECRET_KEY,OMA_RESOURCE_TYPE,
                                                         false);
         if(res) {
             res->set_operation(M2MBase::NOT_ALLOWED);
         }
         if(M2MSecurity::M2MServer == ser_type) {
-            res = _server_instance->create_dynamic_resource(SECURITY_SHORT_SERVER_ID,SECURITY_TYPE,
+            res = _server_instance->create_dynamic_resource(SECURITY_SHORT_SERVER_ID,OMA_RESOURCE_TYPE,
                                                             false);
             if(res) {
                 res->set_operation(M2MBase::NOT_ALLOWED);
@@ -88,7 +88,7 @@ M2MResource* M2MSecurity::create_resource(SecurityResource resource, uint32_t va
     if(!security_id.empty()) {
         if(_server_instance) {
 
-            res = _server_instance->create_dynamic_resource(security_id,SECURITY_TYPE,
+            res = _server_instance->create_dynamic_resource(security_id,OMA_RESOURCE_TYPE,
                                                             false);
 
             if(res) {
@@ -140,7 +140,9 @@ bool M2MSecurity::set_resource_value(SecurityResource resource,
     bool success = false;
     if(M2MSecurity::M2MServerUri == resource) {
         M2MResource* res = get_resource(resource);
-        success = res->set_value((const uint8_t*)value.c_str(),(uint32_t)value.length());
+        if(res) {
+            success = res->set_value((const uint8_t*)value.c_str(),(uint32_t)value.length());
+        }
     }
     return success;
 }
@@ -160,7 +162,9 @@ bool M2MSecurity::set_resource_value(SecurityResource resource,
             // set the value of the resource.
             char buffer[20];
             int size = sprintf(buffer,"%ld",value);
-            success = res->set_value((const uint8_t*)buffer,(const uint32_t)size);
+            success = res->set_value((const uint8_t*)buffer,
+                                     (const uint32_t)size,
+                                     true);
         }
     }
     return success;
@@ -195,16 +199,13 @@ String M2MSecurity::resource_value_string(SecurityResource resource) const
             char *char_buffer = (char*)malloc(length+1);
             if(char_buffer) {
                 memset(char_buffer,0,length+1);
-                memcpy(char_buffer,(char*)buffer,length);
-
-                String s_name(char_buffer);
-                value = s_name;
                 if(buffer) {
+                    memcpy(char_buffer,(char*)buffer,length);
                     free(buffer);
                 }
-                if(char_buffer) {
-                    free(char_buffer);
-                }
+                String s_name(char_buffer);
+                value = s_name;
+                free(char_buffer);
             }
         }
     }
@@ -241,8 +242,8 @@ uint32_t M2MSecurity::resource_value_int(SecurityResource resource) const
             uint8_t* buffer = NULL;
             uint32_t length = 0;
             res->get_value(buffer,length);
-            value = atoi((const char*)buffer);
             if(buffer) {
+                value = atoi((const char*)buffer);
                 free(buffer);
             }
         }

@@ -84,10 +84,10 @@ void __socket_free(void * context, void * ptr)
     free(ptr);
 }
 #ifdef USE_LINUX
-void* __thread_poll_function(void*)
+void* __thread_poll_function(void* object)
 {
     if(__timer_impl) {
-       __timer_impl->thread_function();
+       __timer_impl->thread_function(object);
     }
     return NULL;
 }

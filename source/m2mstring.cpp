@@ -45,6 +45,7 @@ namespace m2m {
   String::String()
   : p( strdup_never_null("") )
   {
+    _return_value = '\0';
   }
 
   String::~String()
@@ -59,11 +60,13 @@ namespace m2m {
     allocated_ = s.size_ + 1;
     size_      = s.size_;
     memcpy(p, s.p, size_ + 1);
+    _return_value = '\0';
   }
 
   String::String(const char* s)
   : p(strdup_never_null(s))
   {
+      _return_value = '\0';
   }
 
   String& String::operator=(const char* s)

@@ -24,11 +24,14 @@ M2MTimer& M2MTimer::operator=(const M2MTimer& other)
 M2MTimer::M2MTimer(const M2MTimer& other)
 : _observer(other._observer)
 {
+    _type = other._type;
+    _impl = new M2MTimerImpl(*other._impl);
     *this = other;
 }
 
 M2MTimer::M2MTimer(M2MTimerObserver& observer)
-: _observer(observer)
+: _observer(observer),
+  _type(M2MTimerObserver::Notdefined)
 {
     _impl = new M2MTimerImpl(*this);
 }

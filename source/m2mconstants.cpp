@@ -9,6 +9,9 @@ const String EQUAL = "=";
 const String AMP = "&";
 const String PMIN = "pmin";
 const String PMAX = "pmax";
+const String GT = "gt";
+const String LT = "lt";
+const String ST = "st";
 const String CANCEL = "cancel";
 
 
@@ -24,10 +27,8 @@ const String M2M_LOCATION_ID = "6";
 const String M2M_CONNECTIVITY_STATISTICS_ID = "7";
 const String RESERVED_ID = "8";
 
-//OBJECT RESOURCE TYPE
-const String DEVICE_TYPE = "device_type";
-const String SECURITY_TYPE = "security_type";
-const String SERVER_TYPE = "server_type";
+//OMA RESOURCE TYPE
+const String OMA_RESOURCE_TYPE = "oma.lwm2m";
 
 //DEVICE RESOURCES
 const String DEVICE_MANUFACTURER = "0";

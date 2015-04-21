@@ -36,7 +36,7 @@ void *__socket_malloc( void * context, size_t size);
 void __socket_free(void * context, void * ptr);
 
 #ifdef USE_LINUX
-    void* __thread_poll_function(void*);
+    void* __thread_poll_function(void* object);
     void* __listen_data_function(void*);
 #endif
 

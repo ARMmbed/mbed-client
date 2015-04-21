@@ -8,6 +8,7 @@ M2MObject::M2MObject(const String &object_name)
 : M2MBase(object_name,M2MBase::Dynamic),
   _instance_index(0)
 {
+    M2MBase::set_base_type(M2MBase::Object);
 }
 
 M2MObject::~M2MObject()
@@ -131,7 +132,7 @@ uint16_t M2MObject::instance_count() const
 
 M2MBase::BaseType M2MObject::base_type() const
 {
-    return M2MBase::Object;
+    return M2MBase::base_type();
 }
 
 void M2MObject::add_object_instance(M2MObjectInstance *obj)

@@ -27,6 +27,7 @@ M2MResource::M2MResource(const String &res_name,
   _has_multiple_instances(multiple_instances)
 {
     M2MBase::set_resource_type(res_type);
+    M2MBase::set_base_type(M2MBase::Resource);
 }
 
 M2MResource::~M2MResource()
@@ -35,7 +36,7 @@ M2MResource::~M2MResource()
 
 M2MBase::BaseType M2MResource::base_type() const
 {
-    return M2MBase::Resource;
+    return M2MBase::base_type();
 }
 
 bool M2MResource::supports_multiple_instances() const

@@ -54,6 +54,8 @@ M2MNsdlInterface::~M2MNsdlInterface()
         }
         _server_list.clear();
     }
+    sn_nsdl_destroy();
+    __nsdl_interface = NULL;
 }
 
 bool M2MNsdlInterface::initialize()
@@ -534,7 +536,7 @@ bool M2MNsdlInterface::create_nsdl_resource_structure(M2MResource *res,
                        ((uint8_t*)memory_alloc(sizeof(res->interface_description().length())));
                memcpy(_resource->resource_parameters_ptr->interface_description_ptr,
                       (uint8_t*)res->interface_description().c_str(),
-                      res->resource_type().length());
+                      res->interface_description().length());
                _resource->resource_parameters_ptr->interface_description_len =
                        res->interface_description().length();
            }
@@ -751,44 +753,49 @@ uint8_t M2MNsdlInterface::handle_get_request(sn_coap_hdr_s *received_coap_header
             }
 
             if(received_coap_header->options_list_ptr) {
-                uint8_t observe_option = received_coap_header->options_list_ptr->observe;
-                uint32_t number = 0;
-                if(START_OBSERVATION == observe_option) {
-
-                    // If the observe length is 0 means register for observation.
-                    if(received_coap_header->options_list_ptr->observe_len == 0) {
-                        object->set_under_observation(true,this);
+                if(received_coap_header->options_list_ptr->observe) {
+                    uint32_t number = 0;
+                    uint8_t observe_option = 0;
+                    if(received_coap_header->options_list_ptr->observe_ptr) {
+                        observe_option = *received_coap_header->options_list_ptr->observe_ptr;
                     }
-                    else {
-                    for(int i=0;i < received_coap_header->options_list_ptr->observe_len; i++) {
-                        number = (*(received_coap_header->options_list_ptr->observe_ptr + i) & 0xff) <<
-                                 8*(received_coap_header->options_list_ptr->observe_len- 1 - i);
+                    if(START_OBSERVATION == observe_option) {
+
+                        // If the observe length is 0 means register for observation.
+                        if(received_coap_header->options_list_ptr->observe_len == 0) {
+                            object->set_under_observation(true,this);
                         }
-                    }
-                    // If the observe value is 0 means register for observation.
-                    if(number == 0) {
-                        object->set_under_observation(true,this);
-                        uint8_t observation_number[2];
-                        uint8_t observation_number_length = 1;
-
-                        uint16_t number = object->observation_number();
-
-                        observation_number[0] = ((number>>8) & 0xFF);
-                        observation_number[1] = (number & 0xFF);
-
-                        if(number > 0xFF) {
-                            observation_number_length = 2;
+                        else {
+                        for(int i=0;i < received_coap_header->options_list_ptr->observe_len; i++) {
+                            number = (*(received_coap_header->options_list_ptr->observe_ptr + i) & 0xff) <<
+                                     8*(received_coap_header->options_list_ptr->observe_len- 1 - i);
+                            }
                         }
-                        coap_response->options_list_ptr->observe_ptr = observation_number;
-                        coap_response->options_list_ptr->observe_len = observation_number_length;
-                    } else if(number == 1) {
-                        // If the observe value is 1 means de-register from observation.
+                        // If the observe value is 0 means register for observation.
+                        if(number == 0) {
+                            object->set_under_observation(true,this);
+                            uint8_t observation_number[2];
+                            uint8_t observation_number_length = 1;
+
+                            uint16_t number = object->observation_number();
+
+                            observation_number[0] = ((number>>8) & 0xFF);
+                            observation_number[1] = (number & 0xFF);
+
+                            if(number > 0xFF) {
+                                observation_number_length = 2;
+                            }
+                            coap_response->options_list_ptr->observe_ptr = observation_number;
+                            coap_response->options_list_ptr->observe_len = observation_number_length;
+                        } else if(number == 1) {
+                            // If the observe value is 1 means de-register from observation.
+                            object->set_under_observation(false,NULL);
+                        }
+                    } else if (STOP_OBSERVATION == observe_option) {
                         object->set_under_observation(false,NULL);
                     }
-
-                } else if (STOP_OBSERVATION == observe_option) {
-                    object->set_under_observation(false,NULL);
                 }
+
             }
         }
     }else {
@@ -831,7 +838,7 @@ uint8_t M2MNsdlInterface::handle_put_request(sn_coap_hdr_s *received_coap_header
                     memset(query + received_coap_header->options_list_ptr->uri_query_len,'\0',1);//String terminator
                     // if anything was updated, re-initialize the stored notification attributes
                     sn_coap_msg_code_e msg_code = COAP_MSG_CODE_RESPONSE_BAD_REQUEST; // 4.00
-                    if (object->parse_notification_attribute(query)){
+                    if (object->handle_observation_attribute(query)){
                         msg_code = COAP_MSG_CODE_RESPONSE_CHANGED; // 2.04
                     }
                     coap_response = sn_coap_build_response(received_coap_header, msg_code);
@@ -860,8 +867,8 @@ uint8_t M2MNsdlInterface::handle_post_request(sn_coap_hdr_s */*received_coap_hea
 void M2MNsdlInterface::clear_resource(sn_nsdl_resource_info_s *&resource)
 {
     //Clear up the filled resource to fill up new resource.
-    sn_nsdl_resource_parameters_s *temp_resource_parameter = resource->resource_parameters_ptr;
-    if(resource) {
+    if(resource && resource->resource_parameters_ptr) {
+        sn_nsdl_resource_parameters_s *temp_resource_parameter = resource->resource_parameters_ptr;
         memset(resource->resource_parameters_ptr, 0, sizeof(sn_nsdl_resource_parameters_s));
         memset(resource,0, sizeof(sn_nsdl_resource_info_s));
         resource->resource_parameters_ptr = temp_resource_parameter;

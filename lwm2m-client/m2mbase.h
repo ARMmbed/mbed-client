@@ -6,12 +6,12 @@
 
 // Support for std args
 #include <stdint.h>
-#include "m2mconfig.h"
-#include "lwm2m-client/m2mtimerobserver.h"
+#include "lwm2m-client/m2mconfig.h"
+#include "lwm2m-client/m2mreportobserver.h"
 
 //FORWARD DECLARATION
 class M2MObservationHandler;
-class M2MTimer;
+class M2MReportHandler;
 
 /**
  *  @brief M2MBase.
@@ -19,7 +19,7 @@ class M2MTimer;
  *  can be created. This serves base class for both Object as well as Resources.
  */
 
-class M2MBase : public M2MTimerObserver {
+class M2MBase : public M2MReportObserver {
 
 public:
 
@@ -142,9 +142,11 @@ public:
      * @brief Sets the value of the given resource.
      * @param value, Pointer to the value to be set on the resource.
      * @param value_length , Length of the value pointer.
+     * @param is_numeric , Defines whether the value is numeric or string format.
+     * Default is false which means value is in string format.
      * @return True if successfully set else false.
      */
-    virtual bool set_value(const uint8_t *value, const uint32_t value_length);
+    virtual bool set_value(const uint8_t *value, const uint32_t value_length, bool is_numeric = false);
 
     /**
      * Sets Observation number of the object
@@ -202,12 +204,6 @@ public:
     virtual bool is_observable() const;
 
     /**
-     * @brief Returns the current observation status of the object
-     * @return True if under observation else false
-     */
-    virtual bool is_under_observation() const;
-
-    /**
      * @brief Returns the observation token of the object
      * @param value[OUT], pointer to the value of token.
      * @param value_length[OUT], length to the token pointer.
@@ -238,14 +234,19 @@ public:
      * attribute.
      * @return true if required attributes are present else false.
      */
-    virtual bool parse_notification_attribute(char *&query);
+    virtual bool handle_observation_attribute(char *&query);
 
-protected : // from M2MTimerObserver
+protected : // from M2MReportObserver
 
-    virtual void timer_expired(M2MTimerObserver::Type type =
-                               M2MTimerObserver::Notdefined);
+    virtual void observation_to_be_sent();
 
 protected:
+
+    /**
+     * @brief Sets the Base type for object.
+     * @param type, Type of the base object
+     */
+    virtual void set_base_type(M2MBase::BaseType type);
 
     /**
      * @brief Removes resource from coap structure.
@@ -260,45 +261,23 @@ protected:
 
 private:
 
-    bool set_notification_attribute(char* option);
-
-    /**
-     * @brief Schedule a report, if the pmin is exceeded
-     * then report immediately else store the state to be
-     * reported once the time fires.
-     */
-    void schedule_report();
-
-    /**
-    * @brief Reports a sample that satisfies the reporting criteria.
-    */
-    void report();
-
-private:
-
+    M2MReportHandler           *_report_handler;
+    M2MObservationHandler      *_observation_handler;
     M2MBase::Operation          _operation;
     M2MBase::Mode               _mode;
-    M2MObservationHandler      *_observation_handler;
+    M2MBase::BaseType           _base_type;
     String                      _name;
     String                      _resource_type;
     String                      _interface_description;
     uint8_t                     _coap_content_type;
     uint16_t                    _instance_id;
     bool                        _observable;
-    bool                        _under_observation;
     uint16_t                    _observation_number;
-    float                       _pmax;
-    float                       _pmin;
-    bool                        _pmin_exceeded;
-    bool                        _pmax_exceeded;
-    bool                        _report_scheduled;
-    M2MTimer                    *_pmin_timer;
-    M2MTimer                    *_pmax_timer;
     uint8_t                     *_value;
     uint32_t                    _value_length;
+    bool                        _is_numeric;
     uint8_t                     *_token;
     uint8_t                     _token_length;
-
 
 friend class Test_M2MBase;
 

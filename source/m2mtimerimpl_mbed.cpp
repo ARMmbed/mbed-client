@@ -53,7 +53,7 @@ void M2MTimerImpl::stop_timer()
 void M2MTimerImpl::timer_expired()
 {
     _observer.timer_expired();
-    if(_single_shot) {
+    if(!_single_shot) {
         start_timer(_interval,true);
     }
 }

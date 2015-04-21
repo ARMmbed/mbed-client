@@ -15,16 +15,18 @@ const uint64_t ONE_SECOND_TIMER = 1;
 
 // values per: draft-ietf-core-observe-16
 // OMA LWM2M CR ref.
-#define START_OBSERVATION 1
-#define STOP_OBSERVATION 0
+#define START_OBSERVATION 0
+#define STOP_OBSERVATION 1
 
 // PUT attributes to be checked from server
 extern const String EQUAL;
 extern const String AMP;
 extern const String PMIN;
 extern const String PMAX;
+extern const String GT;
+extern const String LT;
+extern const String ST;
 extern const String CANCEL;
-
 
 //LWM2MOBJECT NAME/ID
 extern const String M2M_SECURITY_ID;
@@ -39,9 +41,7 @@ extern const String M2M_CONNECTIVITY_STATISTICS_ID;
 extern const String RESERVED_ID;
 
 //OBJECT RESOURCE TYPE
-extern const String DEVICE_TYPE;
-extern const String SECURITY_TYPE;
-extern const String SERVER_TYPE;
+extern const String OMA_RESOURCE_TYPE;
 
 //DEVICE RESOURCES
 extern const String DEVICE_MANUFACTURER;

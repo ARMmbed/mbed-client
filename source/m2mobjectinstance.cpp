@@ -29,6 +29,7 @@ M2MObjectInstance::M2MObjectInstance(const M2MObjectInstance& other)
 M2MObjectInstance::M2MObjectInstance(const String &object_name)
 : M2MBase(object_name,M2MBase::Dynamic)
 {
+    M2MBase::set_base_type(M2MBase::ObjectInstance);
 }
 
 M2MObjectInstance::~M2MObjectInstance()
@@ -168,7 +169,7 @@ uint16_t M2MObjectInstance::resource_count(const String& resource) const
 
 M2MBase::BaseType M2MObjectInstance::base_type() const
 {
-    return M2MBase::ObjectInstance;
+    return M2MBase::base_type();
 }
 
 void M2MObjectInstance::add_resource(M2MResource *res)

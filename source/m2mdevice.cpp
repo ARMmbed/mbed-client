@@ -15,18 +15,18 @@ M2MDevice::M2MDevice()
     _device_instance = M2MObject::create_object_instance();
 
     if(_device_instance) {
-        M2MResource* res = _device_instance->create_dynamic_resource(DEVICE_REBOOT,DEVICE_TYPE,false);
+        M2MResource* res = _device_instance->create_dynamic_resource(DEVICE_REBOOT,OMA_RESOURCE_TYPE,false);
         if(res) {
             res->set_operation(M2MBase::POST_ALLOWED);
         }
 
-        res = _device_instance->create_dynamic_resource(DEVICE_ERROR_CODE,DEVICE_TYPE,false,true);
+        res = _device_instance->create_dynamic_resource(DEVICE_ERROR_CODE,OMA_RESOURCE_TYPE,false,true);
         if(res) {
             res->set_operation(M2MBase::GET_PUT_ALLOWED);
             res->set_value((const uint8_t*)ERROR_CODE_VALUE.c_str(),
                            (uint32_t)ERROR_CODE_VALUE.length());
         }
-        res = _device_instance->create_dynamic_resource(DEVICE_SUPPORTED_BINDING_MODE,DEVICE_TYPE,false);
+        res = _device_instance->create_dynamic_resource(DEVICE_SUPPORTED_BINDING_MODE,OMA_RESOURCE_TYPE,false);
         if(res) {
             res->set_operation(M2MBase::GET_PUT_ALLOWED);
             res->set_value((const uint8_t*)BINDING_MODE_UDP.c_str(),
@@ -78,7 +78,7 @@ M2MResource* M2MDevice::create_resource(DeviceResource resource, const String &v
     }    
     if(!device_id.empty()) {
         if(_device_instance) {
-            res = _device_instance->create_dynamic_resource(device_id,DEVICE_TYPE,false);
+            res = _device_instance->create_dynamic_resource(device_id,OMA_RESOURCE_TYPE,false);
 
             if(res ) {
                 if((device_id == DEVICE_UTC_OFFSET) ||
@@ -118,7 +118,7 @@ M2MResource* M2MDevice::create_resource(DeviceResource resource, uint32_t value)
             break;
         case CurrentTime: {
             if(_device_instance) {
-                res = _device_instance->create_dynamic_resource(DEVICE_CURRENT_TIME,DEVICE_TYPE,false);
+                res = _device_instance->create_dynamic_resource(DEVICE_CURRENT_TIME,OMA_RESOURCE_TYPE,false);
 
                 if(res) {
                     char buffer[20];
@@ -146,7 +146,7 @@ M2MResource* M2MDevice::create_resource(DeviceResource resource, uint32_t value)
 
     if(!device_id.empty()) {
         if(_device_instance) {
-            res = _device_instance->create_dynamic_resource(device_id,DEVICE_TYPE,false);
+            res = _device_instance->create_dynamic_resource(device_id,OMA_RESOURCE_TYPE,false);
 
             if(res) {
                 char buffer[20];
@@ -166,7 +166,7 @@ M2MResource* M2MDevice::create_resource(DeviceResource resource)
     if(!is_resource_present(resource)) {
         if(FactoryReset == resource) {
             if(_device_instance) {
-                res = _device_instance->create_dynamic_resource(DEVICE_FACTORY_RESET,DEVICE_TYPE,false);
+                res = _device_instance->create_dynamic_resource(DEVICE_FACTORY_RESET,OMA_RESOURCE_TYPE,false);
                if(res) {
                     res->set_operation(M2MBase::POST_ALLOWED);
                 }
@@ -233,7 +233,9 @@ bool M2MDevice::set_resource_value(DeviceResource resource,
             // set the value of the resource.
             char buffer[20];
             int size = sprintf(buffer,"%ld",value);
-            success = res->set_value((const uint8_t*)buffer,(const uint32_t)size);
+            success = res->set_value((const uint8_t*)buffer,
+                                     (const uint32_t)size,
+                                     true);
         }
     }
     return success;
@@ -297,8 +299,8 @@ uint32_t M2MDevice::resource_value_int(DeviceResource resource,
             uint8_t* buffer = NULL;
             uint32_t length = 0;
             res->get_value(buffer,length);
-            value = atoi((const char*)buffer);
             if(buffer) {
+                value = atoi((const char*)buffer);
                 free(buffer);
             }
         }
@@ -352,7 +354,7 @@ String M2MDevice::resource_name(DeviceResource resource) const
             res_name = DEVICE_MANUFACTURER;
             break;
         case DeviceType:
-            res_name = DEVICE_TYPE;
+            res_name = DEVICE_DEVICE_TYPE;
             break;
         case ModelNumber:
             res_name = DEVICE_MODEL_NUMBER;
