@@ -13,7 +13,7 @@
 M2MInterfaceImpl::M2MInterfaceImpl(M2MInterfaceObserver& observer,
                                    const String &ep_name,
                                    const String &ep_type,
-                                   const uint32_t l_time,
+                                   const int32_t l_time,
                                    const uint16_t listen_port,
                                    const String &dmn,
                                    BindingMode mode ,                                   
@@ -636,4 +636,3 @@ void M2MInterfaceImpl::memory_free(void *ptr)
     if(ptr)
         free(ptr);
 }
-

@@ -97,7 +97,7 @@ bool M2MNsdlInterface::initialize()
 
 void M2MNsdlInterface::create_endpoint(const String &name,
                                        const String &type,
-                                       const uint32_t life_time,
+                                       const int32_t life_time,
                                        const String &domain,
                                        const uint8_t mode,
                                        const String &/*context_address*/)
@@ -114,12 +114,15 @@ void M2MNsdlInterface::create_endpoint(const String &name,
         }
         _endpoint->binding_and_mode = (sn_nsdl_oma_binding_and_mode_t)mode;
 
-        char buffer[20];
-        int size = sprintf(buffer,"%ld",life_time);
-        _endpoint->lifetime_ptr = (uint8_t*)memory_alloc(sizeof(size));
-        if(_endpoint->lifetime_ptr) {
-            memcpy(_endpoint->lifetime_ptr,buffer,size);
-            _endpoint->lifetime_len =  size;
+        // If lifetime is less than zero then leave the field empty
+        if( life_time > 0) {
+            char buffer[20];
+            int size = sprintf(buffer,"%ld",life_time);
+            _endpoint->lifetime_ptr = (uint8_t*)memory_alloc(sizeof(size));
+            if(_endpoint->lifetime_ptr) {
+                memcpy(_endpoint->lifetime_ptr,buffer,size);
+                _endpoint->lifetime_len =  size;
+            }
         }
     }
 }
@@ -223,19 +226,22 @@ uint8_t M2MNsdlInterface::received_from_server_callback(sn_coap_hdr_s *coap_head
 
         /* If message is response to NSP registration */
         if((COAP_MSG_CODE_RESPONSE_CREATED == coap_header->msg_code)) {
-             // Send callback about registration and unregistration
-             // also send callback for all the send observation messages and
-             // other messages received by the client from server.
-             //TODO: Currently this is assumption that only callback coming here
-             // is for registration however this same callback is also coming for
-             // Update registration , need some mechanism to identify these two separately.
-             //TODO: create M2MServer object for registration against given LWM2M server.
-             M2MServer *server = new M2MServer();
-             server->set_resource_value(M2MServer::ShortServerID,1);
-             _observer.client_registered(server);
-             _registration_timer->start_timer(registration_time() * 1000,
-                                              M2MTimerObserver::Registration,
-                                              false);
+            // Send callback about registration and unregistration
+            // also send callback for all the send observation messages and
+            // other messages received by the client from server.
+            //TODO: Currently this is assumption that only callback coming here
+            // is for registration however this same callback is also coming for
+            // Update registration , need some mechanism to identify these two separately.
+            //TODO: create M2MServer object for registration against given LWM2M server.
+            M2MServer *server = new M2MServer();
+            server->set_resource_value(M2MServer::ShortServerID,1);
+            _server_list.push_back(server);
+            _observer.client_registered(server);
+            if(_endpoint->lifetime_ptr) {
+                _registration_timer->start_timer(registration_time() * 1000,
+                                                 M2MTimerObserver::Registration,
+                                                 false);
+            }
         } else if(COAP_MSG_CODE_RESPONSE_DELETED == coap_header->msg_code) {
             _registration_timer->stop_timer();
             _observer.client_unregistered();
@@ -356,9 +362,11 @@ void M2MNsdlInterface::timer_expired(M2MTimerObserver::Type type)
     if(M2MTimerObserver::NsdlExecution == type) {
         sn_nsdl_exec(_counter_for_nsdl);
         _counter_for_nsdl++;
-    } else if( M2MTimerObserver::Registration == type && _endpoint) {
-        sn_nsdl_update_registration(_endpoint->lifetime_ptr,
-                                    _endpoint->lifetime_len);
+    } else if(M2MTimerObserver::Registration == type) {
+        if(_endpoint && _endpoint->lifetime_ptr) {
+            sn_nsdl_update_registration(_endpoint->lifetime_ptr,
+                                        _endpoint->lifetime_len);
+        }
     }
 }
 
@@ -525,20 +533,24 @@ bool M2MNsdlInterface::create_nsdl_resource_structure(M2MResource *res,
            if(!res->resource_type().empty() && _resource->resource_parameters_ptr) {
                _resource->resource_parameters_ptr->resource_type_ptr =
                        ((uint8_t*)memory_alloc(sizeof(res->resource_type().length())));
-               memcpy(_resource->resource_parameters_ptr->resource_type_ptr,
-                      (uint8_t*)res->resource_type().c_str(),
-                      res->resource_type().length());
-               _resource->resource_parameters_ptr->resource_type_len =
-                       res->resource_type().length();
+               if(_resource->resource_parameters_ptr->resource_type_ptr) {
+                   memcpy(_resource->resource_parameters_ptr->resource_type_ptr,
+                          (uint8_t*)res->resource_type().c_str(),
+                          res->resource_type().length());
+                   _resource->resource_parameters_ptr->resource_type_len =
+                           res->resource_type().length();
+                }
            }
            if(!res->interface_description().empty() && _resource->resource_parameters_ptr) {
                _resource->resource_parameters_ptr->interface_description_ptr =
                        ((uint8_t*)memory_alloc(sizeof(res->interface_description().length())));
-               memcpy(_resource->resource_parameters_ptr->interface_description_ptr,
-                      (uint8_t*)res->interface_description().c_str(),
-                      res->interface_description().length());
-               _resource->resource_parameters_ptr->interface_description_len =
-                       res->interface_description().length();
+               if(_resource->resource_parameters_ptr->interface_description_ptr) {
+                   memcpy(_resource->resource_parameters_ptr->interface_description_ptr,
+                          (uint8_t*)res->interface_description().c_str(),
+                          res->interface_description().length());
+                   _resource->resource_parameters_ptr->interface_description_len =
+                           res->interface_description().length();
+                }
            }
            if(_resource->resource_parameters_ptr) {
                 _resource->resource_parameters_ptr->coap_content_type = res->coap_content_type();
@@ -553,14 +565,26 @@ bool M2MNsdlInterface::create_nsdl_resource_structure(M2MResource *res,
                 success = true;
             }
 
+            if(_resource->path) {
+                memory_free(_resource->path);
+            }
+            if(_resource->resource_parameters_ptr->resource_type_ptr){
+                memory_free(_resource->resource_parameters_ptr->resource_type_ptr);
+            }
+            if(_resource->resource_parameters_ptr->interface_description_ptr){
+                memory_free(_resource->resource_parameters_ptr->interface_description_ptr);
+            }
+
            //Clear up the filled resource to fill up new resource.
            clear_resource(_resource);
 
+           if(buffer){
+               memory_free(buffer);
+           }
            if(success) {
                res->set_under_observation(false,this);
            }
         }
-
     }
     return success;
 }
@@ -581,16 +605,14 @@ String M2MNsdlInterface::coap_to_string(uint8_t *coap_data,int coap_data_length)
 uint64_t M2MNsdlInterface::registration_time()
 {
     uint64_t value = 0;
-    if(_endpoint->lifetime_len) {
+    if(_endpoint->lifetime_ptr) {
         value = (uint64_t)atoi((const char*)_endpoint->lifetime_ptr);
     }
-    // If the registration life time is set more than
-    // 60 seconds then set re-registration timer to
-    // be 80% of the lifetime value.
-    if( value >= MINIMUM_REGISTRATION_TIME ){
-        value = 0.8f * value;
+
+    if(value >= OPTIMUM_LIFETIME) {
+        value = value - REDUCE_LIFETIME;
     } else {
-        value = MINIMUM_REGISTRATION_TIME;
+        value = REDUCTION_FACTOR * value;
     }
     return value;
 }
@@ -720,6 +742,9 @@ uint8_t M2MNsdlInterface::handle_get_request(sn_coap_hdr_s *received_coap_header
 {
     uint8_t result = 1;
     sn_coap_hdr_s * coap_response = NULL;
+    uint8_t *value = 0;
+    uint32_t length = 0;
+
     // process the GET if we have registered a callback for it
     if (object && ((object->operation() & SN_GRS_GET_ALLOWED) != 0)) {
         coap_response = sn_coap_build_response(received_coap_header, COAP_MSG_CODE_RESPONSE_CONTENT);
@@ -734,8 +759,6 @@ uint8_t M2MNsdlInterface::handle_get_request(sn_coap_hdr_s *received_coap_header
             }
 
             // call the resource get() to get value
-            uint8_t *value = 0;
-            uint32_t length = 0;
             object->get_value(value,length);
 
             // fill in the CoAP response payload
@@ -814,6 +837,9 @@ uint8_t M2MNsdlInterface::handle_get_request(sn_coap_hdr_s *received_coap_header
             coap_response->options_list_ptr->observe_len = 0;
         }
         sn_coap_parser_release_allocated_coap_msg_mem(coap_response);
+    }
+    if(value) {
+        free(value);
     }
     return result;
 }

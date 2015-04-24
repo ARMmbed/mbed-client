@@ -67,7 +67,7 @@ public:
                                                   M2MInterface::UDP,
                                                   M2MInterface::LwIP_IPv4,
                                                   "");
-        printf("Endpoint Name : yogesh-endpoint\n");
+        printf("Endpoint Name : linux-endpoint\n");
         return (_interface == NULL) ? false : true;
     }
 

@@ -11,17 +11,23 @@
 M2MInterface* M2MInterfaceFactory::create_interface(M2MInterfaceObserver &observer,
                                                     const String &endpoint_name,
                                                     const String &endpoint_type,
-                                                    const uint32_t life_time,
+                                                    const int32_t life_time,
                                                     const uint16_t listen_port,
                                                     const String &domain,
                                                     M2MInterface::BindingMode mode,
                                                     M2MInterface::NetworkStack stack,
                                                     const String &context_address)
 {
-    M2MInterfaceImpl *interface = new M2MInterfaceImpl(observer, endpoint_name,
-                                                   endpoint_type, life_time,
-                                                   listen_port, domain, mode,
-                                                   stack, context_address);
+    M2MInterfaceImpl *interface = NULL;
+    if( ((life_time == -1) || (life_time >= MINIMUM_REGISTRATION_TIME)) &&
+        !endpoint_name.empty() && (endpoint_name.size() <= ENDPOINT_LENGTH) &&
+        !endpoint_type.empty() && (endpoint_type.size() <= ENDPOINT_LENGTH)) {
+        interface = new M2MInterfaceImpl(observer, endpoint_name,
+                                         endpoint_type, life_time,
+                                         listen_port, domain, mode,
+                                         stack, context_address);
+
+    }
     return interface;
 }
 

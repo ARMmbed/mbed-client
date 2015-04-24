@@ -49,7 +49,7 @@ public:
     */
     void create_endpoint(const String &endpoint_name,
                          const String &endpoint_type,
-                         const uint32_t life_time,
+                         const int32_t life_time,
                          const String &domain,
                          const uint8_t mode,
                          const String &context_address);

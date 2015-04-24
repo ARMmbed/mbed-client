@@ -14,7 +14,7 @@ public:
 
     bool create_interface(const char *endpoint,
                           const char *resource_type,
-                          const uint16_t lifetime,
+                          const int32_t lifetime,
                           const uint16_t listen_port,
                           const char *domain,
                           const uint8_t binding_mode,

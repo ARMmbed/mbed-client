@@ -14,8 +14,8 @@
                                     "   Options for setup command\n"\
                                     "   --endpoint <name>           Endpoint Name\n"\
                                     "   --type  <name>              Resource Type\n"\
-                                    "   --lifetime <n>              Lifetime in seconds\n"\
-                                    "   --port <n>                  Listen port, default is 8000\n"\
+                                    "   --lifetime <n>              Lifetime in seconds, default is -1 means not included\n"\
+                                    "   --port <n>                  Listen port, default is 5683\n"\
                                     "   --domain <name>             Domain for mbed Device Server, default is empty\n"\
                                     "   --binding_mode <n>          Binding Mode, NOT_SET = 0|UDP = 1(default)|QUEUE = 2|SMS = 4\n"\
                                     "   --network_interface <n>     Network Interface, Uninitialized = 0 ,LwIP_IPv4 = 1(default), LwIP_IPv6 = 2, Nanostack_IPv6 = 4\n"\
@@ -160,11 +160,11 @@ int lwm2m_client_setup_command(int argc, char *argv[])
 {
     char *endpoint = 0;
     char *type = 0;
-    int lifetime = 0;
-    int port = 8000;
+    int lifetime = -1;
+    int32_t port = 8000;
     char *domain = 0;
-    int binding_mode = 1;
-    int network_interface = 1;
+    int32_t binding_mode = 1;
+    int32_t network_interface = 1;
     cmd_parameter_val(argc, argv, "--endpoint", &endpoint);
     cmd_parameter_val(argc, argv, "--type", &type);
     cmd_parameter_int(argc, argv, "--lifetime", &lifetime);
@@ -193,14 +193,14 @@ int lwm2m_client_device_command(int argc, char *argv[])
     char *current_time = 0;
     char *utc_offset = 0;
     char *timezone = 0;
-    int  available_power_sources = 0;
-    int  power_source_voltage = 0;
-    int  power_source_current = 0;
-    int  battery_status = 0;
-    int  battery_level = 0;
-    int  memory_free = 0;
-    int  memory_total = 0;
-    int  error_code = 0;
+    int32_t  available_power_sources = 0;
+    int32_t  power_source_voltage = 0;
+    int32_t  power_source_current = 0;
+    int32_t  battery_status = 0;
+    int32_t  battery_level = 0;
+    int32_t  memory_free = 0;
+    int32_t  memory_total = 0;
+    int32_t  error_code = 0;
 
     if(cmd_parameter_val(argc, argv, "--manufacturer", &manufacturer)) {
         if(!lwm2m_client.create_device_object(M2MDevice::Manufacturer,
@@ -318,7 +318,7 @@ int lwm2m_client_object_command(int argc, char *argv[])
 {
     int return_code = CMDLINE_RETCODE_SUCCESS;// CMDLINE_RETCODE_INVALID_PARAMETERS;
     char *object_name = 0;
-    int new_instance = 0;
+    int32_t new_instance = 0;
 
     if(cmd_parameter_val(argc, argv, "--name", &object_name)) {
         cmd_parameter_int(argc, argv, "--new_instance", &new_instance);
@@ -334,10 +334,10 @@ int lwm2m_client_static_resource_command(int argc, char *argv[])
     int return_code = CMDLINE_RETCODE_INVALID_PARAMETERS;
     char *name = 0;
     char *value_string = 0;
-    int value_int = 0;
-    int value_type = -1;
-    int multiple_instance = 0;
-    int object_instance = 0;
+    int32_t value_int = 0;
+    int32_t value_type = -1;
+    int32_t multiple_instance = 0;
+    int32_t object_instance = 0;
 
     cmd_parameter_int(argc, argv, "--multiple_instance", &multiple_instance);
     cmd_parameter_int(argc, argv, "--object_instance", &object_instance);
@@ -368,9 +368,9 @@ int lwm2m_client_dynamic_resource_command(int argc, char *argv[])
 {
     int return_code = CMDLINE_RETCODE_INVALID_PARAMETERS;
     char *name = 0;
-    int multiple_instance = 0;
-    int object_instance = 0;
-    int observable = 0;
+    int32_t multiple_instance = 0;
+    int32_t object_instance = 0;
+    int32_t observable = 0;
 
     cmd_parameter_int(argc, argv, "--multiple_instance", &multiple_instance);
     cmd_parameter_int(argc, argv, "--object_instance", &object_instance);
@@ -432,7 +432,7 @@ int lwm2m_client_register_command()
 int lwm2m_client_update_register_command(int argc, char *argv[])
 {
     int ret_code = CMDLINE_RETCODE_INVALID_PARAMETERS;
-    int lifetime = -1;
+    int32_t lifetime = -1;
 
     cmd_parameter_int(argc, argv, "--lifetime", &lifetime);
 

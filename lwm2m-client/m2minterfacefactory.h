@@ -30,7 +30,8 @@ public:
      * Registration, Device Management and Information Reporting.
      * @param endpoint_name, Endpoint name of the mbed client.
      * @param endpoint_type, Endpoint type of the mbed client.
-     * @param life_time, Lifetime of the endpoint in seconds.
+     * @param life_time, Lifetime of the endpoint in seconds,
+     *        if -1 then it is optional
      * @param listen_port, Listening port for the endpoint, default is 8000.
      * @param domain, Domain of the endpoint.
      * @param mode, Binding Mode of the endpoint, default is UDP
@@ -41,8 +42,8 @@ public:
     static M2MInterface *create_interface(M2MInterfaceObserver &observer,
                                               const String &endpoint_name,
                                               const String &endpoint_type,
-                                              const uint32_t life_time,
-                                              const uint16_t listen_port = 8000,
+                                              const int32_t life_time = -1,
+                                              const uint16_t listen_port = 5683,
                                               const String &domain = "",
                                               M2MInterface::BindingMode mode = M2MInterface::UDP,
                                               M2MInterface::NetworkStack stack = M2MInterface::LwIP_IPv4,

@@ -47,7 +47,7 @@ private:
     M2MInterfaceImpl(M2MInterfaceObserver& observer,
                      const String &endpoint_name,
                      const String &endpoint_type,
-                     const uint32_t life_time,
+                     const int32_t life_time,
                      const uint16_t listen_port,
                      const String &domain = "",
                      BindingMode mode = M2MInterface::UDP,
@@ -319,7 +319,7 @@ private:
     String                      _endpoint_name;
     String                      _endpoint_type;
     String                      _domain;
-    uint32_t                    _life_time;
+    int32_t                     _life_time;
     BindingMode                 _binding_mode;
     String                      _context_address;
     uint16_t                    _listen_port;
