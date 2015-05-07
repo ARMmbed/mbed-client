@@ -11,7 +11,7 @@ M2MReportHandler::M2MReportHandler(M2MReportObserver &observer)
   _under_observation(false),
   _value(0.0f),
   _pmax(0.0f),
-  _pmin(0.0f),
+  _pmin(1.0f),
   _gt(0.0f),
   _lt(0.0f),
   _st(0.0f),
@@ -44,6 +44,12 @@ void M2MReportHandler::set_under_observation(bool observed)
 {
     _under_observation = observed;
     _report_scheduled = false;
+    if(observed) {
+        // initializes and sends an update if observing is on, don't change observing state
+        // allows cancel to turn off observing and update state without sending a notification
+        _report_scheduled = true;
+        report(_current_value);
+    }
 }
 
 void M2MReportHandler::set_value(float value)
@@ -76,12 +82,6 @@ bool M2MReportHandler::parse_notification_attribute(char *&query,
         if(set_notification_attribute(query_options[option],type)) {
             success = true;
         }
-    }
-    if(success) {
-        // initializes and sends an update if observing is on, don't change observing state
-        // allows cancel to turn off observing and update state without sending a notification
-        _report_scheduled = true;
-        report(_current_value);
     }
     return success;
 }
