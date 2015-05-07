@@ -8,7 +8,6 @@ M2MTimerImpl& M2MTimerImpl::operator=(const M2MTimerImpl& other)
 {
     if( this != &other){
         _single_shot= other._single_shot;
-        _ticker = other._ticker;
         _interval = other._interval;
     }
     return *this;
