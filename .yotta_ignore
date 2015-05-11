@@ -1,8 +1,4 @@
 # files for linux builds
-source/m2mconnectionhandlerimpl_linux.cpp
-source/m2mtimerimpl_linux.cpp
-source/include/m2mconnectionhandlerimpl_linux.h
-source/include/m2mtimerimpl_linux.h
 
 # ignore linux test application
 test/lwm2mclient_linux/*

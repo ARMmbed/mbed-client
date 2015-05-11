@@ -9,5 +9,6 @@
 #include "sn_coap_header.h"
 #include "sn_coap_protocol.h"
 #include "sn_nsdl_lib.h"
+#include "ns_list.h"
 
 #endif // NSDL_LINKER_H

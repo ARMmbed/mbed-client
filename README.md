@@ -13,11 +13,10 @@ There are four interfaces between these two components as shown below:
 
 - Client Registration
 
-- *Device management and service enablement*
+- Device management and service enablement
 
-- *Information Reporting*
+- Information Reporting
 
-This API currently covers Bootstrap and Client Registration, the other two features will be added in future releases of this API.
 
 ##LWM2M Features
 
@@ -124,7 +123,7 @@ If you have done bootstrap operation first, then this object is automatically cr
 During registering your endpoint, you will also need to register all your resources that you would like to monitor or follow from mbed Deivce Server.
 This can be easily achieved by creating resource objects and passing them to register API for registration purposes.
 
-For example, if you want to register your OMW M2M Device object , you need to simply create the device object and set the values for manadatory resources like this.
+For example, if you want to register your OMA LWM2M Device object , you need to simply create the device object and set the values for manadatory resources like this.
 ```
 #include "lwm2m-client/m2mdevice.h"
 M2MDevice *device = M2MInterfaceFactory::create_device();
@@ -214,7 +213,17 @@ You can get to know more about the  error from the `error` parameter which is pa
 
 ###Information Reporting Interface
 
-*Not yet supported.*
+The Information Reporting Interface is used by a LWM2M Server to observe any changes in registered Resource on a LWM2M Client, receiving notifications when new values are available. This observation relationship is initiated by sending an “Observe” operation to the L2M2M Client for an Object, an Object Instance or a Resource. An observation ends when a “Cancel Observation” operation is performed. 
+
+Information Reporting interface includes sub-features and currently supported are:
+
+ - Observe
+
+ - Notify
+
+ - Cancel
+
+Currently, Information Reporting is handled only at Resources level, support for Object and Object Instances will be added in later releases. 
 
 ##More Information
 

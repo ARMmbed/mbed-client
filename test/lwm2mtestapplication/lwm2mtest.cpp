@@ -337,3 +337,9 @@ void M2MLWClient::error(M2MInterface::Error error)
     cmd_printf("\nError occured Error Code : %d\n", (int8_t)error);
     cmd_ready( CMDLINE_RETCODE_SUCCESS );
 }
+
+void M2MLWClient::value_updated(M2MBase *base, M2MBase::BaseType type)
+{
+    cmd_printf("\nValue updated of Object name %s and Type \n",
+               base->name().c_str(), type);
+}

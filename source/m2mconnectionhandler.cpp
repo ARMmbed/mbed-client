@@ -2,10 +2,10 @@
  * Copyright (c) 2015 ARM. All rights reserved.
  */
 #include "include/m2mconnectionhandler.h"
-#ifdef USE_LINUX
-    #include "include/m2mconnectionhandlerimpl_linux.h"
+#ifdef TARGET_LIKE_LINUX
+    #include "lwm2m-client-linux/m2mconnectionhandlerimpl.h"
 #else
-    #include "include/m2mconnectionhandlerimpl_mbed.h"
+    #include "lwm2m-client-mbed/m2mconnectionhandlerimpl.h"
 #endif
 #include "include/nsdlaccesshelper.h"
 #include "lwm2m-client/m2mconstants.h"

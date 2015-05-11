@@ -20,7 +20,6 @@ class M2MBase;
 class M2MServer;
 
 typedef Vector<M2MObject *> M2MObjectList;
-typedef Vector<M2MServer *> M2MServerList;
 
 class M2MNsdlInterface : public M2MTimerObserver,
                          public M2MObservationHandler
@@ -120,13 +119,15 @@ public:
     /**
     * @brief Callback from nsdl library to inform the data is ready
     * to be sent to server.
+    * @param nsdl_handle, Handler for the nsdl structure for this endpoint
     * @param protocol, Protocol format of the data
     * @param data, Data to be sent.
     * @param data_len, Size of the data to be sent
     * @param address, server address where data has to be sent.
     * @return 1 if successful else 0.
     */
-    uint8_t send_to_server_callback(sn_nsdl_capab_e protocol,
+    uint8_t send_to_server_callback(struct nsdl_s * nsdl_handle,
+                                    sn_nsdl_capab_e protocol,
                                     uint8_t *data,
                                     uint16_t data_len,
                                     sn_nsdl_addr_s *address);
@@ -134,24 +135,27 @@ public:
     /**
     * @brief Callback from nsdl library to inform the data which is
     * received from server for the client has been converted to coap message.
+    * @param nsdl_handle, Handler for the nsdl structure for this endpoint
     * @param coap_header, Coap message formed from data.
     * @param address, Server address from where the data is received.
     * @return 1 if successful else 0.
     */
-    uint8_t received_from_server_callback(sn_coap_hdr_s *coap_header,
+    uint8_t received_from_server_callback(struct nsdl_s * nsdl_handle,
+                                          sn_coap_hdr_s *coap_header,
                                           sn_nsdl_addr_s *address);
 
     /**
     * @brief Callback from nsdl library to inform the data which is
     * received from server for the resources has been converted to coap message.
+    * @param nsdl_handle, Handler for the nsdl resource structure for this endpoint..
     * @param coap_header, Coap message formed from data.
     * @param address, Server address from where the data is received.
-    * @param proto, Protocol for the message, currently only coap is supported.
+    * @param nsdl_capab, Protocol for the message, currently only coap is supported.
     * @return 1 if successful else 0.
     */
-    uint8_t resource_callback(sn_coap_hdr_s *coap,
+    uint8_t resource_callback(struct nsdl_s *nsdl_handle, sn_coap_hdr_s *coap,
                                sn_nsdl_addr_s *address,
-                               sn_proto_info_s * proto);
+                               sn_nsdl_capab_e nsdl_capab);
 
     void bootstrap_done_callback(sn_nsdl_oma_server_info_t *server_info);
 
@@ -211,17 +215,52 @@ private:
     bool object_present(M2MObject * object) const;
 
     uint8_t handle_get_request(sn_coap_hdr_s *received_coap_header,
-                               M2MBase *object,
+                               M2MBase *base,
                                sn_nsdl_addr_s *address);
 
-
     uint8_t handle_put_request(sn_coap_hdr_s *received_coap_header,
-                               M2MBase *object,
+                               M2MBase *base,
                                sn_nsdl_addr_s *address);
 
     uint8_t handle_post_request(sn_coap_hdr_s *received_coap_header,
-                               M2MBase *object,
-                               sn_nsdl_addr_s *address);
+                                M2MBase *base,
+                                sn_nsdl_addr_s *address);
+
+    uint8_t handle_resource_get_request(sn_coap_hdr_s *received_coap_header,
+                                        M2MResource *resource,
+                                        sn_nsdl_addr_s *address);
+
+    uint8_t handle_resource_put_request(sn_coap_hdr_s *received_coap_header,
+                                        M2MResource *resource,
+                                        sn_nsdl_addr_s *address);
+
+    uint8_t handle_resource_post_request(sn_coap_hdr_s *received_coap_header,
+                                         M2MResource *resource,
+                                         sn_nsdl_addr_s *address);
+
+    uint8_t handle_object_instance_get_request(sn_coap_hdr_s *received_coap_header,
+                                               M2MObjectInstance *instance,
+                                               sn_nsdl_addr_s *address);
+
+    uint8_t handle_object_instance_put_request(sn_coap_hdr_s *received_coap_header,
+                                               M2MObjectInstance *instance,
+                                               sn_nsdl_addr_s *address);
+
+    uint8_t handle_object_instance_post_request(sn_coap_hdr_s *received_coap_header,
+                                                M2MObjectInstance *instance,
+                                                sn_nsdl_addr_s *address);
+
+    uint8_t handle_object_get_request(sn_coap_hdr_s *received_coap_header,
+                                      M2MObject *object,
+                                      sn_nsdl_addr_s *address);
+
+    uint8_t handle_object_put_request(sn_coap_hdr_s *received_coap_header,
+                                      M2MObject *object,
+                                      sn_nsdl_addr_s *address);
+
+    uint8_t handle_object_post_request(sn_coap_hdr_s *received_coap_header,
+                                       M2MObject *object,
+                                       sn_nsdl_addr_s *address);
 
     void clear_resource(sn_nsdl_resource_info_s *&resource);
 
@@ -229,7 +268,7 @@ private:
 
     M2MNsdlObserver                   &_observer;
     M2MObjectList                      _object_list;
-    M2MServerList                      _server_list;
+    M2MServer                         *_server;
     M2MTimer                          *_nsdl_exceution_timer;
     M2MTimer                          *_registration_timer;
     sn_nsdl_ep_parameters_s           *_endpoint;
@@ -237,7 +276,11 @@ private:
     sn_nsdl_bs_ep_info_t               _bootstrap_endpoint;
     sn_nsdl_oma_device_t               _bootstrap_device_setup;
     sn_nsdl_addr_s                     _sn_nsdl_address;
+    nsdl_s                            *_nsdl_handle;
     uint32_t                           _counter_for_nsdl;
+    uint16_t                           _register_id;
+    uint16_t                           _unregister_id;
+    uint16_t                           _update_id;
 
 friend class Test_M2MNsdlInterface;
 

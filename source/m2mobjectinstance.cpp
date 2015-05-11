@@ -172,6 +172,19 @@ M2MBase::BaseType M2MObjectInstance::base_type() const
     return M2MBase::base_type();
 }
 
+bool M2MObjectInstance::handle_observation_attribute(char *&query)
+{
+    bool success = false;
+    if(!_resource_list.empty()) {
+        M2MResourceList::const_iterator it;
+        it = _resource_list.begin();
+        for ( ; it != _resource_list.end(); it++ ) {
+            success = (*it)->handle_observation_attribute(query);
+        }
+    }
+    return success;
+}
+
 void M2MObjectInstance::add_resource(M2MResource *res)
 {
     if(res) {

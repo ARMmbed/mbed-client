@@ -24,7 +24,8 @@ M2MResource::M2MResource(const String &res_name,
                          bool multiple_instances)
 : M2MBase(res_name,
           resource_mode),
-  _has_multiple_instances(multiple_instances)
+  _has_multiple_instances(multiple_instances),
+  _execute_callback(NULL)
 {
     M2MBase::set_resource_type(res_type);
     M2MBase::set_base_type(M2MBase::Resource);
@@ -42,4 +43,21 @@ M2MBase::BaseType M2MResource::base_type() const
 bool M2MResource::supports_multiple_instances() const
 {
     return _has_multiple_instances;
+}
+
+bool M2MResource::handle_observation_attribute(char *&query)
+{
+    return M2MBase::handle_observation_attribute(query);
+}
+
+void M2MResource::set_execute_function(execute_callback callback)
+{
+    _execute_callback = callback;
+}
+
+void M2MResource::execute(void *arguments)
+{
+    if(_execute_callback) {
+        _execute_callback(arguments);
+    }
 }

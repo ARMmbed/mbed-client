@@ -80,7 +80,18 @@ public:
      */
     virtual uint16_t instance_count() const;
 
+    /**
+     * @brief Returns object type
+     * @return BaseType
+     */
     M2MBase::BaseType base_type() const;
+
+    /**
+     * @brief Parses the received query for notification
+     * attribute.
+     * @return true if required attributes are present else false.
+     */
+    virtual bool handle_observation_attribute(char *&query);
 
 private:
 
