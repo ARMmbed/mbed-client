@@ -193,15 +193,15 @@ public:
         if(_object) {
             M2MObjectInstance* inst = _object->object_instance();
             if(inst) {
-                    M2MResource* res = inst->resource("D");
+                M2MResource* res = inst->resource("D");
 
-                    char buffer[20];
-                    int size = sprintf(buffer,"%d",_value);
-                    res->set_value((const uint8_t*)buffer,
-                                   (const uint32_t)size,
-                                   true);
-                    _value++;
-                }
+                char buffer[20];
+                int size = sprintf(buffer,"%d",_value);
+                res->set_value((const uint8_t*)buffer,
+                               (const uint32_t)size,
+                               true);
+                _value++;
+            }
         }
     }
 

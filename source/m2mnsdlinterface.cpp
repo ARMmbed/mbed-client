@@ -549,26 +549,26 @@ bool M2MNsdlInterface::create_nsdl_resource_structure(M2MResource *res,
            _resource->resource = buffer;
            _resource->resourcelen = length;
 
-           String res_name = object_name;
-
            // Append object name to the resource.
            // Take out the instance Id and append to the
            // resource name like "object/0/+ resource + / + 0"
-           char inst_id[10];
-           sprintf(inst_id,"%d",res->instance_id());
-           res_name+= String("/") ;
-           res_name+= res->name();
+           String name = res->name();
+           String res_name = object_name + String("/") + name;
+
+
            // if there are multiple instances supported
            // then add instance Id into creating resource path
            // else normal /object_id/object_instance/resource_id format.
            if(res->supports_multiple_instances()) {
+               char inst_id[10];
+               sprintf(inst_id,"%d",res->instance_id());
                res_name+= String("/") ;
                res_name+= String(inst_id);
             }
 
            _resource->path = ((uint8_t*)memory_alloc(sizeof(res_name.length())));
-           memset(_resource->path, 0, sizeof(uint8_t));
            if(_resource->path) {
+               memset(_resource->path, 0, sizeof(res_name.length()));
                memcpy(_resource->path, (uint8_t*)res_name.c_str(), res_name.length());
                _resource->pathlen = res_name.length();
            }
