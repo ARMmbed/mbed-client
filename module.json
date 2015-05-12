@@ -1,8 +1,8 @@
 {
   "name": "lwm2m-client",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "LWM2M mbed Client API",
-  "private" : true,
+  "private": true,
   "keywords": [],
   "author": "Yogesh Pande <yogesh.pande@arm.com>",
   "homepage": "https://github.com/ARMmbed/lwm2m-client",
