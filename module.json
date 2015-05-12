@@ -1,7 +1,8 @@
 {
   "name": "lwm2m-client",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "LWM2M mbed Client API",
+  "private": true,
   "keywords": [],
   "author": "Yogesh Pande <yogesh.pande@arm.com>",
   "homepage": "https://github.com/ARMmbed/lwm2m-client",
@@ -16,8 +17,7 @@
   },
   "targetDependencies": {
     "arm": {
-      "mbed-cpputest": "ARMmbed/mbed-cpputest-private",
-      "lwm2m-client-mbed": "~0.0.1"
+      "lwm2m-client-mbed": "~0.0.2"
     },
     "linux": {
       "lwm2m-client-linux": "~0.0.1"
