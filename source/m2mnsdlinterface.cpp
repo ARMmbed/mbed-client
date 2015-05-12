@@ -115,7 +115,7 @@ void M2MNsdlInterface::create_endpoint(const String &name,
         if( life_time > 0) {
             char buffer[20];
             int size = sprintf(buffer,"%ld",life_time);
-            _endpoint->lifetime_ptr = (uint8_t*)memory_alloc(sizeof(size));
+            _endpoint->lifetime_ptr = (uint8_t*)memory_alloc(size);
             if(_endpoint->lifetime_ptr) {
                 memcpy(_endpoint->lifetime_ptr,buffer,size);
                 _endpoint->lifetime_len =  size;
@@ -552,8 +552,9 @@ bool M2MNsdlInterface::create_nsdl_resource_structure(M2MResource *res,
            // Append object name to the resource.
            // Take out the instance Id and append to the
            // resource name like "object/0/+ resource + / + 0"
-           String name = res->name();
-           String res_name = object_name + String("/") + name;
+           String res_name = object_name;
+           res_name+= String("/");
+           res_name.append(res->name().c_str(),res->name().length());
 
 
            // if there are multiple instances supported
@@ -566,16 +567,16 @@ bool M2MNsdlInterface::create_nsdl_resource_structure(M2MResource *res,
                res_name+= String(inst_id);
             }
 
-           _resource->path = ((uint8_t*)memory_alloc(sizeof(res_name.length())));
+           _resource->path = ((uint8_t*)memory_alloc(res_name.length()));
            if(_resource->path) {
-               memset(_resource->path, 0, sizeof(res_name.length()));
+               memset(_resource->path, 0, res_name.length());
                memcpy(_resource->path, (uint8_t*)res_name.c_str(), res_name.length());
                _resource->pathlen = res_name.length();
            }
 
            if(!res->resource_type().empty() && _resource->resource_parameters_ptr) {
                _resource->resource_parameters_ptr->resource_type_ptr =
-                       ((uint8_t*)memory_alloc(sizeof(res->resource_type().length())));
+                       ((uint8_t*)memory_alloc(res->resource_type().length()));
                if(_resource->resource_parameters_ptr->resource_type_ptr) {
                    memcpy(_resource->resource_parameters_ptr->resource_type_ptr,
                           (uint8_t*)res->resource_type().c_str(),
@@ -586,7 +587,7 @@ bool M2MNsdlInterface::create_nsdl_resource_structure(M2MResource *res,
            }
            if(!res->interface_description().empty() && _resource->resource_parameters_ptr) {
                _resource->resource_parameters_ptr->interface_description_ptr =
-                       ((uint8_t*)memory_alloc(sizeof(res->interface_description().length())));
+                       ((uint8_t*)memory_alloc(res->interface_description().length()));
                if(_resource->resource_parameters_ptr->interface_description_ptr) {
                    memcpy(_resource->resource_parameters_ptr->interface_description_ptr,
                           (uint8_t*)res->interface_description().c_str(),

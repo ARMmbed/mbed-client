@@ -171,7 +171,7 @@ public:
         if(_object) {
             M2MObjectInstance* inst = _object->create_object_instance();
             if(inst) {
-                    M2MResource* res = inst->create_dynamic_resource("D","ResourceTest",true);
+                    M2MResource* res = inst->create_dynamic_resource("Dynamic","ResourceTest",true);
                     char buffer[20];
                     int size = sprintf(buffer,"%d",_value);
                     res->set_operation(M2MBase::GET_PUT_POST_ALLOWED);
@@ -180,7 +180,7 @@ public:
                     res->set_execute_function(execute_callback(this,&M2MLWClient::execute_function));
                     _value++;
 
-                    inst->create_static_resource("S",
+                    inst->create_static_resource("Static",
                                                  "ResourceTest",
                                                  STATIC_VALUE,
                                                  sizeof(STATIC_VALUE)-1);
@@ -193,7 +193,7 @@ public:
         if(_object) {
             M2MObjectInstance* inst = _object->object_instance();
             if(inst) {
-                M2MResource* res = inst->resource("D");
+                M2MResource* res = inst->resource("Dynamic");
 
                 char buffer[20];
                 int size = sprintf(buffer,"%d",_value);
