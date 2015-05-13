@@ -32,6 +32,10 @@ void TestConfig::setup(const char *unique_name) {
 	_endpointName = m2m::String("lwm2mtest-");
 	_endpointName += unique_name;
 	_domain = m2m::String(domain_in);
+	_endpointType = m2m::String("test");
+
+	_port = 5600;
+	_lifetime = 2222;
 
 	printf("MBED: test configuration \nbootstrap_server=%s\nmds_server=%s\nendpoint_name=%s\ndomain=%s", _bootstrapAddress.c_str(), _mdsAddress.c_str(), _endpointName.c_str(), _domain.c_str());
 }
@@ -50,5 +54,17 @@ m2m::String& TestConfig::get_mds_server() {
 
 m2m::String& TestConfig::get_endpoint_name() {
 	return _endpointName;
+}
+
+m2m::String& TestConfig::get_endpoint_type() {
+	return _endpointType;
+}
+
+int TestConfig::get_port() {
+	return _port++;
+}
+
+int TestConfig::get_lifetime() {
+	return _lifetime;
 }
 
