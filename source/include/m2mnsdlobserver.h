@@ -34,6 +34,13 @@ public :
     virtual void client_registered(M2MServer *server_object) = 0;
 
     /**
+    * @brief Informs that client registration is updated successfully.
+    * @param server_object, Server object associated with
+    * registered server.
+    */
+    virtual void registration_updated(const M2MServer &server_object) = 0;
+
+    /**
     * @brief Informs that some error occured during
     * registration.
     * @param error_code, Error code for registration error
@@ -63,5 +70,10 @@ public :
     */
     virtual void coap_data_processed() = 0;
 
+    /**
+     * @brief Callback informing that the value of the resource object is updated by server.
+     * @param base Object whose value is updated.
+     */
+    virtual void value_updated(M2MBase *base) = 0;
 };
 #endif // M2M_NSDL_OBSERVER_H

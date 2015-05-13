@@ -155,10 +155,10 @@ public:
     virtual void set_observation_number(const uint16_t observation_number);
 
     /**
-     * Returns object type
+     * @brief Returns object type
      * @return BaseType
      */
-    virtual M2MBase::BaseType base_type() const = 0;
+    virtual M2MBase::BaseType base_type() const;
 
     /**
      * @brief Returns the operation type of the object

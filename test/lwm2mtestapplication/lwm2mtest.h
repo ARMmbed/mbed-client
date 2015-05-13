@@ -67,6 +67,8 @@ public:
 
     void error(M2MInterface::Error error);
 
+    void value_updated(M2MBase *base, M2MBase::BaseType type);
+
 private:
 
     M2MInterface        *_interface;

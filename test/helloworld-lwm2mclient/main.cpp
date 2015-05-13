@@ -1,19 +1,26 @@
 /*
  * Copyright (c) 2015 ARM. All rights reserved.
  */
+
+#ifdef TARGET_LIKE_LINUX
+#include <unistd.h>
+#include <pthread.h>
+#include <signal.h> /* For SIGIGN and SIGINT */
+#else
 #include "mbed-net-sockets/UDPSocket.h"
 #include "EthernetInterface.h"
 #include "test_env.h"
+// TODO: Remove when yotta supports init.
+#include "lwipv4_init.h"
+#endif
 #include "lwm2m-client/m2minterfacefactory.h"
 #include "lwm2m-client/m2mdevice.h"
 #include "lwm2m-client/m2minterfaceobserver.h"
 #include "lwm2m-client/m2minterface.h"
 #include "lwm2m-client/m2mobjectinstance.h"
 
-// TODO: Remove when yotta supports init.
-#include "lwipv4_init.h"
 
-#define BOOTSTRAP_ENABLED
+#undef BOOTSTRAP_ENABLED
 
 // Enter your mbed Device Server's IPv4 address and Port number in
 // mentioned format like 192.168.0.1:5693
@@ -26,14 +33,23 @@ const String &SERIAL_NUMBER = "12345";
 
 const uint8_t STATIC_VALUE[] = "Static value";
 
+#ifdef TARGET_LIKE_LINUX
+static void ctrl_c_handle_function(void);
+typedef void (*signalhandler_t)(int); /* Function pointer type for ctrl-c */
+#else
 #if defined(TARGET_K64F)
 #define OBS_BUTTON SW2
 #define UNREG_BUTTON SW3
 #endif
+#endif
 
 class M2MLWClient: public M2MInterfaceObserver {
 public:
-    M2MLWClient(){
+    M2MLWClient()
+#ifndef TARGET_LIKE_LINUX
+    :_led(LED3)
+#endif
+    {
         _interface = NULL;
         _bootstrapped = false;
         _error = false;
@@ -69,14 +85,29 @@ public:
     }
 
     bool bootstrap_successful() {
+#ifdef TARGET_LIKE_LINUX
+        while(!_bootstrapped && !_error) {
+            sleep(1);
+        }
+#endif
         return _bootstrapped;
     }
 
     bool register_successful() {
+#ifdef TARGET_LIKE_LINUX
+        while(!_registered && !_error) {
+            sleep(1);
+        }
+#endif
         return _registered;
     }
 
     bool unregister_successful() {
+#ifdef TARGET_LIKE_LINUX
+        while(!_unregistered && !_error) {
+            sleep(1);
+        }
+#endif
         return _unregistered;
     }
 
@@ -121,22 +152,35 @@ public:
         }
         return device;
     }
+#ifdef TARGET_LIKE_LINUX
+    void execute_function(void *argument) {
+        if(argument) {
+            char* arguments = (char*)argument;
+            printf("Received %s!!\n", arguments);
+        }
+        printf("I am executed !!\n");
+    }
+#else
+    void execute_function(void */*argument*/) {
+        _led == 0 ? _led = 1 : _led = 0;
+    }
+#endif
 
     M2MObject* create_generic_object() {
         _object = M2MInterfaceFactory::create_object("Test");
         if(_object) {
             M2MObjectInstance* inst = _object->create_object_instance();
             if(inst) {
-                    M2MResource* res = inst->create_dynamic_resource("D","ResourceTest",true);
+                    M2MResource* res = inst->create_dynamic_resource("Dynamic","ResourceTest",true);
                     char buffer[20];
                     int size = sprintf(buffer,"%d",_value);
                     res->set_operation(M2MBase::GET_PUT_POST_ALLOWED);
                     res->set_value((const uint8_t*)buffer,
-                                   (const uint32_t)size,
-                                   true);
+                                   (const uint32_t)size);
+                    res->set_execute_function(execute_callback(this,&M2MLWClient::execute_function));
                     _value++;
 
-                    inst->create_static_resource("S",
+                    inst->create_static_resource("Static",
                                                  "ResourceTest",
                                                  STATIC_VALUE,
                                                  sizeof(STATIC_VALUE)-1);
@@ -149,15 +193,15 @@ public:
         if(_object) {
             M2MObjectInstance* inst = _object->object_instance();
             if(inst) {
-                    M2MResource* res = inst->resource("D");
+                M2MResource* res = inst->resource("Dynamic");
 
-                    char buffer[20];
-                    int size = sprintf(buffer,"%d",_value);
-                    res->set_value((const uint8_t*)buffer,
-                                   (const uint32_t)size,
-                                   true);
-                    _value++;
-                }
+                char buffer[20];
+                int size = sprintf(buffer,"%d",_value);
+                res->set_value((const uint8_t*)buffer,
+                               (const uint32_t)size,
+                               true);
+                _value++;
+            }
         }
     }
 
@@ -226,8 +270,19 @@ public:
         printf("\nError occured\n");
     }
 
+    //Callback from mbed client stack if any value has changed
+    // during PUT operation. Object and its type is passed in
+    // the callback.
+    void value_updated(M2MBase *base, M2MBase::BaseType type) {
+        printf("\nValue updated of Object name %s and Type %d\n",
+               base->name().c_str(), type);
+    }
+
 private:
 
+#ifndef TARGET_LIKE_LINUX
+    DigitalOut          _led;
+#endif
     M2MInterface    	*_interface;
     M2MSecurity         *_register_security;
     M2MObject           *_object;
@@ -238,8 +293,86 @@ private:
     int                 _value;
 };
 
+#ifdef TARGET_LIKE_LINUX
+void* wait_for_bootstrap(void* arg) {
+    M2MLWClient *client;
+    client = (M2MLWClient*) arg;
+    if(client->bootstrap_successful()) {
+        printf("Registering endpoint\n");
+
+        // Create LWM2M device object specifying device resources
+        // as per OMA LWM2M specification.
+        M2MDevice* device_object = client->create_device_object();
+
+        M2MObject* object = client->create_generic_object();
+
+        // Add all the objects that you would like to register
+        // into the list and pass the list for register API.
+        M2MObjectList object_list;
+        object_list.push_back(device_object);
+        object_list.push_back(object);
+
+        // Issue register command.
+        client->test_register(object_list);
+    }
+    return NULL;
+}
+
+void* wait_for_unregister(void* arg) {
+    M2MLWClient *client;
+    client = (M2MLWClient*) arg;
+    if(client->unregister_successful()) {
+        printf("Unregistered done --> exiting\n");
+        exit(1);
+    }
+    return NULL;
+}
+
+void* send_observation(void* arg) {
+    M2MLWClient *client;
+    client = (M2MLWClient*) arg;
+    static uint8_t counter = 0;
+    while(1) {
+        sleep(1);
+        if(counter >= 10 &&
+           client->register_successful()) {
+            printf("Sending observation\n");
+            client->update_resource();
+            counter = 0;
+        }
+        else
+            counter++;
+    }
+    return NULL;
+}
+
+static M2MLWClient *m2mclient = NULL;
+
+static void ctrl_c_handle_function(void)
+{
+    if(m2mclient && m2mclient->register_successful()) {
+        printf("Unregistering endpoint\n");
+        m2mclient->test_unregister();
+    }
+}
+#endif
+
 int main() {
 
+    // Instantiate the class which implements
+    // LWM2M Client API
+    M2MLWClient lwm2mclient;
+
+#ifdef TARGET_LIKE_LINUX
+    pthread_t bootstrap_thread;
+    pthread_t unregister_thread;
+    pthread_t observation_thread;
+
+    m2mclient = &lwm2mclient;
+
+    signal(SIGINT, (signalhandler_t)ctrl_c_handle_function);
+
+#else
     // This sets up the network interface configuration which will be used
     // by LWM2M Client API to communicate with mbed Device server.
     EthernetInterface eth;
@@ -248,14 +381,8 @@ int main() {
 
     lwipv4_socket_init();
 
-
-    // Instantiate the class which implements
-    // LWM2M Client API
-    M2MLWClient lwm2mclient;
-
     // Set up Hardware interrupt button.
     InterruptIn obs_button(OBS_BUTTON);
-
     InterruptIn unreg_button(UNREG_BUTTON);
 
     // On press of SW3 button on K64F board, example application
@@ -265,10 +392,28 @@ int main() {
     // On press of SW2 button on K64F board, example application
     // will send observation towards mbed Device Server
     obs_button.fall(&lwm2mclient,&M2MLWClient::update_resource);
+#endif
 
     // Create LWM2M Client API interface to manage bootstrap,
     // register and unregister
     lwm2mclient.create_interface();
+
+#ifdef TARGET_LIKE_LINUX
+
+    // Create LWM2M bootstrap object specifying bootstrap server
+    // information.
+    M2MSecurity* security_object = lwm2mclient.create_bootstrap_object();
+
+    // Issue bootstrap command.
+    lwm2mclient.test_bootstrap(security_object);
+
+    pthread_create(&bootstrap_thread, NULL, &wait_for_bootstrap, (void*) &lwm2mclient);
+    pthread_create(&observation_thread, NULL, &send_observation, (void*) &lwm2mclient);
+    pthread_create(&unregister_thread, NULL, &wait_for_unregister, (void*) &lwm2mclient);
+
+    pthread_join(bootstrap_thread, NULL);
+    pthread_join(unregister_thread, NULL);
+#else
 
 #if defined (BOOTSTRAP_ENABLED)
     // Create LWM2M bootstrap object specifying bootstrap server
@@ -278,14 +423,11 @@ int main() {
     // Issue bootstrap command.
     lwm2mclient.test_bootstrap(security_object);
 
+
     // Wait till the bootstrap callback is called successfully.
     // Callback comes in bootstrap_done()
     while (!lwm2mclient.bootstrap_successful()) { __WFI(); }
 
-    // Delete security object created for bootstrapping
-    if(security_object) {
-        delete security_object;
-    }
 #else
 
     M2MSecurity *register_object = lwm2mclient.create_register_object();
@@ -324,6 +466,12 @@ int main() {
     notify_completion(lwm2mclient.unregister_successful() &&
                       lwm2mclient.register_successful() &&
                       lwm2mclient.bootstrap_successful());
+
+    // Delete security object created for bootstrapping
+    if(security_object) {
+        delete security_object;
+    }
+
 #else
 
     // This will turn on the LED on the board specifying that
@@ -331,7 +479,11 @@ int main() {
     notify_completion(lwm2mclient.unregister_successful() &&
                       lwm2mclient.register_successful());
 
-#endif
+
+    // Disconnect the connect and teardown the network interface
+    eth.disconnect();
+
+#endif //BOOTSTRAP_ENABLED
 
     // Delete device object created for registering device
     // resources.
@@ -342,8 +494,7 @@ int main() {
         delete object;
     }
 
-    // Disconnect the connect and teardown the network interface
-    eth.disconnect();
+#endif //TARGET_LIKE_LINUX
 
     return 0;
 }

@@ -6,8 +6,8 @@
 
 #include "lwm2m-client/m2minterface.h"
 #include "lwm2m-client/m2mserver.h"
-#include "m2mnsdlobserver.h"
-#include "m2mconnectionobserver.h"
+#include "include/m2mnsdlobserver.h"
+#include "lwm2m-client/m2mconnectionobserver.h"
 
 //FORWARD DECLARATION
 class M2MNsdlInterface;
@@ -114,6 +114,8 @@ protected: // From M2MNsdlObserver
 
     virtual void client_registered(M2MServer *server_object);
 
+    void registration_updated(const M2MServer &server_object);
+
     virtual void registration_error(uint8_t error_code);
 
     virtual void client_unregistered();
@@ -123,6 +125,8 @@ protected: // From M2MNsdlObserver
     virtual void bootstrap_error();
 
     virtual void coap_data_processed();
+
+    virtual void value_updated(M2MBase *base);
 
 protected: // From M2MConnectionObserver
 

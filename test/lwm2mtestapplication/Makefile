@@ -40,7 +40,7 @@ override CFLAGS += -DVERSION='"$(VERSION)"'
 
 override CXXFLAGS += -I$(ROOT) -I$(NSDL_DIR)/nsdl-c -I$(LIBSERVICE_DIR)/libService -I$(ROOT)/nanostack/nanostack -I$(ROOT)/event-loop/nanostack-event-loop
 override CXXFLAGS += -I$(LWM2M_ROOT) -I$(LWM2M_ROOT)/lwm2m-client
-override CXXFLAGS += -DUSE_LINUX
+override CXXFLAGS += -DTARGET_LIKE_LINUX
 override CXXFLAGS += -DHAVE_DEBUG
 override CXXFLAGS += -g
 # Generate dependency files when building

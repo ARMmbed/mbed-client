@@ -2,10 +2,10 @@
  * Copyright (c) 2015 ARM. All rights reserved.
  */
 #include "include/m2mtimer.h"
-#ifdef USE_LINUX
-    #include "include/m2mtimerimpl_linux.h"
+#ifdef TARGET_LIKE_LINUX
+    #include "lwm2m-client-linux/m2mtimerimpl.h"
 #else
-    #include "include/m2mtimerimpl_mbed.h"
+    #include "lwm2m-client-mbed/m2mtimerimpl.h"
 #endif
 
 // Prevents the use of assignment operator

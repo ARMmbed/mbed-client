@@ -7,11 +7,11 @@
 #include <stdlib.h>
 #include "m2mstring.h"
 using namespace m2m;
-#ifndef USE_LINUX
-    #include "mbed.h"    
-#else
+#ifdef TARGET_LIKE_LINUX
 #include <cstring>
 #include <cstdio>
+#else
+#include "mbed.h"
 #endif
 
 

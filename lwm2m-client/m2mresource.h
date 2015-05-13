@@ -5,12 +5,14 @@
 #define M2M_RESOURCE_H
 
 #include "m2mbase.h"
+#include "functionpointer.h"
 
 /**
  *  @brief M2MResource.
  *  This class is the base class for LWM2M Resources based on which all defined
  *  LWM2M resource model can be created.
  */
+typedef FP1<void,void*> execute_callback;
 
 class M2MResource : public M2MBase {
 
@@ -48,13 +50,29 @@ private: // Constructor and destructor are private
 
 public:
 
+    /**
+     * @brief Returns object type
+     * @return BaseType
+     */
     virtual M2MBase::BaseType base_type() const;
 
     bool supports_multiple_instances() const;
 
+    /**
+     * @brief Parses the received query for notification
+     * attribute.
+     * @return true if required attributes are present else false.
+     */
+    virtual bool handle_observation_attribute(char *&query);
+
+    virtual void set_execute_function(execute_callback callback);
+
+    void execute(void *arguments);
+
 private:
 
-    bool        _has_multiple_instances;
+    bool                    _has_multiple_instances;
+    execute_callback        _execute_callback;
 
     friend class Test_M2MResource;
     friend class Test_M2MObjectInstance;

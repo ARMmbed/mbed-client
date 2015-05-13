@@ -62,6 +62,12 @@ public:
      */
     virtual void error(M2MInterface::Error error) = 0;
 
+    /**
+     * @brief Callback informing that the value of the resource object is updated by server.
+     * @param base Object whose value is updated.
+     * @param type Type of object.
+     */
+    virtual void value_updated(M2MBase *base, M2MBase::BaseType type) = 0;
 };
 
 #endif // M2M_INTERFACE_OBSERVER_H

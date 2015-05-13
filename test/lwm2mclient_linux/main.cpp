@@ -4,12 +4,13 @@
 #include <unistd.h>
 #include <pthread.h>
 #include <signal.h> /* For SIGIGN and SIGINT */
-#include "m2minterfacefactory.h"
-#include "m2minterface.h"
-#include "m2mdevice.h"
-#include "m2minterfaceobserver.h"
-#include "m2mobjectinstance.h"
-#include "m2mresource.h"
+#include "lwm2m-client/m2minterfacefactory.h"
+#include "lwm2m-client/m2mdevice.h"
+#include "lwm2m-client/m2minterfaceobserver.h"
+#include "lwm2m-client/m2minterface.h"
+#include "lwm2m-client/m2mobjectinstance.h"
+#include "lwm2m-client/m2mresource.h"
+
 
 const String &BOOTSTRAP_SERVER_ADDRESS = "coap://10.45.3.10:5693";
 const String &M2M_SERVER_ADDRESS = "coap://10.45.3.10:5683";
@@ -106,7 +107,6 @@ public:
         _security = M2MInterfaceFactory::create_security(M2MSecurity::Bootstrap);
         if(_security) {
             if(_security->set_resource_value(M2MSecurity::M2MServerUri, BOOTSTRAP_SERVER_ADDRESS) &&
-            _security->set_resource_value(M2MSecurity::BootstrapServer, 1) &&
             _security->set_resource_value(M2MSecurity::SecurityMode, M2MSecurity::NoSecurity)) {
                 success = true;
                 /* Not used now because there is no TLS or DTLS implementation available for stack.
@@ -156,24 +156,33 @@ public:
         return success;
     }
 
+    void execute_function(void *argument) {
+        if(argument) {
+            char* arguments = (char*)argument;
+            printf("Received %s!!\n", arguments);
+        }
+        printf("I am executed !!\n");        
+    }
+
     bool create_generic_object() {
         bool success = false;
         _object = M2MInterfaceFactory::create_object("Test");
         if(_object) {
             M2MObjectInstance* inst = _object->create_object_instance();
             if(inst) {
-                    M2MResource* res = inst->create_dynamic_resource("Dynamic","ResourceTest",true);
-                    char buffer[20];
-                    int size = sprintf(buffer,"%d",_value);
-                    res->set_operation(M2MBase::GET_PUT_POST_ALLOWED);
-                    res->set_value((const uint8_t*)buffer,
-                                   (const uint32_t)size);
-                    _value++;
-                    inst->create_static_resource("Static",
-                                                 "ResourceTest",
-                                                 STATIC_VALUE,
-                                                 sizeof(STATIC_VALUE)-1);
-                }
+                M2MResource* res = inst->create_dynamic_resource("Dynamic","ResourceTest",true);
+                char buffer[20];
+                int size = sprintf(buffer,"%d",_value);
+                  res->set_operation(M2MBase::GET_PUT_POST_ALLOWED);
+                  res->set_value((const uint8_t*)buffer,
+                                 (const uint32_t)size);
+                  res->set_execute_function(execute_callback(this,&M2MLWClient::execute_function));
+                _value++;
+                inst->create_static_resource("Static",
+                                             "ResourceTest",
+                                             STATIC_VALUE,
+                                             sizeof(STATIC_VALUE)-1);
+            }
         }
         return success;
     }
@@ -182,15 +191,15 @@ public:
         if(_object) {
             M2MObjectInstance* inst = _object->object_instance();
             if(inst) {
-                    M2MResource* res = inst->resource("Dynamic");
-                    printf(" Value sent %d\n", _value);
-                    char buffer[20];
-                    int size = sprintf(buffer,"%d",_value);
-                    res->set_value((const uint8_t*)buffer,
-                                   (const uint32_t)size,
-                                   true);
-                    _value++;
-                }
+                M2MResource* res = inst->resource("Dynamic");
+                printf(" Value sent %d\n", _value);
+                char buffer[20];
+                int size = sprintf(buffer,"%d",_value);
+                res->set_value((const uint8_t*)buffer,
+                               (const uint32_t)size,
+                               true);
+                _value++;
+            }
         }
     }
 
@@ -245,6 +254,11 @@ public:
 
     }
 
+    void value_updated(M2MBase *base, M2MBase::BaseType type) {
+        printf("\nValue updated of Object name %s and Type %d\n",
+               base->name().c_str(), type);
+    }
+
 private:
 
     M2MInterface        *_interface;
@@ -286,7 +300,8 @@ void* send_observation(void* arg) {
     static uint8_t counter = 0;
     while(1) {
         sleep(1);
-        if(counter >= 10) {
+        if(counter >= 10 &&
+           client->register_successful()) {
             printf("Sending observation\n");
             client->update_resource();
             counter = 0;
@@ -318,7 +333,6 @@ int main() {
 
     signal(SIGINT, (signalhandler_t)ctrl_c_handle_function);
 
-
     bool result = lwm2mclient.create_interface();
     if(true == result) {
         printf("\nInterface created\n");
@@ -348,6 +362,9 @@ int main() {
 
     pthread_join(bootstrap_thread, NULL);
     pthread_join(unregister_thread, NULL);
+
+    pthread_detach(bootstrap_thread);
+    pthread_detach(unregister_thread);
 
     return 0;
 }

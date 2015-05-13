@@ -196,6 +196,13 @@ void M2MInterfaceImpl::client_registered(M2MServer *server_object)
     _observer.object_registered(_register_server,*server_object);
 }
 
+void M2MInterfaceImpl::registration_updated(const M2MServer &server_object)
+{
+    internal_event(STATE_REGISTERED);
+    _observer.registration_updated(_register_server,server_object);
+}
+
+
 void M2MInterfaceImpl::registration_error(uint8_t /*error_code*/)
 {
     internal_event(STATE_IDLE);
@@ -224,6 +231,14 @@ void M2MInterfaceImpl::bootstrap_error()
 void M2MInterfaceImpl::coap_data_processed()
 {
     internal_event(STATE_COAP_DATA_PROCESSED);
+}
+
+void M2MInterfaceImpl::value_updated(M2MBase *base)
+{
+    if(base) {
+        M2MBase::BaseType type = base->base_type();
+        _observer.value_updated(base, type);
+    }
 }
 
 void M2MInterfaceImpl::data_available(uint8_t* data,
