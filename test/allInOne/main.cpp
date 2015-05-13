@@ -245,24 +245,24 @@ private:
 };
 
 #define SUITE_TEST_INFO(test_name, info)		printf("Suite-%s: %s\n", test_name, info)
-#define SUITE_TEST_RESULT(test_name, result)	printf("Suite-%s: result %s\n", test_name, result ? "pass" : "fail")
+#define SUITE_TEST_RESULT(test_name, result)	printf("Suite-%s: result %s\n", test_name, result ? "PASSED" : "FAILED")
 #define SUITE_RESULT(result)					printf("Suite: result %s\n", result ? "success" : "failure")
 
-bool test_bootstrap(TestConfig *test_config) {
-	SUITE_TEST_INFO("test_bootstrap", "started");
+bool test_bootStrap(TestConfig *test_config) {
+	bool _result = true;
+	const char* _tn = "test_bootStrap";
 
-	bool interface_success = false;
-	bool bootstrap_success = false;
+	SUITE_TEST_INFO(_tn, "STARTED");
 
     // Instantiate the class which implements
     // LWM2M Client API
     M2MLWClient *lwm2mclient = new M2MLWClient(test_config);
 
-    SUITE_TEST_INFO("test_bootstrap", "client done");
+    SUITE_TEST_INFO(_tn, "client done");
 
     // Create LWM2M Client API interface to manage bootstrap,
     // register and unregister
-    interface_success = lwm2mclient->create_interface();
+    _result &= lwm2mclient->create_interface();
 
     // Create LWM2M bootstrap object specifying bootstrap server
     // information.
@@ -271,10 +271,10 @@ bool test_bootstrap(TestConfig *test_config) {
     // Issue bootstrap command.
     lwm2mclient->test_bootstrap(security_object);
 
-    SUITE_TEST_INFO("test_bootstrap", "bootstrap done");
+    SUITE_TEST_INFO(_tn, "bootstrap done");
     // Wait till the bootstrap callback is called successfully.
     // Callback comes in bootstrap_done()
-    while (!(bootstrap_success = lwm2mclient->bootstrap_successful())) { __WFI(); }
+    while (!(_result &= lwm2mclient->bootstrap_successful())) { __WFI(); }
 
     // Delete security object created for bootstrapping
     if(security_object) {
@@ -285,14 +285,176 @@ bool test_bootstrap(TestConfig *test_config) {
     	delete lwm2mclient;
     }
 
-    SUITE_TEST_RESULT("test_bootstrap", interface_success && bootstrap_success);
-    return interface_success && bootstrap_success;
+    SUITE_TEST_RESULT(_tn, _result);
+    return _result;
+}
+
+bool test_deviceObject(TestConfig *test_config) {
+	bool _result = true;
+	const char* _tn = "test_deviceObject";
+
+	SUITE_TEST_INFO(_tn, "STARTED");
+
+	// Instantiate the class which implements
+    // LWM2M Client API
+    M2MLWClient *lwm2mclient = new M2MLWClient(test_config);
+
+    SUITE_TEST_INFO(_tn, "client done");
+
+    // Create LWM2M Client API interface for M2M server
+    _result &= lwm2mclient->create_interface();
+
+    M2MSecurity *register_object = lwm2mclient->create_register_object();
+
+    lwm2mclient->set_register_object(register_object);
+
+    // Create LWM2M device object specifying device resources
+    // as per OMA LWM2M specification.
+    M2MDevice* device_object = lwm2mclient->create_device_object();
+
+    // Add the device object that we want to register
+    // into the list and pass the list for register API.
+    M2MObjectList object_list;
+    object_list.push_back(device_object);
+
+    // Issue register command.
+    lwm2mclient->test_register(object_list);
+
+    SUITE_TEST_INFO(_tn, "register done");
+
+	wait_ms(1000);
+
+    // Wait till the register callback is called successfully.
+    // Callback comes in object_registered()
+    while (!(_result &= lwm2mclient->register_successful() ))
+        { __WFI(); }
+
+    SUITE_TEST_INFO(_tn, "register callback done");
+
+    // Wait 5 seconds
+	wait_ms(1000);
+
+	//TODO move this to callback when that can be taken in use
+	_result &= lwm2mclient->test_update_register(2222);
+
+	SUITE_TEST_INFO(_tn, "update register done");
+
+	// Wait till the register callback is called successfully.
+    // Callback comes in object_updated()
+	//while (!lwm2mclient.update_register_successful()) { __WFI(); }
+
+	// Issue unregister command.
+    lwm2mclient->test_unregister();
+
+	SUITE_TEST_INFO(_tn, "unregister done");
+
+    // Wait for the unregister successful callback,
+    // Callback comes in object_unregistered().
+    while (!(_result &= lwm2mclient->unregister_successful() ))
+        { __WFI(); }
+
+    SUITE_TEST_INFO(_tn, "unregister callback done");
+
+    // Delete device object created for registering device
+    // resources.
+    if(device_object) {
+        delete device_object;
+    }
+
+    if (lwm2mclient) {
+    	delete lwm2mclient;
+    }
+
+	SUITE_TEST_RESULT(_tn, _result);
+    return _result;
+
+}
+
+bool test_resource(TestConfig *test_config) {
+	bool _result = true;
+    const char* _tn = "test_resource";
+	SUITE_TEST_INFO(_tn, "STARTED");
+
+	// Instantiate the class which implements
+    // LWM2M Client API
+
+	//M2MLWClient *lwm2mclient;
+    M2MLWClient *lwm2mclient = new M2MLWClient(test_config);
+
+    SUITE_TEST_INFO(_tn, "client done");
+
+    // Create LWM2M Client API interface for M2M server
+    _result &= lwm2mclient->create_interface();
+
+    M2MSecurity *register_object = lwm2mclient->create_register_object();
+
+    lwm2mclient->set_register_object(register_object);
+
+    // Create LWM2M device object specifying device resources
+    // as per OMA LWM2M specification.
+    M2MDevice* device_object = lwm2mclient->create_device_object();
+
+    // Create LWM2M generic object for resource
+    M2MObject* resource_object = lwm2mclient->create_generic_object();
+
+    // Add the device object that we want to register
+    // into the list and pass the list for register API.
+    M2MObjectList object_list;
+    object_list.push_back(device_object);
+    object_list.push_back(resource_object);
+
+    // Issue register command.
+    lwm2mclient->test_register(object_list);
+
+    SUITE_TEST_INFO(_tn, "register done");
+
+    // Wait till the register callback is called successfully.
+    // Callback comes in object_registered()
+
+    //while (! lwm2mclient.register_successful()) { __WFI(); }
+    while (!( _result &= lwm2mclient->register_successful() ))
+        { __WFI(); }
+
+    SUITE_TEST_INFO(_tn, "register callback done");
+
+    // Wait 5 seconds
+    wait_ms(5000);
+
+    // Issue unregister command.
+    lwm2mclient->test_unregister();
+
+    SUITE_TEST_INFO(_tn, "unregister done");
+
+    // Wait for the unregister successful callback,
+    // Callback comes in object_unregistered().
+    while (!( _result &= lwm2mclient->unregister_successful() ))
+        { __WFI(); }
+
+    SUITE_TEST_INFO(_tn, "unregister callback done");
+
+    // Delete device object created for registering device
+    // resources.
+    if(device_object) {
+        delete device_object;
+    }
+
+    // Delete resource object for registering resources.
+    if(resource_object) {
+    	delete resource_object;
+    }
+
+    if (lwm2mclient) {
+    	delete lwm2mclient;
+    }
+
+	SUITE_TEST_RESULT(_tn, _result);
+    return _result;
 }
 
 int main() {
 	bool result = true;
 
-    MBED_HOSTTEST_TIMEOUT(20);
+    MBED_HOSTTEST_TIMEOUT(180);
     MBED_HOSTTEST_SELECT(lwm2mclient_auto);
     MBED_HOSTTEST_DESCRIPTION(LWM2MClient Happy Day Test);
     MBED_HOSTTEST_START("LWM2MClientHappyDayTest");
@@ -309,13 +471,14 @@ int main() {
     TestConfig test_config;
     test_config.setup(eth.getMACAddress());
 
-    result &= test_bootstrap(&test_config);
-    result &= test_bootstrap(&test_config);
-    result &= test_bootstrap(&test_config);
-    result &= test_bootstrap(&test_config);
-    result &= test_bootstrap(&test_config);
-    result &= test_bootstrap(&test_config);
+    result &= test_bootStrap(&test_config);
+    result &= test_deviceObject(&test_config);
+    result &= test_resource(&test_config);
 
+    // Disconnect and teardown the network interface
+    eth.disconnect();
+
+    // Communicate test result
     SUITE_RESULT(result);
 }
 
