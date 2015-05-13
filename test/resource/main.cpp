@@ -206,6 +206,14 @@ public:
         printf("\nError occured\n");
     }
 
+    //Callback from mbed client stack if any value has changed
+    // during PUT operation. Object and its type is passed in
+    // the callback.
+    void value_updated(M2MBase *base, M2MBase::BaseType type) {
+        printf("\nValue updated of Object name %s and Type %d\n",
+               base->name().c_str(), type);
+    }
+
 private:
 
     M2MInterface    	*_interface;
