@@ -280,6 +280,7 @@ uint8_t M2MNsdlInterface::received_from_server_callback(struct nsdl_s * /*nsdl_h
                 _observer.registration_error(coap_header->msg_code);
             }
         } else if(coap_header->msg_id == _update_id) {
+            _update_id = 0;
             _observer.registration_updated(*_server);
         }
     }
