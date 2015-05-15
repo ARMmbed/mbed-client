@@ -311,6 +311,83 @@ public:
 
 ```
 
+You need to take care that some of these functions are asynchronous in nature and some are expecting callback from network like receiving data from socket which needs to be communicated back to the `lwm2m-client` so that the library can act on received data. The callback are called back through Observer class defined here `M2MConnectionObserver` .
+
+The file `m2mconnectionobserver.h` is present in `lwm2m-client`. In order to see how the callback needs to be called check the implementation in `m2mconnectionhandlerimpl.cpp` present in `lwm2m-client-linux`. 
+
+```
+/*
+ * Copyright (c) 2015 ARM. All rights reserved.
+ */
+#ifndef M2M_CONNECTION_OBSERVER_H__
+#define M2M_CONNECTION_OBSERVER_H__
+
+#include "lwm2m-client/m2minterface.h"
+
+/**
+ * @brief Observer class for informing socket activity to the state machine
+ */
+
+class M2MConnectionObserver
+{
+
+public :
+
+    typedef enum {
+        Bootstrap,
+        LWM2MServer
+    }ServerType;
+
+    /**
+     * @brief The M2MSocketAddress struct
+     * Unified container for holding socket address data
+     * across different platforms.
+     */
+    struct SocketAddress{
+        M2MInterface::NetworkStack  _stack;
+        void                        *_address;    
+        uint8_t                     _length;
+        uint16_t                    _port;
+    };
+
+    /**
+    * @brief Indicates data is available from socket.
+    * @param data, data read from socket
+    * @param data_size, length of data read from socket.
+    * @param address, Server Address from where data is coming.
+    */
+    virtual void data_available(uint8_t* data,
+                                uint16_t data_size,
+                                const M2MConnectionObserver::SocketAddress &address) = 0;
+
+    /**
+    * @brief Indicates some error occured in socket.
+    * @param error_code, Error code from socket.
+    * It cannot be used any further.
+    */
+    virtual void socket_error(uint8_t error_code) = 0;
+
+    /**
+    * @brief Indicates server address resolving is ready.
+    * @param address, Resolved socket address.
+    * @param server_type, Type of server.
+    * @param server_port, Port of the resolved server address.
+    */
+    virtual void address_ready(const M2MConnectionObserver::SocketAddress &address,
+                               M2MConnectionObserver::ServerType server_type,
+                               const uint16_t server_port) = 0;
+
+    /**
+    * @brief Indicates data has been sent successfully.
+    */
+    virtual void data_sent() = 0;
+
+};
+
+#endif // M2M_CONNECTION_OBSERVER_H__
+
+```
+
 # Step 5: Implementing M2MTimerImpl class for your platform
 
 ```
@@ -371,6 +448,40 @@ public:
 };
 
 #endif // M2M_TIMER_IMPL_H
+```
+The timer API functions are asynchronous in nature and it is expected that whenever timer event is available, it is notified  to the `lwm2m-client` so that the library can act on timer expired signal. The callback are called back through Observer class defined here `M2MTimerObserver` .
+
+The file `m2mtimerobserver.h` is present in `lwm2m-client`. In order to see how the callback needs to be called check the implementation in `m2mtimerimpl.cpp` present in `lwm2m-client-linux`. 
+
+```
+/*
+ * Copyright (c) 2015 ARM. All rights reserved.
+ */
+#ifndef M2M_TIMER_OBSERVER_H
+#define M2M_TIMER_OBSERVER_H
+
+/**
+ *  Observer class for informing timer expiry to the parent class
+ */
+class M2MTimerObserver
+{
+public:
+    typedef enum {
+        Notdefined,
+        Registration,
+        NsdlExecution,
+        PMinTimer,
+        PMaxTimer
+    }Type;
+
+    /**
+    * Indicates that the time has expired.
+    */
+    virtual void timer_expired(M2MTimerObserver::Type type =
+                               M2MTimerObserver::Notdefined) = 0;
+};
+
+#endif // M2M_TIMER_OBSERVER_H
 ```
 
 # Step 7: Modify module.json of lwm2m-client module
