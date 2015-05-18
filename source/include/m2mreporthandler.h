@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2015 ARM. All rights reserved.
- */
+*/
 #ifndef M2MREPORTHANDLER_H
 #define M2MREPORTHANDLER_H
 
