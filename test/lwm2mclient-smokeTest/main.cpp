@@ -454,10 +454,10 @@ bool test_resource(TestConfig *test_config) {
 int main() {
 	bool result = true;
 
-    MBED_HOSTTEST_TIMEOUT(180);
+    MBED_HOSTTEST_TIMEOUT(40);
     MBED_HOSTTEST_SELECT(lwm2mclient_auto);
-    MBED_HOSTTEST_DESCRIPTION(LWM2MClient Happy Day Test);
-    MBED_HOSTTEST_START("LWM2MClientHappyDayTest");
+    MBED_HOSTTEST_DESCRIPTION(LWM2MClient Smoke Test);
+    MBED_HOSTTEST_START("LWM2MClientSmokeTest");
 
     // This sets up the network interface configuration which will be used
     // by LWM2M Client API to communicate with mbed Device server.
