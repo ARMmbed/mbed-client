@@ -35,9 +35,11 @@ functionality that it relies on. :
 
 ```
 lwm2m-client 0.1.6
-  ┣─ mbed-client 0.1.1
-  ┃ ┗─ mbed-client-libservice 2.0.12
-  ┗─ lwm2m-client-linux 0.0.2
+|
+|_mbed-client 0.1.1
+|   |_mbed-client-libservice 2.0.12
+|
+|_lwm2m-client-linux 0.0.2
 ```
 
 (You can list dependency trees like this by using the [`yotta list --all`
@@ -53,10 +55,13 @@ each internally depend on various other modules.
 
 ```
 lwm2m-client-linux-example 0.0.1
-┗─ lwm2m-client 0.1.6
-  ┣─ mbed-client 0.1.1
-  ┃ ┗─ mbed-client-libservice 2.0.12
-  ┗─ lwm2m-client-linux 0.0.2
+|
+|_lwm2m-client 0.1.6
+   |
+   |_mbed-client 0.1.1
+   |   |_mbed-client-libservice 2.0.12
+   |
+   |_lwm2m-client-linux 0.0.2
 ```
 
 ## Compilation Targets
@@ -136,23 +141,23 @@ each example application.
 The directory structure of a typical target description is:
 
 ```
-|   readme.md
-│   target.json
-├───CMake
-│   │   toolchain.cmake
-│   │
-│   ├───Compiler
-│   │       GNU-ASM.cmake
-│   │       GNU-C.cmake
-│   │       GNU-CXX.cmake
-│   │
-│   └───Platform
-│           xxx-GNU-C.cmake
-│           xxx-GNU-CXX.cmake
-│           xxx.cmake
-│
-└───ld
-        newtarget.ld
+|readme.md
+|target.json
+|_CMake
+|   |_toolchain.cmake
+|   |
+|   |_Compiler
+|   |   |_GNU-ASM.cmake
+|   |   |_GNU-C.cmake
+|   |   |_GNU-CXX.cmake
+|   |
+|   |_Platform
+|       |_xxx-GNU-C.cmake
+|       |_xxx-GNU-CXX.cmake
+|       |_xxx.cmake
+|
+|_ld
+    |_newtarget.ld
 ```
 
 Where the `target.json` file specifies the path to the CMake toolchain
@@ -179,14 +184,15 @@ your target platform. lwm-client-xxx module should have files for the main targe
 
 An example of lwm2m-client-platform core:
 ```
-│   module.json
-├───lwm2m-client-platform
-│       m2mconnectionhandlerimpl.h
-│       m2mtimerimpl.h
-│
-└───source
-        m2mconnectionhandlerimpl.cpp
-        m2mtimerimpl.cpp
+|_module.json
+|
+|_lwm2m-client-platform
+|    |_m2mconnectionhandlerimpl.h
+|    |_m2mtimerimpl.h
+|
+|_source
+    |_m2mconnectionhandlerimpl.cpp
+    |_m2mtimerimpl.cpp
 ```
 
 To make your module available to other modules that you want to build, you
