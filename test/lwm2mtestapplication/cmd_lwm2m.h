@@ -1,3 +1,6 @@
+/*
+ * Copyright (c) 2015 ARM. All rights reserved.
+ */
 #ifndef CMD_LWM2M_H_
 #define CMD_LWM2M_H_
 

@@ -1,3 +1,6 @@
+/*
+ * Copyright (c) 2015 ARM. All rights reserved.
+ */
 #ifndef CMD_COMMANDS_H_
 #define CMD_COMMANDS_H_
 
