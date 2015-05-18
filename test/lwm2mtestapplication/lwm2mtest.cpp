@@ -1,3 +1,6 @@
+/*
+ * Copyright (c) 2015 ARM. All rights reserved.
+ */
 #include "lwm2mtest.h"
 #include "ns_types.h"
 #include "ns_cmdline.h"

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 ARM. All rights reserved.
+ * Copyright (c) 2014-2015 ARM. All rights reserved.
  */
 #include <string.h>
 #include <stdarg.h>

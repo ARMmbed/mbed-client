@@ -1,3 +1,6 @@
+/*
+ * Copyright (c) 2015 ARM. All rights reserved.
+ */
 #include <string.h>
 #include <stdlib.h> 
 #include <stdarg.h>
