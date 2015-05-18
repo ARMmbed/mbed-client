@@ -1,3 +1,6 @@
+/*
+ * Copyright (c) 2015 ARM. All rights reserved.
+ */
 #ifndef FUNCTIONPOINTER_H
 #define FUNCTIONPOINTER_H
 
