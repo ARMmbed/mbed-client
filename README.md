@@ -1,27 +1,27 @@
 # LWM2M-Client
 
-##Introduction
-This API  provides functionality to use LWM2M features from mbed device client which are described in Lightweight Machine to Machine Technical Specification. Using this API mbed OS developers can develop their own application utilizing LWM2M features. 
+## Introduction
+This API enables the use of LWM2M features from the mbed Device Client. These features are described in the Lightweight Machine to Machine Technical Specification. Using this API, the mbed OS developers can develop their own applications utilizing the LWM2M features. 
 
-This API provides enabler which defines the application layer communication protocol between a LWM2M Server and a LWM2M Client, which is located in a LWM2M Device. 
-The OMA Lightweight M2M enabler includes device management and service enablement for LWM2M Devices. The target LWM2M Devices for this enabler are mainly resource constrained devices. 
-Therefore, this enabler makes use of a light and compact protocol as well as an efficient resource data model.
-A Client-Server architecture is introduced for the LWM2M Enabler, where the LWM2M Device acts as a LWNM2M Client and the M2M service, platform or application acts as the LWM2M Server. 
-There are four interfaces between these two components as shown below:
+This API provides an enabler that defines the application layer communication protocol between a LWM2M Server and a LWM2M Client located in a LWM2M Device. 
+
+The OMA Lightweight M2M enabler includes device management and service enablement for LWM2M Devices. The target LWM2M Devices for this enabler are mainly resource constrained devices. Therefore, this enabler makes use of a light and compact protocol as well as an efficient resource data model.
+
+A Client-Server architecture is introduced for the LWM2M Enabler. The LWM2M Device acts as the LWNM2M Client and the M2M service, platform or application acts as the LWM2M Server.
+
+There are four interfaces between these two components as follows:
 
 - Bootstrap
-
 - Client Registration
-
 - Device management and service enablement
-
 - Information Reporting
 
 
 ##LWM2M Features
 
-The API provides interface to the application developer to define their applications's endpoint infomation which will be delivered to the bootstrap server and mbed Device Server during bootstrap and registration operations respectively,
-This is how you can create your interface for your endpoint.
+The API provides the application developer with an interface to define the application endpoint information that will be delivered to the Bootstrap Server and mbed Device Server during the bootstrap and registration operations respectively.
+
+This is how you can create your interface for your endpoint:
 ```
 #include "lwm2m-client/m2minterfacefactory.h"
 #include "lwm2m-client/m2minterface.h"
@@ -36,20 +36,19 @@ M2MInterface* interface = M2MInterfaceFactory::create_interface(*this,
                                                   M2MInterface::LwIP_IPv4,
                                                   "");
 ```
-Once you have created an interface, you can now proceed to execute operation using this interface.
+Once you have created the interface, you can proceed to execute operations.
 
-###Bootstrap feature
+### Bootstrap feature
 
-The Bootstrap Interface is used to provision essential information into the LWM2M Client to enable the LWM2M Client to perform the operation “Register” with one or more LWM2M Servers. 
+The Bootstrap Interface is used to provision essential information into the LWM2M Client to enable the LWM2M Client to perform the **Register** operation with one or more LWM2M Servers. 
 
-In this release only one bootstrap mode is supported:
+In this release, only the client initiated bootstrap mode is supported.
 
-###Client Initiated Bootstrap
+### Client Initiated Bootstrap
 
-Client Initiated Bootstrap mode provides a mechanism for the LWM2M Client to retrieve the Bootstrap Information from a LWM2M Bootstrap Server.
-The Client Initiated Bootstrap mode requires having a LWM2M Boostrap Server Account. 
-This API enables client initiated bootstrap functionality.
-User can provide the bootstrap server information and issue bootstrap command in following way.
+The Client Initiated Bootstrap mode provides a mechanism for the LWM2M Client to retrieve the bootstrap information from a LWM2M Bootstrap Server. This mode requires a LWM2M Boostrap Server Account.
+
+The User can provide the bootstrap server information and issue bootstrap command in following way.
 
 First you need to create your bootstrap server object which contains information about bootstrap server like server address, security mode used by server etc.
 ```
