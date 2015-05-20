@@ -277,9 +277,9 @@ if(_object) {
                                      sizeof(STATIC_VALUE)-1);
 ```
 
-In Dynamic resource, it is expected for the value to change and everytime the server requests GET operation, value is fetched from setter APIs.
+In Dynamic resource, the value is expected to change and everytime the server requests GET operation, the value is fetched from setter APIs.
 
-For example, You can create custom dynamic resource like this
+For example, you can create a custom dynamic resource as follows:
 
 ```
 #include "lwm2m-client/m2mobject.h"
@@ -296,35 +296,44 @@ if(_object) {
         res->set_value((const uint8_t*)buffer,
                                    (const uint32_t)size);
 ```
-For more information on different functionality of resources, please check the API documentation for M2MObject, M2MObjectInstance and M2MResource classes.
+For more information on different functionalities of resources, please check the API documentation for M2MObject, M2MObjectInstance and M2MResource classes.
 
-###Write
+### Write
 
-The “Write” operation is used to change the value of a Resource, an array of Resources Instances or multiple Resources from an Object Instance. The operation permits multiple Resources to be modified within the same instance of the operation. 
+The **Write** operation is used to change the value of a Resource, an array of Resources Instances or multiple Resources from an Object Instance. The operation permits multiple Resources to be modified within the same instance of the operation. 
 
-Whenever there is a valid PUT operation for any of the resource then the application will receive the callback
+Whenever there is a valid PUT operation for any of the resources, the application will receive callback as follows:
 
 ```
 void value_updated(M2MBase *base, M2MBase::BaseType type) 
 ```
 
-where M2MBase is the object whose value has been updated and M2MBase::BaseType tells what type of object has received updated values.
+Where `M2MBase` is the object whose value has been updated and `M2MBase::BaseType` tells what type of object has received updated values.
 
 
-###Write Attribute
+### Write Attributes
 
-The “Write” operation is used to change the value of a Resource, an array of Resources Instances or multiple Resources from an Object Instance. The operation permits multiple Resources to be modified within the same instance of the operation. 
+The **Write** operation is used to change the value of a Resource, an array of Resources Instances or multiple Resources from an Object Instance. The operation permits multiple Resources to be modified within the same instance of the operation. 
 
-Any readable Resource can have attributes which are considered during the “Observe” operation. The following attributes are used and further explained in the table below: Minimum Period, Maximum Period, Greater Than, Less Than, and Step.
-The “Write Attributes” operation is used to change the attributes of a Resource, an Object Instance, or an Object. The separation between “Write” and “Write Attributes” operations enables cache mechanism for the Observe operation. The operation permits multiple attributes to be modified within the same operation. The operation also can be used for cancelling the “Observe” operation.
+Any readable Resource can have attributes which are considered during the **Observe** operation. The following attributes are used and further explained in the table below:
 
-The value set by the Resources are sent to the LWM2M server based on the criteria set by these attributes set from LWM2M server.
-Check the LWM2M specification for details on all the possible Write Attributes defined for different types of Objects and Resources.
+- Minimum Period
+- Maximum Period
+- Greater Than
+- Less Than
+- Step
 
-###Execute
-The “Execute” operation is used by the LWM2M Server to initiate some action, and can only be performed on individual Resources. A LWM2M Client MUST return an error when the “Execute” operation is received for anObject Instance(s) or Resource Instance(s).
+The **Write Attributes** operation is used to change the attributes of a Resource, an Object Instance, or an Object. The separation between **Write** and **Write Attributes** operations enables cache mechanism for the **Observe** operation. The operation permits multiple attributes to be modified within the same operation. The operation also can be used for cancelling the **Observe** operation.
 
-In order to handle the Execute operation, the application can implement it in following way
+The value set by the Resources are sent to the LWM2M server based on the criteria set by these attributes set from the LWM2M server.
+
+Check the LWM2M specification for details on all the possible **Write Attributes** defined for different types of Objects and Resources.
+
+### Execute
+
+The **Execute** operation is used by the LWM2M Server to initiate some action, and can only be performed on individual Resources. The LWM2M Client MUST return an error when the **Execute** operation is received for Object Instances or Resource Instance.
+
+To handle the **Execute** operation, the application can implement it as follows:
 
 ```
 #include "lwm2m-client/m2mobject.h"
@@ -346,34 +355,35 @@ if(_object) {
                        (const uint32_t)size);
         res->set_execute_function(execute_callback(this,&M2MLWClient::execute_function));
 ```
-When the client will receive POST request for Execute from LWM2M server for this resource, then this function will be called and executed.
 
-###Information Reporting Interface
+When the client receives the POST request for **Execute** from the LWM2M server for this resource, this function will be called and executed.
 
-The Information Reporting Interface is used by a LWM2M Server to observe any changes in registered Resource on a LWM2M Client, receiving notifications when new values are available. This observation relationship is initiated by sending an “Observe” operation to the L2M2M Client for an Object, an Object Instance or a Resource. An observation ends when a “Cancel Observation” operation is performed. 
+### Information Reporting Interface
 
-Information Reporting interface includes sub-features and currently supported are:
+The Information Reporting Interface is used by the LWM2M Server to observe any changes in a registered Resource on the LWM2M Client, receiving notifications when new values are available. This observation relationship is initiated by sending an **Observe** operation to the L2M2M Client for an Object, an Object Instance or a Resource. An observation ends when a **Cancel Observation** operation is performed. 
 
- - Observe
+Information Reporting interface supports the following sub-features:
 
- - Notify
+- Observe
+- Notify
+- Cancel
 
- - Cancel
+Currently, Information Reporting is handled only at Resources level. Support for Object and Object Instances will be added in later releases. 
 
-Currently, Information Reporting is handled only at Resources level, support for Object and Object Instances will be added in later releases. 
+### Observe
 
-###Observe
 The LWM2M Server initiates an observation request for changes of Dynamic Resource, Resources within an Object Instance or for all the Object Instances of an Object within the LWM2M Client.
-Related parameters for “Observe” operation are described in *Write Attributes* section.
-When “Observe” operation contains only Object ID, the “Notify” operation MUST be done per Object Instance.
 
-In order to make your Resource observable , you need to set the Observable parameter as true for your object.
+Related parameters for the **Observe** operation are described in [Write Attributes](#write-attributes) section.
+When the **Observe** operation contains only Object ID, the **Notify** operation MUST be done per Object Instance.
+
+To make your Resource observable, you need to set the Observable parameter as true for your object:
 
 ```
  object->set_observable(true);
 ```
 
-For Dynamic resource, while creating the resource, you can define if you want the resource to be observable
+If you want a Dynamic resource to be observable do the following when creating the resource:
 
 ```
 M2MResource* create_dynamic_resource(const String &resource_name,
@@ -382,30 +392,32 @@ M2MResource* create_dynamic_resource(const String &resource_name,
                                          bool multiple_instance =false);
 ```
 
-LWM2M mbed Client will handle the observation part once the Resources have defined if they want to be observable.
+The LWM2M mbed Client will handle the observation part once you have defined the Resources to be observable.
 
-###Notify
+### Notify
 
-The “Notify” operation is sent from the LWM2M Client to the LWM2M Server during a valid observation on an Object Instance or Resource. This operation includes the new value of the Object Instance or Resource. The “Notify” operation SHOULD be sent when all the conditions (i.e., Minimum Period, Maximum Period, Greater Than, Less Than, Step) configured by “Write Attributes” operation for “Observe” operation are met.
+The **Notify** operation is sent from the LWM2M Client to the LWM2M Server during a valid observation on an Object Instance or a Resource. This operation includes the new value of the Object Instance or Resource. The **Notify** operation SHOULD be sent when all the conditions (Minimum Period, Maximum Period, Greater Than, Less Than, Step) configured by **Write Attributes** operation for **Observe** operation are met.
 
-LWM2M mbed Client will send notifications for the Resources once the conditions are met.
+The LWM2M mbed Client will send notifications for the Resources once the conditions are met.
 
-###Cancel
+### Cancel
 
-The “Cancel Observation” operation is sent from the LWM2M Server to the LWM2M Client to end an observation relationship for Object Instance or Resource. The operation doesn’t contain any parameters at the LWM2M layer. The “Cancel Observation” operation MUST be used in the response of the “Notify” operation.
+The **Cancel Observation** operation is sent from the LWM2M Server to the LWM2M Client to end an observation relationship for an Object Instance or a Resource. The operation does not contain any parameters at the LWM2M layer. The **Cancel Observation** operation MUST be used in the response of the **Notify** operation.
 
-LWM2M Client handles both the types of cancellation 
- 1.  By sending “Cancel Observation” operation from LWM2M server
- 2.  2.	By sending “Write Attributes” with cancel parameter.
+The LWM2M Client handles both cancellation types:
 
-##More Information
+ 1. By sending **Cancel Observation** operation from the LWM2M server
+ 2. By sending **Write Attributes** with cancel parameter.
 
-This API is based on OMA LWM2M specification. You can get specification from [here]()
+## More Information
 
-##API documentation
+This API is based on OMA LWM2M specification. You can get the specification [here](http://technical.openmobilealliance.org/Technical/technical-information/release-program/current-releases/oma-lightweightm2m-v1-0)
 
-You can generate Doxygen API documentation for these APIs from doxy file which is present in `cd doxygen` folder . You need to run `doxygen` command from the `doxygen/` folder and it will generate `docs` folder at API source directory root level where you can find the detailed documentation for each API.
+## API documentation
 
-##Example application
-In order to use these API, there is an example application available [here](https://github.com/ARMmbed/lwm2m-client-example)
+You can generate Doxygen API documentation for these APIs from a doxy file which is present in the `doxygen` folder . You need to run `doxygen` command from the `doxygen/` folder and it will generate a `docs` folder at API source directory root level where you can find the detailed documentation for each API.
+
+## Example application
+
+An example application is available [here](https://github.com/ARMmbed/lwm2m-client-example).
 
