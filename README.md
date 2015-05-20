@@ -1,6 +1,7 @@
 # LWM2M-Client
 
 ## Introduction
+
 This API enables the use of LWM2M features from the mbed Device Client. These features are described in the Lightweight Machine to Machine Technical Specification. Using this API, the mbed OS developers can develop their own applications utilizing the LWM2M features. 
 
 This API provides an enabler that defines the application layer communication protocol between a LWM2M Server and a LWM2M Client located in a LWM2M Device. 
@@ -142,7 +143,7 @@ if(device) {
     }
 ```
 
-You can register other resources as well, please check detailed API documentation for that.
+You can register other resources as well, please check the doxygen documentation for detailed API description.
 
 Apart from the manadatory device obejct, if you would like to register your own customized resources, you can create them and set their values accordingly.
 
@@ -175,7 +176,7 @@ You will get more information about the error from the `error` parameter passed 
 ### Update
 
 Periodically or based on certain events within the LWM2M Client or initiated by the LWM2M Server, the LWM2M Client updates its registration information with the LWM2M Server by sending an **Update** operation to the LWM2M Server.
-This is how you can de-update (what is this?) your registration:
+This is how you can update your registration:
 
 ```
 M2MInterface::update_registration(M2MSecurity* security_object, const uint32_t lifetime)
@@ -197,13 +198,13 @@ If the updation operation fails for some reason,  you will receive the following
 void error(M2MInterface::Error error)
 ```
 
-### De-register
+### Unregister
 
-When the LWM2M Client determines that it no longer requires to be available to the LWM2M Server (LWM2M Device factory reset, for example), the LWM2M Client will de-register from the LWM2M Server. Upon receiving this message, the LWM2M Server removes the registration information from the LWM2M Server.
+When the LWM2M Client determines that it no longer requires to be available to the LWM2M Server (LWM2M Device factory reset, for example), the LWM2M Client will unregister from the LWM2M Server. Upon receiving this message, the LWM2M Server removes the registration information from the LWM2M Server.
 
-This is how you can de-register your endpoint client:
+This is how you can unregister your endpoint client:
 
-If the endpoint has multiple server registrations, you need to provide the `server_object` of the server where you would like to de-register your endpoint. Otherwise, if there is only one registration, you can pass `NULL` and the client will unregister the default registration from the endpoint.
+If the endpoint has multiple server registrations, you need to provide the `server_object` of the server where you would like to unregister your endpoint. Otherwise, if there is only one registration, you can pass `NULL` and the client will unregister the default registration from the endpoint.
 
 ```
 M2MInterface::unregister_object(M2MSecurity *object);
@@ -315,7 +316,7 @@ Where `M2MBase` is the object whose value has been updated and `M2MBase::BaseTyp
 
 The **Write** operation is used to change the value of a Resource, an array of Resources Instances or multiple Resources from an Object Instance. The operation permits multiple Resources to be modified within the same instance of the operation. 
 
-Any readable Resource can have attributes which are considered during the **Observe** operation. The following attributes are used and further explained in the table below:
+Any readable Resource can have attributes which are considered during the **Observe** operation. The following attributes are used:
 
 - Minimum Period
 - Maximum Period
@@ -325,7 +326,7 @@ Any readable Resource can have attributes which are considered during the **Obse
 
 The **Write Attributes** operation is used to change the attributes of a Resource, an Object Instance, or an Object. The separation between **Write** and **Write Attributes** operations enables cache mechanism for the **Observe** operation. The operation permits multiple attributes to be modified within the same operation. The operation also can be used for cancelling the **Observe** operation.
 
-The value set by the Resources are sent to the LWM2M server based on the criteria set by these attributes set from the LWM2M server.
+The LWM2M server sets the endpoint attribute values that are used to determine when the endpoint sends the Resource value to the server.
 
 Check the LWM2M specification for details on all the possible **Write Attributes** defined for different types of Objects and Resources.
 
