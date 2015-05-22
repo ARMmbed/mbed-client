@@ -469,7 +469,7 @@ int main() {
 
     // Create test config object, and setup with unique MAC address
     TestConfig test_config;
-    test_config.setup(eth.getMACAddress());
+    test_config.setup();
 
     result &= test_bootStrap(&test_config);
     result &= test_deviceObject(&test_config);

@@ -12,9 +12,7 @@ public:
 	TestConfig();
 	~TestConfig();
 
-	void setup(const char *unique_name);
 	void setup();
-
 	void set_endpoint_name(const char *name);
 
 	m2m::String& get_bootstrap_server();
@@ -32,7 +30,6 @@ private:
 	m2m::String _endpointType;
 	m2m::String _bootstrapAddress;
 	m2m::String _mdsAddress;
-	m2m::String _domain;
 
 };
 
