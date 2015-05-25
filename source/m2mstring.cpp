@@ -5,6 +5,7 @@
 #include <string.h> // strlen
 #include <stdlib.h> // malloc, realloc
 #include <assert.h>
+#include <algorithm> // min
 
 namespace m2m {
 

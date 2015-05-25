@@ -1,3 +1,6 @@
+/*
+ * Copyright (c) 2015 ARM. All rights reserved.
+ */
 #ifndef M2MREPORTOBSERVER_H
 #define M2MREPORTOBSERVER_H
 

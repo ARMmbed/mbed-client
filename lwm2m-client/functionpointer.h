@@ -1,3 +1,6 @@
+/*
+ * Copyright (c) 2015 ARM. All rights reserved.
+ */
 #ifndef FUNCTIONPOINTER_H
 #define FUNCTIONPOINTER_H
 
@@ -60,7 +63,8 @@ public:
         return (R)0;
     }
 
-    R(*get_function())() const {
+    typedef R (*static_fp)();
+    static_fp get_function() const {
         return (R(*)())_p.function;
     }
 
@@ -144,7 +148,8 @@ public:
         return (R)0;
     }
 
-    R(*get_function())() const {
+    typedef R (*static_fp)();
+    static_fp get_function() const {
         return (R(*)())_p.function;
     }
 
