@@ -78,10 +78,8 @@ To port mbed Client to a new platform, perform the following steps:
  1. Contact [support@mbed.org](mailto:support@mbed.org), to request for new development repositories for your target platform.
  2. Create a yotta compilation target for your board.
  3. Implement the `lwm2m-client-xxx` module for your target platform where `xxx` is the name for your platform (for example, `linux`).
- 4. Verify that your implementation is correct.
- 5. Make sure that your port is updated into `module.json` of the `lwm2m-client` module.
- 6. Make sure that your port is available to other customers, and they can
-    use your platform to start developing products that leverage your OS.
+ 4. Make sure that your port is updated into `module.json` of the `lwm2m-client` module.
+ 5. Verify that your implementation is correct.
 
 The `yotta` build system is designed for easy reuse of generic modules.
 If you intend to support multiple platforms that share common features, it is recommended to store the common 
@@ -106,10 +104,8 @@ module. You also need to provide the target description of your board:
 To compile for a target board, you need a [target description](http://docs.yottabuild.org/tutorial/targets.html) that describes how to compile for the target. 
 
 **Pekka says this is confusing:**
-The target description also defines values which
-modules can test for when selecting dependency modules. The `lwm2m-client` module,
-for example, uses the platform name which each target defines to choose
-which `lwm2m-client-<platform-name>` module to depend on to provide the platform
+**Yogesh : Updated , Comments ??**
+The `lwm2m-client` module uses the platform name, which each target defines, to choose which `lwm2m-client-<platform-name>` module to depend on to provide the platform
 specific implementation.
 **Until here**
 
@@ -125,7 +121,7 @@ To select the target description, run `yotta target <targetname>`. yotta needs t
 The documentation for target descriptions is available on the [yotta
 documentation site](http://docs.yottabuild.org/tutorial/targets.html).
 
-Existing examples for compiling for linux target can be found in the `yotta_targets` directory in each example application.
+Existing example for compiling for linux target can be found in the `yotta_targets` directory in example application.
 
 The directory structure of a typical target description is:
 
@@ -187,8 +183,9 @@ need to give [`yotta link`](http://docs.yottabuild.org/reference/commands.html#y
 to "link" it into the module where you want to test it out.
 
 **Pekka says: This could be written more clearly. Who gives that command (or are these yotta things commands?) where and what is then available for whom?**
-We will then be able to use `yotta link lwm2m-client-xxx` in another module to make
-that other module use your in-development lwm2m-client implementation.
+**Yogesh : Text is now updated, Comments ??**
+You will then be able to use your local your in-development lwm2m-client implementation by giving command `yotta link lwm2m-client-xxx` in main `lwm2m-client` module so that it starts using 
+your local module.
 
 ```
 # in lwm2m-client, link your module:
@@ -197,32 +194,17 @@ yotta link
 
 You can also just commit and push your untested code to github, but it is always a good idea to test before committing.
 
-# Step 4: Implementing lwm2m-client-platform
-
-Clone your `mbed-hal-<platform>` module from github. If
-you use [`yotta link`](http://docs.yottabuild.org/reference/commands.html#yotta-link)
-again, make sure to complete the link from the global links directory from this module:
-
-```
-# in lwm2m-client-platform, run:
-yotta link lwm2m-client-platform
-```
-
-**Pekka says: Please re-write this. It is very confusing.**
-This will cause your in-development `lwm2m-client-platform` implementation that
-you previously linked to be used when you compile this module. If we don’t do this linking step, then the last version of `lwm2m-client-platform` , if available, that we committed to github will be used.
-**Until this**
-
-The `lwm2m-client-platform` module must provide a platform-specific implementation for the lwm2m-client. The APIs that needs porting are defined in the `lwm2m-client-linux` module. The header files contain documentation alongside the declaration of each function, where the function is described along with its parameters and return value.
-
-The header files `m2mconnectionhandlerimpl.h` and `m2mtimerimpl.h` contain all the functions that needs porting and corresponding implementation of your platform.
+Your `lwm2m-client-xxx` module must provide a platform-specific implementation for the lwm2m-client. The APIs that needs porting are defined in the `lwm2m-client-linux` module. The header files contain documentation alongside the declaration of each function, where the function is described along with its parameters and return value.
 
 **Pekka says: Is this redundant. You just named above two header files that require porting.**
+**Yogesh : Updated, Comments ??**
 There are two header files which require porting for your platform.
+1. `m2mconnectionhandlerimpl.h`
+2. `m2mtimerimpl.h` 
 
 To see how this is done in Linux, check the `lwm2m-client-linux` module available in this package.
 
-# Step 5: Implementing M2MConnectionHandlerImpl class for your platform
+## Implementing M2MConnectionHandlerImpl class for your platform
 
 ```
 /*
@@ -385,7 +367,7 @@ public :
 
 ```
 
-# Step 6: Implementing M2MTimerImpl class for your platform
+## Implementing M2MTimerImpl class for your platform
 
 ```
 /*
@@ -448,7 +430,8 @@ public:
 ```
 
 **Pekka says: Can you say callback is called back? This is confusing, at least for me. Callback is received/sent/something else?**
-The timer API functions are asynchronous in nature and it is expected that whenever a timer event is available, it is notified to the `lwm2m-client` so that the library can act on the "timer expired" signal. The callback is called back through an Observer class defined in `M2MTimerObserver` .
+**Yogesh : Updated, Comments ??**
+The timer API functions are asynchronous in nature and it is expected that whenever a timer event is available, it is notified to the `lwm2m-client` so that the library can act on the "timer expired" signal. The callback is received through an Observer class defined in `M2MTimerObserver` .
 
 The file `m2mtimerobserver.h` is present in `lwm2m-client`. To see how the callback needs to be called check the implementation in `m2mtimerimpl.cpp` present in  the`lwm2m-client-linux`. 
 
@@ -483,7 +466,7 @@ public:
 #endif // M2M_TIMER_OBSERVER_H
 ```
 
-# Step 7: Modify module.json of lwm2m-client module
+# Step 4: Modify module.json of lwm2m-client module
 
 You need to add your target name to module.json so that when you set `yt target <platform>` , yotta can resolve the dependency correctly and link the main library with your module.
 
@@ -520,7 +503,7 @@ As you can see ,there is already support available for 2 platform , mbed and lin
 }
 ```
 
-# Step 8: Testing & Verification
+# Step 5: Testing & Verification
 
 You should be able to build your lwm2m-client port immediately. After that, run:
 
