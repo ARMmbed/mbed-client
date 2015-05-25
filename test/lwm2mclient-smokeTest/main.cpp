@@ -451,8 +451,12 @@ bool test_resource(TestConfig *test_config) {
     return _result;
 }
 
+
+
 int main() {
 	bool result = true;
+	DigitalOut _led = DigitalOut(LED3);
+	_led = 1;
 
     MBED_HOSTTEST_TIMEOUT(40);
     MBED_HOSTTEST_SELECT(lwm2mclient_auto);
@@ -471,9 +475,13 @@ int main() {
     TestConfig test_config;
     test_config.setup();
 
+    _led = 0;
+
     result &= test_bootStrap(&test_config);
     result &= test_deviceObject(&test_config);
     result &= test_resource(&test_config);
+
+    _led = 1;
 
     // Disconnect and teardown the network interface
     eth.disconnect();
