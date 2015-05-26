@@ -2,7 +2,7 @@
 
 ## Introduction
 
-This API enables the use of LWM2M features from the mbed Device Client. These features are described in the Lightweight Machine to Machine Technical Specification. Using this API, the mbed OS developers can develop their own applications utilizing the LWM2M features. 
+mbed Device Client API enables the use of LWM2M features from the mbed Device Client. These features are described in the Lightweight Machine to Machine Technical Specification. Using this API, the mbed OS developers can develop their own applications utilizing the LWM2M features. 
 
 This API provides an enabler that defines the application layer communication protocol between a LWM2M Server and a LWM2M Client located in a LWM2M Device. 
 
