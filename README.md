@@ -2,13 +2,13 @@
 
 ## Introduction
 
-mbed Device Client API enables the use of LWM2M features from the mbed Device Client. These features are described in the Lightweight Machine to Machine Technical Specification. Using this API, the mbed OS developers can develop their own applications utilizing the LWM2M features. 
+mbed Device Client API enables the use of LWM2M features from the mbed Device Client. These features are described in the [Lightweight Machine to Machine Technical Specification](http://technical.openmobilealliance.org/Technical/technical-information/release-program/current-releases/oma-lightweightm2m-v1-0). Using this API, the mbed OS developers can develop their own applications utilizing the LWM2M features. 
 
-This API provides an enabler that defines the application layer communication protocol between a LWM2M Server and a LWM2M Client located in a LWM2M Device. 
+This API provides an enabler that defines the application layer communication protocol between a LWM2M Server and a client located in a LWM2M Device. 
 
-The OMA Lightweight M2M enabler includes device management and service enablement for LWM2M Devices. The target LWM2M Devices for this enabler are mainly resource constrained devices. Therefore, this enabler makes use of a light and compact protocol as well as an efficient resource data model.
+API includes device management and service enablement for LWM2M Devices. The target LWM2M Devices for this enabler are mainly resource constrained devices. Therefore, this enabler makes use of a light and compact protocol as well as an efficient resource data model.
 
-A Client-Server architecture is introduced for the LWM2M Enabler. The LWM2M Device acts as the LWNM2M Client and the M2M service, platform or application acts as the LWM2M Server.
+A Client-Server architecture is introduced for mbed Device Client. The LWM2M Device acts as the client and the M2M service, platform or application acts as the LWM2M Server.
 
 There are four interfaces between these two components as follows:
 
@@ -41,13 +41,13 @@ Once you have created the interface, you can proceed to execute operations.
 
 ### Bootstrap feature
 
-The Bootstrap Interface is used to provision essential information into the LWM2M Client to enable the LWM2M Client to perform the **Register** operation with one or more LWM2M Servers. 
+The Bootstrap Interface is used to provision essential information into the client to enable client to perform the **Register** operation with one or more LWM2M Servers. 
 
 In this release, only the Client Initiated Bootstrap mode is supported.
 
 ### Client Initiated Bootstrap
 
-The Client Initiated Bootstrap mode provides a mechanism for the LWM2M Client to retrieve the bootstrap information from a LWM2M Bootstrap Server. This mode requires a LWM2M Boostrap Server Account.
+The Client Initiated Bootstrap mode provides a mechanism for client to retrieve the bootstrap information from a LWM2M Bootstrap Server. This mode requires a LWM2M Boostrap Server Account.
 
 You can provide the bootstrap server information and issue bootstrap command as follows:
 
@@ -73,7 +73,7 @@ M2MInterface::bootstrap(M2MSecurity* bootstrap_object);
 
 Since this is an asynchronous operation, you will receive the result of this operation through callback defined in `m2minterfaceobserver.h` that you should be handling in your application.
 
-If the bootstrap operation is successful and the client can fecth the mbed Device Server information from the Bootstrap Server, your application will receive the following callback:
+If the bootstrap operation is successful and the client can fetch the mbed Device Server information from the Bootstrap Server, your application will receive the following callback:
 
 ```
 void bootstrap_done(M2MSecurity *server_object)
@@ -91,7 +91,7 @@ You will get more information about the error from the `error` parameter passed 
 
 ### Client Registration Interface
 
-The Client Registration Interface is used by the LWM2M Client to register with LWM2M Servers, maintain registration and de-register from the LWM2M Server.
+The Client Registration Interface is used by client to register with LWM2M Servers, maintain registration and de-register from the LWM2M Server.
 
 Currently, only one-to-one client-server regisration is supported. One-to-many client-server registrations will be supported in upcoming releases.
 
@@ -104,7 +104,7 @@ The Client Registration Interface includes multiple sub-features. The following 
 
 ### Register
 
-When registering, the LWM2M Client performs the **Register** operation and provides the properties that the LWM2M Server requires to contact the LWM2M Client (for example End Point Name); maintains the registration and session (for example Lifetime, Queue Mode) between the LWM2M Client and LWM2M Server, and information on the Objects the LWM2M Client supports and existing Object Instances in the LWM2M Client.
+When registering, the client performs the **Register** operation and provides the properties that the LWM2M Server requires to contact the client (for example End Point Name); maintains the registration and session (for example Lifetime, Queue Mode) between the client and LWM2M Server, and information on the Objects the client supports and existing Object Instances in the client.
 
 This API enables client registration functionality.
 
@@ -175,7 +175,7 @@ You will get more information about the error from the `error` parameter passed 
 
 ### Update
 
-Periodically or based on certain events within the LWM2M Client or initiated by the LWM2M Server, the LWM2M Client updates its registration information with the LWM2M Server by sending an **Update** operation to the LWM2M Server.
+Periodically or based on certain events within the client or initiated by the LWM2M Server, the client updates its registration information with the LWM2M Server by sending an **Update** operation to the LWM2M Server.
 This is how you can update your registration:
 
 ```
@@ -200,7 +200,7 @@ void error(M2MInterface::Error error)
 
 ### Unregister
 
-When the LWM2M Client determines that it no longer requires to be available to the LWM2M Server (LWM2M Device factory reset, for example), the LWM2M Client will unregister from the LWM2M Server. Upon receiving this message, the LWM2M Server removes the registration information from the LWM2M Server.
+When the client determines that it no longer requires to be available to the LWM2M Server (LWM2M Device factory reset, for example), the client will unregister from the LWM2M Server. Upon receiving this message, the LWM2M Server removes the registration information from the LWM2M Server.
 
 This is how you can unregister your endpoint client:
 
@@ -230,7 +230,7 @@ You will get more information about the error from the `error` parameter passed 
 
 ### Device Management and Service Enabler Interface
 
-The Device Management and Service Enabler Interface is used by the LWM2M Server to access Object Instances and Resources available in the LWM2M Client. The interface provides this access through the following operations:
+The Device Management and Service Enabler Interface is used by the LWM2M Server to access Object Instances and Resources available in the client. The interface provides this access through the following operations:
 
 - **Create**
 - **Read**
@@ -332,7 +332,7 @@ Check the LWM2M specification for details on all the possible **Write Attributes
 
 ### Execute
 
-The **Execute** operation is used by the LWM2M Server to initiate some action, and can only be performed on individual Resources. The LWM2M Client MUST return an error when the **Execute** operation is received for Object Instances or Resource Instance.
+The **Execute** operation is used by the LWM2M Server to initiate some action, and can only be performed on individual Resources. The client MUST return an error when the **Execute** operation is received for Object Instances or Resource Instance.
 
 To handle the **Execute** operation, the application can implement it as follows:
 
@@ -361,7 +361,7 @@ When the client receives the POST request for **Execute** from the LWM2M server 
 
 ### Information Reporting Interface
 
-The Information Reporting Interface is used by the LWM2M Server to observe any changes in a registered Resource on the LWM2M Client, receiving notifications when new values are available. This observation relationship is initiated by sending an **Observe** operation to the L2M2M Client for an Object, an Object Instance or a Resource. An observation ends when a **Cancel Observation** operation is performed. 
+The Information Reporting Interface is used by the LWM2M Server to observe any changes in a registered Resource on the client, receiving notifications when new values are available. This observation relationship is initiated by sending an **Observe** operation to the L2M2M Client for an Object, an Object Instance or a Resource. An observation ends when a **Cancel Observation** operation is performed. 
 
 Information Reporting interface supports the following sub-features:
 
@@ -373,7 +373,7 @@ Currently, Information Reporting is handled only at Resources level. Support for
 
 ### Observe
 
-The LWM2M Server initiates an observation request for changes of Dynamic Resource, Resources within an Object Instance or for all the Object Instances of an Object within the LWM2M Client.
+The LWM2M Server initiates an observation request for changes of Dynamic Resource, Resources within an Object Instance or for all the Object Instances of an Object within the client.
 
 Related parameters for the **Observe** operation are described in [Write Attributes](#write-attributes) section.
 When the **Observe** operation contains only Object ID, the **Notify** operation MUST be done per Object Instance.
@@ -397,15 +397,15 @@ The LWM2M mbed Client will handle the observation part once you have defined the
 
 ### Notify
 
-The **Notify** operation is sent from the LWM2M Client to the LWM2M Server during a valid observation on an Object Instance or a Resource. This operation includes the new value of the Object Instance or Resource. The **Notify** operation SHOULD be sent when all the conditions (Minimum Period, Maximum Period, Greater Than, Less Than, Step) configured by **Write Attributes** operation for **Observe** operation are met.
+The **Notify** operation is sent from the client to the LWM2M Server during a valid observation on an Object Instance or a Resource. This operation includes the new value of the Object Instance or Resource. The **Notify** operation SHOULD be sent when all the conditions (Minimum Period, Maximum Period, Greater Than, Less Than, Step) configured by **Write Attributes** operation for **Observe** operation are met.
 
 The LWM2M mbed Client will send notifications for the Resources once the conditions are met.
 
 ### Cancel
 
-The **Cancel Observation** operation is sent from the LWM2M Server to the LWM2M Client to end an observation relationship for an Object Instance or a Resource. The operation does not contain any parameters at the LWM2M layer. The **Cancel Observation** operation MUST be used in the response of the **Notify** operation.
+The **Cancel Observation** operation is sent from the LWM2M Server to the client to end an observation relationship for an Object Instance or a Resource. The operation does not contain any parameters at the LWM2M layer. The **Cancel Observation** operation MUST be used in the response of the **Notify** operation.
 
-The LWM2M Client handles both cancellation types:
+The client handles both cancellation types:
 
  1. By sending **Cancel Observation** operation from the LWM2M server
  2. By sending **Write Attributes** with cancel parameter.
