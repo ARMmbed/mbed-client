@@ -24,6 +24,9 @@ const String &STATIC_RESOURCE_NAME = "Static";
 const String &STATIC_RESOURCE_TYPE = "StaticType";
 const uint8_t STATIC_VALUE[] = "Static value";
 
+//TODO: should this be configured in .json conf file, and communicated via host test to here?
+int CALLBACK_TIMEOUT = 5;
+
 class M2MLWClient: public M2MInterfaceObserver {
 public:
     M2MLWClient(TestConfig *test_config){
@@ -248,9 +251,26 @@ private:
 #define SUITE_TEST_RESULT(test_name, result)	printf("Suite-%s: result %s\n", test_name, result ? "PASSED" : "FAILED")
 #define SUITE_RESULT(result)					printf("Suite: result %s\n", result ? "success" : "failure")
 
+
+#define WAIT_CALLBACK(X, TIMEOUT)                                  \
+{int _timer = 0;\
+while ( 1 )       \
+    { 													  \
+	  _result &= (X);									  \
+	  if (_result) {									  \
+		  SUITE_TEST_INFO(_tn, "callback done");          \
+		  break;										  \
+	  }													  \
+	  wait_ms(1000); _timer+=1;                           \
+      if (_timer >= TIMEOUT) {                            \
+    	  SUITE_TEST_INFO(_tn, "ERROR: callback timeout");\
+    	  break;                                          \
+      }                                                   \
+    }}
+
 bool test_bootStrap(TestConfig *test_config) {
 	bool _result = true;
-	const char* _tn = "test_bootStrap";
+	const char* _tn = "TC1_bootStrap";
 
 	SUITE_TEST_INFO(_tn, "STARTED");
 
@@ -270,11 +290,12 @@ bool test_bootStrap(TestConfig *test_config) {
 
     // Issue bootstrap command.
     lwm2mclient->test_bootstrap(security_object);
-
     SUITE_TEST_INFO(_tn, "bootstrap done");
+
+    SUITE_TEST_INFO(_tn, "waiting bootstrap callback...");
     // Wait till the bootstrap callback is called successfully.
     // Callback comes in bootstrap_done()
-    while (!(_result &= lwm2mclient->bootstrap_successful())) { __WFI(); }
+    WAIT_CALLBACK(lwm2mclient->bootstrap_successful(), CALLBACK_TIMEOUT);
 
     // Delete security object created for bootstrapping
     if(security_object) {
@@ -291,7 +312,7 @@ bool test_bootStrap(TestConfig *test_config) {
 
 bool test_deviceObject(TestConfig *test_config) {
 	bool _result = true;
-	const char* _tn = "test_deviceObject";
+	const char* _tn = "TC2_deviceObject";
 
 	SUITE_TEST_INFO(_tn, "STARTED");
 
@@ -319,41 +340,32 @@ bool test_deviceObject(TestConfig *test_config) {
 
     // Issue register command.
     lwm2mclient->test_register(object_list);
-
     SUITE_TEST_INFO(_tn, "register done");
 
-	wait_ms(1000);
-
-    // Wait till the register callback is called successfully.
+    SUITE_TEST_INFO(_tn, "waiting register callback...");
+    wait_ms(1000);
     // Callback comes in object_registered()
-    while (!(_result &= lwm2mclient->register_successful() ))
-        { __WFI(); }
-
-    SUITE_TEST_INFO(_tn, "register callback done");
+    WAIT_CALLBACK(lwm2mclient->register_successful(), CALLBACK_TIMEOUT);
+    //SUITE_TEST_INFO(_tn, "register callback done");
 
     // Wait 5 seconds
 	wait_ms(1000);
 
 	//TODO move this to callback when that can be taken in use
 	_result &= lwm2mclient->test_update_register(2222);
-
 	SUITE_TEST_INFO(_tn, "update register done");
 
-	// Wait till the register callback is called successfully.
-    // Callback comes in object_updated()
-	//while (!lwm2mclient.update_register_successful()) { __WFI(); }
+	//SUITE_TEST_INFO(_tn, "waiting update register callback...");
+	// Callback comes in object_updated()
+	//WAIT_CALLBACK(lwm2mclient->update_register_successful(), CALLBACK_TIMEOUT);
 
 	// Issue unregister command.
     lwm2mclient->test_unregister();
-
 	SUITE_TEST_INFO(_tn, "unregister done");
 
-    // Wait for the unregister successful callback,
-    // Callback comes in object_unregistered().
-    while (!(_result &= lwm2mclient->unregister_successful() ))
-        { __WFI(); }
-
-    SUITE_TEST_INFO(_tn, "unregister callback done");
+	SUITE_TEST_INFO(_tn, "waiting unregister callback...");
+	// Callback comes in object_unregistered().
+    WAIT_CALLBACK(lwm2mclient->unregister_successful(), CALLBACK_TIMEOUT);
 
     // Delete device object created for registering device
     // resources.
@@ -372,15 +384,11 @@ bool test_deviceObject(TestConfig *test_config) {
 
 bool test_resource(TestConfig *test_config) {
 	bool _result = true;
-    const char* _tn = "test_resource";
+    const char* _tn = "TC3_resource";
 	SUITE_TEST_INFO(_tn, "STARTED");
 
-	// Instantiate the class which implements
-    // LWM2M Client API
-
-	//M2MLWClient *lwm2mclient;
+	// Instantiate the class which implements LWM2M Client API
     M2MLWClient *lwm2mclient = new M2MLWClient(test_config);
-
     SUITE_TEST_INFO(_tn, "client done");
 
     // Create LWM2M Client API interface for M2M server
@@ -405,35 +413,24 @@ bool test_resource(TestConfig *test_config) {
 
     // Issue register command.
     lwm2mclient->test_register(object_list);
-
     SUITE_TEST_INFO(_tn, "register done");
 
-    // Wait till the register callback is called successfully.
+    SUITE_TEST_INFO(_tn, "waiting register callback...");
     // Callback comes in object_registered()
-
-    //while (! lwm2mclient.register_successful()) { __WFI(); }
-    while (!( _result &= lwm2mclient->register_successful() ))
-        { __WFI(); }
-
-    SUITE_TEST_INFO(_tn, "register callback done");
+    WAIT_CALLBACK(lwm2mclient->register_successful(), CALLBACK_TIMEOUT);
 
     // Wait 5 seconds
     wait_ms(5000);
 
     // Issue unregister command.
     lwm2mclient->test_unregister();
-
     SUITE_TEST_INFO(_tn, "unregister done");
 
-    // Wait for the unregister successful callback,
+    SUITE_TEST_INFO(_tn, "waiting unregister callback...");
     // Callback comes in object_unregistered().
-    while (!( _result &= lwm2mclient->unregister_successful() ))
-        { __WFI(); }
+    WAIT_CALLBACK(lwm2mclient->unregister_successful(), CALLBACK_TIMEOUT);
 
-    SUITE_TEST_INFO(_tn, "unregister callback done");
-
-    // Delete device object created for registering device
-    // resources.
+    // Delete device object created for registering device resources.
     if(device_object) {
         delete device_object;
     }
