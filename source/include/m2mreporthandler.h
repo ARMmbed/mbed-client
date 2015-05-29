@@ -22,11 +22,14 @@ class M2MTimer;
  *  This class is handles all the observation related operations.
  */
 
-class M2MReportHandler: public M2MTimerObserver {
+class M2MReportHandler: public M2MTimerObserver
+{
+private:
+    // Prevents the use of assignment operator by accident.
+    M2MReportHandler& operator=( const M2MReportHandler& /*other*/ );
 
 public:
 
-    // Prevents the use of default constructor.
     M2MReportHandler(M2MReportObserver &observer);
 
 public:
@@ -46,7 +49,7 @@ public:
 
     /**
      * @brief Sets the value of the given resource.
-     * @param value, Valuye of the observed resource.
+     * @param value, Value of the observed resource.
      */
     virtual void set_value(float value);
 
@@ -86,6 +89,11 @@ private:
     * works with any number of bands 2 to MAX_LIMITS+1
     */
     int band(float value);
+
+    /**
+    * @brief Manage timers for pmin and pmax.
+    */
+    void handle_timers();
 
 private:
 

@@ -72,7 +72,7 @@ M2MResource* M2MServer::create_resource(ServerResource resource, uint32_t value)
                 res->set_operation(M2MBase::GET_PUT_POST_ALLOWED);
                 // If resource is created then set the value.
                 char buffer[20];
-                int size = sprintf(buffer,"%ld",value);
+                int size = sprintf(buffer,"%ld",(long int)value);
                 res->set_value((const uint8_t*)buffer,(const uint32_t)size);
             }
         }
@@ -150,7 +150,7 @@ bool M2MServer::set_resource_value(ServerResource resource,
             // If it is any of the above resource
             // set the value of the resource.
             char buffer[20];
-            int size = sprintf(buffer,"%ld",value);
+            int size = sprintf(buffer,"%ld",(long int)value);
             success = res->set_value((const uint8_t*)buffer,
                                      (const uint32_t)size,
                                      true);

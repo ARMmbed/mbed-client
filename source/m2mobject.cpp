@@ -3,6 +3,7 @@
  */
 #include "lwm2m-client/m2mobject.h"
 #include "lwm2m-client/m2mobjectinstance.h"
+#include "ns_trace.h"
 
 M2MObject::M2MObject(const String &object_name)
 : M2MBase(object_name,M2MBase::Dynamic),
@@ -51,7 +52,7 @@ M2MObject& M2MObject::operator=(const M2MObject& other)
                 _instance_list.push_back(new M2MObjectInstance(*ins));
             }
         }
-        _instance_index = other._instance_index;        
+        _instance_index = other._instance_index;
     }
     return *this;
 }
@@ -59,11 +60,12 @@ M2MObject& M2MObject::operator=(const M2MObject& other)
 M2MObject::M2MObject(const M2MObject& other)
 : M2MBase(other)
 {
-    *this = other;
+    this->operator=(other);
 }
 
 M2MObjectInstance* M2MObject::create_object_instance()
 {
+    tr_debug("M2MObject::create_object_instance()");
     M2MObjectInstance *object_instance = new M2MObjectInstance(this->name());
 
     add_object_instance(object_instance);
@@ -72,6 +74,7 @@ M2MObjectInstance* M2MObject::create_object_instance()
 
 bool M2MObject::remove_object_instance(uint16_t inst_id)
 {
+    tr_debug("M2MObject::remove_object_instance(inst_id %d)", inst_id);
     bool success = false;
     if(!_instance_list.empty()) {
         M2MObjectInstance* obj = NULL;
@@ -105,6 +108,7 @@ bool M2MObject::remove_object_instance(uint16_t inst_id)
 
 M2MObjectInstance* M2MObject::object_instance(uint16_t inst_id) const
 {
+    tr_debug("M2MObject::object_instance(inst_id %d)", inst_id);
     M2MObjectInstance *obj = NULL;
     if(!_instance_list.empty()) {
         M2MObjectInstanceList::const_iterator it;
@@ -137,6 +141,7 @@ M2MBase::BaseType M2MObject::base_type() const
 
 bool M2MObject::handle_observation_attribute(char *&query)
 {
+    tr_debug("M2MObject::handle_observation_attribute(query %s)", query);
     bool success = false;
     if(!_instance_list.empty()) {
         M2MObjectInstanceList::const_iterator it;

@@ -21,6 +21,12 @@ class M2MInterfaceImpl;
  */
 
 class  M2MInterfaceFactory {
+private:
+    // Prevents the use of assignment operator by accident.
+    M2MInterfaceFactory& operator=( const M2MInterfaceFactory& /*other*/ );
+
+    // Prevents the use of copy constructor by accident
+    M2MInterfaceFactory( const M2MInterfaceFactory& /*other*/ );
 
 public:
 

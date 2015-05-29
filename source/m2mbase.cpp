@@ -18,15 +18,28 @@ M2MBase& M2MBase::operator=(const M2MBase& other)
         _coap_content_type = other._coap_content_type;
         _instance_id = other._instance_id;
         _observable = other._observable;
-        _observation_handler = other._observation_handler;
         _observation_number = other._observation_number;
         _is_numeric = other._is_numeric;
+
+        _observation_handler = other._observation_handler;
+
+        if(_value) {
+            free(_value);
+            _value = NULL;
+            _value_length = 0;
+        }
         _value_length = other._value_length;
         if(other._value) {
             _value = (uint8_t *)malloc(other._value_length);
             if(_value) {
                 memcpy((uint8_t *)_value, (uint8_t *)other._value, other._value_length);
             }
+        }
+
+        if(_token) {
+            free(_token);
+            _token = NULL;
+            _token_length = 0;
         }
         _token_length = other._token_length;
         if(other._token) {
@@ -35,6 +48,11 @@ M2MBase& M2MBase::operator=(const M2MBase& other)
                 memcpy((uint8_t *)_token, (uint8_t *)other._token, other._token_length);
             }
         }
+
+        if(_report_handler) {
+            delete _report_handler;
+            _report_handler = NULL;
+        }
         if(other._report_handler) {
             _report_handler = new M2MReportHandler(*other._report_handler);
         }
@@ -42,7 +60,12 @@ M2MBase& M2MBase::operator=(const M2MBase& other)
     return *this;
 }
 
-M2MBase::M2MBase(const M2MBase& other)
+M2MBase::M2MBase(const M2MBase& other) :
+    _report_handler(NULL),
+    _value(NULL),
+    _value_length(0),
+    _token(NULL),
+    _token_length(0)
 {
     _operation = other._operation;
     _mode = other._mode;
@@ -56,12 +79,14 @@ M2MBase::M2MBase(const M2MBase& other)
     _observation_number = other._observation_number;
     _is_numeric = other._is_numeric;
     _value_length = other._value_length;
-    if(other._value) {
+
+    if(other._value) {        
         _value = (uint8_t *)malloc(other._value_length);
         if(_value) {
             memcpy((uint8_t *)_value, (uint8_t *)other._value, other._value_length);
         }
     }
+
     _token_length = other._token_length;
     if(other._token) {
         _token = (uint8_t *)malloc(other._token_length);
@@ -69,10 +94,10 @@ M2MBase::M2MBase(const M2MBase& other)
             memcpy((uint8_t *)_token, (uint8_t *)other._token, other._token_length);
         }
     }
+
     if(other._report_handler) {
         _report_handler = new M2MReportHandler(*other._report_handler);
     }
-    *this = other;
 }
 
 M2MBase::M2MBase(const String & resource_name,
@@ -103,10 +128,12 @@ M2MBase::~M2MBase()
     if(_value) {
         free(_value);
         _value = NULL;
+        _value_length = 0;
     }
     if(_token) {
         free(_token);
         _token = NULL;
+        _token_length = 0;
     }
 }
 
@@ -119,11 +146,6 @@ void M2MBase::set_operation(M2MBase::Operation opr)
     } else {
         _operation = opr;
     }
-}
-
-void M2MBase::set_base_type(M2MBase::BaseType type)
-{
-    _base_type = type;
 }
 
 void M2MBase::set_interface_description(const String &desc)
@@ -258,20 +280,6 @@ bool M2MBase::is_observable() const
     return _observable;
 }
 
-void M2MBase::get_value(uint8_t *&value, uint32_t &value_length)
-{
-    value_length = 0;
-    if(value) {
-        free(value);
-        value = NULL;
-    }
-    value = (uint8_t *)malloc(_value_length);
-    if(value) {
-        value_length = _value_length;
-        memcpy((uint8_t *)value, (uint8_t *)_value, value_length);
-    }
-}
-
 void M2MBase::get_observation_token(uint8_t *&token, uint32_t &token_length)
 {
     token_length = 0;
@@ -289,6 +297,20 @@ void M2MBase::get_observation_token(uint8_t *&token, uint32_t &token_length)
 M2MBase::Mode M2MBase::mode() const
 {
     return _mode;
+}
+
+void M2MBase::get_value(uint8_t *&value, uint32_t &value_length)
+{
+    value_length = 0;
+    if(value) {
+        free(value);
+        value = NULL;
+    }
+    value = (uint8_t *)malloc(_value_length);
+    if(value) {
+        value_length = _value_length;
+        memcpy((uint8_t *)value, (uint8_t *)_value, value_length);
+    }
 }
 
 uint16_t M2MBase::observation_number() const
@@ -310,6 +332,11 @@ void M2MBase::observation_to_be_sent()
     if(_observation_handler) {
        _observation_handler->observation_to_be_sent(this);
     }
+}
+
+void M2MBase::set_base_type(M2MBase::BaseType type)
+{
+    _base_type = type;
 }
 
 void M2MBase::remove_resource_from_coap(const String &resource_name)

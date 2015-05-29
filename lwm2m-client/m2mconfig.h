@@ -14,5 +14,8 @@ using namespace m2m;
 #include "mbed.h"
 #endif
 
+#ifdef HAVE_DEBUG
+#define TRACE_GROUP "lwm2m-client"
+#endif
 
 #endif // M2MCONFIG_H

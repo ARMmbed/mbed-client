@@ -12,7 +12,7 @@ namespace m2m
 template <typename Object>
 
 class Vector
-{  
+{
   public:
 
     explicit Vector( int initSize = 0)
@@ -20,12 +20,13 @@ class Vector
               index(0),
               theCapacity( initSize + SPARE_CAPACITY )
     { objects = new Object[ theCapacity ]; }
-    
+
     Vector(const Vector & rhs ): objects(0)
-    { operator=(rhs); }
+    {operator=(rhs); }
 
     ~Vector()
-    { delete [] objects; }
+    { delete [] objects;
+      objects = NULL;}
 
     const Vector & operator=(const Vector & rhs)
     {
@@ -35,11 +36,10 @@ class Vector
             theSize = rhs.size();
             index = rhs.index;
             theCapacity = rhs.theCapacity;
-            
+
             objects = new Object[capacity()];
             for(int k = 0; k < size(); k++)
                 objects[k] = rhs.objects[k];
-            
         }
 
         return *this;
@@ -68,11 +68,11 @@ class Vector
         delete [] oldArray;
     }
 
-    Object & operator[](int index)
-    { return objects[index]; }
+    Object & operator[](int idx)
+    { return objects[idx]; }
     
-    const Object& operator[](int index) const
-    { return objects[index]; }
+    const Object& operator[](int idx) const
+    { return objects[idx]; }
 
     bool empty() const
     { return size() == 0; }

@@ -31,7 +31,9 @@ NSDL_C_DIR := ../nsdl-c
 override CFLAGS += -I$(NSDL_C_DIR)/nsdl-c
 override CFLAGS += $(addprefix -I,$(INCLUDE_DIRS))
 override CFLAGS += $(addprefix -D,$(FLAGS))
-override LDFLAGS += -lpthread
+ifeq ($(DEBUG),1)
+override CFLAGS += -DHAVE_DEBUG
+endif
 
 #
 # Define compiler toolchain

@@ -24,6 +24,12 @@ typedef Vector<M2MObject *> M2MObjectList;
 class M2MNsdlInterface : public M2MTimerObserver,
                          public M2MObservationHandler
 {
+private:
+    // Prevents the use of assignment operator by accident.
+    M2MNsdlInterface& operator=( const M2MNsdlInterface& /*other*/ );
+
+    // Prevents the use of copy constructor by accident
+    M2MNsdlInterface( const M2MNsdlInterface& /*other*/ );
 
 public:
     /**

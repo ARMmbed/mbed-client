@@ -93,7 +93,7 @@ M2MResource* M2MSecurity::create_resource(SecurityResource resource, uint32_t va
 
             if(res) {
                 char buffer[20];
-                int size = sprintf(buffer,"%ld",value);
+                int size = sprintf(buffer,"%ld",(long int)value);
                 res->set_operation(M2MBase::NOT_ALLOWED);
                 res->set_value((const uint8_t*)buffer,
                                (const uint32_t)size);
@@ -161,7 +161,7 @@ bool M2MSecurity::set_resource_value(SecurityResource resource,
             // If it is any of the above resource
             // set the value of the resource.
             char buffer[20];
-            int size = sprintf(buffer,"%ld",value);
+            int size = sprintf(buffer,"%ld",(long int)value);
             success = res->set_value((const uint8_t*)buffer,
                                      (const uint32_t)size,
                                      true);

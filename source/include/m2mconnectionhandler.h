@@ -17,6 +17,12 @@ class M2MConnectionHandlerImpl;
  */
 
 class M2MConnectionHandler {
+private:
+    // Prevents the use of assignment operator by accident.
+    M2MConnectionHandler& operator=( const M2MConnectionHandler& /*other*/ );
+
+    // Prevents the use of copy constructor by accident
+    M2MConnectionHandler( const M2MConnectionHandler& /*other*/ );
 
 public:
 
