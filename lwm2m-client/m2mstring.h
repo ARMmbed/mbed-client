@@ -4,6 +4,7 @@
 #include <sys/types.h> // size_t
 #include <stdexcept>
 
+class Test_M2MString;
 
 namespace m2m
 {
@@ -22,7 +23,7 @@ namespace m2m
     static const   size_type npos;
 
     String();
-    ~String();
+    virtual ~String();
     String(const String&);
     String(const char*);
 
@@ -34,14 +35,13 @@ namespace m2m
     String&  operator+=(char);
     void     push_back(char);
 
-    friend String
-    operator+(const String& lhs, const String& rhs);
+    //No need for this += is
+    //friend String operator+(const String& lhs, const String& rhs);
 
     bool     operator==(const char*) const;
     bool     operator==(const String&) const;
 
     void     clear();       // set string to empty string (memory remains reserved)
-    void     clearMemory(); // set string to empty string (memory is free'd)
 
     size_type size()   const   { return size_; }   ///< size without terminating NUL
     size_type length() const   { return size_; }   ///< as size()
@@ -100,6 +100,8 @@ namespace m2m
     char* strdup_never_null(const char* other);
 
     char _return_value;
+
+    friend class ::Test_M2MString;
 
   };
   // class

@@ -3,6 +3,7 @@
  */
 #include "lwm2m-client/m2mobjectinstance.h"
 #include "lwm2m-client/m2mresource.h"
+#include "ns_trace.h"
 
 M2MObjectInstance& M2MObjectInstance::operator=(const M2MObjectInstance& other)
 {
@@ -23,7 +24,7 @@ M2MObjectInstance& M2MObjectInstance::operator=(const M2MObjectInstance& other)
 M2MObjectInstance::M2MObjectInstance(const M2MObjectInstance& other)
 : M2MBase(other)
 {
-    *this = other;
+    this->operator=(other);
 }
 
 M2MObjectInstance::M2MObjectInstance(const String &object_name)
@@ -54,6 +55,7 @@ M2MResource* M2MObjectInstance::create_static_resource(const String &resource_na
                                                const uint8_t value_length,
                                                bool multiple_instance)
 {
+    tr_debug("M2MObjectInstance::create_static_resource(resource_name %s)",resource_name.c_str());
     M2MResource *resource = new M2MResource(resource_name, resource_type,
                                             M2MResource::Static,multiple_instance);
     resource->set_operation(M2MBase::GET_ALLOWED);
@@ -74,6 +76,7 @@ M2MResource* M2MObjectInstance::create_dynamic_resource(const String &resource_n
                                                 bool observable,
                                                 bool multiple_instance)
 {
+    tr_debug("M2MObjectInstance::create_dynamic_resource(resource_name %s)",resource_name.c_str());
     M2MResource *resource = new M2MResource(resource_name, resource_type,
                                             M2MResource::Dynamic,multiple_instance);
     resource->set_operation(M2MBase::GET_PUT_ALLOWED);
@@ -84,6 +87,8 @@ M2MResource* M2MObjectInstance::create_dynamic_resource(const String &resource_n
 
 bool M2MObjectInstance::remove_resource(const String &resource_name, uint16_t inst_id)
 {
+    tr_debug("M2MObjectInstance::remove_resource(resource_name %s inst_id %d)",
+             resource_name.c_str(), inst_id);
     bool success = false;
     if(!_resource_list.empty()) {
         M2MResource* res = NULL;
@@ -126,6 +131,8 @@ bool M2MObjectInstance::remove_resource(const String &resource_name, uint16_t in
 
 M2MResource* M2MObjectInstance::resource(const String &resource_name, uint16_t inst_id) const
 {
+    tr_debug("M2MObjectInstance::resource(resource_name %s inst_id %d)",
+             resource_name.c_str(), inst_id);
     M2MResource *res = NULL;
     if(!_resource_list.empty()) {
         M2MResourceList::const_iterator it;
@@ -179,6 +186,7 @@ bool M2MObjectInstance::handle_observation_attribute(char *&query)
         M2MResourceList::const_iterator it;
         it = _resource_list.begin();
         for ( ; it != _resource_list.end(); it++ ) {
+            tr_debug("M2MObjectInstance::handle_observation_attribute()");
             success = (*it)->handle_observation_attribute(query);
         }
     }
@@ -187,6 +195,7 @@ bool M2MObjectInstance::handle_observation_attribute(char *&query)
 
 void M2MObjectInstance::add_resource(M2MResource *res)
 {
+    tr_debug("M2MObjectInstance::add_resource()");
     if(res) {
         if(!_resource_list.empty()) {
             M2MResourceList::const_iterator it;

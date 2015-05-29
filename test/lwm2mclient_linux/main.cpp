@@ -2,6 +2,8 @@
  * Copyright (c) 2015 ARM. All rights reserved.
  */
 #include <unistd.h>
+#include <stdio.h>
+#include <stdarg.h>
 #include <pthread.h>
 #include <signal.h> /* For SIGIGN and SIGINT */
 #include "lwm2m-client/m2minterfacefactory.h"
@@ -10,7 +12,7 @@
 #include "lwm2m-client/m2minterface.h"
 #include "lwm2m-client/m2mobjectinstance.h"
 #include "lwm2m-client/m2mresource.h"
-
+#include "ns_trace.h"
 
 const String &BOOTSTRAP_SERVER_ADDRESS = "coap://10.45.3.10:5693";
 const String &M2M_SERVER_ADDRESS = "coap://10.45.3.10:5683";
@@ -30,6 +32,7 @@ public:
     M2MLWClient(){
         _security = NULL;
         _interface = NULL;
+        _register_security = NULL;
         _device = NULL;
         _object = NULL;
         _bootstrapped = false;
@@ -44,7 +47,7 @@ public:
         if(_security) {
             delete _security;
         }
-        if( _register_security){
+        if(_register_security){
             delete _register_security;
         }
         if(_device) {
@@ -322,6 +325,11 @@ static void ctrl_c_handle_function(void)
     }
 }
 
+void trace_printer(const char* str)
+{
+  printf("%s\r\n", str);
+}
+
 int main() {
 
     pthread_t bootstrap_thread;
@@ -330,6 +338,10 @@ int main() {
     M2MLWClient lwm2mclient;
 
     m2mclient = &lwm2mclient;
+
+    trace_init();
+    set_trace_print_function( trace_printer );
+    set_trace_config(TRACE_MODE_COLOR|TRACE_ACTIVE_LEVEL_DEBUG|TRACE_CARRIAGE_RETURN);
 
     signal(SIGINT, (signalhandler_t)ctrl_c_handle_function);
 

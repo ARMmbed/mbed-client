@@ -52,15 +52,18 @@ namespace m2m {
   String::~String()
   {
       free(p);
+      p = 0;
   }
 
   String::String(const String& s)
     : p(0)
   {
-    p = malloc_never_null( s.size_ + 1 );  // copy only used part
-    allocated_ = s.size_ + 1;
-    size_      = s.size_;
-    memcpy(p, s.p, size_ + 1);
+    if( &s != NULL ){
+        p = malloc_never_null( s.size_ + 1 );  // copy only used part
+        allocated_ = s.size_ + 1;
+        size_      = s.size_;
+        memcpy(p, s.p, size_ + 1);
+    }
     _return_value = '\0';
   }
 
@@ -73,14 +76,14 @@ namespace m2m {
   String& String::operator=(const char* s)
   {
       if ( p != s ) {
-        // s could point into our own string, so we have to allocate a new string
-        const size_t len = strlen(s);
-        char* copy = (char*) malloc( len + 1);
-        memmove(copy, s, len+1); // trailing 0
-        free( p );
-        p = copy;
-        size_ = len;
-        allocated_ = len+1;
+            // s could point into our own string, so we have to allocate a new string
+            const size_t len = strlen(s);
+            char* copy = (char*) malloc( len + 1);
+            memmove(copy, s, len+1); // trailing 0
+            free( p );
+            p = copy;
+            size_ = len;
+            allocated_ = len+1;
       }
 
       return *this;
@@ -109,8 +112,7 @@ namespace m2m {
         if (size_ + lens + 1 <= allocated_) {
           memmove(p+size_, s, lens+1); // trailing 0
           size_ += lens;
-        }
-        else {
+        } else {
           String s2( *this );  // copy own data
           s2.reserve(size_ + lens);
           memmove(s2.p+size_, s, lens+1); // trailing 0
@@ -143,18 +145,20 @@ namespace m2m {
 
   bool String::operator==(const char* s) const
   {
-      return !strcmp(p, s);
+      if( s == NULL ){
+          if( p == NULL ){
+              return true;
+          }
+          return false;
+      }
+      bool ret = strcmp(p, s);
+      return !ret;
   }
 
   bool String::operator==(const String& s) const
   {
-      return !strcmp(p, s.p);
-  }
-
-  void String::clearMemory()
-  {
-    String s;
-    this->swap( s );
+      bool ret = strcmp(p, s.p);
+      return !ret;
   }
 
   void String::clear()
@@ -163,10 +167,10 @@ namespace m2m {
       p[0]  = 0;
   }
 
-  String operator+(const String& lhs, const String& rhs)
-  {
-      return String(lhs) += rhs;
-  }
+//  String operator+(const String& lhs, const String& rhs)
+//  {
+//      return String(lhs) += rhs;
+//  }
 
   String String::substr(const size_type pos, size_type length) const
   {
@@ -200,6 +204,7 @@ namespace m2m {
       }
       return _return_value;
   }
+
   char String::at(const size_type i) const
   {
       if ( i <= strlen(p) ) {
@@ -215,15 +220,15 @@ namespace m2m {
 
       if ( pos < size_ ) { // user must not remove trailing 0
 
-          int s2 = size_;
-          int remain = s2 - (int)pos - len;
+          size_type s2 = size_;
+          size_type remain = s2 - pos - len;
 
           if (remain > 0) {
             // erase by overwriting
             memmove(p + pos, p + pos + len, remain);
           }
 
-          if ( remain < 0 ) remain = 0;
+          //if ( remain < 0 ) remain = 0;
 
           // remove unused space
           this->resize( pos+remain );
@@ -258,7 +263,7 @@ namespace m2m {
         const size_type len2   = std::min(len, osize);
         r = strncmp( p + pos, str.p, len2);
         if (r==0) // equal so far, now compare sizes
-        r = len < osize ? -1 : ( len == osize ? 0 : +1 );
+            r = len < osize ? -1 : ( len == osize ? 0 : +1 );
     }
     return r;
   }

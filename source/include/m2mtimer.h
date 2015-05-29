@@ -15,13 +15,13 @@ class M2MTimerImpl;
 * Timer class for mbed client.
 */
 class M2MTimer : public M2MTimerObserver {
+private:
+    //Prevent usage of assignment operator by accident
+    M2MTimer& operator=(const M2MTimer& /*other*/);
+
 
 public:
 
-    // Prevents the use of assignment operator
-    M2MTimer& operator=(const M2MTimer& /*other*/);
-
-    // Prevents the use of copy constructor
     M2MTimer(const M2MTimer& other);
 
     /**

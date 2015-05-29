@@ -20,7 +20,7 @@
 #include "lwm2m-client/m2mobjectinstance.h"
 
 
-#undef BOOTSTRAP_ENABLED
+#define BOOTSTRAP_ENABLED
 
 // Enter your mbed Device Server's IPv4 address and Port number in
 // mentioned format like 192.168.0.1:5693
@@ -265,9 +265,9 @@ public:
     //Callback from mbed client stack if any error is encountered
     // during any of the LWM2M operations. Error type is passed in
     // the callback.
-    void error(M2MInterface::Error /*error*/){
+    void error(M2MInterface::Error error){
         _error = true;
-        printf("\nError occured\n");
+        printf("\nError occured Error code %d\n", (int)error);
     }
 
     //Callback from mbed client stack if any value has changed

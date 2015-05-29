@@ -26,6 +26,12 @@ class  M2MInterfaceImpl : public M2MInterface,
                           public M2MNsdlObserver,
                           public M2MConnectionObserver
 {
+private:
+    // Prevents the use of assignment operator by accident.
+    M2MInterfaceImpl& operator=( const M2MInterfaceImpl& /*other*/ );
+
+    // Prevents the use of copy constructor by accident
+    M2MInterfaceImpl( const M2MInterfaceImpl& /*other*/ );
 
 friend class M2MInterfaceFactory;
 
@@ -249,18 +255,17 @@ private: // state machine state functions
         STATE_BOOTSTRAP_ADDRESS_RESOLVED,
         STATE_BOOTSTRAP_RESOURCE_CREATED,
         STATE_BOOTSTRAPPED,
-        STATE_REGISTER,
+        STATE_REGISTER, //5
         STATE_REGISTER_ADDRESS_RESOLVED,
         STATE_REGISTER_RESOURCE_CREATED,
         STATE_REGISTERED,
         STATE_UPDATE_REGISTRATION,
-        STATE_UNREGSITER,
+        STATE_UNREGSITER, //10
         STATE_UNREGSITERED,
         STATE_SENDING_COAP_DATA,
         STATE_COAP_DATA_SENT,
-        STATE_RECEIVING_COAP_DATA,
         STATE_COAP_DATA_RECEIVED,
-        STATE_PROCESSING_COAP_DATA,
+        STATE_PROCESSING_COAP_DATA, //15
         STATE_COAP_DATA_PROCESSED,
         STATE_WAITING,
         STATE_MAX_STATES
@@ -291,18 +296,6 @@ private: // state machine state functions
     * @param data to be passed to the state machine.
     */
     void internal_event(uint8_t, EventData* = NULL);
-
-    /**
-     * @brief Memory Allocation required for libCoap.
-     * @param size, Size of memory to be reserved.
-    */
-    void* memory_alloc(uint16_t size);
-
-    /**
-     * @brief Memory free functions required for libCoap
-     * @param ptr, Object whose memory needs to be freed.
-    */
-    void memory_free(void *ptr);
 
     enum
     {

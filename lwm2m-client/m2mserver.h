@@ -147,6 +147,7 @@ private:
     M2MObjectInstance*    _server_instance;
 
     friend class Test_M2MServer;
+    friend class Test_M2MNsdlInterface;
 };
 
 #endif // M2M_SERVER_H

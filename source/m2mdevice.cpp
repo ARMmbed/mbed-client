@@ -122,7 +122,7 @@ M2MResource* M2MDevice::create_resource(DeviceResource resource, uint32_t value)
 
                 if(res) {
                     char buffer[20];
-                    int size = sprintf(buffer,"%ld",value);
+                    int size = sprintf(buffer,"%ld",(long int)value);
                     res->set_operation(M2MBase::GET_PUT_POST_ALLOWED);
                     res->set_value((const uint8_t*)buffer,
                                    (const uint32_t)size);
@@ -150,7 +150,7 @@ M2MResource* M2MDevice::create_resource(DeviceResource resource, uint32_t value)
 
             if(res) {
                 char buffer[20];
-                int size = sprintf(buffer,"%ld",value);
+                int size = sprintf(buffer,"%ld",(long int)value);
                 res->set_operation(M2MBase::GET_PUT_ALLOWED);
                 res->set_value((const uint8_t*)buffer,
                                (const uint32_t)size);
@@ -232,7 +232,7 @@ bool M2MDevice::set_resource_value(DeviceResource resource,
             // If it is any of the above resource
             // set the value of the resource.
             char buffer[20];
-            int size = sprintf(buffer,"%ld",value);
+            int size = sprintf(buffer,"%ld",(long int)value);
             success = res->set_value((const uint8_t*)buffer,
                                      (const uint32_t)size,
                                      true);
