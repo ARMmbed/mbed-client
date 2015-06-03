@@ -9,7 +9,7 @@
 #include "include/m2mnsdlinterface.h"
 #include "lwm2m-client/m2msecurity.h"
 #include "lwm2m-client/m2mconstants.h"
-#include "ns_trace.h"
+#include "libService/ns_trace.h"
 
 M2MInterfaceImpl::M2MInterfaceImpl(M2MInterfaceObserver& observer,
                                    const String &ep_name,

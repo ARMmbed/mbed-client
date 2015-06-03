@@ -8,7 +8,7 @@
     #include "lwm2m-client-mbed/m2mtimerimpl.h"
 #endif
 #include "lwm2m-client/m2mconfig.h"
-#include "ns_trace.h"
+#include "libService/ns_trace.h"
 
 M2MTimer::M2MTimer(const M2MTimer& other)
 : _observer(other._observer)

@@ -9,7 +9,7 @@
 #include "lwm2m-client/m2mobjectinstance.h"
 #include "lwm2m-client/m2mresource.h"
 #include "lwm2m-client/m2mconstants.h"
-#include "ns_trace.h"
+#include "libService/ns_trace.h"
 
 M2MNsdlInterface::M2MNsdlInterface(M2MNsdlObserver &observer)
 : _observer(observer),
@@ -73,6 +73,9 @@ bool M2MNsdlInterface::initialize()
 {
     tr_debug("M2MNsdlInterface::initialize()");
     bool success = false;
+
+    //Sets the packet retransmission attempts and time interval
+    sn_coap_protocol_set_retransmission_parameters(RETRY_COUNT,RETRY_INTERVAL);
 
     _nsdl_exceution_timer->start_timer(ONE_SECOND_TIMER * 1000,
                                        M2MTimerObserver::NsdlExecution,
