@@ -3,7 +3,7 @@
  */
 #include "lwm2m-client/m2mobject.h"
 #include "lwm2m-client/m2mobjectinstance.h"
-#include "ns_trace.h"
+#include "libService/ns_trace.h"
 
 M2MObject::M2MObject(const String &object_name)
 : M2MBase(object_name,M2MBase::Dynamic),
@@ -26,7 +26,7 @@ M2MObject::~M2MObject()
             char obj_inst_id[10];
             sprintf(obj_inst_id,"%d",index);
 
-            String obj_name = name();
+            String obj_name = M2MBase::name();
             obj_name += String("/");
             obj_name += String(obj_inst_id);
 

@@ -8,7 +8,7 @@
 #include "lwm2m-client/m2mconstants.h"
 #include "lwm2m-client/m2mconfig.h"
 #include "include/m2minterfaceimpl.h"
-#include "ns_trace.h"
+#include "libService/ns_trace.h"
 
 M2MInterface* M2MInterfaceFactory::create_interface(M2MInterfaceObserver &observer,
                                                     const String &endpoint_name,
