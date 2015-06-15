@@ -34,7 +34,8 @@ M2MInterfaceImpl::M2MInterfaceImpl(M2MInterfaceObserver& observer,
   _binding_mode(mode),
   _context_address(con_addr),
   _listen_port(listen_port),
-  _register_server(NULL)
+  _register_server(NULL),
+  _event_ignored(false)
 {    
     tr_debug("M2MInterfaceImpl::M2MInterfaceImpl() -IN");
     _nsdl_interface->create_endpoint(_endpoint_name,
@@ -84,6 +85,10 @@ void M2MInterfaceImpl::bootstrap(M2MSecurity *security)
         TRANSITION_MAP_ENTRY (EVENT_IGNORED)                // state_coap_data_processed
         TRANSITION_MAP_ENTRY (EVENT_IGNORED)                // state_waiting
     END_TRANSITION_MAP(data)
+    if(_event_ignored) {
+        _event_ignored = false;
+        _observer.error(M2MInterface::NotAllowed);
+    }
     tr_debug("M2MInterfaceImpl::bootstrap(M2MSecurity *security) - OUT");
 }
 
@@ -122,6 +127,10 @@ void M2MInterfaceImpl::register_object(M2MSecurity *security, const M2MObjectLis
         TRANSITION_MAP_ENTRY (EVENT_IGNORED)                // state_coap_data_processed
         TRANSITION_MAP_ENTRY (STATE_REGISTER)               // state_waiting
     END_TRANSITION_MAP(data)
+    if(_event_ignored) {
+        _event_ignored = false;
+        _observer.error(M2MInterface::NotAllowed);
+    }
     tr_debug("M2MInterfaceImpl::register_object(M2MSecurity *security,const M2MObjectList &object_list) - OUT");
 }
 
@@ -153,6 +162,10 @@ void M2MInterfaceImpl::update_registration(M2MSecurity *security_object, const u
         TRANSITION_MAP_ENTRY (EVENT_IGNORED)                // state_coap_data_processed
         TRANSITION_MAP_ENTRY (STATE_UPDATE_REGISTRATION)    // state_waiting
     END_TRANSITION_MAP(data)
+    if(_event_ignored) {
+        _event_ignored = false;
+        _observer.error(M2MInterface::NotAllowed);
+    }
     tr_debug("M2MInterfaceImpl::update_registration(M2MSecurity *security,const uint32_t lifetime) - OUT");
 }
 
@@ -181,6 +194,10 @@ void M2MInterfaceImpl::unregister_object(M2MSecurity* /*security*/)
         TRANSITION_MAP_ENTRY (EVENT_IGNORED)                // state_coap_data_processed
         TRANSITION_MAP_ENTRY (STATE_UNREGSITER)             // state_waiting
     END_TRANSITION_MAP(NULL)
+    if(_event_ignored) {
+        _event_ignored = false;
+        _observer.error(M2MInterface::NotAllowed);
+    }
     tr_debug("M2MInterfaceImpl::unregister_object(M2MSecurity *security) - OUT");
 }
 
@@ -306,6 +323,7 @@ void M2MInterfaceImpl::state_idle(EventData* /*data*/)
 {
     // Handle Idle state here
     // Cleanup all resources, if necessary
+    _connection_handler->close_connection();
     tr_debug("M2MInterfaceImpl::state_idle");
 }
 
@@ -594,6 +612,7 @@ void M2MInterfaceImpl::external_event(uint8_t new_state,
             delete p_data;
             p_data = NULL;
         }
+        _event_ignored = true;
     }
     else {
         tr_debug("M2MInterfaceImpl::external_event : handle new state");

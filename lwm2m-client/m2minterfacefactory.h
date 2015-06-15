@@ -51,7 +51,7 @@ public:
                                               const int32_t life_time = -1,
                                               const uint16_t listen_port = 5683,
                                               const String &domain = "",
-                                              M2MInterface::BindingMode mode = M2MInterface::UDP,
+                                              M2MInterface::BindingMode mode = M2MInterface::NOT_SET,
                                               M2MInterface::NetworkStack stack = M2MInterface::LwIP_IPv4,
                                               const String &context_address = "");
 

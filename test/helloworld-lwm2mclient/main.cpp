@@ -2,12 +2,19 @@
  * Copyright (c) 2015 ARM. All rights reserved.
  */
 
+#undef SIXLOWPAN_INTERFACE
+
 #ifdef TARGET_LIKE_LINUX
 #include <unistd.h>
 #include <pthread.h>
 #include <signal.h> /* For SIGIGN and SIGINT */
 #else
 #include "mbed-net-sockets/UDPSocket.h"
+#ifdef SIXLOWPAN_INTERFACE
+#include "mbed-6lowpan-adaptor/mesh_interface.h"
+#define HAVE_DEBUG 1
+#include "ns_trace.h"
+#endif
 #include "EthernetInterface.h"
 #include "test_env.h"
 // TODO: Remove when yotta supports init.
@@ -20,12 +27,18 @@
 #include "lwm2m-client/m2mobjectinstance.h"
 
 
-#define BOOTSTRAP_ENABLED
+#undef BOOTSTRAP_ENABLED
+
 
 // Enter your mbed Device Server's IPv4 address and Port number in
 // mentioned format like 192.168.0.1:5693
 const String &BOOTSTRAP_SERVER_ADDRESS = "coap://10.45.3.10:5693";
+
+#ifdef SIXLOWPAN_INTERFACE
+const String &MBED_SERVER_ADDRESS = "coap://FD00:FF1:CE0B:A5E1:1068:AF13:9B61:D557:5683";
+#else
 const String &MBED_SERVER_ADDRESS = "coap://10.45.3.10:5683";
+#endif
 const String &MANUFACTURER = "ARM";
 const String &TYPE = "type";
 const String &MODEL_NUMBER = "2015";
@@ -73,6 +86,11 @@ public:
         // Creates M2MInterface using which endpoint can
         // setup its name, resource type, life time, connection mode,
         // Currently only LwIPv4 is supported.
+
+        M2MInterface::NetworkStack stack = M2MInterface::LwIP_IPv4;
+#ifdef SIXLOWPAN_INTERFACE
+        stack = M2MInterface::Nanostack_IPv6;
+#endif
         _interface = M2MInterfaceFactory::create_interface(*this,
                                                   "mbed-endpoint",
                                                   "test",
@@ -80,7 +98,7 @@ public:
                                                   5683,
                                                   "",
                                                   M2MInterface::UDP,
-                                                  M2MInterface::LwIP_IPv4,
+                                                  stack,
                                                   "");
     }
 
@@ -355,6 +373,16 @@ static void ctrl_c_handle_function(void)
         m2mclient->test_unregister();
     }
 }
+#else
+#ifdef SIXLOWPAN_INTERFACE
+volatile uint8_t network_ready = 0;
+
+void nanostack_network_ready(void)
+{
+    tr_info("Network established");
+    network_ready = 1;
+}
+#endif
 #endif
 
 int main() {
@@ -375,11 +403,37 @@ int main() {
 #else
     // This sets up the network interface configuration which will be used
     // by LWM2M Client API to communicate with mbed Device server.
+
+#ifdef SIXLOWPAN_INTERFACE
+    socket_error_t error_status;
+    error_status = mesh_interface_init();
+    if (SOCKET_ERROR_NONE != error_status)
+    {
+        tr_info("Can't initialize NanoStack!\n");
+        return 1;
+    }
+    printf("NanoStack UDP Example, stack initialized");
+
+    error_status = mesh_interface_connect(nanostack_network_ready);
+
+    if (SOCKET_ERROR_NONE != error_status)
+    {
+        printf("Can't connect to NanoStack!");
+        return 1;
+    }
+
+    do
+    {
+        mesh_interface_run();
+    } while(0 == network_ready);
+
+#else
     EthernetInterface eth;
     eth.init(); //Use DHCP
     eth.connect();
 
     lwipv4_socket_init();
+#endif
 
     // Set up Hardware interrupt button.
     InterruptIn obs_button(OBS_BUTTON);
@@ -392,6 +446,8 @@ int main() {
     // On press of SW2 button on K64F board, example application
     // will send observation towards mbed Device Server
     obs_button.fall(&lwm2mclient,&M2MLWClient::update_resource);
+
+
 #endif
 
     // Create LWM2M Client API interface to manage bootstrap,
@@ -426,7 +482,14 @@ int main() {
 
     // Wait till the bootstrap callback is called successfully.
     // Callback comes in bootstrap_done()
+#ifdef SIXLOWPAN_INTERFACE
+    /* wait network to be established */
+    do {
+        mesh_interface_run();
+    } while(!lwm2mclient.bootstrap_successful());
+#else
     while (!lwm2mclient.bootstrap_successful()) { __WFI(); }
+#endif
 
 #else
 
@@ -452,13 +515,28 @@ int main() {
     lwm2mclient.test_register(object_list);
 
     // Wait till the register callback is called successfully.
-    // Callback comes in object_registered()
+    // Callback comes in object_registered()    
+#ifdef SIXLOWPAN_INTERFACE
+    /* wait network to be established */
+    do {
+        mesh_interface_run();
+    } while(!lwm2mclient.register_successful());
+#else
     while (!lwm2mclient.register_successful()) { __WFI(); }
+#endif
 
     // Wait for the unregister successful callback,
     // Callback comes in object_unregsitered(), this will be
     // waiting for user to press SW2 button on K64F board.
+#ifdef SIXLOWPAN_INTERFACE
+    /* wait network to be established */
+    do {
+        mesh_interface_run();
+    } while(!lwm2mclient.unregister_successful());
+#else
     while (!lwm2mclient.unregister_successful()) { __WFI(); }
+#endif
+
 
 #if defined(BOOTSTRAP_ENABLED)
     // This will turn on the LED on the board specifying that
@@ -481,8 +559,11 @@ int main() {
 
 
     // Disconnect the connect and teardown the network interface
+#ifdef SIXLOWPAN_INTERFACE
+    mesh_interface_disconnect();
+#else
     eth.disconnect();
-
+#endif
 #endif //BOOTSTRAP_ENABLED
 
     // Delete device object created for registering device
@@ -498,4 +579,3 @@ int main() {
 
     return 0;
 }
-

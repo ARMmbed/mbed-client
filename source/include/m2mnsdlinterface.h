@@ -287,6 +287,7 @@ private:
     uint16_t                           _register_id;
     uint16_t                           _unregister_id;
     uint16_t                           _update_id;
+    uint16_t                           _bootstrap_id;
 
 friend class Test_M2MNsdlInterface;
 

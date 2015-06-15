@@ -41,7 +41,8 @@ public:
         NetworkError,
         ResponseParseFailed,
         UnknownError,
-        MemoryFail
+        MemoryFail,
+        NotAllowed
     }Error;
 
     typedef enum {

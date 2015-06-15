@@ -4,3 +4,4 @@
 test/lwm2mclient_linux/*
 test/lwm2mtestapplication/*
 test/lwm2mclient-smokeTest/*
+test/lwm2m/*

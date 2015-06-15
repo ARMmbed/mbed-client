@@ -70,6 +70,11 @@ public:
     */
     bool listen_for_data();
 
+    /**
+    * @brief Closes the open connection
+    */
+    void close_connection();
+
 private:
 
     M2MConnectionObserver               &_observer;

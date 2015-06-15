@@ -77,6 +77,12 @@ void cmd_printer(const char *str)
   cmd_printf("%s", str);
 }
 
+void custom_cmd_response_out(const char* fmt, va_list ap)
+{
+  vprintf(fmt, ap);
+  fflush(stdout);
+}
+
 mem_stat_t  memory_heap_stat;
 /**
  * \brief Application infinite loop.
@@ -90,7 +96,7 @@ int main(void)
     set_trace_cmdprint_function( cmd_printer );
     set_trace_prefix_function( time_now );
     set_trace_config(TRACE_MODE_COLOR|TRACE_ACTIVE_LEVEL_DEBUG|TRACE_CARRIAGE_RETURN);
-    cmd_init( &default_cmd_response_out );
+    cmd_init( &custom_cmd_response_out );
     initialize_app_commands(0);
     eventOS_scheduler_run();
     return 0;

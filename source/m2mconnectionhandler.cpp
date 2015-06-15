@@ -46,6 +46,12 @@ bool M2MConnectionHandler::listen_for_data()
     return _impl->listen_for_data();
 }
 
+void M2MConnectionHandler::close_connection()
+{
+    tr_debug("M2MConnectionHandler::close_connection()");
+    _impl->close_connection();
+}
+
 bool M2MConnectionHandler::send_data(uint8_t *data,
                                      uint16_t data_len,
                                      sn_nsdl_addr_s *address)

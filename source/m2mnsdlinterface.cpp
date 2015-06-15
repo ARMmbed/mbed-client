@@ -20,12 +20,23 @@ M2MNsdlInterface::M2MNsdlInterface(M2MNsdlObserver &observer)
   _counter_for_nsdl(0),
   _register_id(0),
   _unregister_id(0),
-  _update_id(0)
+  _update_id(0),
+  _bootstrap_id(0)
 {
     tr_debug("M2MNsdlInterface::M2MNsdlInterface()");
     _endpoint = NULL;
     _resource = NULL;
     __nsdl_interface = this;
+
+    _bootstrap_endpoint.device_object = NULL;
+    _bootstrap_endpoint.oma_bs_status_cb = NULL;
+
+    _bootstrap_device_setup.sn_oma_device_boot_callback = NULL;
+    _bootstrap_device_setup.error_code = NO_ERROR;
+
+    _sn_nsdl_address.addr_len = 0;
+    _sn_nsdl_address.addr_ptr = NULL;
+    _sn_nsdl_address.port = 0;
 
     // This initializes libCoap and libNsdl
     // Parameters are function pointers to used memory allocation
@@ -178,16 +189,23 @@ bool M2MNsdlInterface::delete_nsdl_resource(const String &resource_name)
 bool M2MNsdlInterface::create_bootstrap_resource(sn_nsdl_addr_s *address)
 {
     tr_debug("M2MNsdlInterface::create_bootstrap_resource()");
+    bool success = false;
     _bootstrap_device_setup.error_code = NO_ERROR;
     _bootstrap_device_setup.sn_oma_device_boot_callback = 0;
 
     _bootstrap_endpoint.device_object = &_bootstrap_device_setup;
     _bootstrap_endpoint.oma_bs_status_cb = &__nsdl_c_bootstrap_done;
 
-    return ((sn_nsdl_oma_bootstrap(_nsdl_handle,
-                                   address,
-                                   _endpoint,
-                                   &_bootstrap_endpoint) != 0) ? true : false);
+    if(_bootstrap_id == 0) {
+        _bootstrap_id = sn_nsdl_oma_bootstrap(_nsdl_handle,
+                                               address,
+                                               _endpoint,
+                                               &_bootstrap_endpoint);
+        tr_debug("M2MNsdlInterface::create_bootstrap_resource - _bootstrap_id %d", _bootstrap_id);
+        success = _bootstrap_id != 0;
+
+    }
+    return success;
 }
 
 bool M2MNsdlInterface::send_register_message(uint8_t* address,
@@ -212,14 +230,25 @@ bool M2MNsdlInterface::send_update_registration(const uint32_t lifetime)
     bool success = false;
     char buffer[20];
     int size = sprintf(buffer,"%ld",(long int)lifetime);
-    //TODO: Currently there is no way to find out if the callback has come for
-    // Update registration or not. Need API or implementation change on C side.
+    if(_endpoint->lifetime_ptr == NULL){
+        _endpoint->lifetime_ptr = (uint8_t*)memory_alloc(size);
+    }
+    if(_endpoint->lifetime_ptr) {
+        memset(_endpoint->lifetime_ptr, 0, size);
+        memcpy(_endpoint->lifetime_ptr,buffer,size);
+        _endpoint->lifetime_len =  size;
+    }
+
     if(_update_id == 0) {
         _update_id = sn_nsdl_update_registration(_nsdl_handle,
-                                                 (uint8_t*)buffer,
-                                                 (uint8_t)size);
-        tr_debug("M2MNsdlInterface::send_update_registration - _update_id %d", _update_id);
+                                                 _endpoint->lifetime_ptr,
+                                                 _endpoint->lifetime_len);
+        tr_debug("M2MNsdlInterface::send_update_registration - _update_id %d", _update_id);        
         success = _update_id != 0;
+        _registration_timer->stop_timer();
+        _registration_timer->start_timer(registration_time() * 1000,
+                                         M2MTimerObserver::Registration,
+                                         false);
     }
     return success;
 }
@@ -316,8 +345,19 @@ uint8_t M2MNsdlInterface::received_from_server_callback(struct nsdl_s * /*nsdl_h
             }
         } else if(coap_header->msg_id == _update_id) {
             _update_id = 0;
-            tr_debug("M2MNsdlInterface::received_from_server_callback - registration_updated callback");
-            _observer.registration_updated(*_server);
+            if(coap_header->coap_status == COAP_STATUS_OK) {
+                tr_debug("M2MNsdlInterface::received_from_server_callback - registration_updated successfully");
+                _observer.registration_updated(*_server);
+            } else {
+                tr_error("M2MNsdlInterface::received_from_server_callback - registration_updated failed %d", coap_header->coap_status);
+                _observer.registration_error(coap_header->msg_code);
+            }
+        }
+        if(coap_header->coap_status == COAP_STATUS_BUILDER_MESSAGE_SENDING_FAILED) {
+            if(coap_header->msg_id == _bootstrap_id) {
+                _bootstrap_id = 0;
+                _observer.bootstrap_error();
+            }
         }
     }
     return value;
@@ -350,6 +390,7 @@ uint8_t M2MNsdlInterface::resource_callback(struct nsdl_s */*nsdl_handle*/,
 void M2MNsdlInterface::bootstrap_done_callback(sn_nsdl_oma_server_info_t *server_info)
 {
     tr_debug("M2MNsdlInterface::bootstrap_done_callback()");
+    _bootstrap_id = 0;
     M2MSecurity* security = NULL;
     if(server_info && server_info->omalw_address_ptr->addr_ptr &&
        (SN_NSDL_ADDRESS_TYPE_IPV4 == server_info->omalw_address_ptr->type)) {
@@ -363,7 +404,7 @@ void M2MNsdlInterface::bootstrap_done_callback(sn_nsdl_oma_server_info_t *server
         String server_address;
         int val = 0;
         for(int index = 0; index < server_info->omalw_address_ptr->addr_len; index++) {
-            char server_buffer[3];
+            char server_buffer[4];
             val = (int)server_info->omalw_address_ptr->addr_ptr[index];
             sprintf(server_buffer,"%d",val);
             server_address +=String(server_buffer);
@@ -448,7 +489,8 @@ void M2MNsdlInterface::timer_expired(M2MTimerObserver::Type type)
         sn_nsdl_exec(_counter_for_nsdl);
         _counter_for_nsdl++;
     } else if(M2MTimerObserver::Registration == type) {
-        tr_debug("M2MNsdlInterface::timer_expired - M2MTimerObserver::Registration - Send update registration");
+        tr_debug("M2MNsdlInterface::timer_expired - M2MTimerObserver::Registration - Send update registration Time %s",
+                 (char*)_endpoint->lifetime_ptr);
         if(_endpoint && _endpoint->lifetime_ptr) {
             sn_nsdl_update_registration(_nsdl_handle,
                                         _endpoint->lifetime_ptr,
@@ -1077,6 +1119,7 @@ uint8_t M2MNsdlInterface::handle_resource_get_request(sn_coap_hdr_s *received_co
     }
     if(value) {
         free(value);
+        value = NULL;
     }
     return result;
 }

@@ -56,7 +56,7 @@ private:
                      const int32_t life_time,
                      const uint16_t listen_port,
                      const String &domain = "",
-                     BindingMode mode = M2MInterface::UDP,
+                     BindingMode mode = M2MInterface::NOT_SET,
                      M2MInterface::NetworkStack stack = M2MInterface::LwIP_IPv4,
                      const String &context_address = "");
 
@@ -321,6 +321,7 @@ private:
     String                      _context_address;
     uint16_t                    _listen_port;
     M2MSecurity                 *_register_server; //TODO: to be the list not owned
+    bool                        _event_ignored;
 
    friend class Test_M2MInterfaceImpl;
 
