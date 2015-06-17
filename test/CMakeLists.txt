@@ -1,6 +1,6 @@
 if(TARGET_LIKE_LINUX)
 add_executable(lwm2m-client-test-lwm2mclient_linux 
-        "/home/yogpan01/lwm2m_github/lwm2m-client/test/lwm2mclient_linux/main.cpp"
+        "lwm2mclient_linux/main.cpp"
 )
 target_link_libraries(lwm2m-client-test-lwm2mclient_linux
     mbed-client
@@ -11,8 +11,8 @@ add_test(lwm2m-client-test-lwm2mclient_linux lwm2m-client-test-lwm2mclient_linux
 add_dependencies(all_tests lwm2m-client-test-lwm2mclient_linux)
 
 add_executable(lwm2m-client-test-helloworld-lwm2mclient 
-        "/home/yogpan01/lwm2m_github/lwm2m-client/test/helloworld-lwm2mclient/main.cpp"
-        "/home/yogpan01/lwm2m_github/lwm2m-client/test/helloworld-lwm2mclient/to_be_ported.c"
+        "helloworld-lwm2mclient/main.cpp"
+        "helloworld-lwm2mclient/to_be_ported.c"
 )
 target_link_libraries(lwm2m-client-test-helloworld-lwm2mclient
     mbed-client
@@ -26,9 +26,9 @@ endif()
 
 if(TARGET_LIKE_MBED)
 add_executable(lwm2m-client-test-lwm2mclient-smokeTest 
-        "/home/yogpan01/lwm2m_github/lwm2m-client/test/lwm2mclient-smokeTest/main.cpp"
-        "/home/yogpan01/lwm2m_github/lwm2m-client/test/lwm2mclient-smokeTest/testconfig.cpp"
-        "/home/yogpan01/lwm2m_github/lwm2m-client/test/lwm2mclient-smokeTest/testconfig.h"
+        "lwm2mclient-smokeTest/main.cpp"
+        "lwm2mclient-smokeTest/testconfig.cpp"
+        "lwm2mclient-smokeTest/testconfig.h"
 )
 target_link_libraries(lwm2m-client-test-lwm2mclient-smokeTest
     mbed-client
@@ -39,8 +39,8 @@ add_test(lwm2m-client-test-lwm2mclient-smokeTest lwm2m-client-test-lwm2mclient-s
 add_dependencies(all_tests lwm2m-client-test-lwm2mclient-smokeTest)
 
 add_executable(lwm2m-client-test-helloworld-lwm2mclient 
-        "/home/yogpan01/lwm2m_github/lwm2m-client/test/helloworld-lwm2mclient/main.cpp"
-        "/home/yogpan01/lwm2m_github/lwm2m-client/test/helloworld-lwm2mclient/to_be_ported.c"
+        "helloworld-lwm2mclient/main.cpp"
+        "helloworld-lwm2mclient/to_be_ported.c"
 )
 target_link_libraries(lwm2m-client-test-helloworld-lwm2mclient
     mbed-client
