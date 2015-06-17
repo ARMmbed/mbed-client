@@ -25,6 +25,7 @@ add_dependencies(all_tests lwm2m-client-test-helloworld-lwm2mclient)
 endif()
 
 if(TARGET_LIKE_MBED)
+
 add_executable(lwm2m-client-test-lwm2mclient-smokeTest 
         "lwm2mclient-smokeTest/main.cpp"
         "lwm2mclient-smokeTest/testconfig.cpp"
@@ -35,8 +36,20 @@ target_link_libraries(lwm2m-client-test-lwm2mclient-smokeTest
     lwm2m-client-mbed
     lwm2m-client
 )
+
 add_test(lwm2m-client-test-lwm2mclient-smokeTest lwm2m-client-test-lwm2mclient-smokeTest)
 add_dependencies(all_tests lwm2m-client-test-lwm2mclient-smokeTest)
+
+# if the target has defined a post-processing step, perform it:
+if(YOTTA_POSTPROCESS_COMMAND)
+    string(REPLACE YOTTA_CURRENT_EXE_NAME "lwm2m-client-test-lwm2mclient-smokeTest" LOCAL_POSTPROCESS_COMMAND "${YOTTA_POSTPROCESS_COMMAND}")
+    separate_arguments(LOCAL_POSTPROCESS_COMMAND_SEPARATED UNIX_COMMAND ${LOCAL_POSTPROCESS_COMMAND})
+    add_custom_command(
+        TARGET lwm2m-client-test-lwm2mclient-smokeTest
+        POST_BUILD
+        COMMAND ${LOCAL_POSTPROCESS_COMMAND_SEPARATED}
+    )
+endif()
 
 add_executable(lwm2m-client-test-helloworld-lwm2mclient 
         "helloworld-lwm2mclient/main.cpp"
@@ -47,6 +60,17 @@ target_link_libraries(lwm2m-client-test-helloworld-lwm2mclient
     lwm2m-client-mbed
     lwm2m-client
 )
+# if the target has defined a post-processing step, perform it:
+if(YOTTA_POSTPROCESS_COMMAND)
+    string(REPLACE YOTTA_CURRENT_EXE_NAME "lwm2m-client-test-helloworld-lwm2mclient" LOCAL_POSTPROCESS_COMMAND "${YOTTA_POSTPROCESS_COMMAND}")
+    separate_arguments(LOCAL_POSTPROCESS_COMMAND_SEPARATED UNIX_COMMAND ${LOCAL_POSTPROCESS_COMMAND})
+    add_custom_command(
+        TARGET lwm2m-client-test-helloworld-lwm2mclient
+        POST_BUILD
+        COMMAND ${LOCAL_POSTPROCESS_COMMAND_SEPARATED}
+    )
+endif()
+
 add_test(lwm2m-client-test-helloworld-lwm2mclient lwm2m-client-test-helloworld-lwm2mclient)
 add_dependencies(all_tests lwm2m-client-test-helloworld-lwm2mclient)
 
