@@ -29,7 +29,7 @@ public:
     }
 
     void registration_updated(const M2MServer &){
-
+        register_updated = true;
     }
 
     void registration_error(uint8_t){
@@ -63,6 +63,7 @@ public:
     bool boot_error;
     bool boot_done;
     bool registered;
+    bool register_updated;
     bool data_processed;
     bool unregistered;
     bool message_ready;
@@ -235,6 +236,29 @@ void Test_M2MNsdlInterface::test_received_from_server_callback()
     memset(coap_header, 0, sizeof(sn_coap_hdr_s));
     coap_header->msg_code = COAP_MSG_CODE_RESPONSE_CREATED;
 
+
+    coap_header->options_list_ptr = (sn_coap_options_list_s *)malloc(sizeof(sn_coap_options_list_s));
+    memset(coap_header->options_list_ptr, 0, sizeof(sn_coap_options_list_s));
+
+    coap_header->options_list_ptr->max_age_len = 2;
+    coap_header->options_list_ptr->max_age_ptr = (uint8_t *)malloc(sizeof(coap_header->options_list_ptr->max_age_len));
+    memset(coap_header->options_list_ptr->max_age_ptr, 0, sizeof(coap_header->options_list_ptr->max_age_len));
+
+    observer->data_processed = false;
+    observer->registered = false;
+    nsdl->received_from_server_callback(NULL,coap_header,NULL);
+    CHECK(observer->data_processed == true);
+    CHECK(observer->registered == true);
+
+    free(coap_header->options_list_ptr->max_age_ptr);
+    coap_header->options_list_ptr->max_age_ptr = NULL;
+
+    free(coap_header->options_list_ptr);
+    coap_header->options_list_ptr = NULL;
+
+    free(nsdl->_endpoint->lifetime_ptr);
+    nsdl->_endpoint->lifetime_ptr = NULL;
+
     uint8_t life[] = {"120"};
     nsdl->_endpoint->lifetime_ptr = (uint8_t*)malloc(sizeof(life));
     memcpy(nsdl->_endpoint->lifetime_ptr,life,sizeof(life));
@@ -279,7 +303,58 @@ void Test_M2MNsdlInterface::test_received_from_server_callback()
     observer->unregistered = false;
     observer->register_error = false;
 
-    coap_header->msg_code = COAP_MSG_CODE_RESPONSE_DELETED;
+    coap_header->msg_code = COAP_MSG_CODE_RESPONSE_BAD_REQUEST;
+    nsdl->received_from_server_callback(NULL,coap_header,NULL);
+    CHECK(observer->data_processed == true);
+    CHECK(observer->register_error == true);
+
+    coap_header->msg_code = COAP_MSG_CODE_RESPONSE_BAD_OPTION;
+    nsdl->received_from_server_callback(NULL,coap_header,NULL);
+    CHECK(observer->data_processed == true);
+    CHECK(observer->register_error == true);
+
+    coap_header->msg_code = COAP_MSG_CODE_RESPONSE_REQUEST_ENTITY_INCOMPLETE;
+    nsdl->received_from_server_callback(NULL,coap_header,NULL);
+    CHECK(observer->data_processed == true);
+    CHECK(observer->register_error == true);
+
+    coap_header->msg_code = COAP_MSG_CODE_RESPONSE_PRECONDITION_FAILED;
+    nsdl->received_from_server_callback(NULL,coap_header,NULL);
+    CHECK(observer->data_processed == true);
+    CHECK(observer->register_error == true);
+
+    coap_header->msg_code = COAP_MSG_CODE_RESPONSE_REQUEST_ENTITY_TOO_LARGE;
+    nsdl->received_from_server_callback(NULL,coap_header,NULL);
+    CHECK(observer->data_processed == true);
+    CHECK(observer->register_error == true);
+
+    coap_header->msg_code = COAP_MSG_CODE_RESPONSE_UNSUPPORTED_CONTENT_FORMAT;
+    nsdl->received_from_server_callback(NULL,coap_header,NULL);
+    CHECK(observer->data_processed == true);
+    CHECK(observer->register_error == true);
+
+    coap_header->msg_code = COAP_MSG_CODE_RESPONSE_UNAUTHORIZED;
+    nsdl->received_from_server_callback(NULL,coap_header,NULL);
+    CHECK(observer->data_processed == true);
+    CHECK(observer->register_error == true);
+
+    coap_header->msg_code = COAP_MSG_CODE_RESPONSE_FORBIDDEN;
+    nsdl->received_from_server_callback(NULL,coap_header,NULL);
+    CHECK(observer->data_processed == true);
+    CHECK(observer->register_error == true);
+
+    coap_header->msg_code = COAP_MSG_CODE_RESPONSE_NOT_FOUND;
+    nsdl->received_from_server_callback(NULL,coap_header,NULL);
+    CHECK(observer->data_processed == true);
+    CHECK(observer->register_error == true);
+
+    coap_header->msg_code = COAP_MSG_CODE_RESPONSE_METHOD_NOT_ALLOWED;
+    nsdl->received_from_server_callback(NULL,coap_header,NULL);
+    CHECK(observer->data_processed == true);
+    CHECK(observer->register_error == true);
+
+    coap_header->msg_code = COAP_MSG_CODE_RESPONSE_BAD_GATEWAY;
+    coap_header->coap_status = COAP_STATUS_BUILDER_MESSAGE_SENDING_FAILED;
     nsdl->received_from_server_callback(NULL,coap_header,NULL);
     CHECK(observer->data_processed == true);
     CHECK(observer->register_error == true);
@@ -288,6 +363,7 @@ void Test_M2MNsdlInterface::test_received_from_server_callback()
     coap_header->msg_id = 8;
     nsdl->_unregister_id = 8;
 
+    coap_header->msg_code = COAP_MSG_CODE_RESPONSE_DELETED;
     observer->register_error = false;
     nsdl->_server = new M2MServer();
     nsdl->received_from_server_callback(NULL,coap_header,NULL);
@@ -306,6 +382,12 @@ void Test_M2MNsdlInterface::test_received_from_server_callback()
     nsdl->received_from_server_callback(NULL,coap_header,NULL);
     CHECK(observer->register_error == true);
 
+    observer->register_error = false;
+    nsdl->_unregister_id = 8;
+    coap_header->coap_status = COAP_STATUS_PARSER_ERROR_IN_HEADER;
+    nsdl->received_from_server_callback(NULL,coap_header,NULL);
+    CHECK(observer->register_error == true);
+
     observer->boot_error = false;
     nsdl->_bootstrap_id = 8;
     coap_header->coap_status = COAP_STATUS_BUILDER_MESSAGE_SENDING_FAILED;
@@ -315,14 +397,18 @@ void Test_M2MNsdlInterface::test_received_from_server_callback()
     //_update_id == msg_id
     nsdl->_update_id = 10;
     coap_header->msg_id = 10;
+    coap_header->msg_code = COAP_MSG_CODE_RESPONSE_CHANGED;
     nsdl->received_from_server_callback(NULL,coap_header,NULL);
     CHECK(nsdl->_update_id == 0);
+    CHECK(observer->register_updated == true);
 
     nsdl->_update_id = 10;
     coap_header->msg_id = 10;
+    coap_header->msg_code = COAP_MSG_CODE_RESPONSE_FORBIDDEN;
     coap_header->coap_status = COAP_STATUS_OK;
     nsdl->received_from_server_callback(NULL,coap_header,NULL);
     CHECK(nsdl->_update_id == 0);
+    CHECK(observer->register_error == true);
 
     coap_header->msg_id = 11;
     CHECK( 0== nsdl->received_from_server_callback(NULL,coap_header,NULL) );
@@ -718,6 +804,147 @@ void Test_M2MNsdlInterface::test_bootstrap_done_callback()
     server_info = NULL;
 
     common_stub::clear();
+
+    // Test for Hostname
+    uint8_t hostname_address[] = {"abc.xyz.sss.sdsd"};
+    server_info =(sn_nsdl_oma_server_info_t *)malloc(sizeof(sn_nsdl_oma_server_info_t));
+    server_info->omalw_address_ptr = (sn_nsdl_addr_ *)malloc(sizeof(sn_nsdl_addr_));
+    server_info->omalw_address_ptr->port = 5685;
+    server_info->omalw_address_ptr->addr_ptr = (uint8_t *)malloc(sizeof(hostname_address));
+    memcpy(server_info->omalw_address_ptr->addr_ptr,hostname_address,sizeof(hostname_address));
+    server_info->omalw_address_ptr->addr_len = sizeof(hostname_address);
+    server_info->omalw_server_security = SEC_NOT_SET;
+
+    nsdl->bootstrap_done_callback(server_info);
+    CHECK(observer->boot_done == true);
+
+    server_info->omalw_server_security = NO_SEC;
+
+    nsdl->bootstrap_done_callback(server_info);
+    CHECK(observer->boot_done == true);
+
+    server_info->omalw_server_security = CERTIFICATE;
+
+    common_stub::cert = (omalw_certificate_list_t *)malloc(sizeof(omalw_certificate_list_t));
+    common_stub::cert->certificate_ptr[0] = (uint8_t *)malloc(sizeof(uint8_t));
+    common_stub::cert->certificate_ptr[1] = (uint8_t *)malloc(sizeof(uint8_t));
+    common_stub::cert->own_private_key_ptr = (uint8_t *)malloc(sizeof(uint8_t));
+    common_stub::cert->certificate_len[0] = sizeof(uint8_t);
+    common_stub::cert->certificate_len[1] = sizeof(uint8_t);
+    common_stub::cert->own_private_key_len = sizeof(uint8_t);
+
+    nsdl->bootstrap_done_callback(server_info);
+    CHECK(observer->boot_done == true);
+
+    observer->boot_done = false;
+    server_info->omalw_address_ptr->type = SN_NSDL_ADDRESS_TYPE_HOSTNAME;
+    nsdl->bootstrap_done_callback(server_info);
+    CHECK(observer->boot_done == true);
+
+    server_info->omalw_server_security = SEC_NOT_SET;
+    nsdl->bootstrap_done_callback(server_info);
+
+    server_info->omalw_server_security = PSK;
+    nsdl->bootstrap_done_callback(server_info);
+
+    server_info->omalw_server_security = RPK;
+    nsdl->bootstrap_done_callback(server_info);
+
+    server_info->omalw_server_security = NO_SEC;
+    nsdl->bootstrap_done_callback(server_info);
+
+    free(common_stub::cert->own_private_key_ptr);
+    common_stub::cert->own_private_key_ptr = NULL;
+    free(common_stub::cert->certificate_ptr[1]);
+    common_stub::cert->certificate_ptr[1] = NULL;
+    free(common_stub::cert->certificate_ptr[0]);
+    common_stub::cert->certificate_ptr[0] = NULL;
+    free(common_stub::cert);
+    common_stub::cert = NULL;
+
+    server_info->omalw_address_ptr->type = SN_NSDL_ADDRESS_TYPE_HOSTNAME;
+    server_info->omalw_server_security = CERTIFICATE;
+    nsdl->bootstrap_done_callback(server_info);
+
+    free(server_info->omalw_address_ptr->addr_ptr);
+    server_info->omalw_address_ptr->addr_ptr = NULL;
+    free(server_info->omalw_address_ptr);
+    server_info->omalw_address_ptr = NULL;
+    free(server_info);
+    server_info = NULL;
+
+    common_stub::clear();
+
+    //Test for IPv6 address
+    uint8_t ipv6_address[] = {"FD00:FF1:CE0B:A5E1:1068:AF13:9B61:D557"};
+    server_info =(sn_nsdl_oma_server_info_t *)malloc(sizeof(sn_nsdl_oma_server_info_t));
+    server_info->omalw_address_ptr = (sn_nsdl_addr_ *)malloc(sizeof(sn_nsdl_addr_));
+    server_info->omalw_address_ptr->port = 5685;
+    server_info->omalw_address_ptr->addr_ptr = (uint8_t *)malloc(sizeof(ipv6_address));
+    memcpy(server_info->omalw_address_ptr->addr_ptr,ipv6_address,sizeof(ipv6_address));
+    server_info->omalw_address_ptr->addr_len = sizeof(ipv6_address);
+    server_info->omalw_server_security = SEC_NOT_SET;
+
+    nsdl->bootstrap_done_callback(server_info);
+    CHECK(observer->boot_done == true);
+
+    server_info->omalw_server_security = NO_SEC;
+
+    nsdl->bootstrap_done_callback(server_info);
+    CHECK(observer->boot_done == true);
+
+    server_info->omalw_server_security = CERTIFICATE;
+
+    common_stub::cert = (omalw_certificate_list_t *)malloc(sizeof(omalw_certificate_list_t));
+    common_stub::cert->certificate_ptr[0] = (uint8_t *)malloc(sizeof(uint8_t));
+    common_stub::cert->certificate_ptr[1] = (uint8_t *)malloc(sizeof(uint8_t));
+    common_stub::cert->own_private_key_ptr = (uint8_t *)malloc(sizeof(uint8_t));
+    common_stub::cert->certificate_len[0] = sizeof(uint8_t);
+    common_stub::cert->certificate_len[1] = sizeof(uint8_t);
+    common_stub::cert->own_private_key_len = sizeof(uint8_t);
+
+    nsdl->bootstrap_done_callback(server_info);
+    CHECK(observer->boot_done == true);
+
+    observer->boot_done = false;
+    server_info->omalw_address_ptr->type = SN_NSDL_ADDRESS_TYPE_IPV6;
+    nsdl->bootstrap_done_callback(server_info);
+    CHECK(observer->boot_done == true);
+
+    server_info->omalw_server_security = SEC_NOT_SET;
+    nsdl->bootstrap_done_callback(server_info);
+
+    server_info->omalw_server_security = PSK;
+    nsdl->bootstrap_done_callback(server_info);
+
+    server_info->omalw_server_security = RPK;
+    nsdl->bootstrap_done_callback(server_info);
+
+    server_info->omalw_server_security = NO_SEC;
+    nsdl->bootstrap_done_callback(server_info);
+
+    free(common_stub::cert->own_private_key_ptr);
+    common_stub::cert->own_private_key_ptr = NULL;
+    free(common_stub::cert->certificate_ptr[1]);
+    common_stub::cert->certificate_ptr[1] = NULL;
+    free(common_stub::cert->certificate_ptr[0]);
+    common_stub::cert->certificate_ptr[0] = NULL;
+    free(common_stub::cert);
+    common_stub::cert = NULL;
+
+    server_info->omalw_address_ptr->type = SN_NSDL_ADDRESS_TYPE_IPV6;
+    server_info->omalw_server_security = CERTIFICATE;
+    nsdl->bootstrap_done_callback(server_info);
+
+    free(server_info->omalw_address_ptr->addr_ptr);
+    server_info->omalw_address_ptr->addr_ptr = NULL;
+    free(server_info->omalw_address_ptr);
+    server_info->omalw_address_ptr = NULL;
+    free(server_info);
+    server_info = NULL;
+
+    common_stub::clear();
+
 }
 
 void Test_M2MNsdlInterface::test_process_received_data()

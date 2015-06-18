@@ -26,6 +26,8 @@ public:
 
     bool test_bootstrap();
 
+    bool create_device_object();
+
     bool create_device_object(M2MDevice::DeviceResource resource,
                               const char *value);
 

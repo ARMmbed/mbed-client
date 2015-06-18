@@ -8,6 +8,7 @@
 #include <netdb.h>
 #include "mbed-net-sockets/UDPSocket.h"
 #include "nsdlaccesshelper.h"
+#include "libService/ip6string.h"
 #include "Ticker.h"
 
 //some internal test related stuff

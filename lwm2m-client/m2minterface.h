@@ -98,9 +98,10 @@ public:
      * @param security_object, Security object from which the device object
      * needs to update registration, if there is only one LWM2M server registered
      * then this parameter can be NULL.
-     * @param lifetime, Lifetime for the endpoint client in seconds.
+     * @param lifetime, Lifetime for the endpoint client in seconds, if the same value
+     * has to be passed then put the default value as 0.
      */
-    virtual void update_registration(M2MSecurity *security_object, const uint32_t lifetime) = 0;
+    virtual void update_registration(M2MSecurity *security_object, const uint32_t lifetime = 0) = 0;
 
     /**
      * @brief Unregisters the registered object from the LWM2M server.

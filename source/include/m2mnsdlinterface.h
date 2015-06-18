@@ -6,6 +6,7 @@
 
 #include "lwm2m-client/m2mvector.h"
 #include "lwm2m-client/m2mconfig.h"
+#include "lwm2m-client/m2minterface.h"
 #include "nsdllinker.h"
 #include "m2mtimer.h"
 #include "lwm2m-client/m2mobservationhandler.h"
@@ -269,6 +270,8 @@ private:
                                        sn_nsdl_addr_s *address);
 
     void clear_resource(sn_nsdl_resource_info_s *&resource);
+
+    M2MInterface::Error interface_error(sn_coap_hdr_s *coap_header);
 
 private:
 

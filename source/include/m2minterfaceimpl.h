@@ -102,7 +102,7 @@ public:
      * then this parameter can be NULL.
      * @param lifetime, Lifetime for the endpoint client in seconds.
      */
-    virtual void update_registration(M2MSecurity *security_object, const uint32_t lifetime);
+    virtual void update_registration(M2MSecurity *security_object, const uint32_t lifetime = 0);
 
     /**
      * @brief Unregisters the registered object from the LWM2M server

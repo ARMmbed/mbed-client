@@ -196,6 +196,9 @@ void Test_M2MInterfaceImpl::test_update_registration()
 
     CHECK(impl->_current_state == M2MInterfaceImpl::STATE_IDLE);
     CHECK(observer->error_occured == true);
+
+    impl->update_registration(NULL,30);
+    CHECK(observer->error_occured == true);
 }
 
 void Test_M2MInterfaceImpl::test_unregister_object()

@@ -28,9 +28,16 @@ M2MInterface* M2MInterfaceFactory::create_interface(M2MInterfaceObserver &observ
     tr_debug("M2MInterfaceFactory::create_interface - parameters Binding Mode : %d",(int)mode);
     tr_debug("M2MInterfaceFactory::create_interface - parameters NetworkStack : %d",(int)stack);
     M2MInterfaceImpl *interface = NULL;
-    if( ((life_time == -1) || (life_time >= MINIMUM_REGISTRATION_TIME)) &&
-        !endpoint_name.empty() && (endpoint_name.size() <= ENDPOINT_LENGTH) &&
-        !endpoint_type.empty() && (endpoint_type.size() <= ENDPOINT_LENGTH)) {
+
+    bool endpoint_type_valid = true;
+    if(!endpoint_type.empty()) {
+        if(endpoint_type.size() > ENDPOINT_LENGTH){
+            endpoint_type_valid = false;
+        }
+    }
+    if(((life_time == -1) || (life_time >= MINIMUM_REGISTRATION_TIME)) &&
+       !endpoint_name.empty() && (endpoint_name.size() <= ENDPOINT_LENGTH) &&
+       endpoint_type_valid) {
         tr_debug("M2MInterfaceFactory::create_interface - Creating M2MInterfaceImpl");
         interface = new M2MInterfaceImpl(observer, endpoint_name,
                                          endpoint_type, life_time,

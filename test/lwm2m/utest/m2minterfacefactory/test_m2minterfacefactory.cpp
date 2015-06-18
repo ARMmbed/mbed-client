@@ -45,6 +45,18 @@ void Test_M2MInterfaceFactory::test_create_interface()
                                                 "domain");
     CHECK(test != NULL);
     delete test;
+    test = NULL;
+
+    // Endpoint name and type of length more than 64 characters
+    test = M2MInterfaceFactory::create_interface(test_obs,
+                                                "endpoint_name-very-long-1-1-1-1-1-1-1-1-1-1-1-1-1-1-1-1-1-1-1-1-1-1-1-1-1-1-1-1-1-1-1-1-1-1-1-1-1-1",
+                                                "endpoint_type-very-long-1-1-1-1-1-1-1-1-1-1-1-1-1-1-1-1-1-1-1-1-1-1-1-1-1-1-1-1-1-1-1-1-1-1-1-1-1-1",
+                                                120,
+                                                8000,
+                                                "domain");
+    CHECK(test == NULL);
+    delete test;
+
 }
 
 void Test_M2MInterfaceFactory::test_create_security()

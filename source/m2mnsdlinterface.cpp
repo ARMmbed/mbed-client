@@ -9,6 +9,7 @@
 #include "lwm2m-client/m2mobjectinstance.h"
 #include "lwm2m-client/m2mresource.h"
 #include "lwm2m-client/m2mconstants.h"
+#include "libService/ip6string.h"
 #include "libService/ns_trace.h"
 
 M2MNsdlInterface::M2MNsdlInterface(M2MNsdlObserver &observer)
@@ -50,7 +51,7 @@ M2MNsdlInterface::M2MNsdlInterface(M2MNsdlObserver &observer)
 
 M2MNsdlInterface::~M2MNsdlInterface()
 {
-    tr_debug("M2MNsdlInterface::~M2MNsdlInterface()");
+    tr_debug("M2MNsdlInterface::~M2MNsdlInterface() - IN");
     if(_resource) {
         if(_resource->resource_parameters_ptr) {
             memory_free(_resource->resource_parameters_ptr);
@@ -61,7 +62,7 @@ M2MNsdlInterface::~M2MNsdlInterface()
     }
     if(_endpoint) {
         if(_endpoint->lifetime_ptr) {
-            free(_endpoint->lifetime_ptr);
+            memory_free(_endpoint->lifetime_ptr);
             _endpoint->lifetime_ptr = NULL;
         }
         memory_free(_endpoint);
@@ -78,6 +79,7 @@ M2MNsdlInterface::~M2MNsdlInterface()
     sn_nsdl_destroy(_nsdl_handle);
     _nsdl_handle = NULL;
     __nsdl_interface = NULL;
+    tr_debug("M2MNsdlInterface::~M2MNsdlInterface() - OUT");
 }
 
 bool M2MNsdlInterface::initialize()
@@ -122,10 +124,14 @@ void M2MNsdlInterface::create_endpoint(const String &name,
               name.c_str(), type.c_str(), life_time, domain.c_str(), mode);
     if(_endpoint){
         memset(_endpoint, 0, sizeof(sn_nsdl_ep_parameters_s));
-        _endpoint->endpoint_name_ptr = (uint8_t*)name.c_str();
-        _endpoint->endpoint_name_len = name.length();
-        _endpoint->type_ptr = (uint8_t*)type.c_str();
-        _endpoint->type_len =  type.length();
+        if(!name.empty()) {
+            _endpoint->endpoint_name_ptr = (uint8_t*)name.c_str();
+            _endpoint->endpoint_name_len = name.length();
+        }
+        if(!type.empty()) {
+            _endpoint->type_ptr = (uint8_t*)type.c_str();
+            _endpoint->type_len =  type.length();
+        }
         if(!domain.empty()) {
             _endpoint->domain_name_ptr = (uint8_t*)domain.c_str();
             _endpoint->domain_name_len = domain.length();
@@ -229,16 +235,24 @@ bool M2MNsdlInterface::send_update_registration(const uint32_t lifetime)
     tr_debug("M2MNsdlInterface::send_update_registration( lifetime %d)", lifetime);
     bool success = false;
     char buffer[20];
-    int size = sprintf(buffer,"%ld",(long int)lifetime);
-    if(_endpoint->lifetime_ptr == NULL){
-        _endpoint->lifetime_ptr = (uint8_t*)memory_alloc(size);
-    }
-    if(_endpoint->lifetime_ptr) {
-        memset(_endpoint->lifetime_ptr, 0, size);
-        memcpy(_endpoint->lifetime_ptr,buffer,size);
-        _endpoint->lifetime_len =  size;
-    }
+    //If Lifetime value is 0, then don't change the existing lifetime value
+    if(lifetime != 0) {
+        int size = sprintf(buffer,"%ld",(long int)lifetime);
+        if(_endpoint->lifetime_ptr) {
+            memory_free(_endpoint->lifetime_ptr);
+            _endpoint->lifetime_ptr = NULL;
+            _endpoint->lifetime_len = 0;
+        }
 
+        if(_endpoint->lifetime_ptr == NULL){
+            _endpoint->lifetime_ptr = (uint8_t*)memory_alloc(size);
+        }
+        if(_endpoint->lifetime_ptr) {
+            memset(_endpoint->lifetime_ptr, 0, size);
+            memcpy(_endpoint->lifetime_ptr,buffer,size);
+            _endpoint->lifetime_len =  size;
+        }
+    }
     if(_update_id == 0) {
         _update_id = sn_nsdl_update_registration(_nsdl_handle,
                                                  _endpoint->lifetime_ptr,
@@ -311,6 +325,31 @@ uint8_t M2MNsdlInterface::received_from_server_callback(struct nsdl_s * /*nsdl_h
                 _server->set_resource_value(M2MServer::ShortServerID,1);
 
                 _observer.client_registered(_server);
+                // If lifetime is less than zero then leave the field empty
+                if(coap_header->options_list_ptr &&
+                    coap_header->options_list_ptr->max_age_ptr) {
+                    if(_endpoint->lifetime_ptr == NULL){
+                        _endpoint->lifetime_ptr = (uint8_t*)memory_alloc(coap_header->options_list_ptr->max_age_len+1);
+                        uint32_t max_time = 0;
+                        if(_endpoint->lifetime_ptr) {
+                            for(int i=0;i < coap_header->options_list_ptr->max_age_len; i++) {
+                                max_time += (*(coap_header->options_list_ptr->max_age_ptr + i) & 0xff) <<
+                                         8*(coap_header->options_list_ptr->max_age_len- 1 - i);
+                                }
+                            // If lifetime is less than zero then leave the field empty
+                            if( max_time > 0) {
+                                char buffer[20];
+                                sprintf(buffer,"%d",(uint32_t)max_time);
+                                if(_endpoint->lifetime_ptr) {
+                                    memset(_endpoint->lifetime_ptr, 0, coap_header->options_list_ptr->max_age_len+1);
+                                    memcpy(_endpoint->lifetime_ptr,buffer,coap_header->options_list_ptr->max_age_len+1);
+                                    _endpoint->lifetime_len =  coap_header->options_list_ptr->max_age_len+1;
+                                }
+                            }
+                        }
+
+                    }
+                }
                 if(_endpoint->lifetime_ptr) {
                     _registration_timer->start_timer(registration_time() * 1000,
                                                      M2MTimerObserver::Registration,
@@ -322,7 +361,8 @@ uint8_t M2MNsdlInterface::received_from_server_callback(struct nsdl_s * /*nsdl_h
                     _server = NULL;
                 }
                 tr_error("M2MNsdlInterface::received_from_server_callback - registration error %d", coap_header->msg_code);
-                _observer.registration_error(coap_header->msg_code);
+                M2MInterface::Error error = interface_error(coap_header);
+                _observer.registration_error(error);
             }
         } else if(coap_header->msg_id == _unregister_id) {
             _unregister_id = 0;
@@ -336,26 +376,29 @@ uint8_t M2MNsdlInterface::received_from_server_callback(struct nsdl_s * /*nsdl_h
                 _observer.client_unregistered();
             } else {
                 tr_error("M2MNsdlInterface::received_from_server_callback - unregistration error %d", coap_header->msg_code);
-
-                if( coap_header->coap_status == COAP_STATUS_BUILDER_MESSAGE_SENDING_FAILED) {
-                    _observer.registration_error(COAP_MSG_CODE_RESPONSE_NOT_FOUND);
-                }else{
-                    _observer.registration_error(coap_header->msg_code);
-                }
+                M2MInterface::Error error = interface_error(coap_header);
+                _observer.registration_error(error);
             }
         } else if(coap_header->msg_id == _update_id) {
             _update_id = 0;
-            if(coap_header->coap_status == COAP_STATUS_OK) {
+
+            if(coap_header->msg_code == COAP_MSG_CODE_RESPONSE_CHANGED) {
                 tr_debug("M2MNsdlInterface::received_from_server_callback - registration_updated successfully");
                 _observer.registration_updated(*_server);
             } else {
-                tr_error("M2MNsdlInterface::received_from_server_callback - registration_updated failed %d", coap_header->coap_status);
-                _observer.registration_error(coap_header->msg_code);
+                tr_error("M2MNsdlInterface::received_from_server_callback - registration_updated failed %d", coap_header->msg_code);
+                M2MInterface::Error error = interface_error(coap_header);
+                // In case, the error for update registration is not allowed implies the client is no longer registered in
+                // server hence the error returns should be NotRegistered.
+                if(M2MInterface::NotAllowed == error) {
+                    error = M2MInterface::NotRegistered;
+                }
+                _observer.registration_error(error);
             }
-        }
-        if(coap_header->coap_status == COAP_STATUS_BUILDER_MESSAGE_SENDING_FAILED) {
-            if(coap_header->msg_id == _bootstrap_id) {
-                _bootstrap_id = 0;
+        }else if(coap_header->msg_id == _bootstrap_id) {
+            _bootstrap_id = 0;
+            M2MInterface::Error error = interface_error(coap_header);
+            if(error != M2MInterface::ErrorNone) {
                 _observer.bootstrap_error();
             }
         }
@@ -392,32 +435,51 @@ void M2MNsdlInterface::bootstrap_done_callback(sn_nsdl_oma_server_info_t *server
     tr_debug("M2MNsdlInterface::bootstrap_done_callback()");
     _bootstrap_id = 0;
     M2MSecurity* security = NULL;
-    if(server_info && server_info->omalw_address_ptr->addr_ptr &&
-       (SN_NSDL_ADDRESS_TYPE_IPV4 == server_info->omalw_address_ptr->type)) {
+    if(server_info && server_info->omalw_address_ptr->addr_ptr) {        
         security = new M2MSecurity(M2MSecurity::M2MServer);
         uint16_t port = server_info->omalw_address_ptr->port;
         char buffer[10];
         sprintf(buffer,"%d",port);
-
-        //TODO: currently only supports IPV4 Mapping, fix to support IPV6 as well
-
+        String server_uri(COAP);
         String server_address;
-        int val = 0;
-        for(int index = 0; index < server_info->omalw_address_ptr->addr_len; index++) {
-            char server_buffer[4];
-            val = (int)server_info->omalw_address_ptr->addr_ptr[index];
-            sprintf(server_buffer,"%d",val);
-            server_address +=String(server_buffer);
-            if(index < server_info->omalw_address_ptr->addr_len-1) {
-                server_address += String(".");
+        //TODO: currently only supports IPV4 Mapping, fix to support IPV6 as well
+        if(SN_NSDL_ADDRESS_TYPE_IPV4 == server_info->omalw_address_ptr->type) {
+            int val = 0;
+            for(int index = 0; index < server_info->omalw_address_ptr->addr_len; index++) {
+                char server_buffer[4];
+                val = (int)server_info->omalw_address_ptr->addr_ptr[index];
+                sprintf(server_buffer,"%d",val);
+                server_address +=String(server_buffer);
+                if(index < server_info->omalw_address_ptr->addr_len-1) {
+                    server_address += String(".");
+                }
             }
+            
+            tr_debug("M2MNsdlInterface::bootstrap_done_callback - IPv4 Server address received %s", server_address.c_str());
+        } else if(SN_NSDL_ADDRESS_TYPE_HOSTNAME == server_info->omalw_address_ptr->type) {
+            char *hostname = (char*)memory_alloc(server_info->omalw_address_ptr->addr_len);
+            if(hostname) {
+                memset(hostname, 0, server_info->omalw_address_ptr->addr_len);
+                memcpy(hostname,
+                       server_info->omalw_address_ptr->addr_ptr,
+                       server_info->omalw_address_ptr->addr_len);
+                server_address += String(hostname);
+                memory_free(hostname);
+                hostname = NULL;
+                tr_debug("M2MNsdlInterface::bootstrap_done_callback - Hostname Server address received %s", server_address.c_str());
+            }
+                
+        } else if(SN_NSDL_ADDRESS_TYPE_IPV6 == server_info->omalw_address_ptr->type) {
+            char ipv6_address[40];
+            ip6tos(server_info->omalw_address_ptr->addr_ptr, ipv6_address);
+            server_address += String(ipv6_address);
+            tr_debug("M2MNsdlInterface::bootstrap_done_callback - IPv6 Server address received %s", server_address.c_str());
         }
 
-        String server_uri(COAP);
         server_uri += server_address;
         server_uri +=String(":");
         server_uri += String(buffer);
-        tr_debug("M2MNsdlInterface::bootstrap_done_callback - Server address received %s", server_uri.c_str());
+
         security->set_resource_value(M2MSecurity::M2MServerUri, server_uri);
         security->set_resource_value(M2MSecurity::BootstrapServer, 0);
 
@@ -1380,4 +1442,42 @@ void M2MNsdlInterface::clear_resource(sn_nsdl_resource_info_s *&resource)
         memset(resource,0, sizeof(sn_nsdl_resource_info_s));
         resource->resource_parameters_ptr = temp_resource_parameter;
     }
+}
+
+M2MInterface::Error M2MNsdlInterface::interface_error(sn_coap_hdr_s *coap_header)
+{
+    M2MInterface::Error error = M2MInterface::ErrorNone;
+    if(coap_header) {
+        switch(coap_header->msg_code) {
+            case COAP_MSG_CODE_RESPONSE_BAD_REQUEST:
+            case COAP_MSG_CODE_RESPONSE_BAD_OPTION:
+            case COAP_MSG_CODE_RESPONSE_REQUEST_ENTITY_INCOMPLETE:
+            case COAP_MSG_CODE_RESPONSE_PRECONDITION_FAILED:
+            case COAP_MSG_CODE_RESPONSE_REQUEST_ENTITY_TOO_LARGE:
+            case COAP_MSG_CODE_RESPONSE_UNSUPPORTED_CONTENT_FORMAT:
+                error = M2MInterface::InvalidParameters;
+                break;
+            case COAP_MSG_CODE_RESPONSE_UNAUTHORIZED:
+            case COAP_MSG_CODE_RESPONSE_FORBIDDEN:
+            case COAP_MSG_CODE_RESPONSE_NOT_ACCEPTABLE:
+            case COAP_MSG_CODE_RESPONSE_NOT_FOUND:
+            case COAP_MSG_CODE_RESPONSE_METHOD_NOT_ALLOWED:
+                error = M2MInterface::NotAllowed;
+                break;
+            case COAP_MSG_CODE_RESPONSE_CREATED:
+            case COAP_MSG_CODE_RESPONSE_DELETED:
+            case COAP_MSG_CODE_RESPONSE_VALID:
+            case COAP_MSG_CODE_RESPONSE_CHANGED:
+            case COAP_MSG_CODE_RESPONSE_CONTENT:
+                error = M2MInterface::ErrorNone;
+                break;
+            default:
+                error = M2MInterface::UnknownError;
+                break;
+        }
+        if(coap_header->coap_status == COAP_STATUS_BUILDER_MESSAGE_SENDING_FAILED) {
+            error = M2MInterface::NetworkError;
+        }
+    }
+    return error;
 }

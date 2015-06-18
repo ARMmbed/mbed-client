@@ -49,6 +49,7 @@ Test_M2MConnectionHandlerImpl_linux::Test_M2MConnectionHandlerImpl_linux()
 
 Test_M2MConnectionHandlerImpl_linux::~Test_M2MConnectionHandlerImpl_linux()
 {
+    handler->_listen_thread = 1;
     delete handler;
     delete observer;
 }

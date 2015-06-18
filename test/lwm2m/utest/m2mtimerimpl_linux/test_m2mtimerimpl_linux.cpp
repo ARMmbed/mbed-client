@@ -35,6 +35,8 @@ Test_M2MTimerImpl_linux::~Test_M2MTimerImpl_linux()
 {
     common_stub::clear();
     delete observer;
+    timer->_timer_th = 1;
+    common_stub::int2_value = 0;
     delete timer;
 }
 

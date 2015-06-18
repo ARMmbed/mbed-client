@@ -194,6 +194,11 @@ int8_t sn_coap_protocol_set_retransmission_parameters(uint8_t, uint8_t)
     return common_stub::int_value;
 }
 
+// IP6String.h
+void ip6tos(const void *, char *)
+{
+}
+
 //Socket
 Socket::Socket(const socket_stack_t ) : _irq(this)
 {

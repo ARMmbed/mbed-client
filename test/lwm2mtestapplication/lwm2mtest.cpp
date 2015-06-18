@@ -51,15 +51,18 @@ bool M2MLWClient::create_interface(const char *endpoint,
     if(domain) {
         dmn += domain;
     }
-    _interface = M2MInterfaceFactory::create_interface(*this,
-                                              ep,
-                                              rt,
-                                              lifetime,
-                                              listen_port,
-                                              dmn,
-                                              (M2MInterface::BindingMode)binding_mode,
-                                              (M2MInterface::NetworkStack)network_interface,
-                                              "");
+    // Binding mode cannot be higher than 0x07 since it is an enum, check M2MInterface::BindingMode
+    if(binding_mode <= 0x07) {
+        _interface = M2MInterfaceFactory::create_interface(*this,
+                                                  ep,
+                                                  rt,
+                                                  lifetime,
+                                                  listen_port,
+                                                  dmn,
+                                                  (M2MInterface::BindingMode)binding_mode,
+                                                  (M2MInterface::NetworkStack)network_interface,
+                                                  "");
+    }
     return (_interface == NULL) ? false : true;
 }
 
@@ -131,6 +134,16 @@ bool M2MLWClient::create_device_object(M2MDevice::DeviceResource resource,
         } else {
             success = _device->set_resource_value(resource,value);
         }
+    }
+    return success;
+}
+
+bool M2MLWClient::create_device_object()
+{
+    bool success = false;
+    if(!_device) {
+        _device = M2MInterfaceFactory::create_device();
+        success = true;
     }
     return success;
 }

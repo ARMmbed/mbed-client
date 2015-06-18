@@ -47,7 +47,7 @@ public:
      */
     static M2MInterface *create_interface(M2MInterfaceObserver &observer,
                                               const String &endpoint_name,
-                                              const String &endpoint_type,
+                                              const String &endpoint_type = "",
                                               const int32_t life_time = -1,
                                               const uint16_t listen_port = 5683,
                                               const String &domain = "",

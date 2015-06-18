@@ -161,7 +161,7 @@ int lwm2m_client_setup_command(int argc, char *argv[])
     char *endpoint = 0;
     char *type = 0;
     int lifetime = -1;
-    int32_t port = 8000;
+    int32_t port = 5683;
     char *domain = 0;
     int32_t binding_mode = 1;
     int32_t network_interface = 1;
@@ -173,9 +173,11 @@ int lwm2m_client_setup_command(int argc, char *argv[])
     cmd_parameter_int(argc, argv, "--binding_mode", &binding_mode);
     cmd_parameter_int(argc, argv, "--network_interface", &network_interface);
 
-    if(lwm2m_client.create_interface(endpoint,type,lifetime,port,
+    if(port > 0) {
+        if(lwm2m_client.create_interface(endpoint,type,lifetime,port,
                                 domain,binding_mode,network_interface)){
         return CMDLINE_RETCODE_SUCCESS;
+        }
     }
     return CMDLINE_RETCODE_INVALID_PARAMETERS;
 }
@@ -201,6 +203,8 @@ int lwm2m_client_device_command(int argc, char *argv[])
     int32_t  memory_free = 0;
     int32_t  memory_total = 0;
     int32_t  error_code = 0;
+
+    lwm2m_client.create_device_object();
 
     if(cmd_parameter_val(argc, argv, "--manufacturer", &manufacturer)) {
         if(!lwm2m_client.create_device_object(M2MDevice::Manufacturer,
@@ -432,11 +436,11 @@ int lwm2m_client_register_command()
 int lwm2m_client_update_register_command(int argc, char *argv[])
 {
     int ret_code = CMDLINE_RETCODE_INVALID_PARAMETERS;
-    int32_t lifetime = -1;
+    int32_t lifetime = 0;
 
     cmd_parameter_int(argc, argv, "--lifetime", &lifetime);
 
-    if(lifetime > 0) {
+    if(lifetime >= 0) {
         if(lwm2m_client.test_update_register(lifetime)) {
             ret_code = CMDLINE_RETCODE_SUCCESS;
         }
