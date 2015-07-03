@@ -19,10 +19,10 @@ private:
     //Prevent usage of assignment operator by accident
     M2MTimer& operator=(const M2MTimer& /*other*/);
 
+    //Prevent usage of copy constructor by accident
+    M2MTimer(const M2MTimer& other);
 
 public:
-
-    M2MTimer(const M2MTimer& other);
 
     /**
     * Constructor.

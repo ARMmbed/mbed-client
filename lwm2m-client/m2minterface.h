@@ -49,7 +49,10 @@ public:
         NOT_SET = 0,
         UDP = 0x01,
         QUEUE = 0x02,
-        SMS = 0x04
+        UDP_QUEUE = 0x03,
+        SMS = 0x04,
+        SMS_QUEUE =0x06,
+        UDP_SMS_QUEUE = 0x07
     }BindingMode;
 
     typedef enum {

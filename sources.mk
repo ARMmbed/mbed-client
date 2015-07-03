@@ -2,7 +2,7 @@ SRCS += \
 	lwm2m-client-linux/source/m2mconnectionhandlerimpl.cpp \
 	lwm2m-client-linux/source/m2mtimerimpl.cpp \
 	lwm2m-client-linux/source/connthreadhelper.cpp \
-	lwm2m-client-linux/source/timerthreadhelper.cpp \
+	lwm2m-client-linux/source/threadhelper.cpp \
 	source/m2mbase.cpp \
 	source/m2mconnectionhandler.cpp \
 	source/m2mconstants.cpp \

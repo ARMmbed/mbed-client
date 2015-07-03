@@ -30,8 +30,9 @@ M2MBase& M2MBase::operator=(const M2MBase& other)
         }
         _value_length = other._value_length;
         if(other._value) {
-            _value = (uint8_t *)malloc(other._value_length);
+            _value = (uint8_t *)malloc(other._value_length+1);
             if(_value) {
+                memset(_value, 0, other._value_length+1);
                 memcpy((uint8_t *)_value, (uint8_t *)other._value, other._value_length);
             }
         }
@@ -43,8 +44,9 @@ M2MBase& M2MBase::operator=(const M2MBase& other)
         }
         _token_length = other._token_length;
         if(other._token) {
-            _token = (uint8_t *)malloc(other._token_length);
+            _token = (uint8_t *)malloc(other._token_length+1);
             if(_token) {
+                memset(_token, 0, other._token_length+1);
                 memcpy((uint8_t *)_token, (uint8_t *)other._token, other._token_length);
             }
         }
@@ -81,16 +83,18 @@ M2MBase::M2MBase(const M2MBase& other) :
     _value_length = other._value_length;
 
     if(other._value) {        
-        _value = (uint8_t *)malloc(other._value_length);
+        _value = (uint8_t *)malloc(other._value_length+1);
         if(_value) {
+            memset(_value, 0, other._value_length+1);
             memcpy((uint8_t *)_value, (uint8_t *)other._value, other._value_length);
         }
     }
 
     _token_length = other._token_length;
     if(other._token) {
-        _token = (uint8_t *)malloc(other._token_length);
+        _token = (uint8_t *)malloc(other._token_length+1);
         if(_token) {
+            memset(_token, 0, other._token_length+1);
             memcpy((uint8_t *)_token, (uint8_t *)other._token, other._token_length);
         }
     }
@@ -196,8 +200,9 @@ void M2MBase::set_observation_token(const uint8_t *token, const uint8_t length)
     }
 
     if( token != NULL && length > 0 ) {
-        _token = (uint8_t *)malloc(length);
+        _token = (uint8_t *)malloc(length+1);
        if(_token) {
+            memset(_token, 0, length+1);
             memcpy((uint8_t *)_token, (uint8_t *)token, length);
             _token_length = length;
         }
@@ -223,8 +228,9 @@ bool M2MBase::set_value(const uint8_t *value,
     if( value != NULL && value_length > 0 ) {
         success = true;
         _is_numeric = is_numeric;
-        _value = (uint8_t *)malloc(value_length);
+        _value = (uint8_t *)malloc(value_length+1);
         if(_value) {
+            memset(_value, 0, value_length+1);
             memcpy((uint8_t *)_value, (uint8_t *)value, value_length);
             _value_length = value_length;
             if(_is_numeric && _report_handler) {
@@ -287,9 +293,10 @@ void M2MBase::get_observation_token(uint8_t *&token, uint32_t &token_length)
         free(token);
         token = NULL;
     }
-    token = (uint8_t *)malloc(_token_length);
+    token = (uint8_t *)malloc(_token_length+1);
     if(token) {
         token_length = _token_length;
+        memset(token, 0, _token_length+1);
         memcpy((uint8_t *)token, (uint8_t *)_token, token_length);
     }
 }
@@ -306,9 +313,10 @@ void M2MBase::get_value(uint8_t *&value, uint32_t &value_length)
         free(value);
         value = NULL;
     }
-    value = (uint8_t *)malloc(_value_length);
+    value = (uint8_t *)malloc(_value_length+1);
     if(value) {
         value_length = _value_length;
+        memset(value, 0, _value_length+1);
         memcpy((uint8_t *)value, (uint8_t *)_value, value_length);
     }
 }

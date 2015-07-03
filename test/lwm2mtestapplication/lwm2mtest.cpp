@@ -27,7 +27,9 @@ M2MLWClient::~M2MLWClient()
     }
 }
 
-bool M2MLWClient::create_interface(const char *endpoint,
+
+bool M2MLWClient::create_interface(int32_t param_count,
+					  const char *endpoint,
                       const char *resource_type,
                       const int32_t lifetime,
                       const uint16_t listen_port,
@@ -51,18 +53,32 @@ bool M2MLWClient::create_interface(const char *endpoint,
     if(domain) {
         dmn += domain;
     }
+
     // Binding mode cannot be higher than 0x07 since it is an enum, check M2MInterface::BindingMode
-    if(binding_mode <= 0x07) {
-        _interface = M2MInterfaceFactory::create_interface(*this,
-                                                  ep,
-                                                  rt,
-                                                  lifetime,
-                                                  listen_port,
-                                                  dmn,
-                                                  (M2MInterface::BindingMode)binding_mode,
-                                                  (M2MInterface::NetworkStack)network_interface,
-                                                  "");
+    if(binding_mode > 0x07) {
+        return false;
     }
+
+    switch (param_count) {
+		case 0:
+			_interface = M2MInterfaceFactory::create_interface(*this, ep, rt);
+			break;
+		case 1:
+			_interface = M2MInterfaceFactory::create_interface(*this, ep, rt, lifetime);
+			break;
+		case 2:
+			_interface = M2MInterfaceFactory::create_interface(*this, ep, rt, lifetime, listen_port);
+			break;
+		case 3:
+			_interface = M2MInterfaceFactory::create_interface(*this, ep, rt, lifetime, listen_port, dmn);
+			break;
+		case 4:
+			_interface = M2MInterfaceFactory::create_interface(*this, ep, rt, lifetime, listen_port, dmn, (M2MInterface::BindingMode)binding_mode);
+			break;
+		case 5:
+			_interface = M2MInterfaceFactory::create_interface(*this, ep, rt, lifetime, listen_port, dmn, (M2MInterface::BindingMode)binding_mode, (M2MInterface::NetworkStack)network_interface);
+			break;
+	}
     return (_interface == NULL) ? false : true;
 }
 
@@ -158,6 +174,8 @@ bool M2MLWClient::create_device_object(M2MDevice::DeviceResource resource,
     if(_device) {
         if(_device->create_resource(resource,value)) {
             success = true;
+        } else {
+            success = _device->set_resource_value(resource,value);
         }
     }
     return success;

@@ -318,6 +318,11 @@ int pthread_join (pthread_t , void **)
     return common_stub::int_value;
 }
 
+void pthread_exit (void *__retval)/* __attribute__ ((__noreturn__))*/
+{
+
+}
+
 // sys/socket
 #ifndef __SOCKADDR_ARG
 # define __SOCKADDR_ARG		struct sockaddr *__restrict

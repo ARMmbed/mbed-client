@@ -1,6 +1,6 @@
 include ../makefile_defines.txt
 
-COMPONENT_NAME = nsdlaccesshelepr_unit
+COMPONENT_NAME = nsdlaccesshelper_unit
 SRC_FILES = \
 	../../../../source/nsdlaccesshelper.cpp
 

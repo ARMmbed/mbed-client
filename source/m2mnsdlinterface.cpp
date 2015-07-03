@@ -98,16 +98,16 @@ bool M2MNsdlInterface::initialize()
     _resource = (sn_nsdl_resource_info_s*)memory_alloc(sizeof(sn_nsdl_resource_info_s));
     if(_resource) {
         memset(_resource, 0, sizeof(sn_nsdl_resource_info_s));
-        _resource->resource_parameters_ptr = (sn_nsdl_resource_parameters_s*)memory_alloc(sizeof(sn_nsdl_resource_parameters_s));
+        _resource->resource_parameters_ptr = (sn_nsdl_resource_parameters_s*)memory_alloc(sizeof(sn_nsdl_resource_parameters_s)+1);
         if(_resource->resource_parameters_ptr) {
-            memset(_resource->resource_parameters_ptr, 0, sizeof(sn_nsdl_resource_parameters_s));
+            memset(_resource->resource_parameters_ptr, 0, sizeof(sn_nsdl_resource_parameters_s)+1);
         }
     }
 
     //Allocate the memory for endpoint
-    _endpoint = (sn_nsdl_ep_parameters_s*)memory_alloc(sizeof(sn_nsdl_ep_parameters_s));
+    _endpoint = (sn_nsdl_ep_parameters_s*)memory_alloc(sizeof(sn_nsdl_ep_parameters_s)+1);
     if(_endpoint) {
-        memset(_endpoint, 0, sizeof(sn_nsdl_ep_parameters_s));
+        memset(_endpoint, 0, sizeof(sn_nsdl_ep_parameters_s)+1);
         success = true;
     }
     return success;
@@ -123,7 +123,7 @@ void M2MNsdlInterface::create_endpoint(const String &name,
     tr_debug("M2MNsdlInterface::create_endpoint( name %s type %s lifetime %d, domain %s, mode %d)",
               name.c_str(), type.c_str(), life_time, domain.c_str(), mode);
     if(_endpoint){
-        memset(_endpoint, 0, sizeof(sn_nsdl_ep_parameters_s));
+        memset(_endpoint, 0, sizeof(sn_nsdl_ep_parameters_s)+1);
         if(!name.empty()) {
             _endpoint->endpoint_name_ptr = (uint8_t*)name.c_str();
             _endpoint->endpoint_name_len = name.length();
@@ -143,10 +143,10 @@ void M2MNsdlInterface::create_endpoint(const String &name,
             char buffer[20];
             int size = sprintf(buffer,"%ld",(long int)life_time);
             if( _endpoint->lifetime_ptr == NULL ){
-                _endpoint->lifetime_ptr = (uint8_t*)memory_alloc(size);
+                _endpoint->lifetime_ptr = (uint8_t*)memory_alloc(size+1);
             }
             if(_endpoint->lifetime_ptr) {
-                memset(_endpoint->lifetime_ptr, 0, size);
+                memset(_endpoint->lifetime_ptr, 0, size+1);
                 memcpy(_endpoint->lifetime_ptr,buffer,size);
                 _endpoint->lifetime_len =  size;
             }
@@ -245,24 +245,25 @@ bool M2MNsdlInterface::send_update_registration(const uint32_t lifetime)
         }
 
         if(_endpoint->lifetime_ptr == NULL){
-            _endpoint->lifetime_ptr = (uint8_t*)memory_alloc(size);
+            _endpoint->lifetime_ptr = (uint8_t*)memory_alloc(size+1);
         }
         if(_endpoint->lifetime_ptr) {
-            memset(_endpoint->lifetime_ptr, 0, size);
+            memset(_endpoint->lifetime_ptr, 0, size+1);
             memcpy(_endpoint->lifetime_ptr,buffer,size);
             _endpoint->lifetime_len =  size;
         }
+        _registration_timer->stop_timer();
+        _registration_timer->start_timer(registration_time() * 1000,
+                                         M2MTimerObserver::Registration,
+                                         false);
     }
-    if(_update_id == 0) {
+    if(_update_id == 0 && _nsdl_handle &&
+       _endpoint && _endpoint->lifetime_ptr) {
         _update_id = sn_nsdl_update_registration(_nsdl_handle,
                                                  _endpoint->lifetime_ptr,
                                                  _endpoint->lifetime_len);
         tr_debug("M2MNsdlInterface::send_update_registration - _update_id %d", _update_id);        
         success = _update_id != 0;
-        _registration_timer->stop_timer();
-        _registration_timer->start_timer(registration_time() * 1000,
-                                         M2MTimerObserver::Registration,
-                                         false);
     }
     return success;
 }
@@ -551,13 +552,8 @@ void M2MNsdlInterface::timer_expired(M2MTimerObserver::Type type)
         sn_nsdl_exec(_counter_for_nsdl);
         _counter_for_nsdl++;
     } else if(M2MTimerObserver::Registration == type) {
-        tr_debug("M2MNsdlInterface::timer_expired - M2MTimerObserver::Registration - Send update registration Time %s",
-                 (char*)_endpoint->lifetime_ptr);
-        if(_endpoint && _endpoint->lifetime_ptr) {
-            sn_nsdl_update_registration(_nsdl_handle,
-                                        _endpoint->lifetime_ptr,
-                                        _endpoint->lifetime_len);
-        }
+        tr_debug("M2MNsdlInterface::timer_expired - M2MTimerObserver::Registration - Send update registration");
+        send_update_registration();
     }
 }
 
@@ -819,7 +815,7 @@ uint64_t M2MNsdlInterface::registration_time()
 {
     uint64_t value = 0;
     if(_endpoint->lifetime_ptr) {
-        value = (uint64_t)atoi((const char*)_endpoint->lifetime_ptr);
+        value = atoll((const char*)_endpoint->lifetime_ptr);
     }
 
     if(value >= OPTIMUM_LIFETIME) {

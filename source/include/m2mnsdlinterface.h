@@ -103,7 +103,7 @@ public:
      * @return  true if sent successfully else false.
      *
     */
-    bool send_update_registration(const uint32_t lifetime);
+    bool send_update_registration(const uint32_t lifetime = 0);
 
     /**
      * @brief Sends unregister message to the server.
