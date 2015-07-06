@@ -25,6 +25,7 @@ const uint8_t value[] = "MyValue";
 const uint8_t STATIC_VALUE[] = "Static value";
 
 static void ctrl_c_handle_function(void);
+void close_function();
 typedef void (*signalhandler_t)(int); /* Function pointer type for ctrl-c */
 
 class M2MLWClient: public M2MInterfaceObserver {
@@ -291,8 +292,8 @@ void* wait_for_unregister(void* arg) {
     M2MLWClient *client;
     client = (M2MLWClient*) arg;
     if(client->unregister_successful()) {
-        printf("Unregistered done --> exiting\n");
-        exit(1);
+        printf("Unregistered done --> exiting\n");        
+        close_function();
     }
     return NULL;
 }
@@ -303,7 +304,7 @@ void* send_observation(void* arg) {
     static uint8_t counter = 0;
     while(1) {
         sleep(1);
-        if(counter >= 10 &&
+        if(counter >= 4 &&
            client->register_successful()) {
             printf("Sending observation\n");
             client->update_resource();
@@ -330,11 +331,18 @@ void trace_printer(const char* str)
   printf("%s\r\n", str);
 }
 
+static pthread_t bootstrap_thread;
+static pthread_t unregister_thread;
+static pthread_t observation_thread;
+
+void close_function() {
+    pthread_cancel(bootstrap_thread);
+    pthread_cancel(unregister_thread);
+    pthread_cancel(observation_thread);
+}
+
 int main() {
 
-    pthread_t bootstrap_thread;
-    pthread_t unregister_thread;
-    pthread_t observation_thread;
     M2MLWClient lwm2mclient;
 
     m2mclient = &lwm2mclient;
@@ -374,9 +382,7 @@ int main() {
 
     pthread_join(bootstrap_thread, NULL);
     pthread_join(unregister_thread, NULL);
-
-    pthread_detach(bootstrap_thread);
-    pthread_detach(unregister_thread);
+    pthread_join(observation_thread, NULL);
 
     return 0;
 }

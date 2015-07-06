@@ -12,7 +12,8 @@ public:
 
     ~M2MLWClient();
 
-    bool create_interface(const char *endpoint,
+    bool create_interface(int32_t param_count,
+    					  const char *endpoint,
                           const char *resource_type,
                           const int32_t lifetime,
                           const uint16_t listen_port,

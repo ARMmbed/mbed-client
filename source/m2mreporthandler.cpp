@@ -229,13 +229,6 @@ void M2MReportHandler::report(float value)
 
 int M2MReportHandler::band(float sample)
 {
-    for ( int limit = 0; limit < _num_limits; limit++ ) {
-        if (sample <= _limits[limit]) {
-            tr_debug("M2MReportHandler::band - limit %d", limit);
-            return limit;
-            }
-    }
-    tr_debug("M2MReportHandler::band - _num_limits %d", _num_limits);
     return _num_limits;
 }
 

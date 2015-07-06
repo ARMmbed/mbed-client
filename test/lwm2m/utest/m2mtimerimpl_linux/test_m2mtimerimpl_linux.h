@@ -15,15 +15,13 @@ public:
 
     virtual ~Test_M2MTimerImpl_linux();
 
-    void test_copy_constructor();
-
     void test_start_timer();
 
     void test_stop_timer();
 
     void test_timer_expired();
 
-    void test_thread_function();
+    void test_run();
 
     M2MTimerImpl* timer;
     TestObserver* observer;

@@ -24,11 +24,6 @@ TEST(M2MTimerImpl_linux, Create)
     CHECK(m2m_timer != NULL);
 }
 
-TEST(M2MTimerImpl_linux, copy_constructor)
-{
-    m2m_timer->test_copy_constructor();
-}
-
 TEST(M2MTimerImpl_linux, start_timer)
 {
     m2m_timer->test_start_timer();
@@ -44,8 +39,8 @@ TEST(M2MTimerImpl_linux, timer_expired)
     m2m_timer->test_timer_expired();
 }
 
-TEST(M2MTimerImpl_linux, test_thread_function)
+TEST(M2MTimerImpl_linux, test_run)
 {
-    m2m_timer->test_thread_function();
+    m2m_timer->test_run();
 }
 

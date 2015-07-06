@@ -158,7 +158,8 @@ public:
     }
     operator bool(void)
     {
-        return (_membercaller != NULL ? _p.object : (void*)_p.function) != NULL;
+        void *q = &_p.function;
+        return (_membercaller != NULL) && _p.object != NULL && (*static_cast<void **>(q) != NULL);
     }
 private:
     template<typename T>

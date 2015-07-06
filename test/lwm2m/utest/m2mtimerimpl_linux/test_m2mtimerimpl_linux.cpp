@@ -23,19 +23,11 @@ Test_M2MTimerImpl_linux::Test_M2MTimerImpl_linux()
     timer = new M2MTimerImpl(*observer);
 }
 
-void Test_M2MTimerImpl_linux::test_copy_constructor()
-{
-    M2MTimerImpl* copy = new M2MTimerImpl(*timer);
-
-    copy->start_timer(100,true);
-    delete copy;
-}
 
 Test_M2MTimerImpl_linux::~Test_M2MTimerImpl_linux()
 {
     common_stub::clear();
     delete observer;
-    timer->_timer_th = 1;
     common_stub::int2_value = 0;
     delete timer;
 }
@@ -60,20 +52,15 @@ void Test_M2MTimerImpl_linux::test_stop_timer()
 
 void Test_M2MTimerImpl_linux::test_timer_expired()
 {
-    timer->timer_expired(true);
+    timer->timer_expired();
     CHECK(observer->visited == true);
 
     timer->_single_shot = false;
-    timer->timer_expired(false);
+    timer->timer_expired();
 }
 
-void Test_M2MTimerImpl_linux::test_thread_function()
+void Test_M2MTimerImpl_linux::test_run()
 {
-    timer->thread_function(NULL);
-
-    M2MTimerImpl *obj = new M2MTimerImpl(*observer);
-    timer->thread_function(obj);
-
-    delete obj;
-    obj = NULL;
+    timer->run();
+    CHECK(observer->visited == true);
 }

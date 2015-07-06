@@ -185,10 +185,13 @@ void Test_M2MNsdlInterface::test_send_register_message()
 void Test_M2MNsdlInterface::test_send_update_registration()
 {
     common_stub::uint_value = 23;
+    nsdl->_nsdl_handle = (nsdl_s*)malloc(sizeof(1));
     CHECK(nsdl->send_update_registration(120) == true);
 
     common_stub::uint_value = 0;
     CHECK(nsdl->send_update_registration(120) == false);
+
+    free(nsdl->_nsdl_handle);
 }
 
 void Test_M2MNsdlInterface::test_send_unregister_message()

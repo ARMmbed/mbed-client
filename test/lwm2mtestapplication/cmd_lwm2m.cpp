@@ -12,7 +12,7 @@
                                     "setup <p> [options]                            Set up the LWM2M Interface\n"\
                                     "<p>:\n"\
                                     "   Options for setup command\n"\
-                                    "   --endpoint <name>           Endpoint Name\n"\
+                                    "   --endpoint <name>           Endpoint Name (mandatory)\n"\
                                     "   --type  <name>              Resource Type\n"\
                                     "   --lifetime <n>              Lifetime in seconds, default is -1 means not included\n"\
                                     "   --port <n>                  Listen port, default is 5683\n"\
@@ -165,21 +165,66 @@ int lwm2m_client_setup_command(int argc, char *argv[])
     char *domain = 0;
     int32_t binding_mode = 1;
     int32_t network_interface = 1;
-    cmd_parameter_val(argc, argv, "--endpoint", &endpoint);
-    cmd_parameter_val(argc, argv, "--type", &type);
-    cmd_parameter_int(argc, argv, "--lifetime", &lifetime);
-    cmd_parameter_int(argc, argv, "--port", &port);
-    cmd_parameter_val(argc, argv, "--domain", &domain);
-    cmd_parameter_int(argc, argv, "--binding_mode", &binding_mode);
-    cmd_parameter_int(argc, argv, "--network_interface", &network_interface);
 
-    if(port > 0) {
-        if(lwm2m_client.create_interface(endpoint,type,lifetime,port,
-                                domain,binding_mode,network_interface)){
-        return CMDLINE_RETCODE_SUCCESS;
-        }
+    if (!cmd_parameter_val(argc, argv, "--endpoint", &endpoint)) {
+    	return CMDLINE_RETCODE_INVALID_PARAMETERS;
     }
-    return CMDLINE_RETCODE_INVALID_PARAMETERS;
+    int opt_params = 0;
+    cmd_parameter_val(argc, argv, "--type", &type);
+    if (cmd_parameter_int(argc, argv, "--lifetime", &lifetime)) {
+    	if (opt_params != 0) {
+			return CMDLINE_RETCODE_INVALID_PARAMETERS;
+		}
+		else {
+			opt_params += 1;
+		}
+    }
+    if (cmd_parameter_int(argc, argv, "--port", &port)) {
+    	if (port > UINT16_MAX || opt_params != 1) {
+    		return CMDLINE_RETCODE_INVALID_PARAMETERS;
+    	}
+    	else {
+    		opt_params += 1;
+    	}
+    }
+	if (cmd_parameter_val(argc, argv, "--domain", &domain)) {
+    	if (opt_params != 2) {
+    		return CMDLINE_RETCODE_INVALID_PARAMETERS;
+    	}
+    	else {
+    		opt_params += 1;
+    	}
+    }
+	if (cmd_parameter_int(argc, argv, "--binding_mode", &binding_mode)) {
+		if (opt_params != 3) {
+			return CMDLINE_RETCODE_INVALID_PARAMETERS;
+		}
+		else {
+			opt_params += 1;
+		}
+	}
+	if (cmd_parameter_int(argc, argv, "--network_interface", &network_interface)) {
+		if (opt_params != 4) {
+			return CMDLINE_RETCODE_INVALID_PARAMETERS;
+		}
+		else {
+			opt_params += 1;
+		}
+	}
+
+	bool success = false;
+	if (lwm2m_client.create_interface(opt_params,
+									endpoint,
+									type,
+									lifetime,
+									port,
+									domain,
+									binding_mode,
+									network_interface)) {
+		return CMDLINE_RETCODE_SUCCESS;
+	}
+
+    return CMDLINE_RETCODE_FAIL;
 }
 
 int lwm2m_client_device_command(int argc, char *argv[])

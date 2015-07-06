@@ -9,13 +9,6 @@
 #endif
 #include "lwm2m-client/m2mconfig.h"
 
-M2MTimer::M2MTimer(const M2MTimer& other)
-: _observer(other._observer)
-{
-    _type = other._type;
-    _impl = new M2MTimerImpl(*other._impl);
-}
-
 M2MTimer::M2MTimer(M2MTimerObserver& observer)
 : _observer(observer),
   _type(M2MTimerObserver::Notdefined)
