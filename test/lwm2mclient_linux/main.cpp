@@ -52,7 +52,7 @@ public:
             delete _register_security;
         }
         if(_device) {
-            delete _device;
+            M2MDevice::delete_instance();
         }
         if(_object) {
             delete _object;
@@ -165,7 +165,7 @@ public:
             char* arguments = (char*)argument;
             printf("Received %s!!\n", arguments);
         }
-        printf("I am executed !!\n");        
+        printf("I am executed !!\n");
     }
 
     bool create_generic_object() {
@@ -292,7 +292,7 @@ void* wait_for_unregister(void* arg) {
     M2MLWClient *client;
     client = (M2MLWClient*) arg;
     if(client->unregister_successful()) {
-        printf("Unregistered done --> exiting\n");        
+        printf("Unregistered done --> exiting\n");
         close_function();
     }
     return NULL;

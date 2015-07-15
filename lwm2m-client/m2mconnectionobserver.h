@@ -27,7 +27,7 @@ public :
      */
     struct SocketAddress{
         M2MInterface::NetworkStack  _stack;
-        void                        *_address;    
+        void                        *_address;
         uint8_t                     _length;
         uint16_t                    _port;
     };
@@ -36,7 +36,7 @@ public :
     * @brief Indicates data is available from socket.
     * @param data, data read from socket
     * @param data_size, length of data read from socket.
-    * @param address, Server Address from where data is coming.    
+    * @param address, Server Address from where data is coming.
     */
     virtual void data_available(uint8_t* data,
                                 uint16_t data_size,
@@ -63,7 +63,6 @@ public :
     * @brief Indicates data has been sent successfully.
     */
     virtual void data_sent() = 0;
-
 };
 
 #endif // M2M_CONNECTION_OBSERVER_H__

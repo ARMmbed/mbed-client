@@ -4,6 +4,7 @@
 #ifndef M2M_INTERFACE_OBSERVER_H
 #define M2M_INTERFACE_OBSERVER_H
 
+#include "lwm2m-client/m2mbase.h"
 #include "m2minterface.h"
 
 //FORWARD DECLARATION

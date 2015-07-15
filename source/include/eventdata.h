@@ -5,7 +5,7 @@
 #define EVENT_DATA_H
 
 #include "lwm2m-client/m2mvector.h"
-#include "m2mconnectionhandler.h"
+//#include "lwm2m-client/m2mconnectionhandler.h"
 
 //FORWARD DECLARATION
 class M2MObject;
@@ -17,7 +17,7 @@ class M2MSecurity;
 
 class EventData
 {
-public:    
+public:
     virtual ~EventData() {}
 };
 

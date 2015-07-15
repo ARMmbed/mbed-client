@@ -4,7 +4,8 @@
 #ifndef M2M_DEVICE_H
 #define M2M_DEVICE_H
 
-#include "m2mobject.h"
+#include "lwm2m-client/m2mobject.h"
+#include "lwm2m-client/m2msingleton.h"
 
 // FORWARD DECLARATION
 class M2MResource;
@@ -16,7 +17,8 @@ class M2MResource;
  *  and all its corresponding resources.There can be only one instance
  *  of Device Object.
  */
-class  M2MDevice : public M2MObject {
+class  M2MDevice : public M2MSingleton<M2MDevice>,
+                   public M2MObject {
 
 friend class M2MInterfaceFactory;
 
@@ -64,12 +66,17 @@ private:
     // Prevents the use of copy constructor
     M2MDevice( const M2MDevice& /*other*/ );
 
-public:
 
     /**
      * Destructor
      */
     virtual ~M2MDevice();
+
+public:
+
+    static M2MDevice* get_instance();
+
+    static void delete_instance();
 
     /**
      * @brief Creates a new resource for given resource enum.
@@ -196,9 +203,14 @@ private:
 
 private :
 
-    M2MObjectInstance*    _device_instance;
+    M2MObjectInstance*    _device_instance;     //Not owned
+
+protected:
+
+    static M2MDevice*     _instance;
 
     friend class Test_M2MDevice;
+    friend class Test_M2MInterfaceFactory;
 };
 
 #endif // M2M_DEVICE_H

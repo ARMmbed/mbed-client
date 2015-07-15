@@ -4,7 +4,7 @@
 #include "lwm2m-client/m2mbase.h"
 #include "lwm2m-client/m2mobservationhandler.h"
 #include "lwm2m-client/m2mconstants.h"
-#include "include/m2mtimer.h"
+#include "lwm2m-client/m2mtimer.h"
 #include "include/m2mreporthandler.h"
 
 M2MBase& M2MBase::operator=(const M2MBase& other)
@@ -82,7 +82,8 @@ M2MBase::M2MBase(const M2MBase& other) :
     _is_numeric = other._is_numeric;
     _value_length = other._value_length;
 
-    if(other._value) {        
+
+    if(other._value) {
         _value = (uint8_t *)malloc(other._value_length+1);
         if(_value) {
             memset(_value, 0, other._value_length+1);
@@ -120,7 +121,7 @@ M2MBase::M2MBase(const String & resource_name,
   _is_numeric(false),
   _token(NULL),
   _token_length(0)
-{ 
+{
 }
 
 M2MBase::~M2MBase()
@@ -313,11 +314,14 @@ void M2MBase::get_value(uint8_t *&value, uint32_t &value_length)
         free(value);
         value = NULL;
     }
-    value = (uint8_t *)malloc(_value_length+1);
-    if(value) {
-        value_length = _value_length;
-        memset(value, 0, _value_length+1);
-        memcpy((uint8_t *)value, (uint8_t *)_value, value_length);
+
+    if(_value && _value_length > 0) {
+        value = (uint8_t *)malloc(_value_length+1);
+        if(value) {
+            value_length = _value_length;
+            memset(value, 0, _value_length+1);
+            memcpy((uint8_t *)value, (uint8_t *)_value, value_length);
+        }
     }
 }
 

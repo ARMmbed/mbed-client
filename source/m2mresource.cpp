@@ -3,7 +3,7 @@
  */
 #include "lwm2m-client/m2mresource.h"
 #include "lwm2m-client/m2mconstants.h"
-#include "libService/ns_trace.h"
+#include "mbed-client-libservice/ns_trace.h"
 
 M2MResource& M2MResource::operator=(const M2MResource& other)
 {
@@ -33,7 +33,7 @@ M2MResource::M2MResource(const String &res_name,
 }
 
 M2MResource::~M2MResource()
-{    
+{
 }
 
 M2MBase::BaseType M2MResource::base_type() const

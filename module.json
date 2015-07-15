@@ -17,10 +17,12 @@
   },
   "targetDependencies": {
     "arm": {
-      "lwm2m-client-mbed": "~0.0.3"
+      "lwm2m-client-mbed": "~0.0.8",
+      "lwm2m-client-mbedtls": "~0.0.2"
     },
     "linux": {
-      "lwm2m-client-linux": "~0.0.1"
+      "lwm2m-client-linux": "~0.0.9",
+      "lwm2m-client-mbedtls": "~0.0.2"
     }
   }
 }

@@ -311,7 +311,7 @@ private:
     uint8_t                     _current_state;
     const int                   _max_states;
     bool                        _event_generated;
-    EventData*                  _event_data;
+    EventData                   *_event_data;
 
     String                      _endpoint_name;
     String                      _endpoint_type;

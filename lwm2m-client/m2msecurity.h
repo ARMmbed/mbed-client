@@ -43,9 +43,10 @@ public:
     }SecurityResource;
 
     typedef enum {
-        SecurityNotSet,
-        Certificate,
-        NoSecurity
+        SecurityNotSet = -1,
+        Psk = 0,
+        Certificate = 2,
+        NoSecurity = 3
     } SecurityModeType;
     /**
      * @brief Enum defining interface operation which can be
@@ -193,6 +194,10 @@ private:
 
     friend class Test_M2MSecurity;
     friend class Test_M2MInterfaceImpl;
+    friend class Test_M2MConnectionSecurityImpl;
+    friend class Test_M2MConnectionHandlerPimpl_linux;
+    friend class Test_M2MConnectionHandlerPimpl_mbed;
+    friend class Test_M2MConnectionSecurityPimpl;
 };
 
 #endif // M2M_SECURITY_H
