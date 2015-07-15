@@ -5,7 +5,7 @@
 # make PLATFORM=arm-linux-gnueabi-
 #
 
-ROOT := ../../..
+ROOT := ../../../..
 LWM2M_ROOT := $(ROOT)/lwm2m
 ROUTER_ROOT := $(ROOT)/Applications/NanoRouter
 
@@ -50,7 +50,8 @@ override CFLAGS += -MMD -MP -MF"$(@:%.o=%.d)" -MT"$(@:%.o=%.d)"
 # Libraries
 #
 NSDL_DIR := $(ROOT)/nsdl-c
-LWM2M_DIR := $(ROOT)/lwm2m/
+LWM2M_DIR := $(ROOT)/lwm2m/lwm2m-client
+MBEDTLS_DIR := $(ROOT)/mbedtls/library
 LIBSERVICE_DIR := $(ROOT)/libService
 override CFLAGS += -I$(ROOT) -I$(NSDL_DIR)/nsdl-c -I$(LIBSERVICE_DIR)/libService -I$(ROOT)/nanostack/nanostack -I$(ROOT)/event-loop/nanostack-event-loop
 override CFLAGS += -I$(ROOT)/nanostack/Core/include -I$(ROOT)/Platforms/linux/include -I$(ROOT)/nanostack/HAL/common
@@ -60,7 +61,8 @@ LDFLAGS += -D_REENTRANT
 LDFLAGS += -L$(ROOT)/event-loop -leventOS_gcc
 LDFLAGS += -L$(LWM2M_DIR) -llwm2m_gcc
 LDFLAGS += -L$(NSDL_DIR) -lnsdl_gcc
-LDFLAGS += -L$(LIBSERVICE_DIR) -lCmdline_gcc -lnsdynmem_gcc -llist_gcc -lTrace_gcc -lip6string_gcc -lbits_gcc
+LDFLAGS += -L$(LIBSERVICE_DIR) -lCmdline_gcc -lservice_gcc
+LDFLAGS += -L$(MBEDTLS_DIR) -lmbedtls -lmbedx509 -lmbedcrypto
 LDFLAGS += -lpthread
 
 

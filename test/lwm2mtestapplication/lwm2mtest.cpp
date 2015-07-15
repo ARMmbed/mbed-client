@@ -337,7 +337,7 @@ void M2MLWClient::object_unregistered(M2MSecurity *server_object)
 {
     _unregistered = true;
     if(_device) {
-        delete _device;
+        M2MDevice::delete_instance();
         _device = NULL;
     }
     if(_object) {
