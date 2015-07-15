@@ -31,3 +31,5 @@
 yotta_modules
 yotta_targets
 build
+lcov/*
+output/*

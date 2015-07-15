@@ -9,7 +9,7 @@
 #include "lwm2m-client/m2minterface.h"
 
 //TODO: refactor this to include lwm2m-client header!
-#include "nsdl-c/sn_nsdl.h"
+#include "sn_nsdl.h"
 
 class M2MConnectionSecurity;
 class M2MConnectionHandlerPimpl;

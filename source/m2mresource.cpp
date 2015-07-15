@@ -3,7 +3,7 @@
  */
 #include "lwm2m-client/m2mresource.h"
 #include "lwm2m-client/m2mconstants.h"
-#include "mbed-client-libservice/ns_trace.h"
+#include "ns_trace.h"
 
 M2MResource& M2MResource::operator=(const M2MResource& other)
 {
