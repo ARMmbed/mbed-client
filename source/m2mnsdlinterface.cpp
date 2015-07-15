@@ -9,8 +9,8 @@
 #include "lwm2m-client/m2mobjectinstance.h"
 #include "lwm2m-client/m2mresource.h"
 #include "lwm2m-client/m2mconstants.h"
-#include "mbed-client-libservice/ip6string.h"
-#include "mbed-client-libservice/ns_trace.h"
+#include "ip6string.h"
+#include "ns_trace.h"
 #include "lwm2m-client/m2mtimer.h"
 
 M2MNsdlInterface::M2MNsdlInterface(M2MNsdlObserver &observer)

@@ -3,7 +3,7 @@
  */
 #include "lwm2m-client/m2mobjectinstance.h"
 #include "lwm2m-client/m2mresource.h"
-#include "mbed-client-libservice/ns_trace.h"
+#include "ns_trace.h"
 
 M2MObjectInstance& M2MObjectInstance::operator=(const M2MObjectInstance& other)
 {

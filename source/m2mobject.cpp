@@ -3,7 +3,7 @@
  */
 #include "lwm2m-client/m2mobject.h"
 #include "lwm2m-client/m2mobjectinstance.h"
-#include "mbed-client-libservice/ns_trace.h"
+#include "ns_trace.h"
 
 M2MObject::M2MObject(const String &object_name)
 : M2MBase(object_name,M2MBase::Dynamic),

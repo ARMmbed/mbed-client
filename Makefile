@@ -31,8 +31,9 @@ include sources.mk
 include include_dirs.mk
 include config/$(CONFIG).mk
 
-SERVLIB_DIR := ../libService
-NSDL_C_DIR := ../nsdl-c
+SERVLIB_DIR := ../../libService
+NSDL_C_DIR := ../../nsdl-c
+override CFLAGS += -I$(SERVLIB_DIR)/libService
 override CFLAGS += -I$(NSDL_C_DIR)/nsdl-c
 override CFLAGS += $(addprefix -I,$(INCLUDE_DIRS))
 override CFLAGS += $(addprefix -D,$(FLAGS))
@@ -47,7 +48,7 @@ COVERAGEFILE := ./lcov/coverage.info
 #
 # Define compiler toolchain
 #
-include ../libService/toolchain_rules.mk
+include ../../libService/toolchain_rules.mk
 
 $(eval $(call generate_rules,$(LIB),$(SRCS)))
 

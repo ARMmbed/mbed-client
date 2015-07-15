@@ -13,13 +13,13 @@ INCLUDE_DIRS =\
   ../../../../lwm2m-client\
   ../../../../source/include\
   ../../../../source\
-  ../../../../lwm2m-client-linux\
-  ../../../../lwm2m-client-linux/source\
-  ../../../../lwm2m-client-mbed\
-  ../../../../../nsdl-c\
-  ../../../../../nsdl-c/nsdl-c\
+  ../../../../../lwm2m-client-linux\
+  ../../../../../lwm2m-client-linux/source\
+  ../../../../../lwm2m-client-mbed\
+  ../../../../../../nsdl-c\
+  ../../../../../../nsdl-c/nsdl-c\
   /usr/include\
-  ../../../../../nsdl-c/source/libNsdl/src/include\
+  ../../../../../../nsdl-c/source/libNsdl/src/include\
   $(CPPUTEST_HOME)/include\
 
 CPPUTESTFLAGS = -D__thumb2__
