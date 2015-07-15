@@ -8,7 +8,7 @@
 #include "lwm2m-client/m2mconfig.h"
 #include "lwm2m-client/m2minterface.h"
 #include "nsdllinker.h"
-#include "m2mtimer.h"
+#include "lwm2m-client/m2mtimerobserver.h"
 #include "lwm2m-client/m2mobservationhandler.h"
 
 //FORWARD DECLARARTION
@@ -19,6 +19,7 @@ class M2MResource;
 class M2MNsdlObserver;
 class M2MBase;
 class M2MServer;
+class M2MTimer;
 
 typedef Vector<M2MObject *> M2MObjectList;
 

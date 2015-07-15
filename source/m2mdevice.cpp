@@ -8,6 +8,23 @@
 #include "lwm2m-client/m2mobjectinstance.h"
 #include "lwm2m-client/m2mresource.h"
 
+M2MDevice* M2MDevice::_instance = NULL;
+
+M2MDevice* M2MDevice::get_instance()
+{
+    if(_instance == NULL) {
+        _instance = new M2MDevice();
+    }
+    return _instance;
+}
+
+void M2MDevice::delete_instance()
+{
+    if(_instance) {
+        delete _instance;
+        _instance = NULL;
+    }
+}
 
 M2MDevice::M2MDevice()
 : M2MObject(M2M_DEVICE_ID)
@@ -113,9 +130,6 @@ M2MResource* M2MDevice::create_resource(DeviceResource resource, uint32_t value)
         case MemoryTotal:
             device_id = DEVICE_MEMORY_TOTAL;
             break;
-        case ResetErrorCode:
-            device_id = DEVICE_RESET_ERROR_CODE;
-            break;
         case CurrentTime: {
             if(_device_instance) {
                 res = _device_instance->create_dynamic_resource(DEVICE_CURRENT_TIME,OMA_RESOURCE_TYPE,false);
@@ -136,12 +150,13 @@ M2MResource* M2MDevice::create_resource(DeviceResource resource, uint32_t value)
     }
     // For these resources multiple instance can exist
     if(AvailablePowerSources == resource) {
-            device_id = DEVICE_AVAILABLE_POWER_SOURCES;
+        device_id = DEVICE_AVAILABLE_POWER_SOURCES;
     } else if(PowerSourceVoltage == resource) {
-            device_id = DEVICE_POWER_SOURCE_VOLTAGE;
+        device_id = DEVICE_POWER_SOURCE_VOLTAGE;
     } else if(PowerSourceCurrent == resource) {
-            device_id = DEVICE_POWER_SOURCE_CURRENT;
-
+        device_id = DEVICE_POWER_SOURCE_CURRENT;
+    } else if(ErrorCode == resource) {
+        device_id = DEVICE_ERROR_CODE;
     }
 
     if(!device_id.empty()) {
@@ -164,12 +179,16 @@ M2MResource* M2MDevice::create_resource(DeviceResource resource)
 {
     M2MResource* res = NULL;
     if(!is_resource_present(resource)) {
+        String device_Id;
         if(FactoryReset == resource) {
-            if(_device_instance) {
-                res = _device_instance->create_dynamic_resource(DEVICE_FACTORY_RESET,OMA_RESOURCE_TYPE,false);
-               if(res) {
-                    res->set_operation(M2MBase::POST_ALLOWED);
-                }
+            device_Id = DEVICE_FACTORY_RESET;
+        } else if(ResetErrorCode == resource) {
+            device_Id = DEVICE_RESET_ERROR_CODE;
+        }
+        if(_device_instance && !device_Id.empty()) {
+            res = _device_instance->create_dynamic_resource(device_Id,OMA_RESOURCE_TYPE,false);
+            if(res) {
+                res->set_operation(M2MBase::POST_ALLOWED);
             }
         }
     }
@@ -224,7 +243,7 @@ bool M2MDevice::set_resource_value(DeviceResource resource,
            M2MDevice::BatteryStatus == resource         ||
            M2MDevice::MemoryFree == resource            ||
            M2MDevice::MemoryTotal == resource           ||
-           M2MDevice::ResetErrorCode == resource        ||
+           M2MDevice::ErrorCode == resource             ||
            M2MDevice::CurrentTime == resource           ||
            M2MDevice::AvailablePowerSources == resource ||
            M2MDevice::PowerSourceVoltage == resource    ||
@@ -290,7 +309,7 @@ uint32_t M2MDevice::resource_value_int(DeviceResource resource,
            M2MDevice::BatteryStatus == resource         ||
            M2MDevice::MemoryFree == resource            ||
            M2MDevice::MemoryTotal == resource           ||
-           M2MDevice::ResetErrorCode == resource        ||
+           M2MDevice::ErrorCode == resource             ||
            M2MDevice::CurrentTime == resource           ||
            M2MDevice::AvailablePowerSources == resource ||
            M2MDevice::PowerSourceVoltage == resource    ||

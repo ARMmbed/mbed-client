@@ -3,9 +3,9 @@
  */
 #include "lwm2m-client/m2mreportobserver.h"
 #include "lwm2m-client/m2mconstants.h"
-#include "include/m2mtimer.h"
+#include "lwm2m-client/m2mtimer.h"
 #include "include/m2mreporthandler.h"
-#include "libService/ns_trace.h"
+#include "mbed-client-libservice/ns_trace.h"
 
 M2MReportHandler::M2MReportHandler(M2MReportObserver &observer)
 : _observer(observer),

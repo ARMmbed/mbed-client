@@ -15,7 +15,8 @@ public:
         Registration,
         NsdlExecution,
         PMinTimer,
-        PMaxTimer
+        PMaxTimer,
+        Dtls
     }Type;
 
     /**

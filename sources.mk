@@ -1,10 +1,6 @@
 SRCS += \
-	lwm2m-client-linux/source/m2mconnectionhandlerimpl.cpp \
-	lwm2m-client-linux/source/m2mtimerimpl.cpp \
-	lwm2m-client-linux/source/connthreadhelper.cpp \
-	lwm2m-client-linux/source/threadhelper.cpp \
 	source/m2mbase.cpp \
-	source/m2mconnectionhandler.cpp \
+	source/m2mconnectionhandlerfactory.cpp \
 	source/m2mconstants.cpp \
 	source/m2mdevice.cpp \
 	source/m2minterfacefactory.cpp \
@@ -17,6 +13,14 @@ SRCS += \
 	source/m2msecurity.cpp \
 	source/m2mserver.cpp \
 	source/m2mstring.cpp \
-	source/m2mtimer.cpp \
 	source/nsdlaccesshelper.cpp \
+	lwm2m-client-linux/source/m2mconnectionhandlerimpl.cpp \
+	lwm2m-client-linux/source/m2mconnectionhandlerpimpl.cpp \
+	lwm2m-client-linux/source/m2mtimerimpl.cpp \
+	lwm2m-client-linux/source/m2mtimerpimpl.cpp \
+	lwm2m-client-linux/source/connthreadhelper.cpp \
+	lwm2m-client-linux/source/threadhelper.cpp \
+        lwm2m-client-mbedtls/source/m2mconnectionsecurityimpl.cpp \
+        lwm2m-client-mbedtls/source/m2mconnectionsecuritypimpl.cpp \
+
 

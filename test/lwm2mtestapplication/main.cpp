@@ -6,7 +6,7 @@
 #include "eventOS_event.h"
 #include "eventOS_scheduler.h"
 
-//libService
+//mbed-client-libservice
 #include "randLIB.h"
 #include "nsdynmemLIB.h"
 #include "ns_trace.h"

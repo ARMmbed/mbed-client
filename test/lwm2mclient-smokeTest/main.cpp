@@ -53,21 +53,21 @@ public:
     }
 
     bool create_interface() {
-    	bool success = false;
+        bool success = false;
          // Creates M2MInterface using which endpoint can
          // setup its name, resource type, life time, connection mode,
          // Currently only LwIPv4 is supported.
          _interface = M2MInterfaceFactory::create_interface( *this,
-												   _test_config->get_endpoint_name(),
-												   _test_config->get_endpoint_type(),
-												   _test_config->get_lifetime(),
-												   _test_config->get_port(),
+                                                   _test_config->get_endpoint_name(),
+                                                   _test_config->get_endpoint_type(),
+                                                   _test_config->get_lifetime(),
+                                                   _test_config->get_port(),
                                                    "",
                                                    M2MInterface::UDP,
                                                    M2MInterface::LwIP_IPv4,
                                                    "");
          if (_interface) {
-        	 success = true;
+             success = true;
          }
 
          return success;
@@ -136,10 +136,10 @@ public:
     }
 
     void test_unregister(){
-    	if(_interface) {
-    		// Unregister function
-    		_interface->unregister_object(NULL);
-    	}
+        if(_interface) {
+            // Unregister function
+            _interface->unregister_object(NULL);
+        }
     }
 
     void set_register_object(M2MSecurity *&register_object){
@@ -151,12 +151,12 @@ public:
     }
 
     M2MDevice* create_device_object() {
-    	M2MDevice *device = M2MInterfaceFactory::create_device();
-    	if (device) {
-    		device->create_resource(M2MDevice::Manufacturer, MANUFACTURER);
-    		device->create_resource(M2MDevice::DeviceType, TYPE);
-    	}
-    	return device;
+        M2MDevice *device = M2MInterfaceFactory::create_device();
+        if (device) {
+            device->create_resource(M2MDevice::Manufacturer, MANUFACTURER);
+            device->create_resource(M2MDevice::DeviceType, TYPE);
+        }
+        return device;
     }
 
     M2MObject* create_generic_object() {
@@ -187,7 +187,7 @@ public:
     // which will be used for registering the resources to
     // mbed Device server.
     void bootstrap_done(M2MSecurity *server_object){
-    	if(server_object) {
+        if(server_object) {
             _bootstrapped = true;
             _error = false;
         }
@@ -256,23 +256,23 @@ private:
 {int _timer = 0;\
 while ( 1 )       \
     { 													  \
-	  _result &= (X);									  \
-	  if (_result) {									  \
-		  SUITE_TEST_INFO(_tn, "callback done");          \
-		  break;										  \
-	  }													  \
-	  wait_ms(1000); _timer+=1;                           \
+      _result &= (X);									  \
+      if (_result) {									  \
+          SUITE_TEST_INFO(_tn, "callback done");          \
+          break;										  \
+      }													  \
+      wait_ms(1000); _timer+=1;                           \
       if (_timer >= TIMEOUT) {                            \
-    	  SUITE_TEST_INFO(_tn, "ERROR: callback timeout");\
-    	  break;                                          \
+          SUITE_TEST_INFO(_tn, "ERROR: callback timeout");\
+          break;                                          \
       }                                                   \
     }}
 
 bool test_bootStrap(TestConfig *test_config) {
-	bool _result = true;
-	const char* _tn = "TC1_bootStrap";
+    bool _result = true;
+    const char* _tn = "TC1_bootStrap";
 
-	SUITE_TEST_INFO(_tn, "STARTED");
+    SUITE_TEST_INFO(_tn, "STARTED");
 
     // Instantiate the class which implements
     // LWM2M Client API
@@ -303,7 +303,7 @@ bool test_bootStrap(TestConfig *test_config) {
     }
 
     if (lwm2mclient) {
-    	delete lwm2mclient;
+        delete lwm2mclient;
     }
 
     SUITE_TEST_RESULT(_tn, _result);
@@ -311,12 +311,12 @@ bool test_bootStrap(TestConfig *test_config) {
 }
 
 bool test_deviceObject(TestConfig *test_config) {
-	bool _result = true;
-	const char* _tn = "TC2_deviceObject";
+    bool _result = true;
+    const char* _tn = "TC2_deviceObject";
 
-	SUITE_TEST_INFO(_tn, "STARTED");
+    SUITE_TEST_INFO(_tn, "STARTED");
 
-	// Instantiate the class which implements
+    // Instantiate the class which implements
     // LWM2M Client API
     M2MLWClient *lwm2mclient = new M2MLWClient(test_config);
 
@@ -349,45 +349,45 @@ bool test_deviceObject(TestConfig *test_config) {
     //SUITE_TEST_INFO(_tn, "register callback done");
 
     // Wait 5 seconds
-	wait_ms(1000);
+    wait_ms(1000);
 
-	//TODO move this to callback when that can be taken in use
-	_result &= lwm2mclient->test_update_register(2222);
-	SUITE_TEST_INFO(_tn, "update register done");
+    //TODO move this to callback when that can be taken in use
+    _result &= lwm2mclient->test_update_register(2222);
+    SUITE_TEST_INFO(_tn, "update register done");
 
-	//SUITE_TEST_INFO(_tn, "waiting update register callback...");
-	// Callback comes in object_updated()
-	//WAIT_CALLBACK(lwm2mclient->update_register_successful(), CALLBACK_TIMEOUT);
+    //SUITE_TEST_INFO(_tn, "waiting update register callback...");
+    // Callback comes in object_updated()
+    //WAIT_CALLBACK(lwm2mclient->update_register_successful(), CALLBACK_TIMEOUT);
 
-	// Issue unregister command.
+    // Issue unregister command.
     lwm2mclient->test_unregister();
-	SUITE_TEST_INFO(_tn, "unregister done");
+    SUITE_TEST_INFO(_tn, "unregister done");
 
-	SUITE_TEST_INFO(_tn, "waiting unregister callback...");
-	// Callback comes in object_unregistered().
+    SUITE_TEST_INFO(_tn, "waiting unregister callback...");
+    // Callback comes in object_unregistered().
     WAIT_CALLBACK(lwm2mclient->unregister_successful(), CALLBACK_TIMEOUT);
 
     // Delete device object created for registering device
     // resources.
     if(device_object) {
-        delete device_object;
+        M2MDevice::delete_instance();
     }
 
     if (lwm2mclient) {
-    	delete lwm2mclient;
+        delete lwm2mclient;
     }
 
-	SUITE_TEST_RESULT(_tn, _result);
+    SUITE_TEST_RESULT(_tn, _result);
     return _result;
 
 }
 
 bool test_resource(TestConfig *test_config) {
-	bool _result = true;
+    bool _result = true;
     const char* _tn = "TC3_resource";
-	SUITE_TEST_INFO(_tn, "STARTED");
+    SUITE_TEST_INFO(_tn, "STARTED");
 
-	// Instantiate the class which implements LWM2M Client API
+    // Instantiate the class which implements LWM2M Client API
     M2MLWClient *lwm2mclient = new M2MLWClient(test_config);
     SUITE_TEST_INFO(_tn, "client done");
 
@@ -432,28 +432,28 @@ bool test_resource(TestConfig *test_config) {
 
     // Delete device object created for registering device resources.
     if(device_object) {
-        delete device_object;
+        M2MDevice::delete_instance();
     }
 
     // Delete resource object for registering resources.
     if(resource_object) {
-    	delete resource_object;
+        delete resource_object;
     }
 
     if (lwm2mclient) {
-    	delete lwm2mclient;
+        delete lwm2mclient;
     }
 
-	SUITE_TEST_RESULT(_tn, _result);
+    SUITE_TEST_RESULT(_tn, _result);
     return _result;
 }
 
 
 
 int main() {
-	bool result = true;
-	DigitalOut _led = DigitalOut(LED3);
-	_led = 1;
+    bool result = true;
+    DigitalOut _led = DigitalOut(LED3);
+    _led = 1;
 
     MBED_HOSTTEST_TIMEOUT(40);
     MBED_HOSTTEST_SELECT(lwm2mclient_auto);

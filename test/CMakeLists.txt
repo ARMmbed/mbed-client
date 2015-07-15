@@ -12,6 +12,7 @@ add_dependencies(all_tests lwm2m-client-test-lwm2mclient_linux)
 
 add_executable(lwm2m-client-test-helloworld-lwm2mclient 
         "helloworld-lwm2mclient/main.cpp"
+        "helloworld-lwm2mclient/m2mlwclient.cpp"
         "helloworld-lwm2mclient/to_be_ported.c"
 )
 target_link_libraries(lwm2m-client-test-helloworld-lwm2mclient
@@ -53,6 +54,7 @@ endif()
 
 add_executable(lwm2m-client-test-helloworld-lwm2mclient 
         "helloworld-lwm2mclient/main.cpp"
+        "helloworld-lwm2mclient/m2mlwclient.cpp"
         "helloworld-lwm2mclient/to_be_ported.c"
 )
 target_link_libraries(lwm2m-client-test-helloworld-lwm2mclient

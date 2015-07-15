@@ -8,7 +8,7 @@
 #include "lwm2m-client/m2mconstants.h"
 #include "lwm2m-client/m2mconfig.h"
 #include "include/m2minterfaceimpl.h"
-#include "libService/ns_trace.h"
+#include "mbed-client-libservice/ns_trace.h"
 
 M2MInterface* M2MInterfaceFactory::create_interface(M2MInterfaceObserver &observer,
                                                     const String &endpoint_name,
@@ -66,7 +66,7 @@ M2MServer* M2MInterfaceFactory::create_server()
 M2MDevice* M2MInterfaceFactory::create_device()
 {
     tr_debug("M2MInterfaceFactory::create_device");
-    M2MDevice* device = new M2MDevice();
+    M2MDevice* device = M2MDevice::get_instance();
     return device;
 }
 

@@ -3,7 +3,7 @@
  */
 #include "lwm2m-client/m2mobject.h"
 #include "lwm2m-client/m2mobjectinstance.h"
-#include "libService/ns_trace.h"
+#include "mbed-client-libservice/ns_trace.h"
 
 M2MObject::M2MObject(const String &object_name)
 : M2MBase(object_name,M2MBase::Dynamic),
@@ -37,7 +37,7 @@ M2MObject::~M2MObject()
         }
         remove_object_from_coap();
         _instance_list.clear();
-    }    
+    }
 }
 
 M2MObject& M2MObject::operator=(const M2MObject& other)
