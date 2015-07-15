@@ -3,7 +3,7 @@ add_executable(lwm2m-client-test-lwm2mclient_linux
         "lwm2mclient_linux/main.cpp"
 )
 target_link_libraries(lwm2m-client-test-lwm2mclient_linux
-    mbed-client
+    mbed-client-c
     lwm2m-client-linux
     lwm2m-client
 )
@@ -16,7 +16,7 @@ add_executable(lwm2m-client-test-helloworld-lwm2mclient
         "helloworld-lwm2mclient/to_be_ported.c"
 )
 target_link_libraries(lwm2m-client-test-helloworld-lwm2mclient
-    mbed-client
+    mbed-client-c
     lwm2m-client-linux
     lwm2m-client
 )
@@ -33,7 +33,7 @@ add_executable(lwm2m-client-test-lwm2mclient-smokeTest
         "lwm2mclient-smokeTest/testconfig.h"
 )
 target_link_libraries(lwm2m-client-test-lwm2mclient-smokeTest
-    mbed-client
+    mbed-client-c
     lwm2m-client-mbed
     lwm2m-client
 )
@@ -58,7 +58,7 @@ add_executable(lwm2m-client-test-helloworld-lwm2mclient
         "helloworld-lwm2mclient/to_be_ported.c"
 )
 target_link_libraries(lwm2m-client-test-helloworld-lwm2mclient
-    mbed-client
+    mbed-client-c
     lwm2m-client-mbed
     lwm2m-client
 )

@@ -13,7 +13,7 @@
     }
   ],
   "dependencies": {
-    "mbed-client": "~0.1.0"
+    "mbed-client-c": "~0.1.6"
   },
   "targetDependencies": {
     "arm": {
