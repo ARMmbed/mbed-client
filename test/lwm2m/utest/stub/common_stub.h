@@ -6,9 +6,9 @@
 
 #include <sys/types.h>
 #include <netdb.h>
-#include "mbed-net-sockets/UDPSocket.h"
+#include "UDPSocket.h"
 #include "nsdlaccesshelper.h"
-#include "libService/ip6string.h"
+#include "ip6string.h"
 #include "Ticker.h"
 
 //some internal test related stuff

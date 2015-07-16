@@ -64,7 +64,7 @@ void Test_M2MInterfaceFactory::test_create_security()
     M2MSecurity *test = M2MInterfaceFactory::create_security(M2MSecurity::Bootstrap);
     CHECK(test != NULL);
     delete test;
-
+    test = NULL;
 }
 
 void Test_M2MInterfaceFactory::test_create_device()
@@ -72,6 +72,7 @@ void Test_M2MInterfaceFactory::test_create_device()
     M2MDevice *test = M2MInterfaceFactory::create_device();
     CHECK(test != NULL);
     delete test;
+    test = NULL;
 }
 
 void Test_M2MInterfaceFactory::test_create_server()
@@ -79,6 +80,7 @@ void Test_M2MInterfaceFactory::test_create_server()
     M2MServer *test = M2MInterfaceFactory::create_server();
     CHECK(test != NULL);
     delete test;
+    test = NULL;
 }
 
 void Test_M2MInterfaceFactory::test_create_object()
@@ -86,4 +88,5 @@ void Test_M2MInterfaceFactory::test_create_object()
     M2MObject *test = M2MInterfaceFactory::create_object("name");
     CHECK(test != NULL);
     delete test;
+    test = NULL;
 }

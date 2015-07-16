@@ -10,7 +10,7 @@ uint8_t nsdlaccesshelper_stub::int_value;
 M2MNsdlInterface  *__nsdl_interface= NULL;
 #ifdef USE_LINUX
 M2MTimerImpl  *__timer_impl = NULL;
-M2MConnectionHandlerImpl *__connection_impl = NULL;
+M2MConnectionHandler *__connection_impl = NULL;
 #endif
 void nsdlaccesshelper_stub::clear()
 {

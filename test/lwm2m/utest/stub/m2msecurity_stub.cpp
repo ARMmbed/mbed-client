@@ -3,6 +3,7 @@
  */
 #include "m2msecurity_stub.h"
 
+bool m2msecurity_stub::has_value;
 uint32_t m2msecurity_stub::int_value;
 bool m2msecurity_stub::bool_value;
 String *m2msecurity_stub::string_value;
@@ -10,6 +11,7 @@ M2MResource* m2msecurity_stub::resource;
 
 void m2msecurity_stub::clear()
 {
+    has_value = false;
     int_value = -1;
     bool_value = false;
     string_value = NULL;
@@ -62,8 +64,12 @@ String M2MSecurity::resource_value_string(SecurityResource) const
 }
 
 uint32_t M2MSecurity::resource_value_buffer(SecurityResource,
-                               uint8_t *&) const
+                               uint8_t *&value) const
 {
+    if( m2msecurity_stub::has_value ){
+        value = (uint8_t *)malloc(5);
+        return 5;
+    }
     return m2msecurity_stub::int_value;
 }
 

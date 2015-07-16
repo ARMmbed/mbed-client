@@ -4,7 +4,7 @@
 #ifndef TEST_THREAD_HELPER_H
 #define TEST_THREAD_HELPER_H
 
-#include "include/threadhelper.h"
+#include "lwm2m-client-linux/threadhelper.h"
 
 class Test_ThreadHelper : public ThreadHelper
 {

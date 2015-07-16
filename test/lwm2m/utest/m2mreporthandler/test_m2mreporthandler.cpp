@@ -123,6 +123,7 @@ void Test_M2MReportHandler::test_set_value()
 
     _handler->set_value(8);
 
+    _handler->_last_band = 2;
     _handler->set_value(1);
     CHECK(_handler->_report_scheduled == true);
 

@@ -1,18 +1,40 @@
 /*
- * Copyright (c) 2015 ARM. All rights reserved.
+ * PackageLicenseDeclared: Apache-2.0
+ * Copyright (c) 2015 ARM Limited
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
-#ifndef SOCKET_ADDR_H
-#define SOCKET_ADDR_H
+#ifndef __MBED_NET_SOCKETS_SOCKETADDR_H__
+#define __MBED_NET_SOCKETS_SOCKETADDR_H__
 
-#include "socket_types.h"
+#include <socket_types.h>
+
+namespace mbed {
 
 class SocketAddr {
 public:
-    const struct socket_addr * getAddr() const;
-    void * getImpl();
+    struct socket_addr * getAddr() {return &_addr;}
+    const struct socket_addr * getAddr() const {return &_addr;}
     void setAddr(const struct socket_addr *addr);
     void setAddr(const SocketAddr *addr);
-    size_t getAddrSize() const;
+    size_t getAddrSize() const {return sizeof(_addr.ipv6be);}
+    bool is_v4();
+
+    int fmtIPv4(char *buf, size_t size);
+    int fmtIPv6(char *buf, size_t size);
+protected:
+    struct socket_addr _addr;
 };
 
-#endif
+}; // namespace mbed
+#endif // __MBED_NET_SOCKETS_SOCKETADDR_H__

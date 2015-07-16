@@ -16,6 +16,8 @@ TEST_SRC_FILES = \
         ../stub/m2mtimer_stub.cpp \
         ../stub/m2mnsdlinterface_stub.cpp \
         ../stub/m2mconnectionhandler_stub.cpp \
+        ../stub/m2mconnectionsecurity_stub.cpp \
+        ../stub/m2mconnectionhandlerfactory_stub.cpp \
 	m2minterfaceimpltest.cpp \
         test_m2minterfaceimpl.cpp
 

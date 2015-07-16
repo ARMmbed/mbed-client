@@ -9,6 +9,8 @@
 //some internal test related stuff
 namespace m2mtimer_stub
 {
+    extern bool bool_value;
+    extern bool total_bool_value;
     void clear();
 }
 
