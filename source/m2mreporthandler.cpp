@@ -166,32 +166,37 @@ bool M2MReportHandler::set_notification_attribute(char* option,
     if (strcmp(attribute, PMIN.c_str()) == 0) {
         sscanf(value, "%f", &_pmin);
         success = true;
+        tr_debug("M2MReportHandler::set_notification_attribute %s to %f", attribute, _pmin);
     }
     else if(strcmp(attribute, PMAX.c_str()) == 0) {
         sscanf(value, "%f", &_pmax);
         success = true;
+        tr_debug("M2MReportHandler::set_notification_attribute %s to %f", attribute, _pmax);
     }
     else if(strcmp(attribute, GT.c_str()) == 0 &&
             M2MBase::Resource == type){
         sscanf(value, "%f", &_gt);
         success = true;
+        tr_debug("M2MReportHandler::set_notification_attribute %s to %f", attribute, _gt);
     }
     else if(strcmp(attribute, LT.c_str()) == 0 &&
             M2MBase::Resource == type){
         sscanf(value, "%f", &_lt);
         success = true;
+        tr_debug("M2MReportHandler::set_notification_attribute %s to %f", attribute, _lt);
     }
     else if(strcmp(attribute, ST.c_str()) == 0 &&
             M2MBase::Resource == type){
         sscanf(value, "%f", &_st);
         success = true;
+        tr_debug("M2MReportHandler::set_notification_attribute %s to %f", attribute, _st);
     }
     else if(strcmp(attribute, CANCEL.c_str()) == 0) {
         observation = false;
         success = true;
     }
     if(success) {
-        tr_debug("M2MReportHandler::set_notification_attribute - set under observation");
+        tr_debug("M2MReportHandler::set_notification_attribute %s - set under observation", attribute);
         set_under_observation(observation);
     }
     return success;
