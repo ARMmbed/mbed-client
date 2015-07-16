@@ -4,7 +4,7 @@
 #ifndef THREAD_HELPER_STUB_H
 #define THREAD_HELPER_STUB_H
 
-#include "lwm2m-client-linux/source/include/threadhelper.h"
+#include "lwm2m-client-linux/threadhelper.h"
 
 //some internal test related stuff
 namespace threadhelper_stub

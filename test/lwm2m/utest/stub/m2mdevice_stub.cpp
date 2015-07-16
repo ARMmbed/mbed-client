@@ -25,6 +25,15 @@ M2MDevice::~M2MDevice()
 {
 }
 
+M2MDevice* M2MDevice::get_instance()
+{
+    return new M2MDevice();
+}
+
+void M2MDevice::delete_instance()
+{
+}
+
 M2MResource* M2MDevice::create_resource(DeviceResource, const String &)
 {
     return m2mdevice_stub::resource;

@@ -11,6 +11,8 @@ INCLUDE_DIRS =\
   ../stub\
   ../../../..\
   ../../../../lwm2m-client\
+  ../../../../../lwm2m-client-mbedtls\
+  ../../../../../../mbedtls/include\
   ../../../../source/include\
   ../../../../source\
   ../../../../../lwm2m-client-linux\
@@ -22,4 +24,4 @@ INCLUDE_DIRS =\
   ../../../../../../nsdl-c/source/libNsdl/src/include\
   $(CPPUTEST_HOME)/include\
 
-CPPUTESTFLAGS = -D__thumb2__
+CPPUTESTFLAGS = -D__thumb2__ -w

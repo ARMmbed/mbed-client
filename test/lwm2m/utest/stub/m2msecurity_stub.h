@@ -9,6 +9,7 @@
 //some internal test related stuff
 namespace m2msecurity_stub
 {
+    extern bool has_value;
     extern uint32_t int_value;
     extern bool bool_value;
     extern String *string_value;

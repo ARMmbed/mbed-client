@@ -4,16 +4,16 @@
 #ifndef TEST_M2M_CONNECTION_HANDLER_IMPL_LINUX_H
 #define TEST_M2M_CONNECTION_HANDLER_IMPL_LINUX_H
 
-#include "lwm2m-client-linux/m2mconnectionhandlerimpl.h"
+#include "lwm2m-client/m2mconnectionhandler.h"
 
 class M2MConnection_TestObserver;
 
-class Test_M2MConnectionHandlerImpl_linux
+class Test_M2MConnectionHandler_linux
 {
 public:
-    Test_M2MConnectionHandlerImpl_linux();
+    Test_M2MConnectionHandler_linux();
 
-    virtual ~Test_M2MConnectionHandlerImpl_linux();
+    virtual ~Test_M2MConnectionHandler_linux();
 
     void test_bind_connection();
 
@@ -21,14 +21,18 @@ public:
 
     void test_send_data();
 
-    void test_listen_for_data();
+    void test_start_listening_for_data();
 
-    void test_data_receive();
+//    void test_data_receive();
 
-    void test_close_connection();
+    void test_stop_listening();
+
+    void test_sendToSocket();
+
+    void test_receiveFromSocket();
 
 
-    M2MConnectionHandlerImpl* handler;
+    M2MConnectionHandler* handler;
     M2MConnection_TestObserver *observer;
 };
 

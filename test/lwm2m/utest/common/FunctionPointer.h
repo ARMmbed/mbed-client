@@ -1,5 +1,5 @@
 /* mbed Microcontroller Library
- * Copyright (c) 2006-2013 ARM Limited
+ * Copyright (c) 2006-2015 ARM Limited
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,19 +18,28 @@
 
 #include <string.h>
 #include <stdint.h>
+#include <stddef.h>
+#include <stdarg.h>
+#include <new>
+#include "FunctionPointerBase.h"
+#include "FunctionPointerBind.h"
 
 namespace mbed {
-
 /** A class for storing and calling a pointer to a static or member void function
  */
 template <typename R>
-class FunctionPointer0{
+class FunctionPointer0 : public FunctionPointerBase<R>{
 public:
+    typedef R(*static_fp)(void);
+    typedef struct arg_struct{
+    } ArgStruct;
     /** Create a FunctionPointer, attaching a static function
      *
      *  @param function The void static function to attach (default is none)
      */
-    FunctionPointer0(R (*function)(void) = 0) {
+    FunctionPointer0(static_fp function = 0):
+        FunctionPointerBase<R>()
+    {
         attach(function);
     }
 
@@ -40,7 +49,9 @@ public:
      *  @param function The address of the void member function to attach
      */
     template<typename T>
-    FunctionPointer0(T *object, R (T::*member)(void)) {
+    FunctionPointer0(T *object, R (T::*member)(void)):
+        FunctionPointerBase<R>()
+    {
         attach(object, member);
     }
 
@@ -48,9 +59,9 @@ public:
      *
      *  @param function The void static function to attach (default is none)
      */
-    void attach(R (*function)(void)) {
-        _p.function = function;
-        _membercaller = 0;
+    void attach(static_fp function) {
+        FunctionPointerBase<R>::_object = reinterpret_cast<void*>(function);
+        FunctionPointerBase<R>::_membercaller = &FunctionPointer0::staticcaller;
     }
 
     /** Attach a member function
@@ -60,49 +71,45 @@ public:
      */
     template<typename T>
     void attach(T *object, R (T::*member)(void)) {
-        _p.object = static_cast<void*>(object);
-        *reinterpret_cast<R (T::**)(void)>(_member) = member;
-        _membercaller = &FunctionPointer0::membercaller<T>;
+        FunctionPointerBase<R>::_object = static_cast<void*>(object);
+        *reinterpret_cast<R (T::**)(void)>(FunctionPointerBase<R>::_member) = member;
+        FunctionPointerBase<R>::_membercaller = &FunctionPointer0::membercaller<T>;
     }
 
     /** Call the attached static or member function
      */
     R call(){
-        if (_membercaller == 0 && _p.function) {
-            return _p.function();
-        } else if (_membercaller && _p.object) {
-            return _membercaller(_p.object, _member);
-        }
-        return (R)0;
+        return FunctionPointerBase<R>::call(NULL);
     }
 
-    R(*get_function())() const {
-        return (R(*)())_p.function;
+    FunctionPointerBind<R> bind() {
+        FunctionPointerBind<R> fp;
+        fp.bind(&FunctionPointerBase<R>::_nullops, (ArgStruct *) NULL, this);
+        return fp;
     }
 
-#ifdef MBED_OPERATORS
+    static_fp get_function()const {
+        return reinterpret_cast<static_fp>(FunctionPointerBase<R>::_object);
+    }
+
     R operator ()(void) {
         return call();
     }
-    operator bool(void) const {
-        return (_membercaller != NULL ? _p.object : (void*)_p.function) != NULL;
-    }
-#endif
 
 private:
     template<typename T>
-    static void membercaller(void *object, uintptr_t *member) {
+    static R membercaller(void *object, uintptr_t *member, void *arg) {
+        (void) arg;
         T* o = static_cast<T*>(object);
         R (T::**m)(void) = reinterpret_cast<R (T::**)(void)>(member);
-        (o->**m)();
+        return (o->**m)();
     }
-
-    union {
-        R (*function)(void);               // static function pointer - 0 if none attached
-        void *object;                         // object this pointer - 0 if none attached
-    } _p;
-    uintptr_t _member[4];                     // aligned raw member function pointer storage - converted back by registered _membercaller
-    R (*_membercaller)(void*, uintptr_t*); // registered membercaller function to convert back and call _m.member on _object
+    static R staticcaller(void *object, uintptr_t *member, void *arg) {
+        (void) arg;
+        (void) member;
+        static_fp f = reinterpret_cast<static_fp>(object);
+        return f();
+    }
 };
 
 /* If we had variaditic templates, this wouldn't be a problem, but until C++11 is enabled, we are stuck with multiple classes... */
@@ -110,13 +117,22 @@ private:
 /** A class for storing and calling a pointer to a static or member void function
  */
 template <typename R, typename A1>
-class FunctionPointer1{
+class FunctionPointer1 : public FunctionPointerBase<R> {
+protected:
+    typedef struct arg_struct{
+        A1 a1;
+        arg_struct(const A1 *b1) {
+            a1 = *b1;
+        }
+    } ArgStruct;
+
 public:
+    typedef R(*static_fp)(A1);
     /** Create a FunctionPointer, attaching a static function
      *
      *  @param function The void static function to attach (default is none)
      */
-    FunctionPointer1(R (*function)(A1) = 0) {
+    FunctionPointer1(static_fp function = 0) {
         attach(function);
     }
 
@@ -134,9 +150,9 @@ public:
      *
      *  @param function The void static function to attach (default is none)
      */
-    void attach(R (*function)(A1)) {
-        _p.function = function;
-        _membercaller = 0;
+    void attach(static_fp function) {
+        FunctionPointerBase<R>::_object = reinterpret_cast<void*>(function);
+        FunctionPointerBase<R>::_membercaller = &FunctionPointer1::staticcaller;
     }
 
     /** Attach a member function
@@ -145,53 +161,73 @@ public:
      *  @param function The address of the void member function to attach
      */
     template<typename T>
-    void attach(T *object, R (T::*member)(A1)) {
-        _p.object = static_cast<void*>(object);
-        *reinterpret_cast<R (T::**)(A1)>(_member) = member;
-        _membercaller = &FunctionPointer1::membercaller<T>;
+    void attach(T *object, R (T::*member)(A1))
+    {
+        FunctionPointerBase<R>::_object = static_cast<void*>(object);
+        *reinterpret_cast<R (T::**)(A1)>(FunctionPointerBase<R>::_member) = member;
+        FunctionPointerBase<R>::_membercaller = &FunctionPointer1::membercaller<T>;
     }
+
+    FunctionPointerBind<R> bind(const A1 &a1) {
+        FunctionPointerBind<R> fp;
+        fp.bind(&_fp1_ops, (ArgStruct *) NULL, this, &a1);
+        return fp;
+    }
+
 
     /** Call the attached static or member function
      */
-    R call(A1 a){
-        if (_membercaller == 0 && _p.function) {
-           return _p.function(a);
-        } else if (_membercaller && _p.object) {
-           return _membercaller(_p.object, _member, a);
-        }
-        return (R)0;
+    R call(A1 a1)
+    {
+        ArgStruct Args(&a1);
+        return FunctionPointerBase<R>::call(&Args);
     }
 
-    R(*get_function())() const {
-        return (R(*)())_p.function;
+    static_fp get_function()const
+    {
+        return reinterpret_cast<static_fp>(FunctionPointerBase<R>::_object);
     }
 
-#ifdef MBED_OPERATORS
     R operator ()(A1 a) {
         return call(a);
     }
-    operator bool(void)
-    {
-        return (_membercaller != NULL ? _p.object : (void*)_p.function) != NULL;
-    }
-#endif
+
 private:
     template<typename T>
-    static void membercaller(void *object, uintptr_t *member, A1 a) {
+    static R membercaller(void *object, uintptr_t *member, void *arg) {
+        ArgStruct *Args = static_cast<ArgStruct *>(arg);
         T* o = static_cast<T*>(object);
         R (T::**m)(A1) = reinterpret_cast<R (T::**)(A1)>(member);
-        (o->**m)(a);
+        return (o->**m)(Args->a1);
+    }
+    static R staticcaller(void *object, uintptr_t *member, void *arg) {
+        ArgStruct *Args = static_cast<ArgStruct *>(arg);
+        (void) member;
+        static_fp f = reinterpret_cast<static_fp>(object);
+        return f(Args->a1);
+    }
+    static void constructor(void * dest, va_list args) {
+        new ArgStruct(va_arg(args,A1*));
+    }
+    static void copy_constructor(void *dest , void* src) {
+        ArgStruct *src_args = static_cast<ArgStruct *>(src);
+        new ArgStruct(&(src_args->a1));
+    }
+    static void destructor(void *args) {
+        ArgStruct *argstruct = static_cast<ArgStruct *>(args);
+        argstruct->~arg_struct();
     }
 
-    union {
-        R (*function)(A1);               // static function pointer - 0 if none attached
-        void *object;                         // object this pointer - 0 if none attached
-    } _p;
-    uintptr_t _member[4];                     // aligned raw member function pointer storage - converted back by registered _membercaller
-    R (*_membercaller)(void*, uintptr_t*, A1); // registered membercaller function to convert back and call _m.member on _object
+protected:
+    static const struct FunctionPointerBase<R>::ArgOps _fp1_ops;
 };
 
-
+template <typename R, typename A1>
+const struct FunctionPointerBase<R>::ArgOps FunctionPointer1<R,A1>::_fp1_ops = {
+    FunctionPointer1<R,A1>::constructor,
+    FunctionPointer1<R,A1>::copy_constructor,
+    FunctionPointer1<R,A1>::destructor
+};
 
 typedef FunctionPointer0<void> FunctionPointer;
 typedef FunctionPointer1<void, int> event_callback_t;

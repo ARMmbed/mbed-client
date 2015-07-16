@@ -14,7 +14,7 @@ Test_M2MDevice::Test_M2MDevice()
     //m2mobjectinstance_stub::resource = new M2MResource("name","type",M2MBase::Dynamic);
     m2mresource_stub::bool_value = true;
     m2mobjectinstance_stub::create_resource = new M2MResource("name","type",M2MBase::Dynamic);
-    device = new M2MDevice();
+    device = M2MDevice::get_instance();
 
     delete m2mobjectinstance_stub::create_resource;
     m2mobjectinstance_stub::create_resource = NULL;
@@ -25,7 +25,8 @@ Test_M2MDevice::~Test_M2MDevice()
     delete m2mobject_stub::inst;
     m2mobject_stub::inst = NULL;
 
-    delete device;
+    M2MDevice::delete_instance();
+    device = NULL;
 }
 
 void Test_M2MDevice::test_create_resource_string()
@@ -98,7 +99,6 @@ void Test_M2MDevice::test_create_resource_int()
     m2mobjectinstance_stub::create_resource = new M2MResource("name","type",M2MBase::Dynamic);
 
     CHECK(device->create_resource(M2MDevice::Reboot,10) == NULL);
-    CHECK(device->create_resource(M2MDevice::ErrorCode,10) == NULL);
     CHECK(device->create_resource(M2MDevice::SupportedBindingMode,10) == NULL);
 
     CHECK(device->create_resource(M2MDevice::Manufacturer,10) == NULL);
@@ -112,9 +112,10 @@ void Test_M2MDevice::test_create_resource_int()
     CHECK(device->create_resource(M2MDevice::Timezone,10) == NULL);
     CHECK(device->create_resource(M2MDevice::FactoryReset,10) == NULL);
 
+    CHECK(device->create_resource(M2MDevice::ErrorCode,10) != NULL);
+
     CHECK(device->create_resource(M2MDevice::BatteryLevel,10) != NULL);
     CHECK(M2MBase::GET_PUT_ALLOWED == m2mbase_stub::operation);
-
 
     CHECK(device->create_resource(M2MDevice::BatteryStatus,10) != NULL);
     CHECK(M2MBase::GET_PUT_ALLOWED == m2mbase_stub::operation);
@@ -123,9 +124,6 @@ void Test_M2MDevice::test_create_resource_int()
     CHECK(M2MBase::GET_PUT_ALLOWED == m2mbase_stub::operation);
 
     CHECK(device->create_resource(M2MDevice::MemoryTotal,10) != NULL);
-    CHECK(M2MBase::GET_PUT_ALLOWED == m2mbase_stub::operation);
-
-    CHECK(device->create_resource(M2MDevice::ResetErrorCode,10) != NULL);
     CHECK(M2MBase::GET_PUT_ALLOWED == m2mbase_stub::operation);
 
     CHECK(device->create_resource(M2MDevice::CurrentTime,10) != NULL);
@@ -166,11 +164,12 @@ void Test_M2MDevice::test_create_resource_no_param()
     CHECK(device->create_resource(M2MDevice::BatteryStatus) == NULL);
     CHECK(device->create_resource(M2MDevice::MemoryFree) == NULL);
     CHECK(device->create_resource(M2MDevice::MemoryTotal) == NULL);
-    CHECK(device->create_resource(M2MDevice::ResetErrorCode) == NULL);
     CHECK(device->create_resource(M2MDevice::CurrentTime) == NULL);
     CHECK(device->create_resource(M2MDevice::AvailablePowerSources) == NULL);
     CHECK(device->create_resource(M2MDevice::PowerSourceVoltage) == NULL);
     CHECK(device->create_resource(M2MDevice::PowerSourceCurrent) == NULL);
+
+    CHECK(device->create_resource(M2MDevice::ResetErrorCode) != NULL);
 
     CHECK(device->create_resource(M2MDevice::FactoryReset) != NULL);
     CHECK(M2MBase::POST_ALLOWED == m2mbase_stub::operation);
@@ -234,7 +233,7 @@ void Test_M2MDevice::test_set_resource_value_int()
     m2mobjectinstance_stub::resource = new M2MResource("name","type",M2MBase::Dynamic);
 
     CHECK(device->set_resource_value(M2MDevice::Reboot,10) == false);
-    CHECK(device->set_resource_value(M2MDevice::ErrorCode,10) == false);
+    CHECK(device->set_resource_value(M2MDevice::ErrorCode,10) == true);
     CHECK(device->set_resource_value(M2MDevice::SupportedBindingMode,10) == false);
 
     CHECK(device->set_resource_value(M2MDevice::Manufacturer,10) == false);
@@ -251,7 +250,7 @@ void Test_M2MDevice::test_set_resource_value_int()
     CHECK(device->set_resource_value(M2MDevice::BatteryStatus,10) == true);
     CHECK(device->set_resource_value(M2MDevice::MemoryFree,10) == true);
     CHECK(device->set_resource_value(M2MDevice::MemoryTotal,10) == true);
-    CHECK(device->set_resource_value(M2MDevice::ResetErrorCode,10) == true);
+    CHECK(device->set_resource_value(M2MDevice::ErrorCode,10) == true);
     CHECK(device->set_resource_value(M2MDevice::CurrentTime,10) == true);
     CHECK(device->set_resource_value(M2MDevice::AvailablePowerSources,10) == true);
     CHECK(device->set_resource_value(M2MDevice::PowerSourceVoltage,10) == true);
@@ -277,7 +276,7 @@ void Test_M2MDevice::test_resource_value_int()
     CHECK(device->resource_value_int(M2MDevice::BatteryStatus) == 10);
     CHECK(device->resource_value_int(M2MDevice::MemoryFree) == 10);
     CHECK(device->resource_value_int(M2MDevice::MemoryTotal) == 10);
-    CHECK(device->resource_value_int(M2MDevice::ResetErrorCode) == 10);
+    CHECK(device->resource_value_int(M2MDevice::ErrorCode) == 10);
     CHECK(device->resource_value_int(M2MDevice::CurrentTime) == 10);
     CHECK(device->resource_value_int(M2MDevice::AvailablePowerSources) == 10);
     CHECK(device->resource_value_int(M2MDevice::PowerSourceVoltage) == 10);

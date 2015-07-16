@@ -2,7 +2,7 @@ include ../makefile_defines.txt
 
 COMPONENT_NAME = threadhelper_unit
 SRC_FILES = \
-        ../../../../lwm2m-client-linux/source/threadhelper.cpp
+        ../../../../../lwm2m-client-linux/source/threadhelper.cpp
 
 TEST_SRC_FILES = \
 	main.cpp \

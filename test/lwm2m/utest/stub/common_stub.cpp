@@ -381,3 +381,4 @@ const char *inet_ntop (int, const void *__restrict,
 {
     return common_stub::char_value;
 }
+

@@ -7,7 +7,7 @@
 #include "CppUTestExt/MockSupportPlugin.h"
 int main(int ac, char** av)
 {
-	return CommandLineTestRunner::RunAllTests(ac, av);
+    return CommandLineTestRunner::RunAllTests(ac, av);
 }
 
-IMPORT_TEST_GROUP( M2MConnectionHandlerImpl_mbed);
+IMPORT_TEST_GROUP( M2MConnectionHandler_mbed);

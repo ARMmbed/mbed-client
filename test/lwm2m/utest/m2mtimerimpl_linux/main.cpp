@@ -10,4 +10,4 @@ int main(int ac, char** av)
 	return CommandLineTestRunner::RunAllTests(ac, av);
 }
 
-IMPORT_TEST_GROUP( M2MTimerImpl_linux);
+IMPORT_TEST_GROUP( M2MTimer);
