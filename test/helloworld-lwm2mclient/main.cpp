@@ -3,7 +3,6 @@
  */
 
 #include "m2mlwclient.h"
-#undef SIXLOWPAN_INTERFACE
 
 #ifdef TARGET_LIKE_LINUX
 #include <unistd.h>

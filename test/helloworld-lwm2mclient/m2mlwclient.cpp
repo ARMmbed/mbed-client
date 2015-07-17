@@ -16,13 +16,12 @@ const String &BOOTSTRAP_SERVER_DTLS_ADDRESS = "coap://10.45.3.10:5694";
 const String &MBED_SERVER_ADDRESS = "coap://FD00:FF1:CE0B:A5E1:1068:AF13:9B61:D557:5683";
 const String &MBED_SERVER_DTLS_ADDRESS = "coap://FD00:FF1:CE0B:A5E1:1068:AF13:9B61:D557:5684";
 #else
-//const String &MBED_SERVER_ADDRESS = "coap://10.45.3.10:5683";
-//const String &MBED_SERVER_DTLS_ADDRESS = "coap://10.45.3.10:5684";
-const String &MBED_SERVER_ADDRESS = "coap://10.45.0.152:5683";
-const uint16_t SERVER_PORT = 5683;
-const String &MBED_SERVER_DTLS_ADDRESS = "coap://10.45.0.152:5684";
-const uint16_t SECURE_PORT = 5684;
+const String &MBED_SERVER_ADDRESS = "coap://10.45.3.10:5683";
+const String &MBED_SERVER_DTLS_ADDRESS = "coap://10.45.3.10:5684";
 #endif
+const uint16_t SERVER_PORT = 5683;
+const uint16_t SECURE_PORT = 5684;
+
 const String &MANUFACTURER = "ARM";
 const String &TYPE = "type";
 const String &MODEL_NUMBER = "2015";

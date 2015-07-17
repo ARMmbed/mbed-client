@@ -813,7 +813,7 @@ uint64_t M2MNsdlInterface::registration_time()
 {
     uint64_t value = 0;
     if(_endpoint->lifetime_ptr) {
-        value = atoll((const char*)_endpoint->lifetime_ptr);
+        value = atol((const char*)_endpoint->lifetime_ptr);
     }
 
     if(value >= OPTIMUM_LIFETIME) {

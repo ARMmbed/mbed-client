@@ -1,6 +1,8 @@
 #ifndef __M2M_LW_CLIENT_H__
 #define __M2M_LW_CLIENT_H__
 
+#undef SIXLOWPAN_INTERFACE
+
 #include "lwm2m-client/m2minterfaceobserver.h"
 
 #ifndef TARGET_LIKE_LINUX

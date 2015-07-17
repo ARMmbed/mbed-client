@@ -52,6 +52,9 @@ include ../../libService/toolchain_rules.mk
 
 $(eval $(call generate_rules,$(LIB),$(SRCS)))
 
+# Extend default clean rule
+clean: clean-extra
+
 .PHONY: release
 release:
 	7z a nanostack_$(VERSION).zip *.a *.lib include
@@ -84,5 +87,5 @@ test: $(TESTDIRS)
 	@genhtml -q $(COVERAGEFILE) --show-details --prefix $(CURDIR:%/applications/libService=%) --output-directory lcov/html
 	@echo LibService unit tests built
 
-clean: $(CLEANDIRS) \
+clean-extra: $(CLEANDIRS) \
 	$(CLEANTESTDIRS)
