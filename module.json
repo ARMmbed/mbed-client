@@ -1,6 +1,6 @@
 {
   "name": "lwm2m-client",
-  "version": "0.1.12",
+  "version": "0.1.13",
   "description": "LWM2M mbed Client API",
   "private": true,
   "keywords": [],
