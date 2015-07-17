@@ -13,7 +13,8 @@
     }
   ],
   "dependencies": {
-    "mbed-client-c": "~0.1.6"
+    "mbed-client-c": "~0.1.6",
+    "atmel-rf-driver": "~0.0.13"
   },
   "targetDependencies": {
     "arm": {
