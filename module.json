@@ -18,6 +18,7 @@
   "targetDependencies": {
     "arm": {
       "lwm2m-client-mbed": "~0.0.8",
+      "atmel-rf-driver": "~0.0.13",
       "lwm2m-client-mbedtls": "~0.0.2"
     },
     "linux": {

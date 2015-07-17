@@ -13,7 +13,8 @@
 #else
 #include "mbed-net-sockets/UDPSocket.h"
 #ifdef SIXLOWPAN_INTERFACE
-#include "mbed-6lowpan-adaptor/mesh_interface.h"
+#include "atmel-rf-driver/driverRFPhy.h"    // rf_device_register
+#include "mbed-mesh-api/Mesh6LoWPAN_ND.h"
 #endif
 #include "EthernetInterface.h"
 #include "test_env.h"
@@ -162,12 +163,12 @@ static void ctrl_c_handle_function(void)
 }
 #else
 #ifdef SIXLOWPAN_INTERFACE
-volatile uint8_t network_ready = 0;
+volatile uint8_t mesh_network_state = MESH_DISCONNECTED;
 
-void nanostack_network_ready(void)
+void mesh_network_callback(mesh_connection_status_t mesh_state)
 {
     tr_info("Network established");
-    network_ready = 1;
+    mesh_network_state = mesh_state;
 }
 #endif
 #endif
@@ -200,27 +201,29 @@ int main() {
     // by LWM2M Client API to communicate with mbed Device server.
 
 #ifdef SIXLOWPAN_INTERFACE
-    socket_error_t error_status;
-    error_status = mesh_interface_init();
-    if (SOCKET_ERROR_NONE != error_status)
+
+    Mesh6LoWPAN_ND *mesh_api = Mesh6LoWPAN_ND::getInstance();
+    int8_t status;
+
+    status = mesh_api->init(rf_device_register(), mesh_network_callback);
+    if (status != MESH_ERROR_NONE)
     {
-        tr_info("Can't initialize NanoStack!\n");
+        tr_error("Mesh network initialization failed %d!", status);
         return 1;
     }
-    printf("NanoStack UDP Example, stack initialized");
 
-    error_status = mesh_interface_connect(nanostack_network_ready);
-
-    if (SOCKET_ERROR_NONE != error_status)
+    status = mesh_api->connect();
+    if (status != MESH_ERROR_NONE)
     {
-        printf("Can't connect to NanoStack!");
+        tr_error("Can't connect to mesh network!");
         return 1;
     }
 
     do
     {
-        mesh_interface_run();
-    } while(0 == network_ready);
+        mesh_api->processEvent();
+    } while(mesh_network_state != MESH_CONNECTED);
+
 
 #else
     EthernetInterface eth;
@@ -367,7 +370,7 @@ int main() {
 #ifdef SIXLOWPAN_INTERFACE
     /* wait network to be established */
     do {
-        mesh_interface_run();
+        mesh_api->processEvent();
     } while(!lwm2mclient.register_successful());
 #else
     while (!lwm2mclient.register_successful()) { __WFI(); }
@@ -379,7 +382,7 @@ int main() {
 #ifdef SIXLOWPAN_INTERFACE
     /* wait network to be established */
     do {
-        mesh_interface_run();
+        mesh_api->processEvent();
     } while(!lwm2mclient.unregister_successful());
 #else
     while (!lwm2mclient.unregister_successful()) { __WFI(); }
@@ -408,7 +411,7 @@ int main() {
 
     // Disconnect the connect and teardown the network interface
 #ifdef SIXLOWPAN_INTERFACE
-    mesh_interface_disconnect();
+    mesh_api->disconnect();
 #else
     eth.disconnect();
 #endif
