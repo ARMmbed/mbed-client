@@ -6,7 +6,6 @@
 #include "lwm2m-client/m2mobjectinstance.h"
 #include "lwm2m-client/m2mresource.h"
 
-#define SIXLOWPAN_INTERFACE
 // Enter your mbed Device Server's IPv4 address and Port number in
 // mentioned format like 192.168.0.1:5693
 const String &BOOTSTRAP_SERVER_ADDRESS = "coap://10.45.3.10:5693";
@@ -21,7 +20,7 @@ const String &MBED_SERVER_DTLS_ADDRESS = "coap://10.45.3.10:5684";
 #endif
 
 const uint16_t SERVER_PORT = 5683;
-const uint16_t SECURE_PORT = 5684;
+const uint16_t SECURE_PORT = 5683;
 
 const String &MANUFACTURER = "ARM";
 const String &TYPE = "type";
@@ -91,7 +90,7 @@ bool M2MLWClient::create_interface(bool useSecureConnection) {
         printf("Endpoint Name : linux-secure-endpoint\n");
     }else{
         _interface = M2MInterfaceFactory::create_interface(*this,
-                                                  "linux-endpoint",
+                                                  "lwm2m-endpoint",
                                                   "test",
                                                   60,
                                                   SERVER_PORT,
@@ -99,7 +98,7 @@ bool M2MLWClient::create_interface(bool useSecureConnection) {
                                                   M2MInterface::UDP,
                                                   stack,
                                                   "");
-        printf("Endpoint Name : linux-endpoint\n");
+        printf("Endpoint Name : lwm2m-endpoint\n");
     }
 
     return (_interface == NULL) ? false : true;
