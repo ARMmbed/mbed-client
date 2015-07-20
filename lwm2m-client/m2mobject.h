@@ -56,20 +56,20 @@ public:
 
     /**
      * @brief Removes the object instance resource with given instance id.
-     * @param instance_id, Instance ID of object instance to be removed, default is 0
+     * @param instance_id, Instance ID of object instance to be removed, default is 0.
      * @return True if removed else false.
      */
     virtual bool remove_object_instance(uint16_t instance_id = 0);
 
     /**
-     * @brief Returns object instance with the given instance id
-     * @param instance_id, Instance ID of the requested object instance id, default is 0
+     * @brief Returns object instance with the given instance id.
+     * @param instance_id, Instance ID of the requested object instance id, default is 0.
      * @return Object instance reference if found else NULL.
      */
     virtual M2MObjectInstance* object_instance(uint16_t instance_id = 0) const;
 
     /**
-     * @brief Returns list of object instances
+     * @brief Returns list of object instances.
      * @return List of instances with the object.
      */
     virtual const M2MObjectInstanceList& instances() const;
@@ -81,8 +81,8 @@ public:
     virtual uint16_t instance_count() const;
 
     /**
-     * @brief Returns object type
-     * @return BaseType
+     * @brief Returns object type.
+     * @return BaseType.
      */
     M2MBase::BaseType base_type() const;
 

@@ -25,7 +25,7 @@ friend class M2MInterfaceFactory;
 public:
 
      /**
-      * @brief Enum defining all the resources associdated with
+      * @brief Enum defining all the resources associated with
       * Device Object in LWM2M framework.
       */
     typedef enum {
@@ -66,7 +66,6 @@ private:
     // Prevents the use of copy constructor
     M2MDevice( const M2MDevice& /*other*/ );
 
-
     /**
      * Destructor
      */
@@ -84,7 +83,7 @@ public:
      * 'Manufacturer', 'DeviceType','ModelNumber','SerialNumber',
      * 'HardwareVersion', 'FirmwareVersion', 'SoftwareVersion',
      *  'UTCOffset', 'Timezone', 'SupportedBindingMode'.
-     * @param value, Value to be set on the resource, in String format
+     * @param value, Value to be set on the resource, in String format.
      * @return M2MResource if created successfully else NULL.
      */
     M2MResource* create_resource(DeviceResource resource, const String &value);
@@ -95,7 +94,7 @@ public:
      * 'AvailablePowerSources','PowerSourceVoltage','PowerSourceCurrent',
      * 'BatteryLevel', 'BatteryStatus', 'MemoryFree', 'MemoryTotal',
      * 'ErrorCode', 'CurrentTime'.
-     * @param value, Value to be set on the resource, in Integer format
+     * @param value, Value to be set on the resource, in Integer format.
      * @return M2MResource if created successfully else NULL.
      */
     M2MResource* create_resource(DeviceResource resource, uint32_t value);
@@ -109,10 +108,10 @@ public:
     M2MResource* create_resource(DeviceResource resource);
 
     /**
-     * @brief Deletes the resource with the given resource enum.
-     * It cannot not delete the mandatory resources.
+     * @brief Deletes the resource with the given resource enum,
+     * it cannot not delete the mandatory resources.
      * @param resource, Name of the resource to be deleted.
-     * @param instance_id, Instance Id of the resource, default is 0
+     * @param instance_id, Instance Id of the resource, default is 0.
      * @return True if deleted else false.
      */
     bool delete_resource(DeviceResource resource,
@@ -125,8 +124,8 @@ public:
      * 'Manufacturer', 'DeviceType','ModelNumber','SerialNumber',
      * 'HardwareVersion', 'FirmwareVersion', 'SoftwareVersion',
      *  'UTCOffset', 'Timezone', 'SupportedBindingMode'.
-     * @param value, Value to be set on the key, in String format
-     * @param instance_id, Instance Id of the resource, default is 0
+     * @param value, Value to be set on the key, in String format.
+     * @param instance_id, Instance Id of the resource, default is 0.
      * @return True if successfully set else false.
      */
     bool set_resource_value(DeviceResource resource,
@@ -141,7 +140,7 @@ public:
      * 'BatteryLevel', 'BatteryStatus', 'MemoryFree', 'MemoryTotal',
      * 'ErrorCode', 'CurrentTime'.
      * @param value, Value to be set on the key, in Integer format
-     * @param instance_id, Instance Id of the resource, default is 0
+     * @param instance_id, Instance Id of the resource, default is 0.
      * @return True if successfully set else false.
      */
     bool set_resource_value(DeviceResource resource,
@@ -149,19 +148,19 @@ public:
                             uint16_t instance_id = 0);
 
     /**
-     * @brief Returns the value of the given resource enum, in String
+     * @brief Returns the value of the given resource enum, in String.
      * @param resource, List of resource names which can return value using this function are
      * 'Manufacturer', 'DeviceType','ModelNumber','SerialNumber',
      * 'HardwareVersion', 'FirmwareVersion', 'SoftwareVersion',
      *  'UTCOffset', 'Timezone', 'SupportedBindingMode'.
-     * @param instance_id, Instance Id of the resource, default is 0
+     * @param instance_id, Instance Id of the resource, default is 0.
      * @return Value associated with that key, if key is not valid it returns NULL.
      */
     String resource_value_string(DeviceResource resource,
                                  uint16_t instance_id = 0) const;
 
     /**
-     * @brief Returns the value of the given resource key name, in Integer
+     * @brief Returns the value of the given resource key name, in Integer.
      * @param resource, List of resource names which can return value using this function are
      * 'AvailablePowerSources','PowerSourceVoltage','PowerSourceCurrent',
      * 'BatteryLevel', 'BatteryStatus', 'MemoryFree', 'MemoryTotal',
@@ -173,20 +172,20 @@ public:
                                uint16_t instance_id = 0) const;
 
     /**
-     * @brief Returns if the resource instance with given resource enum exists or not
+     * @brief Returns if the resource instance with given resource enum exists or not.
      * @param resource, resource enum.
      * @return True if at least one instance exists else false.
      */
     bool is_resource_present(DeviceResource resource)const;
 
     /**
-     * @brief Returns number of resources for whole device object
+     * @brief Returns number of resources for whole device object.
      * @return Total umber of resources belonging to device object.
      */
     uint16_t total_resource_count()const;
 
     /**
-     * @brief Returns number of resources for given resource enum
+     * @brief Returns number of resources for given resource enum.
      * @param resource, resource enum.
      * @return Number of resources for a given resource enum returns 1 for
      * mandatory resources else can be 0 as well if no instance exists for an

@@ -66,7 +66,7 @@ public:
      * @param resource, List of resource names which can set value using this function are
      *  'ShortServerID','Lifetime','DefaultMinPeriod','DefaultMaxPeriod','DisableTimeout',
      *  'NotificationStorage'.
-     * @param value, Value to be set on the resource, in Integer format
+     * @param value, Value to be set on the resource, in Integer format.
      * @return M2MResource if created successfully else NULL.
      */
     M2MResource* create_resource(ServerResource resource, uint32_t value);
@@ -91,7 +91,7 @@ public:
      * @brief Sets the value of the given resource enum.
      * @param resource, List of resource names which can set value using this function are
      * 'Binding'.
-     * @param value, Value to be set on the resource, in String format
+     * @param value, Value to be set on the resource, in String format.
      * @return True if successfully set else false.
      */
     bool set_resource_value(ServerResource resource,
@@ -102,13 +102,13 @@ public:
      * @param resource, List of resource names which can set value using this function are
      *  'ShortServerID','Lifetime','DefaultMinPeriod','DefaultMaxPeriod','DisableTimeout',
      *  'NotificationStorage'.
-     * @param value, Value to be set on the resource, in Integer format
+     * @param value, Value to be set on the resource, in Integer format.
      * @return True if successfully set else false.
      */
     bool set_resource_value(ServerResource resource,
                             uint32_t value);
     /**
-     * @brief Returns the value of the given resource enum, in String
+     * @brief Returns the value of the given resource enum, in String.
      * @param resource, List of resource names which can return value using this function are
      * 'Binding'.
      * @return Value associated with that resource, if resourceis not valid it returns empty string.
@@ -116,7 +116,7 @@ public:
     String resource_value_string(ServerResource resource) const;
 
     /**
-     * @brief Returns the value of the given resource name, in Integer
+     * @brief Returns the value of the given resource name, in Integer.
      * @param resource, List of resource names which can return value using this function are
      *  'ShortServerID','Lifetime','DefaultMinPeriod','DefaultMaxPeriod','DisableTimeout',
      *  'NotificationStorage'
@@ -125,7 +125,7 @@ public:
     uint32_t resource_value_int(ServerResource resource) const;
 
     /**
-     * @brief Returns if the resource instance with given resource enum exists or not
+     * @brief Returns if the resource instance with given resource enum exists or not.
      * @param resource, resource enum.
      * @return True if at least one instance exists else false.
      */

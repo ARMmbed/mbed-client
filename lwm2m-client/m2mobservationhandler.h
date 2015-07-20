@@ -9,7 +9,8 @@
 class M2MBase;
 
 /**
- * @brief An interface to handle the observation
+ * @brief M2MObservationHandler
+ * An interface to handle the observation
  * callbacks from different objects.
  *
  */

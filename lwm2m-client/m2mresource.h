@@ -51,8 +51,8 @@ private: // Constructor and destructor are private
 public:
 
     /**
-     * @brief Returns object type
-     * @return BaseType
+     * @brief Returns object type.
+     * @return BaseType.
      */
     virtual M2MBase::BaseType base_type() const;
 
@@ -65,8 +65,18 @@ public:
      */
     virtual bool handle_observation_attribute(char *&query);
 
+    /**
+     * @brief Sets the function which should be executed when this
+     * resource will receive POST command for this resource.
+     * @param callback, Function pointer which needs to be executed.
+     */
     virtual void set_execute_function(execute_callback callback);
 
+    /**
+     * @brief Executes the function which is set in "set_execute_function".
+     * @param arguments, arguments that will be passed to execute which
+     * needs to be executed.
+     */
     void execute(void *arguments);
 
 private:

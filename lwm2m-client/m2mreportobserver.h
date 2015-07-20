@@ -5,7 +5,8 @@
 #define M2MREPORTOBSERVER_H
 
 /**
- * @brief An interface to report to the base class
+ * @brief M2MReportObserver
+ * An interface to report to the base class
  * when to send the report to the server.
  *
  */

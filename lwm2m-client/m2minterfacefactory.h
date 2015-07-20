@@ -34,14 +34,15 @@ public:
      * @brief Creates interface object for LWM2M Inteface using which
      * client can handle LWM2M operations like Bootstrapping, Client
      * Registration, Device Management and Information Reporting.
-     * @param endpoint_name, Endpoint name of the mbed client.
-     * @param endpoint_type, Endpoint type of the mbed client.
+     * @param endpoint_name, Endpoint name of the LWM2M client.
+     * @param endpoint_type, Endpoint type of the LWM2M client,default is empty.
      * @param life_time, Lifetime of the endpoint in seconds,
      *        if -1 then it is optional
-     * @param listen_port, Listening port for the endpoint, default is 8000.
-     * @param domain, Domain of the endpoint.
-     * @param mode, Binding Mode of the endpoint, default is UDP
-     * @param stack, Select the underlying network stack to be used for connection.
+     * @param listen_port, Listening port for the endpoint, default is 5683.
+     * @param domain, Domain of the endpoint,default is empty.
+     * @param mode, Binding Mode of the endpoint, default is NOT_SET
+     * @param stack, Select the underlying network stack to be used for connection
+     * default is LwIP_IPv4.
      * @param context_address, Context address for M2M-HTTP, not used currently.
      * @return M2MInterfaceImpl , Object to manage other LWM2M operations.
      */

@@ -18,7 +18,4 @@ using namespace m2m;
 #define TRACE_GROUP "lwm2m-client"
 #endif
 
-//undefine this if the build does not contain "mbedtls"
-#define HAVE_MBEDTLS
-
 #endif // M2MCONFIG_H

@@ -21,6 +21,9 @@ public :
 
     /**
     * @brief Informs that coap message is ready.
+    * @param data_ptr, Data object of coap message.
+    * @param data_len, Length of the data object.
+    * @param address_ptr, Address structure of the server.
     */
     virtual void coap_message_ready(uint8_t *data_ptr,
                                     uint16_t data_len,

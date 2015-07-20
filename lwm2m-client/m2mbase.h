@@ -16,7 +16,7 @@ class M2MReportHandler;
 /**
  *  @brief M2MBase.
  *  This class is the base class based on which all LWM2M object model
- *  can be created. This serves base class for both Object as well as Resources.
+ *  can be created. This serves base class for Object, ObjectInstances and Resources.
  */
 
 class M2MBase : public M2MReportObserver {
@@ -98,7 +98,7 @@ public:
 
     /**
      * @brief Sets the resource type of the object.
-     * @param description, Description to be set.
+     * @param resource_type, Resource type to be set.
      */
     virtual void set_resource_type(const String &resource_type);
 
@@ -111,13 +111,13 @@ public:
 
     /**
      * @brief Sets the observable mode for the object.
-     * @param Value for the observation.
+     * @param observable, Value for the observation.
      */
     virtual void set_observable(bool observable);
 
     /**
      * @brief Sets that object is under observation.
-     * @param Value for the observation.
+     * @param observed for the observation.
      * @param handler, Handler object for sending
      * observation callbacks.
      */
@@ -133,8 +133,8 @@ public:
                                        const uint8_t length);
 
     /**
-     * Sets instance ID of the object
-     * @param Instance ID of the object
+     * Sets instance ID of the object.
+     * @param instance_id, Instance ID of the object.
      */
     virtual void set_instance_id(const uint16_t instance_id);
 
@@ -149,32 +149,32 @@ public:
     virtual bool set_value(const uint8_t *value, const uint32_t value_length, bool is_numeric = false);
 
     /**
-     * Sets Observation number of the object
-     * @param observation_number of the object.
+     * Sets Observation number of the object.
+     * @param observation_number, Observation number of the object.
      */
     virtual void set_observation_number(const uint16_t observation_number);
 
     /**
-     * @brief Returns object type
-     * @return BaseType
+     * @brief Returns object type.
+     * @return BaseType of the object.
      */
     virtual M2MBase::BaseType base_type() const;
 
     /**
-     * @brief Returns the operation type of the object
-     * @return Operation, Supported operation on the object
+     * @brief Returns the operation type of the object.
+     * @return Operation, Supported operation on the object.
      */
     virtual M2MBase::Operation operation() const;
 
     /**
-     * @brief Returns object name
-     * @return Name for the object
+     * @brief Returns object name.
+     * @return Name for the object.
      */
     virtual const String &name() const;
 
     /**
-     * @brief Returns object's Instance ID
-     * @returns Instance ID of the object
+     * @brief Returns object's Instance ID.
+     * @returns Instance ID of the object.
      */
     virtual uint16_t instance_id() const;
 
@@ -192,32 +192,31 @@ public:
 
     /**
      * @brief Returns coap content type of the object.
-     * @param content_type, .
      * @return Content Type of the object.
      */
     virtual uint8_t coap_content_type() const;
 
     /**
-     * @brief Returns the observation status of the object
-     * @return True if observable else false
+     * @brief Returns the observation status of the object.
+     * @return True if observable else false.
      */
     virtual bool is_observable() const;
 
     /**
-     * @brief Returns the observation token of the object
+     * @brief Provides the observation token of the object.
      * @param value[OUT], pointer to the value of token.
      * @param value_length[OUT], length to the token pointer.
      */
     virtual void get_observation_token(uint8_t *&token, uint32_t &token_length);
 
     /**
-     * @brief Returns the mode of the resource
+     * @brief Returns the mode of the resource.
      * @return Mode of the resource.
      */
      virtual Mode mode() const;
 
     /**
-     * @brief Returns the value of the given resource.
+     * @brief Provides the value of the given resource.
      * @param value[OUT], pointer to the value of resource.
      * @param value_length[OUT], length to the value pointer.
      */
@@ -225,7 +224,7 @@ public:
 
     /**
      * @brief Returns the observation number.
-     * @return observation number for the object
+     * @return observation number for the object.
      */
     virtual uint16_t observation_number() const;
 
@@ -244,7 +243,7 @@ protected:
 
     /**
      * @brief Sets the Base type for object.
-     * @param type, Type of the base object
+     * @param type, Type of the base object.
      */
     virtual void set_base_type(M2MBase::BaseType type);
 

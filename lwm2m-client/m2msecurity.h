@@ -42,12 +42,17 @@ public:
         ClientHoldOffTime
     }SecurityResource;
 
+    /**
+     * @brief Enum defining type of security attribute
+     * used by the Security Object.
+     */
     typedef enum {
         SecurityNotSet = -1,
         Psk = 0,
         Certificate = 2,
         NoSecurity = 3
     } SecurityModeType;
+
     /**
      * @brief Enum defining interface operation which can be
      * handled by the Security Object.
@@ -104,7 +109,7 @@ public:
      * @param resource, List of resource name for which value can be set
      * using this function are
      * 'M2MServerUri', 'SMSBindingKey', 'SMSBindingSecretKey'.
-     * @param value, Value to be set on the key, in String format
+     * @param value, Value to be set on the key, in String format.
      * @return True if successfully set else false.
      */
     bool set_resource_value(SecurityResource resource,
@@ -116,7 +121,7 @@ public:
      * using this function are
      * 'BootstrapServer', 'SecurityMode', 'SMSSecurityMode',
      * 'M2MServerSMSNumber', 'ShortServerID', 'ClientHoldOffTime'.
-     * @param value, Value to be set on the resource, in Integer format
+     * @param value, Value to be set on the resource, in Integer format.
      * @return True if successfully set else false.
      */
     bool set_resource_value(SecurityResource resource,
@@ -127,7 +132,7 @@ public:
      * @param resource, List of resource name for which value can be set
      * using this function are
      * 'PublicKey', 'ServerPublicKey', 'Secretkey'.
-     * @param value, Value to be set on the key, in uint8_t format
+     * @param value, Value to be set on the key, in uint8_t format.
      * @param size, size of the buffer value to be set on the key.
      * @return True if successfully set else false.
      */
@@ -136,7 +141,7 @@ public:
                             const uint16_t length);
 
     /**
-     * @brief Returns the value of the given resource enum, in String
+     * @brief Returns the value of the given resource enum, in String.
      * @param resource, List of resource names which can return value using this function are
      * 'M2MServerUri','SMSBindingKey', 'SMSBindingSecretKey'.
      * @return Value associated with that resource, if resource is not valid it returns empty string.
@@ -154,7 +159,7 @@ public:
                                    uint8_t *&data) const;
 
     /**
-     * @brief Returns the value of the given resource name, in Integer
+     * @brief Returns the value of the given resource name, in Integer.
      * @param resource, List of resource names which can return value using this function are
      * 'BootstrapServer', 'SecurityMode', 'SMSSecurityMode',
      * 'M2MServerSMSNumber', 'ShortServerID', 'ClientHoldOffTime'.

@@ -23,6 +23,10 @@ class M2MTimer;
 
 typedef Vector<M2MObject *> M2MObjectList;
 
+/**
+ * @brief M2MNsdlInterface
+ * Class which interacts between C++ Library and mbed-client-c library.
+ */
 class M2MNsdlInterface : public M2MTimerObserver,
                          public M2MObservationHandler
 {
@@ -165,8 +169,19 @@ public:
                                sn_nsdl_addr_s *address,
                                sn_nsdl_capab_e nsdl_capab);
 
+    /**
+     * @brief Callback when the bootstrap information is received from bootstrap server.
+     * @param server_info, Server information received from bootstrap server.
+     */
     void bootstrap_done_callback(sn_nsdl_oma_server_info_t *server_info);
 
+    /**
+     * @brief Callback when there is data received from server and needs to be processed.
+     * @param data, data received from server.
+     * @param data_size, data size received from server.
+     * @param addres, address structure of the server.
+     * @return true if successfully processed else false.
+     */
     bool process_received_data(uint8_t *data,
                                uint16_t data_size,
                                sn_nsdl_addr_s *address);

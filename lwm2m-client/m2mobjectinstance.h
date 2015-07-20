@@ -12,8 +12,8 @@ class M2MResource;
 typedef Vector<M2MResource *> M2MResourceList;
 
 /**
- *  @brief M2MObject.
- *  This class is the base class for LWM2M Objects based on which all defined
+ *  @brief M2MObjectInstance.
+ *  This class is the instance class for LWM2M Objects based on which all defined
  *  LWM2M objects model can be created. This class will also hold all resources
  *  instances associated with the given object.
  */
@@ -85,16 +85,16 @@ public:
 
     /**
      * @brief Removes the resource with given name.
-     * @param name, Name of the resource to be removed
-     * @param instance_id, Instance ID of resource to be removed, default is 0
+     * @param name, Name of the resource to be removed.
+     * @param instance_id, Instance ID of resource to be removed, default is 0.
      * @return True if removed else false.
      */
     virtual bool remove_resource(const String &name, uint16_t instance_id = 0);
 
     /**
-     * @brief Returns resource with the given name
-     * @param name, Name of the requested resource
-     * @param instance_id, Instance ID of the requested resource, default is 0
+     * @brief Returns resource with the given name.
+     * @param name, Name of the requested resource.
+     * @param instance_id, Instance ID of the requested resource, default is 0.
      * @return Resource reference if found else NULL.
      */
     virtual M2MResource* resource(const String &name, uint16_t instance_id = 0) const;
@@ -119,8 +119,8 @@ public:
     virtual uint16_t resource_count(const String& resource) const;
 
     /**
-     * @brief Returns object type
-     * @return BaseType
+     * @brief Returns object type.
+     * @return BaseType.
      */
     M2MBase::BaseType base_type() const;
 

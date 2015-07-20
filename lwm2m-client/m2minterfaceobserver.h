@@ -50,7 +50,7 @@ public:
     /**
      * @brief Callback informing that the device object registration has been
      * updated successfully on the LWM2M serevr.
-     * @param server_object Server object on which the device object registration
+     * @param security_object Server object on which the device object registration
      * updated. The object ownership is passed.
      * @param server_object, Object containing information about LWM2M server.
      * Client maintains the object.

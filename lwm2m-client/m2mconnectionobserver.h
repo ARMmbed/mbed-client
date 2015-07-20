@@ -7,7 +7,8 @@
 #include "lwm2m-client/m2minterface.h"
 
 /**
- * @brief Observer class for informing socket activity to the state machine
+ * @brief M2MConnectionObserver
+ * Observer class for informing socket activity to the state machine.
  */
 
 class M2MConnectionObserver
@@ -15,13 +16,17 @@ class M2MConnectionObserver
 
 public :
 
+    /**
+      * @enum ServerType, Defines the type of
+      * server client wants to use.
+      */
     typedef enum {
         Bootstrap,
         LWM2MServer
     }ServerType;
 
     /**
-     * @brief The M2MSocketAddress struct
+     * @brief The M2MSocketAddress struct.
      * Unified container for holding socket address data
      * across different platforms.
      */
@@ -34,7 +39,7 @@ public :
 
     /**
     * @brief Indicates data is available from socket.
-    * @param data, data read from socket
+    * @param data, data read from socket.
     * @param data_size, length of data read from socket.
     * @param address, Server Address from where data is coming.
     */
@@ -44,8 +49,8 @@ public :
 
     /**
     * @brief Indicates some error occured in socket.
-    * @param error_code, Error code from socket.
-    * It cannot be used any further.
+    * @param error_code, Error code from socket,
+    * it cannot be used any further.
     */
     virtual void socket_error(uint8_t error_code) = 0;
 

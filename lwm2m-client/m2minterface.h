@@ -45,6 +45,10 @@ public:
         NotAllowed
     }Error;
 
+    /**
+     * @brief Enum defining different kind of binding
+     * mode handled for LWM2M operations.
+     */
     typedef enum {
         NOT_SET = 0,
         UDP = 0x01,
@@ -55,6 +59,10 @@ public:
         UDP_SMS_QUEUE = 0x07
     }BindingMode;
 
+    /**
+     * @brief Enum defining different kind of network
+     * stack which can be used by LWM2M Client.
+     */
     typedef enum {
         Uninitialized = 0,
         LwIP_IPv4,
@@ -90,7 +98,7 @@ public:
      * required for registering to the LWM2M server.
      * If client wants to register to multiple LWM2M servers then it has call
      * this function once for each of LWM2M server object separately.
-     * @param object_list, Objects which contains information
+     * @param object_list, Objects which contains information.
      * which the client want to register to the LWM2M server.
      */
     virtual void register_object(M2MSecurity *security_object, const M2MObjectList &object_list) = 0;
@@ -98,7 +106,7 @@ public:
     /**
      * @brief Updates or refreshes the client's registration on the LWM2M
      * server.
-     * @param security_object, Security object from which the device object
+     * @param security_object, Security object from which the device object.
      * needs to update registration, if there is only one LWM2M server registered
      * then this parameter can be NULL.
      * @param lifetime, Lifetime for the endpoint client in seconds, if the same value

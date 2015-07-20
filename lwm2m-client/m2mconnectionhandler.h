@@ -21,6 +21,12 @@ class M2MConnectionHandlerPimpl;
 
 class M2MConnectionHandler {
 public:
+
+    /**
+     * @enum ConnectionError
+     * This enum defines error which can come from
+     * socket read and write operation.
+     */
     typedef enum {
         CONNECTION_ERROR_WANTS_READ = -1000,
         CONNECTION_ERROR_WANTS_WRITE = -1001
@@ -43,7 +49,7 @@ public:
     /**
     * @brief This binds the socket connection.
     * @param listen_port Port to listen for incoming connection.
-    * @return true if successfulelse false.
+    * @return true if successful else false.
     */
     bool bind_connection(const uint16_t listen_port);
 
@@ -53,6 +59,8 @@ public:
     * @param String server address.
     * @param uint16_t Server port.
     * @param ServerType, Server Type to be resolved.
+    * @param security, M2MSecurity object which determines what
+    * kind of secure connection will be used by socket.
     * @return true if address is valid else false.
     */
     bool resolve_server_address(const String& server_address,
@@ -62,7 +70,10 @@ public:
 
     /**
     * @brief Sends data, to the connected sent to server.
-    * @param data, Data to be sent.
+    * @param data_ptr, Data to be sent.
+    * @param data_len, Length of data to be sent.
+    * @param address_ptr, Address structure where data has to be sent.
+    * @return True if data sent is successful else false.
     */
     bool send_data(uint8_t *data_ptr,
                            uint16_t data_len,
@@ -75,31 +86,31 @@ public:
     bool start_listening_for_data();
 
     /**
-    * @brief Stops listening for incoming data
+    * @brief Stops listening for incoming data.
     */
     void stop_listening();
 
     /**
      * @brief sendToSocket Sends directly to socket. This is used by
      * security classes to send after data has been encrypted.
-     * @param buf Buffer to send
-     * @param len Length of a buffer
-     * @return Number of bytes sent or -1 if failed
+     * @param buf Buffer to send.
+     * @param len Length of a buffer.
+     * @return Number of bytes sent or -1 if failed.
      */
     int sendToSocket(const unsigned char *buf, size_t len);
 
     /**
      * @brief receiveFromSocket Receives directly from a socket. This
      * is used by security classes to receive raw data to be decrypted.
-     * @param buf Buffer to send
-     * @param len Length of a buffer
+     * @param buf Buffer to send.
+     * @param len Length of a buffer.
      * @return Number of bytes read or -1 if failed.
      */
     int receiveFromSocket(unsigned char *buf, size_t len);
 
 
     /**
-    * @brief Closes the open connection
+    * @brief Closes the open connection.
     */
     void close_connection();
 
