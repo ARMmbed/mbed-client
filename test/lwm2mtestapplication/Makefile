@@ -46,6 +46,12 @@ override CXXFLAGS += -g
 # Generate dependency files when building
 override CFLAGS += -MMD -MP -MF"$(@:%.o=%.d)" -MT"$(@:%.o=%.d)"
 
+# Build with coverage
+ifeq ($(COVERAGE), 1)
+override CFLAGS += --coverage
+override CXXFLAGS += --coverage
+endif
+
 #
 # Libraries
 #
