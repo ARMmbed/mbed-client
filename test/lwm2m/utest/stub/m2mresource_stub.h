@@ -12,6 +12,8 @@ namespace m2mresource_stub
     extern uint32_t int_value;
     extern uint8_t* value;
     extern bool bool_value;
+    extern M2MResourceInstanceList list;
+    extern M2MResourceInstance *instance;
     void clear();
 }
 

@@ -28,7 +28,6 @@ void Test_M2MObject::test_copy_constructor()
     M2MObjectInstance *ins = new M2MObjectInstance("name");
     object->set_instance_id(0);
     object->_instance_list.push_back(ins);
-    object->_instance_index = 0;
 
     M2MObject* copy = new M2MObject(*object);
 
@@ -49,7 +48,6 @@ void Test_M2MObject::test_remove_object_instance()
     M2MObjectInstance *ins = new M2MObjectInstance("name");
     object->set_instance_id(0);
     object->_instance_list.push_back(ins);
-    object->_instance_index = 0;
 
     CHECK(true == object->remove_object_instance(0));
 
@@ -62,7 +60,6 @@ void Test_M2MObject::test_object_instance()
     M2MObjectInstance *ins = new M2MObjectInstance(*test);
     object->set_instance_id(0);
     object->_instance_list.push_back(ins);
-    object->_instance_index = 0;
 
     m2mbase_stub::string_value = test;
 
@@ -81,12 +78,10 @@ void Test_M2MObject::test_instances()
     M2MObjectInstance *ins = new M2MObjectInstance(*test);
     ins->set_instance_id(0);
     object->_instance_list.push_back(ins);
-    object->_instance_index = 0;
 
     M2MObjectInstance *ins1 = new M2MObjectInstance(*test);
     ins1->set_instance_id(1);
     object->_instance_list.push_back(ins1);
-    object->_instance_index = 1;
 
     m2mbase_stub::string_value = test;
 
@@ -106,12 +101,10 @@ void Test_M2MObject::test_instance_count()
     M2MObjectInstance *ins = new M2MObjectInstance(test);
     object->set_instance_id(0);
     object->_instance_list.push_back(ins);
-    object->_instance_index = 0;
 
     ins = new M2MObjectInstance(test);
     object->set_instance_id(1);
     object->_instance_list.push_back(ins);
-    object->_instance_index = 1;
 
     CHECK(2 == object->instance_count());
 }
@@ -130,9 +123,23 @@ void Test_M2MObject::test_handle_observation_attribute()
     M2MObjectInstance *ins = new M2MObjectInstance("name");
     object->set_instance_id(0);
     object->_instance_list.push_back(ins);
-    object->_instance_index = 0;
 
     m2mobjectinstance_stub::bool_value = true;
     ret = object->handle_observation_attribute(c);
     CHECK(ret == true);
+}
+
+void Test_M2MObject::test_handle_get_request()
+{
+
+}
+
+void Test_M2MObject::test_handle_put_request()
+{
+
+}
+
+void Test_M2MObject::test_handle_post_request()
+{
+
 }

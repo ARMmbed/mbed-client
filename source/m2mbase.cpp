@@ -6,6 +6,7 @@
 #include "lwm2m-client/m2mconstants.h"
 #include "lwm2m-client/m2mtimer.h"
 #include "include/m2mreporthandler.h"
+#include "include/nsdllinker.h"
 
 M2MBase& M2MBase::operator=(const M2MBase& other)
 {
@@ -19,23 +20,8 @@ M2MBase& M2MBase::operator=(const M2MBase& other)
         _instance_id = other._instance_id;
         _observable = other._observable;
         _observation_number = other._observation_number;
-        _is_numeric = other._is_numeric;
 
         _observation_handler = other._observation_handler;
-
-        if(_value) {
-            free(_value);
-            _value = NULL;
-            _value_length = 0;
-        }
-        _value_length = other._value_length;
-        if(other._value) {
-            _value = (uint8_t *)malloc(other._value_length+1);
-            if(_value) {
-                memset(_value, 0, other._value_length+1);
-                memcpy((uint8_t *)_value, (uint8_t *)other._value, other._value_length);
-            }
-        }
 
         if(_token) {
             free(_token);
@@ -64,8 +50,6 @@ M2MBase& M2MBase::operator=(const M2MBase& other)
 
 M2MBase::M2MBase(const M2MBase& other) :
     _report_handler(NULL),
-    _value(NULL),
-    _value_length(0),
     _token(NULL),
     _token_length(0)
 {
@@ -79,17 +63,6 @@ M2MBase::M2MBase(const M2MBase& other) :
     _observable = other._observable;
     _observation_handler = other._observation_handler;
     _observation_number = other._observation_number;
-    _is_numeric = other._is_numeric;
-    _value_length = other._value_length;
-
-
-    if(other._value) {
-        _value = (uint8_t *)malloc(other._value_length+1);
-        if(_value) {
-            memset(_value, 0, other._value_length+1);
-            memcpy((uint8_t *)_value, (uint8_t *)other._value, other._value_length);
-        }
-    }
 
     _token_length = other._token_length;
     if(other._token) {
@@ -116,12 +89,14 @@ M2MBase::M2MBase(const String & resource_name,
   _instance_id(0),
   _observable(false),
   _observation_number(0),
-  _value(NULL),
-  _value_length(0),
-  _is_numeric(false),
   _token(NULL),
   _token_length(0)
 {
+    if(is_integer(_name)) {
+        _name_id = strtoul(_name.c_str(), NULL, 10);        
+    } else {
+        _name_id = -1;
+    }
 }
 
 M2MBase::~M2MBase()
@@ -129,11 +104,6 @@ M2MBase::~M2MBase()
     if(_report_handler) {
         delete _report_handler;
         _report_handler = NULL;
-    }
-    if(_value) {
-        free(_value);
-        _value = NULL;
-        _value_length = 0;
     }
     if(_token) {
         free(_token);
@@ -176,7 +146,6 @@ void M2MBase::set_observable(bool observable)
 void M2MBase::set_under_observation(bool observed,
                                     M2MObservationHandler *handler)
 {
-
     _observation_handler = handler;
     if(handler) {
         if(!_report_handler){
@@ -189,7 +158,6 @@ void M2MBase::set_under_observation(bool observed,
             _report_handler = NULL;
         }
     }
-
 }
 
 void M2MBase::set_observation_token(const uint8_t *token, const uint8_t length)
@@ -215,33 +183,6 @@ void M2MBase::set_instance_id(const uint16_t inst_id)
     _instance_id = inst_id;
 }
 
-bool M2MBase::set_value(const uint8_t *value,
-                        const uint32_t value_length,
-                        bool  is_numeric)
-{
-    bool success = false;
-    if(_value) {
-         free(_value);
-         _value = NULL;
-         _value_length = 0;
-    }
-
-    if( value != NULL && value_length > 0 ) {
-        success = true;
-        _is_numeric = is_numeric;
-        _value = (uint8_t *)malloc(value_length+1);
-        if(_value) {
-            memset(_value, 0, value_length+1);
-            memcpy((uint8_t *)_value, (uint8_t *)value, value_length);
-            _value_length = value_length;
-            if(_is_numeric && _report_handler) {
-                _report_handler->set_value(atof((const char*)_value));
-            }
-        }
-    }
-    return success;
-}
-
 void M2MBase::set_observation_number(const uint16_t observation_number)
 {
     _observation_number = observation_number;
@@ -260,6 +201,11 @@ M2MBase::Operation M2MBase::operation() const
 const String& M2MBase::name() const
 {
     return _name;
+}
+
+int M2MBase::name_id() const
+{
+    return _name_id;
 }
 
 uint16_t M2MBase::instance_id() const
@@ -307,24 +253,6 @@ M2MBase::Mode M2MBase::mode() const
     return _mode;
 }
 
-void M2MBase::get_value(uint8_t *&value, uint32_t &value_length)
-{
-    value_length = 0;
-    if(value) {
-        free(value);
-        value = NULL;
-    }
-
-    if(_value && _value_length > 0) {
-        value = (uint8_t *)malloc(_value_length+1);
-        if(value) {
-            value_length = _value_length;
-            memset(value, 0, _value_length+1);
-            memcpy((uint8_t *)value, (uint8_t *)_value, value_length);
-        }
-    }
-}
-
 uint16_t M2MBase::observation_number() const
 {
     return _observation_number;
@@ -341,6 +269,7 @@ bool M2MBase::handle_observation_attribute(char *&query)
 
 void M2MBase::observation_to_be_sent()
 {
+    //TODO: Move this to M2MResourceInstance
     if(_observation_handler) {
        _observation_handler->observation_to_be_sent(this);
     }
@@ -363,4 +292,63 @@ void M2MBase::remove_object_from_coap()
     if(_observation_handler) {
         _observation_handler->remove_object(this);
     }
+}
+
+sn_coap_hdr_s* M2MBase::handle_get_request(nsdl_s */*nsdl*/,
+                                           sn_coap_hdr_s */*received_coap_header*/,
+                                           M2MObservationHandler */*observation_handler*/)
+{
+    //Handled in M2MResource, M2MObjectInstance and M2MObject classes
+    return NULL;
+}
+
+sn_coap_hdr_s* M2MBase::handle_put_request(nsdl_s */*nsdl*/,
+                                           sn_coap_hdr_s */*received_coap_header*/,
+                                           M2MObservationHandler */*observation_handler*/)
+{
+    //Handled in M2MResource, M2MObjectInstance and M2MObject classes
+    return NULL;
+}
+
+sn_coap_hdr_s* M2MBase::handle_post_request(nsdl_s */*nsdl*/,
+                                            sn_coap_hdr_s */*received_coap_header*/,
+                                            M2MObservationHandler */*observation_handler*/)
+{
+    //Handled in M2MResource, M2MObjectInstance and M2MObject classes
+    return NULL;
+}
+
+void *M2MBase::memory_alloc(uint16_t size)
+{
+    if(size)
+        return malloc(size);
+    else
+        return 0;
+}
+
+void M2MBase::memory_free(void *ptr)
+{
+    if(ptr)
+        free(ptr);
+}
+
+M2MReportHandler* M2MBase::report_handler()
+{
+    return _report_handler;
+}
+
+M2MObservationHandler* M2MBase::observation_handler()
+{
+    return _observation_handler;
+}
+
+bool M2MBase::is_integer(const String &value)
+{
+    const char *s = value.c_str();
+    if(value.empty() || ((!isdigit(s[0])) && (s[0] != '-') && (s[0] != '+'))) {
+        return false;
+    }
+    char * p ;
+    strtol(value.c_str(), &p, 10);
+    return (*p == 0);
 }

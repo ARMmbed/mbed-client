@@ -15,6 +15,7 @@ namespace m2mobject_stub
     extern bool bool_value;
     extern M2MObjectInstanceList instance_list;
     extern M2MBase::BaseType base_type;
+    extern sn_coap_hdr_s *header;
     void clear();
 }
 

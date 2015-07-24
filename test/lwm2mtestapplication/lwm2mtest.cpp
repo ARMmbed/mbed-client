@@ -218,8 +218,10 @@ bool M2MLWClient::create_static_resource_string(const char *name,
     if(_object) {
         M2MObjectInstance *inst = _object->object_instance(object_instance);
         if(inst) {
-            if(inst->create_static_resource(name,"resource",(const uint8_t*)value_string.c_str(),
-                                            value_string.size(),multiple_instance) != NULL) {
+            if(inst->create_static_resource(name,"resource",
+                                            M2MResourceInstance::STRING,
+                                            (const uint8_t*)value_string.c_str(),
+                                            value_string.size()) != NULL) {
                 success = true;
             }
         }
@@ -247,8 +249,10 @@ bool M2MLWClient::create_static_resource_int(const char *name,
     if(_object) {
         M2MObjectInstance *inst = _object->object_instance(object_instance);
         if(inst) {
-            if(inst->create_static_resource(name,"resource",(const uint8_t*)value_string.c_str(),
-                                            value_string.size(),multiple_instance) != NULL) {
+            if(inst->create_static_resource(name,"resource",
+                                            M2MResourceInstance::INTEGER,
+                                            (const uint8_t*)value_string.c_str(),
+                                            value_string.size()) != NULL) {
                 success = true;
             }
         }
@@ -270,7 +274,8 @@ bool M2MLWClient::create_dynamic_resource(const char *name,
         M2MObjectInstance *inst = _object->object_instance(object_instance);
         if(inst) {
             if(inst->create_dynamic_resource(name,"resource",
-                                             observable,multiple_instance) != NULL) {
+                                             M2MResourceInstance::OPAQUE,
+                                             observable) != NULL) {
                 success = true;
             }
         }

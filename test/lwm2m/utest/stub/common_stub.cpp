@@ -17,6 +17,7 @@ addrinfo* common_stub::addrinfo;
 uint16_t common_stub::uint_value;
 omalw_certificate_list_t *common_stub::cert;
 sn_coap_hdr_s *common_stub::coap_header;
+sn_nsdl_resource_info_s *common_stub::resource;
 pthread_t common_stub::thread;
 const char* common_stub::char_value;
 
@@ -35,6 +36,7 @@ void common_stub::clear()
     visited = false;
     bool_value= false;
     coap_header = NULL;
+    resource = NULL;
     addrinfo = NULL;
     char_value = NULL;
 }
@@ -108,6 +110,11 @@ int8_t sn_nsdl_destroy(struct nsdl_s *handle)
 sn_coap_hdr_s *sn_nsdl_build_response(struct nsdl_s *, sn_coap_hdr_s *, uint8_t )
 {
     return common_stub::coap_header;
+}
+
+sn_nsdl_resource_info_s *sn_nsdl_get_resource(struct nsdl_s *, uint16_t, uint8_t *)
+{
+    return common_stub::resource;
 }
 
 int8_t sn_nsdl_process_coap(struct nsdl_s *, uint8_t *, uint16_t , sn_nsdl_addr_s *)

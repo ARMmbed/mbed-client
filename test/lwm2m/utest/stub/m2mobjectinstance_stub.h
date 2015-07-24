@@ -13,6 +13,8 @@ namespace m2mobjectinstance_stub
     extern bool bool_value;
     extern M2MResource *resource;
     extern M2MResource* create_resource;
+    extern M2MResourceInstance* create_resource_instance;
+    extern sn_coap_hdr_s* header;
     extern M2MResourceList resource_list;
     void clear();    
 }

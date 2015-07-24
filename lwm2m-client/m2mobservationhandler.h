@@ -7,6 +7,7 @@
 
 //FORWARD DECLARATION
 class M2MBase;
+class M2MResourceInstance;
 
 /**
  * @brief M2MObservationHandler
@@ -33,6 +34,12 @@ class M2MObservationHandler
      * needs to be deleted.
      */
     virtual void resource_to_be_deleted(const String &resource_name) = 0;
+
+    /**
+     * @brief Callback informing that the value of the resource object is updated by server.
+     * @param base, Object whose value is updated.
+     */
+    virtual void value_updated(M2MBase *base) = 0;
 
     /**
      * @brief Object to be removed from list.

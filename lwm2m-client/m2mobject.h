@@ -30,7 +30,6 @@ protected :
      */
     M2MObject(const String &object_name);
 
-
     // Prevents the use of default constructor.
     M2MObject();
 
@@ -52,7 +51,7 @@ public:
      * client can respond to server's GET methods with the provided value.
      * @return M2MObjectInstance, Object instance to manage other LWM2M operations.
      */
-    M2MObjectInstance* create_object_instance();
+    M2MObjectInstance* create_object_instance(uint16_t instance_id = 0);
 
     /**
      * @brief Removes the object instance resource with given instance id.
@@ -93,14 +92,44 @@ public:
      */
     virtual bool handle_observation_attribute(char *&query);
 
+    /**
+     * @brief Handles GET request for the registered objects.
+     * @param nsdl, NSDL handler for the Coap library.
+     * @param received_coap_header, Received CoAP message from the server.
+     * @param observation_handler, Handler object for sending
+     * observation callbacks.
+     * @return sn_coap_hdr_s,  Message that needs to be sent to server.
+     */
+    virtual sn_coap_hdr_s* handle_get_request(nsdl_s *nsdl,
+                                              sn_coap_hdr_s *received_coap_header,
+                                              M2MObservationHandler *observation_handler = NULL);
+    /**
+     * @brief Handles PUT request for the registered objects.
+     * @param nsdl, NSDL handler for the Coap library.
+     * @param received_coap_header, Received CoAP message from the server.
+     * @param observation_handler, Handler object for sending
+     * observation callbacks.
+     * @return sn_coap_hdr_s,  Message that needs to be sent to server.
+     */
+    virtual sn_coap_hdr_s* handle_put_request(nsdl_s *nsdl,
+                                              sn_coap_hdr_s *received_coap_header,
+                                              M2MObservationHandler *observation_handler = NULL);
+
+    /**
+     * @brief Handles GET request for the registered objects.
+     * @param nsdl, NSDL handler for the Coap library.
+     * @param received_coap_header, Received CoAP message from the server.
+     * @param observation_handler, Handler object for sending
+     * observation callbacks.
+     * @return sn_coap_hdr_s,  Message that needs to be sent to server.
+     */
+    virtual sn_coap_hdr_s* handle_post_request(nsdl_s *nsdl,
+                                               sn_coap_hdr_s *received_coap_header,
+                                               M2MObservationHandler *observation_handler = NULL);
+
 private:
 
-    void add_object_instance(M2MObjectInstance *obj);
-
-private:
-
-    M2MObjectInstanceList     _instance_list; // owned
-    uint16_t                  _instance_index;
+    M2MObjectInstanceList     _instance_list; // owned    
 
 friend class Test_M2MObject;
 friend class Test_M2MInterfaceImpl;

@@ -19,32 +19,33 @@ Test_M2MResource::Test_M2MResource()
 {
     resource = new M2MResource("name",
                                "resource_type",
-                               M2MBase::Static,false);
+                               M2MResourceInstance::INTEGER,
+                               false,false);
 }
 
 void Test_M2MResource::test_copy_constructor()
 {
-    u_int8_t value[] = {"value"};
-    resource->set_value(value,(u_int32_t)sizeof(value));
+//    u_int8_t value[] = {"value"};
+//    resource->set_value(value,(u_int32_t)sizeof(value));
 
-    M2MResource* copy = new M2MResource(*resource);
-    u_int8_t* out_value = (u_int8_t*)malloc(sizeof(u_int8_t));
-    u_int32_t out_size;
+//    M2MResource* copy = new M2MResource(*resource);
+//    u_int8_t* out_value = (u_int8_t*)malloc(sizeof(u_int8_t));
+//    u_int32_t out_size;
 
-    uint8_t* ptr = (uint8_t*)malloc((uint32_t)sizeof(value));
-    m2mbase_stub::value = ptr;
-    memset(m2mbase_stub::value,0,(uint32_t)sizeof(value));
-    memcpy(m2mbase_stub::value,value,sizeof(value));
-    m2mbase_stub::int_value = (uint32_t)sizeof(value);
+//    uint8_t* ptr = (uint8_t*)malloc((uint32_t)sizeof(value));
+//    m2mbase_stub::value = ptr;
+//    memset(m2mbase_stub::value,0,(uint32_t)sizeof(value));
+//    memcpy(m2mbase_stub::value,value,sizeof(value));
+//    m2mbase_stub::int_value = (uint32_t)sizeof(value);
 
-    copy->get_value(out_value,out_size);
+//    copy->get_value(out_value,out_size);
 
-    CHECK(out_size == sizeof(value));
+//    CHECK(out_size == sizeof(value));
 
-    free(out_value);
-    free(ptr);
+//    free(out_value);
+//    free(ptr);
 
-    delete copy;
+//    delete copy;
 }
 
 Test_M2MResource::~Test_M2MResource()
@@ -69,17 +70,27 @@ void Test_M2MResource::test_handle_observation_attribute()
     CHECK(false == resource->handle_observation_attribute(d));
 }
 
-void Test_M2MResource::test_set_execute_function()
+void Test_M2MResource::test_add_resource_instance()
 {
-    MyTest test;
-    resource->set_execute_function(execute_callback(&test,&MyTest::execute_function));
+
 }
 
-void Test_M2MResource::test_execute()
+void Test_M2MResource::test_remove_resource_instance()
 {
-    MyTest test;
-    void *args = NULL;
-    resource->set_execute_function(execute_callback(&test,&MyTest::execute_function));
 
-    resource->execute(args);
+}
+
+void Test_M2MResource::test_resource_instance()
+{
+
+}
+
+void Test_M2MResource::test_resource_instances()
+{
+
+}
+
+void Test_M2MResource::test_resource_instance_count()
+{
+
 }

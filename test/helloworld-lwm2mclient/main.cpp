@@ -178,7 +178,11 @@ void trace_printer(const char* str)
   printf("%s\r\n", str);
 }
 
+#ifdef TARGET_LIKE_MBED
+void app_start(int /*argc*/, char* /*argv*/[]) {
+#else
 int main() {
+#endif
 
     // Instantiate the class which implements
     // LWM2M Client API
@@ -363,7 +367,11 @@ int main() {
     object_list.push_back(object);
 
     // Issue register command.
-    lwm2mclient.test_register(object_list);
+
+    FunctionPointer1<void, M2MObjectList> fp(&lwm2mclient, &M2MLWClient::test_register);
+    minar::Scheduler::postCallback(fp.bind(object_list));
+
+    minar::Scheduler::start();
 
     // Wait till the register callback is called successfully.
     // Callback comes in object_registered()
@@ -373,7 +381,7 @@ int main() {
         mesh_api->processEvent();
     } while(!lwm2mclient.register_successful());
 #else
-    while (!lwm2mclient.register_successful()) { __WFI(); }
+//    while (!lwm2mclient.register_successful()) { __WFI(); }
 #endif
 
     // Wait for the unregister successful callback,
@@ -385,7 +393,7 @@ int main() {
         mesh_api->processEvent();
     } while(!lwm2mclient.unregister_successful());
 #else
-    while (!lwm2mclient.unregister_successful()) { __WFI(); }
+//    while (!lwm2mclient.unregister_successful()) { __WFI(); }
 #endif
 
 
@@ -402,12 +410,6 @@ int main() {
     }
 
 #else
-
-    // This will turn on the LED on the board specifying that
-    // the application has run successfully.
-    notify_completion(lwm2mclient.unregister_successful() &&
-                      lwm2mclient.register_successful());
-
 
     // Disconnect the connect and teardown the network interface
 #ifdef SIXLOWPAN_INTERFACE
@@ -428,5 +430,7 @@ int main() {
 
 #endif //TARGET_LIKE_LINUX
 
-    return 0;
+#ifndef TARGET_LIKE_MBED
+return 0;
+#endif
 }

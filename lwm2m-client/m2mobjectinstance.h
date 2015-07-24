@@ -5,11 +5,11 @@
 #define M2M_OBJECT_INSTANCE_H
 
 #include "m2mvector.h"
-#include "m2mbase.h"
+#include "m2mresource.h"
 
 //FORWARD DECLARATION
-class M2MResource;
 typedef Vector<M2MResource *> M2MResourceList;
+typedef Vector<M2MResourceInstance *> M2MResourceInstanceList;
 
 /**
  *  @brief M2MObjectInstance.
@@ -49,7 +49,6 @@ private: // Constructor and destructor are private
 
 public:
 
-
     /**
      * @brief Creates static resource for a given object LWM2M Inteface using which
      * client can respond to server's GET methods with the provided value.
@@ -63,6 +62,7 @@ public:
      */
     M2MResource* create_static_resource(const String &resource_name,
                                         const String &resource_type,
+                                        M2MResourceInstance::ResourceType type,
                                         const uint8_t *value,
                                         const uint8_t value_length,
                                         bool multiple_instance = false);
@@ -80,28 +80,70 @@ public:
      */
     M2MResource* create_dynamic_resource(const String &resource_name,
                                          const String &resource_type,
+                                         M2MResourceInstance::ResourceType type,
                                          bool observable,
-                                         bool multiple_instance =false);
+                                         bool multiple_instance = false);
+
+
+    /**
+     * @brief Creates static resource instance for a given object LWM2M Inteface using which
+     * client can respond to server's GET methods with the provided value.
+     * @param resource_name, Name of the resource.
+     * @param resource_type, Type of the resource.
+     * @param value, pointer to the value of the resource.
+     * @param value_length, length to the value in pointer.
+     * @param instance_id, Instance Id of the resource.
+     * @return M2MResourceInstance, Resource Instance to manage other LWM2M operations.
+     */
+    M2MResourceInstance* create_static_resource_instance(const String &resource_name,
+                                                         const String &resource_type,
+                                                         M2MResourceInstance::ResourceType type,
+                                                         const uint8_t *value,
+                                                         const uint8_t value_length,
+                                                         uint16_t instance_id);
+
+    /**
+     * @brief Creates dynamic resource instance for a given object LWM2M Inteface using which
+     * client can respond to different queries from server (GET,PUT etc).Also,
+     * this type of resource is observable and will carry callbacks.
+     * @param resource_name, Name of the resource.
+     * @param resource_type, Type of the resource.
+     * @param observable, whether resource is observable or not.
+     * @param instance_id, Instance Id of the resource.
+     * @return M2MResourceInstance, Resource Instance to manage other LWM2M operations.
+     */
+    M2MResourceInstance* create_dynamic_resource_instance(const String &resource_name,
+                                                          const String &resource_type,
+                                                          M2MResourceInstance::ResourceType type,
+                                                          bool observable,
+                                                          uint16_t instance_id);
 
     /**
      * @brief Removes the resource with given name.
      * @param name, Name of the resource to be removed.
-     * @param instance_id, Instance ID of resource to be removed, default is 0.
      * @return True if removed else false.
      */
-    virtual bool remove_resource(const String &name, uint16_t instance_id = 0);
+    virtual bool remove_resource(const String &name);
+
+    /**
+     * @brief Removes the resource instance with given name.
+     * @param resource_name, Name of the resource instance to be removed.
+     * @param instance_id, Instance Id of the instance.
+     * @return True if removed else false.
+     */
+    virtual bool remove_resource_instance(const String &resource_name,
+                                          uint16_t instance_id);
 
     /**
      * @brief Returns resource with the given name.
      * @param name, Name of the requested resource.
-     * @param instance_id, Instance ID of the requested resource, default is 0.
      * @return Resource reference if found else NULL.
      */
-    virtual M2MResource* resource(const String &name, uint16_t instance_id = 0) const;
+    virtual M2MResource* resource(const String &name) const;
 
     /**
-     * @brief Returns list of resources
-     * @return List of resources with the object.
+     * @brief Returns list of M2MResourceBase objects.
+     * @return List of Resource base with the object instance.
      */
     virtual const M2MResourceList& resources() const;
 
@@ -131,9 +173,40 @@ public:
      */
     virtual bool handle_observation_attribute(char *&query);
 
-private:
+    /**
+     * @brief Handles GET request for the registered objects.
+     * @param nsdl, NSDL handler for the Coap library
+     * @param received_coap_header, Received CoAP message from the server
+     * @param observation_handler, Handler object for sending
+     * observation callbacks.
+     * @return sn_coap_hdr_s,  Message that needs to be sent to server.
+     */
+    virtual sn_coap_hdr_s* handle_get_request(nsdl_s *nsdl,
+                                              sn_coap_hdr_s *received_coap_header,
+                                              M2MObservationHandler *observation_handler = NULL);
+    /**
+     * @brief Handles PUT request for the registered objects.
+     * @param nsdl, NSDL handler for the Coap library
+     * @param received_coap_header, Received CoAP message from the server
+     * @param observation_handler, Handler object for sending
+     * observation callbacks.
+     * @return sn_coap_hdr_s,  Message that needs to be sent to server.
+     */
+    virtual sn_coap_hdr_s* handle_put_request(nsdl_s *nsdl,
+                                              sn_coap_hdr_s *received_coap_header,
+                                              M2MObservationHandler *observation_handler = NULL);
 
-    void add_resource(M2MResource *res);
+    /**
+     * @brief Handles GET request for the registered objects.
+     * @param nsdl, NSDL handler for the Coap library
+     * @param received_coap_header, Received CoAP message from the server
+     * @param observation_handler, Handler object for sending
+     * observation callbacks.
+     * @return sn_coap_hdr_s,  Message that needs to be sent to server.
+     */
+    virtual sn_coap_hdr_s* handle_post_request(nsdl_s *nsdl,
+                                               sn_coap_hdr_s *received_coap_header,
+                                               M2MObservationHandler *observation_handler = NULL);
 
 private:
 

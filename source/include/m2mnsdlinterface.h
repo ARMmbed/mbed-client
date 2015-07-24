@@ -16,6 +16,7 @@ class M2MSecurity;
 class M2MObject;
 class M2MObjectInstance;
 class M2MResource;
+class M2MResourceInstance;
 class M2MNsdlObserver;
 class M2MBase;
 class M2MServer;
@@ -192,11 +193,13 @@ protected: // from M2MTimerObserver
 
 protected: // from M2MObservationHandler
 
-    virtual void observation_to_be_sent(M2MBase *object);
+    void observation_to_be_sent(M2MBase *object);
 
-    virtual void resource_to_be_deleted(const String &resource_name);
+    void resource_to_be_deleted(const String &resource_name);
 
-    virtual void remove_object(M2MBase *object);
+    void value_updated(M2MBase *base);
+
+    void remove_object(M2MBase *object);
 
 private:
 
@@ -206,11 +209,6 @@ private:
     */
     bool initialize();
 
-    /**
-     * @brief Adds object to the observation list
-     * @param object, Object to be added
-     * @return true if added else false if already exists.
-     */
     bool add_object_to_list(M2MObject *object);
 
     bool create_nsdl_object_structure(M2MObject *object);
@@ -218,7 +216,10 @@ private:
     bool create_nsdl_object_instance_structure(M2MObjectInstance *object_instance);
 
     bool create_nsdl_resource_structure(M2MResource *resource,
-                                        const String &object_name = "");
+                                        const String &object_name = "",
+                                        bool multiple_instances = false);
+
+    bool create_nsdl_resource(M2MBase *base, const String &name = "");
 
     String coap_to_string(uint8_t *coap_data_ptr,
                           int coap_data_ptr_length);
@@ -235,59 +236,17 @@ private:
     M2MBase* find_resource(const M2MObjectInstance *object_instance,
                            const String &resource_instance);
 
+    M2MBase* find_resource(const M2MResource *resource,
+                           const String &object_name,
+                           const String &resource_instance);
+
     bool object_present(M2MObject * object) const;
-
-    uint8_t handle_get_request(sn_coap_hdr_s *received_coap_header,
-                               M2MBase *base,
-                               sn_nsdl_addr_s *address);
-
-    uint8_t handle_put_request(sn_coap_hdr_s *received_coap_header,
-                               M2MBase *base,
-                               sn_nsdl_addr_s *address);
-
-    uint8_t handle_post_request(sn_coap_hdr_s *received_coap_header,
-                                M2MBase *base,
-                                sn_nsdl_addr_s *address);
-
-    uint8_t handle_resource_get_request(sn_coap_hdr_s *received_coap_header,
-                                        M2MResource *resource,
-                                        sn_nsdl_addr_s *address);
-
-    uint8_t handle_resource_put_request(sn_coap_hdr_s *received_coap_header,
-                                        M2MResource *resource,
-                                        sn_nsdl_addr_s *address);
-
-    uint8_t handle_resource_post_request(sn_coap_hdr_s *received_coap_header,
-                                         M2MResource *resource,
-                                         sn_nsdl_addr_s *address);
-
-    uint8_t handle_object_instance_get_request(sn_coap_hdr_s *received_coap_header,
-                                               M2MObjectInstance *instance,
-                                               sn_nsdl_addr_s *address);
-
-    uint8_t handle_object_instance_put_request(sn_coap_hdr_s *received_coap_header,
-                                               M2MObjectInstance *instance,
-                                               sn_nsdl_addr_s *address);
-
-    uint8_t handle_object_instance_post_request(sn_coap_hdr_s *received_coap_header,
-                                                M2MObjectInstance *instance,
-                                                sn_nsdl_addr_s *address);
-
-    uint8_t handle_object_get_request(sn_coap_hdr_s *received_coap_header,
-                                      M2MObject *object,
-                                      sn_nsdl_addr_s *address);
-
-    uint8_t handle_object_put_request(sn_coap_hdr_s *received_coap_header,
-                                      M2MObject *object,
-                                      sn_nsdl_addr_s *address);
-
-    uint8_t handle_object_post_request(sn_coap_hdr_s *received_coap_header,
-                                       M2MObject *object,
-                                       sn_nsdl_addr_s *address);
 
     void clear_resource(sn_nsdl_resource_info_s *&resource);
 
     M2MInterface::Error interface_error(sn_coap_hdr_s *coap_header);
+
+    void send_observation(M2MResourceInstance *resource);
 
 private:
 
