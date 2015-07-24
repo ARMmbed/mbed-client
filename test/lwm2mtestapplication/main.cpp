@@ -71,10 +71,12 @@ void trace_printer(const char* str)
 {
   printf("%s\r\n", str);
   cmd_output();
+  fflush(stdout);
 }
 void cmd_printer(const char *str)
 {
   cmd_printf("%s", str);
+  fflush(stdout);
 }
 
 void custom_cmd_response_out(const char* fmt, va_list ap)

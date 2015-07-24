@@ -487,7 +487,7 @@ int lwm2m_client_update_register_command(int argc, char *argv[])
 
     if(lifetime >= 0) {
         if(lwm2m_client.test_update_register(lifetime)) {
-            ret_code = CMDLINE_RETCODE_SUCCESS;
+            ret_code = CMDLINE_RETCODE_EXCUTING_CONTINUE;
         }
     }
     return ret_code;
