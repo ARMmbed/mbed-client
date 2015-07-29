@@ -278,6 +278,34 @@ bool M2MLWClient::create_dynamic_resource(const char *name,
     return success;
 }
 
+bool M2MLWClient::set_resource_value(const char *name,
+                                          int32_t value,
+                                          uint16_t object_instance)
+{
+    bool success = false;
+    String name_string;
+    String value_string;
+    if(name) {
+        name_string += name;
+    }
+
+    char value_buffer[20];
+    sprintf(value_buffer,"%d",value);
+    value_string += value_buffer;
+
+    if(_object && name_string.length() > 0) {
+        M2MObjectInstance *inst = _object->object_instance(object_instance);
+        if(inst) {
+            M2MResource *res = inst->resource(name_string, 0);
+            if (res) {
+                if (res->set_value((const uint8_t*)value_string.c_str(), value_string.size(), true)) {
+                    success = true;
+                }
+            }
+        }
+    }
+    return success;
+}
 
 bool M2MLWClient::test_register()
 {

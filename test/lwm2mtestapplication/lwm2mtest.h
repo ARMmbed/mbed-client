@@ -52,6 +52,10 @@ public:
                                  bool multiple_instance,
                                  uint16_t object_instance = 0);
 
+    bool set_resource_value(const char *name,
+                                    int32_t value,
+                                    uint16_t object_instance = 0);
+
     bool create_object_instance();
 
     bool test_register();

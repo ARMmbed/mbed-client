@@ -91,6 +91,7 @@ int lwm2m_client_register_object_command(int argc, char *argv[]);
 int lwm2m_client_register_command();
 int lwm2m_client_update_register_command(int argc, char *argv[]);
 int lwm2m_client_unregister_command();
+int lwm2m_client_set_value_command(int argc, char *argv[]);
 int exit_command(int argc, char *argv[]);
 
 void  lwm2m_command_init(void)
@@ -151,6 +152,10 @@ int lwm2m_client_command(int argc, char *argv[])
     else if( strcmp(argv[1], "unregister") == 0 )
     {
       return lwm2m_client_unregister_command();
+    }
+    else if ( strcmp(argv[1], "set_value") == 0)
+    {
+      return lwm2m_client_set_value_command(argc, argv);
     }
     //:TODO what another commands should be there ?
     return CMDLINE_RETCODE_COMMAND_NOT_IMPLEMENTED;
@@ -499,6 +504,24 @@ int lwm2m_client_unregister_command()
         return CMDLINE_RETCODE_EXCUTING_CONTINUE;
     }
     return CMDLINE_RETCODE_INVALID_PARAMETERS;
+}
+
+int lwm2m_client_set_value_command(int argc, char *argv[])
+{
+    int return_code = CMDLINE_RETCODE_INVALID_PARAMETERS;
+    char *name = 0;
+    int32_t value = 0;
+    int32_t object_instance = 0;
+
+    cmd_parameter_int(argc, argv, "--object_instance", &object_instance);
+
+    if(cmd_parameter_val(argc, argv, "--name", &name) &&
+       cmd_parameter_int(argc, argv, "--value", &value)) {
+        if(lwm2m_client.set_resource_value(name,value,object_instance)) {
+            return_code = CMDLINE_RETCODE_SUCCESS;
+        }
+    }
+    return return_code;
 }
 
 int exit_command(int argc, char *argv[])
