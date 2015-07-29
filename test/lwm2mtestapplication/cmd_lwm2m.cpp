@@ -74,7 +74,13 @@
                                     "<p>:\n"\
                                     "   Options for update-register command\n"\
                                     "   --lifetime <n>              Lifetime value in seconds\n"\
-                                    "unregister                     Issues Un-register command\n"
+                                    "unregister                     Issues Un-register command\n"\
+                                    "set_value <p> [options]\n"\
+                                    "<p>:\n"\
+                                    "   Options for set_value command \n"\
+                                    "   --name <name>               Resource name (Mandatory)\n"\
+                                    "   --value <value>             Resource value (Mandatory)\n"\
+                                    "   --object_instance <n>       Instance ID of object this resource is associated with, default is 0\n"
 
 #define EXIT_MANUAL         "exit :closes the application\n"
 
