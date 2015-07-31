@@ -4,35 +4,52 @@
 #ifndef M2M_RESOURCE_H
 #define M2M_RESOURCE_H
 
-#include "m2mbase.h"
-#include "functionpointer.h"
+#include "m2mvector.h"
+#include "m2mresourceinstance.h"
+
+//FORWARD DECLARATION
+typedef Vector<M2MResourceInstance *> M2MResourceInstanceList;
 
 /**
  *  @brief M2MResource.
  *  This class is the base class for LWM2M Resources based on which all defined
- *  LWM2M resource model can be created.
+ *  LWM2M objects model can be created. This class will also hold all resources
+ *  instances associated with the given object.
  */
-typedef FP1<void,void*> execute_callback;
 
-class M2MResource : public M2MBase {
+class M2MResource : public M2MResourceInstance {
 
 friend class M2MObjectInstance;
 
 private: // Constructor and destructor are private
          // so that these objects can be created or
          // deleted only through function provided by M2MObjectInstance.
+
     /**
-     * @brief Constructor for creating resource.
-     * @param name, name of the resource
-     * @param resource_type, Resource Type.
-     * @param resource_mode, Static or Dynamic.
-     * @param multiple_instance, Resource can have
-     *        multiple instances.
+     * @brief Constructor
+     * @param resource_name, Resource name of the object.
+     * @param resource_type, Resource type of the object.
+     * @param type, Resource Data Type of the object.
+     * @param value, Value pointer of the object.
+     * @param value_length, Length of the value pointer
+     * @param multiple_instance, True if resource supports instances.
      */
     M2MResource(const String &resource_name,
                 const String &resource_type,
-                M2MBase::Mode resource_mode,
-                bool multiple_instances = false);
+                M2MResourceInstance::ResourceType type,
+                const uint8_t *value,
+                const uint8_t value_length,
+                bool multiple_instance = false);
+
+    /**
+     * @brief Constructor
+     * @param name, name of the object
+     */
+    M2MResource(const String &resource_name,
+                const String &resource_type,
+                M2MResourceInstance::ResourceType type,
+                bool observable,
+                bool multiple_instance = false);
 
     // Prevents the use of default constructor.
     M2MResource();
@@ -51,12 +68,45 @@ private: // Constructor and destructor are private
 public:
 
     /**
-     * @brief Returns object type.
-     * @return BaseType.
+     * @brief Adds resource instances to the M2MResource.
+     * @param resource_instance, Resource Instance to be added.
      */
-    virtual M2MBase::BaseType base_type() const;
+    void add_resource_instance(M2MResourceInstance *resource_instance);
 
+    /**
+     * @brief Returns if the resource is having multiple
+     * resource instance or not.
+     * @return True if resource base is having multiple instance
+     * else false.
+     */
     bool supports_multiple_instances() const;
+
+    /**
+     * @brief Removes the resource with given name.
+     * @param name, Name of the resource to be removed.
+     * @param instance_id, Instance ID of resource to be removed, default is 0.
+     * @return True if removed else false.
+     */
+    virtual bool remove_resource_instance(uint16_t instance_id = 0);
+
+    /**
+     * @brief Returns resource instance with the given name.
+     * @param instance_id, Instance ID of the requested resource, default is 0
+     * @return M2MResourceInstance object if found else NULL.
+     */
+    virtual M2MResourceInstance* resource_instance(uint16_t instance_id = 0) const;
+
+    /**
+     * @brief Returns list of resources.
+     * @return List of resources with the object.
+     */
+    virtual const M2MResourceInstanceList& resource_instances() const;
+
+    /**
+     * @brief Returns total number of resources with the object.
+     * @return Total count of the resources.
+     */
+    virtual uint16_t resource_instance_count() const;
 
     /**
      * @brief Parses the received query for notification
@@ -65,33 +115,19 @@ public:
      */
     virtual bool handle_observation_attribute(char *&query);
 
-    /**
-     * @brief Sets the function which should be executed when this
-     * resource will receive POST command for this resource.
-     * @param callback, Function pointer which needs to be executed.
-     */
-    virtual void set_execute_function(execute_callback callback);
-
-    /**
-     * @brief Executes the function which is set in "set_execute_function".
-     * @param arguments, arguments that will be passed to execute which
-     * needs to be executed.
-     */
-    void execute(void *arguments);
-
 private:
 
-    bool                    _has_multiple_instances;
-    execute_callback        _execute_callback;
+    M2MResourceInstanceList     _resource_instance_list; // owned
+    bool                        _has_multiple_instances;
 
-    friend class Test_M2MResource;
-    friend class Test_M2MObjectInstance;
-    friend class Test_M2MObject;
-    friend class Test_M2MDevice;
-    friend class Test_M2MSecurity;
-    friend class Test_M2MServer;
-    friend class Test_M2MNsdlInterface;
+friend class Test_M2MResource;
+friend class Test_M2MObjectInstance;
+friend class Test_M2MObject;
+friend class Test_M2MDevice;
+friend class Test_M2MSecurity;
+friend class Test_M2MServer;
+friend class Test_M2MNsdlInterface;
+
 };
 
 #endif // M2M_RESOURCE_H
-

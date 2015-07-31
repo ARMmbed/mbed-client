@@ -8,6 +8,9 @@ bool m2mobjectinstance_stub::bool_value;
 M2MResource* m2mobjectinstance_stub::resource;
 M2MResource* m2mobjectinstance_stub::create_resource;
 M2MResourceList m2mobjectinstance_stub::resource_list;
+M2MResourceInstance* m2mobjectinstance_stub::create_resource_instance;
+sn_coap_hdr_s* m2mobjectinstance_stub::header;
+
 
 void m2mobjectinstance_stub::clear()
 {
@@ -15,6 +18,8 @@ void m2mobjectinstance_stub::clear()
     bool_value = false;
     resource = NULL;
     create_resource = NULL;
+    create_resource_instance = NULL;
+    header = NULL;
     resource_list.clear();
 }
 
@@ -40,6 +45,7 @@ M2MObjectInstance::~M2MObjectInstance()
 
 M2MResource* M2MObjectInstance::create_static_resource(const String &,
                                                const String &,
+                                               M2MResourceInstance::ResourceType,
                                                const uint8_t *,
                                                const uint8_t,
                                                bool)
@@ -49,18 +55,43 @@ M2MResource* M2MObjectInstance::create_static_resource(const String &,
 
 M2MResource* M2MObjectInstance::create_dynamic_resource(const String &,
                                                 const String &,
+                                                M2MResourceInstance::ResourceType,
                                                 bool,
                                                 bool)
 {
     return m2mobjectinstance_stub::create_resource;
 }
 
-bool M2MObjectInstance::remove_resource(const String &, uint16_t )
+M2MResourceInstance* M2MObjectInstance::create_static_resource_instance(const String &,
+                                               const String &,
+                                               M2MResourceInstance::ResourceType,
+                                               const uint8_t *,
+                                               const uint8_t,
+                                               uint16_t)
+{
+    return m2mobjectinstance_stub::create_resource_instance;
+}
+
+M2MResourceInstance* M2MObjectInstance::create_dynamic_resource_instance(const String &,
+                                                const String &,
+                                                M2MResourceInstance::ResourceType,
+                                                bool,
+                                                uint16_t)
+{
+    return m2mobjectinstance_stub::create_resource_instance;
+}
+
+bool M2MObjectInstance::remove_resource(const String &)
 {
     return m2mobjectinstance_stub::bool_value;
 }
 
-M2MResource* M2MObjectInstance::resource(const String &, uint16_t) const
+bool M2MObjectInstance::remove_resource_instance(const String &, uint16_t)
+{
+    return m2mobjectinstance_stub::bool_value;
+}
+
+M2MResource* M2MObjectInstance::resource(const String &) const
 {
     return m2mobjectinstance_stub::resource;
 }
@@ -87,4 +118,25 @@ M2MBase::BaseType M2MObjectInstance::base_type() const
 
 bool M2MObjectInstance::handle_observation_attribute(char *&){
     return m2mobjectinstance_stub::bool_value;
+}
+
+sn_coap_hdr_s* M2MObjectInstance::handle_get_request(nsdl_s *,
+                                  sn_coap_hdr_s *,
+                                  M2MObservationHandler *)
+{
+    return m2mobjectinstance_stub::header;
+}
+
+sn_coap_hdr_s* M2MObjectInstance::handle_put_request(nsdl_s *,
+                                  sn_coap_hdr_s *,
+                                  M2MObservationHandler *)
+{
+    return m2mobjectinstance_stub::header;
+}
+
+sn_coap_hdr_s* M2MObjectInstance::handle_post_request(nsdl_s *,
+                                   sn_coap_hdr_s *,
+                                   M2MObservationHandler *)
+{
+    return m2mobjectinstance_stub::header;
 }

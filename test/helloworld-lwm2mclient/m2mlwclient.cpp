@@ -6,6 +6,11 @@
 #include "lwm2m-client/m2mobjectinstance.h"
 #include "lwm2m-client/m2mresource.h"
 
+#ifdef TARGET_LIKE_MBED
+#include "minar/minar.h"
+#include "test_env.h"
+#endif
+
 // Enter your mbed Device Server's IPv4 address and Port number in
 // mentioned format like 192.168.0.1:5693
 const String &BOOTSTRAP_SERVER_ADDRESS = "coap://10.45.3.10:5693";
@@ -20,7 +25,7 @@ const String &MBED_SERVER_DTLS_ADDRESS = "coap://10.45.3.10:5684";
 #endif
 
 const uint16_t SERVER_PORT = 5683;
-const uint16_t SECURE_PORT = 5683;
+const uint16_t SECURE_PORT = 5684;
 
 const String &MANUFACTURER = "ARM";
 const String &TYPE = "type";
@@ -210,7 +215,10 @@ M2MObject* M2MLWClient::create_generic_object() {
     if(_object) {
         M2MObjectInstance* inst = _object->create_object_instance();
         if(inst) {
-            M2MResource* res = inst->create_dynamic_resource("Dynamic","ResourceTest",true);
+            M2MResource* res = inst->create_dynamic_resource("Dynamic",
+                                                             "ResourceTest",
+                                                             M2MResourceInstance::INTEGER,
+                                                             true);
             char buffer[20];
             int size = sprintf(buffer,"%d",_value);
             res->set_operation(M2MBase::GET_PUT_POST_ALLOWED);
@@ -221,6 +229,7 @@ M2MObject* M2MLWClient::create_generic_object() {
 
             inst->create_static_resource("Static",
                                          "ResourceTest",
+                                         M2MResourceInstance::STRING,
                                          STATIC_VALUE,
                                          sizeof(STATIC_VALUE)-1);
         }
@@ -236,8 +245,7 @@ void M2MLWClient::update_resource() {
             char buffer[20];
             int size = sprintf(buffer,"%d",_value);
             res->set_value((const uint8_t*)buffer,
-                           (const uint32_t)size,
-                           true);
+                           (const uint32_t)size);
             _value++;
         }
     }
@@ -291,6 +299,11 @@ void M2MLWClient::object_registered(M2MSecurity */*security_object*/, const M2MS
 void M2MLWClient::object_unregistered(M2MSecurity */*server_object*/){
     _unregistered = true;
     _registered = false;
+
+#ifdef TARGET_LIKE_MBED
+    notify_completion(_unregistered);
+    minar::Scheduler::stop();
+#endif
     printf("\nUnregistered\n");
 }
 

@@ -12,12 +12,16 @@ namespace m2mbase_stub
     extern uint8_t uint8_value;
     extern uint16_t uint16_value;
     extern uint16_t int_value;
+    extern int name_id_value;
     extern String *string_value;
-    extern uint8_t* value;
+    extern uint8_t *value;
     extern bool bool_value;
     extern M2MBase::BaseType base_type;
     extern M2MBase::Mode mode_value;
     extern M2MBase::Operation operation;
+    extern void *void_value;
+    extern M2MObservationHandler *observe;
+    extern M2MReportHandler *report;
     void clear();
 }
 

@@ -34,9 +34,19 @@ TEST(M2MObjectInstance, create_static_resource)
     m2m_object_instance->test_create_static_resource();
 }
 
+TEST(M2MObjectInstance, create_static_resource_instance)
+{
+    m2m_object_instance->test_create_static_resource_instance();
+}
+
 TEST(M2MObjectInstance, create_dynamic_resource)
 {
     m2m_object_instance->test_create_dynamic_resource();
+}
+
+TEST(M2MObjectInstance, create_dynamic_resource_instance)
+{
+    m2m_object_instance->test_create_dynamic_resource_instance();
 }
 
 TEST(M2MObjectInstance, remove_resource)
@@ -72,4 +82,19 @@ TEST(M2MObjectInstance, base_type)
 TEST(M2MObjectInstance, handle_observation_attribute)
 {
     m2m_object_instance->test_handle_observation_attribute();
+}
+
+TEST(M2MObjectInstance, handle_get_request)
+{
+    m2m_object_instance->test_handle_get_request();
+}
+
+TEST(M2MObjectInstance, handle_put_request)
+{
+    m2m_object_instance->test_handle_put_request();
+}
+
+TEST(M2MObjectInstance, handle_post_request)
+{
+    m2m_object_instance->test_handle_post_request();
 }

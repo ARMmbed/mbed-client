@@ -18,38 +18,52 @@ M2MSecurity::M2MSecurity(ServerType ser_type)
 
     if(_server_instance) {
 
-        M2MResource* res = _server_instance->create_dynamic_resource(SECURITY_M2M_SERVER_URI,OMA_RESOURCE_TYPE,
+        M2MResource* res = _server_instance->create_dynamic_resource(SECURITY_M2M_SERVER_URI,
+                                                                     OMA_RESOURCE_TYPE,
+                                                                     M2MResourceInstance::STRING,
                                                                      false);
         if(res) {
             res->set_operation(M2MBase::NOT_ALLOWED);
         }
-        res = _server_instance->create_dynamic_resource(SECURITY_BOOTSTRAP_SERVER,OMA_RESOURCE_TYPE,
+        res = _server_instance->create_dynamic_resource(SECURITY_BOOTSTRAP_SERVER,
+                                                        OMA_RESOURCE_TYPE,
+                                                        M2MResourceInstance::BOOLEAN,
                                                         false);
         if(res) {
             res->set_operation(M2MBase::NOT_ALLOWED);
         }
-        res = _server_instance->create_dynamic_resource(SECURITY_SECURITY_MODE,OMA_RESOURCE_TYPE,
+        res = _server_instance->create_dynamic_resource(SECURITY_SECURITY_MODE,
+                                                        OMA_RESOURCE_TYPE,
+                                                        M2MResourceInstance::INTEGER,
                                                         false);
         if(res) {
             res->set_operation(M2MBase::NOT_ALLOWED);
         }
-        res = _server_instance->create_dynamic_resource(SECURITY_PUBLIC_KEY,OMA_RESOURCE_TYPE,
+        res = _server_instance->create_dynamic_resource(SECURITY_PUBLIC_KEY,
+                                                        OMA_RESOURCE_TYPE,
+                                                        M2MResourceInstance::OPAQUE,
                                                         false);
         if(res) {
             res->set_operation(M2MBase::NOT_ALLOWED);
         }
-        res = _server_instance->create_dynamic_resource(SECURITY_SERVER_PUBLIC_KEY,OMA_RESOURCE_TYPE,
+        res = _server_instance->create_dynamic_resource(SECURITY_SERVER_PUBLIC_KEY,
+                                                        OMA_RESOURCE_TYPE,
+                                                        M2MResourceInstance::OPAQUE,
                                                         false);
         if(res) {
             res->set_operation(M2MBase::NOT_ALLOWED);
         }
-        res = _server_instance->create_dynamic_resource(SECURITY_SECRET_KEY,OMA_RESOURCE_TYPE,
+        res = _server_instance->create_dynamic_resource(SECURITY_SECRET_KEY,
+                                                        OMA_RESOURCE_TYPE,
+                                                        M2MResourceInstance::OPAQUE,
                                                         false);
         if(res) {
             res->set_operation(M2MBase::NOT_ALLOWED);
         }
         if(M2MSecurity::M2MServer == ser_type) {
-            res = _server_instance->create_dynamic_resource(SECURITY_SHORT_SERVER_ID,OMA_RESOURCE_TYPE,
+            res = _server_instance->create_dynamic_resource(SECURITY_SHORT_SERVER_ID,
+                                                            OMA_RESOURCE_TYPE,
+                                                            M2MResourceInstance::INTEGER,
                                                             false);
             if(res) {
                 res->set_operation(M2MBase::NOT_ALLOWED);
@@ -89,14 +103,18 @@ M2MResource* M2MSecurity::create_resource(SecurityResource resource, uint32_t va
         if(_server_instance) {
 
             res = _server_instance->create_dynamic_resource(security_id,OMA_RESOURCE_TYPE,
+                                                            M2MResourceInstance::INTEGER,
                                                             false);
 
             if(res) {
-                char buffer[20];
-                int size = sprintf(buffer,"%ld",(long int)value);
+                char *buffer;
+                int size = asprintf(&buffer,"%ld",(long int)value);
                 res->set_operation(M2MBase::NOT_ALLOWED);
                 res->set_value((const uint8_t*)buffer,
                                (const uint32_t)size);
+                if(size > 0) {
+                    free(buffer);
+                }
             }
         }
     }
@@ -160,11 +178,14 @@ bool M2MSecurity::set_resource_value(SecurityResource resource,
            M2MSecurity::ClientHoldOffTime == resource) {
             // If it is any of the above resource
             // set the value of the resource.
-            char buffer[20];
-            int size = sprintf(buffer,"%ld",(long int)value);
+            char *buffer;
+            int size = asprintf(&buffer,"%ld",(long int)value);
             success = res->set_value((const uint8_t*)buffer,
-                                     (const uint32_t)size,
-                                     true);
+                                     (const uint32_t)size);
+
+            if(size > 0) {
+                free(buffer);
+            }
         }
     }
     return success;
@@ -318,7 +339,7 @@ M2MResource* M2MSecurity::get_resource(SecurityResource res) const
                 res_name = SECURITY_CLIENT_HOLD_OFF_TIME;
                 break;
         }
-        res_object = _server_instance->resource(res_name,0);
+        res_object = _server_instance->resource(res_name);
     }
     return res_object;
 }

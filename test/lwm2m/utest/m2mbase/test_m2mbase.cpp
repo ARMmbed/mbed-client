@@ -20,6 +20,7 @@ public:
     }
     void resource_to_be_deleted(const String &){visited=true;}
     void remove_object(M2MBase *){visited = true;}
+    void value_updated(M2MBase *){visited = true;}
 
     void clear() {visited = false;}
     bool visited;
@@ -56,10 +57,10 @@ void Test_M2MBase::test_copy_constructor()
     Test_M2MBase* test = new Test_M2MBase();
     test->_interface_description = test_string;
 
-    u_int8_t value[] = {"value1"};
-    this->_value = (u_int8_t*)malloc(sizeof(u_int8_t));
+//    u_int8_t value[] = {"value1"};
+//    this->_value = (u_int8_t*)malloc(sizeof(u_int8_t));
 
-    test->set_value(value,(u_int32_t)sizeof(value));
+//    test->set_value(value,(u_int32_t)sizeof(value));
 
     test->_token_length = 3;
     test->_token = (u_int8_t *)malloc(test->_token_length);
@@ -71,7 +72,7 @@ void Test_M2MBase::test_copy_constructor()
 
     CHECK(copy->_interface_description.compare(0,test_string.size(),test_string) == 0);
 
-    CHECK(copy->_value_length == 7);
+//    CHECK(copy->_value_length == 7);
 
     CHECK(copy->_token != NULL);
 
@@ -93,16 +94,16 @@ void Test_M2MBase::test_assignment_operator()
     Test_M2MBase* test = new Test_M2MBase();
     Test_M2MBase* test2 = new Test_M2MBase();
     Test_M2MBase* test3 = new Test_M2MBase();
-    test->_value_length = 2;
-    test->_value = (u_int8_t *)malloc(test->_value_length);
+//    test->_value_length = 2;
+//    test->_value = (u_int8_t *)malloc(test->_value_length);
 
     test->operator=(*test3);
     delete test3;
 
-    CHECK(test->_value == NULL);
+//    CHECK(test->_value == NULL);
 
-    test->_value_length = 2;
-    test->_value = (u_int8_t *)malloc(test->_value_length);
+//    test->_value_length = 2;
+//    test->_value = (u_int8_t *)malloc(test->_value_length);
 
     test->_token_length = 3;
     test->_token = (u_int8_t *)malloc(test->_token_length);
@@ -110,8 +111,8 @@ void Test_M2MBase::test_assignment_operator()
     Observer obs;
     test->_report_handler = new M2MReportHandler(obs);
 
-    test2->_value_length = 7;
-    test2->_value = (u_int8_t *)malloc(test2->_value_length);
+//    test2->_value_length = 7;
+//    test2->_value = (u_int8_t *)malloc(test2->_value_length);
 
     test2->_token_length = 8;
     test2->_token = (u_int8_t *)malloc(test2->_token_length);
@@ -121,7 +122,7 @@ void Test_M2MBase::test_assignment_operator()
 
 
     *test = *test2;
-    CHECK(test->_value_length == 7);
+//    CHECK(test->_value_length == 7);
 
     CHECK(test->_token != NULL);
 
@@ -320,21 +321,21 @@ void Test_M2MBase::test_base_type()
     CHECK(M2MBase::ObjectInstance == base_type());
 }
 
-void Test_M2MBase::test_set_value()
-{
-    u_int8_t value[] = {"value2"};
-    this->_value = (u_int8_t*)malloc(sizeof(u_int8_t));
+//void Test_M2MBase::test_set_value()
+//{
+//    u_int8_t value[] = {"value2"};
+//    this->_value = (u_int8_t*)malloc(sizeof(u_int8_t));
 
-    CHECK(set_value(value,(u_int32_t)sizeof(value)) == true);
-    CHECK( this->_value_length == sizeof(value));
-    CHECK( *this->_value == *value);
+//    CHECK(set_value(value,(u_int32_t)sizeof(value)) == true);
+//    CHECK( this->_value_length == sizeof(value));
+//    CHECK( *this->_value == *value);
 
-    Observer obs;
-    this->_report_handler = new M2MReportHandler(obs);
+//    Observer obs;
+//    this->_report_handler = new M2MReportHandler(obs);
 
-    u_int8_t value2[] = {"12"};
-    CHECK(set_value(value2,(u_int32_t)sizeof(value2), true) == true);
-}
+//    u_int8_t value2[] = {"12"};
+//    CHECK(set_value(value2,(u_int32_t)sizeof(value2), true) == true);
+//}
 
 void Test_M2MBase::test_set_observation_number()
 {
@@ -344,24 +345,24 @@ void Test_M2MBase::test_set_observation_number()
     CHECK(test == this->_observation_number);
 }
 
-void Test_M2MBase::test_get_value()
-{
-    u_int8_t test_value[] = {"value3"};
-    u_int32_t value_length((u_int32_t)sizeof(test_value));
+//void Test_M2MBase::test_get_value()
+//{
+//    u_int8_t test_value[] = {"value3"};
+//    u_int32_t value_length((u_int32_t)sizeof(test_value));
 
-    u_int8_t* out_value = (u_int8_t *)malloc(1);
-    u_int32_t out_size = 1;
+//    u_int8_t* out_value = (u_int8_t *)malloc(1);
+//    u_int32_t out_size = 1;
 
-    this->_value = (u_int8_t *)malloc(value_length);
-    this->_value_length = value_length;
-    memcpy((u_int8_t *)this->_value, (u_int8_t *)test_value, value_length);
+//    this->_value = (u_int8_t *)malloc(value_length);
+//    this->_value_length = value_length;
+//    memcpy((u_int8_t *)this->_value, (u_int8_t *)test_value, value_length);
 
-    get_value(out_value,out_size);
+//    get_value(out_value,out_size);
 
-    CHECK(out_size == value_length);
+//    CHECK(out_size == value_length);
 
-    free(out_value);
-}
+//    free(out_value);
+//}
 
 void Test_M2MBase::test_handle_observation_attribute()
 {

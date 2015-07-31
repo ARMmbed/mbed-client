@@ -17,7 +17,11 @@ public:
 
     void test_create_static_resource();
 
+    void test_create_static_resource_instance();
+
     void test_create_dynamic_resource();
+
+    void test_create_dynamic_resource_instance();
 
     void test_remove_resource();
 
@@ -32,6 +36,12 @@ public:
     void test_base_type();
 
     void test_handle_observation_attribute();
+
+    void test_handle_get_request();
+
+    void test_handle_put_request();
+
+    void test_handle_post_request();
 
     M2MObjectInstance* object;
 };

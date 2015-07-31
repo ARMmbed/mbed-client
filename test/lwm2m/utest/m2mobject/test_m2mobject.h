@@ -28,6 +28,12 @@ public:
 
     void test_handle_observation_attribute();
 
+    void test_handle_get_request();
+
+    void test_handle_put_request();
+
+    void test_handle_post_request();
+
     M2MObject* object;
 };
 

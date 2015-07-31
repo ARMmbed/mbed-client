@@ -8,6 +8,7 @@ bool m2mobject_stub::bool_value;
 M2MObjectInstance* m2mobject_stub::inst;
 M2MObjectInstanceList m2mobject_stub::instance_list;
 M2MBase::BaseType m2mobject_stub::base_type;
+sn_coap_hdr_s *m2mobject_stub::header;
 
 void m2mobject_stub::clear()
 {
@@ -15,6 +16,7 @@ void m2mobject_stub::clear()
     bool_value = false;
     m2mobject_stub::base_type = M2MBase::Object;
     instance_list.clear();
+    header = NULL;
 }
 
 M2MObject::M2MObject(const String &object_name)
@@ -37,7 +39,7 @@ M2MObject::M2MObject(const M2MObject& other)
     *this = other;
 }
 
-M2MObjectInstance* M2MObject::create_object_instance()
+M2MObjectInstance* M2MObject::create_object_instance(uint16_t instance_id)
 {
     return m2mobject_stub::inst;
 }
@@ -71,3 +73,23 @@ bool M2MObject::handle_observation_attribute(char *&){
     return m2mobject_stub::bool_value;
 }
 
+sn_coap_hdr_s* M2MObject::handle_get_request(nsdl_s *,
+                                  sn_coap_hdr_s *,
+                                  M2MObservationHandler *)
+{
+    return m2mobject_stub::header;
+}
+
+sn_coap_hdr_s* M2MObject::handle_put_request(nsdl_s *,
+                                  sn_coap_hdr_s *,
+                                  M2MObservationHandler *)
+{
+    return m2mobject_stub::header;
+}
+
+sn_coap_hdr_s* M2MObject::handle_post_request(nsdl_s *,
+                                   sn_coap_hdr_s *,
+                                   M2MObservationHandler *)
+{
+    return m2mobject_stub::header;
+}

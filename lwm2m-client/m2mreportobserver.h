@@ -4,6 +4,9 @@
 #ifndef M2MREPORTOBSERVER_H
 #define M2MREPORTOBSERVER_H
 
+//FORWARD DECLARATION
+class M2MResourceInstance;
+
 /**
  * @brief M2MReportObserver
  * An interface to report to the base class

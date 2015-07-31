@@ -6,6 +6,8 @@
 uint8_t m2mbase_stub::uint8_value;
 uint16_t m2mbase_stub::uint16_value;
 uint16_t m2mbase_stub::int_value;
+int m2mbase_stub::name_id_value;
+
 bool m2mbase_stub::bool_value;
 String *m2mbase_stub::string_value;
 uint8_t* m2mbase_stub::value;
@@ -14,12 +16,18 @@ M2MBase::BaseType m2mbase_stub::base_type;
 M2MBase::Operation m2mbase_stub::operation;
 M2MBase::Mode m2mbase_stub::mode_value;
 
+void *m2mbase_stub::void_value;
+M2MObservationHandler *m2mbase_stub::observe;
+M2MReportHandler *m2mbase_stub::report;
+
+
 void m2mbase_stub::clear()
 {
     int_value = 0;
     uint8_value = 0;
     uint16_value = 0;
     string_value = NULL;
+    name_id_value = -1;
     mode_value = M2MBase::Static;
     base_type = M2MBase::Object;
     bool_value = false;
@@ -28,6 +36,10 @@ void m2mbase_stub::clear()
         delete value;
         value = NULL;
     }
+    void_value = NULL;
+    observe = NULL;
+    report = NULL;
+
 }
 
 M2MBase::M2MBase(const String &/*resource_name*/,
@@ -72,11 +84,6 @@ void M2MBase::set_instance_id(const uint16_t /*inst_id*/)
 {
 }
 
-bool M2MBase::set_value(const uint8_t *, const uint32_t, bool is_numeric)
-{
-    return m2mbase_stub::bool_value;
-}
-
 void M2MBase::set_observation_number(const uint16_t /*observation_number*/)
 {
 }
@@ -89,6 +96,11 @@ M2MBase::Operation M2MBase::operation() const
 const String& M2MBase::name() const
 {
     return *m2mbase_stub::string_value;
+}
+
+int M2MBase::name_id() const
+{
+    return m2mbase_stub::name_id_value;
 }
 
 uint16_t M2MBase::instance_id() const
@@ -149,20 +161,6 @@ M2MBase::Mode M2MBase::mode() const
     return m2mbase_stub::mode_value;
 }
 
-void M2MBase::get_value(uint8_t *&value, uint32_t &value_length)
-{
-    value_length = 0;
-    if(value) {
-        free(value);
-        value = NULL;
-    }
-    value = (uint8_t *)malloc(m2mbase_stub::int_value);
-    if(value) {
-        value_length = m2mbase_stub::int_value;
-        memcpy((uint8_t *)value, (uint8_t *)m2mbase_stub::value, value_length);
-    }
-}
-
 uint16_t M2MBase::observation_number() const
 {
     return m2mbase_stub::uint16_value;
@@ -183,4 +181,47 @@ bool M2MBase::handle_observation_attribute(char *&query)
 
 void M2MBase::observation_to_be_sent()
 {
+}
+
+void* M2MBase::memory_alloc(uint16_t)
+{
+    return m2mbase_stub::void_value;
+}
+
+void M2MBase::memory_free(void *)
+{
+}
+
+M2MReportHandler* M2MBase::report_handler()
+{
+    return m2mbase_stub::report;
+}
+
+M2MObservationHandler* M2MBase::observation_handler()
+{
+    return m2mbase_stub::observe;
+}
+
+sn_coap_hdr_s* M2MBase::handle_get_request(nsdl_s */*nsdl*/,
+                                           sn_coap_hdr_s */*received_coap_header*/,
+                                           M2MObservationHandler */*observation_handler*/)
+{
+    //Handled in M2MResource, M2MObjectInstance and M2MObject classes
+    return NULL;
+}
+
+sn_coap_hdr_s* M2MBase::handle_put_request(nsdl_s */*nsdl*/,
+                                           sn_coap_hdr_s */*received_coap_header*/,
+                                           M2MObservationHandler */*observation_handler*/)
+{
+    //Handled in M2MResource, M2MObjectInstance and M2MObject classes
+    return NULL;
+}
+
+sn_coap_hdr_s* M2MBase::handle_post_request(nsdl_s */*nsdl*/,
+                                            sn_coap_hdr_s */*received_coap_header*/,
+                                            M2MObservationHandler */*observation_handler*/)
+{
+    //Handled in M2MResource, M2MObjectInstance and M2MObject classes
+    return NULL;
 }

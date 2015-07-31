@@ -2,6 +2,7 @@
  * Copyright (c) 2015 ARM. All rights reserved.
  */
 #include <unistd.h>
+#include <malloc.h>
 #include <stdio.h>
 #include <stdarg.h>
 #include <pthread.h>
@@ -12,6 +13,7 @@
 #include "lwm2m-client/m2minterface.h"
 #include "lwm2m-client/m2mobjectinstance.h"
 #include "lwm2m-client/m2mresource.h"
+
 #include "ns_trace.h"
 
 const String &BOOTSTRAP_SERVER_ADDRESS = "coap://10.45.3.10:5693";
@@ -21,11 +23,11 @@ const String &TYPE = "type";
 const String &MODEL_NUMBER = "2015";
 const String &SERIAL_NUMBER = "12345";
 
-const uint8_t value[] = "MyValue";
-const uint8_t STATIC_VALUE[] = "Static value";
+const uint8_t STATIC_VALUE[] = "Open Mobile Alliance";
 
 static void ctrl_c_handle_function(void);
 void close_function();
+static void display_mallinfo(void);
 typedef void (*signalhandler_t)(int); /* Function pointer type for ctrl-c */
 
 class M2MLWClient: public M2MInterfaceObserver {
@@ -52,7 +54,8 @@ public:
             delete _register_security;
         }
         if(_device) {
-            M2MDevice::delete_instance();
+           M2MDevice::delete_instance();
+            _device = NULL;
         }
         if(_object) {
             delete _object;
@@ -128,8 +131,7 @@ public:
         bool success = false;
         _register_security = M2MInterfaceFactory::create_security(M2MSecurity::M2MServer);
         if(_register_security) {
-            if(_register_security->set_resource_value(M2MSecurity::M2MServerUri, M2M_SERVER_ADDRESS) &&
-            _register_security->set_resource_value(M2MSecurity::BootstrapServer, 0) &&
+            if(_register_security->set_resource_value(M2MSecurity::M2MServerUri, M2M_SERVER_ADDRESS) &&            
             _register_security->set_resource_value(M2MSecurity::SecurityMode, M2MSecurity::NoSecurity)) {
                 success = true;
                 /* Not used now because there is no TLS or DTLS implementation available for stack.
@@ -150,6 +152,7 @@ public:
         bool success = false;
         _device = M2MInterfaceFactory::create_device();
         if(_device) {
+            _device->object_instance()->set_operation(M2MBase::GET_PUT_POST_ALLOWED);
             if(_device->create_resource(M2MDevice::Manufacturer,MANUFACTURER)     &&
                _device->create_resource(M2MDevice::DeviceType,TYPE)        &&
                _device->create_resource(M2MDevice::ModelNumber,MODEL_NUMBER)      &&
@@ -172,20 +175,38 @@ public:
         bool success = false;
         _object = M2MInterfaceFactory::create_object("Test");
         if(_object) {
+            _object->set_operation(M2MBase::GET_PUT_POST_ALLOWED);
             M2MObjectInstance* inst = _object->create_object_instance();
             if(inst) {
-                M2MResource* res = inst->create_dynamic_resource("Dynamic","ResourceTest",true);
+               inst->set_operation(M2MBase::GET_PUT_POST_ALLOWED);
+               inst->set_observable(false);
+               M2MResource* res = inst->create_dynamic_resource("1","ResourceTest",
+                                                                 M2MResourceInstance::INTEGER,
+                                                                 true,true);
                 char buffer[20];
                 int size = sprintf(buffer,"%d",_value);
-                  res->set_operation(M2MBase::GET_PUT_POST_ALLOWED);
-                  res->set_value((const uint8_t*)buffer,
-                                 (const uint32_t)size);
-                  res->set_execute_function(execute_callback(this,&M2MLWClient::execute_function));
+                res->set_operation(M2MBase::GET_PUT_POST_ALLOWED);
+                res->set_value((const uint8_t*)buffer,
+                             (const uint32_t)size);
+                res->set_execute_function(execute_callback(this,&M2MLWClient::execute_function));
                 _value++;
-                inst->create_static_resource("Static",
+
+                inst->create_static_resource("0",
                                              "ResourceTest",
+                                             M2MResourceInstance::INTEGER,
                                              STATIC_VALUE,
                                              sizeof(STATIC_VALUE)-1);
+
+                M2MResourceInstance* instance = inst->create_dynamic_resource_instance("1",
+                                                                         "ResourceTest",
+                                                                         M2MResourceInstance::INTEGER,
+                                                                         true,0);
+
+                if(instance) {
+                    instance->set_operation(M2MBase::GET_PUT_ALLOWED);
+                    instance->set_value((const uint8_t*)buffer,
+                                 (const uint32_t)size);
+                }
             }
         }
         return success;
@@ -195,14 +216,26 @@ public:
         if(_object) {
             M2MObjectInstance* inst = _object->object_instance();
             if(inst) {
-                M2MResource* res = inst->resource("Dynamic");
-                printf(" Value sent %d\n", _value);
-                char buffer[20];
-                int size = sprintf(buffer,"%d",_value);
-                res->set_value((const uint8_t*)buffer,
-                               (const uint32_t)size,
-                               true);
-                _value++;
+                M2MResource* res = inst->resource("1");
+                if(res) {
+                    printf(" Value sent %d\n", _value);
+                    char buffer[20];
+                    int size = sprintf(buffer,"%d",_value);
+                    res->set_value((const uint8_t*)buffer,
+                                   (const uint32_t)size);
+                    _value++;
+                }
+                res = inst->resource("1");
+                if(res) {
+                    M2MResourceInstance *res_inst = res->resource_instance(0);
+                    if(res_inst) {
+                        char buffer1[20];
+                        int size1 = sprintf(buffer1,"%d",_value);
+                        res_inst->set_value((const uint8_t*)buffer1,
+                                       (const uint32_t)size1);
+                        _value++;
+                    }
+                }
             }
         }
     }
@@ -232,13 +265,15 @@ public:
             _bootstrapped = true;
             printf("\nBootstrapped\n");
             printf("mDS Address %s\n",
-                   _register_security->resource_value_string(M2MSecurity::M2MServerUri).c_str());
+            _register_security->resource_value_string(M2MSecurity::M2MServerUri).c_str());
         }
     }
 
     void object_registered(M2MSecurity */*security_object*/, const M2MServer &/*server_object*/){
         _registered = true;
         printf("\nRegistered\n");
+        printf("\n============== After Registering ==============\n");
+        display_mallinfo();
     }
 
     void object_unregistered(M2MSecurity */*server_object*/){
@@ -282,6 +317,8 @@ void* wait_for_bootstrap(void* arg) {
     M2MLWClient *client;
     client = (M2MLWClient*) arg;
     if(client->bootstrap_successful()) {
+        printf("\n============== After Bootstrapping ==============\n");
+        display_mallinfo();
         printf("Registering endpoint\n");
         client->test_register();
     }
@@ -309,6 +346,8 @@ void* send_observation(void* arg) {
             printf("Sending observation\n");
             client->update_resource();
             counter = 0;
+            printf("\n============== After Sending Observation ==============\n");
+            display_mallinfo();
         }
         else
             counter++;
@@ -341,7 +380,28 @@ void close_function() {
     pthread_cancel(observation_thread);
 }
 
+static void display_mallinfo(void)
+{
+    struct mallinfo mi;
+
+   mi = mallinfo();
+
+    printf("Total non-mmapped bytes (arena):       %d\n", mi.arena);
+    printf("# of free chunks (ordblks):            %d\n", mi.ordblks);
+    printf("# of free fastbin blocks (smblks):     %d\n", mi.smblks);
+    printf("# of mapped regions (hblks):           %d\n", mi.hblks);
+    printf("Bytes in mapped regions (hblkhd):      %d\n", mi.hblkhd);
+    printf("Max. total allocated space (usmblks):  %d\n", mi.usmblks);
+    printf("Free bytes held in fastbins (fsmblks): %d\n", mi.fsmblks);
+    printf("Total allocated space (uordblks):      %d\n", mi.uordblks);
+    printf("Total free space (fordblks):           %d\n", mi.fordblks);
+    printf("Topmost releasable block (keepcost):   %d\n", mi.keepcost);
+}
+
 int main() {
+
+    printf("============== Before allocating blocks ==============\n");
+    display_mallinfo();
 
     M2MLWClient lwm2mclient;
 
@@ -362,6 +422,11 @@ int main() {
         printf("Bootstrap object created");
     }
 
+    result = lwm2mclient.create_register_object();
+    if(true == result) {
+        printf("Register object created");
+    }
+
     result = lwm2mclient.create_device_object();
     if(true == result){
         printf("\nDevice object created !!\n");
@@ -376,6 +441,10 @@ int main() {
     printf("Bootstrapping endpoint\n");
     lwm2mclient.test_bootstrap();
 
+//    printf("Registering endpoint\n");
+//    lwm2mclient.test_register();
+
+
     pthread_create(&bootstrap_thread, NULL, &wait_for_bootstrap, (void*) &lwm2mclient);
     pthread_create(&observation_thread, NULL, &send_observation, (void*) &lwm2mclient);
     pthread_create(&unregister_thread, NULL, &wait_for_unregister, (void*) &lwm2mclient);
@@ -384,6 +453,9 @@ int main() {
     pthread_join(unregister_thread, NULL);
     pthread_join(observation_thread, NULL);
 
-    return 0;
+    printf("\n============== After freeing blocks ==============\n");
+    display_mallinfo();
+
+    exit(EXIT_SUCCESS);
 }
 

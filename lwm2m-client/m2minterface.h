@@ -52,7 +52,6 @@ public:
     typedef enum {
         NOT_SET = 0,
         UDP = 0x01,
-        QUEUE = 0x02,
         UDP_QUEUE = 0x03,
         SMS = 0x04,
         SMS_QUEUE =0x06,
@@ -119,7 +118,6 @@ public:
      * @param security_object, Security object from which the device object
      * needs to be unregistered, if there is only one LWM2M server registered
      * then this parameter can be NULL.
-     *
      */
     virtual void unregister_object(M2MSecurity* security_object = NULL) = 0;
 

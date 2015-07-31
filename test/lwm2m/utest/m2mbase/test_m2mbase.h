@@ -57,11 +57,11 @@ public:
 
     void test_base_type();
 
-    void test_set_value();
+//    void test_set_value();
 
     void test_set_observation_number();
 
-    void test_get_value();
+//    void test_get_value();
 
     void test_handle_observation_attribute();
 

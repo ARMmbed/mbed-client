@@ -44,12 +44,27 @@ TEST(M2MResource, test_handle_observation_attribute)
     m2m_resource->test_handle_observation_attribute();
 }
 
-TEST(M2MResource, test_set_execute_function)
+TEST(M2MResource, test_add_resource_instance)
 {
-    m2m_resource->test_set_execute_function();
+    m2m_resource->test_add_resource_instance();
 }
 
-TEST(M2MResource, test_execute)
+TEST(M2MResource, test_remove_resource_instance)
 {
-    m2m_resource->test_execute();
+    m2m_resource->test_remove_resource_instance();
+}
+
+TEST(M2MResource, test_resource_instance_count)
+{
+    m2m_resource->test_resource_instance_count();
+}
+
+TEST(M2MResource, test_resource_instances)
+{
+    m2m_resource->test_resource_instances();
+}
+
+TEST(M2MResource, test_resource_instance)
+{
+    m2m_resource->test_resource_instance();
 }

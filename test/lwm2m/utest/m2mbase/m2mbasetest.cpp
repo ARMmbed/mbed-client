@@ -135,20 +135,20 @@ TEST(M2MBase, test_base_type)
     m2m_base->test_base_type();
 }
 
-TEST(M2MBase, set_value)
-{
-    m2m_base->test_set_value();
-}
+//TEST(M2MBase, set_value)
+//{
+//    m2m_base->test_set_value();
+//}
 
 TEST(M2MBase, test_set_observation_number)
 {
     m2m_base->test_set_observation_number();
 }
 
-TEST(M2MBase, get_value)
-{
-    m2m_base->test_get_value();
-}
+//TEST(M2MBase, get_value)
+//{
+//    m2m_base->test_get_value();
+//}
 
 TEST(M2MBase, test_handle_observation_attribute)
 {

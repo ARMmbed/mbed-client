@@ -10,6 +10,7 @@ TEST_SRC_FILES = \
         ../stub/m2mstring_stub.cpp \
         ../stub/m2mtimer_stub.cpp \
         ../stub/m2mreporthandler_stub.cpp \
+        ../stub/m2mresourceinstance_stub.cpp \
 	m2mresourcetest.cpp \
         test_m2mresource.cpp
 

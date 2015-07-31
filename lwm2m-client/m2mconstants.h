@@ -108,4 +108,20 @@ extern const String SERVER_NOTIFICATION_STORAGE;
 extern const String SERVER_BINDING;
 extern const String SERVER_REGISTRATION_UPDATE;
 
+// TLV serializer / deserializer
+const uint8_t TYPE_RESOURCE = 0xC0;
+const uint8_t TYPE_MULTIPLE_RESOURCE = 0x80;
+const uint8_t TYPE_RESOURCE_INSTANCE = 0x40;
+const uint8_t TYPE_OBJECT_INSTANCE = 0x0;
+
+const uint8_t ID8 = 0x0;
+const uint8_t ID16 = 0x20;
+
+const uint8_t LENGTH8 = 0x08;
+const uint8_t LENGTH16 = 0x10;
+const uint8_t LENGTH24 = 0x18;
+
+const int COAP_CONTENT_OMA_TLV_TYPE = 99;
+const int COAP_CONTENT_OMA_JSON_TYPE = 100;
+
 #endif // M2MCONSTANTS_H

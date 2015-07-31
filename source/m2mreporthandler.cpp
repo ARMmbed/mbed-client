@@ -199,6 +199,10 @@ bool M2MReportHandler::set_notification_attribute(char* option,
         tr_debug("M2MReportHandler::set_notification_attribute %s - set under observation", attribute);
         set_under_observation(observation);
     }
+    if(_pmin > _pmax ||
+       _lt + 2 * _st > _gt) {
+        success = false;
+    }
     return success;
 }
 

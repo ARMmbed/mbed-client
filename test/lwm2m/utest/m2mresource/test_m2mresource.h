@@ -21,9 +21,15 @@ public:
 
     void test_handle_observation_attribute();
 
-    void test_set_execute_function();
+    void test_add_resource_instance();
 
-    void test_execute();
+    void test_remove_resource_instance();
+
+    void test_resource_instance();
+
+    void test_resource_instances();
+
+    void test_resource_instance_count();
 
     M2MResource* resource;
 };

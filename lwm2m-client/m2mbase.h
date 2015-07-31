@@ -10,6 +10,10 @@
 #include "lwm2m-client/m2mreportobserver.h"
 
 //FORWARD DECLARATION
+struct sn_coap_hdr_;
+typedef sn_coap_hdr_ sn_coap_hdr_s;
+struct nsdl_s;
+
 class M2MObservationHandler;
 class M2MReportHandler;
 
@@ -120,6 +124,8 @@ public:
      * @param observed for the observation.
      * @param handler, Handler object for sending
      * observation callbacks.
+     * @param handler, Handler object for sending
+     * observation callbacks.
      */
     virtual void set_under_observation(bool observed,
                                        M2MObservationHandler *handler);
@@ -139,20 +145,11 @@ public:
     virtual void set_instance_id(const uint16_t instance_id);
 
     /**
-     * @brief Sets the value of the given resource.
-     * @param value, Pointer to the value to be set on the resource.
-     * @param value_length , Length of the value pointer.
-     * @param is_numeric , Defines whether the value is numeric or string format.
-     * Default is false which means value is in string format.
-     * @return True if successfully set else false.
-     */
-    virtual bool set_value(const uint8_t *value, const uint32_t value_length, bool is_numeric = false);
-
-    /**
      * Sets Observation number of the object.
      * @param observation_number, Observation number of the object.
      */
     virtual void set_observation_number(const uint16_t observation_number);
+
 
     /**
      * @brief Returns object type.
@@ -171,6 +168,12 @@ public:
      * @return Name for the object.
      */
     virtual const String &name() const;
+
+    /**
+     * @brief Returns object name in integer.
+     * @return Name for the object in integer.
+     */
+    virtual int name_id() const;
 
     /**
      * @brief Returns object's Instance ID.
@@ -216,13 +219,6 @@ public:
      virtual Mode mode() const;
 
     /**
-     * @brief Provides the value of the given resource.
-     * @param value[OUT], pointer to the value of resource.
-     * @param value_length[OUT], length to the value pointer.
-     */
-    virtual void get_value(uint8_t *&value, uint32_t &value_length);
-
-    /**
      * @brief Returns the observation number.
      * @return observation number for the object.
      */
@@ -231,10 +227,45 @@ public:
     /**
      * @brief Parses the received query for notification
      * attribute.
+     * @param query, Query which needs to be parsed.
      * @return true if required attributes are present else false.
      */
     virtual bool handle_observation_attribute(char *&query);
 
+    /**
+     * @brief Handles GET request for the registered objects.
+     * @param nsdl, NSDL handler for the Coap library.
+     * @param received_coap_header, Received CoAP message from the server.
+     * @param observation_handler, Handler object for sending
+     * observation callbacks.
+     * @return sn_coap_hdr_s,  Message that needs to be sent to server.
+     */
+    virtual sn_coap_hdr_s* handle_get_request(nsdl_s *nsdl,
+                                              sn_coap_hdr_s *received_coap_header,
+                                              M2MObservationHandler *observation_handler = NULL);
+    /**
+     * @brief Handles PUT request for the registered objects.
+     * @param nsdl, NSDL handler for the Coap library.
+     * @param received_coap_header, Received CoAP message from the server.
+     * @param observation_handler, Handler object for sending
+     * observation callbacks.
+     * @return sn_coap_hdr_s,  Message that needs to be sent to server.
+     */
+    virtual sn_coap_hdr_s* handle_put_request(nsdl_s *nsdl,
+                                              sn_coap_hdr_s *received_coap_header,
+                                              M2MObservationHandler *observation_handler = NULL);
+
+    /**
+     * @brief Handles GET request for the registered objects.
+     * @param nsdl, NSDL handler for the Coap library.
+     * @param received_coap_header, Received CoAP message from the server.
+     * @param observation_handler, Handler object for sending
+     * observation callbacks.
+     * @return sn_coap_hdr_s,  Message that needs to be sent to server.
+     */
+    virtual sn_coap_hdr_s* handle_post_request(nsdl_s *nsdl,
+                                               sn_coap_hdr_s *received_coap_header,
+                                               M2MObservationHandler *observation_handler = NULL);
 protected : // from M2MReportObserver
 
     virtual void observation_to_be_sent();
@@ -258,7 +289,36 @@ protected:
      */
     virtual void remove_object_from_coap();
 
+    /**
+     * @brief Memory Allocation required for libCoap.
+     * @param size, Size of memory to be reserved.
+    */
+    virtual void* memory_alloc(uint16_t size);
+
+    /**
+     * @brief Memory free functions required for libCoap.
+     * @param ptr, Object whose memory needs to be freed.
+    */
+    virtual void memory_free(void *ptr);
+
+    /**
+     * @brief Returns Report Handler object.
+     * @return M2MReportHandler object.
+    */
+    M2MReportHandler* report_handler();
+
+    /**
+     * @brief Returns Observation Handler object.
+     * @return M2MObservationHandler object.
+    */
+    M2MObservationHandler* observation_handler();
+
 private:
+
+    bool is_integer(const String &value);
+
+private:
+
 
     M2MReportHandler           *_report_handler;
     M2MObservationHandler      *_observation_handler;
@@ -267,14 +327,12 @@ private:
     M2MBase::BaseType           _base_type;
     String                      _name;
     String                      _resource_type;
+    int                         _name_id;
     String                      _interface_description;
     uint8_t                     _coap_content_type;
     uint16_t                    _instance_id;
     bool                        _observable;
     uint16_t                    _observation_number;
-    uint8_t                     *_value;
-    uint32_t                    _value_length;
-    bool                        _is_numeric;
     uint8_t                     *_token;
     uint8_t                     _token_length;
 

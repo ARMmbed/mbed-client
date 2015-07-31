@@ -11,6 +11,7 @@ TEST_SRC_FILES = \
         ../stub/m2mstring_stub.cpp \
         ../stub/m2mobjectinstance_stub.cpp \
         ../stub/m2mresource_stub.cpp \
+        ../stub/m2mresourceinstance_stub.cpp \
         ../stub/m2mbase_stub.cpp \
 	m2mservertest.cpp \
         test_m2mserver.cpp

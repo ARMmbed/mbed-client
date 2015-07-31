@@ -5,10 +5,10 @@
 #define M2M_DEVICE_H
 
 #include "lwm2m-client/m2mobject.h"
-#include "lwm2m-client/m2msingleton.h"
 
 // FORWARD DECLARATION
 class M2MResource;
+class M2MResourceInstance;
 
 /**
  *  @brief M2MDevice.
@@ -17,8 +17,7 @@ class M2MResource;
  *  and all its corresponding resources.There can be only one instance
  *  of Device Object.
  */
-class  M2MDevice : public M2MSingleton<M2MDevice>,
-                   public M2MObject {
+class  M2MDevice : public M2MObject {
 
 friend class M2MInterfaceFactory;
 
@@ -71,10 +70,13 @@ private:
      */
     virtual ~M2MDevice();
 
-public:
-
     static M2MDevice* get_instance();
 
+public:
+
+    /**
+     * @brief Deletes the M2MDevice instance.
+     */
     static void delete_instance();
 
     /**
@@ -100,6 +102,17 @@ public:
     M2MResource* create_resource(DeviceResource resource, uint32_t value);
 
     /**
+     * @brief Creates a new resource instance for given resource enum.
+     * @param resource, List of resource names which can be created using this function are
+     * 'AvailablePowerSources','PowerSourceVoltage','PowerSourceCurrent',
+     * 'ErrorCode'.
+     * @param value, Value to be set on the resource, in Integer format.
+     * @return M2MResourceInstance if created successfully else NULL.
+     */
+    M2MResourceInstance* create_resource_instance(DeviceResource resource, uint32_t value,
+                                                  uint16_t instance_id);
+
+    /**
      * @brief Creates a new resource for given resource name.
      * @param resource, List of resource names which can be created using this function are
      * 'ResetErrorCode','FactoryReset'.
@@ -111,11 +124,19 @@ public:
      * @brief Deletes the resource with the given resource enum,
      * it cannot not delete the mandatory resources.
      * @param resource, Name of the resource to be deleted.
-     * @param instance_id, Instance Id of the resource, default is 0.
      * @return True if deleted else false.
      */
-    bool delete_resource(DeviceResource resource,
-                         uint16_t instance_id = 0);
+    bool delete_resource(DeviceResource resource);
+
+    /**
+     * @brief Deletes the resource with the given resource enum,
+     * it cannot not delete the mandatory resources.
+     * @param resource, Name of the resource to be deleted.
+     * @param instance_id, Instance Id of the resource.
+     * @return True if deleted else false.
+     */
+    bool delete_resource_instance(DeviceResource resource,
+                                  uint16_t instance_id);
 
     /**
      * @brief Sets the value of the given resource enum.
@@ -195,8 +216,8 @@ public:
 
 private:
 
-    M2MResource* get_resource(DeviceResource res,
-                              uint16_t instance_id = 0) const;
+    M2MResourceInstance* get_resource_instance(DeviceResource dev_res,
+                                               uint16_t instance_id) const;
 
     String resource_name(DeviceResource resource) const;
 
@@ -209,7 +230,6 @@ protected:
     static M2MDevice*     _instance;
 
     friend class Test_M2MDevice;
-    friend class Test_M2MInterfaceFactory;
 };
 
 #endif // M2M_DEVICE_H

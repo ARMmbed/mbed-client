@@ -18,23 +18,38 @@ M2MServer::M2MServer()
 
     if(_server_instance) {
 
-        M2MResource* res = _server_instance->create_dynamic_resource(SERVER_SHORT_SERVER_ID,OMA_RESOURCE_TYPE,true);
+        M2MResource* res = _server_instance->create_dynamic_resource(SERVER_SHORT_SERVER_ID,
+                                                                     OMA_RESOURCE_TYPE,
+                                                                     M2MResourceInstance::INTEGER,
+                                                                     true);
         if(res) {
             res->set_operation(M2MBase::GET_PUT_ALLOWED);
         }
-        res = _server_instance->create_dynamic_resource(SERVER_LIFETIME,OMA_RESOURCE_TYPE,true);
+        res = _server_instance->create_dynamic_resource(SERVER_LIFETIME,
+                                                        OMA_RESOURCE_TYPE,
+                                                        M2MResourceInstance::INTEGER,
+                                                        true);
         if(res) {
             res->set_operation(M2MBase::GET_PUT_POST_ALLOWED);
         }
-        res = _server_instance->create_dynamic_resource(SERVER_NOTIFICATION_STORAGE,OMA_RESOURCE_TYPE,true);
+        res = _server_instance->create_dynamic_resource(SERVER_NOTIFICATION_STORAGE,
+                                                        OMA_RESOURCE_TYPE,
+                                                        M2MResourceInstance::BOOLEAN,
+                                                        true);
         if(res) {
             res->set_operation(M2MBase::GET_PUT_POST_ALLOWED);
         }
-        res = _server_instance->create_dynamic_resource(SERVER_BINDING,OMA_RESOURCE_TYPE,true);
+        res = _server_instance->create_dynamic_resource(SERVER_BINDING,
+                                                        OMA_RESOURCE_TYPE,
+                                                        M2MResourceInstance::STRING,
+                                                        true);
         if(res) {
             res->set_operation(M2MBase::GET_PUT_POST_ALLOWED);
         }
-        res = _server_instance->create_dynamic_resource(SERVER_REGISTRATION_UPDATE,OMA_RESOURCE_TYPE,false);
+        res = _server_instance->create_dynamic_resource(SERVER_REGISTRATION_UPDATE,
+                                                        OMA_RESOURCE_TYPE,
+                                                        M2MResourceInstance::OPAQUE,
+                                                        false);
         if(res) {
           res->set_operation(M2MBase::POST_ALLOWED);
         }
@@ -67,13 +82,20 @@ M2MResource* M2MServer::create_resource(ServerResource resource, uint32_t value)
     }
     if(!server_id.empty()) {
         if(_server_instance) {
-            res = _server_instance->create_dynamic_resource(server_id,OMA_RESOURCE_TYPE,true);
+            res = _server_instance->create_dynamic_resource(server_id,
+                                                            OMA_RESOURCE_TYPE,
+                                                            M2MResourceInstance::INTEGER,
+                                                            true);
             if(res) {
                 res->set_operation(M2MBase::GET_PUT_POST_ALLOWED);
                 // If resource is created then set the value.
-                char buffer[20];
-                int size = sprintf(buffer,"%ld",(long int)value);
+                char *buffer;
+                int size = asprintf(&buffer,"%ld",(long int)value);
                 res->set_value((const uint8_t*)buffer,(const uint32_t)size);
+
+                if(size > 0) {
+                    free(buffer);
+                }
             }
         }
     }
@@ -86,7 +108,10 @@ M2MResource* M2MServer::create_resource(ServerResource resource)
     if(!is_resource_present(resource)) {
         if(M2MServer::Disable == resource) {
                 if(_server_instance) {
-                    res = _server_instance->create_dynamic_resource(SERVER_DISABLE,OMA_RESOURCE_TYPE,false);
+                    res = _server_instance->create_dynamic_resource(SERVER_DISABLE,
+                                                                    OMA_RESOURCE_TYPE,
+                                                                    M2MResourceInstance::OPAQUE,
+                                                                    false);
                 if(res) {
                     res->set_operation(M2MBase::POST_ALLOWED);
                 }
@@ -149,11 +174,14 @@ bool M2MServer::set_resource_value(ServerResource resource,
            M2MServer::NotificationStorage == resource) {
             // If it is any of the above resource
             // set the value of the resource.
-            char buffer[20];
-            int size = sprintf(buffer,"%ld",(long int)value);
+            char *buffer;
+            int size = asprintf(&buffer,"%ld",(long int)value);
             success = res->set_value((const uint8_t*)buffer,
-                                     (const uint32_t)size,
-                                     true);
+                                     (const uint32_t)size);
+
+            if(size > 0) {
+                free(buffer);
+            }
         }
     }
     return success;

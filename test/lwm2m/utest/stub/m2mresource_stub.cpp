@@ -5,40 +5,49 @@
 
 uint32_t m2mresource_stub::int_value;
 bool m2mresource_stub::bool_value;
+M2MResourceInstanceList m2mresource_stub::list;
+M2MResourceInstance *m2mresource_stub::instance;
 
 void m2mresource_stub::clear()
 {
     int_value = 0;
     bool_value = false;
+    list.clear();
+    instance = NULL;
 }
 
-M2MResource::M2MResource(const String &res_name,
-                         const String &/*res_type*/,
-                         M2MBase::Mode res_mode,
-                         bool /*multiple_instances*/)
-: M2MBase(res_name,
-          res_mode)
-{
-}
-
-M2MResource& M2MResource::operator=(const M2MResource& )
+M2MResource& M2MResource::operator=(const M2MResource& other)
 {
     return *this;
 }
 
 M2MResource::M2MResource(const M2MResource& other)
-: M2MBase(other)
+: M2MResource(other)
 {
     *this = other;
 }
 
-M2MResource::~M2MResource()
+M2MResource::M2MResource(const String &resource_name,
+                         const String &resource_type,
+                         M2MResourceInstance::ResourceType type,
+                         const uint8_t *value,
+                         const uint8_t value_length,
+                         bool)
+: M2MResourceInstance(resource_name, resource_type, type, value, value_length)
 {
 }
 
-M2MBase::BaseType M2MResource::base_type() const
+M2MResource::M2MResource(const String &resource_name,
+                         const String &resource_type,
+                         M2MResourceInstance::ResourceType type,
+                         bool,
+                         bool )
+: M2MResourceInstance(resource_name, resource_type, type)
 {
-    return M2MBase::Resource;
+}
+
+M2MResource::~M2MResource()
+{
 }
 
 bool M2MResource::supports_multiple_instances() const
@@ -46,16 +55,31 @@ bool M2MResource::supports_multiple_instances() const
     return m2mresource_stub::bool_value;
 }
 
-void M2MResource::set_execute_function(execute_callback )
+bool M2MResource::remove_resource_instance(uint16_t inst_id)
 {
-
-}
-
-bool M2MResource::handle_observation_attribute(char *&){
     return m2mresource_stub::bool_value;
 }
 
-void M2MResource::execute(void *)
+M2MResourceInstance* M2MResource::resource_instance(uint16_t inst_id) const
 {
+    return m2mresource_stub::instance;
+}
 
+const M2MResourceInstanceList& M2MResource::resource_instances() const
+{
+    return m2mresource_stub::list;
+}
+
+uint16_t M2MResource::resource_instance_count() const
+{
+    return m2mresource_stub::int_value;
+}
+
+bool M2MResource::handle_observation_attribute(char *&query)
+{
+    return m2mresource_stub::bool_value;
+}
+
+void M2MResource::add_resource_instance(M2MResourceInstance *)
+{
 }
