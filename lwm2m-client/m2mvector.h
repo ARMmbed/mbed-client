@@ -1,6 +1,19 @@
 /*
- * Copyright (c) 2015 ARM. All rights reserved.
+ * Copyright (c) 2015 ARM Limited. All rights reserved.
+ * SPDX-License-Identifier: Apache-2.0
+ * Licensed under the Apache License, Version 2.0 (the License); you may
+ * not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an AS IS BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
+
 #ifndef M2M_VECTOR_H
 #define M2M_VECTOR_H
 
@@ -9,130 +22,142 @@
 namespace m2m
 {
 
-template <typename Object>
+template <typename ObjectTemplate>
 
 class Vector
 {
   public:
 
-    explicit Vector( int initSize = 0)
-            : theSize( initSize ),
-              index(0),
-              theCapacity( initSize + SPARE_CAPACITY )
-    { objects = new Object[ theCapacity ]; }
+    explicit Vector( int init_size = 0)
+            : _size( init_size ),
+              _index(0),
+              _capacity( init_size + MORE_SIZE ){
+        _object_template = new ObjectTemplate[ _capacity ];
+    }
 
-    Vector(const Vector & rhs ): objects(0)
-    {operator=(rhs); }
+    Vector(const Vector & rhs ): _object_template(0) {
+        operator=(rhs);
+    }
 
-    ~Vector()
-    { delete [] objects;
-      objects = NULL;}
+    ~Vector() {
+        delete [] _object_template;
+      _object_template = NULL;
+    }
 
-    const Vector & operator=(const Vector & rhs)
-    {
-        if(this != &rhs)
-        {
-            delete[] objects;
-            theSize = rhs.size();
-            index = rhs.index;
-            theCapacity = rhs.theCapacity;
+    const Vector & operator=(const Vector & rhs) {
+        if(this != &rhs) {
+            delete[] _object_template;
+            _size = rhs.size();
+            _index = rhs._index;
+            _capacity = rhs._capacity;
 
-            objects = new Object[capacity()];
-            for(int k = 0; k < size(); k++)
-                objects[k] = rhs.objects[k];
+            _object_template = new ObjectTemplate[capacity()];
+            for(int k = 0; k < size(); k++) {
+                _object_template[k] = rhs._object_template[k];
+            }
         }
-
         return *this;
     }
 
-    void resize(int newSize)
-    {
-        if(newSize > theCapacity)
-            reserve(newSize * 2 + 1);
-        theSize = newSize;
+    void resize(int new_size) {
+        if(new_size > _capacity) {
+            reserve(new_size * 2 + 1);
+        }
+        _size = new_size;
     }
 
-    void reserve(int newCapacity)
-    {
-        if(newCapacity < theSize)
+    void reserve(int new_capacity) {
+        if(new_capacity < _size) {
             return;
+        }
+        ObjectTemplate *old_array = _object_template;
 
-        Object *oldArray = objects;
+        _object_template = new ObjectTemplate[new_capacity];
+        for(int k = 0; k < _size; k++) {
+            _object_template[k] = old_array[k];
+        }
+        _capacity = new_capacity;
 
-        objects = new Object[newCapacity];
-        for(int k = 0; k < theSize; k++)
-            objects[k] = oldArray[k];
-
-        theCapacity = newCapacity;
-
-        delete [] oldArray;
+        delete [] old_array;
     }
 
-    Object & operator[](int idx)
-    { return objects[idx]; }
+    ObjectTemplate & operator[](int idx) {
+        return _object_template[idx];
+    }
     
-    const Object& operator[](int idx) const
-    { return objects[idx]; }
+    const ObjectTemplate& operator[](int idx) const {
+        return _object_template[idx];
+    }
 
-    bool empty() const
-    { return size() == 0; }
+    bool empty() const{
+        return size() == 0;
+    }
     
-    int size() const
-    { return theSize; }
+    int size() const {
+        return _size;
+    }
     
-    int capacity() const
-    { return theCapacity; }
-
-    void push_back(const Object& x)
-    {        
-        if(theSize == theCapacity)
-            reserve(2 * theCapacity + 1);
-        objects[index++] = x;
-        theSize++;
+    int capacity() const {
+        return _capacity;
     }
 
-    void pop_back()
-    {
-        theSize--;
-        index--;
+    void push_back(const ObjectTemplate& x) {
+        if(_size == _capacity) {
+            reserve(2 * _capacity + 1);
+        }
+        _object_template[_index++] = x;
+        _size++;
     }
 
-    void clear()
-    {
-        theSize = 0;
-        index = 0;
+    void pop_back() {
+        _size--;
+        _index--;
     }
 
-    const Object& back() const
-    { return objects[index- 1]; }
+    void clear() {
+        _size = 0;
+        _index = 0;
+    }
 
-    typedef Object* iterator;
-    typedef const Object* const_iterator;
+    const ObjectTemplate& back() const {
+        return _object_template[_index- 1];
+    }
 
-    iterator begin()
-    { return &objects[0]; }
-    const_iterator begin() const
-    { return &objects[0]; }
+    typedef ObjectTemplate* iterator;
+    typedef const ObjectTemplate* const_iterator;
 
-    iterator end()
-    { return &objects[index]; }
-    const_iterator end() const
-    { return &objects[index]; }
+    iterator begin() {
+        return &_object_template[0];
+    }
 
-    void erase(int position)
-    {
-        if(position <= theSize) {
-            objects[position] = 0;
-            theSize--;
+    const_iterator begin() const {
+        return &_object_template[0];
+    }
+
+    iterator end() {
+        return &_object_template[_index];
+    }
+
+    const_iterator end() const {
+        return &_object_template[_index];
+    }
+
+    void erase(int position) {
+        if(position <= _size) {
+            _object_template[position] = 0;
+            _size--;
         }
     }
 
-    enum { SPARE_CAPACITY = 32 };
+    enum {
+        MORE_SIZE = 32
+    };
+
   private:
-    int theSize;
-    int index;
-    int theCapacity;
-    Object* objects;
+    int                 _size;
+    int                 _index;
+    int                 _capacity;
+    ObjectTemplate*     _object_template;
 };
 
 } // namespace
