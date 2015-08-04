@@ -413,6 +413,9 @@ The client handles both cancellation types:
 
 This API is based on OMA LWM2M specification. You can get the specification [here](http://technical.openmobilealliance.org/Technical/technical-information/release-program/current-releases/oma-lightweightm2m-v1-0)
 
+## How to use the API
+More information on how to use the API effectively to create and configure Objects, Object Instances and Resources , can be found from [here](https://github.com/ARMmbed/lwm2m-client/blob/master/Howto.md)
+
 ## API documentation
 
 You can generate Doxygen API documentation for these APIs from a doxy file which is present in the `doxygen` folder . You need to run `doxygen` command from the `doxygen/` folder and it will generate a `docs` folder at API source directory root level where you can find the detailed documentation for each API.

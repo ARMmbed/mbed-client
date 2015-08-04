@@ -14,7 +14,9 @@ M2MObject class is derived out of M2MBase class so all the public methods can be
 
 ####Device Object.
 There is a direct API to create Device Object using following API from M2MInterfaceFactory class
+
 ```static M2MDevice *create_device();```
+
 
 Since there can be only one instance of M2MDevice , M2MDevice is a static class and it can be deleted using 
 ```M2MDevice::delete_instance();```
@@ -240,5 +242,8 @@ You can pass the function pointer using this API
 
 Apart from this, there are multiple APIs which provides getter and remove functions for Resource/ResourceInstances present in M2MResource/M2MResourceInstance class, check the API documentation for their required usage. 
 
+## API documentation
+
+You can generate Doxygen API documentation for these APIs from a doxy file which is present in the `doxygen` folder . You need to run `doxygen` command from the `doxygen/` folder and it will generate a `docs` folder at API source directory root level where you can find the detailed documentation for each API.
 
 
