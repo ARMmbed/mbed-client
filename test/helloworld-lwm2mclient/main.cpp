@@ -392,8 +392,6 @@ int main() {
     do {
         mesh_api->processEvent();
     } while(!lwm2mclient.register_successful());
-#else
-//    while (!lwm2mclient.register_successful()) { __WFI(); }
 #endif
 
     // Wait for the unregister successful callback,
@@ -404,8 +402,6 @@ int main() {
     do {
         mesh_api->processEvent();
     } while(!lwm2mclient.unregister_successful());
-#else
-//    while (!lwm2mclient.unregister_successful()) { __WFI(); }
 #endif
 
 

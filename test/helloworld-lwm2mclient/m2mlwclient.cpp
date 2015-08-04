@@ -39,9 +39,6 @@ const String &MBED_SERVER_ADDRESS = "coap://10.45.3.10:5683";
 const String &MBED_SERVER_DTLS_ADDRESS = "coap://10.45.3.10:5684";
 #endif
 
-const uint16_t SERVER_PORT = 5683;
-const uint16_t SECURE_PORT = 5684;
-
 const String &MANUFACTURER = "ARM";
 const String &TYPE = "type";
 const String &MODEL_NUMBER = "2015";
@@ -97,12 +94,15 @@ bool M2MLWClient::create_interface(bool useSecureConnection) {
             stack = M2MInterface::Nanostack_IPv6;
     #endif
 
+   srand(time(NULL));
+   uint16_t port = rand() % 65535;
+
     if(useSecureConnection){
         _interface = M2MInterfaceFactory::create_interface(*this,
                                                   "client-endpoint",
                                                   "test",
                                                   60,
-                                                  SECURE_PORT,
+                                                  port,
                                                   "",
                                                   M2MInterface::UDP,
                                                   stack,
@@ -113,7 +113,7 @@ bool M2MLWClient::create_interface(bool useSecureConnection) {
                                                   "lwm2m-endpoint",
                                                   "test",
                                                   60,
-                                                  SERVER_PORT,
+                                                  port,
                                                   "",
                                                   M2MInterface::UDP,
                                                   stack,

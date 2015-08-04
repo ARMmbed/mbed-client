@@ -238,7 +238,6 @@ The Device Management and Service Enabler Interface is used by the LWM2M Server 
 - **Delete**
 - **Execute**
 - **Write Attributes**
-- **Discover**
 
 The Device Management and Service Enabler Interface supports currently the following sub-features:
 
@@ -247,7 +246,7 @@ The Device Management and Service Enabler Interface supports currently the follo
 - Write Attributes
 - Execute
 
-Currently, the Device Management and Service Enabler Interface is handled only at Resources level, support for Object and Object Instances will be added in later releases.
+The Device Management and Service Enabler Interface is handled at Resources level for text, support for Object and Object Instances is available for TLV data type.
 
 ### Read
 
