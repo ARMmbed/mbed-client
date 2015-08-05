@@ -316,9 +316,9 @@ bool M2MLWClient::set_resource_value(const char *name,
     if(_object && name_string.length() > 0) {
         M2MObjectInstance *inst = _object->object_instance(object_instance);
         if(inst) {
-            M2MResource *res = inst->resource(name_string, 0);
+            M2MResource *res = inst->resource(name_string);
             if (res) {
-                if (res->set_value((const uint8_t*)value_string.c_str(), value_string.size(), true)) {
+                if (res->set_value((const uint8_t*)value_string.c_str(), value_string.size())) {
                     success = true;
                 }
             }
