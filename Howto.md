@@ -17,8 +17,8 @@ There is a direct API to create Device Object using following API from M2MInterf
 
 ```static M2MDevice *create_device();```
 
-
 Since there can be only one instance of M2MDevice , M2MDevice is a static class and it can be deleted using 
+
 ```M2MDevice::delete_instance();```
 
 Check M2MDevice class documentation to see how you can configure the device object as well as how to create appropriate Resources and assign value to them. 
