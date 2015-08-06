@@ -137,13 +137,18 @@ M2MResource* M2MDevice::create_resource(DeviceResource resource, uint32_t value)
 {
     M2MResource* res = NULL;
     String device_id = "";
+    M2MBase::Operation operation = M2MBase::GET_ALLOWED;
     if(!is_resource_present(resource)) {
         switch(resource) {
         case BatteryLevel:
-            device_id = DEVICE_BATTERY_LEVEL;
+            if(0 <= value && value <= 100) {
+                device_id = DEVICE_BATTERY_LEVEL;
+            }
             break;
         case BatteryStatus:
-            device_id = DEVICE_BATTERY_STATUS;
+            if(0 <= value && value <= 6) {
+                device_id = DEVICE_BATTERY_STATUS;
+            }
             break;
         case MemoryFree:
             device_id = DEVICE_MEMORY_FREE;
@@ -151,28 +156,31 @@ M2MResource* M2MDevice::create_resource(DeviceResource resource, uint32_t value)
         case MemoryTotal:
             device_id = DEVICE_MEMORY_TOTAL;
             break;
-        case CurrentTime: {
-            if(_device_instance) {
-                res = _device_instance->create_dynamic_resource(DEVICE_CURRENT_TIME,
-                                                                OMA_RESOURCE_TYPE,
-                                                                M2MResourceInstance::INTEGER,
-                                                                false);
-
-                if(res) {
-                    char *buffer;
-                    int size = asprintf(&buffer,"%ld",(long int)value);
-                    res->set_operation(M2MBase::GET_PUT_POST_ALLOWED);
-                    res->set_value((const uint8_t*)buffer,
-                                   (const uint32_t)size);
-                    if(size > 0) {
-                        free(buffer);
-                    }
-                }
-            }
-        }
+        case CurrentTime:
+            device_id = DEVICE_CURRENT_TIME;
+            operation = M2MBase::GET_PUT_ALLOWED;
             break;
         default:
             break;
+        }
+    }
+    if(!device_id.empty()) {
+        if(_device_instance) {
+            res = _device_instance->create_dynamic_resource(device_id,
+                                                            OMA_RESOURCE_TYPE,
+                                                            M2MResourceInstance::INTEGER,
+                                                            false);
+
+            if(res) {
+                char *buffer;
+                int size = asprintf(&buffer,"%ld",(long int)value);
+                res->set_operation(operation);
+                res->set_value((const uint8_t*)buffer,
+                               (const uint32_t)size);
+                if(size > 0) {
+                    free(buffer);
+                }
+            }
         }
     }
     return res;
