@@ -190,18 +190,10 @@ public:
             _object->set_operation(M2MBase::GET_PUT_POST_ALLOWED);
             M2MObjectInstance* inst = _object->create_object_instance();
             if(inst) {
-               inst->set_operation(M2MBase::GET_PUT_POST_ALLOWED);
-               inst->set_observable(false);
-               M2MResource* res = inst->create_dynamic_resource("1","ResourceTest",
-                                                                 M2MResourceInstance::INTEGER,
-                                                                 true,true);
+                inst->set_operation(M2MBase::GET_PUT_POST_ALLOWED);
+                inst->set_observable(false);
                 char buffer[20];
                 int size = sprintf(buffer,"%d",_value);
-                res->set_operation(M2MBase::GET_PUT_POST_ALLOWED);
-                res->set_value((const uint8_t*)buffer,
-                             (const uint32_t)size);
-                res->set_execute_function(execute_callback(this,&M2MLWClient::execute_function));
-                _value++;
 
                 inst->create_static_resource("0",
                                              "ResourceTest",
@@ -215,9 +207,11 @@ public:
                                                                          true,0);
 
                 if(instance) {
-                    instance->set_operation(M2MBase::GET_PUT_ALLOWED);
+                    instance->set_operation(M2MBase::GET_PUT_POST_ALLOWED);
                     instance->set_value((const uint8_t*)buffer,
                                  (const uint32_t)size);
+                    instance->set_execute_function(execute_callback(this,&M2MLWClient::execute_function));
+                    _value++;
                 }
             }
         }
@@ -229,14 +223,6 @@ public:
             M2MObjectInstance* inst = _object->object_instance();
             if(inst) {
                 M2MResource* res = inst->resource("1");
-                if(res) {
-                    printf(" Value sent %d\n", _value);
-                    char buffer[20];
-                    int size = sprintf(buffer,"%d",_value);
-                    res->set_value((const uint8_t*)buffer,
-                                   (const uint32_t)size);
-                    _value++;
-                }
                 res = inst->resource("1");
                 if(res) {
                     M2MResourceInstance *res_inst = res->resource_instance(0);
@@ -353,7 +339,7 @@ void* send_observation(void* arg) {
     static uint8_t counter = 0;
     while(1) {
         sleep(1);
-        if(counter >= 4 &&
+        if(counter >= 5 &&
            client->register_successful()) {
             printf("Sending observation\n");
             client->update_resource();
