@@ -38,6 +38,7 @@ const String &MBED_SERVER_DTLS_ADDRESS = "coap://FD00:FF1:CE0B:A5E1:1068:AF13:9B
 const String &MBED_SERVER_ADDRESS = "coap://10.45.3.10:5683";
 const String &MBED_SERVER_DTLS_ADDRESS = "coap://10.45.3.10:5684";
 #endif
+const String CLIENT_NAME = "secure-client";
 
 const String &MANUFACTURER = "ARM";
 const String &TYPE = "type";
@@ -87,39 +88,27 @@ M2MLWClient::~M2MLWClient() {
     }
 }
 
-bool M2MLWClient::create_interface(bool useSecureConnection) {
+bool M2MLWClient::create_interface() {
 
     M2MInterface::NetworkStack stack = M2MInterface::LwIP_IPv4;
     #ifdef SIXLOWPAN_INTERFACE
             stack = M2MInterface::Nanostack_IPv6;
     #endif
 
-   srand(time(NULL));
-   uint16_t port = rand() % 65535;
+    /* From http://www.iana.org/assignments/port-numbers:
+       "The Dynamic and/or Private Ports are those from 49152 through 65535" */
+    srand(time(NULL));
+    uint16_t port = (rand() % (65535-49152)) + 49152;
 
-    if(useSecureConnection){
-        _interface = M2MInterfaceFactory::create_interface(*this,
-                                                  "client-endpoint",
-                                                  "test",
-                                                  60,
-                                                  port,
-                                                  "",
-                                                  M2MInterface::UDP,
-                                                  stack,
-                                                  "");
-        printf("Endpoint Name : linux-secure-endpoint\n");
-    }else{
-        _interface = M2MInterfaceFactory::create_interface(*this,
-                                                  "lwm2m-endpoint",
-                                                  "test",
-                                                  60,
-                                                  port,
-                                                  "",
-                                                  M2MInterface::UDP,
-                                                  stack,
-                                                  "");
-        printf("Endpoint Name : lwm2m-endpoint\n");
-    }
+    _interface = M2MInterfaceFactory::create_interface(*this,
+                                              CLIENT_NAME,
+                                              "test",
+                                              60,
+                                              port,
+                                              "",
+                                              M2MInterface::UDP,
+                                              stack,
+                                              "");
 
     return (_interface == NULL) ? false : true;
 }

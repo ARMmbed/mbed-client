@@ -172,8 +172,8 @@ bool M2MObjectInstance::remove_resource(const String &resource_name)
                  // Resource found and deleted.
                  res = *it;
 
-                 char *obj_inst_id;
-                 int size = asprintf(&obj_inst_id,"%d",instance_id());
+                 char *obj_inst_id = (char*)malloc(20);
+                 snprintf(obj_inst_id, 20,"%d",instance_id());
 
                  String obj_name = name();
                  obj_name += String("/");
@@ -181,9 +181,7 @@ bool M2MObjectInstance::remove_resource(const String &resource_name)
                  obj_name += String("/");
                  obj_name += (*it)->name();
 
-                 if(size > 0) {
-                     free(obj_inst_id);
-                 }
+                 free(obj_inst_id);
 
                  remove_resource_from_coap(obj_name);
                  delete res;
@@ -211,8 +209,8 @@ bool M2MObjectInstance::remove_resource_instance(const String &resource_name,
          for ( ; it != list.end(); it++) {
              if((*it)->instance_id() == inst_id) {
 
-                 char *obj_inst_id;
-                 int size = asprintf(&obj_inst_id,"%d",instance_id());
+                 char *obj_inst_id = (char*)malloc(20);
+                 snprintf(obj_inst_id, 20,"%d",instance_id());
 
                  String obj_name = name();
                  obj_name += String("/");
@@ -220,18 +218,14 @@ bool M2MObjectInstance::remove_resource_instance(const String &resource_name,
                  obj_name += String("/");
                  obj_name += resource_name;
 
-                 if(size > 0) {
-                     free(obj_inst_id);
-                 }
+                 free(obj_inst_id);
 
-                 char *res_inst_id;
-                 size = asprintf(&res_inst_id,"%d",inst_id);
+                 char *res_inst_id = (char*)malloc(20);
+                 snprintf(res_inst_id, 20,"%d",inst_id);
                  obj_name += String("/");
                  obj_name += String(res_inst_id);
 
-                 if(size > 0) {
-                     free(res_inst_id);
-                 }
+                 free(res_inst_id);
 
                  remove_resource_from_coap(obj_name);
                  success = res->remove_resource_instance(inst_id);
@@ -327,13 +321,13 @@ sn_coap_hdr_s* M2MObjectInstance::handle_get_request(nsdl_s *nsdl,
     uint8_t * data = NULL;
     uint32_t  data_length = 0;
     //TODO: GET for Object is not yet implemented.
-    // Need to first fix C library and then implement on C++ side.    
+    // Need to first fix C library and then implement on C++ side.
     if(received_coap_header) {
         // process the GET if we have registered a callback for it
         if ((operation() & SN_GRS_GET_ALLOWED) != 0) {
             coap_response = sn_nsdl_build_response(nsdl,
                                                    received_coap_header,
-                                                   COAP_MSG_CODE_RESPONSE_CONTENT);            
+                                                   COAP_MSG_CODE_RESPONSE_CONTENT);
             if(coap_response) {
                 if(received_coap_header->content_type_ptr){
                     coap_response->content_type_ptr = (uint8_t*)memory_alloc(received_coap_header->content_type_len);

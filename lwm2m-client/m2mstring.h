@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include <sys/types.h> // size_t
+#include <stddef.h> // size_t
 #include <stdexcept>
 
 class Test_M2MString;

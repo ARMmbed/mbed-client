@@ -128,7 +128,7 @@ void M2MResourceInstance::set_execute_function(execute_callback callback)
 bool M2MResourceInstance::set_value(const uint8_t *value,
                                     const uint32_t value_length)
 {
-    bool success = false;    
+    bool success = false;
     if( value != NULL && value_length > 0 ) {
         success = true;
         if(_value) {
@@ -205,8 +205,8 @@ sn_coap_hdr_s* M2MResourceInstance::handle_get_request(nsdl_s *nsdl,
                                                    received_coap_header,
                                                    COAP_MSG_CODE_RESPONSE_CONTENT);
             if(coap_response) {
-                char *content_type;
-                int content_type_size = asprintf(&content_type,"%x",coap_content_type());
+                char *content_type = (char*)malloc(20);
+                int content_type_size = snprintf(content_type, 20,"%x",coap_content_type());
 
                 if( coap_response->content_type_ptr ){
                     memory_free( coap_response->content_type_ptr );
@@ -219,9 +219,7 @@ sn_coap_hdr_s* M2MResourceInstance::handle_get_request(nsdl_s *nsdl,
                     coap_response->content_type_len = (uint8_t)content_type_size;
                 }
 
-                if(content_type_size > 0) {
-                    free(content_type);
-                }
+                free(content_type);
 
                 if( coap_response->payload_ptr ){
                     memory_free( coap_response->payload_ptr );

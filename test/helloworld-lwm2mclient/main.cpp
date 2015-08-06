@@ -269,13 +269,13 @@ int main() {
 
     //These 2 are defining the secure connection usage
     M2MSecurity::SecurityModeType mode = M2MSecurity::NoSecurity;
-    _have_secure_conn = false;
+    _have_secure_conn = (mode == M2MSecurity::Certificate || mode == M2MSecurity::Psk);
     //    SecurityNotSet,
     //    Psk = 0,
     //    Certificate = 2,
     //    NoSecurity = 3
 
-    lwm2mclient.create_interface(_have_secure_conn);
+    lwm2mclient.create_interface();
 
 #ifdef TARGET_LIKE_LINUX
 

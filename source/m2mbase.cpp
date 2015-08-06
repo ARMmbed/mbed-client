@@ -19,6 +19,7 @@
 #include "lwm2m-client/m2mtimer.h"
 #include "include/m2mreporthandler.h"
 #include "include/nsdllinker.h"
+#include <ctype.h>
 
 M2MBase& M2MBase::operator=(const M2MBase& other)
 {
@@ -105,7 +106,7 @@ M2MBase::M2MBase(const String & resource_name,
   _token_length(0)
 {
     if(is_integer(_name)) {
-        _name_id = strtoul(_name.c_str(), NULL, 10);        
+        _name_id = strtoul(_name.c_str(), NULL, 10);
     } else {
         _name_id = -1;
     }

@@ -101,13 +101,10 @@ M2MResource* M2MServer::create_resource(ServerResource resource, uint32_t value)
             if(res) {
                 res->set_operation(M2MBase::GET_PUT_POST_ALLOWED);
                 // If resource is created then set the value.
-                char *buffer;
-                int size = asprintf(&buffer,"%ld",(long int)value);
+                char *buffer = (char*)malloc(20);
+                int size = snprintf(buffer, 20,"%ld",(long int)value);
                 res->set_value((const uint8_t*)buffer,(const uint32_t)size);
-
-                if(size > 0) {
-                    free(buffer);
-                }
+                free(buffer);
             }
         }
     }
@@ -186,14 +183,11 @@ bool M2MServer::set_resource_value(ServerResource resource,
            M2MServer::NotificationStorage == resource) {
             // If it is any of the above resource
             // set the value of the resource.
-            char *buffer;
-            int size = asprintf(&buffer,"%ld",(long int)value);
+            char *buffer = (char*)malloc(20);
+            int size = snprintf(buffer, 20,"%ld",(long int)value);
             success = res->set_value((const uint8_t*)buffer,
                                      (const uint32_t)size);
-
-            if(size > 0) {
-                free(buffer);
-            }
+            free(buffer);
         }
     }
     return success;
@@ -263,7 +257,7 @@ bool M2MServer::is_resource_present(ServerResource resource) const
 
 uint16_t M2MServer::total_resource_count() const
 {
-    uint16_t total_count = 0;    
+    uint16_t total_count = 0;
     if(_server_instance) {
     total_count = _server_instance->resources().size();
     }
@@ -303,7 +297,7 @@ M2MResource* M2MServer::get_resource(ServerResource res) const
         res_name = SERVER_REGISTRATION_UPDATE;
         break;
     }
-    if(!res_name.empty()) {        
+    if(!res_name.empty()) {
         if(_server_instance) {
         res_object = _server_instance->resource(res_name);
         }

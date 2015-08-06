@@ -42,16 +42,14 @@ M2MObject::~M2MObject()
             //Free allocated memory for object instances.
             obj = *it;
 
-            char *obj_inst_id;
-            int size = asprintf(&obj_inst_id,"%d",index);
+            char *obj_inst_id = (char*)malloc(20);
+            snprintf(obj_inst_id, 20,"%d",index);
 
             String obj_name = M2MBase::name();
             obj_name += String("/");
             obj_name += String(obj_inst_id);
 
-            if(size > 0) {
-                free(obj_inst_id);
-            }
+            free(obj_inst_id);
 
             remove_resource_from_coap(obj_name);
 
@@ -111,16 +109,14 @@ bool M2MObject::remove_object_instance(uint16_t inst_id)
                 // Instance found and deleted.
                 obj = *it;
 
-                char *obj_inst_id;
-                int size = asprintf(&obj_inst_id,"%d",obj->instance_id());
+                char *obj_inst_id = (char*)malloc(20);
+                snprintf(obj_inst_id, 20,"%d",obj->instance_id());
 
                 String obj_name = name();
                 obj_name += String("/");
                 obj_name += String(obj_inst_id);
 
-                if(size > 0) {
-                    free(obj_inst_id);
-                }
+                free(obj_inst_id);
 
                 remove_resource_from_coap(obj_name);
 

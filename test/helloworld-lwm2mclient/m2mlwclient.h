@@ -37,7 +37,7 @@ public:
 
     ~M2MLWClient();
 
-    bool create_interface(bool useSecureConnection);
+    bool create_interface();
 
     bool bootstrap_successful();
 

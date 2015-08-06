@@ -119,14 +119,12 @@ M2MResource* M2MSecurity::create_resource(SecurityResource resource, uint32_t va
                                                             false);
 
             if(res) {
-                char *buffer;
-                int size = asprintf(&buffer,"%ld",(long int)value);
+                char *buffer = (char*)malloc(20);
+                int size = snprintf(buffer, 20,"%ld",(long int)value);
                 res->set_operation(M2MBase::NOT_ALLOWED);
                 res->set_value((const uint8_t*)buffer,
                                (const uint32_t)size);
-                if(size > 0) {
-                    free(buffer);
-                }
+                free(buffer);
             }
         }
     }
@@ -190,14 +188,11 @@ bool M2MSecurity::set_resource_value(SecurityResource resource,
            M2MSecurity::ClientHoldOffTime == resource) {
             // If it is any of the above resource
             // set the value of the resource.
-            char *buffer;
-            int size = asprintf(&buffer,"%ld",(long int)value);
+            char *buffer = (char*)malloc(20);
+            int size = snprintf(buffer, 20,"%ld",(long int)value);
             success = res->set_value((const uint8_t*)buffer,
                                      (const uint32_t)size);
-
-            if(size > 0) {
-                free(buffer);
-            }
+            free(buffer);
         }
     }
     return success;
