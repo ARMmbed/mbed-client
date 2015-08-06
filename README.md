@@ -245,6 +245,8 @@ The Device Management and Service Enabler Interface supports currently the follo
 - Write
 - Write Attributes
 - Execute
+- Create (For ObjectInstances)
+- Delete (For ObjectInstances)
 
 The Device Management and Service Enabler Interface is handled at Resources level for text, support for Object and Object Instances is available for TLV data type.
 
