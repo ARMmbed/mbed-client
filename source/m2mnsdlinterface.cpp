@@ -808,7 +808,7 @@ bool M2MNsdlInterface::create_nsdl_resource_structure(M2MResource *res,
                 for ( ; it != res_list.end(); it++ ) {
                     // Create NSDL structure for all resources inside
                     char *inst_id = (char*)memory_alloc(20);
-                    snprintf(inst_id, 20,"%d",res->instance_id());
+                    snprintf(inst_id, 20,"%d",(*it)->instance_id());
                     res_name+= String("/") ;
                     res_name+= String(inst_id);
 
