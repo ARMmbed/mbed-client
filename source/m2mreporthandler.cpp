@@ -187,7 +187,7 @@ bool M2MReportHandler::set_notification_attribute(char* option,
         strncpy(attribute, option, (size_t)(pos-option));
         pos++;
         attribute[pos-option] = '\0';
-        strncpy(value, pos, strlen(pos));
+        strncpy(value, pos, 20);
     }else{
         strncpy(attribute, option, (size_t)strlen(option));
     }

@@ -72,8 +72,40 @@ public:
                                  uint16_t object_instance = 0);
 
     bool set_resource_value(const char *name,
-                                    int32_t value,
-                                    uint16_t object_instance = 0);
+                            int32_t value,
+                            uint16_t object_instance = 0);
+
+    bool set_resource_value(const char *name,
+                            const char *value,
+                            uint16_t object_instance = 0);
+
+    bool create_static_resource_instance_string(const char *name,
+                                                const char *value,
+                                                bool multiple_instance,
+                                                uint16_t object_instance = 0,
+                                                uint16_t resource_instance = 0);
+
+    bool create_static_resource_instance_int(const char *name,
+                                             uint32_t value,
+                                             bool multiple_instance,
+                                             uint16_t object_instance = 0,
+                                             uint16_t resource_instance = 0);
+
+    bool create_dynamic_resource_instance(const char *name,
+                                          bool observable,
+                                          bool multiple_instance,
+                                          uint16_t object_instance = 0,
+                                          uint16_t resource_instance = 0);
+
+    bool set_resource_instance_value(const char *name,
+                                     int32_t value,
+                                     uint16_t object_instance = 0,
+                                     uint16_t resource_instance = 0);
+
+    bool set_resource_instance_value(const char *name,
+                                     const char *value,
+                                     uint16_t object_instance = 0,
+                                     uint16_t resource_instance = 0);
 
     bool create_object_instance();
 

@@ -59,6 +59,23 @@
                                     "   --name <name>       Resource name\n"\
                                     "   --observable <n>    Resource is observable false=0(default), true=1\n"\
                                     "   --multiple_instance <n> Supports multiple instances, false=0(default), true=1\n"\
+                                    "static_resource_instance <p> [options]\n"\
+                                    "<p>:\n"\
+                                    "   Options for static resource instance\n"\
+                                    "   --object_instance <n> Instance Id of the object this resource is associated with, default is 0\n"\
+                                    "   --resource_instance <n> Instance Id of the resource associated with, default is 0\n"\
+                                    "   --name <name>       Resource name\n"\
+                                    "   --value <name>      Resource value\n"\
+                                    "   --value_type <n>    Value Type String=0, Integer=1\n"\
+                                    "   --multiple_instance <n> Supports multiple instances, false=0(default), true=1\n"\
+                                    "dynamic_resource_instance <p> [options]\n"\
+                                    "<p>:\n"\
+                                    "   Options for dynamic resource instance\n"\
+                                    "   --object_instance <n> Instance Id of the object this resource is associated with, default is 0\n"\
+                                    "   --resource_instance <n> Instance Id of the resource associated with, default is 0\n"\
+                                    "   --name <name>       Resource name\n"\
+                                    "   --observable <n>    Resource is observable false=0(default), true=1\n"\
+                                    "   --multiple_instance <n> Supports multiple instances, false=0(default), true=1\n"\
                                     "device <p> [options]\n"\
                                     "<p>:\n"\
                                     "   Options for device object \n"\
@@ -69,14 +86,14 @@
                                     "   --hardware_version <name>   Hardware version\n"\
                                     "   --software_version <name>   Software version\n"\
                                     "   --firmware_version <name>   Firmware version\n"\
-                                    "   --available_power_sources <n> Number of available power sources\n"\
-                                    "   --power_source_voltage <n>   Power source voltage\n"\
-                                    "   --power_source_current <n>   Power source current\n"\
+                                    "   --available_power_sources <n> Number of available power sources, Must have Instance ID\n"\
+                                    "   --power_source_voltage <n>   Power source voltage, Must have Instance ID\n"\
+                                    "   --power_source_current <n>   Power source current, Must have Instance ID\n"\
                                     "   --battery_level <n>        Battery level\n"\
                                     "   --battery_status <n>   Battery status\n"\
                                     "   --memory_free <n>   Free memory, in bytes\n"\
                                     "   --memory_total <n>   Free memory in bytes\n"\
-                                    "   --error_code <n>   Error Code\n"\
+                                    "   --error_code <n>   Error Code, Must have Instance ID\n"\
                                     "   --current_time <n>   Current Time, EPOCH format\n"\
                                     "   --utc_offset <name>   UTC Format\n"\
                                     "   --timezone <name>   Time zone \n"\
@@ -96,7 +113,14 @@
                                     "   Options for set_value command \n"\
                                     "   --name <name>               Resource name (Mandatory)\n"\
                                     "   --value <value>             Resource value (Mandatory)\n"\
-                                    "   --object_instance <n>       Instance ID of object this resource is associated with, default is 0\n"
+                                    "   --object_instance <n>       Instance ID of object this resource is associated with, default is 0\n"\
+                                    "set_value_instance <p> [options]\n"\
+                                    "<p>:\n"\
+                                    "   Options for set_value_instance command for Resource Instances\n"\
+                                    "   --name <name>               Resource name (Mandatory)\n"\
+                                    "   --value <value>             Resource value (Mandatory)\n"\
+                                    "   --object_instance <n>       Instance ID of object this resource is associated with, default is 0\n"\
+                                    "   --resource_instance <n>     Instance ID of object of the resource, default is 0\n"
 
 #define EXIT_MANUAL         "exit :closes the application\n"
 
@@ -107,6 +131,8 @@ int lwm2m_client_device_command(int argc, char *argv[]);
 int lwm2m_client_object_command(int argc, char *argv[]);
 int lwm2m_client_static_resource_command(int argc, char *argv[]);
 int lwm2m_client_dynamic_resource_command(int argc, char *argv[]);
+int lwm2m_client_static_resource_instance_command(int argc, char *argv[]);
+int lwm2m_client_dynamic_resource_instance_command(int argc, char *argv[]);
 int lwm2m_client_bootstrap_object_command(int argc, char *argv[]);
 int lwm2m_client_bootstrap_command();
 int lwm2m_client_register_object_command(int argc, char *argv[]);
@@ -114,6 +140,7 @@ int lwm2m_client_register_command();
 int lwm2m_client_update_register_command(int argc, char *argv[]);
 int lwm2m_client_unregister_command();
 int lwm2m_client_set_value_command(int argc, char *argv[]);
+int lwm2m_client_set_value_instance_command(int argc, char *argv[]);
 int exit_command(int argc, char *argv[]);
 
 void  lwm2m_command_init(void)
@@ -159,6 +186,14 @@ int lwm2m_client_command(int argc, char *argv[])
     {
       return lwm2m_client_dynamic_resource_command(argc, argv);
     }
+    else if( strcmp(argv[1], "static_resource_instance") == 0 )
+    {
+      return lwm2m_client_static_resource_instance_command(argc, argv);
+    }
+    else if( strcmp(argv[1], "dynamic_resource_instance") == 0 )
+    {
+      return lwm2m_client_dynamic_resource_instance_command(argc, argv);
+    }
     else if( strcmp(argv[1], "register_object") == 0 )
     {
       return lwm2m_client_register_object_command(argc, argv);
@@ -178,6 +213,10 @@ int lwm2m_client_command(int argc, char *argv[])
     else if ( strcmp(argv[1], "set_value") == 0)
     {
       return lwm2m_client_set_value_command(argc, argv);
+    }
+    else if ( strcmp(argv[1], "set_value_instance") == 0)
+    {
+      return lwm2m_client_set_value_instance_command(argc, argv);
     }
     //:TODO what another commands should be there ?
     return CMDLINE_RETCODE_COMMAND_NOT_IMPLEMENTED;
@@ -470,6 +509,72 @@ int lwm2m_client_dynamic_resource_command(int argc, char *argv[])
     return return_code;
 }
 
+int lwm2m_client_static_resource_instance_command(int argc, char *argv[])
+{
+    int return_code = CMDLINE_RETCODE_INVALID_PARAMETERS;
+    char *name = 0;
+    char *value_string = 0;
+    int32_t value_int = 0;
+    int32_t value_type = -1;
+    int32_t multiple_instance = 0;
+    int32_t object_instance = 0;
+    int32_t resource_instance = 0;
+
+    cmd_parameter_int(argc, argv, "--multiple_instance", &multiple_instance);
+    cmd_parameter_int(argc, argv, "--object_instance", &object_instance);
+    cmd_parameter_int(argc, argv, "--resource_instance", &resource_instance);
+
+    if(cmd_parameter_int(argc, argv, "--value_type", &value_type)) {
+        if(0 == value_type){
+            if(cmd_parameter_val(argc, argv, "--name", &name) &&
+               cmd_parameter_val(argc, argv, "--value", &value_string)) {
+                if(lwm2m_client.create_static_resource_instance_string(name,value_string,
+                                                                       multiple_instance,
+                                                                       object_instance,
+                                                                       resource_instance)) {
+                    return_code =  CMDLINE_RETCODE_SUCCESS;
+                }
+            }
+        } else if(1 == value_type){
+            if(cmd_parameter_val(argc, argv, "--name", &name) &&
+               cmd_parameter_int(argc, argv, "--value", &value_int)) {
+                if(lwm2m_client.create_static_resource_instance_int(name,value_int,
+                                                                    multiple_instance,
+                                                                    object_instance,
+                                                                    resource_instance)) {
+                    return_code =  CMDLINE_RETCODE_SUCCESS;
+                }
+            }
+        }
+    }
+    return return_code;
+}
+
+int lwm2m_client_dynamic_resource_instance_command(int argc, char *argv[])
+{
+    int return_code = CMDLINE_RETCODE_INVALID_PARAMETERS;
+    char *name = 0;
+    int32_t multiple_instance = 0;
+    int32_t object_instance = 0;
+    int32_t resource_instance = 0;
+    int32_t observable = 0;
+
+    cmd_parameter_int(argc, argv, "--multiple_instance", &multiple_instance);
+    cmd_parameter_int(argc, argv, "--object_instance", &object_instance);
+    cmd_parameter_int(argc, argv, "--resource_instance", &resource_instance);
+    cmd_parameter_int(argc, argv, "--observable", &observable);
+
+    if(cmd_parameter_val(argc, argv, "--name", &name)) {
+        if(lwm2m_client.create_dynamic_resource_instance(name,observable,
+                                                         multiple_instance,
+                                                         object_instance,
+                                                         resource_instance)) {
+            return_code =  CMDLINE_RETCODE_SUCCESS;
+        }
+    }
+    return return_code;
+}
+
 int lwm2m_client_bootstrap_object_command(int argc, char *argv[])
 {
     int return_code = CMDLINE_RETCODE_FAIL;
@@ -549,6 +654,28 @@ int lwm2m_client_set_value_command(int argc, char *argv[])
     if(cmd_parameter_val(argc, argv, "--name", &name) &&
        cmd_parameter_int(argc, argv, "--value", &value)) {
         if(lwm2m_client.set_resource_value(name,value,object_instance)) {
+            return_code = CMDLINE_RETCODE_SUCCESS;
+        }
+    }
+    return return_code;
+}
+
+int lwm2m_client_set_value_instance_command(int argc, char *argv[])
+{
+    int return_code = CMDLINE_RETCODE_INVALID_PARAMETERS;
+    char *name = 0;
+    int32_t value = 0;
+    int32_t object_instance = 0;
+    int32_t resource_instance = 0;
+
+    cmd_parameter_int(argc, argv, "--object_instance", &object_instance);
+    cmd_parameter_int(argc, argv, "--resource_instance", &resource_instance);
+
+    if(cmd_parameter_val(argc, argv, "--name", &name) &&
+       cmd_parameter_int(argc, argv, "--value", &value)) {
+        if(lwm2m_client.set_resource_instance_value(name,value,
+                                                    object_instance,
+                                                    resource_instance)) {
             return_code = CMDLINE_RETCODE_SUCCESS;
         }
     }

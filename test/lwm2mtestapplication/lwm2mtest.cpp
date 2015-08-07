@@ -347,6 +347,187 @@ bool M2MLWClient::set_resource_value(const char *name,
     return success;
 }
 
+bool M2MLWClient::set_resource_value(const char *name,
+                                     const char *value,
+                                     uint16_t object_instance)
+{
+    bool success = false;
+    String name_string;
+    String value_string;
+    if(name) {
+        name_string += name;
+    }
+    if(value) {
+        value_string += value;
+    }
+
+    if(_object && name_string.length() > 0) {
+        M2MObjectInstance *inst = _object->object_instance(object_instance);
+        if(inst) {
+            M2MResource *res = inst->resource(name_string);
+            if (res) {
+                if (res->set_value((const uint8_t*)value_string.c_str(), value_string.size())) {
+                    success = true;
+                }
+            }
+        }
+    }
+    return success;
+}
+
+bool M2MLWClient::create_static_resource_instance_string(const char *name,
+                                                         const char *value,
+                                                         bool multiple_instance,
+                                                         uint16_t object_instance,
+                                                         uint16_t resource_instance)
+{
+    bool success = false;
+    String name_string;
+    if(name) {
+        name_string += name;
+    }
+    String value_string;
+    if(value) {
+        value_string += value;
+    }
+    if(_object) {
+        M2MObjectInstance *inst = _object->object_instance(object_instance);
+        if(inst) {
+            if(inst->create_static_resource_instance(name,"resource",
+                                                    M2MResourceInstance::STRING,
+                                                    (const uint8_t*)value_string.c_str(),
+                                                    value_string.size(),
+                                                    resource_instance) != NULL) {
+                success = true;
+            }
+        }
+    }
+    return success;
+}
+
+bool M2MLWClient::create_static_resource_instance_int(const char *name,
+                                                      uint32_t value,
+                                                      bool multiple_instance,
+                                                      uint16_t object_instance,
+                                                      uint16_t resource_instance)
+{
+    bool success = false;
+    String name_string;
+    String value_string;
+
+    if(name) {
+        name_string += name;
+    }
+
+    char value_buffer[20];
+    sprintf(value_buffer,"%d",value);
+    value_string += value_buffer;
+
+    if(_object) {
+        M2MObjectInstance *inst = _object->object_instance(object_instance);
+        if(inst) {
+            if(inst->create_static_resource_instance(name,"resource",
+                                                    M2MResourceInstance::INTEGER,
+                                                    (const uint8_t*)value_string.c_str(),
+                                                    value_string.size(),
+                                                    resource_instance) != NULL) {
+                success = true;
+            }
+        }
+    }
+    return success;
+}
+
+bool M2MLWClient::create_dynamic_resource_instance(const char *name,
+                                                   bool observable,
+                                                   bool multiple_instance,
+                                                   uint16_t object_instance,
+                                                   uint16_t resource_instance)
+{
+    bool success = false;
+    String name_string;
+    if(name) {
+        name_string += name;
+    }
+    if(_object) {
+        M2MObjectInstance *inst = _object->object_instance(object_instance);
+        if(inst) {
+            if(inst->create_dynamic_resource_instance(name,"resource",
+                                                      M2MResourceInstance::OPAQUE,
+                                                      observable,
+                                                      resource_instance) != NULL) {
+                success = true;
+            }
+        }
+    }
+    return success;
+}
+
+bool M2MLWClient::set_resource_instance_value(const char *name,
+                                              int32_t value,
+                                              uint16_t object_instance,
+                                              uint16_t resource_instance)
+{
+    bool success = false;
+    String name_string;
+    String value_string;
+    if(name) {
+        name_string += name;
+    }
+
+    char value_buffer[20];
+    sprintf(value_buffer,"%d",value);
+    value_string += value_buffer;
+
+    if(_object && name_string.length() > 0) {
+        M2MObjectInstance *inst = _object->object_instance(object_instance);
+        if(inst) {
+            M2MResource *res = inst->resource(name_string);
+            if (res) {
+                M2MResourceInstance *res_inst = res->resource_instance(resource_instance);
+                if(res_inst) {
+                    if (res_inst->set_value((const uint8_t*)value_string.c_str(), value_string.size())) {
+                        success = true;
+                    }
+                }
+            }
+        }
+    }
+    return success;
+}
+
+bool M2MLWClient::set_resource_instance_value(const char *name,
+                                              const char *value,
+                                              uint16_t object_instance,
+                                              uint16_t resource_instance)
+{
+    bool success = false;
+    String name_string;
+    String value_string;
+    if(name) {
+        name_string += name;
+    }
+    if(value) {
+        value_string += value;
+    }
+
+    if(_object && name_string.length() > 0) {
+        M2MObjectInstance *inst = _object->object_instance(object_instance);
+        if(inst) {
+            M2MResource *res = inst->resource(name_string);
+            if (res) {
+                M2MResourceInstance *res_inst = res->resource_instance(resource_instance);
+                if(res_inst) {
+                    if (res_inst->set_value((const uint8_t*)value_string.c_str(), value_string.size())) {
+                        success = true;
+                    }
+                }
+            }
+        }
+    }
+    return success;
+}
+
 bool M2MLWClient::test_register()
 {
     bool success = false;

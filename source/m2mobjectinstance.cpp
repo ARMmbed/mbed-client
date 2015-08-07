@@ -118,7 +118,7 @@ M2MResourceInstance* M2MObjectInstance::create_static_resource_instance(const St
                               value, value_length, true);
         _resource_list.push_back(res);
     }
-    if(res->supports_multiple_instances()) {
+    if(res->supports_multiple_instances()&& (res->resource_instance(instance_id) == NULL)) {
         instance = new M2MResourceInstance(resource_name, resource_type, type,
                                            value, value_length);
         if(instance) {
@@ -145,7 +145,7 @@ M2MResourceInstance* M2MObjectInstance::create_dynamic_resource_instance(const S
                           observable, true);
         _resource_list.push_back(res);
     }
-    if(res->supports_multiple_instances()) {
+    if(res->supports_multiple_instances() && (res->resource_instance(instance_id) == NULL)) {
         instance = new M2MResourceInstance(resource_name, resource_type, type);
         if(instance) {
             instance->set_operation(M2MBase::GET_PUT_ALLOWED);

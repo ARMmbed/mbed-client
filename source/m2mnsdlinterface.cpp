@@ -806,15 +806,16 @@ bool M2MNsdlInterface::create_nsdl_resource_structure(M2MResource *res,
                 M2MResourceInstanceList::const_iterator it;
                 it = res_list.begin();
                 for ( ; it != res_list.end(); it++ ) {
+                    String inst_name = res_name;
                     // Create NSDL structure for all resources inside
                     char *inst_id = (char*)memory_alloc(20);
                     snprintf(inst_id, 20,"%d",(*it)->instance_id());
-                    res_name+= String("/") ;
-                    res_name+= String(inst_id);
+                    inst_name+= String("/") ;
+                    inst_name+= String(inst_id);
 
                     memory_free(inst_id);
 
-                    success = create_nsdl_resource((*it),res_name);
+                    success = create_nsdl_resource((*it),inst_name);
                 }
             }
         } else {
@@ -1070,15 +1071,13 @@ M2MBase* M2MNsdlInterface::find_resource(const M2MResource *resource,
 {
     M2MBase *res = NULL;
     if(resource) {
-        String name = object_name;
-
         if(resource->supports_multiple_instances()) {
             M2MResourceInstanceList list = resource->resource_instances();
             if(!list.empty()) {
                 M2MResourceInstanceList::const_iterator it;
                 it = list.begin();
                 for ( ; it != list.end(); it++ ) {
-
+                    String name = object_name;
                     // if there are multiple instances supported
                     // then add instance Id into creating resource path
                     // else normal /object_id/object_instance/resource_id format.
