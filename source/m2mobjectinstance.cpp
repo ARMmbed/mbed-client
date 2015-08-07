@@ -172,7 +172,7 @@ bool M2MObjectInstance::remove_resource(const String &resource_name)
                  // Resource found and deleted.
                  res = *it;
 
-                 char *obj_inst_id = (char*)malloc(20);
+                 char *obj_inst_id = (char*)memory_alloc(20);
                  snprintf(obj_inst_id, 20,"%d",instance_id());
 
                  String obj_name = name();
@@ -181,7 +181,7 @@ bool M2MObjectInstance::remove_resource(const String &resource_name)
                  obj_name += String("/");
                  obj_name += (*it)->name();
 
-                 free(obj_inst_id);
+                 memory_free(obj_inst_id);
 
                  remove_resource_from_coap(obj_name);
                  delete res;
@@ -209,7 +209,7 @@ bool M2MObjectInstance::remove_resource_instance(const String &resource_name,
          for ( ; it != list.end(); it++) {
              if((*it)->instance_id() == inst_id) {
 
-                 char *obj_inst_id = (char*)malloc(20);
+                 char *obj_inst_id = (char*)memory_alloc(20);
                  snprintf(obj_inst_id, 20,"%d",instance_id());
 
                  String obj_name = name();
@@ -218,14 +218,14 @@ bool M2MObjectInstance::remove_resource_instance(const String &resource_name,
                  obj_name += String("/");
                  obj_name += resource_name;
 
-                 free(obj_inst_id);
+                 memory_free(obj_inst_id);
 
-                 char *res_inst_id = (char*)malloc(20);
+                 char *res_inst_id = (char*)memory_alloc(20);
                  snprintf(res_inst_id, 20,"%d",inst_id);
                  obj_name += String("/");
                  obj_name += String(res_inst_id);
 
-                 free(res_inst_id);
+                 memory_free(res_inst_id);
 
                  remove_resource_from_coap(obj_name);
                  success = res->remove_resource_instance(inst_id);

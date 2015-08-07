@@ -153,7 +153,7 @@ void M2MNsdlInterface::create_endpoint(const String &name,
 
         // If lifetime is less than zero then leave the field empty
         if( life_time > 0) {
-            char *buffer = (char*)malloc(20);
+            char *buffer = (char*)memory_alloc(20);
             int size = snprintf(buffer, 20,"%ld",(long int)life_time);
             if( _endpoint->lifetime_ptr == NULL ){
                 _endpoint->lifetime_ptr = (uint8_t*)memory_alloc(size+1);
@@ -163,7 +163,7 @@ void M2MNsdlInterface::create_endpoint(const String &name,
                 memcpy(_endpoint->lifetime_ptr,buffer,size);
                 _endpoint->lifetime_len =  size;
             }
-            free(buffer);
+            memory_free(buffer);
         }
     }
 }
@@ -248,9 +248,10 @@ bool M2MNsdlInterface::send_update_registration(const uint32_t lifetime)
 {
     tr_debug("M2MNsdlInterface::send_update_registration( lifetime %d)", lifetime);
     bool success = false;
-    char *buffer = (char*)malloc(20);
+
     //If Lifetime value is 0, then don't change the existing lifetime value
     if(lifetime != 0) {
+        char *buffer = (char*)memory_alloc(20);
         int size = snprintf(buffer, 20,"%ld",(long int)lifetime);
         if(_endpoint->lifetime_ptr) {
             memory_free(_endpoint->lifetime_ptr);
@@ -266,20 +267,27 @@ bool M2MNsdlInterface::send_update_registration(const uint32_t lifetime)
             memcpy(_endpoint->lifetime_ptr,buffer,size);
             _endpoint->lifetime_len =  size;
         }
-        free(buffer);
+        memory_free(buffer);
 
         _registration_timer->stop_timer();
         _registration_timer->start_timer(registration_time() * 1000,
                                          M2MTimerObserver::Registration,
                                          false);
-    }
-    if(_update_id == 0 && _nsdl_handle &&
-       _endpoint && _endpoint->lifetime_ptr) {
-        _update_id = sn_nsdl_update_registration(_nsdl_handle,
-                                                 _endpoint->lifetime_ptr,
-                                                 _endpoint->lifetime_len);
-        tr_debug("M2MNsdlInterface::send_update_registration - _update_id %d", _update_id);
-        success = _update_id != 0;
+        if(_update_id == 0 && _nsdl_handle &&
+           _endpoint && _endpoint->lifetime_ptr) {
+            _update_id = sn_nsdl_update_registration(_nsdl_handle,
+                                                     _endpoint->lifetime_ptr,
+                                                     _endpoint->lifetime_len);
+            tr_debug("M2MNsdlInterface::send_update_registration - New lifetime value _update_id %d", _update_id);
+            success = _update_id != 0;
+        }
+    } else {
+        if(_update_id == 0 && _nsdl_handle) {
+            _update_id = sn_nsdl_update_registration(_nsdl_handle, NULL, 0);
+            tr_debug("M2MNsdlInterface::send_update_registration - regular update- _update_id %d", _update_id);
+            success = _update_id != 0;
+        }
+
     }
     return success;
 }
@@ -357,7 +365,7 @@ uint8_t M2MNsdlInterface::received_from_server_callback(struct nsdl_s * /*nsdl_h
                         }
                     // If lifetime is less than zero then leave the field empty
                     if( max_time > 0) {
-                        char *buffer = (char*)malloc(20);
+                        char *buffer = (char*)memory_alloc(20);
                         int size = snprintf(buffer, 20,"%d",(uint32_t)max_time);
                         _endpoint->lifetime_ptr = (uint8_t*)memory_alloc(size+1);
                         if(_endpoint->lifetime_ptr) {
@@ -365,7 +373,7 @@ uint8_t M2MNsdlInterface::received_from_server_callback(struct nsdl_s * /*nsdl_h
                             memcpy(_endpoint->lifetime_ptr,buffer,size);
                             _endpoint->lifetime_len =  size;
                         }
-                        free(buffer);
+                        memory_free(buffer);
                     }
                 }
                 if(_endpoint->lifetime_ptr) {
@@ -515,7 +523,7 @@ void M2MNsdlInterface::bootstrap_done_callback(sn_nsdl_oma_server_info_t *server
     if(server_info && server_info->omalw_address_ptr->addr_ptr) {
         security = new M2MSecurity(M2MSecurity::M2MServer);
         uint16_t port = server_info->omalw_address_ptr->port;
-        char *buffer = (char*)malloc(20);
+        char *buffer = (char*)memory_alloc(20);
         snprintf(buffer, 20,"%d",port);
         String server_uri(COAP);
         String server_address;
@@ -523,12 +531,12 @@ void M2MNsdlInterface::bootstrap_done_callback(sn_nsdl_oma_server_info_t *server
         if(SN_NSDL_ADDRESS_TYPE_IPV4 == server_info->omalw_address_ptr->type) {
             int val = 0;
             for(int index = 0; index < server_info->omalw_address_ptr->addr_len; index++) {
-                char *server_buffer = (char*)malloc(20);
+                char *server_buffer = (char*)memory_alloc(20);
                 val = (int)server_info->omalw_address_ptr->addr_ptr[index];
                 snprintf(server_buffer, 20,"%d",val);
                 server_address +=String(server_buffer);
 
-                free(server_buffer);
+                memory_free(server_buffer);
 
                 if(index < server_info->omalw_address_ptr->addr_len-1) {
                     server_address += String(".");
@@ -559,7 +567,7 @@ void M2MNsdlInterface::bootstrap_done_callback(sn_nsdl_oma_server_info_t *server
         server_uri +=String(":");
         server_uri += String(buffer);
 
-        free(buffer);
+        memory_free(buffer);
         security->set_resource_value(M2MSecurity::M2MServerUri, server_uri);
         security->set_resource_value(M2MSecurity::BootstrapServer, 0);
 
@@ -799,12 +807,12 @@ bool M2MNsdlInterface::create_nsdl_resource_structure(M2MResource *res,
                 it = res_list.begin();
                 for ( ; it != res_list.end(); it++ ) {
                     // Create NSDL structure for all resources inside
-                    char *inst_id = (char*)malloc(20);
+                    char *inst_id = (char*)memory_alloc(20);
                     snprintf(inst_id, 20,"%d",res->instance_id());
                     res_name+= String("/") ;
                     res_name+= String(inst_id);
 
-                    free(inst_id);
+                    memory_free(inst_id);
 
                     success = create_nsdl_resource((*it),res_name);
                 }
@@ -994,15 +1002,15 @@ M2MBase* M2MNsdlInterface::find_resource(const M2MObject *object,
             M2MObjectInstanceList::const_iterator it;
             it = list.begin();
             for ( ; it != list.end(); it++ ) {
-                char *inst_id = (char*)malloc(20);
-                int size = snprintf(inst_id, 20,"%d",(*it)->instance_id());
+                char *inst_id = (char*)memory_alloc(20);
+                snprintf(inst_id, 20,"%d",(*it)->instance_id());
 
                 // Append object instance id to the object name.
                 String name = (*it)->name();
                 name+= String("/");
                 name+= String(inst_id);
 
-                free(inst_id);
+                memory_free(inst_id);
 
                 if(name == object_instance){
                     instance = (*it);
@@ -1029,14 +1037,14 @@ M2MBase* M2MNsdlInterface::find_resource(const M2MObjectInstance *object_instanc
             it = list.begin();
             for ( ; it != list.end(); it++ ) {
                 String name = object_instance->name();
-                char *obj_inst_id = (char*)malloc(20);
-                int size  = snprintf(obj_inst_id, 20,"%d",object_instance->instance_id());
+                char *obj_inst_id = (char*)memory_alloc(20);
+                snprintf(obj_inst_id, 20,"%d",object_instance->instance_id());
 
                 // Append object instance id to the object name.
                 name+= String("/");
                 name+= String(obj_inst_id);
 
-                free(obj_inst_id);
+                memory_free(obj_inst_id);
 
                 name+= String("/");
                 name+= (*it)->name();
@@ -1075,13 +1083,13 @@ M2MBase* M2MNsdlInterface::find_resource(const M2MResource *resource,
                     // then add instance Id into creating resource path
                     // else normal /object_id/object_instance/resource_id format.
 
-                    char *inst_id = (char*)malloc(20);
-                    int size = snprintf(inst_id, 20,"%d",(*it)->instance_id());
+                    char *inst_id = (char*)memory_alloc(20);
+                    snprintf(inst_id, 20,"%d",(*it)->instance_id());
 
                     name+= String("/") ;
                     name+= String(inst_id);
 
-                    free(inst_id);
+                    memory_free(inst_id);
 
                     if(name == resource_instance){
                         res = (*it);

@@ -172,12 +172,12 @@ M2MResource* M2MDevice::create_resource(DeviceResource resource, uint32_t value)
                                                             false);
 
             if(res) {
-                char *buffer = (char*)malloc(20);
+                char *buffer = (char*)memory_alloc(20);
                 int size = snprintf(buffer, 20,"%ld",(long int)value);
                 res->set_operation(operation);
                 res->set_value((const uint8_t*)buffer,
                                (const uint32_t)size);
-                free(buffer);
+                memory_free(buffer);
             }
         }
     }
@@ -208,12 +208,12 @@ M2MResourceInstance* M2MDevice::create_resource_instance(DeviceResource resource
                                                                      false, instance_id);
 
             if(res) {
-                char *buffer = (char*)malloc(20);
+                char *buffer = (char*)memory_alloc(20);
                 int size = snprintf(buffer, 20,"%ld",(long int)value);
                 res->set_operation(M2MBase::GET_PUT_ALLOWED);
                 res->set_value((const uint8_t*)buffer,
                                (const uint32_t)size);
-                free(buffer);
+                memory_free(buffer);
             }
         }
     }
@@ -310,11 +310,11 @@ bool M2MDevice::set_resource_value(DeviceResource resource,
            M2MDevice::PowerSourceCurrent == resource) {
             // If it is any of the above resource
             // set the value of the resource.
-            char *buffer = (char*)malloc(20);
+            char *buffer = (char*)memory_alloc(20);
             int size = snprintf(buffer, 20,"%ld",(long int)value);
             success = res->set_value((const uint8_t*)buffer,
                                      (const uint32_t)size);
-            free(buffer);
+            memory_free(buffer);
         }
     }
     return success;

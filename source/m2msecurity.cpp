@@ -119,12 +119,12 @@ M2MResource* M2MSecurity::create_resource(SecurityResource resource, uint32_t va
                                                             false);
 
             if(res) {
-                char *buffer = (char*)malloc(20);
+                char *buffer = (char*)memory_alloc(20);
                 int size = snprintf(buffer, 20,"%ld",(long int)value);
                 res->set_operation(M2MBase::NOT_ALLOWED);
                 res->set_value((const uint8_t*)buffer,
                                (const uint32_t)size);
-                free(buffer);
+                memory_free(buffer);
             }
         }
     }
