@@ -257,14 +257,11 @@ sn_coap_hdr_s* M2MResourceInstance::handle_get_request(nsdl_s *nsdl,
                         if(START_OBSERVATION == observe_option) {
                             tr_debug("M2MResourceInstance::handle_get_request - Starts Observation");
                             // If the observe length is 0 means register for observation.
-                            if(received_coap_header->options_list_ptr->observe_len == 0) {
-                                set_under_observation(true,observation_handler);
-                            }
-                            else {
-                            for(int i=0;i < received_coap_header->options_list_ptr->observe_len; i++) {
-                                number = (*(received_coap_header->options_list_ptr->observe_ptr + i) & 0xff) <<
-                                         8*(received_coap_header->options_list_ptr->observe_len- 1 - i);
-                                }
+                            if(received_coap_header->options_list_ptr->observe_len != 0) {
+                                for(int i=0;i < received_coap_header->options_list_ptr->observe_len; i++) {
+                                    number = (*(received_coap_header->options_list_ptr->observe_ptr + i) & 0xff) <<
+                                             8*(received_coap_header->options_list_ptr->observe_len- 1 - i);
+                                    }
                             }
                             // If the observe value is 0 means register for observation.
                             if(number == 0) {
