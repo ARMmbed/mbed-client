@@ -190,7 +190,12 @@ bool M2MLWClient::create_device_object(M2MDevice::DeviceResource resource,
         if(_device->create_resource(resource,value)) {
             success = true;
         } else {
-            success = _device->set_resource_value(resource,value);
+            if (_device->create_resource_instance(resource, value, 0)) {
+                success = true;
+            }
+            else {
+                success = _device->set_resource_value(resource, value);
+            }
         }
     }
     return success;
