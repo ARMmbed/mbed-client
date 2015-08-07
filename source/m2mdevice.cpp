@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 #include <cstdio>
-#include "lwm2m-client/m2mdevice.h"
-#include "lwm2m-client/m2mconstants.h"
-#include "lwm2m-client/m2mobject.h"
-#include "lwm2m-client/m2mobjectinstance.h"
-#include "lwm2m-client/m2mresource.h"
+#include "mbed-client/m2mdevice.h"
+#include "mbed-client/m2mconstants.h"
+#include "mbed-client/m2mobject.h"
+#include "mbed-client/m2mobjectinstance.h"
+#include "mbed-client/m2mresource.h"
 # include "stdint-gcc.h"
 
 M2MDevice* M2MDevice::_instance = NULL;

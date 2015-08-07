@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-#include "lwm2m-client/m2mconfig.h"
-#include "lwm2m-client/m2mconnectionhandlerfactory.h"
-#include "lwm2m-client/m2mconnectionsecurity.h"
-#include "lwm2m-client/m2mconnectionhandler.h"
+#include "mbed-client/m2mconfig.h"
+#include "mbed-client/m2mconnectionhandlerfactory.h"
+#include "mbed-client/m2mconnectionsecurity.h"
+#include "mbed-client/m2mconnectionhandler.h"
 
 
-#include "lwm2m-client/m2mconnectionsecurity.h"
-#include "lwm2m-client/m2mconnectionhandler.h"
+#include "mbed-client/m2mconnectionsecurity.h"
+#include "mbed-client/m2mconnectionhandler.h"
 
 M2MConnectionHandler* M2MConnectionHandlerFactory::createConnectionHandler(M2MConnectionObserver &observer,
                                                                            M2MInterface::NetworkStack stack){

@@ -18,9 +18,9 @@
 
 // Support for std args
 #include <stdint.h>
-#include "lwm2m-client/m2mconfig.h"
-#include "lwm2m-client/m2mbase.h"
-#include "lwm2m-client/m2mtimerobserver.h"
+#include "mbed-client/m2mconfig.h"
+#include "mbed-client/m2mbase.h"
+#include "mbed-client/m2mtimerobserver.h"
 
 //algorithm can accept any number of limit values and report when signal changes between limit bands
 #define MAX_LIMITS 2

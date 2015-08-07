@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 #include <cstdio>
-#include "lwm2m-client/m2mserver.h"
-#include "lwm2m-client/m2mconstants.h"
-#include "lwm2m-client/m2mobject.h"
-#include "lwm2m-client/m2mobjectinstance.h"
-#include "lwm2m-client/m2mresource.h"
+#include "mbed-client/m2mserver.h"
+#include "mbed-client/m2mconstants.h"
+#include "mbed-client/m2mobject.h"
+#include "mbed-client/m2mobjectinstance.h"
+#include "mbed-client/m2mresource.h"
 
 
 M2MServer::M2MServer()

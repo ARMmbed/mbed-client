@@ -13,9 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "lwm2m-client/m2mreportobserver.h"
-#include "lwm2m-client/m2mconstants.h"
-#include "lwm2m-client/m2mtimer.h"
+#include "mbed-client/m2mreportobserver.h"
+#include "mbed-client/m2mconstants.h"
+#include "mbed-client/m2mtimer.h"
 #include "include/m2mreporthandler.h"
 #include "ns_trace.h"
 

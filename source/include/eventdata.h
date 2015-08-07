@@ -16,8 +16,7 @@
 #ifndef EVENT_DATA_H
 #define EVENT_DATA_H
 
-#include "lwm2m-client/m2mvector.h"
-//#include "lwm2m-client/m2mconnectionhandler.h"
+#include "mbed-client/m2mvector.h"
 
 //FORWARD DECLARATION
 class M2MObject;

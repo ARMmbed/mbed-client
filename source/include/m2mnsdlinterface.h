@@ -16,12 +16,12 @@
 #ifndef M2MNSDLINTERFACE_H
 #define M2MNSDLINTERFACE_H
 
-#include "lwm2m-client/m2mvector.h"
-#include "lwm2m-client/m2mconfig.h"
-#include "lwm2m-client/m2minterface.h"
-#include "nsdllinker.h"
-#include "lwm2m-client/m2mtimerobserver.h"
-#include "lwm2m-client/m2mobservationhandler.h"
+#include "mbed-client/m2mvector.h"
+#include "mbed-client/m2mconfig.h"
+#include "mbed-client/m2minterface.h"
+#include "mbed-client/m2mtimerobserver.h"
+#include "mbed-client/m2mobservationhandler.h"
+#include "include/nsdllinker.h"
 
 //FORWARD DECLARARTION
 class M2MSecurity;
@@ -38,7 +38,7 @@ typedef Vector<M2MObject *> M2MObjectList;
 
 /**
  * @brief M2MNsdlInterface
- * Class which interacts between C++ Library and mbed-client-c library.
+ * Class which interacts between mbed Client C++ Library and mbed-client-c library.
  */
 class M2MNsdlInterface : public M2MTimerObserver,
                          public M2MObservationHandler

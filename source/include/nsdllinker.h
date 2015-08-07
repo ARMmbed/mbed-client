@@ -17,10 +17,10 @@
 #define NSDL_LINKER_H
 
 #include <stdint.h>
-#include "sn_nsdl.h"        // libCoap includes
-#include "sn_coap_header.h"
-#include "sn_coap_protocol.h"
-#include "sn_nsdl_lib.h"
+#include "nsdl-c/sn_nsdl.h"        // libCoap includes
+#include "nsdl-c/sn_coap_header.h"
+#include "nsdl-c/sn_coap_protocol.h"
+#include "nsdl-c/sn_nsdl_lib.h"
 #include "ns_list.h"
 
 #endif // NSDL_LINKER_H

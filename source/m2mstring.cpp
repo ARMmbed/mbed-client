@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "lwm2m-client/m2mstring.h"
+#include "mbed-client/m2mstring.h"
 #include <string.h> // strlen
 #include <stdlib.h> // malloc, realloc
 #include <assert.h>

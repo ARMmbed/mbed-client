@@ -15,15 +15,15 @@
  */
 #include "include/nsdlaccesshelper.h"
 #include "include/m2mnsdlobserver.h"
-#include "lwm2m-client/m2msecurity.h"
-#include "lwm2m-client/m2mserver.h"
-#include "lwm2m-client/m2mobject.h"
-#include "lwm2m-client/m2mobjectinstance.h"
-#include "lwm2m-client/m2mresource.h"
-#include "lwm2m-client/m2mconstants.h"
+#include "mbed-client/m2msecurity.h"
+#include "mbed-client/m2mserver.h"
+#include "mbed-client/m2mobject.h"
+#include "mbed-client/m2mobjectinstance.h"
+#include "mbed-client/m2mresource.h"
+#include "mbed-client/m2mconstants.h"
 #include "ip6string.h"
 #include "ns_trace.h"
-#include "lwm2m-client/m2mtimer.h"
+#include "mbed-client/m2mtimer.h"
 
 M2MNsdlInterface::M2MNsdlInterface(M2MNsdlObserver &observer)
 : _observer(observer),

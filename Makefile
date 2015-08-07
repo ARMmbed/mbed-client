@@ -1,5 +1,5 @@
 #
-# Makefile for LWM2M C++ Library
+# Makefile for mbed Client C++ Library
 #
 # List of subdirectories to build
 TEST_FOLDER := ./test/
@@ -17,7 +17,7 @@ TEST_FOLDER := ./test/
 # OR (IAR-ARM)
 # make CC=iccarm
 
-LIB = liblwm2m.a
+LIB = libmbedclient.a
 
 # List of unit test directories for libraries
 UNITTESTS := $(sort $(dir $(wildcard $(TEST_FOLDER)*/utest/*)))
