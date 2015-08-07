@@ -190,12 +190,27 @@ bool M2MLWClient::create_device_object(M2MDevice::DeviceResource resource,
         if(_device->create_resource(resource,value)) {
             success = true;
         } else {
-            if (_device->create_resource_instance(resource, value, 0)) {
-                success = true;
-            }
-            else {
-                success = _device->set_resource_value(resource, value);
-            }
+            success = _device->set_resource_value(resource, value);
+        }
+    }
+    return success;
+}
+
+bool M2MLWClient::create_device_object(M2MDevice::DeviceResource resource,
+                                       uint32_t value,
+                                       uint16_t instance_id)
+{
+    bool success = false;
+    if(!_device) {
+        _device = M2MInterfaceFactory::create_device();
+    }
+    if(_device) {
+        if(_device->create_resource_instance(resource,value,instance_id)) {
+            success = true;
+        } else {
+            success = _device->set_resource_value(resource,
+                                                  value,
+                                                  instance_id);
         }
     }
     return success;

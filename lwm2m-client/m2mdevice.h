@@ -107,7 +107,8 @@ public:
      * @param resource, List of resource names which can be created using this function are
      * 'AvailablePowerSources','PowerSourceVoltage','PowerSourceCurrent',
      * 'BatteryLevel', 'BatteryStatus', 'MemoryFree', 'MemoryTotal',
-     * 'ErrorCode', 'CurrentTime'.
+     * 'ErrorCode', 'CurrentTime'. For 'CurrentTime' pass the time value in EPOCH format like
+     * 1438944683.
      * @param value, Value to be set on the resource, in Integer format.
      * @return M2MResource if created successfully else NULL.
      */

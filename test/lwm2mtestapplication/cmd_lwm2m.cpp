@@ -80,6 +80,7 @@
                                     "   --current_time <n>   Current Time, EPOCH format\n"\
                                     "   --utc_offset <name>   UTC Format\n"\
                                     "   --timezone <name>   Time zone \n"\
+                                    "   --instance_id <n>   Instance ID for multiple resources \n"\
                                     "register_object <p> [options]\n"\
                                     "<p>:\n"\
                                     "   Options for register command\n"\
@@ -262,10 +263,10 @@ int lwm2m_client_device_command(int argc, char *argv[])
     char *device_type = 0;
     char *hardware_version = 0;
     char *software_version = 0;
-    char *firmware_version = 0;
-    char *current_time = 0;
+    char *firmware_version = 0;    
     char *utc_offset = 0;
     char *timezone = 0;
+    int32_t current_time = 0;
     int32_t  available_power_sources = 0;
     int32_t  power_source_voltage = 0;
     int32_t  power_source_current = 0;
@@ -274,6 +275,7 @@ int lwm2m_client_device_command(int argc, char *argv[])
     int32_t  memory_free = 0;
     int32_t  memory_total = 0;
     int32_t  error_code = 0;
+    int32_t  instance_id = 0;
 
     lwm2m_client.create_device_object();
 
@@ -320,24 +322,30 @@ int lwm2m_client_device_command(int argc, char *argv[])
         }
    }
     if(cmd_parameter_int(argc, argv, "--available_power_sources", &available_power_sources)){
-       if(!lwm2m_client.create_device_object(M2MDevice::AvailablePowerSources,
-                                             available_power_sources)) {
-            return CMDLINE_RETCODE_INVALID_PARAMETERS;
+        if(cmd_parameter_int(argc, argv, "--instance_id", &instance_id)) {
+            if(!lwm2m_client.create_device_object(M2MDevice::AvailablePowerSources,
+                                             available_power_sources,instance_id)) {
+                return CMDLINE_RETCODE_INVALID_PARAMETERS;
+            }
         }
    }
     if(cmd_parameter_int(argc, argv, "--power_source_voltage", &power_source_voltage)){
-       if(!lwm2m_client.create_device_object(M2MDevice::PowerSourceVoltage,
-                                             power_source_voltage)) {
-            return CMDLINE_RETCODE_INVALID_PARAMETERS;
+        if(cmd_parameter_int(argc, argv, "--instance_id", &instance_id)) {
+            if(!lwm2m_client.create_device_object(M2MDevice::PowerSourceVoltage,
+                                         power_source_voltage,instance_id)) {
+                return CMDLINE_RETCODE_INVALID_PARAMETERS;
+            }
         }
    }
     if(cmd_parameter_int(argc, argv, "--power_source_current", &power_source_current)){
-       if(!lwm2m_client.create_device_object(M2MDevice::PowerSourceCurrent,
-                                             power_source_current)) {
-            return CMDLINE_RETCODE_INVALID_PARAMETERS;
+        if(cmd_parameter_int(argc, argv, "--instance_id", &instance_id)) {
+            if(!lwm2m_client.create_device_object(M2MDevice::PowerSourceCurrent,
+                                         power_source_current,instance_id)) {
+                return CMDLINE_RETCODE_INVALID_PARAMETERS;
+            }
         }
    }
-    if(cmd_parameter_int(argc, argv, "--battery_level", &battery_level)){
+    if(cmd_parameter_int(argc, argv, "--battery_level", &battery_level)){            
        if(!lwm2m_client.create_device_object(M2MDevice::BatteryLevel,
                                              battery_level)) {
             return CMDLINE_RETCODE_INVALID_PARAMETERS;
@@ -362,12 +370,14 @@ int lwm2m_client_device_command(int argc, char *argv[])
        }
    }
     if(cmd_parameter_int(argc, argv, "--error_code", &error_code)){
-       if(!lwm2m_client.create_device_object(M2MDevice::ErrorCode,
-                                             error_code)) {
-           return CMDLINE_RETCODE_INVALID_PARAMETERS;
-       }
+        if(cmd_parameter_int(argc, argv, "--instance_id", &instance_id)) {
+            if(!lwm2m_client.create_device_object(M2MDevice::ErrorCode,
+                                                 error_code,instance_id)) {
+               return CMDLINE_RETCODE_INVALID_PARAMETERS;
+            }
+        }
    }
-    if(cmd_parameter_val(argc, argv, "--current_time", &current_time)){
+    if(cmd_parameter_int(argc, argv, "--current_time", &current_time)){
        if(!lwm2m_client.create_device_object(M2MDevice::CurrentTime,
                                              current_time)) {
            return CMDLINE_RETCODE_INVALID_PARAMETERS;

@@ -48,6 +48,10 @@ public:
                               const char *value);
 
     bool create_device_object(M2MDevice::DeviceResource resource,
+                              uint32_t value,
+                              uint16_t instance_id);
+
+    bool create_device_object(M2MDevice::DeviceResource resource,
                               uint32_t value);
 
     bool create_object(const char *name,bool new_instance);
