@@ -1,5 +1,5 @@
 {
-  "name": "lwm2m-client",
+  "name": "mbed-client",
   "version": "0.2.4",
   "description": "LWM2M mbed Client API",
   "private": true,
@@ -12,12 +12,12 @@
   },
   "targetDependencies": {
     "arm": {
-      "lwm2m-client-mbed": "~0.1.1",
-      "lwm2m-client-mbedtls": "~0.0.2"
+      "mbed-client-mbed-os": "~0.1.1",
+      "mbed-client-mbedtls": "~0.0.2"
     },
     "linux": {
-      "lwm2m-client-linux": "~0.0.9",
-      "lwm2m-client-mbedtls": "~0.0.2"
+      "mbed-client-linux": "~0.0.9",
+      "mbed-client-mbedtls": "~0.0.2"
     }
   }
 }
