@@ -205,7 +205,7 @@ sn_coap_hdr_s* M2MResourceInstance::handle_get_request(nsdl_s *nsdl,
                                                    received_coap_header,
                                                    COAP_MSG_CODE_RESPONSE_CONTENT);
             if(coap_response) {
-                char *content_type = (char*)malloc(20);
+                char *content_type = (char*)memory_alloc(20);
                 int content_type_size = snprintf(content_type, 20,"%x",coap_content_type());
 
                 if( coap_response->content_type_ptr ){
@@ -219,7 +219,7 @@ sn_coap_hdr_s* M2MResourceInstance::handle_get_request(nsdl_s *nsdl,
                     coap_response->content_type_len = (uint8_t)content_type_size;
                 }
 
-                free(content_type);
+                memory_free(content_type);
 
                 if( coap_response->payload_ptr ){
                     memory_free( coap_response->payload_ptr );
