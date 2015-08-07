@@ -19,6 +19,7 @@
 #include "lwm2m-client/m2mobject.h"
 #include "lwm2m-client/m2mobjectinstance.h"
 #include "lwm2m-client/m2mresource.h"
+# include "stdint-gcc.h"
 
 M2MDevice* M2MDevice::_instance = NULL;
 
@@ -133,7 +134,7 @@ M2MResource* M2MDevice::create_resource(DeviceResource resource, const String &v
     return res;
 }
 
-M2MResource* M2MDevice::create_resource(DeviceResource resource, uint32_t value)
+M2MResource* M2MDevice::create_resource(DeviceResource resource, int64_t value)
 {
     M2MResource* res = NULL;
     String device_id = "";
@@ -173,7 +174,8 @@ M2MResource* M2MDevice::create_resource(DeviceResource resource, uint32_t value)
 
             if(res) {
                 char *buffer = (char*)memory_alloc(20);
-                int size = snprintf(buffer, 20,"%ld",(long int)value);
+                int size = snprintf(buffer, 20,"%lld",value);
+
                 res->set_operation(operation);
                 res->set_value((const uint8_t*)buffer,
                                (const uint32_t)size);
@@ -184,7 +186,7 @@ M2MResource* M2MDevice::create_resource(DeviceResource resource, uint32_t value)
     return res;
 }
 
-M2MResourceInstance* M2MDevice::create_resource_instance(DeviceResource resource, uint32_t value,
+M2MResourceInstance* M2MDevice::create_resource_instance(DeviceResource resource, int64_t value,
                                                  uint16_t instance_id)
 {
     M2MResourceInstance* res = NULL;
@@ -192,7 +194,9 @@ M2MResourceInstance* M2MDevice::create_resource_instance(DeviceResource resource
 
     // For these resources multiple instance can exist
     if(AvailablePowerSources == resource) {
-        device_id = DEVICE_AVAILABLE_POWER_SOURCES;
+        if(0 <= instance_id && instance_id <= 7) {
+            device_id = DEVICE_AVAILABLE_POWER_SOURCES;
+        }
     } else if(PowerSourceVoltage == resource) {
         device_id = DEVICE_POWER_SOURCE_VOLTAGE;
     } else if(PowerSourceCurrent == resource) {
@@ -209,7 +213,8 @@ M2MResourceInstance* M2MDevice::create_resource_instance(DeviceResource resource
 
             if(res) {
                 char *buffer = (char*)memory_alloc(20);
-                int size = snprintf(buffer, 20,"%ld",(long int)value);
+                int size = snprintf(buffer, 20,"%lld",value);
+
                 res->set_operation(M2MBase::GET_PUT_ALLOWED);
                 res->set_value((const uint8_t*)buffer,
                                (const uint32_t)size);
@@ -293,7 +298,7 @@ bool M2MDevice::set_resource_value(DeviceResource resource,
 }
 
 bool M2MDevice::set_resource_value(DeviceResource resource,
-                                       uint32_t value,
+                                       int64_t value,
                                        uint16_t instance_id)
 {
     bool success = false;
@@ -310,8 +315,9 @@ bool M2MDevice::set_resource_value(DeviceResource resource,
            M2MDevice::PowerSourceCurrent == resource) {
             // If it is any of the above resource
             // set the value of the resource.
+
             char *buffer = (char*)memory_alloc(20);
-            int size = snprintf(buffer, 20,"%ld",(long int)value);
+            int size = snprintf(buffer, 20,"%lld",value);
             success = res->set_value((const uint8_t*)buffer,
                                      (const uint32_t)size);
             memory_free(buffer);
@@ -359,7 +365,7 @@ String M2MDevice::resource_value_string(DeviceResource resource,
     return value;
 }
 
-uint32_t M2MDevice::resource_value_int(DeviceResource resource,
+int64_t M2MDevice::resource_value_int(DeviceResource resource,
                                       uint16_t instance_id) const
 {
     int64_t value = -1;
