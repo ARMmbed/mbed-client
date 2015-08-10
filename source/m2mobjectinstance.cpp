@@ -13,11 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "lwm2m-client/m2mobjectinstance.h"
-#include "lwm2m-client/m2mconstants.h"
-#include "lwm2m-client/m2mresource.h"
-#include "lwm2m-client/m2mresource.h"
-#include "lwm2m-client/m2mobservationhandler.h"
+#include "mbed-client/m2mobjectinstance.h"
+#include "mbed-client/m2mconstants.h"
+#include "mbed-client/m2mresource.h"
+#include "mbed-client/m2mresource.h"
+#include "mbed-client/m2mobservationhandler.h"
 #include "include/m2mtlvserializer.h"
 #include "include/m2mtlvdeserializer.h"
 #include "include/nsdllinker.h"

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "lwm2m-client/m2mconstants.h"
+#include "mbed-client/m2mconstants.h"
 const String COAP = "coap://";
 
 // PUT attributes to be checked from server

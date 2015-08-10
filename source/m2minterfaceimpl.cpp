@@ -16,12 +16,12 @@
 #include <assert.h>
 #include "include/m2minterfaceimpl.h"
 #include "include/eventdata.h"
-#include "lwm2m-client/m2minterfaceobserver.h"
-#include "lwm2m-client/m2mconnectionhandler.h"
-#include "lwm2m-client/m2mconnectionhandlerfactory.h"
+#include "mbed-client/m2minterfaceobserver.h"
+#include "mbed-client/m2mconnectionhandler.h"
+#include "mbed-client/m2mconnectionhandlerfactory.h"
 #include "include/m2mnsdlinterface.h"
-#include "lwm2m-client/m2msecurity.h"
-#include "lwm2m-client/m2mconstants.h"
+#include "mbed-client/m2msecurity.h"
+#include "mbed-client/m2mconstants.h"
 #include "ns_trace.h"
 
 M2MInterfaceImpl::M2MInterfaceImpl(M2MInterfaceObserver& observer,

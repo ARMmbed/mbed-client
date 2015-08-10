@@ -13,10 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "lwm2m-client/m2mbase.h"
-#include "lwm2m-client/m2mobservationhandler.h"
-#include "lwm2m-client/m2mconstants.h"
-#include "lwm2m-client/m2mtimer.h"
+#include "mbed-client/m2mbase.h"
+#include "mbed-client/m2mobservationhandler.h"
+#include "mbed-client/m2mconstants.h"
+#include "mbed-client/m2mtimer.h"
 #include "include/m2mreporthandler.h"
 #include "include/nsdllinker.h"
 #include <ctype.h>

@@ -16,10 +16,10 @@
 #ifndef M2M_INTERFACE_IMPL_H
 #define M2M_INTERFACE_IMPL_H
 
-#include "lwm2m-client/m2minterface.h"
-#include "lwm2m-client/m2mserver.h"
+#include "mbed-client/m2minterface.h"
+#include "mbed-client/m2mserver.h"
+#include "mbed-client/m2mconnectionobserver.h"
 #include "include/m2mnsdlobserver.h"
-#include "lwm2m-client/m2mconnectionobserver.h"
 
 //FORWARD DECLARATION
 class M2MNsdlInterface;
@@ -28,7 +28,7 @@ class EventData;
 
 /**
  *  @brief M2MInterfaceImpl.
- *  This class implements handling of all LWM2M Interface operations
+ *  This class implements handling of all mbed Client Interface operations
  *  defined in OMA LWM2M specifications.
  *  This includes Bootstrapping, Client Registration, Device Management &
  *  Service Enablement and Information Reporting.

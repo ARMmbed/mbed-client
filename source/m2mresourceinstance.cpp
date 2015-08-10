@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 #include <stdlib.h>
-#include "lwm2m-client/m2mresource.h"
-#include "lwm2m-client/m2mconstants.h"
-#include "lwm2m-client/m2mobservationhandler.h"
+#include "mbed-client/m2mresource.h"
+#include "mbed-client/m2mconstants.h"
+#include "mbed-client/m2mobservationhandler.h"
 #include "include/m2mreporthandler.h"
 #include "include/nsdllinker.h"
 #include "ns_trace.h"

@@ -16,7 +16,7 @@
 #ifndef NSDL_ACCESS_HELPER_H
 #define NSDL_ACCESS_HELPER_H
 
-#include "m2mnsdlinterface.h"
+#include "include/m2mnsdlinterface.h"
 
 extern M2MNsdlInterface  *__nsdl_interface;
 

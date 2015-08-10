@@ -27,7 +27,7 @@ Check M2MDevice class documentation to see how you can configure the device obje
 There is a direct API to create Security  Object using following API from M2MInterfaceFactory class
 ```static M2MSecurity *create_security(M2MSecurity::ServerType server_type);```
 
-You can create a Bootstrap or normal LWM2M server by passing appropriate enum value.
+You can create a Bootstrap or normal mbed Device server by passing appropriate enum value.
 
 Check M2MSecurity class documentation to see how you can configure the security object as well as how to create appropriate Resources and assign value to them.
 

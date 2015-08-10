@@ -13,10 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "lwm2m-client/m2mvector.h"
-#include "lwm2m-client/m2mobject.h"
-#include "lwm2m-client/m2mobjectinstance.h"
-#include "lwm2m-client/m2mresource.h"
+#include "mbed-client/m2mvector.h"
+#include "mbed-client/m2mobject.h"
+#include "mbed-client/m2mobjectinstance.h"
+#include "mbed-client/m2mresource.h"
 
 /**
  * @brief M2MTLVDeserializer
@@ -81,7 +81,7 @@ public :
      * array can be checked before invoking this method with 
      * {@link #isObjectInstance(byte[])}.
      * @param tlv Binary in OMA-TLV format
-     * @return List of <code>LWM2MObjectInstance</code> objects.
+     * @return List of <code>M2MObjectInstance</code> objects.
      * @throws IllegalArgumentException if given binary is not a valid OMA-TLV
      *         or it encodes a structure other than object instances.
      * @see #deserializeResources(byte[])
@@ -92,7 +92,7 @@ public :
      * Deserialises the given binary that must encode resources. Binary array 
      * can be checked before invoking this method with {@link #isResource(byte[])}.
      * @param tlv Binary in OMA-TLV format
-     * @return List of <code>LWM2MObjectInstance</code> objects.
+     * @return List of <code>M2MObjectInstance</code> objects.
      * @throws IllegalArgumentException if given binary is not a valid OMA-TLV
      *         or it encodes a structure other than object instances.
      * @see #deserializeResources(byte[])

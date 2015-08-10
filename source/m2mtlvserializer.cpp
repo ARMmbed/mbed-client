@@ -15,7 +15,7 @@
  */
 #include <stdio.h>
 #include "include/m2mtlvserializer.h"
-#include "lwm2m-client/m2mconstants.h"
+#include "mbed-client/m2mconstants.h"
 
 M2MTLVSerializer::M2MTLVSerializer()
 {
