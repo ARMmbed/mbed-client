@@ -19,8 +19,6 @@
 #include "mbed-client/m2mconnectionobserver.h"
 #include "mbed-client/m2mconfig.h"
 #include "mbed-client/m2minterface.h"
-
-//TODO: refactor this to include mbed-client header!
 #include "nsdl-c/sn_nsdl.h"
 
 class M2MConnectionSecurity;
