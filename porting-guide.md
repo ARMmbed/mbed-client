@@ -27,17 +27,17 @@ Before embarking on your own port, you should build the core mbed Client for an 
 
 The mbed Client consists of one main component. More major components will be added in the further development phases:
 
- * `lwm2m-client` is the core mbed Client, providing C++ APIs for the mbed Client
+ * `mbed-client` is the core mbed Client, providing C++ APIs for the mbed Client
 
 This module depends on further internal modules:
 
 ```
-lwm2m-client 0.1.6
+mbed-client x.x.x
 |
-|_mbed-client 0.1.1
-|   |_mbed-client-libservice 2.0.12
+|_mbed-client-c x.x.x
+|   |_mbed-client-libservice x.x.x
 |
-|_lwm2m-client-linux 0.0.2
+|_mbed-client-linux x.x.x
 ```
 
 To list the dependency trees, give [`yotta list --all`
@@ -47,17 +47,17 @@ command](http://docs.yottabuild.org/reference/commands.html).
 compilation target. Different modules are needed for different compilation target.
 
 If you list the modules contained in the LWM2M client linux example, you can see that
-it depends directly only on the `lwm2m-client` and `lwm2m-client-linux` modules. These modules depend internally on various other modules.
+it depends directly only on the `mbed-client` and `mbed-client-linux` modules. These modules depend internally on various other modules.
 
 ```
-lwm2m-client-linux-example 0.0.1
+mbed-client-linux-example x.x.x
 |
-|_lwm2m-client 0.1.6
+|_mbed-client x.x.x
    |
-   |_mbed-client 0.1.1
-   |   |_mbed-client-libservice 2.0.12
+   |_mbed-client-c x.x.x
+   |   |_mbed-client-libservice x.x.x
    |
-   |_lwm2m-client-linux 0.0.2
+   |_mbed-client-linux 0.0.2
 ```
 
 ## Compilation Targets
@@ -77,8 +77,8 @@ To port mbed Client to a new platform, perform the following steps:
 
  1. Contact [support@mbed.org](mailto:support@mbed.org), to request for new development repositories for your target platform.
  2. Create a yotta compilation target for your board.
- 3. Implement the `lwm2m-client-xxx` module for your target platform where `xxx` is the name for your platform (for example, `linux`).
- 4. Make sure that your port is updated into `module.json` of the `lwm2m-client` module.
+ 3. Implement the `mbed-client-xxx` module for your target platform where `xxx` is the name for your platform (for example, `linux`).
+ 4. Make sure that your port is updated into `module.json` of the `mbed-client` module.
  5. Verify that your implementation is correct.
 
 The `yotta` build system is designed for easy reuse of generic modules.
@@ -93,7 +93,7 @@ We provide private git repositories to our partners porting mbed Client. Only th
 When you contact `support@mbed.org`, a repository will be created for your
 module. You also need to provide the target description of your board:
 
-- **`lwm2m-client-<platform-name>`** is the module that provides the `lwm2m-client-xxx`
+- **`mbed-client-<platform-name>`** is the module that provides the `mbed-client-xxx`
    implementation for your platform. You may choose to split it into further modules in the future, to enable sharing
    of code, but we recommend that you implement the port for your first board in this module itself. 
 
@@ -104,7 +104,7 @@ module. You also need to provide the target description of your board:
 
 To compile for a target board, you need a [target description](http://docs.yottabuild.org/tutorial/targets.html) that describes how to compile for the target. 
 
-The `lwm2m-client` module uses the platform name, which each target defines, to choose which `lwm2m-client-<platform-name>` module to depend on to provide the platform-specific implementation.
+The `mbed-client` module uses the platform name, which each target defines, to choose which `mbed-client-<platform-name>` module to depend on to provide the platform-specific implementation.
 
 The target description contains:
  * `target.json` - the target description file
@@ -155,86 +155,101 @@ yotta link-target
 
 You can then give `yotta link-target <targetname>` command to make the globally linked target available when compiling another module. After that, give `yotta target <targetname>` command to select your target for the compilation.
 
-# Step 3: Implementing lwm2m-client-xxx
+# Step 3: Implementing mbed-client-xxx
 
-First, clone your `lwm2m-client-<your-platform-name>` module and `lwm2m-client` modules from github.
+First, clone your `mbed-client-<your-platform-name>` module and `mbed-client` modules from github.
 
-The `lwm2m-client-<your-platform-name>` module needs to provide a socket and timer implementation for
-your target platform. The lwm-client-xxx module should include files for the main target, such as `m2mconnectionhandlerimpl`and `m2mtimerimpl` header files.
+The `mbed-client-<your-platform-name>` module needs to provide a socket and timer implementation for
+your target platform. The mbed-client-xxx module should include files `m2mconnectionhandler.h`and `m2mtimer.h` from `mbed-client` and implement corresponding .cpp file, which then points to platform specific private implementations of timer and socket.
+NOTE: Private implementation classes MUST be named to `M2MConnectionHandlerPimpl` and `M2MTimerPimpl`, because of forward declarations!
 
-An example of lwm2m-client-platform core:
+An example of mbed-client-platform core:
 ```
 |_module.json
 |
-|_lwm2m-client-platform
-|    |_m2mconnectionhandlerimpl.h
-|    |_m2mtimerimpl.h
+|_mbed-client-platform
+|    |_m2mconnectionhandlerpimpl.h
+|    |_m2mtimerpimpl.h
 |
 |_source
-    |_m2mconnectionhandlerimpl.cpp
-    |_m2mtimerimpl.cpp
+    |_m2mconnectionhandler.cpp
+    |_m2mconnectionhandlerpimpl.cpp
+    |_m2mtimer.cpp
+    |_m2mtimerpimpl.cpp
 ```
 
 To make your module available to other modules that you want to build, you
 need to give [`yotta link`](http://docs.yottabuild.org/reference/commands.html#yotta-link) command
 to link it into the module where you want to test it out.
 
-To use your local your in-development lwm2m-client implementation, give the command `yotta link lwm2m-client-xxx` in the main `lwm2m-client` module.
+To use your local your in-development mbed-client implementation, give the command `yotta link mbed-client-xxx` in the main `mbed-client` module.
 
 ```
-# in lwm2m-client, link your module:
+# in mbed-client, link your module:
 yotta link
 ```
 
 You can also just commit and push your untested code to github, but it is always a good idea to test before committing.
 
-Your `lwm2m-client-xxx` module must provide a platform-specific implementation for the lwm2m-client. The APIs that needs porting are defined in the `lwm2m-client-linux` module. The header files contain documentation alongside the declaration of each function, where the function is described along with its parameters and return value.
+Your `mbed-client-xxx` module must provide a platform-specific implementation for the mbed-client. The APIs that needs porting are defined in the `mbed-client-linux` module. The header files contain documentation alongside the declaration of each function, where the function is described along with its parameters and return value.
 
 There are two header files that require porting for your platform:
 
-1. `m2mconnectionhandlerimpl.h`
-2. `m2mtimerimpl.h` 
+1. `m2mconnectionhandler.h`
+2. `m2mtimer.h` 
 
-To see how this is done in Linux, check the `lwm2m-client-linux` module available in this package.
+To see how this is done in Linux, check the `mbed-client-linux` module available in this package.
 
-## Implementing M2MConnectionHandlerImpl class for your platform
+## Implementing M2MConnectionHandler class for your platform
 
 ```
 /*
  * Copyright (c) 2015 ARM. All rights reserved.
  */
-#ifndef M2M_CONNECTION_HANDLER_IMPL_H__
-#define M2M_CONNECTION_HANDLER_IMPL_H__
+#ifndef M2M_CONNECTION_HANDLER_H__
+#define M2M_CONNECTION_HANDLER_H__
 
-#include "lwm2m-client/m2mconfig.h"
-#include "lwm2m-client/m2minterface.h"
-#include "lwm2m-client/m2mconnectionobserver.h"
+#include "mbed-client/m2mconfig.h"
+#include "mbed-client/m2minterface.h"
+#include "mbed-client/m2mconnectionobserver.h"
 #include "nsdl-c/sn_nsdl.h"
 
 /**
  * @brief M2MConnectionHandler.
- * This class handles the socket connection for LWM2M Client
+ * This class handles the socket connection for Mbed Client
  */
 
-class M2MConnectionHandlerImpl {
+class M2MConnectionHandler {
+public:
+
+    /**
+     * @enum ConnectionError
+     * This enum defines error which can come from
+     * socket read and write operation.
+     */
+    typedef enum {
+        CONNECTION_ERROR_WANTS_READ = -1000,
+        CONNECTION_ERROR_WANTS_WRITE = -1001
+    }ConnectionError;
 
 public:
 
     /**
     * @brief Constructor
     */
-    M2MConnectionHandlerImpl(M2MConnectionObserver &observer,
-                             M2MInterface::NetworkStack stack);
+    M2MConnectionHandler(M2MConnectionObserver &observer,
+                         M2MConnectionSecurity* sec,
+                         M2MInterface::NetworkStack stack);
 
     /**
     * @brief Destructor
     */
-    ~M2MConnectionHandlerImpl();
+    ~M2MConnectionHandler();
 
     /**
     * @brief This binds the socket connection.
     * @param listen_port Port to listen for incoming connection.
-    * @return true if successfulelse false.
+    * @return true if successful else false.
     */
     bool bind_connection(const uint16_t listen_port);
 
@@ -244,48 +259,79 @@ public:
     * @param String server address.
     * @param uint16_t Server port.
     * @param ServerType, Server Type to be resolved.
+    * @param security, M2MSecurity object which determines what
+    * kind of secure connection will be used by socket.
     * @return true if address is valid else false.
     */
     bool resolve_server_address(const String& server_address,
                                 const uint16_t server_port,
-                                M2MConnectionObserver::ServerType server_type);
+                                M2MConnectionObserver::ServerType server_type,
+                                const M2MSecurity* security);
 
     /**
     * @brief Sends data, to the connected sent to server.
-    * @param data, Data to be sent.
+    * @param data_ptr, Data to be sent.
+    * @param data_len, Length of data to be sent.
+    * @param address_ptr, Address structure where data has to be sent.
+    * @return True if data sent is successful else false.
     */
     bool send_data(uint8_t *data_ptr,
-                   uint16_t data_len,
-                   sn_nsdl_addr_s *address_ptr);
-
-    /**
-    * @brief Returns server port which is set.
-    * @return Port,Server port
-    */
-    uint16_t server_port();
-
-    /**
-    * @brief Returns listening port which is set.
-    * @return Port,Listening port
-    */
-    uint16_t listen_port();
+                           uint16_t data_len,
+                           sn_nsdl_addr_s *address_ptr);
 
     /**
     * @brief Listens for incoming data from remote server
     * @return true if successful else false.
     */
-    bool listen_for_data();
+    bool start_listening_for_data();
 
-    void data_receive(void *object);
+    /**
+    * @brief Stops listening for incoming data.
+    */
+    void stop_listening();
 
+    /**
+     * @brief sendToSocket Sends directly to socket. This is used by
+     * security classes to send after data has been encrypted.
+     * @param buf Buffer to send.
+     * @param len Length of a buffer.
+     * @return Number of bytes sent or -1 if failed.
+     */
+    int sendToSocket(const unsigned char *buf, size_t len);
+
+    /**
+     * @brief receiveFromSocket Receives directly from a socket. This
+     * is used by security classes to receive raw data to be decrypted.
+     * @param buf Buffer to send.
+     * @param len Length of a buffer.
+     * @return Number of bytes read or -1 if failed.
+     */
+    int receiveFromSocket(unsigned char *buf, size_t len);
+
+
+    /**
+    * @brief Closes the open connection.
+    */
+    void close_connection();
+
+private:
+
+    M2MConnectionObserver                       &_observer;
+    M2MConnectionHandlerPimpl                   *_private_impl;
+
+friend class Test_M2MConnectionHandler;
+friend class Test_M2MConnectionHandler_mbed;
+friend class Test_M2MConnectionHandler_linux;
+friend class M2MConnection_TestObserver;
 };
-#endif //M2M_CONNECTION_HANDLER_IMPL_H__
+
+#endif //M2M_CONNECTION_HANDLER_H__
 
 ```
 
-You need to make sure that some of these functions are asynchronous in nature and some are expecting callback from the network. For example, receiving data from socket needs to be communicated back to the `lwm2m-client` so that the library can act on the data received. The callback comes through the Observer class defined in `M2MConnectionObserver`.
+You need to make sure that some of these functions are asynchronous in nature and some are expecting callback from the network. For example, receiving data from socket needs to be communicated back to the `mbed-client` so that the library can act on the data received. The callback comes through the Observer class defined in `M2MConnectionObserver`.
 
-The file `m2mconnectionobserver.h` is present in the `lwm2m-client`. To see how the callback needs to be called, check the implementation in `m2mconnectionhandlerimpl.cpp` present in the `lwm2m-client-linux`. 
+The file `m2mconnectionobserver.h` is present in the `mbed-client`. To see how the callback needs to be called, check the implementation in `m2mconnectionhandlerpimpl.cpp` present in the `mbed-client-linux`. 
 
 ```
 /*
@@ -360,14 +406,14 @@ public :
 
 ```
 
-## Implementing M2MTimerImpl class for your platform
+## Implementing M2MTimer class for your platform
 
 ```
 /*
  * Copyright (c) 2015 ARM. All rights reserved.
  */
-#ifndef M2M_TIMER_IMPL_H
-#define M2M_TIMER_IMPL_H
+#ifndef M2M_TIMER_H
+#define M2M_TIMER_H
 
 #include <stdint.h>
 
@@ -380,23 +426,25 @@ class M2MTimerObserver;
  */
 class M2MTimerImpl
 {
-public:
+private:
 
     // Prevents the use of assignment operator
-    M2MTimerImpl& operator=(const M2MTimerImpl& other);
+    M2MTimer& operator=(const M2MTimer& other);
 
     // Prevents the use of copy constructor
-    M2MTimerImpl(const M2MTimerImpl& other);
+    M2MTimer(const M2MTimer& other);
+    
+public:
 
     /**
     * Constructor.
     */
-    M2MTimerImpl(M2MTimerObserver& _observer);
+    M2MTimer(M2MTimerObserver& _observer);
 
     /**
     * Destructor.
     */
-    virtual ~M2MTimerImpl();
+    virtual ~M2MTimer();
 
     /**
      * Starts timer
@@ -407,24 +455,40 @@ public:
     void start_timer(uint64_t interval, bool single_shot = true);
 
     /**
+     * @brief Starts timer in DTLS manner.
+     * @param intermediate_interval Intermediate interval to use, must be smaller than tiotal (usually 1/4 of total).
+     * @param total_interval Total interval to use; This is the timeout value of a DTLS packet.
+     * @param type Type of the timer
+     */
+    void start_dtls_timer(uint64_t intermediate_interval, uint64_t total_interval, 
+                          M2MTimerObserver::Type type = M2MTimerObserver::Dtls);
+
+    /**
     * Stops timer.
     * This cancels the ongoing timer.
     */
     void stop_timer();
+    
+    /**
+     * @brief Checks if the intermediate interval has passed.
+     * @return true if interval has passed, false otherwise.
+     */
+    bool is_intermediate_interval_passed();
 
     /**
-    * Callback function for timer completion.
-    */
-    void timer_expired();
+     * @brief Checks if the total interval has passed.
+     * @return true if interval has passed, false otherwise.
+     */
+    bool is_total_interval_passed();
 
 };
 
-#endif // M2M_TIMER_IMPL_H
+#endif // M2M_TIMER_H
 ```
 
-The timer API functions are asynchronous in nature and it is expected that whenever a timer event is available, it is notified to the `lwm2m-client` so that the library can act on the _timer expired_ signal. The callback is received through an Observer class defined in `M2MTimerObserver` .
+The timer API functions are asynchronous in nature and it is expected that whenever a timer event is available, it is notified to the `mbed-client` so that the library can act on the _timer expired_ signal. The callback is received through an Observer class defined in `M2MTimerObserver` .
 
-The file `m2mtimerobserver.h` is present in `lwm2m-client`. To see how the callback needs to be called, check the implementation in `m2mtimerimpl.cpp` present in  the`lwm2m-client-linux`. 
+The file `m2mtimerobserver.h` is present in `mbed-client`. To see how the callback needs to be called, check the implementation in `m2mtimerimpl.cpp` present in  the`mbed-client-linux`. 
 
 ```
 /*
@@ -444,7 +508,8 @@ public:
         Registration,
         NsdlExecution,
         PMinTimer,
-        PMaxTimer
+        PMaxTimer,
+        Dtls
     }Type;
 
     /**
@@ -465,13 +530,13 @@ Two platforms, mbed and linux, are already supported. You just need to add your 
 
 ```
 {
-  "name": "lwm2m-client",
+  "name": "mbed-client",
   "version": "0.1.6",
-  "description": "LWM2M mbed Client API",
+  "description": "Mbed Client API",
   "private": true,
   "keywords": [],
   "author": "Yogesh Pande <yogesh.pande@arm.com>",
-  "homepage": "https://github.com/ARMmbed/lwm2m-client",
+  "homepage": "https://github.com/ARMmbed/mbed-client",
   "licenses": [
     {
       "url": "https://spdx.org/licenses/Apache-2.0",
@@ -479,17 +544,17 @@ Two platforms, mbed and linux, are already supported. You just need to add your 
     }
   ],
   "dependencies": {
-    "mbed-client": "~0.1.0"
+    "mbed-client-c": "~0.1.0"
   },
   "targetDependencies": {
     "arm": {
-      "lwm2m-client-mbed": "~0.0.3"
+      "mbed-client-mbed": "~0.0.3"
     },
     "linux": {
-      "lwm2m-client-linux": "~0.0.1"
+      "mbed-client-linux": "~0.0.1"
     },
     "<your platform as defined in target.json>" : {
-      "lwm2m-client-platform": "<published version , can be done later, first link locally as explained in above steps>"
+      "mbed-client-platform": "<published version , can be done later, first link locally as explained in above steps>"
     },
   }
 }
@@ -497,7 +562,7 @@ Two platforms, mbed and linux, are already supported. You just need to add your 
 
 # Step 5: Testing & Verification
 
-You should be able to build your lwm2m-client port immediately. After that, run:
+You should be able to build your mbed-client port immediately. After that, run:
 
 ```
 # use the target we previously made locally available (not necessary if your target has been published):
@@ -506,12 +571,12 @@ yotta link-target <yourtargetname>
 yotta build
 ```
 
-A `helloworld-lwm2mclient` program will be produced inside the `build/<yourtargetname>/test/` directory. This test application might require some changes to compile and run for your platform. First, check for the compilation errors. If you find any, fix the test application for your testing. 
+A `helloworld-mbedclient` program will be produced inside the `build/<yourtargetname>/test/` directory. This test application might require some changes to compile and run for your platform. First, check for the compilation errors. If you find any, fix the test application for your testing. 
 
-This test is available in `lwm2m-client/test/helloworld-lwm2mclient`, and can be found in:
+This test is available in `mbed-client/test/helloworld-mbedclient`, and can be found in:
 
 ```
 build/<yourtargetname>/test/
 ```
 
-Follow the `readme` instructions of the `lwm2m-client-linux` example to see what the test application can do.
+Follow the `readme` instructions of the `mbed-client-linux` example to see what the test application can do.
