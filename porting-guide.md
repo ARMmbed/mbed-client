@@ -1,4 +1,4 @@
-# Introduction to LWM2M mbed client
+# Introduction to Mbed client
 
 The mbed Client is structured as a set of modules. Each module declares which other
 modules it depends on. When you build a module, our build system `yotta`
@@ -46,7 +46,7 @@ command](http://docs.yottabuild.org/reference/commands.html).
 **Note**: In this case we have listed the dependencies for the `x86-linux-native`
 compilation target. Different modules are needed for different compilation target.
 
-If you list the modules contained in the LWM2M client linux example, you can see that
+If you list the modules contained in the Mbed Client linux example, you can see that
 it depends directly only on the `mbed-client` and `mbed-client-linux` modules. These modules depend internally on various other modules.
 
 ```
@@ -340,7 +340,7 @@ The file `m2mconnectionobserver.h` is present in the `mbed-client`. To see how t
 #ifndef M2M_CONNECTION_OBSERVER_H__
 #define M2M_CONNECTION_OBSERVER_H__
 
-#include "lwm2m-client/m2minterface.h"
+#include "mbed-client/m2minterface.h"
 
 /**
  * @brief Observer class for informing socket activity to the state machine
@@ -353,7 +353,7 @@ public :
 
     typedef enum {
         Bootstrap,
-        LWM2MServer
+        MbedServer
     }ServerType;
 
     /**
@@ -522,7 +522,7 @@ public:
 #endif // M2M_TIMER_OBSERVER_H
 ```
 
-# Step 4: Modify module.json of lwm2m-client module
+# Step 4: Modify module.json of mbed-client module
 
 You need to add your target name to `module.json` so that when you set `yt target <platform>` , yotta can resolve the dependency correctly and link the main library with your module.
 
