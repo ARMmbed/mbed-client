@@ -199,6 +199,11 @@ public:
                                uint16_t data_size,
                                sn_nsdl_addr_s *address);
 
+    /**
+     * @brief Stops all the timers in case there is any errors.
+     */
+    void stop_timers();
+
 protected: // from M2MTimerObserver
 
     virtual void timer_expired(M2MTimerObserver::Type type);

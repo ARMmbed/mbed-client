@@ -310,7 +310,7 @@ void M2MInterfaceImpl::data_available(uint8_t* data,
 void M2MInterfaceImpl::socket_error(uint8_t /*error_code*/)
 {
     tr_debug("M2MInterfaceImpl::socket_error(uint8_t error_code)");
-    internal_event(STATE_IDLE);
+    internal_event(STATE_IDLE);    
     M2MInterface::Error error = M2MInterface::NetworkError;
     _observer.error(error);
 }
@@ -344,6 +344,7 @@ void M2MInterfaceImpl::state_idle(EventData* /*data*/)
     // Handle Idle state here
     // Cleanup all resources, if necessary
     _connection_handler->stop_listening();
+    _nsdl_interface->stop_timers();
     tr_debug("M2MInterfaceImpl::state_idle");
 }
 
@@ -561,13 +562,11 @@ void M2MInterfaceImpl::state_unregistered( EventData */*data*/)
 void M2MInterfaceImpl::state_sending_coap_data( EventData */*data*/)
 {
     tr_debug("M2MInterfaceImpl::state_sending_coap_data");
-    internal_event(STATE_WAITING);
 }
 
 void M2MInterfaceImpl::state_coap_data_sent( EventData */*data*/)
 {
     tr_debug("M2MInterfaceImpl::state_coap_data_sent");
-    internal_event(STATE_WAITING);
 }
 
 void M2MInterfaceImpl::state_coap_data_received( EventData *data)
@@ -606,13 +605,11 @@ void M2MInterfaceImpl::state_coap_data_received( EventData *data)
 void M2MInterfaceImpl::state_processing_coap_data( EventData */*data*/)
 {
     tr_debug("M2MInterfaceImpl::state_processing_coap_data");
-    internal_event(STATE_WAITING);
 }
 
 void M2MInterfaceImpl::state_coap_data_processed( EventData */*data*/)
 {
     tr_debug("M2MInterfaceImpl::state_coap_data_processed");
-    internal_event(STATE_WAITING);
 }
 
 void M2MInterfaceImpl::state_waiting( EventData */*data*/)

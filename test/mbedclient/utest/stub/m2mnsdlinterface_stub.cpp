@@ -129,6 +129,11 @@ bool M2MNsdlInterface::process_received_data(uint8_t *,
     return m2mnsdlinterface_stub::bool_value;
 }
 
+void M2MNsdlInterface::stop_timers()
+{
+
+}
+
 void M2MNsdlInterface::timer_expired(M2MTimerObserver::Type)
 {
 }

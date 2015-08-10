@@ -4,23 +4,21 @@
 
 mbed Device Client API enables the use of LWM2M features from the mbed Device Client. These features are described in the [Lightweight Machine to Machine Technical Specification](http://technical.openmobilealliance.org/Technical/technical-information/release-program/current-releases/oma-lightweightm2m-v1-0). Using this API, the mbed OS developers can develop their own applications utilizing the LWM2M features. 
 
-This API provides an enabler that defines the application layer communication protocol between a mbed Device Server and a client located in a mbed Device. 
+mbed Client is an OS agnostic embedded software library that provides the means to connect and manage constrained embedded devices to Web applications via mbed Device Server 
 
-The API includes device management and service enablement for mbed Devices. The target mbed devices for this enabler are mainly resource constrained devices. Therefore, this enabler makes use of a light and compact protocol as well as an efficient resource data model.
 
-Client-server architecture is introduced for mbed Device Client. The mbed Device acts as the client, and the M2M service, platform or application acts as the mbed Device Server.
+The API includes High level APIs to communicate and manage devices with Internet Services securely. It provides full control of endpoint and application logic via APIs. C++ API exposed for application development through which device can manage resources on the mbed Device server end. mbed Device Client is fully secure as it provides secure connectivity using Industry standard TLS/DTLS.
 
 There are four interfaces between these two components as follows:
 
-- Bootstrap
-- Client registration
+-  Client registration and unregistration
 - Device management and service enablement
 - Information reporting
 
 
 ##mbed Client features
 
-The API provides the application developer with an interface to define the application endpoint information that will be delivered to the Bootstrap Server and mbed Device Server during the bootstrap and registration operations respectively.
+The API provides the application developer with an interface to define the application endpoint information that will be delivered to mbed Device Server during the registration operation.
 
 This is how you can create your interface for your endpoint:
 ```
@@ -39,59 +37,9 @@ M2MInterface* interface = M2MInterfaceFactory::create_interface(*this,
 ```
 When you have created the interface, you can proceed to execute operations.
 
-### Bootstrap feature
-
-The Bootstrap Interface is used to provision essential information into the client to enable the client to perform the **Register** operation with one or more mbed Device Servers. 
-
-In this release, only the client initiated bootstrap mode is supported.
-
-### Client initiated bootstrap
-
-The client initiated bootstrap mode provides a mechanism for client to retrieve the bootstrap information from a LWM2M Bootstrap Server. This mode requires a LWM2M Boostrap Server account.
-
-You can provide the bootstrap server information and issue the bootstrap command as follows:
-
-First, you need to create your bootstrap server object that contains information about bootstrap server, for example server address and security mode used by the server.
-
-```
-#include "mbed-client/m2msecurity.h"
- M2MSecurity *security = M2MInterfaceFactory::create_security(M2MSecurity::Bootstrap);
-        if(security) {
-            security->set_resource_value(M2MSecurity::M2MServerUri, BOOTSTRAP_SERVER_ADDRESS);
-            security->set_resource_value(M2MSecurity::BootstrapServer, 1);
-            security->set_resource_value(M2MSecurity::SecurityMode, M2MSecurity::NoSecurity);
-        }
-```
-
-**Note**: Currently, this API supports only non-secure mode operations. Security features will be added in upcoming  releases.
- 
-When you have the bootstrap object ready, you only need to call the bootstrap API by passing this object as parameter.
-
-```
-M2MInterface::bootstrap(M2MSecurity* bootstrap_object);
-```
-
-Because this is an asynchronous operation, you will receive the result of it through a callback defined in `m2minterfaceobserver.h` that you are handling in your application.
-
-If the bootstrap operation is successful and the client can fetch the mbed Device Server information from the Bootstrap Server, your application will receive the following callback:
-
-```
-void bootstrap_done(M2MSecurity *server_object)
-```
-
-The `server_object` contains the data for the mbed Device Server, for example, server URI and security mode. With this object, you can execute the registration operation for the client.
-
-If the bootstrap operation fails for some reason, you will receive the following callback:
-
-```
-void error(M2MInterface::Error error)
-```
-
-You will get more information about the error from the `error` parameter passed with the callback and then you can act accordingly.
-
 ### Client Registration Interface
 
-The Client Registration Interface is used by the client to register with mbed Device Servers, maintain registration and de-register from the mbed Device Server.
+The Client Registration Interface is used by the client to register with mbed Device Servers, update registration and de-register from the mbed Device Server.
 
 Currently, only one-to-one client-server registration is supported. One-to-many client-server registrations will be supported in upcoming releases.
 
@@ -101,18 +49,15 @@ The Client Registration Interface includes multiple sub-features. The following 
 - Update 
 - De-register
 
-
 ### Register
 
-When registering, the client performs the **Register** operation and provides the properties that the mbed Device Server requires to contact the client (for example End Point Name); maintains the registration and session (for example Lifetime, Queue Mode) between the client and mbed Device Server, and information on the Objects the client supports and existing Object Instances in the client.
+When registering, the client performs the **Register** operation and provides parameters which mbed Device Server requires to register the client (for example End Point Name); maintains the registration and session (for example Lifetime, Queue Mode) between the client and mbed Device Server, and information on the Objects the client supports and existing Object Instances in the client.
 
 This API enables the client registration functionality.
 
 You can provide the mbed Device Server information and issue register command as follows:
 
-First you need to create your mbed Device Server object that contains information about the Bootstrap Server, such as server address and security mode used by the server.
-
-If you have performed the bootstrap operation first, this object is automatically created and available through the `bootstrap_done()` callback that you can use directly.
+First you need to create your mbed Device Server object that contains information about the mbed Device Server, such as server address and security mode used by the server.
 
 ```
 #include "mbed-client/m2msecurity.h"
@@ -124,7 +69,7 @@ If you have performed the bootstrap operation first, this object is automaticall
         }
 ```
 
-**Note**: This API supports only non-secure mode operations. Security features will be added in upcoming releases.
+**Note**: This API supports both non-secure and secure mode operations. For secure mode , you will need to also provide certificate, private key and server public key through the API.
 
 When registering your endpoint, you will also need to register all your resources that you would like to monitor or follow via the mbed Device Server.
 
@@ -143,9 +88,9 @@ if(device) {
     }
 ```
 
-You can register other resources as well. Please check the doxygen documentation for the detailed API description.
+You can register other resources as well. Please check the API documentation for the detailed API description.
 
-Apart from the manadatory device obejct, if you would like to register your own customized resources, you can create them and set their values accordingly.
+Apart from the manadatory device object, if you would like to register your own customized resources, you can create them and set their values accordingly.
 
 To do that, please check the API documentation for M2MObject, M2MObjectInstance and M2MResource classes.
 
@@ -163,7 +108,7 @@ If the register operation is successful and the client can register all your res
 void object_registered(M2MSecurity *server_object, const M2MServer& server)
 ```
 
-The `M2MSecurity *server_object` informs to which mbed Device Server the client has just registered and `M2MServer &server` contains the data related to mbed Device Server including for example the Short ServerID and the client registration period.
+The `M2MSecurity *server_object` informs to which mbed Device Server the client has just registered and `M2MServer &server` contains the data related to mbed Device Server including for example the Short ServerID and the client registration period .
 
 If the registration operation fails for some reason, you will receive the following callback:
 
@@ -200,7 +145,7 @@ void error(M2MInterface::Error error)
 
 ### Unregister
 
-When the client determines that it no longer requires to be available to the mbed Device Server (LWM2M Device factory reset, for example), the client will unregister from the mbed Device Server. Upon receiving this message, the mbed Device Server removes the registration information from the mbed Device Server.
+When the client no longer requires to be registered  to the mbed Device Server, the client will de-register from the mbed Device Server. Upon receiving this message, the mbed Device Server removes the registration information from the mbed Device Server.
 
 This is how you can unregister your endpoint client:
 
@@ -252,7 +197,7 @@ The Device Management and Service Enabler Interface is handled at Resources leve
 
 ### Read
 
-The **Read** operation is used to access the value of a Resource, an array of Resource Instances, an Object Instance or all the Object Instances of an Object.
+The **Read** operation is used to access the value of a Resource, an array of Resource Instances, an Object Instance or all the Object Instances of an Object (TLV format supported).
 
 The Client API enables you to set the value of resources that can be read by mbed Device server.
 
@@ -302,7 +247,7 @@ For more information on different functionalities of resources, please check the
 
 ### Write
 
-The **Write** operation is used to change the value of a Resource, an array of Resources Instances or multiple Resources from an Object Instance. The operation permits multiple Resources to be modified within the same instance of the operation. 
+The **Write** operation is used to overwrite the value of a Resource, an array of Resources Instances or multiple Resources from an Object Instance. 
 
 Whenever there is a valid PUT operation for any of the resources, the application will receive callback as follows:
 
@@ -315,17 +260,13 @@ Where `M2MBase` is the object whose value has been updated and `M2MBase::BaseTyp
 
 ### Write Attributes
 
-The **Write** operation is used to change the value of a Resource, an array of Resources Instances or multiple Resources from an Object Instance. The operation permits multiple Resources to be modified within the same instance of the operation. 
-
 Any readable Resource can have attributes which are considered during the **Observe** operation. The following attributes are used:
 
-- Minimum Period
-- Maximum Period
-- Greater Than
-- Less Than
-- Step
-
-The **Write Attributes** operation is used to change the attributes of a Resource, an Object Instance, or an Object. The separation between **Write** and **Write Attributes** operations enables cache mechanism for the **Observe** operation. The operation permits multiple attributes to be modified within the same operation. The operation also can be used for cancelling the **Observe** operation.
+- Minimum Period (pmin)
+- Maximum Period (pmax)
+- Greater Than (gt)
+- Less Than (lt)
+- Step (st)
 
 The mbed Device server sets the endpoint attribute values that are used to determine when the endpoint sends the Resource value to the server.
 
@@ -333,7 +274,7 @@ Check the LWM2M specification for details on all the possible **Write Attributes
 
 ### Execute
 
-The **Execute** operation is used by the mbed Device Server to initiate some action, and can only be performed on individual Resources. The client MUST return an error when the **Execute** operation is received for Object Instances or Resource Instance.
+The **Execute** operation is used by the mbed Device Server to execute some action, and can only be performed on individual Resources. The client MUST return an error when the **Execute** operation is received for Object Instances or Resource Instance.
 
 To handle the **Execute** operation, the application can implement it as follows:
 
@@ -362,22 +303,20 @@ When the client receives the POST request for **Execute** from the mbed Device s
 
 ### Information Reporting Interface
 
-The Information Reporting Interface is used by the mbed Device Server to observe any changes in a registered Resource on the client, receiving notifications when new values are available. This observation relationship is initiated by sending an **Observe** operation to the L2M2M Client for an Object, an Object Instance or a Resource. An observation ends when a **Cancel Observation** operation is performed. 
+The Information Reporting Interface is used by the mbed Device Server to observe any changes in a registered Resource on the client, receiving notifications when new values are available. 
 
 Information Reporting interface supports the following sub-features:
 
 - Observe
 - Notify
 - Cancel
-
-Currently, Information Reporting is handled only at Resources level. Support for Object and Object Instances will be added in later releases. 
+ 
 
 ### Observe
 
-The mbed Device Server initiates an observation request for changes of Dynamic Resource, Resources within an Object Instance or for all the Object Instances of an Object within the client.
+The mbed Device Server initiates an observation request for changes of Dynamic Resource.
 
 Related parameters for the **Observe** operation are described in [Write Attributes](#write-attributes) section.
-When the **Observe** operation contains only Object ID, the **Notify** operation MUST be done per Object Instance.
 
 To make your Resource observable, you need to set the Observable parameter as true for your object:
 
@@ -398,18 +337,13 @@ The mbed Client will handle the observation part once you have defined the Resou
 
 ### Notify
 
-The **Notify** operation is sent from the client to the mbed Device Server during a valid observation on an Object Instance or a Resource. This operation includes the new value of the Object Instance or Resource. The **Notify** operation SHOULD be sent when all the conditions (Minimum Period, Maximum Period, Greater Than, Less Than, Step) configured by **Write Attributes** operation for **Observe** operation are met.
+The **Notify** operation is sent from the client to the mbed Device Server during a valid observation on a Resource.
 
 The mbed Client will send notifications for the Resources once the conditions are met.
 
 ### Cancel
 
-The **Cancel Observation** operation is sent from the mbed Device Server to the client to end an observation relationship for an Object Instance or a Resource. The operation does not contain any parameters at the LWM2M layer. The **Cancel Observation** operation MUST be used in the response of the **Notify** operation.
-
-The client handles both cancellation types:
-
- 1. By sending **Cancel Observation** operation from the mbed Device server
- 2. By sending **Write Attributes** with cancel parameter.
+The **Cancel Observation** operation is sent from the mbed Device Server to the client to end an observation relationship for an Object Instance or a Resource.
 
 ## More Information
 

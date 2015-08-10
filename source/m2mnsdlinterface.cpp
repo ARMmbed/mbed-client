@@ -646,6 +646,14 @@ bool M2MNsdlInterface::process_received_data(uint8_t *data,
                                       address)) ? true : false;
 }
 
+void M2MNsdlInterface::stop_timers()
+{
+    tr_debug("M2MNsdlInterface::stop_timers()");
+    if(_registration_timer) {
+        _registration_timer->stop_timer();
+    }
+}
+
 void M2MNsdlInterface::timer_expired(M2MTimerObserver::Type type)
 {
     if(M2MTimerObserver::NsdlExecution == type) {
