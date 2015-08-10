@@ -36,6 +36,7 @@ const String &MBED_SERVER_ADDRESS = "coap://FD00:FF1:CE0B:A5E1:1068:AF13:9B61:D5
 const String &MBED_SERVER_DTLS_ADDRESS = "coap://FD00:FF1:CE0B:A5E1:1068:AF13:9B61:D557:5684";
 #else
 const String &MBED_SERVER_ADDRESS = "coap://10.45.3.10:5683";
+//const String &MBED_SERVER_ADDRESS = "coap://10.45.0.152:5683";
 const String &MBED_SERVER_DTLS_ADDRESS = "coap://10.45.3.10:5684";
 #endif
 const String CLIENT_NAME = "secure-client";
@@ -219,10 +220,13 @@ M2MObject* MbedClient::create_generic_object() {
     if(_object) {
         M2MObjectInstance* inst = _object->create_object_instance();
         if(inst) {
+            inst->set_operation(M2MBase::GET_ALLOWED);
+
             M2MResource* res = inst->create_dynamic_resource("Dynamic",
                                                              "ResourceTest",
                                                              M2MResourceInstance::INTEGER,
                                                              true);
+
             char buffer[20];
             int size = sprintf(buffer,"%d",_value);
             res->set_operation(M2MBase::GET_PUT_POST_ALLOWED);
@@ -246,11 +250,13 @@ void MbedClient::update_resource() {
         M2MObjectInstance* inst = _object->object_instance();
         if(inst) {
             M2MResource* res = inst->resource("Dynamic");
-            char buffer[20];
-            int size = sprintf(buffer,"%d",_value);
-            res->set_value((const uint8_t*)buffer,
-                           (const uint32_t)size);
-            _value++;
+            if( res ){
+                char buffer[20];
+                int size = sprintf(buffer,"%d",_value);
+                res->set_value((const uint8_t*)buffer,
+                               (const uint32_t)size);
+                _value++;
+            }
         }
     }
 }

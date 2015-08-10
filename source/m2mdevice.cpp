@@ -194,7 +194,7 @@ M2MResourceInstance* M2MDevice::create_resource_instance(DeviceResource resource
 
     // For these resources multiple instance can exist
     if(AvailablePowerSources == resource) {
-        if(0 <= instance_id && instance_id <= 7) {
+        if(0 <= value && value <= 7) {
             device_id = DEVICE_AVAILABLE_POWER_SOURCES;
         }
     } else if(PowerSourceVoltage == resource) {

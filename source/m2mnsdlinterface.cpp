@@ -432,25 +432,38 @@ uint8_t M2MNsdlInterface::received_from_server_callback(struct nsdl_s * /*nsdl_h
                 if(coap_header->uri_path_ptr) {
                     String resource_name = coap_to_string(coap_header->uri_path_ptr,
                                                           coap_header->uri_path_len);
+
+                    sn_coap_hdr_s *coap_response = NULL;
                     String object_name;
                     int slash_found = resource_name.find_last_of('/');
+                    //The POST operation here is only allowed for non-existing object instances
                     if(slash_found != -1) {
                         object_name = resource_name.substr(0,slash_found);
-                        uint16_t instance_id = atoi(resource_name.substr(slash_found+1,
-                                                 resource_name.size()-object_name.size()).c_str());
-                        M2MBase* base = find_resource(object_name);
-                        if(base) {
-                            M2MObject* object = (M2MObject*)base;
-                            object->create_object_instance(instance_id);
-                            sn_coap_hdr_s *coap_response = object->handle_post_request(_nsdl_handle,
-                                                                                       coap_header,
-                                                                                       this);
-                            if(coap_response) {
-                                tr_debug("M2MNsdlInterface::received_from_server_callback - send CoAP response");
-                                (sn_nsdl_send_coap_message(_nsdl_handle, address, coap_response) == 0) ? value = 0 : value = 1;
-                                sn_nsdl_release_allocated_coap_msg_mem(_nsdl_handle, coap_response);
+                        if( object_name.find_last_of('/') != -1){
+                            coap_response = sn_nsdl_build_response(_nsdl_handle,
+                                                                   coap_header,
+                                                                   COAP_MSG_CODE_RESPONSE_METHOD_NOT_ALLOWED);
+                        }else{
+                            uint16_t instance_id = atoi(resource_name.substr(slash_found+1,
+                                                     resource_name.size()-object_name.size()).c_str());
+                            M2MBase* base = find_resource(object_name);
+                            if(base) {
+                                M2MObject* object = (M2MObject*)base;
+                                object->create_object_instance(instance_id);
+                                coap_response = object->handle_post_request(_nsdl_handle,
+                                                                            coap_header,
+                                                                            this);
                             }
                         }
+                    }else{
+                        coap_response = sn_nsdl_build_response(_nsdl_handle,
+                                                               coap_header,
+                                                               COAP_MSG_CODE_RESPONSE_METHOD_NOT_ALLOWED);
+                    }
+                    if(coap_response) {
+                        tr_debug("M2MNsdlInterface::received_from_server_callback - send CoAP response");
+                        (sn_nsdl_send_coap_message(_nsdl_handle, address, coap_response) == 0) ? value = 0 : value = 1;
+                        sn_nsdl_release_allocated_coap_msg_mem(_nsdl_handle, coap_response);
                     }
                 }
             }

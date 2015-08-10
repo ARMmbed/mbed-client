@@ -85,6 +85,9 @@ M2MDevice* M2MInterfaceFactory::create_device()
 M2MObject* M2MInterfaceFactory::create_object(const String &name)
 {
     tr_debug("M2MInterfaceFactory::create_object : Name : %s", name.c_str());
+    if( name.empty() ){
+        return NULL;
+    }
     M2MObject *object = NULL;
     object = new M2MObject(name);
     return object;
