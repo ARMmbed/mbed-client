@@ -1,6 +1,6 @@
-# Introduction to Mbed client
+# Introduction to mbed Client
 
-The mbed Client is structured as a set of modules. Each module declares which other
+mbed Client is structured as a set of modules. Each module declares which other
 modules it depends on. When you build a module, our build system `yotta`
 looks at these dependencies and installs the necessary modules before
 completing the build.
@@ -17,17 +17,17 @@ each example program, so you do not need to download them separately. In
 general, `yotta` downloads and installs the necessary modules over the internet from the public yotta Registry 
 (which saves published versions of modules) or from a specified source control URL.
 
-# Building and Testing mbed Client
+# Building and testing mbed Client
 
 Before embarking on your own port, you should build the core mbed Client for an existing compilation target to get an understanding of how the mbed Client builds. You can find a general guide for building the mbed Client and its example application in the mbed Client release notes.
 
 # Components of mbed Client
 
-## Component Software Modules
+## Component software modules
 
 The mbed Client consists of one main component. More major components will be added in the further development phases:
 
- * `mbed-client` is the core mbed Client, providing C++ APIs for the mbed Client
+ * `mbed-client` is the core mbed Client, providing C++ APIs for the mbed Client.
 
 This module depends on further internal modules:
 
@@ -43,7 +43,7 @@ mbed-client x.x.x
 To list the dependency trees, give [`yotta list --all`
 command](http://docs.yottabuild.org/reference/commands.html).
 
-**Note**: In this case we have listed the dependencies for the `x86-linux-native`
+**Note**: In this case, we have listed the dependencies for the `x86-linux-native`
 compilation target. Different modules are needed for different compilation target.
 
 If you list the modules contained in the Mbed Client linux example, you can see that
@@ -60,7 +60,7 @@ mbed-client-linux-example x.x.x
    |_mbed-client-linux 0.0.2
 ```
 
-## Compilation Targets
+## Compilation targets
 
 This release supports only one compilation target:
 
@@ -86,9 +86,9 @@ If you intend to support multiple platforms that share common features, it is re
 functionality into a separate module and use it for each platform.
 
 
-# Step 1: Creating Development Repositories
+# Step 1: Creating development repositories
 
-We provide private git repositories to our partners porting mbed Client. Only the members of the mbed Client team, and relevant partner contacts and engineers have access to these repositories.
+We provide private git repositories to our partners porting mbed Client. Only the members of the mbed Client team and relevant partner contacts and engineers have access to these repositories.
 
 When you contact `support@mbed.org`, a repository will be created for your
 module. You also need to provide the target description of your board:
@@ -100,17 +100,17 @@ module. You also need to provide the target description of your board:
 - **`target-<targetname>`** contains the yotta target description of the
    target you are porting to. This is usually your platform name.
 
-# Step 2: Creating a yotta Compilation Target
+# Step 2: Creating a yotta compilation target
 
 To compile for a target board, you need a [target description](http://docs.yottabuild.org/tutorial/targets.html) that describes how to compile for the target. 
 
-The `mbed-client` module uses the platform name, which each target defines, to choose which `mbed-client-<platform-name>` module to depend on to provide the platform-specific implementation.
+The `mbed-client` module uses the platform name that each target defines, to choose which `mbed-client-<platform-name>` module to depend on to provide the platform-specific implementation.
 
 The target description contains:
  * `target.json` - the target description file
  * a [CMake toolchain
    file](http://www.cmake.org/cmake/help/v3.0/manual/cmake-toolchains.7.html)
-   (and any dependencies it needs), that describes how to run the compiler
+   (and any dependencies it needs) that describes how to run the compiler
  * a linker script file
 
 To select the target description, run `yotta target <targetname>`. yotta needs this to set up the build.
@@ -118,7 +118,7 @@ To select the target description, run `yotta target <targetname>`. yotta needs t
 The documentation for target descriptions is available on the [yotta
 documentation site](http://docs.yottabuild.org/tutorial/targets.html).
 
-An example for compiling for linux target can be found in the `yotta_targets` directory in the example application.
+An example on compiling for linux target can be found in the `yotta_targets` directory of the example application.
 
 The directory structure of a typical target description is:
 
@@ -142,7 +142,7 @@ The directory structure of a typical target description is:
     |_newtarget.ld
 ```
 
-Where the `target.json` file specifies the path to the CMake toolchain (`toolchain.cmake`), that uses the standard CMake mechanisms for including compiler, platform and language specific configuration.
+Where the `target.json` file specifies the path to the CMake toolchain (`toolchain.cmake`) that uses the standard CMake mechanisms for including compiler, platform and language specific configuration.
 
 **Note**: Improvements are planned to the yotta target description to allow more reuse of the descriptions between targets.
 
@@ -157,11 +157,12 @@ You can then give `yotta link-target <targetname>` command to make the globally 
 
 # Step 3: Implementing mbed-client-xxx
 
-First, clone your `mbed-client-<your-platform-name>` module and `mbed-client` modules from github.
+First, clone your `mbed-client-<your-platform-name>` module and `mbed-client` modules from GitHub.
 
 The `mbed-client-<your-platform-name>` module needs to provide a socket and timer implementation for
-your target platform. The mbed-client-xxx module should include files `m2mconnectionhandler.h`and `m2mtimer.h` from `mbed-client` and implement corresponding .cpp file, which then points to platform specific private implementations of timer and socket.
-NOTE: Private implementation classes MUST be named to `M2MConnectionHandlerPimpl` and `M2MTimerPimpl`, because of forward declarations!
+your target platform. The mbed-client-xxx module should include files `m2mconnectionhandler.h`and `m2mtimer.h` from `mbed-client` and implement a corresponding `.cpp` file that points to the platform-specific private implementations of the timer and the socket.
+
+**Note**: Private implementation classes MUST be named as `M2MConnectionHandlerPimpl` and `M2MTimerPimpl`, because of forward declarations.
 
 An example of mbed-client-platform core:
 ```
@@ -180,7 +181,7 @@ An example of mbed-client-platform core:
 
 To make your module available to other modules that you want to build, you
 need to give [`yotta link`](http://docs.yottabuild.org/reference/commands.html#yotta-link) command
-to link it into the module where you want to test it out.
+to link it to the module where you want to test it out.
 
 To use your local your in-development mbed-client implementation, give the command `yotta link mbed-client-xxx` in the main `mbed-client` module.
 
@@ -189,7 +190,7 @@ To use your local your in-development mbed-client implementation, give the comma
 yotta link
 ```
 
-You can also just commit and push your untested code to github, but it is always a good idea to test before committing.
+You can also just commit and push your untested code to GitHub, but it is always a good idea to test before committing.
 
 Your `mbed-client-xxx` module must provide a platform-specific implementation for the mbed-client. The APIs that needs porting are defined in the `mbed-client-linux` module. The header files contain documentation alongside the declaration of each function, where the function is described along with its parameters and return value.
 
@@ -329,7 +330,7 @@ friend class M2MConnection_TestObserver;
 
 ```
 
-You need to make sure that some of these functions are asynchronous in nature and some are expecting callback from the network. For example, receiving data from socket needs to be communicated back to the `mbed-client` so that the library can act on the data received. The callback comes through the Observer class defined in `M2MConnectionObserver`.
+Please, note that some of these functions are asynchronous in nature and some are expecting callback from the network. For example, receiving data from socket needs to be communicated back to the `mbed-client` so that the library can act on the data received. The callback comes through the Observer class defined in `M2MConnectionObserver`.
 
 The file `m2mconnectionobserver.h` is present in the `mbed-client`. To see how the callback needs to be called, check the implementation in `m2mconnectionhandlerpimpl.cpp` present in the `mbed-client-linux`. 
 
@@ -486,7 +487,7 @@ public:
 #endif // M2M_TIMER_H
 ```
 
-The timer API functions are asynchronous in nature and it is expected that whenever a timer event is available, it is notified to the `mbed-client` so that the library can act on the _timer expired_ signal. The callback is received through an Observer class defined in `M2MTimerObserver` .
+The timer API functions are asynchronous in nature and whenever a timer event is available, it is notified to the `mbed-client` so that the library can act on the _timer expired_ signal. The callback is received through an Observer class defined in `M2MTimerObserver` .
 
 The file `m2mtimerobserver.h` is present in `mbed-client`. To see how the callback needs to be called, check the implementation in `m2mtimerimpl.cpp` present in  the`mbed-client-linux`. 
 
@@ -524,7 +525,7 @@ public:
 
 # Step 4: Modify module.json of mbed-client module
 
-You need to add your target name to `module.json` so that when you set `yt target <platform>` , yotta can resolve the dependency correctly and link the main library with your module.
+You need to add your target name to `module.json` so that when you set `yt target <platform>`, yotta can resolve the dependency correctly and link the main library with your module.
 
 Two platforms, mbed and linux, are already supported. You just need to add your module support after that.
 
@@ -560,9 +561,9 @@ Two platforms, mbed and linux, are already supported. You just need to add your 
 }
 ```
 
-# Step 5: Testing & Verification
+# Step 5: Testing and verification
 
-You should be able to build your mbed-client port immediately. After that, run:
+You can build your mbed-client port immediately. After that, run:
 
 ```
 # use the target we previously made locally available (not necessary if your target has been published):
@@ -571,7 +572,7 @@ yotta link-target <yourtargetname>
 yotta build
 ```
 
-A `helloworld-mbedclient` program will be produced inside the `build/<yourtargetname>/test/` directory. This test application might require some changes to compile and run for your platform. First, check for the compilation errors. If you find any, fix the test application for your testing. 
+A `helloworld-mbedclient` program will be produced inside the `build/<yourtargetname>/test/` directory. This test application may require some changes to compile and run for your platform. First, check for the compilation errors. If you find any, fix the test application for your testing. 
 
 This test is available in `mbed-client/test/helloworld-mbedclient`, and can be found in:
 
