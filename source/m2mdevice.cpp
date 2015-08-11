@@ -19,7 +19,6 @@
 #include "mbed-client/m2mobject.h"
 #include "mbed-client/m2mobjectinstance.h"
 #include "mbed-client/m2mresource.h"
-# include "stdint-gcc.h"
 
 M2MDevice* M2MDevice::_instance = NULL;
 
@@ -194,7 +193,7 @@ M2MResourceInstance* M2MDevice::create_resource_instance(DeviceResource resource
 
     // For these resources multiple instance can exist
     if(AvailablePowerSources == resource) {
-        if(0 <= value && value <= 7) {
+        if(0 >= value && value <= 7) {
             device_id = DEVICE_AVAILABLE_POWER_SOURCES;
         }
     } else if(PowerSourceVoltage == resource) {

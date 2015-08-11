@@ -20,6 +20,7 @@
 #include "include/m2mreporthandler.h"
 #include "include/nsdllinker.h"
 #include <ctype.h>
+#include <string.h>
 
 M2MBase& M2MBase::operator=(const M2MBase& other)
 {
