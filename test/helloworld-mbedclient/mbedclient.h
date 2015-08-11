@@ -100,7 +100,7 @@ public:
 private:
 
 #ifndef TARGET_LIKE_LINUX
-    DigitalOut          _led;
+    mbed::DigitalOut    _led;
 #endif
     M2MInterface        *_interface;
     M2MSecurity         *_security;

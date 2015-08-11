@@ -17,14 +17,10 @@
 #define M2MCONFIG_H
 
 #include <stdlib.h>
-#include "m2mstring.h"
-using namespace m2m;
-#ifdef TARGET_LIKE_LINUX
 #include <cstring>
 #include <cstdio>
-#else
-#include "mbed/mbed.h"
-#endif
+#include "mbed-client/m2mstring.h"
+using namespace m2m;
 
 #ifdef HAVE_DEBUG
 #define TRACE_GROUP "mbed-client"

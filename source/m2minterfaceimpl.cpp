@@ -203,8 +203,8 @@ void M2MInterfaceImpl::unregister_object(M2MSecurity* /*security*/)
         TRANSITION_MAP_ENTRY (EVENT_IGNORED)                // state_register
         TRANSITION_MAP_ENTRY (EVENT_IGNORED)                // state_register_address_resolved
         TRANSITION_MAP_ENTRY (EVENT_IGNORED)                // state_register_resource_created
-        TRANSITION_MAP_ENTRY (STATE_UNREGSITER)             // state_registered
-        TRANSITION_MAP_ENTRY (STATE_UNREGSITER)             // state_update_registration
+        TRANSITION_MAP_ENTRY (STATE_UNREGISTER)             // state_registered
+        TRANSITION_MAP_ENTRY (STATE_UNREGISTER)             // state_update_registration
         TRANSITION_MAP_ENTRY (EVENT_IGNORED)                // state_unregister
         TRANSITION_MAP_ENTRY (EVENT_IGNORED)                // state_unregistered
         TRANSITION_MAP_ENTRY (EVENT_IGNORED)                // state_sending_coap_data
@@ -212,7 +212,7 @@ void M2MInterfaceImpl::unregister_object(M2MSecurity* /*security*/)
         TRANSITION_MAP_ENTRY (EVENT_IGNORED)                // state_coap_data_received
         TRANSITION_MAP_ENTRY (EVENT_IGNORED)                // state_processing_coap_data
         TRANSITION_MAP_ENTRY (EVENT_IGNORED)                // state_coap_data_processed
-        TRANSITION_MAP_ENTRY (STATE_UNREGSITER)             // state_waiting
+        TRANSITION_MAP_ENTRY (STATE_UNREGISTER)             // state_waiting
     END_TRANSITION_MAP(NULL)
     if(_event_ignored) {
         _event_ignored = false;
@@ -261,7 +261,7 @@ void M2MInterfaceImpl::registration_error(uint8_t error_code)
 void M2MInterfaceImpl::client_unregistered()
 {
     tr_debug("M2MInterfaceImpl::client_unregistered()");
-    internal_event(STATE_UNREGSITERED);
+    internal_event(STATE_UNREGISTERED);
     //TODO: manage register object in a list.
     _observer.object_unregistered(_register_server);
 }
@@ -310,7 +310,7 @@ void M2MInterfaceImpl::data_available(uint8_t* data,
 void M2MInterfaceImpl::socket_error(uint8_t /*error_code*/)
 {
     tr_debug("M2MInterfaceImpl::socket_error(uint8_t error_code)");
-    internal_event(STATE_IDLE);    
+    internal_event(STATE_IDLE);
     M2MInterface::Error error = M2MInterface::NetworkError;
     _observer.error(error);
 }
@@ -562,11 +562,13 @@ void M2MInterfaceImpl::state_unregistered( EventData */*data*/)
 void M2MInterfaceImpl::state_sending_coap_data( EventData */*data*/)
 {
     tr_debug("M2MInterfaceImpl::state_sending_coap_data");
+    internal_event(STATE_WAITING);
 }
 
 void M2MInterfaceImpl::state_coap_data_sent( EventData */*data*/)
 {
     tr_debug("M2MInterfaceImpl::state_coap_data_sent");
+    internal_event(STATE_WAITING);
 }
 
 void M2MInterfaceImpl::state_coap_data_received( EventData *data)
@@ -605,11 +607,13 @@ void M2MInterfaceImpl::state_coap_data_received( EventData *data)
 void M2MInterfaceImpl::state_processing_coap_data( EventData */*data*/)
 {
     tr_debug("M2MInterfaceImpl::state_processing_coap_data");
+    internal_event(STATE_WAITING);
 }
 
 void M2MInterfaceImpl::state_coap_data_processed( EventData */*data*/)
 {
     tr_debug("M2MInterfaceImpl::state_coap_data_processed");
+    internal_event(STATE_WAITING);
 }
 
 void M2MInterfaceImpl::state_waiting( EventData */*data*/)
@@ -709,10 +713,10 @@ void M2MInterfaceImpl::state_function( uint8_t current_state, EventData* data )
         case STATE_UPDATE_REGISTRATION:
             M2MInterfaceImpl::state_update_registration(data);
             break;
-        case STATE_UNREGSITER:
+        case STATE_UNREGISTER:
             M2MInterfaceImpl::state_unregister(data);
             break;
-        case STATE_UNREGSITERED:
+        case STATE_UNREGISTERED:
             M2MInterfaceImpl::state_unregistered(data);
             break;
         case STATE_SENDING_COAP_DATA:
