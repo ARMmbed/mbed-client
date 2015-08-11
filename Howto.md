@@ -1,273 +1,279 @@
-#How to create Object , Object Instances and Resources for the client
+#How to create Objects, Object Instances and Resources for the client
 
-This section explains how to create different types of Objects, Object Instances and Resources for the client as per the OMA LWM2M specifications.
+This section explains how to create different types of Objects, Object Instances and Resources for the client to comply with the OMA LWM2M specifications.
 
-In order for client  to communicate the resources to mDS, it needs to create Objects, Object Instances and Resources. 
-This can be done very easily with the Client C++ APIs where client can define its resources in a similar structure as defined in the LWM2M specification.
+In order for the client to communicate its resources to the mbed Device Server (mDS), it needs to create Objects, Object Instances and Resources. This can be done very easily with the Client C++ APIs, where the client can define its resources in a similar structure to the one defined in the LWM2M specification.
+
 This quick guide will explain how you can create and configure these resources using the C++ API.
 
 ##How to create and configure Objects
 
-M2MObject class is derived out of M2MBase class so all the public methods can be used from M2MObject and its derived classes.
+The M2MObject class is derived from the M2MBase class, so all the public methods can be used from M2MObject and its derived classes.
 
-###Creating OMA defined Objects
+###Creating OMA-defined Objects
 
-####Device Object.
-There is a direct API to create Device Object using following API from M2MInterfaceFactory class
+####Device Object
+
+There is a direct API in the M2MInterfaceFactory class to create Device Object:
 
 ```static M2MDevice *create_device();```
 
-Since there can be only one instance of M2MDevice , M2MDevice is a static class and it can be deleted using
+Since there can be only one instance of M2MDevice, M2MDevice is a static class and it can be deleted using
 
 `M2MDevice::delete_instance();`
 
-Check M2MDevice class documentation to see how you can configure the device object as well as how to create appropriate Resources and assign value to them. 
+Check the M2MDevice class documentation to see how you can configure the device object, as well as how to create appropriate Resources and assign values to them. 
 
-####Security Object.
-There is a direct API to create Security  Object using following API from M2MInterfaceFactory class
+####Security Object
+
+There is a direct API in the M2MInterfaceFactory class to create a Security Object:
+
 ```static M2MSecurity *create_security(M2MSecurity::ServerType server_type);```
 
-You can create a Bootstrap or normal mbed Device server by passing appropriate enum value.
+You can create a Bootstrap or normal mbed Device Server by passing the appropriate enum value.
 
-Check M2MSecurity class documentation to see how you can configure the security object as well as how to create appropriate Resources and assign value to them.
+Check the M2MSecurity class documentation to see how you can configure the security object, as well as how to create appropriate Resources and assign values to them.
 
-####Creating custom object
-As per the OMA LWM2M specification, client must have defined Objects under which it can create Object Instances.
-You can create M2MObject using this API from M2MInterfaceFactory class
+####Creating a custom Object
+
+As per the OMA LWM2M specification, the client must have defined Objects, under which it can create Object Instances. You can create M2MObject using this API from the M2MInterfaceFactory class:
+
 ```static M2MObject *create_object(const String &name);```
 
-
-You need to pass the name of the Object that you would like to create like ```Test``` and this would create an object like ```/Test``` in the mDS to be used.
+You need to pass the name of the Object that you would like to create (like ```Test```); this will create an object with that name in mDS.
 
 
 ####Configuring the Object
 
-Once you have created an Object (whether OMA specific or Custom), you can configure various parameters in that object so that they can be controlled or modified to commnicate with the mDS accordingly.
-Here, we discuss few most important parameters that you must configure properly in order to work around with the objects.
+Once you have created an Object (whether OMA specific or custom), you can configure various parameters in that object so that they can be controlled or modified to affect communication with mDS.
+
+Here, we discuss a few of the most important parameters, which you must configure properly in order to work with the objects.
 
 #####Setting Operation Mode
-You can set the Object operation mode so that they can handle GET, PUT, POST, DELETE or combination of these requests coming from mDS accordingly.
-The API that can be used to set the operation mode (present in M2MBase class) is
+
+You can set the objects' operation mode so that they can handle GET, PUT, POST, DELETE or a combination of these requests coming from mDS.
+
+The API that sets the operation mode (present in the M2MBase class) is
 
 ```virtual void set_operation(M2MBase::Operation operation);```
 
 #####Setting Observable Mode
-You can set the Object to be an observing resource. 
-This can be done by setting the observable mode accordingly using following API
+
+You can set the object to be an observing resource. This can be done by setting the observable mode using the following API:
+
 ```virtual void set_observable(bool observable);```
 
+#####Setting CoAP content type
 
-#####Setting CoAP Content Type
-Currently only OMA TLV type is supported for the content type , which we have defined to be of value ```99``` . The OMA TLV type works only for objects which are numeric in value , for eg: the custom object that you would like to create must be of numeric type like ```100```, only then the CoAP TLV type will work for the custom object. 
-Later we will introduce JSON support for Content type.
-You can set the CoAP content typs for the object as ```99```, if you want TLV support for your object.
+Currently the only available content type is the OMA TLV type. The OMA TLV type works only for objects with a numeric value. For example, if you're creating a custom object it must be of a numeric type like ```100```; only then will the CoAP TLV type work for the custom object. 
+
+If you want your object to support the TLV type, set the object's CoAP content type as ```99```:
 
 ```virtual void set_coap_content_type(const uint8_t content_type);```
 
+Later we will introduce support for the JSON content types.
 
 ##How to create and configure Object Instances
 
-M2MObjectInstance class is derived out of M2MBase class so all the public methods can be used from M2MObjectInstance and its derived classes.
+The M2MObjectInstance class is derived from the M2MBase class, so all the public methods can be used from M2MObjectInstance and its derived classes.
 
 ###Creating OMA defined ObjectInstance
 
-####Device ObjectInstance.
+####Device ObjectInstance
+
 Since there can only be one instance for the Device Object , the ObjectInstance is automatically created when creating M2MDevice Object.
 
-####Security ObjectInstance.
-Since there can only be one instance for the Device Object , the ObjectInstance is automatically created when creating M2MDevice Object based on selected server type. 
+####Security ObjectInstance
+
+Since there can only be one instance for the Device Object, the Object Instance is automatically created when creating M2MDevice Object based on a selected server type.
 
 ####Creating custom object instances
-As per the OMA LWM2M specification, client must have created ObjectInstances under Objects , which will eventually contain Resources.
-You can create M2MObjectInstance using this API from M2MObject class
+
+As per the OMA LWM2M specification, the client must have created Object Instances under Objects, which will eventually contain Resources.
+
+You can create an M2M Object Instance using this API from the M2MObject class:
 
 ``` M2MObject::create_object_instance(uint16_t instance_id);```
 
+You can pass an Object Instance ID to create appropriate Object Instances. Normally, Object Instances will start from ```0``` and increment. So the Object Instance structure on the mDS side would look like 
 
-You can pass Object Instance ID to create appropriate Object Instances, normally the Object Instances will start from ```0``` and increment accordingly. So the Object Instance structure on mDS side would look like ```Object/Object Instance ID```
+```Object/Object Instance ID```
 
+You need to pass the name of the Object Instance ID that you would like to create (like ```0```); this will create an object like ```/Test/0``` in mDS.
 
-You need to pass the name of the ObjectInstance ID that you would like to create like ```0``` and this would create an object like ```/Test/0``` in the mDS to be used.
+###Configuring the Object Instance
 
+Once you have created an Object Instance (whether OMA-specific or custom), you can configure various parameters in that object so that they can be controlled or modified to affect communication with mDS.
 
-###Configuring the ObjectInstance
+Here, we discuss a few of the most important parameters, which you must configure properly in order to work with the object instances.
 
-Once you have created an ObjectInstance (whether OMA specific or Custom), you can configure various parameters in that object so that they can be controlled or modified to commnicate with the mDS accordingly.
-Here, we discuss few most important parameters that you must configure properly in order to work around with the object instance.
+####Setting operation mode
 
-####Setting Operation Mode
-You can set the ObjectInstance operation mode so that they can handle **GET**, **PUT**, **POST**, **DELETE** or combination of these requests coming from mDS accordingly.
-The API that can be used to set the operation mode (present in M2MBase class) is
+You can set the Object Instances' operation mode so that they can handle GET, PUT, POST, DELETE or a combination of these requests coming from mDS.
+
+The API that can be used to set the operation mode (present in the M2MBase class) is:
 
 ```virtual void set_operation(M2MBase::Operation operation);```
 
+####Setting observable mode
 
-####Setting Observable Mode
-You can set the Object to be an observing resource. 
-This can be done by setting the observable mode accordingly using following API
+You can set the object to be an observing resource. 
+
+This can be done by setting the observable mode using the following API:
 
 ```virtual void set_observable(bool observable);```
 
+####Setting CoAP content type
 
-####Setting CoAP Content Type
-Currently only OMA TLV type is supported for the content type , which we have defined to be of value ```99```. The OMA TLV type works only for objects which are numeric in value , for eg: the custom object that you would like to create must be of numeric type like ```100```, only then the CoAP TLV type will work for the custom object. 
-Later we will introduce JSON support for Content type.
-You can set the CoAP content typs for the object as ```99```, if you want TLV support for your object.
+Currently the only available content type is the OMA TLV type. The OMA TLV type works only for objects with a numeric value. For example, if you're creating a custom object it must be of a numeric type like ```100```; only then still the CoAP TLV type work for the custom object. 
+
+If you want your object to support the TLV type, set the object's CoAP content type as ```99```:
 
 ```virtual void set_coap_content_type(const uint8_t content_type);```
 
+Later we will introduce support for JSON content types.
 
-Apart from this, there are multiple APIs which provides getter and remove functions for ObjectInstances present in M2MObjectInstance class, check the API documentation for their required usage. 
+Apart from this, there are multiple APIs that provides getter and remove functions for Object Instances in the M2MObjectInstance class; check the API documentation for their usage. 
 
-##How to create and configure Resources/ResourceInstances
+##How to create and configure Resources and Resource Instances
 
-M2MResource class is derived out of M2MResourceInstance which in turn is derived out of M2MBase class so all the public methods can be used from M2MResource/M2MResourceInstance and its derived classes.
+The M2MResource class is derived from the M2MResourceInstance, which in turn is derived from the M2MBase class, so all the public methods can be used from M2MResource or M2MResourceInstance and their derived classes.
 
-###Creating OMA defined Resources
+###Creating OMA-defined Resources
 
-####Device Object Resources.
-There are direct APIs to create and set values to the Device Resources. 
+####Device Object Resources
+
+There are direct APIs to create and set values for the Device Resources.
+
 You can create the required Resource and set values based on their data types.
 
-For Resources , which take the values as String you can create and set the Resource using following API.
+For Resources that take string values you can create and set the Resource using the following API:
 
 ```M2MResource* create_resource(DeviceResource resource, const String &value);```
 
-
-For Resources , which take the values as Integer you can create and set the Resource using following API.
+For Resources that take integer values you can create and set the Resource using the following API:
 
 ```M2MResource* create_resource(DeviceResource resource, uint32_t value);```
 
-
-Their are few resources which can have multiple instances, for creating such resources , use these APIs.
+There are a few resources that can have multiple instances. To create these resources, use these APIs:
 
 ```M2MResourceInstance* create_resource_instance(DeviceResource resource, uint32_t value,uint16_t instance_id); ```
 
+Where ```instance_id``` is the Resource Instance ID, like ```/3/0/11/0```.
 
-where ```instance_id``` will be the resource instance id like ```/3/0/11/0```
+Check M2MDevice's API documentation to find which enums are supported for integer or string value types.
 
+There are other APIs in the M2MDevice class, which you can use to set, remove and modify new values for the resources.
 
-Check the API documentation of M2MDevice to find which enums are supported for Integer or String value types.
-There are more APIs in M2MDevice class which you can use to set, remove and modify new values to the resources.
+####Security Object Resources
 
-####Security Object Resources.
-There are direct APIs to create and set values to the Security Resources. 
-You can create the required Resource and set values based on their data types.
+There are direct APIs to create and set values for the Security Resources, based on their data types.
 
-For Resources which are not mandatory, are those which take in value as Integer, you can create and set value using this API .
+Most of the mandatory resources are created automatically when you create M2MSecurity object. You can set their values using the following APIs:
+
+- For resources that take integer values:
+
+	```bool set_resource_value(SecurityResource resource,uint32_t value);```
+
+- For resources that take string values:
+
+	```bool set_resource_value(SecurityResource resource,const String &value);```
+
+- For resources that take binary values, like setting public keys and certificates:
+
+	```bool set_resource_value(SecurityResource resource,onst uint8_t *value,const uint16_t length);```
+
+You can create and set values for Resources that are not mandatory, and which take an integer value, using this API:
 
 ```M2MResource* create_resource(SecurityResource resource, uint32_t value);```
 
+Check M2MSecurity's API documentation to find which enums are supported for integer, string or uint8_t* value types.
 
-Most of the mandatory resources are created automatically when you create M2MSecurity object.
-You can set the values of those resources by using following APIs.
+There are more APIs in the M2MSecurity class that you can use to set, remove and modify Resource values.
 
-For resources, which take in Integer values, use these APIs.
+####Creating custom Resources
 
-```bool set_resource_value(SecurityResource resource,uint32_t value);```
+As per the OMA LWM2M specification, the client must have Resources under Object Instances which belong to Objects.
 
+You can create different types of Resources or Resource Instances.
 
-For resources, which take in String values, use these APIs.
+There are two types of Resources:
 
-```bool set_resource_value(SecurityResource resource,const String &value);```
+- M2MResource: a resource with a unique instance, like ```/Test/0/Resource```.
 
+- M2MResourceInstance: a resource with multiple instances, like```/Test/0/Resource/0```, ```/Test/0/Resource/1```.
 
-For resources, like setting public keys, certificates which take in binary values, use these APIs.
+Apart from these two types, you can create two types of Resource and Resource Instances:
 
-```bool set_resource_value(SecurityResource resource,onst uint8_t *value,const uint16_t length);```
+- Static: Resource and Resource Instances whose value doesn't change over time.
 
+- Dynamic: Resource and Resource Instances whose value can change. These resources can be made observable.
 
-Check the API documentation of M2MSecurity to find which enums are supported for Integer,String or uint8_t* value types.
-There are more APIs in M2MSecurity class which you can use to set, remove and modify new values to the resources.
+___Creating dynamic and static single-instance Resources___
 
-####Creating custom resources
-As per the OMA LWM2M specification, client must have created Resources under ObjectInstances which belongs to Objects.
+As per the OMA LWM2M specification, the client must have created Resources under Object Instance. You can create M2MResource from the M2MObjectInstance class.
 
-You can create different types of Resources or ResourceInstances.
+- You can create a single-instance Resource with a static value using this API:
 
-There are 2 types of Resources
-
-- M2MResource - Resouce with unique instance, like ```/Test/0/Resource```
--  M2MResourceInstance - Resources with multiple instances ```/Test/0/Resource/0```, ```/Test/0/Resource/0```
-
-
-Apart from these 2 types, you can create 2 types of Resource/ResourceInstances
-
-- Static  - Resource/ResourceInstances, whose value doesn't change over time.
-- Dynamic - Resource/ResourceInstances whose value can change and these resources can be made observable.
-
-We will first explain how to create different types of **Resource**
-
-As per the OMA LWM2M specification, client must have created Resources under ObjectInstance.
-
-You can create M2MResource from M2MObjectInstance class.
-
-You can create a static resource using this API
-
-```M2MResource* create_static_resource(const String &resource_name,const String &resource_type,M2MResourceInstance::ResourceType type,
+	```M2MResource* create_static_resource(const String &resource_name,const String &resource_type,M2MResourceInstance::ResourceType type,
                                         const uint8_t *value,const uint8_t value_length,bool multiple_instance = false);```
 
+- You can create a single-instance Resource with a dynamic value, which can be set later on, using this API:
 
-The API takes in different parameters which you can check in API documentation, using this API you can create a single instance Resource with static value.
-
-You can create a dynamic resource using this API
-
-```M2MResource* create_dynamic_resource(const String &resource_name,const String &resource_type,M2MResourceInstance::ResourceType type,
+	```M2MResource* create_dynamic_resource(const String &resource_name,const String &resource_type,M2MResourceInstance::ResourceType type,
                                         bool observable,bool multiple_instance = false);```
 
+These APIs take different parameters, which you can see in their documentation.
 
-The API takes in different parameters which you can check in API documentation, using this API you can create a single instance Resource having a dynamic value, which can be set later on.
+___Creating dynamic and static Resource Instances___
 
-We will now see how to create **Resources with instances**
-As per the OMA LWM2M specification, client must have created Resource instances under Resources.
-You can create M2MResourceInstance from M2MObjectInstance class.
+As per the OMA LWM2M specification, the client must have created Resource Instances under Resources.
+You can create M2MResourceInstance from the M2MObjectInstance class.
 
-You can create a static resource instance using this API
+- You can create a Resource Instance with a static value using this API:
 
-```M2MResourceInstance* create_static_resource_instance(const String &resource_name,const String &resource_type,M2MResourceInstance::ResourceType type,
+	```M2MResourceInstance* create_static_resource_instance(const String &resource_name,const String &resource_type,M2MResourceInstance::ResourceType type,
                                                          const uint8_t *value,const uint8_t value_length,uint16_t instance_id);```
 
+- You can create a Resource Instance with a dynamic value, which can be set later on, using this API:
 
-The API takes in different parameters which you can check in API documentation, using this API you can create ResourceInstance with static value.
-
-You can create a dynamic resource instance using this API
-
-```M2MResourceInstance* create_dynamic_resource_instance(const String &resource_name,const String &resource_type,M2MResourceInstance::ResourceType type,
+	```M2MResourceInstance* create_dynamic_resource_instance(const String &resource_name,const String &resource_type,M2MResourceInstance::ResourceType type,
                                                           bool observable,uint16_t instance_id);```
 
+These APIs take different parameters, which you can see in their documentation.
 
-The API takes in different parameters which you can check in API documentation, using this API you can create ResourceInstance having a dynamic value, which can be set later on.
+####Configuring the Resource and Resource Instance
 
+Once you have created a Resource or Resource Instance (whether OMA-specific or custom), you can configure various parameters so they can be controlled or modified to affect communication with mDS.
 
-####Configuring the Resource/ResourceInstance
-
-Once you have created  Resource/ResourceInstance (whether OMA specific or Custom), you can configure various parameters so they can be controlled or modified to commnicate with the mDS accordingly.
-Here, we discuss few most important parameters that you must configure properly in order to work around with the Resource/ResourceInstance.
+Here, we discuss a few of the most important parameters that you must configure properly in order to work with the Resource and Resource Instance.
 
 #####Setting Operation Mode
-You can set the Resource/ResourceInstance operation mode so that they can handle **GET**, **PUT**, **POST**, **DELETE** or combination of these requests coming from mDS accordingly.
-The API that can be used to set the operation mode (present in M2MBase class) is
+
+You can set the Resource or Resource Instance operation mode so that they can handle GET, PUT, POST, DELETE or a combination of these requests coming from mDS.
+
+The API that can be used to set the operation mode (present in the M2MBase class) is
 
 ```virtual void set_operation(M2MBase::Operation operation);```
 
+#####Setting the value of a dynamic Resource or Resource Instance
 
-Setting Value to the dynamic Resource/ResourceInstance
-You can set the value of dynamic Resource/ResourceInstance so that those values can be sent to the mDS based on GET requests.
-The API that can be used to set the operation mode (present in M2MResourceInstance class) is
+You can set the value of a dynamic Resource or Resource Instance so that they can be sent to mDS using GET requests.
+
+The API used to set the values (present in the M2MResourceInstance class) is
 
 ```virtual bool set_value(const uint8_t *value, const uint32_t value_length);```
 
+#####Setting an executable function
 
-#####Setting Executable Function
-For Dynamic Resources, you can pass the function pointer to the Resource/ResourceInstance, which will get executed when the mDS server calls POST method on that resource. Given the condition
-that Resource/ResourceInstance supports POST operation mode.
-You can pass the function pointer using this API
+For Dynamic Resources, you can pass a function pointer to the Resource or Resource Instance, which will get executed when mDS calls a POST method on that resource. The Resource or Resource Instance must support the POST operation mode for this feature to work.
+
+You can pass the function pointer using this API:
 
 ```virtual void set_execute_function(execute_callback callback);```
 
-
-Apart from this, there are multiple APIs which provides getter and remove functions for Resource/ResourceInstances present in M2MResource/M2MResourceInstance class, check the API documentation for their required usage. 
+Apart from this, there are multiple APIs that provide getter and remove functions for Resource and Resource Instances in the M2MResource and M2MResourceInstance classes. Check the API documentation for their usage. 
 
 ## API documentation
 
-You can generate Doxygen API documentation for these APIs from a doxy file which is present in the `doxygen` folder . You need to run `doxygen` command from the `doxygen/` folder and it will generate a `docs` folder at API source directory root level where you can find the detailed documentation for each API.
+You can generate Doxygen API documentation for these APIs from a doxy file in the `doxygen` folder. You need to run the `doxygen` command from the `doxygen/` folder; it will generate a `docs` folder at the API source directory root level, where you can find the detailed documentation for each API.
