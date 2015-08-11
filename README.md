@@ -1,4 +1,4 @@
-# mbed-Client
+# mbed Client
 
 ## Introduction
 
@@ -7,11 +7,11 @@ mbed Device Client API enables the use of LWM2M features from the mbed Device Cl
 mbed Client is an OS agnostic embedded software library that provides the means to connect and manage constrained embedded devices to Web applications via mbed Device Server 
 
 
-The API includes High level APIs to communicate and manage devices with Internet Services securely. It provides full control of endpoint and application logic via APIs. C++ API exposed for application development through which device can manage resources on the mbed Device server end. mbed Device Client is fully secure as it provides secure connectivity using Industry standard TLS/DTLS.
+The API includes High level APIs to communicate and manage devices with Internet Services securely. It provides full control of endpoint and application logic via APIs. C++ API is exposed for application development. The device can use the API to manage resources on the mbed Device Server end. mbed Device Client is fully secure as it provides secure connectivity using industry standard TLS/DTLS.
 
 There are four interfaces between these two components as follows:
 
--  Client registration and unregistration
+- Client registration and deregistration
 - Device management and service enablement
 - Information reporting
 
@@ -47,7 +47,7 @@ The Client Registration Interface includes multiple sub-features. The following 
 
 - Register
 - Update 
-- De-register
+- Deregister
 
 ### Register
 
@@ -143,13 +143,13 @@ If the updation operation fails for some reason,  you will receive the following
 void error(M2MInterface::Error error)
 ```
 
-### Unregister
+### Deregister
 
-When the client no longer requires to be registered  to the mbed Device Server, the client will de-register from the mbed Device Server. Upon receiving this message, the mbed Device Server removes the registration information from the mbed Device Server.
+When the client no longer requires to be registered  to the mbed Device Server, the client will deregister from the mbed Device Server. Upon receiving this message, the mbed Device Server removes the registration information from the mbed Device Server.
 
-This is how you can unregister your endpoint client:
+This is how you can deregister your endpoint client:
 
-If the endpoint has multiple server registrations, you need to provide the `server_object` of the server where you would like to unregister your endpoint. Otherwise, if there is only one registration, you can pass `NULL` and the client will unregister the default registration from the endpoint.
+If the endpoint has multiple server registrations, you need to provide the `server_object` of the server where you would like to deregister your endpoint. Otherwise, if there is only one registration, you can pass `NULL` and the client will deregister the default registration from the endpoint.
 
 ```
 M2MInterface::unregister_object(M2MSecurity *object);
@@ -157,15 +157,15 @@ M2MInterface::unregister_object(M2MSecurity *object);
 
 Because this is an asynchronous operation, you will receive the result of this operation through callback defined in `m2minterfaceobserver.h` which you are handling in your application.
 
-If the unregister operation is successful and the client is successfully unregistered from mbed Device Server information, your application will receive the following callback:
+If the deregister operation is successful and the client is successfully deregistered from mbed Device Server information, your application will receive the following callback:
 
 ```
 void object_unregistered(M2MSecurity *server_object)
 ```
 
-The `M2MSecurity *server_object` informs from which mbed Device Server the client has just unregistered.
+The `M2MSecurity *server_object` informs from which mbed Device Server the client has just deregistered.
 
-If the unregistration operation fails for some reason, you will receive the following callback:
+If the deregistration operation fails for some reason, you will receive the following callback:
 
 ```
 void error(M2MInterface::Error error)
