@@ -334,6 +334,8 @@ private:
     uint16_t                    _listen_port;
     M2MSecurity                 *_register_server; //TODO: to be the list not owned
     bool                        _event_ignored;
+    bool                        _register_ongoing;
+    bool                        _update_register_ongoing;
 
    friend class Test_M2MInterfaceImpl;
 

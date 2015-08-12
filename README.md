@@ -14,11 +14,10 @@ There are three interfaces between the mbed Device Server (mDS) and mbed Client:
 - Device management and service enabler.
 - Information reporting.
 
+##mbed Client interfaces
 - Client registration and deregistration
 - Device management and service enablement
 - Information reporting
-
-##mbed Client interfaces
 
 The API provides an interface to define the application endpoint information. This information will be delivered to mbed Device Server during the registration operation (explained below).
 

@@ -249,6 +249,7 @@ bool M2MNsdlInterface::send_update_registration(const uint32_t lifetime)
     tr_debug("M2MNsdlInterface::send_update_registration( lifetime %d)", lifetime);
     bool success = false;
 
+    create_nsdl_list_structure(_object_list);
     //If Lifetime value is 0, then don't change the existing lifetime value
     if(lifetime != 0) {
         char *buffer = (char*)memory_alloc(20);
@@ -861,9 +862,21 @@ bool M2MNsdlInterface::create_nsdl_resource(M2MBase *base, const String &name)
                                                                  name.length(),
                                                                  (uint8_t*)name.c_str());
         if(resource) {
-            sn_nsdl_delete_resource(_nsdl_handle,name.length(),(uint8_t*)name.c_str());
-        }
-        if(_resource) {
+         //   sn_nsdl_delete_resource(_nsdl_handle,name.length(),(uint8_t*)name.c_str());
+            if(resource->mode == SN_GRS_STATIC) {
+                if(M2MBase::Resource == base->base_type() &&
+                   M2MBase::Static == base->mode()) {
+                    M2MResource *res = (M2MResource*)base;
+                    res->get_value(buffer,length);
+                    if(resource->resource) {
+                        memory_free(resource->resource);
+                    }
+                    resource->resource = buffer;
+                    resource->resourcelen = length;
+                    sn_nsdl_update_resource(_nsdl_handle,resource);
+                }
+            }
+        } else if(_resource) {
             //TODO: implement access control
             // Currently complete access is given
             _resource->access = (sn_grs_resource_acl_e)base->operation();
