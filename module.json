@@ -1,6 +1,6 @@
 {
   "name": "mbed-client",
-  "version": "0.2.8",
+  "version": "0.2.9",
   "description": "mbed Client C++ API",
   "private": true,
   "keywords": [],
