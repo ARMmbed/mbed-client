@@ -862,7 +862,7 @@ bool M2MNsdlInterface::create_nsdl_resource(M2MBase *base, const String &name)
                                                                  name.length(),
                                                                  (uint8_t*)name.c_str());
         if(resource) {
-         //   sn_nsdl_delete_resource(_nsdl_handle,name.length(),(uint8_t*)name.c_str());
+            success = true;
             if(resource->mode == SN_GRS_STATIC) {
                 if(M2MBase::Resource == base->base_type() &&
                    M2MBase::Static == base->mode()) {
@@ -873,9 +873,10 @@ bool M2MNsdlInterface::create_nsdl_resource(M2MBase *base, const String &name)
                     }
                     resource->resource = buffer;
                     resource->resourcelen = length;
-                    sn_nsdl_update_resource(_nsdl_handle,resource);
-                }
+                    sn_nsdl_update_resource(_nsdl_handle,resource);                    
+                }                
             }
+
         } else if(_resource) {
             //TODO: implement access control
             // Currently complete access is given
