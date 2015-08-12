@@ -46,7 +46,7 @@ command](http://docs.yottabuild.org/reference/commands.html).
 **Note**: In this case, we have listed the dependencies for the `x86-linux-native`
 compilation target. Different modules are needed for different compilation target.
 
-If you list the modules contained in the Mbed Client linux example, you can see that
+If you list the modules included in the Mbed Client linux example, you can see that
 it depends directly only on the `mbed-client` and `mbed-client-linux` modules. These modules depend internally on various other modules.
 
 ```
@@ -67,7 +67,7 @@ This release supports only one compilation target:
  * `x86-linux-native`: to compile for linux OS, using the gcc toolchain.
 
 To select the compilation target used for compiling a library or example
-program, give the command `yotta target x86-linux-native` before buliding. More
+program, give the command `yotta target x86-linux-native` before building. More
 documentation on target descriptions can be found on the [yotta
 documentation site](http://docs.yottabuild.org/tutorial/targets.html).
 
@@ -330,7 +330,7 @@ friend class M2MConnection_TestObserver;
 
 ```
 
-Please, note that some of these functions are asynchronous in nature and some are expecting callback from the network. For example, receiving data from socket needs to be communicated back to the `mbed-client` so that the library can act on the data received. The callback comes through the Observer class defined in `M2MConnectionObserver`.
+Please note that some of these functions are asynchronous in nature and some are expecting callback from the network. For example, receiving data from a socket needs to be communicated back to the `mbed-client` so that the library can act on the data received. The callback comes through the Observer class defined in `M2MConnectionObserver`.
 
 The file `m2mconnectionobserver.h` is present in the `mbed-client`. To see how the callback needs to be called, check the implementation in `m2mconnectionhandlerpimpl.cpp` present in the `mbed-client-linux`. 
 
@@ -489,7 +489,7 @@ public:
 
 The timer API functions are asynchronous in nature and whenever a timer event is available, it is notified to the `mbed-client` so that the library can act on the _timer expired_ signal. The callback is received through an Observer class defined in `M2MTimerObserver` .
 
-The file `m2mtimerobserver.h` is present in `mbed-client`. To see how the callback needs to be called, check the implementation in `m2mtimerimpl.cpp` present in  the`mbed-client-linux`. 
+The file `m2mtimerobserver.h` is present in `mbed-client`. To see how the callback needs to be called, check the implementation in `m2mtimerimpl.cpp` present in the`mbed-client-linux`. 
 
 ```
 /*
