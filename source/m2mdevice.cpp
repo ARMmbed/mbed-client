@@ -59,7 +59,7 @@ M2MDevice::M2MDevice()
                                                                  M2MResourceInstance::INTEGER,
                                                                  false,0);
         if(instance) {
-            instance->set_operation(M2MBase::GET_PUT_ALLOWED);
+            instance->set_operation(M2MBase::GET_ALLOWED);
             instance->set_value((const uint8_t*)ERROR_CODE_VALUE.c_str(),
                            (uint32_t)ERROR_CODE_VALUE.length());
         }
@@ -68,7 +68,7 @@ M2MDevice::M2MDevice()
                                                         M2MResourceInstance::STRING,
                                                         false);
         if(res) {
-            res->set_operation(M2MBase::GET_PUT_ALLOWED);
+            res->set_operation(M2MBase::GET_ALLOWED);
             res->set_value((const uint8_t*)BINDING_MODE_UDP.c_str(),
                            (uint32_t)BINDING_MODE_UDP.length());
         }
@@ -83,6 +83,7 @@ M2MResource* M2MDevice::create_resource(DeviceResource resource, const String &v
 {
     M2MResource* res = NULL;
     String device_id = "";
+    M2MBase::Operation operation = M2MBase::GET_ALLOWED;
     if(!is_resource_present(resource)) {
         switch(resource) {
             case Manufacturer:
@@ -108,9 +109,11 @@ M2MResource* M2MDevice::create_resource(DeviceResource resource, const String &v
                 break;
             case UTCOffset:
                 device_id = DEVICE_UTC_OFFSET;
+                operation = M2MBase::GET_PUT_ALLOWED;
                 break;
             case Timezone:
                 device_id = DEVICE_TIMEZONE;
+                operation = M2MBase::GET_PUT_ALLOWED;
                 break;
             default:
                 break;
@@ -124,7 +127,7 @@ M2MResource* M2MDevice::create_resource(DeviceResource resource, const String &v
                                                             false);
 
             if(res ) {
-                res->set_operation(M2MBase::GET_PUT_ALLOWED);
+                res->set_operation(operation);
                 res->set_value((const uint8_t*)value.c_str(),
                                (uint32_t)value.length());
             }
@@ -189,11 +192,10 @@ M2MResourceInstance* M2MDevice::create_resource_instance(DeviceResource resource
                                                  uint16_t instance_id)
 {
     M2MResourceInstance* res = NULL;
-    String device_id = "";
-
+    String device_id = "";    
     // For these resources multiple instance can exist
     if(AvailablePowerSources == resource) {
-        if(0 >= value && value <= 7) {
+        if(0 <= value && value <= 7) {
             device_id = DEVICE_AVAILABLE_POWER_SOURCES;
         }
     } else if(PowerSourceVoltage == resource) {
@@ -201,7 +203,9 @@ M2MResourceInstance* M2MDevice::create_resource_instance(DeviceResource resource
     } else if(PowerSourceCurrent == resource) {
         device_id = DEVICE_POWER_SOURCE_CURRENT;
     } else if(ErrorCode == resource) {
-        device_id = DEVICE_ERROR_CODE;
+        if(0 <= value && value <= 8) {
+            device_id = DEVICE_ERROR_CODE;
+        }
     }
 
     if(!device_id.empty()) {
@@ -213,8 +217,8 @@ M2MResourceInstance* M2MDevice::create_resource_instance(DeviceResource resource
             if(res) {
                 char *buffer = (char*)memory_alloc(20);
                 int size = snprintf(buffer, 20,"%lld",value);
-
-                res->set_operation(M2MBase::GET_PUT_ALLOWED);
+                // Only read operation is allowed for above resources
+                res->set_operation(M2MBase::GET_ALLOWED);
                 res->set_value((const uint8_t*)buffer,
                                (const uint32_t)size);
                 memory_free(buffer);
