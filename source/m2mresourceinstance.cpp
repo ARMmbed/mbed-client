@@ -117,7 +117,14 @@ M2MResourceInstance::ResourceType M2MResourceInstance::resource_instance_type() 
 bool M2MResourceInstance::handle_observation_attribute(char *&query)
 {
     tr_debug("M2MResourceInstance::handle_observation_attribute()");
-    return M2MBase::handle_observation_attribute(query);
+    if (resource_instance_type() == M2MResourceInstance::INTEGER ||
+        resource_instance_type() == M2MResourceInstance::FLOAT ){
+        return M2MBase::handle_observation_attribute(query);
+    }
+    else {
+        tr_debug("M2MResourceInstance::handle_observation_attribute() - write attribute is not numerical");
+        return false;
+    }
 }
 
 void M2MResourceInstance::set_execute_function(execute_callback callback)
