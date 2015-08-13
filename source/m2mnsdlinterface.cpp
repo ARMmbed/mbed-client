@@ -857,7 +857,6 @@ bool M2MNsdlInterface::create_nsdl_resource(M2MBase *base, const String &name)
 
     // Create the NSDL Resource Pointer...
     if(base) {
-        base->set_under_observation(false,this);
         sn_nsdl_resource_info_s* resource = sn_nsdl_get_resource(_nsdl_handle,
                                                                  name.length(),
                                                                  (uint8_t*)name.c_str());
@@ -876,8 +875,8 @@ bool M2MNsdlInterface::create_nsdl_resource(M2MBase *base, const String &name)
                     sn_nsdl_update_resource(_nsdl_handle,resource);                    
                 }                
             }
-
         } else if(_resource) {
+            base->set_under_observation(false,this);
             //TODO: implement access control
             // Currently complete access is given
             _resource->access = (sn_grs_resource_acl_e)base->operation();
