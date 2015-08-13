@@ -44,7 +44,13 @@
                                     "   Options for custom object\n"\
                                     "   --name <name>       Object name\n"\
                                     "   --new_instance <n>  If you need new instance 0=false(default), 1=true\n"\
-                                    "static_resource <p> [options]\n"\
+                                    "   --object_operation <n> Operation Mode, Default is  0, NOT_ALLOWED = 0, GET_ALLOWED = 1,\n"\
+                                    "PUT_ALLOWED = 2, GET_PUT_ALLOWED = 3, POST_ALLOWED = 4,GET_POST_ALLOWED = 5,\n"\
+                                    "PUT_POST_ALLOWED = 6, GET_PUT_POST_ALLOWED = 7, DELETE_ALLOWED = 8\n"\
+                                    "   --object_instance_operation <n> Operation Mode, Default is  0, NOT_ALLOWED = 0, GET_ALLOWED = 1,\n"\
+                                    "PUT_ALLOWED = 2, GET_PUT_ALLOWED = 3, POST_ALLOWED = 4,GET_POST_ALLOWED = 5,\n"\
+                                    "PUT_POST_ALLOWED = 6, GET_PUT_POST_ALLOWED = 7, DELETE_ALLOWED = 8\n"\
+                                        "static_resource <p> [options]\n"\
                                     "<p>:\n"\
                                     "   Options for static resource\n"\
                                     "   --object_instance <n> Instance Id of the object this resource is associated with, default is 0\n"\
@@ -59,6 +65,10 @@
                                     "   --name <name>       Resource name\n"\
                                     "   --observable <n>    Resource is observable false=0(default), true=1\n"\
                                     "   --multiple_instance <n> Supports multiple instances, false=0(default), true=1\n"\
+                                    "   --resource_operation <n> Operation Mode, Default is  1, NOT_ALLOWED = 0, GET_ALLOWED = 1,\n"\
+                                    "PUT_ALLOWED = 2, GET_PUT_ALLOWED = 3, POST_ALLOWED = 4,GET_POST_ALLOWED = 5,\n"\
+                                    "PUT_POST_ALLOWED = 6, GET_PUT_POST_ALLOWED = 7, DELETE_ALLOWED = 8\n"\
+                                    "dynamic_resource <p> [options]\n"\
                                     "static_resource_instance <p> [options]\n"\
                                     "<p>:\n"\
                                     "   Options for static resource instance\n"\
@@ -68,6 +78,7 @@
                                     "   --value <name>      Resource value\n"\
                                     "   --value_type <n>    Value Type String=0, Integer=1\n"\
                                     "   --multiple_instance <n> Supports multiple instances, false=0(default), true=1\n"\
+                                    "dynamic_resource <p> [options]\n"\
                                     "dynamic_resource_instance <p> [options]\n"\
                                     "<p>:\n"\
                                     "   Options for dynamic resource instance\n"\
@@ -76,6 +87,10 @@
                                     "   --name <name>       Resource name\n"\
                                     "   --observable <n>    Resource is observable false=0(default), true=1\n"\
                                     "   --multiple_instance <n> Supports multiple instances, false=0(default), true=1\n"\
+                                    "   --resource_instance_operation <n> Operation Mode, Default is  1, NOT_ALLOWED = 0, GET_ALLOWED = 1,\n"\
+                                    "PUT_ALLOWED = 2, GET_PUT_ALLOWED = 3, POST_ALLOWED = 4,GET_POST_ALLOWED = 5,\n"\
+                                    "PUT_POST_ALLOWED = 6, GET_PUT_POST_ALLOWED = 7, DELETE_ALLOWED = 8\n"\
+                                    "dynamic_resource <p> [options]\n"\
                                     "device <p> [options]\n"\
                                     "<p>:\n"\
                                     "   Options for device object \n"\
@@ -443,10 +458,14 @@ int lwm2m_client_object_command(int argc, char *argv[])
     int return_code = CMDLINE_RETCODE_SUCCESS;// CMDLINE_RETCODE_INVALID_PARAMETERS;
     char *object_name = 0;
     int32_t new_instance = 0;
+    int32_t object_operation = 0;
+    int32_t object_instance_operation = 0;
 
     if(cmd_parameter_val(argc, argv, "--name", &object_name)) {
         cmd_parameter_int(argc, argv, "--new_instance", &new_instance);
-        if(!lwm2m_client.create_object(object_name,new_instance)) {
+        cmd_parameter_int(argc, argv, "--object_operation", &object_operation);
+        cmd_parameter_int(argc, argv, "--object_instance_operation", &object_instance_operation);
+        if(!lwm2m_client.create_object(object_name,new_instance,object_operation,object_instance_operation)) {
             return_code = CMDLINE_RETCODE_INVALID_PARAMETERS;
          }
     }
@@ -465,6 +484,7 @@ int lwm2m_client_static_resource_command(int argc, char *argv[])
 
     cmd_parameter_int(argc, argv, "--multiple_instance", &multiple_instance);
     cmd_parameter_int(argc, argv, "--object_instance", &object_instance);
+
 
     if(cmd_parameter_int(argc, argv, "--value_type", &value_type)) {
         if(0 == value_type){
@@ -495,14 +515,18 @@ int lwm2m_client_dynamic_resource_command(int argc, char *argv[])
     int32_t multiple_instance = 0;
     int32_t object_instance = 0;
     int32_t observable = 0;
+    int32_t resource_operation = 1;
 
     cmd_parameter_int(argc, argv, "--multiple_instance", &multiple_instance);
     cmd_parameter_int(argc, argv, "--object_instance", &object_instance);
     cmd_parameter_int(argc, argv, "--observable", &observable);
+    cmd_parameter_int(argc, argv, "--resource_operation", &resource_operation);
 
     if(cmd_parameter_val(argc, argv, "--name", &name)) {
         if(lwm2m_client.create_dynamic_resource(name,observable,
-                                                multiple_instance,object_instance)) {
+                                                multiple_instance,
+                                                object_instance,
+                                                resource_operation)) {
             return_code =  CMDLINE_RETCODE_SUCCESS;
         }
     }
@@ -558,17 +582,20 @@ int lwm2m_client_dynamic_resource_instance_command(int argc, char *argv[])
     int32_t object_instance = 0;
     int32_t resource_instance = 0;
     int32_t observable = 0;
+    int32_t resource_instance_operation = 1;
 
     cmd_parameter_int(argc, argv, "--multiple_instance", &multiple_instance);
     cmd_parameter_int(argc, argv, "--object_instance", &object_instance);
     cmd_parameter_int(argc, argv, "--resource_instance", &resource_instance);
     cmd_parameter_int(argc, argv, "--observable", &observable);
+    cmd_parameter_int(argc, argv, "--resource_instance_operation", &resource_instance_operation);
 
     if(cmd_parameter_val(argc, argv, "--name", &name)) {
         if(lwm2m_client.create_dynamic_resource_instance(name,observable,
                                                          multiple_instance,
                                                          object_instance,
-                                                         resource_instance)) {
+                                                         resource_instance,
+                                                         resource_instance_operation)) {
             return_code =  CMDLINE_RETCODE_SUCCESS;
         }
     }

@@ -54,7 +54,10 @@ public:
     bool create_device_object(M2MDevice::DeviceResource resource,
                               uint32_t value);
 
-    bool create_object(const char *name,bool new_instance);
+    bool create_object(const char *name,
+                       bool new_instance,
+                       uint8_t object_operation,
+                       uint8_t object_instance_operation);
 
     bool create_static_resource_string(const char *name,
                                        const char *value,
@@ -69,7 +72,8 @@ public:
     bool create_dynamic_resource(const char *name,
                                  bool observable,
                                  bool multiple_instance,
-                                 uint16_t object_instance = 0);
+                                 uint16_t object_instance = 0,
+                                 uint8_t resource_operation = 1);
 
     bool set_resource_value(const char *name,
                             int32_t value,
@@ -95,7 +99,8 @@ public:
                                           bool observable,
                                           bool multiple_instance,
                                           uint16_t object_instance = 0,
-                                          uint16_t resource_instance = 0);
+                                          uint16_t resource_instance = 0,
+                                          uint8_t resource_instance_operation = 1);
 
     bool set_resource_instance_value(const char *name,
                                      int32_t value,
@@ -126,6 +131,10 @@ public:
     void error(M2MInterface::Error error);
 
     void value_updated(M2MBase *base, M2MBase::BaseType type);
+
+private:
+
+    M2MBase::Operation int_to_operation(uint8_t operation);
 
 private:
 

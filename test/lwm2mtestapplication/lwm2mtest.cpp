@@ -216,20 +216,29 @@ bool M2MLWClient::create_device_object(M2MDevice::DeviceResource resource,
     return success;
 }
 
-bool M2MLWClient::create_object(const char *name, bool new_instance)
+bool M2MLWClient::create_object(const char *name,
+                                bool new_instance,
+                                uint8_t object_operation,
+                                uint8_t object_instance_operation)
 {
     bool success = false;
+    M2MObjectInstance *inst = NULL;
     if(!_object) {
         _object = M2MInterfaceFactory::create_object(name);
         if(_object) {
-            if(_object->create_object_instance()) {
+            _object->set_operation(int_to_operation(object_operation));
+            inst = _object->create_object_instance();
+            if(inst) {
                 success = true;
+                inst->set_operation(int_to_operation(object_instance_operation));
             }
         }
     } else {
         if(new_instance) {
-            if(_object->create_object_instance()) {
+            inst = _object->create_object_instance();
+            if(inst) {
                 success = true;
+                inst->set_operation(int_to_operation(object_instance_operation));
             }
         }
     }
@@ -298,7 +307,8 @@ bool M2MLWClient::create_static_resource_int(const char *name,
 bool M2MLWClient::create_dynamic_resource(const char *name,
                                           bool observable,
                                           bool multiple_instance,
-                                          uint16_t object_instance)
+                                          uint16_t object_instance,
+                                          uint8_t resource_operation)
 {
     bool success = false;
     String name_string;
@@ -308,10 +318,12 @@ bool M2MLWClient::create_dynamic_resource(const char *name,
     if(_object) {
         M2MObjectInstance *inst = _object->object_instance(object_instance);
         if(inst) {
-            if(inst->create_dynamic_resource(name,"resource",
-                                             M2MResourceInstance::OPAQUE,
-                                             observable) != NULL) {
+            M2MResource *res = inst->create_dynamic_resource(name,"resource",
+                                                             M2MResourceInstance::OPAQUE,
+                                                             observable);
+            if(res) {
                 success = true;
+                res->set_operation(int_to_operation(resource_operation));
             }
         }
     }
@@ -442,7 +454,8 @@ bool M2MLWClient::create_dynamic_resource_instance(const char *name,
                                                    bool observable,
                                                    bool multiple_instance,
                                                    uint16_t object_instance,
-                                                   uint16_t resource_instance)
+                                                   uint16_t resource_instance,
+                                                   uint8_t resource_instance_operation)
 {
     bool success = false;
     String name_string;
@@ -452,11 +465,13 @@ bool M2MLWClient::create_dynamic_resource_instance(const char *name,
     if(_object) {
         M2MObjectInstance *inst = _object->object_instance(object_instance);
         if(inst) {
-            if(inst->create_dynamic_resource_instance(name,"resource",
-                                                      M2MResourceInstance::OPAQUE,
-                                                      observable,
-                                                      resource_instance) != NULL) {
+            M2MResourceInstance *res = inst->create_dynamic_resource_instance(name,"resource",
+                                                                      M2MResourceInstance::OPAQUE,
+                                                                      observable,
+                                                                      resource_instance);
+            if( res) {
                 success = true;
+                res->set_operation(int_to_operation(resource_instance_operation));
             }
         }
     }
@@ -488,7 +503,7 @@ bool M2MLWClient::set_resource_instance_value(const char *name,
                 if(res_inst) {
                     if (res_inst->set_value((const uint8_t*)value_string.c_str(), value_string.size())) {
                         success = true;
-                    }
+                    }                    
                 }
             }
         }
@@ -624,4 +639,41 @@ void M2MLWClient::value_updated(M2MBase *base, M2MBase::BaseType type)
 {
     cmd_printf("\nValue updated of Object name %s and Type \n",
                base->name().c_str(), type);
+}
+
+M2MBase::Operation M2MLWClient::int_to_operation(uint8_t operation)
+{
+    M2MBase::Operation op = M2MBase::NOT_ALLOWED;
+    switch(operation) {
+        case 0:
+            op = M2MBase::NOT_ALLOWED;
+            break;
+        case 1:
+            op = M2MBase::GET_ALLOWED;
+            break;
+        case 2:
+            op = M2MBase::PUT_ALLOWED;
+            break;
+        case 3:
+            op = M2MBase::GET_PUT_ALLOWED;
+            break;
+        case 4:
+            op = M2MBase::POST_ALLOWED;
+            break;
+        case 5:
+            op = M2MBase::GET_POST_ALLOWED;
+            break;
+        case 6:
+            op = M2MBase::PUT_POST_ALLOWED;
+            break;
+        case 7:
+            op = M2MBase::GET_PUT_POST_ALLOWED;
+            break;
+        case 8:
+            op = M2MBase::DELETE_ALLOWED;
+            break;
+        default:
+            break;
+    }
+    return op;
 }
