@@ -148,11 +148,15 @@ bool M2MResource::handle_observation_attribute(char *&query)
         M2MResourceInstanceList::const_iterator it;
         it = _resource_instance_list.begin();
         for ( ; it != _resource_instance_list.end(); it++ ) {
-            tr_debug("M2MResource::handle_observation_attribute()");
+            tr_debug("M2MResource::handle_observation_attribute()");            
             success = (*it)->handle_observation_attribute(query);
         }
     } else {
-        success = M2MBase::handle_observation_attribute(query);
+        tr_debug("M2MResource::handle_observation_attribute() - else");
+        // Apply write attributes only if resource is numerical
+        if (_resource_type == M2MResourceInstance::INTEGER ||
+            _resource_type == M2MResourceInstance::FLOAT)
+            success = M2MBase::handle_observation_attribute(query);
     }
     return success;
 }
