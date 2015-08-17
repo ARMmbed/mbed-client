@@ -59,6 +59,8 @@ public:
 
     void test_name();
 
+    void test_name_id();
+
     void test_instance_id();
 
     void test_interface_description();
@@ -83,6 +85,21 @@ public:
 
     void test_remove_object_from_coap();
 
+    void test_handle_get_request();
+
+    void test_handle_put_request();
+
+    void test_handle_post_request();
+
+    void test_memory_alloc();
+
+    void test_memory_free();
+
+    void test_report_handler();
+
+    void test_observation_handler();
+
+    void test_id_number();
 };
 
 

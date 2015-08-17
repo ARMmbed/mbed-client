@@ -243,6 +243,7 @@ protected:
     static M2MDevice*     _instance;
 
     friend class Test_M2MDevice;
+    friend class Test_M2MInterfaceFactory;
 };
 
 #endif // M2M_DEVICE_H

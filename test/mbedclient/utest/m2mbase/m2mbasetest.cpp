@@ -122,6 +122,11 @@ TEST(M2MBase, name)
     m2m_base->test_name();
 }
 
+TEST(M2MBase, name_id)
+{
+    m2m_base->test_name_id();
+}
+
 TEST(M2MBase, instance_id)
 {
     m2m_base->test_instance_id();
@@ -181,3 +186,44 @@ TEST(M2MBase, test_remove_object_from_coap)
 {
     m2m_base->test_remove_object_from_coap();
 }
+
+TEST(M2MBase, test_handle_get_request)
+{
+    m2m_base->test_handle_get_request();
+}
+
+TEST(M2MBase, test_handle_put_request)
+{
+    m2m_base->test_handle_put_request();
+}
+
+TEST(M2MBase, test_handle_post_request)
+{
+    m2m_base->test_handle_post_request();
+}
+
+TEST(M2MBase, test_memory_alloc)
+{
+    m2m_base->test_memory_alloc();
+}
+
+TEST(M2MBase, test_memory_free)
+{
+    m2m_base->test_memory_free();
+}
+
+TEST(M2MBase, test_report_handler)
+{
+    m2m_base->test_report_handler();
+}
+
+TEST(M2MBase, test_observation_handler)
+{
+    m2m_base->test_observation_handler();
+}
+
+TEST(M2MBase, test_id_number)
+{
+    m2m_base->test_id_number();
+}
+

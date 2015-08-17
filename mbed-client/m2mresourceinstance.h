@@ -194,6 +194,7 @@ private:
     ResourceType            _resource_type;
 
     friend class Test_M2MResourceInstance;
+    friend class Test_M2MResource;
     friend class Test_M2MObjectInstance;
     friend class Test_M2MObject;
     friend class Test_M2MDevice;

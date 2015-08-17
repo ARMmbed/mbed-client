@@ -51,6 +51,11 @@ TEST(M2MTimerPimpl_mbed, timer_expired)
     m2m_timer->test_timer_expired();
 }
 
+TEST(M2MTimerPimpl_mbed, still_left_timer_expired)
+{
+    m2m_timer->test_still_left_timer_expired();
+}
+
 TEST(M2MTimerPimpl_mbed, test_start_dtls_timer)
 {
     m2m_timer->test_start_dtls_timer();

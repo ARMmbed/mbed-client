@@ -72,6 +72,11 @@ void Test_M2MReportHandler::test_set_under_observation()
     _handler->set_under_observation(test);
     CHECK(test == _handler->_under_observation);
     CHECK(false == _observer->visited);
+
+    _handler->_pmin = 0.0f;
+
+    _handler->set_under_observation(true);
+    CHECK(true == _handler->_under_observation);
 }
 
 void Test_M2MReportHandler::test_parse_notification_attribute()
@@ -89,11 +94,16 @@ void Test_M2MReportHandler::test_parse_notification_attribute()
     CHECK(true == _handler->parse_notification_attribute(val_real, M2MBase::Resource ));
 
     char* val_real1 = {"a=1&pmin=2&pmax=3&gt=4&lt=5&st=6&cancel"};
-    CHECK(true == _handler->parse_notification_attribute(val_real1, M2MBase::Resource ));
+    CHECK(false == _handler->parse_notification_attribute(val_real1, M2MBase::Resource ));
 
     char* val2_real = {"cancel&gt=4&lt=5&st=6&cancel"};
-    CHECK(true == _handler->parse_notification_attribute(val2_real, M2MBase::Resource ));
+    CHECK(false == _handler->parse_notification_attribute(val2_real, M2MBase::Resource ));
 
+    char* val3_real = {"cancel&gt=40&lt=5&st=6&cancel"};
+    CHECK(true == _handler->parse_notification_attribute(val3_real, M2MBase::Resource ));
+
+    char* val4_real = {"cancel"};
+    CHECK(true == _handler->parse_notification_attribute(val4_real, M2MBase::Resource ));
 }
 
 void Test_M2MReportHandler::test_timer_expired()

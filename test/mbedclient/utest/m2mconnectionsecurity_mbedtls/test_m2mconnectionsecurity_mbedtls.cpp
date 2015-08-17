@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 #include "CppUTest/TestHarness.h"
-#include "test_m2mconnectionsecurityimpl_mbedtls.h"
+#include "test_m2mconnectionsecurity_mbedtls.h"
 #include "m2mtimerobserver.h"
 #include "m2msecurity.h"
 #include "m2msecurity_stub.h"
@@ -40,63 +40,63 @@ public:
     void data_sent(){}
 };
 
-Test_M2MConnectionSecurityImpl::Test_M2MConnectionSecurityImpl()
+Test_M2MConnectionSecurity::Test_M2MConnectionSecurity()
 {
     mbedtls_stub::clear();
     m2msecurity_stub::clear();
 }
 
-Test_M2MConnectionSecurityImpl::~Test_M2MConnectionSecurityImpl()
+Test_M2MConnectionSecurity::~Test_M2MConnectionSecurity()
 {
 }
 
-void Test_M2MConnectionSecurityImpl::test_constructor()
+void Test_M2MConnectionSecurity::test_constructor()
 {
     M2MConnectionSecurity impl = M2MConnectionSecurity();
 }
 
-void Test_M2MConnectionSecurityImpl::test_destructor()
+void Test_M2MConnectionSecurity::test_destructor()
 {
     M2MConnectionSecurity* impl = new M2MConnectionSecurity();
     delete impl;
     //Memory leak detector will report an error if leaks
 }
 
-void Test_M2MConnectionSecurityImpl::test_reset()
+void Test_M2MConnectionSecurity::test_reset()
 {
     M2MConnectionSecurity impl = M2MConnectionSecurity();
     impl.reset();
 }
 
-void Test_M2MConnectionSecurityImpl::test_init()
+void Test_M2MConnectionSecurity::test_init()
 {
     M2MConnectionSecurity impl = M2MConnectionSecurity();
     m2mconnectionsecuritypimpl_stub::int_value = 7;
     CHECK( 7 == impl.init(NULL) );
 }
 
-void Test_M2MConnectionSecurityImpl::test_connect()
+void Test_M2MConnectionSecurity::test_connect()
 {
     M2MConnectionSecurity impl = M2MConnectionSecurity();
     m2mconnectionsecuritypimpl_stub::int_value = 7;
     CHECK( 7 == impl.connect(NULL));
 }
 
-void Test_M2MConnectionSecurityImpl::test_start_connecting_non_blocking()
+void Test_M2MConnectionSecurity::test_start_connecting_non_blocking()
 {
     M2MConnectionSecurity impl = M2MConnectionSecurity();
     m2mconnectionsecuritypimpl_stub::int_value = 7;
     CHECK( 7 == impl.start_connecting_non_blocking(NULL));
 }
 
-void Test_M2MConnectionSecurityImpl::test_continue_connecting()
+void Test_M2MConnectionSecurity::test_continue_connecting()
 {
     M2MConnectionSecurity impl = M2MConnectionSecurity();
     m2mconnectionsecuritypimpl_stub::int_value = 7;
     CHECK( 7 == impl.continue_connecting());
 }
 
-void Test_M2MConnectionSecurityImpl::test_send_message()
+void Test_M2MConnectionSecurity::test_send_message()
 {
     M2MConnectionSecurity impl = M2MConnectionSecurity();
     unsigned char msg[6] = "hello";
@@ -104,7 +104,7 @@ void Test_M2MConnectionSecurityImpl::test_send_message()
     CHECK( 7 == impl.send_message(msg, 5) );
 }
 
-void Test_M2MConnectionSecurityImpl::test_read()
+void Test_M2MConnectionSecurity::test_read()
 
 {
     M2MConnectionSecurity impl = M2MConnectionSecurity();

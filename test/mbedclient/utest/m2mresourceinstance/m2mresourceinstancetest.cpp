@@ -36,9 +36,19 @@ TEST(M2MResourceInstance, Create)
     CHECK(m2m_resourceinstance != NULL);
 }
 
+TEST(M2MResourceInstance, test_static_resource_instance)
+{
+    m2m_resourceinstance->test_static_resource_instance();
+}
+
 TEST(M2MResourceInstance, copy_constructor)
 {
     m2m_resourceinstance->test_copy_constructor();
+}
+
+TEST(M2MResourceInstance, assignment_constructor)
+{
+    m2m_resourceinstance->test_assignment_constructor();
 }
 
 TEST(M2MResourceInstance, base_type)

@@ -53,7 +53,7 @@ public:
         *this = fp;
     }
 
-    ~FunctionPointerBind() {
+    virtual ~FunctionPointerBind() {
         _ops->destructor(_storage);
     }
 

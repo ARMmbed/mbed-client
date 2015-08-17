@@ -154,8 +154,9 @@ bool M2MResource::handle_observation_attribute(char *&query)
     } else {
         tr_debug("M2MResource::handle_observation_attribute() - else");
         // Apply write attributes only if resource is numerical
-        if (_resource_type == M2MResourceInstance::INTEGER ||
-            _resource_type == M2MResourceInstance::FLOAT)
+        M2MResourceInstance::ResourceType type = M2MResourceInstance::resource_instance_type();
+        if (type == M2MResourceInstance::INTEGER ||
+            type == M2MResourceInstance::FLOAT)
             success = M2MBase::handle_observation_attribute(query);
     }
     return success;

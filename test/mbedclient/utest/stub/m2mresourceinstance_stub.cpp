@@ -71,7 +71,7 @@ M2MBase::BaseType M2MResourceInstance::base_type() const
 
 M2MResourceInstance::ResourceType M2MResourceInstance::resource_instance_type() const
 {
-    return _resource_type;
+    return m2mresourceinstance_stub::resource_type;
 }
 
 bool M2MResourceInstance::handle_observation_attribute(char *&)

@@ -101,4 +101,5 @@ void Test_M2MInterfaceFactory::test_create_object()
     CHECK(test != NULL);
     delete test;
     test = NULL;
+    CHECK(M2MInterfaceFactory::create_object("") == NULL);
 }

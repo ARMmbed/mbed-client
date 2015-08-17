@@ -37,6 +37,8 @@ public:
 
     void test_remove_resource();
 
+    void test_remove_resource_instance();
+
     void test_resource();
 
     void test_resources();

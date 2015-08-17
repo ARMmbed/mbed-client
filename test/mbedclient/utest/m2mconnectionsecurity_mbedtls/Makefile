@@ -1,13 +1,13 @@
 include ../makefile_defines.txt
 
-COMPONENT_NAME = m2mconnectionsecurityimpl_unit
+COMPONENT_NAME = m2mconnectionsecurity_unit
 SRC_FILES = \
-        ../../../../../lwm2m-client-mbedtls/source/m2mconnectionsecurityimpl.cpp \
+        ../../../../../lwm2m-client-mbedtls/source/m2mconnectionsecurity.cpp \
 
 TEST_SRC_FILES = \
 	main.cpp \
-	m2mconnectionsecurityimpl_mbedtlstest.cpp \
-        test_m2mconnectionsecurityimpl_mbedtls.cpp \
+	m2mconnectionsecurity_mbedtlstest.cpp \
+        test_m2mconnectionsecurity_mbedtls.cpp \
         ../stub/m2mstring_stub.cpp \
         ../stub/m2mtimer_stub.cpp \
         ../stub/m2mbase_stub.cpp \

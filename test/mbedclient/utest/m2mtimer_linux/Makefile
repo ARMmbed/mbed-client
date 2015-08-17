@@ -1,8 +1,8 @@
 include ../makefile_defines.txt
 
-COMPONENT_NAME = m2mtimer_unit
+COMPONENT_NAME = m2mtimer_linux_unit
 SRC_FILES = \
-        ../../../../../lwm2m-client-linux/source/m2mtimerimpl.cpp
+        ../../../../../lwm2m-client-linux/source/m2mtimer.cpp
 
 TEST_SRC_FILES = \
 	main.cpp \

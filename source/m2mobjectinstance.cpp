@@ -181,25 +181,28 @@ bool M2MObjectInstance::remove_resource(const String &resource_name)
          int pos = 0;
          for ( ; it != _resource_list.end(); it++, pos++ ) {
              if(((*it)->name() == resource_name)) {
-                 // Resource found and deleted.
-                 res = *it;
+                // Resource found and deleted.
+                res = *it;
 
-                 char *obj_inst_id = (char*)memory_alloc(20);
-                 snprintf(obj_inst_id, 20,"%d",instance_id());
+                char *obj_inst_id = (char*)memory_alloc(20);
+                if(obj_inst_id) {
+                    snprintf(obj_inst_id, 20,"%d",instance_id());
 
-                 String obj_name = name();
-                 obj_name += String("/");
-                 obj_name += String(obj_inst_id);
-                 obj_name += String("/");
-                 obj_name += (*it)->name();
+                    String obj_name = name();
+                    obj_name += String("/");
+                    obj_name += String(obj_inst_id);
+                    obj_name += String("/");
+                    obj_name += (*it)->name();
 
-                 memory_free(obj_inst_id);
+                    memory_free(obj_inst_id);
 
-                 remove_resource_from_coap(obj_name);
-                 delete res;
-                 res = NULL;
-                 _resource_list.erase(pos);
-                 success = true;
+
+                    remove_resource_from_coap(obj_name);
+                    delete res;
+                    res = NULL;
+                    _resource_list.erase(pos);
+                    success = true;
+                }
                  break;
              }
          }
@@ -215,36 +218,52 @@ bool M2MObjectInstance::remove_resource_instance(const String &resource_name,
     bool success = false;
     M2MResource *res = resource(resource_name);
     if(res) {
-         M2MResourceInstanceList list = res->resource_instances();
-         M2MResourceInstanceList::const_iterator it;
-         it = list.begin();
-         for ( ; it != list.end(); it++) {
-             if((*it)->instance_id() == inst_id) {
+        M2MResourceInstanceList list = res->resource_instances();
+        M2MResourceInstanceList::const_iterator it;
+        it = list.begin();
+        for ( ; it != list.end(); it++) {
+            if((*it)->instance_id() == inst_id) {
+                char *obj_inst_id = (char*)memory_alloc(20);
+                if(obj_inst_id) {
+                    snprintf(obj_inst_id, 20,"%d",instance_id());
 
-                 char *obj_inst_id = (char*)memory_alloc(20);
-                 snprintf(obj_inst_id, 20,"%d",instance_id());
+                    String obj_name = name();
+                    obj_name += String("/");
+                    obj_name += String(obj_inst_id);
+                    obj_name += String("/");
+                    obj_name += resource_name;
 
-                 String obj_name = name();
-                 obj_name += String("/");
-                 obj_name += String(obj_inst_id);
-                 obj_name += String("/");
-                 obj_name += resource_name;
+                    memory_free(obj_inst_id);
 
-                 memory_free(obj_inst_id);
+                    char *res_inst_id = (char*)memory_alloc(20);
+                    if(res_inst_id) {
+                        snprintf(res_inst_id, 20,"%d",inst_id);
+                        obj_name += String("/");
+                        obj_name += String(res_inst_id);
 
-                 char *res_inst_id = (char*)memory_alloc(20);
-                 snprintf(res_inst_id, 20,"%d",inst_id);
-                 obj_name += String("/");
-                 obj_name += String(res_inst_id);
+                        memory_free(res_inst_id);
 
-                 memory_free(res_inst_id);
-
-                 remove_resource_from_coap(obj_name);
-                 success = res->remove_resource_instance(inst_id);
-                 break;
-             }
-         }
-     }
+                        remove_resource_from_coap(obj_name);
+                        success = res->remove_resource_instance(inst_id);
+                        if(res->resource_instance_count() == 0) {
+                            M2MResourceList::const_iterator itr;
+                            itr = _resource_list.begin();
+                            int pos = 0;
+                            for ( ; itr != _resource_list.end(); itr++, pos++ ) {
+                                if(((*itr)->name() == resource_name)) {
+                                    delete res;
+                                    res = NULL;
+                                    _resource_list.erase(pos);
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
+                break;
+            }
+        }
+    }
     return success;
 }
 

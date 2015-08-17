@@ -98,7 +98,7 @@ private:
     M2MConnectionSecurityPimpl* _private_impl;
 
     friend class Test_M2MConnectionSecurity;
-    friend class Test_M2MConnectionSecurityImpl;
+    //friend class Test_M2MConnectionSecurityImpl;
 };
 
 #endif //__M2M_CONNECTION_SECURITY_H__

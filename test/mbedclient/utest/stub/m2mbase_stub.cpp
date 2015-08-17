@@ -22,7 +22,6 @@ int m2mbase_stub::name_id_value;
 
 bool m2mbase_stub::bool_value;
 String *m2mbase_stub::string_value;
-uint8_t* m2mbase_stub::value;
 
 M2MBase::BaseType m2mbase_stub::base_type;
 M2MBase::Operation m2mbase_stub::operation;
@@ -44,10 +43,6 @@ void m2mbase_stub::clear()
     base_type = M2MBase::Object;
     bool_value = false;
     m2mbase_stub::operation = M2MBase::NOT_ALLOWED;
-    if(value != NULL){
-        delete value;
-        value = NULL;
-    }
     void_value = NULL;
     observe = NULL;
     report = NULL;

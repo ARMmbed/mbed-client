@@ -45,6 +45,8 @@ Test_M2MTimerPimpl_mbed::~Test_M2MTimerPimpl_mbed()
 void Test_M2MTimerPimpl_mbed::test_start_timer()
 {
     timer->start_timer(100,M2MTimerObserver::Notdefined,true);
+
+    timer->start_timer(2100000,M2MTimerObserver::Notdefined,true);
 }
 
 void Test_M2MTimerPimpl_mbed::test_stop_timer()
@@ -60,6 +62,23 @@ void Test_M2MTimerPimpl_mbed::test_timer_expired()
 
     timer->_single_shot = false;
     timer->timer_expired();
+}
+
+void Test_M2MTimerPimpl_mbed::test_still_left_timer_expired()
+{
+    timer->_single_shot = false;
+    timer->_still_left = 0;
+
+    timer->still_left_timer_expired();
+    CHECK(observer->visited == true);
+
+    timer->_still_left = 2000000;
+    timer->still_left_timer_expired();
+    CHECK(timer->_still_left == 0);
+
+    timer->_still_left = 2100000;
+    timer->still_left_timer_expired();
+    CHECK(timer->_still_left == 100000);
 }
 
 void Test_M2MTimerPimpl_mbed::test_start_dtls_timer()

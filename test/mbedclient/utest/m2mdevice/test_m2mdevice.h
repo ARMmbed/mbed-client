@@ -26,6 +26,8 @@ public:
     Test_M2MDevice();
     virtual ~Test_M2MDevice();
 
+    void test_create_resource_instance();
+
     void test_create_resource_string();
 
     void test_create_resource_int();
@@ -33,6 +35,8 @@ public:
     void test_create_resource_no_param();
 
     void test_delete_resource();
+
+    void test_delete_resource_instance();
 
     void test_set_resource_value_int();
 

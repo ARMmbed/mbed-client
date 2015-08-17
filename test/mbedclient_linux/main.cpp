@@ -287,6 +287,7 @@ public:
 
     void error(M2MInterface::Error error){
         _error = true;
+        close_function();
         printf("\nError occured Error Code : %d\n", (int8_t)error);
 
     }

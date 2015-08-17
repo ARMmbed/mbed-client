@@ -146,6 +146,10 @@ void M2MNsdlInterface::resource_to_be_deleted(const String &)
 {
 }
 
+void M2MNsdlInterface::value_updated(M2MBase *)
+{
+}
+
 void M2MNsdlInterface::remove_object(M2MBase *)
 {
 }

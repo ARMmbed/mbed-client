@@ -27,6 +27,8 @@ public:
 
     virtual ~Test_M2MResource();
 
+    void test_static_resource();
+
     void test_base_type();
 
     void test_muliptle_instances();

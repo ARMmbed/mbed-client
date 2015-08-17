@@ -33,6 +33,8 @@ public:
 
     void test_timer_expired();
 
+    void test_still_left_timer_expired();
+
     void test_start_dtls_timer();
 
     void test_dtls_timer_expired();
