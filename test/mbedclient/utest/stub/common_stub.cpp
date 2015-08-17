@@ -34,6 +34,7 @@ pthread_t common_stub::thread;
 const char* common_stub::char_value;
 
 using namespace mbed;
+using namespace mbed::Sockets::v0;
 
 void common_stub::clear()
 {
@@ -74,6 +75,11 @@ void SocketAddr::setAddr(const struct socket_addr *)
 
 void SocketAddr::setAddr(const SocketAddr *)
 {
+}
+
+bool SocketAddr::SocketAddr::is_v4()
+{
+    return common_stub::bool_value;
 }
 
 void mbed::Ticker::detach()
@@ -170,6 +176,11 @@ int8_t sn_nsdl_send_coap_message(struct nsdl_s *, sn_nsdl_addr_s *, sn_coap_hdr_
     return common_stub::int_value;
 }
 
+int8_t sn_nsdl_update_resource(struct nsdl_s *, sn_nsdl_resource_info_s *)
+{
+    return common_stub::int_value;
+}
+
 int8_t set_NSP_address(struct nsdl_s *, uint8_t *, uint16_t, sn_nsdl_addr_type_e)
 {
     return common_stub::int_value;
@@ -242,13 +253,15 @@ void Socket::_eventHandler(struct socket_event *)
 {
 }
 
-void Socket::setOnError(handler_t )
+void Socket::setOnError(const ErrorHandler_t &)
 {
 }
-void Socket::setOnReadable(handler_t )
+
+void Socket::setOnReadable(const ReadableHandler_t &)
 {
 }
-void Socket::setOnSent(handler_t )
+
+void Socket::setOnSent(const SentHandler_t & )
 {
 }
 
@@ -256,12 +269,27 @@ void Socket::_nvEventHandler(void * )
 {
 }
 
-socket_event_t * Socket::getEvent()
+socket_error_t Socket::getLocalAddr(SocketAddr *) const
 {
-    return common_stub::event;
+    return common_stub::error;
 }
 
-socket_error_t Socket::resolve(const char* , handler_t )
+socket_error_t Socket::getLocalPort(uint16_t *) const
+{
+    return common_stub::error;
+}
+
+socket_error_t Socket::getRemoteAddr(SocketAddr *) const
+{
+    return common_stub::error;
+}
+
+socket_error_t Socket::getRemotePort(uint16_t *) const
+{
+    return common_stub::error;
+}
+
+socket_error_t Socket::resolve(const char* , const DNSHandler_t & )
 {
     return common_stub::error;
 }

@@ -25,8 +25,7 @@ namespace m2mbase_stub
     extern uint16_t uint16_value;
     extern uint16_t int_value;
     extern int name_id_value;
-    extern String *string_value;
-    extern uint8_t *value;
+    extern String *string_value;    
     extern bool bool_value;
     extern M2MBase::BaseType base_type;
     extern M2MBase::Mode mode_value;

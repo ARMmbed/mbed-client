@@ -106,6 +106,12 @@ void mbedtls_ssl_conf_rng( mbedtls_ssl_config *,
 
 }
 
+void mbedtls_ssl_conf_ciphersuites( mbedtls_ssl_config *,
+                                   const int *)
+{
+
+}
+
 int mbedtls_ssl_setup( mbedtls_ssl_context *,
                        const mbedtls_ssl_config * ){
     if( mbedtls_stub::useCounter ){

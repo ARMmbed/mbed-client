@@ -66,6 +66,11 @@ TEST(M2MObjectInstance, remove_resource)
     m2m_object_instance->test_remove_resource();
 }
 
+TEST(M2MObjectInstance, remove_resource_instance)
+{
+    m2m_object_instance->test_remove_resource_instance();
+}
+
 TEST(M2MObjectInstance, resource)
 {
     m2m_object_instance->test_resource();

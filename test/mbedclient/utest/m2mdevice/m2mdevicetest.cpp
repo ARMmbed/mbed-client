@@ -36,6 +36,11 @@ TEST(M2MDevice, Create)
     CHECK(m2m_device != NULL);
 }
 
+TEST(M2MDevice, create_resource_instance)
+{
+    m2m_device->test_create_resource_instance();
+}
+
 TEST(M2MDevice, create_resource_string)
 {
     m2m_device->test_create_resource_string();
@@ -54,6 +59,11 @@ TEST(M2MDevice, create_resource_no_param)
 TEST(M2MDevice, delete_resource)
 {
     m2m_device->test_delete_resource();
+}
+
+TEST(M2MDevice, delete_resource_instance)
+{
+    m2m_device->test_delete_resource_instance();
 }
 
 TEST(M2MDevice, set_resource_value_int)

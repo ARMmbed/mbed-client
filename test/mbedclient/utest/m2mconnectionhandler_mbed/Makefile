@@ -1,8 +1,8 @@
 include ../makefile_defines.txt
 
-COMPONENT_NAME = m2mconnectionhandlerimpl_mbed_unit
+COMPONENT_NAME = m2mconnectionhandler_mbed_unit
 SRC_FILES = \
-        ../../../../../lwm2m-client-mbed/source/m2mconnectionhandlerimpl.cpp
+        ../../../../../lwm2m-client-mbed/source/m2mconnectionhandler.cpp
 
 TEST_SRC_FILES = \
 	main.cpp \

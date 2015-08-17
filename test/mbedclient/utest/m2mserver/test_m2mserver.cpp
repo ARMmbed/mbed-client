@@ -18,13 +18,14 @@
 #include "m2mobject_stub.h"
 #include "m2mobjectinstance_stub.h"
 #include "m2mresource_stub.h"
+#include "m2mresourceinstance_stub.h"
 #include "m2mbase_stub.h"
 
 Test_M2MServer::Test_M2MServer()
 {
     m2mobject_stub::inst = new M2MObjectInstance("name");
     m2mresource_stub::bool_value = true;
-//    m2mobjectinstance_stub::create_resource = new M2MResource("name","type",M2MBase::Dynamic);
+    m2mobjectinstance_stub::create_resource = new M2MResource("name","type",M2MResourceInstance::STRING,M2MBase::Dynamic);
     server = new M2MServer();
 
     delete m2mobjectinstance_stub::create_resource;
@@ -45,7 +46,7 @@ Test_M2MServer::~Test_M2MServer()
 
 void Test_M2MServer::test_create_resource_int()
 {
-//    m2mobjectinstance_stub::create_resource = new M2MResource("name","type",M2MBase::Dynamic);
+    m2mobjectinstance_stub::create_resource = new M2MResource("name","type",M2MResourceInstance::STRING,M2MBase::Dynamic);
 
     CHECK(server->create_resource(M2MServer::DefaultMinPeriod,10) != NULL);
     CHECK(server->create_resource(M2MServer::DefaultMaxPeriod,10) != NULL);
@@ -65,7 +66,7 @@ void Test_M2MServer::test_create_resource_int()
 
 void Test_M2MServer::test_create_resource()
 {
-//    m2mobjectinstance_stub::create_resource = new M2MResource("name","type",M2MBase::Dynamic);
+    m2mobjectinstance_stub::create_resource = new M2MResource("name","type",M2MResourceInstance::STRING,M2MBase::Dynamic);
 
     CHECK(server->create_resource(M2MServer::Disable) != NULL);
 
@@ -103,7 +104,7 @@ void Test_M2MServer::test_set_resource_value_int()
 {
     m2mbase_stub::bool_value = true;
 
-//    m2mobjectinstance_stub::resource = new M2MResource("name", "name", M2MBase::Dynamic);
+    m2mobjectinstance_stub::resource = new M2MResource("name", "name",M2MResourceInstance::STRING,M2MBase::Dynamic);
 
     CHECK(server->set_resource_value(M2MServer::DefaultMinPeriod,10) == true);
     CHECK(server->set_resource_value(M2MServer::DefaultMaxPeriod,10) == true);
@@ -122,9 +123,9 @@ void Test_M2MServer::test_set_resource_value_int()
 
 void Test_M2MServer::test_set_resource_value_string()
 {
-    m2mbase_stub::bool_value = true;
+    m2mresourceinstance_stub::bool_value = true;
 
-//    m2mobjectinstance_stub::resource = new M2MResource("name", "name", M2MBase::Dynamic);
+    m2mobjectinstance_stub::resource = new M2MResource("name", "name", M2MResourceInstance::STRING, M2MBase::Dynamic);
 
     CHECK(server->set_resource_value(M2MServer::Binding,"test") == true);
 
@@ -144,12 +145,12 @@ void Test_M2MServer::test_set_resource_value_string()
 void Test_M2MServer::test_resource_value_int()
 {
     uint8_t value[] = {"10"};
-    m2mbase_stub::value = (uint8_t*)malloc((uint32_t)sizeof(value));
-    memset(m2mbase_stub::value,0,(uint32_t)sizeof(value));
-    memcpy(m2mbase_stub::value,value,sizeof(value));
-    m2mbase_stub::int_value = (uint32_t)sizeof(value);
+    m2mresourceinstance_stub::value = (uint8_t*)malloc((uint32_t)sizeof(value));
+    memset(m2mresourceinstance_stub::value,0,(uint32_t)sizeof(value));
+    memcpy(m2mresourceinstance_stub::value,value,sizeof(value));
+    m2mresourceinstance_stub::int_value = (uint32_t)sizeof(value);
 
-//    m2mobjectinstance_stub::resource = new M2MResource("name", "name", M2MBase::Dynamic);
+    m2mobjectinstance_stub::resource = new M2MResource("name", "name", M2MResourceInstance::STRING, M2MBase::Dynamic);
 
    CHECK(server->resource_value_int(M2MServer::ShortServerID) == 10);
    CHECK(server->resource_value_int(M2MServer::DefaultMinPeriod) == 10);
@@ -164,8 +165,8 @@ void Test_M2MServer::test_resource_value_int()
    delete m2mobjectinstance_stub::resource;
    m2mobjectinstance_stub::resource = NULL;
 
-   free(m2mbase_stub::value);
-   m2mbase_stub::value = NULL;
+   free(m2mresourceinstance_stub::value);
+   m2mresourceinstance_stub::value = NULL;
 }
 
 void Test_M2MServer::test_resource_value_string()
@@ -173,12 +174,12 @@ void Test_M2MServer::test_resource_value_string()
     String test = "string";
     uint8_t value[] = {"string"};
 
-    m2mbase_stub::value = (uint8_t*)malloc((uint32_t)sizeof(value));
-    memset(m2mbase_stub::value,0,(uint32_t)sizeof(value));
-    memcpy(m2mbase_stub::value,value,sizeof(value));
-    m2mbase_stub::int_value = (uint32_t)sizeof(value);
+    m2mresourceinstance_stub::value = (uint8_t*)malloc((uint32_t)sizeof(value));
+    memset(m2mresourceinstance_stub::value,0,(uint32_t)sizeof(value));
+    memcpy(m2mresourceinstance_stub::value,value,sizeof(value));
+    m2mresourceinstance_stub::int_value = (uint32_t)sizeof(value);
 
-//    m2mobjectinstance_stub::resource = new M2MResource("name", "name", M2MBase::Dynamic);
+    m2mobjectinstance_stub::resource = new M2MResource("name", "name", M2MResourceInstance::STRING, M2MBase::Dynamic);
 
     CHECK(server->resource_value_string(M2MServer::Binding) == test);
 
@@ -194,13 +195,13 @@ void Test_M2MServer::test_resource_value_string()
     delete m2mobjectinstance_stub::resource;
     m2mobjectinstance_stub::resource = NULL;
 
-    free(m2mbase_stub::value);
-    m2mbase_stub::value = NULL;
+    free(m2mresourceinstance_stub::value);
+    m2mresourceinstance_stub::value = NULL;
 }
 
 void Test_M2MServer::test_is_resource_present()
 {
-//    m2mobjectinstance_stub::resource = new M2MResource("name","type",M2MBase::Dynamic);
+    m2mobjectinstance_stub::resource = new M2MResource("name","type",M2MResourceInstance::STRING,M2MBase::Dynamic);
 
     CHECK(server->is_resource_present(M2MServer::ShortServerID) == true);
 
@@ -212,17 +213,17 @@ void Test_M2MServer::test_is_resource_present()
 
 void Test_M2MServer::test_total_resource_count()
 {
-//    M2MResource *res = new M2MResource("test","test",M2MBase::Dynamic);
+    M2MResource *res = new M2MResource("test","test",M2MResourceInstance::STRING,M2MBase::Dynamic);
 
-//    m2mobjectinstance_stub::resource_list.push_back(res);
-//    M2MResource *res2 = new M2MResource("test","test",M2MBase::Dynamic);
+    m2mobjectinstance_stub::resource_list.push_back(res);
+    M2MResource *res2 = new M2MResource("test","test",M2MResourceInstance::STRING,M2MBase::Dynamic);
 
-//    m2mobjectinstance_stub::resource_list.push_back(res2);
+    m2mobjectinstance_stub::resource_list.push_back(res2);
 
-//    CHECK(server->total_resource_count() == 2);
+    CHECK(server->total_resource_count() == 2);
 
-//    m2mobjectinstance_stub::resource_list.clear();
+    m2mobjectinstance_stub::resource_list.clear();
 
-//    delete res2;
-//    delete res;
+    delete res2;
+    delete res;
 }

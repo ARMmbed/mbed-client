@@ -20,6 +20,7 @@
 #include "m2mobject_stub.h"
 #include "m2mobjectinstance_stub.h"
 #include "m2mresource_stub.h"
+#include "m2mresourceinstance_stub.h"
 #include "m2mresource.h"
 #include "m2mbase_stub.h"
 #include "m2mserver.h"
@@ -483,10 +484,10 @@ void Test_M2MNsdlInterface::test_resource_callback_get()
 
     m2mbase_stub::uint8_value = 1;
     uint8_t value2[] = {"v"};
-    m2mbase_stub::value = (uint8_t *)malloc(sizeof(value2));
-    memset( m2mbase_stub::value, 0, sizeof(value2));
-    memcpy(m2mbase_stub::value,value2,sizeof(value2));
-    m2mbase_stub::int_value = sizeof(value2);
+    m2mresourceinstance_stub::value = (uint8_t *)malloc(sizeof(value2));
+    memset( m2mresourceinstance_stub::value, 0, sizeof(value2));
+    memcpy(m2mresourceinstance_stub::value,value2,sizeof(value2));
+    m2mresourceinstance_stub::int_value = sizeof(value2);
 
     CHECK(nsdl->resource_callback(NULL,coap_header,address,SN_NSDL_PROTOCOL_HTTP) == 0);
 
@@ -541,8 +542,8 @@ void Test_M2MNsdlInterface::test_resource_callback_get()
     free(coap_header->options_list_ptr);
     coap_header->options_list_ptr = NULL;
 
-    free(m2mbase_stub::value);
-    m2mbase_stub::value = NULL;
+    free(m2mresourceinstance_stub::value);
+    m2mresourceinstance_stub::value = NULL;
 
     if(common_stub::coap_header){
         if( common_stub::coap_header->content_type_ptr ){
@@ -564,6 +565,7 @@ void Test_M2MNsdlInterface::test_resource_callback_get()
     delete name;
     name = NULL;
 
+    m2mresourceinstance_stub::clear();
     m2mbase_stub::clear();
     common_stub::clear();
     m2mobject_stub::clear();
@@ -1010,10 +1012,10 @@ void Test_M2MNsdlInterface::test_observation_to_be_sent()
                                        M2MBase::Dynamic,false);
 
     uint8_t value[] = {"value"};
-    m2mbase_stub::value = (uint8_t *)malloc(sizeof(value));
-    memset( m2mbase_stub::value, 0, sizeof(value));
-    memcpy(m2mbase_stub::value,value,sizeof(value));
-    m2mbase_stub::int_value = sizeof(value);
+    m2mresourceinstance_stub::value = (uint8_t *)malloc(sizeof(value));
+    memset( m2mresourceinstance_stub::value, 0, sizeof(value));
+    memcpy(m2mresourceinstance_stub::value,value,sizeof(value));
+    m2mresourceinstance_stub::int_value = sizeof(value);
 
     m2mbase_stub::uint16_value = 321;
     String *owned = new String("token");
@@ -1025,10 +1027,11 @@ void Test_M2MNsdlInterface::test_observation_to_be_sent()
     delete owned;
     owned = NULL;
 
-    free(m2mbase_stub::value);
-    m2mbase_stub::value = NULL;
+    free(m2mresourceinstance_stub::value);
+    m2mresourceinstance_stub::value = NULL;
 
     m2mbase_stub::clear();
+    m2mresourceinstance_stub::clear();
 
     delete res;
     res = NULL;

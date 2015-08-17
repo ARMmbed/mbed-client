@@ -46,15 +46,6 @@ M2MResourceInstance::M2MResourceInstance(const M2MResourceInstance& other)
 : M2MBase(other)
 {
     this->operator=(other);
-    _value_length = other._value_length;
-
-    if(other._value) {
-        _value = (uint8_t *)malloc(other._value_length+1);
-        if(_value) {
-            memset(_value, 0, other._value_length+1);
-            memcpy((uint8_t *)_value, (uint8_t *)other._value, other._value_length);
-        }
-    }
 }
 
 M2MResourceInstance::M2MResourceInstance(const String &res_name,
@@ -117,8 +108,8 @@ M2MResourceInstance::ResourceType M2MResourceInstance::resource_instance_type() 
 bool M2MResourceInstance::handle_observation_attribute(char *&query)
 {
     tr_debug("M2MResourceInstance::handle_observation_attribute()");
-    if (resource_instance_type() == M2MResourceInstance::INTEGER ||
-        resource_instance_type() == M2MResourceInstance::FLOAT ){
+    if (_resource_type == M2MResourceInstance::INTEGER ||
+        _resource_type == M2MResourceInstance::FLOAT ){
         return M2MBase::handle_observation_attribute(query);
     }
     else {

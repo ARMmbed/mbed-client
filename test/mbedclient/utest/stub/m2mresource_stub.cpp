@@ -34,7 +34,7 @@ M2MResource& M2MResource::operator=(const M2MResource& other)
 }
 
 M2MResource::M2MResource(const M2MResource& other)
-: M2MResource(other)
+: M2MResourceInstance(other)
 {
     *this = other;
 }

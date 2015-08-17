@@ -2,7 +2,7 @@ include ../makefile_defines.txt
 
 COMPONENT_NAME = m2mconnectionhandlerimpl_linux_unit
 SRC_FILES = \
-        ../../../../../lwm2m-client-linux/source/m2mconnectionhandlerimpl.cpp \
+        ../../../../../lwm2m-client-linux/source/m2mconnectionhandler.cpp \
         ../../../../../lwm2m-client-linux/source/connthreadhelper.cpp
 
 TEST_SRC_FILES = \

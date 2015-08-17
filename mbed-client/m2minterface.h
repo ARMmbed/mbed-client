@@ -90,15 +90,17 @@ public:
     /**
      * @brief Initiates bootstrapping of the client with the provided Bootstrap
      * server information.
+     * NOTE: This API is not supported for developers!!
      * @param security_object, Security object which contains information
-     * required for successful bootstrapping of the client.
+     * required for successful bootstrapping of the client.     
      */
     virtual void bootstrap(M2MSecurity *security_object) = 0;
 
     /**
      * @brief Cancels on going bootstrapping operation of the client. If the client has
      * already successfully bootstrapped then this function deletes existing
-     * bootstrap information from the client.
+     * bootstrap information from the client.     
+     * NOTE: This API is not supported for developers!!
      */
     virtual void cancel_bootstrap() = 0;
 

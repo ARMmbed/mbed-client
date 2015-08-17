@@ -124,37 +124,40 @@ void Test_M2MConnectionHandlerPimpl_mbed::test_start_listening_for_data()
 
 void Test_M2MConnectionHandlerPimpl_mbed::test_send_handler()
 {
-    handler->send_handler(SOCKET_ERROR_NONE);
+    handler->send_handler(NULL, 10);
     CHECK(observer->dataSent == true);
-
-    handler->send_handler(SOCKET_ERROR_BAD_FAMILY);
-    CHECK(observer->error == true);
 }
 
 void Test_M2MConnectionHandlerPimpl_mbed::test_receive_handler()
 {
     handler->_network_stack = M2MInterface::LwIP_IPv4;
-    handler->receive_handler(SOCKET_ERROR_NONE);
+    handler->receive_handler(NULL);
     CHECK(observer->dataAvailable == true);
 
     observer->dataAvailable = false;
     handler->_network_stack = M2MInterface::Nanostack_IPv6;
-    handler->receive_handler(SOCKET_ERROR_NONE);
+    handler->receive_handler(NULL);
     CHECK(observer->dataAvailable == true);
 
-    handler->receive_handler(SOCKET_ERROR_BAD_FAMILY);
+    handler->receive_handler(NULL);
     CHECK(observer->error == true);
+
+    common_stub::error = SOCKET_ERROR_BAD_FAMILY;
+    handler->receive_handler(NULL);
+    CHECK(observer->error == true);
+
+    common_stub::error = SOCKET_ERROR_NONE;
 
     M2MConnectionSecurity* conSec = new M2MConnectionSecurity();
     handler->_security_impl = conSec;
     handler->_use_secure_connection = true;
     m2mconnectionsecurityimpl_stub::int_value = -5;
-    handler->receive_handler(SOCKET_ERROR_NONE);
+    handler->receive_handler(NULL);
     CHECK(observer->error == true);
 
     observer->dataAvailable = false;
     m2mconnectionsecurityimpl_stub::int_value = 5;
-    handler->receive_handler(SOCKET_ERROR_NONE);
+    handler->receive_handler(NULL);
     CHECK(observer->dataAvailable == true);
 
     handler->_security_impl = NULL;
@@ -165,16 +168,16 @@ void Test_M2MConnectionHandlerPimpl_mbed::test_receive_handshake_handler()
 {
     handler->_is_handshaking = true;
     m2mconnectionsecurityimpl_stub::int_value = M2MConnectionHandler::CONNECTION_ERROR_WANTS_READ;
-    handler->receive_handshake_handler(SOCKET_ERROR_NONE);
+    handler->receive_handshake_handler(NULL);
     CHECK(true == handler->_is_handshaking);
 
     m2mconnectionsecurityimpl_stub::int_value = 0;
-    handler->receive_handshake_handler(SOCKET_ERROR_NONE);
+    handler->receive_handshake_handler(NULL);
     CHECK(false == handler->_is_handshaking);
 
     handler->_is_handshaking = true;
     m2mconnectionsecurityimpl_stub::int_value = -10;
-    handler->receive_handshake_handler(SOCKET_ERROR_NONE);
+    handler->receive_handshake_handler(NULL);
     CHECK(false == handler->_is_handshaking);
 }
 
@@ -183,15 +186,18 @@ void Test_M2MConnectionHandlerPimpl_mbed::test_dns_handler()
     common_stub::event = (socket_event_t*)malloc(sizeof(socket_event_t));
     memset(common_stub::event, 0, sizeof(socket_event_t));
     handler->_network_stack = M2MInterface::LwIP_IPv4;
+    common_stub::bool_value = true;
 
-    handler->dns_handler(SOCKET_ERROR_NONE);
+    socket_addr sa;
+    handler->dns_handler(NULL,sa,NULL);
     CHECK(observer->addressReady == true);
 
+    common_stub::bool_value = false;
     handler->_network_stack = M2MInterface::Nanostack_IPv6;
-    handler->dns_handler(SOCKET_ERROR_NONE);
+    handler->dns_handler(NULL,sa,NULL);
     CHECK(observer->addressReady == true);
 
-    handler->dns_handler(SOCKET_ERROR_BAD_FAMILY);
+    handler->dns_handler(NULL,sa,NULL);
     CHECK(observer->error == true);
 
     M2MConnectionSecurity* conSec = new M2MConnectionSecurity();
@@ -200,11 +206,11 @@ void Test_M2MConnectionHandlerPimpl_mbed::test_dns_handler()
     m2mconnectionsecurityimpl_stub::int_value = -5;
     m2msecurity_stub::int_value = M2MSecurity::Psk;
 
-    handler->dns_handler(SOCKET_ERROR_NONE);
+    handler->dns_handler(NULL,sa,NULL);
     CHECK(false == handler->_is_handshaking);
 
     m2mconnectionsecurityimpl_stub::int_value = 5;
-    handler->dns_handler(SOCKET_ERROR_NONE);
+    handler->dns_handler(NULL,sa,NULL);
     CHECK(true == handler->_is_handshaking);
 
     handler->_security_impl = NULL;
@@ -215,7 +221,7 @@ void Test_M2MConnectionHandlerPimpl_mbed::test_dns_handler()
 
 void Test_M2MConnectionHandlerPimpl_mbed::test_error_handler()
 {
-    handler->error_handler(SOCKET_ERROR_BAD_FAMILY);
+    handler->error_handler(NULL,SOCKET_ERROR_BAD_FAMILY);
     CHECK(observer->error == true);
 }
 

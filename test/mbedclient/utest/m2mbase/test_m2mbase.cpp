@@ -294,6 +294,14 @@ void Test_M2MBase::test_name()
     CHECK(test == name());
 }
 
+void Test_M2MBase::test_name_id()
+{
+    int id = 10;
+    this->_name_id = id;
+
+    CHECK(id == name_id());
+}
+
 void Test_M2MBase::test_instance_id()
 {
     u_int16_t test = 1;
@@ -434,4 +442,52 @@ void Test_M2MBase::test_remove_object_from_coap()
     remove_object_from_coap();
 
     CHECK(handler.visited == true);
+}
+
+void Test_M2MBase::test_handle_get_request()
+{
+    CHECK(this->handle_get_request(NULL,NULL,NULL) == NULL);
+}
+
+void Test_M2MBase::test_handle_put_request()
+{
+    CHECK(this->handle_put_request(NULL,NULL,NULL) == NULL);
+}
+
+void Test_M2MBase::test_handle_post_request()
+{
+    CHECK(this->handle_post_request(NULL,NULL,NULL) == NULL);
+}
+
+void Test_M2MBase::test_memory_alloc()
+{
+    CHECK(memory_alloc(0) == 0);
+    uint8_t *ptr = 0;
+    ptr = (uint8_t*)memory_alloc(sizeof(uint8_t));
+    CHECK(ptr != NULL);
+    memory_free(ptr);
+}
+
+void Test_M2MBase::test_memory_free()
+{
+    uint8_t *ptr = (uint8_t*)memory_alloc(sizeof(uint8_t));
+    memory_free((void*)ptr);
+    //memory leak test will fail, if there is a leak, so no need for CHECK
+}
+
+void Test_M2MBase::test_report_handler()
+{
+    CHECK(report_handler() == NULL);
+}
+
+void Test_M2MBase::test_observation_handler()
+{
+    CHECK(observation_handler() == NULL);
+}
+
+void Test_M2MBase::test_id_number()
+{
+    M2MBase b("10", M2MBase::Static);
+    printf("name ID %d", b.name_id());
+    CHECK(b.name_id() == 10);
 }

@@ -101,10 +101,12 @@ M2MResource* M2MServer::create_resource(ServerResource resource, uint32_t value)
             if(res) {
                 res->set_operation(M2MBase::GET_PUT_POST_ALLOWED);
                 // If resource is created then set the value.
-                char *buffer = (char*)memory_alloc(20);
-                int size = snprintf(buffer, 20,"%ld",(long int)value);
-                res->set_value((const uint8_t*)buffer,(const uint32_t)size);
-                memory_free(buffer);
+                char *buffer = (char*)malloc(20);
+                if(buffer) {
+                    int size = snprintf(buffer, 20,"%ld",(long int)value);
+                    res->set_value((const uint8_t*)buffer,(const uint32_t)size);
+                    free(buffer);
+                }
             }
         }
     }
@@ -183,11 +185,13 @@ bool M2MServer::set_resource_value(ServerResource resource,
            M2MServer::NotificationStorage == resource) {
             // If it is any of the above resource
             // set the value of the resource.
-            char *buffer = (char*)memory_alloc(20);
-            int size = snprintf(buffer, 20,"%ld",(long int)value);
-            success = res->set_value((const uint8_t*)buffer,
-                                     (const uint32_t)size);
-            memory_free(buffer);
+            char *buffer = (char*)malloc(20);
+            if(buffer) {
+                int size = snprintf(buffer, 20,"%ld",(long int)value);
+                success = res->set_value((const uint8_t*)buffer,
+                                         (const uint32_t)size);
+                free(buffer);
+            }
         }
     }
     return success;
@@ -209,12 +213,12 @@ String M2MServer::resource_value_string(ServerResource resource) const
 
             String s_name(char_buffer);
             value = s_name;
-            if(buffer) {
-                free(buffer);
-            }
             if(char_buffer) {
                 free(char_buffer);
             }
+        }
+        if(buffer) {
+            free(buffer);
         }
     }
     return value;

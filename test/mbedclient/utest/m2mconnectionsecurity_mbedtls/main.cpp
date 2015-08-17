@@ -13,36 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef TEST_M2M_CONNECTION_SECURITY_IMPL_H
-#define TEST_M2M_CONNECTION_SECURITY_IMPL_H
-
-#include "m2mconnectionsecurity.h"
-
-class Test_M2MConnectionSecurityImpl
+#include "CppUTest/CommandLineTestRunner.h"
+#include "CppUTest/TestPlugin.h"
+#include "CppUTest/TestRegistry.h"
+#include "CppUTestExt/MockSupportPlugin.h"
+int main(int ac, char** av)
 {
-public:
-    Test_M2MConnectionSecurityImpl();
+    return CommandLineTestRunner::RunAllTests(ac, av);
+}
 
-    virtual ~Test_M2MConnectionSecurityImpl();
-
-    void test_constructor();
-
-    void test_destructor();
-
-    void test_reset();
-
-    void test_init();
-
-    void test_connect();
-
-    void test_start_connecting_non_blocking();
-
-    void test_continue_connecting();
-
-    void test_send_message();
-
-    void test_read();
-};
-
-
-#endif // TEST_M2M_CONNECTION_SECURITY_IMPL_H
+IMPORT_TEST_GROUP(M2MConnectionSecurity_mbedtls);

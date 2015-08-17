@@ -176,12 +176,14 @@ M2MResource* M2MDevice::create_resource(DeviceResource resource, int64_t value)
 
             if(res) {
                 char *buffer = (char*)memory_alloc(20);
-                int size = snprintf(buffer, 20,"%lld",value);
+                if(buffer) {
+                    int size = snprintf(buffer, 20,"%ld",value);
 
-                res->set_operation(operation);
-                res->set_value((const uint8_t*)buffer,
-                               (const uint32_t)size);
-                memory_free(buffer);
+                    res->set_operation(operation);
+                    res->set_value((const uint8_t*)buffer,
+                                   (const uint32_t)size);
+                    memory_free(buffer);
+                }
             }
         }
     }
@@ -216,12 +218,14 @@ M2MResourceInstance* M2MDevice::create_resource_instance(DeviceResource resource
 
             if(res) {
                 char *buffer = (char*)memory_alloc(20);
-                int size = snprintf(buffer, 20,"%lld",value);
-                // Only read operation is allowed for above resources
-                res->set_operation(M2MBase::GET_ALLOWED);
-                res->set_value((const uint8_t*)buffer,
-                               (const uint32_t)size);
-                memory_free(buffer);
+                if(buffer) {
+                    int size = snprintf(buffer, 20,"%lld",value);
+                    // Only read operation is allowed for above resources
+                    res->set_operation(M2MBase::GET_ALLOWED);
+                    res->set_value((const uint8_t*)buffer,
+                                   (const uint32_t)size);
+                    memory_free(buffer);
+                }
             }
         }
     }
@@ -320,10 +324,12 @@ bool M2MDevice::set_resource_value(DeviceResource resource,
             // set the value of the resource.
 
             char *buffer = (char*)memory_alloc(20);
-            int size = snprintf(buffer, 20,"%lld",value);
-            success = res->set_value((const uint8_t*)buffer,
-                                     (const uint32_t)size);
-            memory_free(buffer);
+            if(buffer) {
+                int size = snprintf(buffer, 20,"%lld",value);
+                success = res->set_value((const uint8_t*)buffer,
+                                         (const uint32_t)size);
+                memory_free(buffer);
+            }
         }
     }
     return success;
@@ -356,12 +362,12 @@ String M2MDevice::resource_value_string(DeviceResource resource,
 
                 String s_name(char_buffer);
                 value = s_name;
-                if(buffer) {
-                    free(buffer);
-                }
                 if(char_buffer) {
                     free(char_buffer);
                 }
+            }
+            if(buffer) {
+                free(buffer);
             }
         }
     }

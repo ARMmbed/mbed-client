@@ -119,12 +119,14 @@ M2MResource* M2MSecurity::create_resource(SecurityResource resource, uint32_t va
                                                             false);
 
             if(res) {
-                char *buffer = (char*)memory_alloc(20);
-                int size = snprintf(buffer, 20,"%ld",(long int)value);
-                res->set_operation(M2MBase::NOT_ALLOWED);
-                res->set_value((const uint8_t*)buffer,
-                               (const uint32_t)size);
-                memory_free(buffer);
+                char *buffer = (char*)malloc(20);
+                if(buffer) {
+                    int size = snprintf(buffer, 20,"%ld",(long int)value);
+                    res->set_operation(M2MBase::NOT_ALLOWED);
+                    res->set_value((const uint8_t*)buffer,
+                                   (const uint32_t)size);
+                    free(buffer);
+                }
             }
         }
     }
@@ -189,10 +191,12 @@ bool M2MSecurity::set_resource_value(SecurityResource resource,
             // If it is any of the above resource
             // set the value of the resource.
             char *buffer = (char*)malloc(20);
-            int size = snprintf(buffer, 20,"%ld",(long int)value);
-            success = res->set_value((const uint8_t*)buffer,
-                                     (const uint32_t)size);
-            free(buffer);
+            if(buffer) {
+                int size = snprintf(buffer, 20,"%ld",(long int)value);
+                success = res->set_value((const uint8_t*)buffer,
+                                         (const uint32_t)size);
+                free(buffer);
+            }
         }
     }
     return success;
@@ -228,12 +232,14 @@ String M2MSecurity::resource_value_string(SecurityResource resource) const
             if(char_buffer) {
                 memset(char_buffer,0,length+1);
                 if(buffer) {
-                    memcpy(char_buffer,(char*)buffer,length);
-                    free(buffer);
+                    memcpy(char_buffer,(char*)buffer,length);                    
                 }
                 String s_name(char_buffer);
                 value = s_name;
                 free(char_buffer);
+            }
+            if(buffer) {
+                free(buffer);
             }
         }
     }

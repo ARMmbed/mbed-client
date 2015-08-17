@@ -56,8 +56,12 @@ M2MResource* M2MDevice::create_resource(DeviceResource)
     return m2mdevice_stub::resource;
 }
 
-bool M2MDevice::delete_resource(DeviceResource,
-                                uint16_t)
+bool M2MDevice::delete_resource(DeviceResource)
+{
+    return m2mdevice_stub::bool_value;
+}
+
+bool M2MDevice::delete_resource_instance(DeviceResource, uint16_t)
 {
     return m2mdevice_stub::bool_value;
 }
@@ -70,7 +74,7 @@ bool M2MDevice::set_resource_value(DeviceResource,
 }
 
 bool M2MDevice::set_resource_value(DeviceResource,
-                                       uint32_t,
+                                       int64_t,
                                        uint16_t)
 {
     return m2mdevice_stub::bool_value;
@@ -82,7 +86,7 @@ String M2MDevice::resource_value_string(DeviceResource,
     return m2mdevice_stub::string_value;
 }
 
-uint32_t M2MDevice::resource_value_int(DeviceResource,
+int64_t M2MDevice::resource_value_int(DeviceResource,
                                       uint16_t) const
 {
     return m2mdevice_stub::int_value;

@@ -131,7 +131,7 @@ void Test_M2MInterfaceImpl::test_register_object()
 
     M2MObject *object = new M2MObject("test");
     M2MObjectInstance *ins = object->create_object_instance();
-    ins->create_dynamic_resource("test","type",false);
+    ins->create_dynamic_resource("test","type",M2MResourceInstance::STRING,false,false);
 
     M2MObjectList list;
     list.push_back(object);
