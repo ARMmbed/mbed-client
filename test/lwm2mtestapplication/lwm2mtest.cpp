@@ -304,7 +304,7 @@ bool M2MLWClient::create_static_resource_int(const char *name,
     return success;
 }
 
-bool M2MLWClient::create_dynamic_resource(const char *name,
+bool M2MLWClient::create_dynamic_resource_string(const char *name,
                                           bool observable,
                                           bool multiple_instance,
                                           uint16_t object_instance,
@@ -319,7 +319,33 @@ bool M2MLWClient::create_dynamic_resource(const char *name,
         M2MObjectInstance *inst = _object->object_instance(object_instance);
         if(inst) {
             M2MResource *res = inst->create_dynamic_resource(name,"resource",
-                                                             M2MResourceInstance::OPAQUE,
+                                                             M2MResourceInstance::STRING,
+                                                             observable);
+            if(res) {
+                success = true;
+                res->set_operation(int_to_operation(resource_operation));
+            }
+        }
+    }
+    return success;
+}
+
+bool M2MLWClient::create_dynamic_resource_int(const char *name,
+                                          bool observable,
+                                          bool multiple_instance,
+                                          uint16_t object_instance,
+                                          uint8_t resource_operation)
+{
+    bool success = false;
+    String name_string;
+    if(name) {
+        name_string += name;
+    }
+    if(_object) {
+        M2MObjectInstance *inst = _object->object_instance(object_instance);
+        if(inst) {
+            M2MResource *res = inst->create_dynamic_resource(name,"resource",
+                                                             M2MResourceInstance::INTEGER,
                                                              observable);
             if(res) {
                 success = true;
@@ -450,7 +476,7 @@ bool M2MLWClient::create_static_resource_instance_int(const char *name,
     return success;
 }
 
-bool M2MLWClient::create_dynamic_resource_instance(const char *name,
+bool M2MLWClient::create_dynamic_resource_instance_int(const char *name,
                                                    bool observable,
                                                    bool multiple_instance,
                                                    uint16_t object_instance,
@@ -466,7 +492,35 @@ bool M2MLWClient::create_dynamic_resource_instance(const char *name,
         M2MObjectInstance *inst = _object->object_instance(object_instance);
         if(inst) {
             M2MResourceInstance *res = inst->create_dynamic_resource_instance(name,"resource",
-                                                                      M2MResourceInstance::OPAQUE,
+                                                                      M2MResourceInstance::INTEGER,
+                                                                      observable,
+                                                                      resource_instance);
+            if( res) {
+                success = true;
+                res->set_operation(int_to_operation(resource_instance_operation));
+            }
+        }
+    }
+    return success;
+}
+
+bool M2MLWClient::create_dynamic_resource_instance_string(const char *name,
+                                                   bool observable,
+                                                   bool multiple_instance,
+                                                   uint16_t object_instance,
+                                                   uint16_t resource_instance,
+                                                   uint8_t resource_instance_operation)
+{
+    bool success = false;
+    String name_string;
+    if(name) {
+        name_string += name;
+    }
+    if(_object) {
+        M2MObjectInstance *inst = _object->object_instance(object_instance);
+        if(inst) {
+            M2MResourceInstance *res = inst->create_dynamic_resource_instance(name,"resource",
+                                                                      M2MResourceInstance::STRING,
                                                                       observable,
                                                                       resource_instance);
             if( res) {

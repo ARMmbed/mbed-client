@@ -85,6 +85,7 @@
                                     "   --object_instance <n> Instance Id of the object this resource is associated with, default is 0\n"\
                                     "   --resource_instance <n> Instance Id of the resource associated with, default is 0\n"\
                                     "   --name <name>       Resource name\n"\
+                                    "   --value_type <n>    Value Type String=0, Integer=1(default)\n"\
                                     "   --observable <n>    Resource is observable false=0(default), true=1\n"\
                                     "   --multiple_instance <n> Supports multiple instances, false=0(default), true=1\n"\
                                     "   --resource_instance_operation <n> Operation Mode, Default is  1, NOT_ALLOWED = 0, GET_ALLOWED = 1,\n"\
@@ -516,19 +517,35 @@ int lwm2m_client_dynamic_resource_command(int argc, char *argv[])
     int32_t object_instance = 0;
     int32_t observable = 0;
     int32_t resource_operation = 1;
+    int32_t value_type = -1;
 
+    cmd_parameter_int(argc, argv, "--value_type", &value_type);
     cmd_parameter_int(argc, argv, "--multiple_instance", &multiple_instance);
     cmd_parameter_int(argc, argv, "--object_instance", &object_instance);
     cmd_parameter_int(argc, argv, "--observable", &observable);
     cmd_parameter_int(argc, argv, "--resource_operation", &resource_operation);
+    if(-1 == value_type){
+        value_type = 1;
+    }
 
     if(cmd_parameter_val(argc, argv, "--name", &name)) {
-        if(lwm2m_client.create_dynamic_resource(name,observable,
-                                                multiple_instance,
-                                                object_instance,
-                                                resource_operation)) {
-            return_code =  CMDLINE_RETCODE_SUCCESS;
+        if(0 == value_type) {
+            if(lwm2m_client.create_dynamic_resource_string(name,observable,
+                                                    multiple_instance,
+                                                    object_instance,
+                                                    resource_operation)) {
+                return_code =  CMDLINE_RETCODE_SUCCESS;
+            }
         }
+        else if(1 == value_type){
+            if(lwm2m_client.create_dynamic_resource_int(name,observable,
+                                                    multiple_instance,
+                                                    object_instance,
+                                                    resource_operation)) {
+                return_code =  CMDLINE_RETCODE_SUCCESS;
+            }
+        }
+
     }
     return return_code;
 }
@@ -583,20 +600,36 @@ int lwm2m_client_dynamic_resource_instance_command(int argc, char *argv[])
     int32_t resource_instance = 0;
     int32_t observable = 0;
     int32_t resource_instance_operation = 1;
+    int32_t value_type = -1;
 
+    cmd_parameter_int(argc, argv, "--value_type", &value_type);
     cmd_parameter_int(argc, argv, "--multiple_instance", &multiple_instance);
     cmd_parameter_int(argc, argv, "--object_instance", &object_instance);
     cmd_parameter_int(argc, argv, "--resource_instance", &resource_instance);
     cmd_parameter_int(argc, argv, "--observable", &observable);
-    cmd_parameter_int(argc, argv, "--resource_instance_operation", &resource_instance_operation);
+    cmd_parameter_int(argc, argv, "--resource_instance_operation", &resource_instance_operation);    
+    if(-1 == value_type){
+        value_type = 1;
+    }
 
     if(cmd_parameter_val(argc, argv, "--name", &name)) {
-        if(lwm2m_client.create_dynamic_resource_instance(name,observable,
-                                                         multiple_instance,
-                                                         object_instance,
-                                                         resource_instance,
-                                                         resource_instance_operation)) {
-            return_code =  CMDLINE_RETCODE_SUCCESS;
+        if(0 == value_type){
+            if(lwm2m_client.create_dynamic_resource_instance_string(name,observable,
+                                                             multiple_instance,
+                                                             object_instance,
+                                                             resource_instance,
+                                                             resource_instance_operation)) {
+                return_code =  CMDLINE_RETCODE_SUCCESS;
+            }
+        }
+        else if(1 == value_type){
+            if(lwm2m_client.create_dynamic_resource_instance_int(name,observable,
+                                                             multiple_instance,
+                                                             object_instance,
+                                                             resource_instance,
+                                                             resource_instance_operation)) {
+                return_code =  CMDLINE_RETCODE_SUCCESS;
+            }
         }
     }
     return return_code;

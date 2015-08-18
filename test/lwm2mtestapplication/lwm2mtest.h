@@ -69,7 +69,12 @@ public:
                                     bool multiple_instance,
                                     uint16_t object_instance = 0);
 
-    bool create_dynamic_resource(const char *name,
+    bool create_dynamic_resource_int(const char *name,
+                                 bool observable,
+                                 bool multiple_instance,
+                                 uint16_t object_instance = 0,
+                                 uint8_t resource_operation = 1);
+    bool create_dynamic_resource_string(const char *name,
                                  bool observable,
                                  bool multiple_instance,
                                  uint16_t object_instance = 0,
@@ -95,7 +100,13 @@ public:
                                              uint16_t object_instance = 0,
                                              uint16_t resource_instance = 0);
 
-    bool create_dynamic_resource_instance(const char *name,
+    bool create_dynamic_resource_instance_int(const char *name,
+                                          bool observable,
+                                          bool multiple_instance,
+                                          uint16_t object_instance = 0,
+                                          uint16_t resource_instance = 0,
+                                          uint8_t resource_instance_operation = 1);
+    bool create_dynamic_resource_instance_string(const char *name,
                                           bool observable,
                                           bool multiple_instance,
                                           uint16_t object_instance = 0,
