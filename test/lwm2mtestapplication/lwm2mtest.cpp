@@ -190,7 +190,7 @@ bool M2MLWClient::create_device_object()
 }
 
 bool M2MLWClient::create_device_object(M2MDevice::DeviceResource resource,
-                          uint32_t value)
+                          int64_t value)
 {
     bool success = false;
     if(!_device) {
@@ -207,7 +207,7 @@ bool M2MLWClient::create_device_object(M2MDevice::DeviceResource resource,
 }
 
 bool M2MLWClient::create_device_object(M2MDevice::DeviceResource resource,
-                                       uint32_t value,
+                                       int64_t value,
                                        uint16_t instance_id)
 {
     bool success = false;
@@ -284,7 +284,7 @@ bool M2MLWClient::create_static_resource_string(const char *name,
 }
 
 bool M2MLWClient::create_static_resource_int(const char *name,
-                                             uint32_t value,
+                                             int64_t value,
                                              bool multiple_instance,
                                              uint16_t object_instance)
 {
@@ -297,7 +297,7 @@ bool M2MLWClient::create_static_resource_int(const char *name,
     }
 
     char value_buffer[20];
-    sprintf(value_buffer,"%d",value);
+    sprintf(value_buffer,"%ld",value);
     value_string += value_buffer;
 
     if(_object) {
@@ -454,7 +454,7 @@ bool M2MLWClient::create_static_resource_instance_string(const char *name,
 }
 
 bool M2MLWClient::create_static_resource_instance_int(const char *name,
-                                                      uint32_t value,
+                                                      int64_t value,
                                                       bool multiple_instance,
                                                       uint16_t object_instance,
                                                       uint16_t resource_instance)
@@ -468,7 +468,7 @@ bool M2MLWClient::create_static_resource_instance_int(const char *name,
     }
 
     char value_buffer[20];
-    sprintf(value_buffer,"%d",value);
+    sprintf(value_buffer,"%ld",value);
     value_string += value_buffer;
 
     if(_object) {
@@ -567,7 +567,7 @@ bool M2MLWClient::set_resource_instance_value(const char *name,
                 if(res_inst) {
                     if (res_inst->set_value((const uint8_t*)value_string.c_str(), value_string.size())) {
                         success = true;
-                    }                    
+                    }
                 }
             }
         }

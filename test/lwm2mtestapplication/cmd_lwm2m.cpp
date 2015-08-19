@@ -609,7 +609,7 @@ int lwm2m_client_dynamic_resource_instance_command(int argc, char *argv[])
     cmd_parameter_int(argc, argv, "--object_instance", &object_instance);
     cmd_parameter_int(argc, argv, "--resource_instance", &resource_instance);
     cmd_parameter_int(argc, argv, "--observable", &observable);
-    cmd_parameter_int(argc, argv, "--resource_instance_operation", &resource_instance_operation);    
+    cmd_parameter_int(argc, argv, "--resource_instance_operation", &resource_instance_operation);
     if(-1 == value_type){
         value_type = 1;
     }
