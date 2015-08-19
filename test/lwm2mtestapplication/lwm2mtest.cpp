@@ -44,7 +44,7 @@ M2MLWClient::~M2MLWClient()
 
 
 bool M2MLWClient::create_interface(int32_t param_count,
-					  const char *endpoint,
+                      const char *endpoint,
                       const char *resource_type,
                       const int32_t lifetime,
                       const uint16_t listen_port,
@@ -75,25 +75,25 @@ bool M2MLWClient::create_interface(int32_t param_count,
     }
 
     switch (param_count) {
-		case 0:
-			_interface = M2MInterfaceFactory::create_interface(*this, ep, rt);
-			break;
-		case 1:
-			_interface = M2MInterfaceFactory::create_interface(*this, ep, rt, lifetime);
-			break;
-		case 2:
-			_interface = M2MInterfaceFactory::create_interface(*this, ep, rt, lifetime, listen_port);
-			break;
-		case 3:
-			_interface = M2MInterfaceFactory::create_interface(*this, ep, rt, lifetime, listen_port, dmn);
-			break;
-		case 4:
-			_interface = M2MInterfaceFactory::create_interface(*this, ep, rt, lifetime, listen_port, dmn, (M2MInterface::BindingMode)binding_mode);
-			break;
-		case 5:
-			_interface = M2MInterfaceFactory::create_interface(*this, ep, rt, lifetime, listen_port, dmn, (M2MInterface::BindingMode)binding_mode, (M2MInterface::NetworkStack)network_interface);
-			break;
-	}
+        case 0:
+            _interface = M2MInterfaceFactory::create_interface(*this, ep, rt);
+            break;
+        case 1:
+            _interface = M2MInterfaceFactory::create_interface(*this, ep, rt, lifetime);
+            break;
+        case 2:
+            _interface = M2MInterfaceFactory::create_interface(*this, ep, rt, lifetime, listen_port);
+            break;
+        case 3:
+            _interface = M2MInterfaceFactory::create_interface(*this, ep, rt, lifetime, listen_port, dmn);
+            break;
+        case 4:
+            _interface = M2MInterfaceFactory::create_interface(*this, ep, rt, lifetime, listen_port, dmn, (M2MInterface::BindingMode)binding_mode);
+            break;
+        case 5:
+            _interface = M2MInterfaceFactory::create_interface(*this, ep, rt, lifetime, listen_port, dmn, (M2MInterface::BindingMode)binding_mode, (M2MInterface::NetworkStack)network_interface);
+            break;
+    }
     return (_interface == NULL) ? false : true;
 }
 
@@ -117,7 +117,7 @@ bool M2MLWClient::create_bootstrap_object(const char *coap_bootstrap_address)
     return success;
 }
 
-bool M2MLWClient::create_register_object(const char *coap_register_address)
+bool M2MLWClient::create_register_object(const char *coap_register_address, bool useSecureConn)
 {
     bool success = false;
     String address;
@@ -129,9 +129,19 @@ bool M2MLWClient::create_register_object(const char *coap_register_address)
     }
     _register_security = M2MInterfaceFactory::create_security(M2MSecurity::M2MServer);
     if(_register_security) {
-        if(_register_security->set_resource_value(M2MSecurity::M2MServerUri, address) &&
-           _register_security->set_resource_value(M2MSecurity::SecurityMode, M2MSecurity::NoSecurity)) {
-            success = true;
+        if( !useSecureConn ){
+            if(_register_security->set_resource_value(M2MSecurity::M2MServerUri, address) &&
+               _register_security->set_resource_value(M2MSecurity::SecurityMode, M2MSecurity::NoSecurity)) {
+                success = true;
+            }
+        }else{
+            if(_register_security->set_resource_value(M2MSecurity::M2MServerUri, address) &&
+               _register_security->set_resource_value(M2MSecurity::SecurityMode, M2MSecurity::Certificate) &&
+               _register_security->set_resource_value(M2MSecurity::ServerPublicKey,server_cert,server_cert_len) &&
+               _register_security->set_resource_value(M2MSecurity::PublicKey,cert,cert_len) &&
+               _register_security->set_resource_value(M2MSecurity::Secretkey,key,key_len) ){
+                success = true;
+            }
         }
     }
     return success;

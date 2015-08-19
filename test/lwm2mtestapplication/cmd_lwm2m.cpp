@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 #include <string.h>
-#include <stdlib.h> 
+#include <stdlib.h>
 #include <stdarg.h>
 
 //libServices
@@ -118,6 +118,7 @@
                                     "<p>:\n"\
                                     "   Options for register command\n"\
                                     "   --address <name>            mbed Device Server address, format is coap://192.168.0.1:5683\n"\
+                                    "   --secure <number>           1 == secure mode, non-secure otherwise (remember: secure port is 5684)\n"\
                                     "register                       Issues Register command\n"\
                                     "update-register <p> [options]  Issues Update registration command\n"\
                                     "<p>:\n"\
@@ -166,6 +167,7 @@ void  lwm2m_command_init(void)
   cmd_alias_add("lwm2m-client-test-device", "lwm2m-client device --manufacturer ARM --model_number 2015 --serial_number 12345");
   cmd_alias_add("lwm2m-client-test-bootstrap-object", "lwm2m-client bootstrap_object --address coap://10.45.3.10:5693");
   cmd_alias_add("lwm2m-client-test-register-object", "lwm2m-client register_object --address coap://10.45.3.10:5683");
+  cmd_alias_add("lwm2m-client-test-secure-register-object", "lwm2m-client register_object --address coap://10.45.3.10:5684 --secure 1");
   cmd_add("exit", exit_command, "exit command", EXIT_MANUAL);
 }
 char *test_mem_block = 0;
@@ -249,62 +251,62 @@ int lwm2m_client_setup_command(int argc, char *argv[])
     int32_t network_interface = 1;
 
     if (!cmd_parameter_val(argc, argv, "--endpoint", &endpoint)) {
-    	return CMDLINE_RETCODE_INVALID_PARAMETERS;
+        return CMDLINE_RETCODE_INVALID_PARAMETERS;
     }
     int opt_params = 0;
     cmd_parameter_val(argc, argv, "--type", &type);
     if (cmd_parameter_int(argc, argv, "--lifetime", &lifetime)) {
-    	if (opt_params != 0) {
-			return CMDLINE_RETCODE_INVALID_PARAMETERS;
-		}
-		else {
-			opt_params += 1;
-		}
+        if (opt_params != 0) {
+            return CMDLINE_RETCODE_INVALID_PARAMETERS;
+        }
+        else {
+            opt_params += 1;
+        }
     }
     if (cmd_parameter_int(argc, argv, "--port", &port)) {
-    	if (port > UINT16_MAX || opt_params != 1) {
-    		return CMDLINE_RETCODE_INVALID_PARAMETERS;
-    	}
-    	else {
-    		opt_params += 1;
-    	}
+        if (port > UINT16_MAX || opt_params != 1) {
+            return CMDLINE_RETCODE_INVALID_PARAMETERS;
+        }
+        else {
+            opt_params += 1;
+        }
     }
-	if (cmd_parameter_val(argc, argv, "--domain", &domain)) {
-    	if (opt_params != 2) {
-    		return CMDLINE_RETCODE_INVALID_PARAMETERS;
-    	}
-    	else {
-    		opt_params += 1;
-    	}
+    if (cmd_parameter_val(argc, argv, "--domain", &domain)) {
+        if (opt_params != 2) {
+            return CMDLINE_RETCODE_INVALID_PARAMETERS;
+        }
+        else {
+            opt_params += 1;
+        }
     }
-	if (cmd_parameter_int(argc, argv, "--binding_mode", &binding_mode)) {
-		if (opt_params != 3) {
-			return CMDLINE_RETCODE_INVALID_PARAMETERS;
-		}
-		else {
-			opt_params += 1;
-		}
-	}
-	if (cmd_parameter_int(argc, argv, "--network_interface", &network_interface)) {
-		if (opt_params != 4) {
-			return CMDLINE_RETCODE_INVALID_PARAMETERS;
-		}
-		else {
-			opt_params += 1;
-		}
-	}
+    if (cmd_parameter_int(argc, argv, "--binding_mode", &binding_mode)) {
+        if (opt_params != 3) {
+            return CMDLINE_RETCODE_INVALID_PARAMETERS;
+        }
+        else {
+            opt_params += 1;
+        }
+    }
+    if (cmd_parameter_int(argc, argv, "--network_interface", &network_interface)) {
+        if (opt_params != 4) {
+            return CMDLINE_RETCODE_INVALID_PARAMETERS;
+        }
+        else {
+            opt_params += 1;
+        }
+    }
 
-	bool success = false;
-	if (lwm2m_client.create_interface(opt_params,
-									endpoint,
-									type,
-									lifetime,
-									port,
-									domain,
-									binding_mode,
-									network_interface)) {
-		return CMDLINE_RETCODE_SUCCESS;
-	}
+    bool success = false;
+    if (lwm2m_client.create_interface(opt_params,
+                                    endpoint,
+                                    type,
+                                    lifetime,
+                                    port,
+                                    domain,
+                                    binding_mode,
+                                    network_interface)) {
+        return CMDLINE_RETCODE_SUCCESS;
+    }
 
     return CMDLINE_RETCODE_FAIL;
 }
@@ -318,7 +320,7 @@ int lwm2m_client_device_command(int argc, char *argv[])
     char *device_type = 0;
     char *hardware_version = 0;
     char *software_version = 0;
-    char *firmware_version = 0;    
+    char *firmware_version = 0;
     char *utc_offset = 0;
     char *timezone = 0;
     int32_t current_time = 0;
@@ -400,7 +402,7 @@ int lwm2m_client_device_command(int argc, char *argv[])
             }
         }
    }
-    if(cmd_parameter_int(argc, argv, "--battery_level", &battery_level)){            
+    if(cmd_parameter_int(argc, argv, "--battery_level", &battery_level)){
        if(!lwm2m_client.create_device_object(M2MDevice::BatteryLevel,
                                              battery_level)) {
             return CMDLINE_RETCODE_INVALID_PARAMETERS;
@@ -665,7 +667,12 @@ int lwm2m_client_register_object_command(int argc, char *argv[])
     char *address = 0;
     cmd_parameter_val(argc, argv, "--address", &address);
 
-   if(lwm2m_client.create_register_object(address)) {
+    int useSecureConn = 0;
+    if( !cmd_parameter_int(argc, argv, "--secure", &useSecureConn) ){
+        useSecureConn = 0;
+    }
+
+   if(lwm2m_client.create_register_object(address, useSecureConn == 1)) {
         return CMDLINE_RETCODE_SUCCESS;
     }
     return CMDLINE_RETCODE_INVALID_PARAMETERS;
