@@ -44,6 +44,7 @@
                                     "   Options for custom object\n"\
                                     "   --name <name>       Object name\n"\
                                     "   --new_instance <n>  If you need new instance 0=false(default), 1=true\n"\
+									"   --object_instance_id <n> Instance id of object instance 0=(default)\n"\
                                     "   --object_operation <n> Operation Mode, Default is  0, NOT_ALLOWED = 0, GET_ALLOWED = 1,\n"\
                                     "PUT_ALLOWED = 2, GET_PUT_ALLOWED = 3, POST_ALLOWED = 4,GET_POST_ALLOWED = 5,\n"\
                                     "PUT_POST_ALLOWED = 6, GET_PUT_POST_ALLOWED = 7, DELETE_ALLOWED = 8\n"\
@@ -463,12 +464,14 @@ int lwm2m_client_object_command(int argc, char *argv[])
     int32_t new_instance = 0;
     int32_t object_operation = 0;
     int32_t object_instance_operation = 0;
+    int32_t object_instance_id = 0;
 
     if(cmd_parameter_val(argc, argv, "--name", &object_name)) {
         cmd_parameter_int(argc, argv, "--new_instance", &new_instance);
         cmd_parameter_int(argc, argv, "--object_operation", &object_operation);
         cmd_parameter_int(argc, argv, "--object_instance_operation", &object_instance_operation);
-        if(!lwm2m_client.create_object(object_name,new_instance,object_operation,object_instance_operation)) {
+        cmd_parameter_int(argc, argv, "--object_instance_id", &object_instance_id);
+        if(!lwm2m_client.create_object(object_name,new_instance,object_operation,object_instance_operation, object_instance_id)) {
             return_code = CMDLINE_RETCODE_INVALID_PARAMETERS;
          }
     }

@@ -229,7 +229,8 @@ bool M2MLWClient::create_device_object(M2MDevice::DeviceResource resource,
 bool M2MLWClient::create_object(const char *name,
                                 bool new_instance,
                                 uint8_t object_operation,
-                                uint8_t object_instance_operation)
+                                uint8_t object_instance_operation,
+								uint16_t object_instance_id)
 {
     bool success = false;
     M2MObjectInstance *inst = NULL;
@@ -237,7 +238,7 @@ bool M2MLWClient::create_object(const char *name,
         _object = M2MInterfaceFactory::create_object(name);
         if(_object) {
             _object->set_operation(int_to_operation(object_operation));
-            inst = _object->create_object_instance();
+            inst = _object->create_object_instance(object_instance_id);
             if(inst) {
                 success = true;
                 inst->set_operation(int_to_operation(object_instance_operation));
@@ -245,7 +246,7 @@ bool M2MLWClient::create_object(const char *name,
         }
     } else {
         if(new_instance) {
-            inst = _object->create_object_instance();
+            inst = _object->create_object_instance(object_instance_id);
             if(inst) {
                 success = true;
                 inst->set_operation(int_to_operation(object_instance_operation));
