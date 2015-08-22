@@ -28,6 +28,7 @@ namespace m2mobjectinstance_stub
     extern M2MResourceInstance* create_resource_instance;
     extern sn_coap_hdr_s* header;
     extern M2MResourceList resource_list;
+    extern M2MBase::BaseType base_type;
     void clear();    
 }
 

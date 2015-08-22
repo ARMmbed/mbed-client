@@ -109,8 +109,8 @@ namespace m2m {
   String& String::operator+=(const String& s)
   {
     if (s.size_ > 0){
-//      this->reserve(size_ + s.size_);
-//      memmove(p+size_, s.p, s.size_+1); // trailing 0
+      this->reserve(size_ + s.size_);
+      memmove(p+size_, s.p, s.size_+1); // trailing 0
       size_ += s.size_;
     }
     return *this;

@@ -11,6 +11,7 @@ TEST_SRC_FILES = \
         ../stub/m2mtimer_stub.cpp \
         ../stub/m2mreporthandler_stub.cpp \
         ../stub/common_stub.cpp \
+        ../stub/m2mtlvdeserializer_stub.cpp \
 	m2mresourceinstancetest.cpp \
         test_m2mresourceinstance.cpp
 

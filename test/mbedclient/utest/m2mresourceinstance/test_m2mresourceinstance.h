@@ -18,18 +18,20 @@
 
 #include "m2mresourceinstance.h"
 
+class Handler;
+
 class Test_M2MResourceInstance
 {
 public:
     Test_M2MResourceInstance();
+
+    ~Test_M2MResourceInstance();
 
     void test_copy_constructor();
 
     void test_assignment_constructor();
 
     void test_static_resource_instance();
-
-    virtual ~Test_M2MResourceInstance();
 
     void test_base_type();
 
@@ -56,6 +58,8 @@ public:
     void test_handle_post_request();
 
     M2MResourceInstance* resource_instance;
+
+    Handler* handler;
 };
 
 #endif // TEST_M2M_RESOURCE_INSTANCE_H

@@ -98,19 +98,29 @@ TEST(M2MNsdlInterface, create_nsdl_list_structure)
     m2m_nsdl_interface->test_create_nsdl_list_structure();
 }
 
-TEST(M2MNsdlInterface, resource_callback_get)
+TEST(M2MNsdlInterface, resource_callback)
 {
-    m2m_nsdl_interface->test_resource_callback_get();
+    m2m_nsdl_interface->test_resource_callback();
 }
 
-TEST(M2MNsdlInterface, resource_callback_put)
-{
-    m2m_nsdl_interface->test_resource_callback_put();
-}
+//TEST(M2MNsdlInterface, resource_callback_get)
+//{
+//    m2m_nsdl_interface->test_resource_callback_get();
+//}
 
-TEST(M2MNsdlInterface, resource_callback_post)
+//TEST(M2MNsdlInterface, resource_callback_put)
+//{
+//    m2m_nsdl_interface->test_resource_callback_put();
+//}
+
+//TEST(M2MNsdlInterface, resource_callback_post)
+//{
+//    m2m_nsdl_interface->test_resource_callback_post();
+//}
+
+TEST(M2MNsdlInterface, resource_callback_delete)
 {
-    m2m_nsdl_interface->test_resource_callback_post();
+    m2m_nsdl_interface->test_resource_callback_delete();
 }
 
 TEST(M2MNsdlInterface, bootstrap_done_callback)
@@ -128,6 +138,11 @@ TEST(M2MNsdlInterface, process_received_data)
     m2m_nsdl_interface->test_process_received_data();
 }
 
+TEST(M2MNsdlInterface, stop_timers)
+{
+    m2m_nsdl_interface->test_stop_timers();
+}
+
 TEST(M2MNsdlInterface, observation_to_be_sent)
 {
     m2m_nsdl_interface->test_observation_to_be_sent();
@@ -136,6 +151,16 @@ TEST(M2MNsdlInterface, observation_to_be_sent)
 TEST(M2MNsdlInterface, resource_to_be_deleted)
 {
     m2m_nsdl_interface->test_resource_to_be_deleted();
+}
+
+TEST(M2MNsdlInterface, value_updated)
+{
+    m2m_nsdl_interface->test_value_updated();
+}
+
+TEST(M2MNsdlInterface, find_resource)
+{
+    m2m_nsdl_interface->test_find_resource();
 }
 
 TEST(M2MNsdlInterface, remove_object)

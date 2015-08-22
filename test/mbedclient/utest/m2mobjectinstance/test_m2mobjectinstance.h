@@ -18,6 +18,8 @@
 
 #include "m2mobjectinstance.h"
 
+class Handler;
+
 class Test_M2MObjectInstance
 {
 public:
@@ -58,6 +60,8 @@ public:
     void test_handle_post_request();
 
     M2MObjectInstance* object;
+
+    Handler* handler;
 };
 
 #endif // TEST_M2M_OBJECT_INSTANCE_H

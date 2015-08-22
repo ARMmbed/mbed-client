@@ -52,21 +52,31 @@ public:
 
     void test_received_from_server_callback();
 
+    void test_resource_callback();
+
     void test_resource_callback_get();
 
     void test_resource_callback_put();
 
     void test_resource_callback_post();
 
+    void test_resource_callback_delete();
+
     void test_bootstrap_done_callback();
 
     void test_process_received_data();
+
+    void test_stop_timers();
 
     void test_timer_expired();
 
     void test_observation_to_be_sent();
 
     void test_resource_to_be_deleted();
+
+    void test_value_updated();
+
+    void test_find_resource();
 
     void test_remove_object();
 
