@@ -367,14 +367,16 @@ uint8_t M2MNsdlInterface::received_from_server_callback(struct nsdl_s * /*nsdl_h
                     // If lifetime is less than zero then leave the field empty
                     if( max_time > 0) {
                         char *buffer = (char*)memory_alloc(20);
-                        int size = snprintf(buffer, 20,"%d",(uint32_t)max_time);
-                        _endpoint->lifetime_ptr = (uint8_t*)memory_alloc(size+1);
-                        if(_endpoint->lifetime_ptr) {
-                            memset(_endpoint->lifetime_ptr, 0, size+1);
-                            memcpy(_endpoint->lifetime_ptr,buffer,size);
-                            _endpoint->lifetime_len =  size;
+                        if(buffer) {
+                            int size = snprintf(buffer, 20,"%d",(uint32_t)max_time);
+                            _endpoint->lifetime_ptr = (uint8_t*)memory_alloc(size+1);
+                            if(_endpoint->lifetime_ptr) {
+                                memset(_endpoint->lifetime_ptr, 0, size+1);
+                                memcpy(_endpoint->lifetime_ptr,buffer,size);
+                                _endpoint->lifetime_len =  size;
+                            }
+                            memory_free(buffer);
                         }
-                        memory_free(buffer);
                     }
                 }
                 if(_endpoint->lifetime_ptr) {
@@ -454,7 +456,12 @@ uint8_t M2MNsdlInterface::received_from_server_callback(struct nsdl_s * /*nsdl_h
                                 coap_response = object->handle_post_request(_nsdl_handle,
                                                                             coap_header,
                                                                             this);
+                            } else {
+                                coap_response = sn_nsdl_build_response(_nsdl_handle,
+                                                                       coap_header,
+                                                                       COAP_MSG_CODE_RESPONSE_METHOD_NOT_ALLOWED);
                             }
+
                         }
                     }else{
                         coap_response = sn_nsdl_build_response(_nsdl_handle,
@@ -505,8 +512,6 @@ uint8_t M2MNsdlInterface::resource_callback(struct nsdl_s */*nsdl_handle*/,
                     M2MObject *object = (M2MObject*)base_object;
                     object->remove_object_instance(object->instance_id());
                     msg_code = COAP_MSG_CODE_RESPONSE_DELETED;
-                } else {
-                    msg_code = COAP_MSG_CODE_RESPONSE_BAD_REQUEST;
                 }
             } else {
                 msg_code = COAP_MSG_CODE_RESPONSE_BAD_REQUEST; // 4.00

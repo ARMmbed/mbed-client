@@ -22,6 +22,7 @@ M2MResource* m2mobjectinstance_stub::create_resource;
 M2MResourceList m2mobjectinstance_stub::resource_list;
 M2MResourceInstance* m2mobjectinstance_stub::create_resource_instance;
 sn_coap_hdr_s* m2mobjectinstance_stub::header;
+M2MBase::BaseType m2mobjectinstance_stub::base_type;
 
 
 void m2mobjectinstance_stub::clear()
@@ -32,6 +33,7 @@ void m2mobjectinstance_stub::clear()
     create_resource = NULL;
     create_resource_instance = NULL;
     header = NULL;
+    base_type = M2MBase::ObjectInstance;
     resource_list.clear();
 }
 
@@ -125,7 +127,7 @@ uint16_t M2MObjectInstance::resource_count(const String& ) const
 
 M2MBase::BaseType M2MObjectInstance::base_type() const
 {
-    return M2MBase::ObjectInstance;
+    return m2mobjectinstance_stub::base_type;
 }
 
 bool M2MObjectInstance::handle_observation_attribute(char *&){

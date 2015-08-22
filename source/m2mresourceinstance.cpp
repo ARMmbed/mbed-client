@@ -203,41 +203,24 @@ sn_coap_hdr_s* M2MResourceInstance::handle_get_request(nsdl_s *nsdl,
                                                    received_coap_header,
                                                    COAP_MSG_CODE_RESPONSE_CONTENT);
             if(coap_response) {
-                char *content_type = (char*)memory_alloc(20);
+                char *content_type = (char*)malloc(20);
                 int content_type_size = snprintf(content_type, 20,"%x",coap_content_type());
 
-                if( coap_response->content_type_ptr ){
-                    memory_free( coap_response->content_type_ptr );
-                    coap_response->content_type_ptr = NULL;
-                }
-                coap_response->content_type_ptr = (uint8_t*)memory_alloc(content_type_size);
+                coap_response->content_type_ptr = (uint8_t*)malloc(content_type_size);
                 if(coap_response->content_type_ptr) {
                     memset(coap_response->content_type_ptr, 0, content_type_size);
                     memcpy(coap_response->content_type_ptr,content_type,content_type_size);
                     coap_response->content_type_len = (uint8_t)content_type_size;
                 }
 
-                memory_free(content_type);
+                free(content_type);
 
-                if( coap_response->payload_ptr ){
-                    memory_free( coap_response->payload_ptr );
-                    coap_response->payload_ptr = NULL;
-                }
                 // fill in the CoAP response payload
                 coap_response->payload_len = value_length();
                 coap_response->payload_ptr = value();
 
-                if( coap_response->options_list_ptr ){
-                    memory_free( coap_response->options_list_ptr );
-                    coap_response->options_list_ptr = NULL;
-                }
-                coap_response->options_list_ptr = (sn_coap_options_list_s*)memory_alloc(sizeof(sn_coap_options_list_s));
+                coap_response->options_list_ptr = (sn_coap_options_list_s*)malloc(sizeof(sn_coap_options_list_s));
                 memset(coap_response->options_list_ptr, 0, sizeof(sn_coap_options_list_s));
-
-                if( coap_response->options_list_ptr->observe_ptr ){
-                    memory_free( coap_response->options_list_ptr->observe_ptr );
-                    coap_response->options_list_ptr->observe_ptr = NULL;
-                }
 
                 if(received_coap_header->token_ptr) {
                     tr_debug("M2MResourceInstance::handle_get_request - Sets Observation Token to resource");
@@ -265,7 +248,7 @@ sn_coap_hdr_s* M2MResourceInstance::handle_get_request(nsdl_s *nsdl,
                             if(number == 0) {
                                 tr_debug("M2MResourceInstance::handle_get_request - Put Resource under Observation");
                                 set_under_observation(true,observation_handler);
-                                uint8_t *obs_number = (uint8_t*)memory_alloc(3);
+                                uint8_t *obs_number = (uint8_t*)malloc(3);
                                 memset(obs_number,0,3);
                                 uint8_t observation_number_length = 1;
 
@@ -280,10 +263,6 @@ sn_coap_hdr_s* M2MResourceInstance::handle_get_request(nsdl_s *nsdl,
                                 }
                                 coap_response->options_list_ptr->observe_ptr = obs_number;
                                 coap_response->options_list_ptr->observe_len = observation_number_length;
-                            } else if(number == 1) {
-                                tr_debug("M2MResourceInstance::handle_get_request - de-register Resource from observation");
-                                // If the observe vaoptions_list_ptr->observe_ptr lue is 1 means de-register from observation.
-                                set_under_observation(false,NULL);
                             }
                         } else if (STOP_OBSERVATION == observe_option) {
                             tr_debug("M2MResourceInstance::handle_get_request - Stops Observation");
@@ -327,7 +306,7 @@ sn_coap_hdr_s* M2MResourceInstance::handle_put_request(nsdl_s *nsdl,
             }
             if(received_coap_header->options_list_ptr &&
                received_coap_header->options_list_ptr->uri_query_ptr) {
-                char *query = (char*)memory_alloc(received_coap_header->options_list_ptr->uri_query_len+1);
+                char *query = (char*)malloc(received_coap_header->options_list_ptr->uri_query_len+1);
                 if (query){
                     memset(query, 0, received_coap_header->options_list_ptr->uri_query_len+1);
                     memcpy(query,
@@ -340,7 +319,7 @@ sn_coap_hdr_s* M2MResourceInstance::handle_put_request(nsdl_s *nsdl,
                         tr_debug("M2MResourceInstance::handle_put_request() - Invalid query");
                         msg_code = COAP_MSG_CODE_RESPONSE_BAD_REQUEST; // 4.00
                     }
-                    memory_free(query);
+                    free(query);
                 }
             }
             coap_response = sn_nsdl_build_response(nsdl,
@@ -374,7 +353,7 @@ sn_coap_hdr_s* M2MResourceInstance::handle_post_request(nsdl_s *nsdl,
             void *arguments = NULL;
             if(received_coap_header->options_list_ptr) {
                 if(received_coap_header->options_list_ptr->uri_query_ptr) {
-                    arguments = (void*)memory_alloc(received_coap_header->options_list_ptr->uri_query_len+1);
+                    arguments = (void*)malloc(received_coap_header->options_list_ptr->uri_query_len+1);
                     if (arguments){
                         memset(arguments, 0, received_coap_header->options_list_ptr->uri_query_len+1);
                         memcpy(arguments,
@@ -385,7 +364,7 @@ sn_coap_hdr_s* M2MResourceInstance::handle_post_request(nsdl_s *nsdl,
             }
             tr_debug("M2MResourceInstance::handle_post_request - Execute resource function");
             execute(arguments);
-            memory_free(arguments);
+            free(arguments);
         } else { // if ((object->operation() & SN_GRS_POST_ALLOWED) != 0)
             tr_error("M2MResourceInstance::handle_post_request - COAP_MSG_CODE_RESPONSE_METHOD_NOT_ALLOWED");
             msg_code = COAP_MSG_CODE_RESPONSE_METHOD_NOT_ALLOWED; // 4.05
