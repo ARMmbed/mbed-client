@@ -368,7 +368,7 @@ bool M2MLWClient::create_dynamic_resource_int(const char *name,
 }
 
 bool M2MLWClient::set_resource_value(const char *name,
-                                          int64_t value,
+                                          int32_t value,
                                           uint16_t object_instance)
 {
     bool success = false;
@@ -544,7 +544,7 @@ bool M2MLWClient::create_dynamic_resource_instance_string(const char *name,
 }
 
 bool M2MLWClient::set_resource_instance_value(const char *name,
-                                              int64_t value,
+                                              int32_t value,
                                               uint16_t object_instance,
                                               uint16_t resource_instance)
 {

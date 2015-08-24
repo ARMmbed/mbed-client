@@ -560,7 +560,7 @@ int lwm2m_client_static_resource_instance_command(int argc, char *argv[])
     int return_code = CMDLINE_RETCODE_INVALID_PARAMETERS;
     char *name = 0;
     char *value_string = 0;
-    int64_t value_int = 0;
+    int32_t value_int = 0;
     int32_t value_type = -1;
     int32_t multiple_instance = 0;
     int32_t object_instance = 0;
@@ -716,7 +716,7 @@ int lwm2m_client_set_value_command(int argc, char *argv[])
 {
     int return_code = CMDLINE_RETCODE_INVALID_PARAMETERS;
     char *name = 0;
-    int64_t value = 0;
+    int32_t value = 0;
     int32_t object_instance = 0;
 
     cmd_parameter_int(argc, argv, "--object_instance", &object_instance);
@@ -734,7 +734,7 @@ int lwm2m_client_set_value_instance_command(int argc, char *argv[])
 {
     int return_code = CMDLINE_RETCODE_INVALID_PARAMETERS;
     char *name = 0;
-    int64_t value = 0;
+    int32_t value = 0;
     int32_t object_instance = 0;
     int32_t resource_instance = 0;
 
