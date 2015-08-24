@@ -455,7 +455,7 @@ bool M2MLWClient::create_static_resource_instance_string(const char *name,
 }
 
 bool M2MLWClient::create_static_resource_instance_int(const char *name,
-                                                      int64_t value,
+                                                      int32_t value,
                                                       bool multiple_instance,
                                                       uint16_t object_instance,
                                                       uint16_t resource_instance)
