@@ -90,8 +90,9 @@ void Test_M2MReportHandler::test_parse_notification_attribute()
     char* val3 = {"toolongvaluevaluevaluevaluevalue&toolongvaluevaluevaluevaluevalue"};
     CHECK(false == _handler->parse_notification_attribute(val3, M2MBase::ObjectInstance ));
 
-    char* val_real = {"st=6"};
+    char* val_real = {"st=6&pmax=3&lt=1&gt=100"};
     CHECK(true == _handler->parse_notification_attribute(val_real, M2MBase::Resource ));
+    CHECK(true == _handler->_notif_params_set);
 
     char* val_real1 = {"a=1&pmin=2&pmax=3&gt=4&lt=5&st=6&cancel"};
     CHECK(false == _handler->parse_notification_attribute(val_real1, M2MBase::Resource ));
@@ -104,6 +105,14 @@ void Test_M2MReportHandler::test_parse_notification_attribute()
 
     char* val4_real = {"cancel"};
     CHECK(true == _handler->parse_notification_attribute(val4_real, M2MBase::Resource ));
+    CHECK(false == _handler->_notif_params_set);
+
+    char* val_real = {"st=6&pmax=30&lt=1&gt=100&pmin=0"};
+    CHECK(true == _handler->parse_notification_attribute(val_real, M2MBase::Resource ));
+
+    _handler->set_value(12);
+    _handler->timer_expired(M2MTimerObserver::PMinTimer);
+    CHECK(_handler->_pmin_exceeded == true);
 }
 
 void Test_M2MReportHandler::test_timer_expired()
@@ -112,11 +121,13 @@ void Test_M2MReportHandler::test_timer_expired()
     CHECK(_observer->visited == false);
 
     _handler->_under_observation = true;
+    _handler->_pmin_exceeded = true;
     _observer->visited = false;
     _handler->timer_expired(M2MTimerObserver::PMaxTimer);
     CHECK(_handler->_pmax_exceeded == false);
     CHECK(_observer->visited == true);
 
+    _handler->_pmin_exceeded = false;
     _observer->visited = false;
 
     _handler->timer_expired(M2MTimerObserver::PMinTimer);
@@ -128,6 +139,11 @@ void Test_M2MReportHandler::test_timer_expired()
     CHECK(_handler->_pmin_trigger == false);
     CHECK(_observer->visited == true);
 
+    _handler->_under_observation = true;
+    _handler->_pmin_exceeded = true;
+    _observer->visited = true;
+    _handler->timer_expired(M2MTimerObserver::PMinTimer);
+    CHECK(_handler->_pmin_exceeded == true);
 }
 
 void Test_M2MReportHandler::test_set_value()
