@@ -107,6 +107,16 @@ private:
     */
     void handle_timers();
 
+    /**
+    * @brief Check whether notification params can be accepted.
+    */
+    bool check_attribute_validity();
+
+    /**
+    * @brief Stop pmin & pmax timers.
+    */
+    void stop_timers();
+
 private:
 
     M2MReportObserver           &_observer;
@@ -120,7 +130,7 @@ private:
     bool                        _pmin_exceeded;
     bool                        _pmin_trigger;
     bool                        _pmax_exceeded;
-    bool                        _report_scheduled;
+    bool                        _report_scheduled;    
     M2MTimer                    *_pmin_timer;
     M2MTimer                    *_pmax_timer;
     int                         _num_limits;
@@ -130,6 +140,7 @@ private:
     float                       _low_step;
     float                       _current_value;
     float                       _last_value;
+    bool                        _notif_params_set;
 
 friend class Test_M2MReportHandler;
 
