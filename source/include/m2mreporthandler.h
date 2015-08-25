@@ -117,6 +117,11 @@ private:
     */
     void stop_timers();
 
+    /**
+    * @brief Set back to default values.
+    */
+    void set_default_values();
+
 private:
 
     M2MReportObserver           &_observer;
@@ -141,6 +146,9 @@ private:
     float                       _current_value;
     float                       _last_value;
     bool                        _notif_params_set;
+    bool                        _pmax_set;
+    bool                        _pmin_set;
+    bool                        _gt_set;
 
 friend class Test_M2MReportHandler;
 

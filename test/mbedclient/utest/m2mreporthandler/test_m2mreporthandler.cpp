@@ -97,7 +97,7 @@ void Test_M2MReportHandler::test_parse_notification_attribute()
     char* val_real1 = {"a=1&pmin=2&pmax=3&gt=4&lt=5&st=6&cancel"};
     CHECK(false == _handler->parse_notification_attribute(val_real1, M2MBase::Resource ));
 
-    char* val2_real = {"cancel&gt=4&lt=5&st=6&cancel"};
+    char* val2_real = {"cancel=&cancel=&st=6&lt=50&gt=1"};
     CHECK(false == _handler->parse_notification_attribute(val2_real, M2MBase::Resource ));
 
     char* val3_real = {"cancel&gt=40&lt=5&st=6&cancel"};
@@ -107,8 +107,14 @@ void Test_M2MReportHandler::test_parse_notification_attribute()
     CHECK(true == _handler->parse_notification_attribute(val4_real, M2MBase::Resource ));
     CHECK(false == _handler->_notif_params_set);
 
-    char* val_real = {"st=6&pmax=30&lt=1&gt=100&pmin=0"};
-    CHECK(true == _handler->parse_notification_attribute(val_real, M2MBase::Resource ));
+    char* val5_real = {"pmin=10"};
+    CHECK(true == _handler->parse_notification_attribute(val5_real, M2MBase::Resource ));
+
+    char* val6_real = {"pmin=100&pmax=5"};
+    CHECK(false == _handler->parse_notification_attribute(val6_real, M2MBase::Resource ));
+
+    char* val7_real = {"st=6&pmax=30&lt=1&gt=100&pmin=0"};
+    CHECK(true == _handler->parse_notification_attribute(val7_real, M2MBase::Resource ));
 
     _handler->set_value(12);
     _handler->timer_expired(M2MTimerObserver::PMinTimer);
