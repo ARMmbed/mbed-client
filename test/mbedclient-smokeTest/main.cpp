@@ -74,7 +74,7 @@ public:
                                                    _test_config->get_endpoint_type(),
                                                    _test_config->get_lifetime(),
                                                    _test_config->get_port(),
-                                                   "",
+												   _test_config->get_domain(),
                                                    M2MInterface::UDP,
                                                    M2MInterface::LwIP_IPv4,
                                                    "");
@@ -125,6 +125,7 @@ public:
         M2MSecurity *security = M2MInterfaceFactory::create_security(M2MSecurity::M2MServer);
         if(security) {
             security->set_resource_value(M2MSecurity::M2MServerUri, _test_config->get_mds_server());
+            //security->set_resource_value(M2MSecurity::M2MServerUri, "ds-test.dev.mbed.com");
             security->set_resource_value(M2MSecurity::SecurityMode, M2MSecurity::NoSecurity);
         }
         return security;
@@ -336,6 +337,9 @@ bool test_deviceObject(TestConfig *test_config) {
 
     SUITE_TEST_INFO(_tn, "client done");
 
+    // Wait 5 seconds
+    wait_ms(5000);
+
     // Create LWM2M Client API interface for M2M server
     _result &= mbed_client->create_interface();
 
@@ -360,18 +364,18 @@ bool test_deviceObject(TestConfig *test_config) {
     wait_ms(1000);
     // Callback comes in object_registered()
     WAIT_CALLBACK(mbed_client->register_successful(), CALLBACK_TIMEOUT);
-    //SUITE_TEST_INFO(_tn, "register callback done");
+    SUITE_TEST_INFO(_tn, "register callback done");
 
-    // Wait 5 seconds
+    // Wait 1 seconds
     wait_ms(1000);
 
     //TODO move this to callback when that can be taken in use
     _result &= mbed_client->test_update_register(2222);
     SUITE_TEST_INFO(_tn, "update register done");
 
-    //SUITE_TEST_INFO(_tn, "waiting update register callback...");
+    SUITE_TEST_INFO(_tn, "waiting update register callback...");
     // Callback comes in object_updated()
-    //WAIT_CALLBACK(mbed_client->update_register_successful(), CALLBACK_TIMEOUT);
+    WAIT_CALLBACK(mbed_client->update_register_successful(), CALLBACK_TIMEOUT);
 
     // Issue unregister command.
     mbed_client->test_unregister();
@@ -383,6 +387,7 @@ bool test_deviceObject(TestConfig *test_config) {
 
     // Delete device object created for registering device
     // resources.
+
     if(device_object) {
         M2MDevice::delete_instance();
     }
@@ -488,7 +493,8 @@ void app_start(int /*argc*/, char* /*argv*/[]) {
 
     _led = 0;
 
-    result &= test_bootStrap(&test_config);
+    // Bootstrap test is uncommented, until it will be supported.
+    //result &= test_bootStrap(&test_config);
     result &= test_deviceObject(&test_config);
     result &= test_resource(&test_config);
 
