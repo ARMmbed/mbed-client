@@ -17,37 +17,39 @@
 #include <stdio.h>
 #include "mbed-client/m2mstring.h"
 #include "testconfig.h"
+#include "security.h"
 
 TestConfig::TestConfig() { }
 
 TestConfig::~TestConfig() {	}
 
-void TestConfig::set_endpoint_name(const char *name) {
+/*void TestConfig::set_endpoint_name(const char *name) {
 	_endpointName = m2m::String("lwm2mtest-");
 	_endpointName += name;
 
 	printf("MBED: endpoint=%s", _endpointName.c_str());
-}
+}*/
 
 void TestConfig::setup() {
-	char mds_in[32] = {0};
-	char bs_in[32] = {0};
-	char ep_name_in[16] = {0};
-
-	printf("MBED: Waiting for test configuration from host...\r\n");
-	scanf("%*2[<>]%31[^>]", bs_in);
-	scanf("%*2[<>]%31[^>]", mds_in);
-	scanf("%*2[<>]%15[^>]", ep_name_in);
-
-	_bootstrapAddress = m2m::String(bs_in);
-	_mdsAddress = m2m::String(mds_in);
-	_endpointName = ep_name_in;
+	_bootstrapAddress = m2m::String("dummy");
+	_mdsAddress = m2m::String("ds-test.dev.mbed.com");
+	_endpointName = m2m::String(MBED_ENDPOINT_NAME);
 	_endpointType = m2m::String("test");
-
-	_port = 5600;
+	_domain = m2m::String(MBED_DOMAIN);
+	_port = 5683;
 	_lifetime = 2222;
 
-	printf("MBED: test configuration \nbootstrap_server=%s\nmds_server=%s\nendpoint_name=%s\n", _bootstrapAddress.c_str(), _mdsAddress.c_str(), _endpointName.c_str());
+	printf("MBED: test configuration \n");
+	printf("mds_server=%s\n", _mdsAddress.c_str());
+	printf("endpoint name=%s\n", _endpointName.c_str());
+	printf("endpoint type=%s\n", _endpointType.c_str());
+	printf("domain=%s\n", _domain.c_str());
+	printf("port=%d\n", _port);
+	printf("lifetime=%d\n\n", _lifetime);
+}
+
+m2m::String& TestConfig::get_domain() {
+	return _domain;
 }
 
 m2m::String& TestConfig::get_bootstrap_server() {
@@ -67,7 +69,8 @@ m2m::String& TestConfig::get_endpoint_type() {
 }
 
 int TestConfig::get_port() {
-	return _port++;
+	//return _port++;
+	return _port;
 }
 
 int TestConfig::get_lifetime() {
