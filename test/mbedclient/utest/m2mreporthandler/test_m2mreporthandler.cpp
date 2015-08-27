@@ -113,10 +113,20 @@ void Test_M2MReportHandler::test_parse_notification_attribute()
 
     char* val7_real = {"st=6&pmax=30&lt=1&gt=100&pmin=0"};
     CHECK(true == _handler->parse_notification_attribute(val7_real, M2MBase::Resource ));
-
     _handler->set_value(12);
     _handler->timer_expired(M2MTimerObserver::PMinTimer);
     CHECK(_handler->_pmin_exceeded == true);
+
+    char* val8_real = {"pmax=30&lt=10&gt=5&pmin=1"};
+    CHECK(false == _handler->parse_notification_attribute(val8_real, M2MBase::Resource ));
+
+    // low = lt + 2 * st = 18
+    char* val9_real = {"pmax=30&lt=10&gt=17&pmin=1&st=4"};
+    CHECK(false == _handler->parse_notification_attribute(val9_real, M2MBase::Resource ));
+
+    // low = lt + 2 * st = 18
+    char* val10_real = {"pmax=30&lt=10&gt=19&pmin=1&st=4"};
+    CHECK(true == _handler->parse_notification_attribute(val10_real, M2MBase::Resource ));
 }
 
 void Test_M2MReportHandler::test_timer_expired()
@@ -172,7 +182,17 @@ void Test_M2MReportHandler::test_set_value()
 
     _handler->set_value(121);
 
-//    CHECK(set_value(value,(u_int32_t)sizeof(value)) == true);
-//    CHECK( this->_value_length == sizeof(value));
-//    CHECK( *this->_value == *value);
+    char* query = {"pmax=30&lt=10&gt=50&pmin=1"};
+    CHECK(true == _handler->parse_notification_attribute(query, M2MBase::Resource ));
+    _handler->set_value(25);
+
+
+    _handler->_under_observation = true;
+    _handler->_attribute_state = 0;
+    _handler->_high_step = 0;
+    _handler->_low_step = 0;
+    char* query2 = {"gt=50"};
+    CHECK(true == _handler->parse_notification_attribute(query2, M2MBase::Resource ));
+    _handler->set_value(55);
+    CHECK(_handler->_value_not_in_range == true);
 }

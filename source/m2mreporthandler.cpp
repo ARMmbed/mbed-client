@@ -91,9 +91,10 @@ void M2MReportHandler::set_value(float value)
             tr_debug("M2MReportHandler::set_value - value not in range");
             if ((_attribute_state & M2MReportHandler::Lt) == M2MReportHandler::Lt ||
                     (_attribute_state & M2MReportHandler::Gt) == M2MReportHandler::Gt) {
-                tr_debug("M2MReportHandler::set_value - clear timers");
+                tr_debug("M2MReportHandler::set_value - clear pmin timer");
                 _value_not_in_range = true;
-                stop_timers();
+                _pmin_timer->stop_timer();
+                _pmin_exceeded = true;
             }
         }
     }
@@ -292,11 +293,6 @@ void M2MReportHandler::report(float value)
 
 void M2MReportHandler::handle_timers()
 {
-    if (_attribute_state == 0) {
-        tr_debug("M2MReportHandler::handle_timers() - params not set!");
-        return;
-    }
-
     uint64_t time_interval = 0;
     if(_pmin > 0) {
         time_interval = (uint64_t)(_pmin * 1000);
