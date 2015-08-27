@@ -73,7 +73,7 @@ void M2MReportHandler::set_under_observation(bool observed)
             tr_debug("M2MReportHandler::set_under_observation - current value doesn't meet treshold limits");
         }
     }
-    else {        
+    else {
         set_default_values();
     }
 }
