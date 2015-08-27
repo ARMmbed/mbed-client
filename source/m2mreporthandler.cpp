@@ -279,11 +279,6 @@ int M2MReportHandler::band(float sample)
 
 void M2MReportHandler::handle_timers()
 {    
-    if (!_notif_params_set) {
-        tr_debug("M2MReportHandler::handle_timers() - params not set!");
-        return;
-    }
-
     uint64_t time_interval = 0;
 
     if(_pmin > 0) {

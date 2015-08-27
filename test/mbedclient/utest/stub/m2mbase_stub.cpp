@@ -18,7 +18,7 @@
 uint8_t m2mbase_stub::uint8_value;
 uint16_t m2mbase_stub::uint16_value;
 uint16_t m2mbase_stub::int_value;
-int m2mbase_stub::name_id_value;
+int32_t m2mbase_stub::name_id_value;
 
 bool m2mbase_stub::bool_value;
 String *m2mbase_stub::string_value;
@@ -105,7 +105,7 @@ const String& M2MBase::name() const
     return *m2mbase_stub::string_value;
 }
 
-int M2MBase::name_id() const
+int32_t M2MBase::name_id() const
 {
     return m2mbase_stub::name_id_value;
 }

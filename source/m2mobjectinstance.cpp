@@ -398,60 +398,61 @@ sn_coap_hdr_s* M2MObjectInstance::handle_get_request(nsdl_s *nsdl,
                 coap_response->payload_len = data_length;
                 coap_response->payload_ptr = data;
 
-                coap_response->options_list_ptr = (sn_coap_options_list_s*)malloc(sizeof(sn_coap_options_list_s));
-                memset(coap_response->options_list_ptr, 0, sizeof(sn_coap_options_list_s));
+                if(data) {
+                    coap_response->options_list_ptr = (sn_coap_options_list_s*)malloc(sizeof(sn_coap_options_list_s));
+                    memset(coap_response->options_list_ptr, 0, sizeof(sn_coap_options_list_s));
 
-                if(received_coap_header->token_ptr) {
-                    tr_debug("M2MResource::handle_get_request - Sets Observation Token to resource");
-                    set_observation_token(received_coap_header->token_ptr,
-                                          received_coap_header->token_len);
-                }
-
-                if(received_coap_header->options_list_ptr) {
-                    if(received_coap_header->options_list_ptr->observe) {
-                        uint32_t number = 0;
-                        uint8_t observe_option = 0;
-                        if(received_coap_header->options_list_ptr->observe_ptr) {
-                            observe_option = *received_coap_header->options_list_ptr->observe_ptr;
-                        }
-                        if(START_OBSERVATION == observe_option) {
-                            tr_debug("M2MResource::handle_get_request - Starts Observation");
-                            // If the observe length is 0 means register for observation.
-                            if(received_coap_header->options_list_ptr->observe_len == 0) {
-                                set_under_observation(true,observation_handler);
+                    if(received_coap_header->token_ptr) {
+                        tr_debug("M2MObjectInstance::handle_get_request - Sets Observation Token to resource");
+                        set_observation_token(received_coap_header->token_ptr,
+                                              received_coap_header->token_len);
+                    }
+                    if(received_coap_header->options_list_ptr) {
+                        if(received_coap_header->options_list_ptr->observe) {
+                            uint32_t number = 0;
+                            uint8_t observe_option = 0;
+                            if(received_coap_header->options_list_ptr->observe_ptr) {
+                                observe_option = *received_coap_header->options_list_ptr->observe_ptr;
                             }
-                            else {
-                            for(int i=0;i < received_coap_header->options_list_ptr->observe_len; i++) {
-                                number = (*(received_coap_header->options_list_ptr->observe_ptr + i) & 0xff) <<
-                                         8*(received_coap_header->options_list_ptr->observe_len- 1 - i);
+                            if(START_OBSERVATION == observe_option) {
+                                tr_debug("M2MObjectInstance::handle_get_request - Starts Observation");
+                                // If the observe length is 0 means register for observation.
+                                if(received_coap_header->options_list_ptr->observe_len == 0) {
+                                    set_under_observation(true,observation_handler);
+                                } else {
+                                    for(int i=0;i < received_coap_header->options_list_ptr->observe_len; i++) {
+                                        number = (*(received_coap_header->options_list_ptr->observe_ptr + i) & 0xff) <<
+                                                 8*(received_coap_header->options_list_ptr->observe_len- 1 - i);
+                                    }
                                 }
-                            }
-                            // If the observe value is 0 means register for observation.
-                            if(number == 0) {
-                                tr_debug("M2MResource::handle_get_request - Put Resource under Observation");
-                                set_under_observation(true,observation_handler);
-                                uint8_t *obs_number = (uint8_t*)malloc(3);
-                                memset(obs_number,0,3);
-                                uint8_t observation_number_length = 1;
+                                // If the observe value is 0 means register for observation.
+                                if(number == 0) {
+                                    tr_debug("M2MResource::handle_get_request - Put Resource under Observation");
+                                    set_under_observation(true,observation_handler);
+                                    uint8_t *obs_number = (uint8_t*)malloc(3);
+                                    memset(obs_number,0,3);
+                                    uint8_t observation_number_length = 1;
 
-                                uint16_t number = observation_number();
+                                    uint16_t number = observation_number();
 
-                                tr_debug("M2MResource::handle_get_request - Observation Number %d", number);
-                                obs_number[0] = ((number>>8) & 0xFF);
-                                obs_number[1] = (number & 0xFF);
+                                    tr_debug("M2MResource::handle_get_request - Observation Number %d", number);
+                                    obs_number[0] = ((number>>8) & 0xFF);
+                                    obs_number[1] = (number & 0xFF);
 
-                                if(number > 0xFF) {
-                                    observation_number_length = 2;
+                                    if(number > 0xFF) {
+                                        observation_number_length = 2;
+                                    }
+                                    coap_response->options_list_ptr->observe_ptr = obs_number;
+                                    coap_response->options_list_ptr->observe_len = observation_number_length;
                                 }
-                                coap_response->options_list_ptr->observe_ptr = obs_number;
-                                coap_response->options_list_ptr->observe_len = observation_number_length;
+                            } else if (STOP_OBSERVATION == observe_option) {
+                                tr_debug("M2MResource::handle_get_request - Stops Observation");
+                                set_under_observation(false,NULL);
                             }
-                        } else if (STOP_OBSERVATION == observe_option) {
-                            tr_debug("M2MResource::handle_get_request - Stops Observation");
-                            set_under_observation(false,NULL);
                         }
                     }
-
+                } else {
+                    coap_response->msg_code = COAP_MSG_CODE_RESPONSE_UNSUPPORTED_CONTENT_FORMAT; // Content format not supported
                 }
             }
         }else {
@@ -480,8 +481,7 @@ sn_coap_hdr_s* M2MObjectInstance::handle_put_request(nsdl_s *nsdl,
     if(received_coap_header) {
         if ((operation() & SN_GRS_PUT_ALLOWED) != 0) {
             sn_coap_msg_code_e msg_code = COAP_MSG_CODE_RESPONSE_CHANGED; // 2.04
-            if(received_coap_header->payload_ptr) {
-                tr_debug("M2MObjectInstance::handle_put_request() - Update Object Instance with new values");
+            if(received_coap_header->content_type_ptr) {
                 if(*received_coap_header->content_type_ptr == COAP_CONTENT_OMA_TLV_TYPE) {
                     M2MTLVDeserializer *deserializer = new M2MTLVDeserializer();
                     if(deserializer) {
@@ -495,26 +495,26 @@ sn_coap_hdr_s* M2MObjectInstance::handle_put_request(nsdl_s *nsdl,
                         delete deserializer;
                     }
                 }
-                if(received_coap_header->options_list_ptr &&
-                   received_coap_header->options_list_ptr->uri_query_ptr) {
-                    char *query = (char*)malloc(received_coap_header->options_list_ptr->uri_query_len+1);
-                    if (query){
-                        memset(query, 0, received_coap_header->options_list_ptr->uri_query_len+1);
-                        memcpy(query,
-                            received_coap_header->options_list_ptr->uri_query_ptr,
-                            received_coap_header->options_list_ptr->uri_query_len);
-                        memset(query + received_coap_header->options_list_ptr->uri_query_len,'\0',1);//String terminator
-                       tr_debug("M2MResourceInstance::handle_put_request() - Query %s", query);
-                        // if anything was updated, re-initialize the stored notification attributes
-                        if (!handle_observation_attribute(query)){
-                            tr_debug("M2MResourceInstance::handle_put_request() - Invalid query");
-                            msg_code = COAP_MSG_CODE_RESPONSE_BAD_REQUEST; // 4.00
-                        }
-                        free(query);
+            }
+            if(received_coap_header->options_list_ptr &&
+               received_coap_header->options_list_ptr->uri_query_ptr) {
+                char *query = (char*)malloc(received_coap_header->options_list_ptr->uri_query_len+1);
+                if (query){
+                    memset(query, 0, received_coap_header->options_list_ptr->uri_query_len+1);
+                    memcpy(query,
+                        received_coap_header->options_list_ptr->uri_query_ptr,
+                        received_coap_header->options_list_ptr->uri_query_len);
+                    memset(query + received_coap_header->options_list_ptr->uri_query_len,'\0',1);//String terminator
+                   tr_debug("M2MObjectInstance::handle_put_request() - Query %s", query);
+                    // if anything was updated, re-initialize the stored notification attributes
+                    if (!handle_observation_attribute(query)){
+                        tr_debug("M2MResourceInstance::handle_put_request() - Invalid query");
+                        msg_code = COAP_MSG_CODE_RESPONSE_BAD_REQUEST; // 4.00
                     }
-                    if(observation_handler) {
-                        observation_handler->value_updated(this);
-                    }
+                    free(query);
+                }
+                if(observation_handler) {
+                    observation_handler->value_updated(this);
                 }
             }
             coap_response = sn_nsdl_build_response(nsdl,
@@ -522,7 +522,7 @@ sn_coap_hdr_s* M2MObjectInstance::handle_put_request(nsdl_s *nsdl,
                                                    msg_code);
         } else {
             // Operation is not allowed.
-            tr_error("M2MResourceInstance::handle_put_request() - COAP_MSG_CODE_RESPONSE_BAD_REQUEST");
+            tr_error("M2MObjectInstance::handle_put_request() - COAP_MSG_CODE_RESPONSE_BAD_REQUEST");
             coap_response = sn_nsdl_build_response(nsdl,
                                                    received_coap_header,
                                                    COAP_MSG_CODE_RESPONSE_BAD_REQUEST);

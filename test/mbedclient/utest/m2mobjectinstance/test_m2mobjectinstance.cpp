@@ -20,6 +20,7 @@
 #include "m2mresourceinstance_stub.h"
 #include "m2mbase_stub.h"
 #include "m2mtlvdeserializer_stub.h"
+#include "m2mtlvserializer_stub.h"
 
 class Handler : public M2MObservationHandler {
 
@@ -346,6 +347,8 @@ void Test_M2MObjectInstance::test_handle_get_request()
     common_stub::coap_header = (sn_coap_hdr_ *)malloc(sizeof(sn_coap_hdr_));
     memset(common_stub::coap_header,0,sizeof(sn_coap_hdr_));
 
+    m2mtlvserializer_stub::uint8_value = (uint8_t*)malloc(1);
+
     coap_header->token_ptr = (uint8_t*)malloc(sizeof(value));
     memcpy(coap_header->token_ptr, value, sizeof(value));
 
@@ -418,6 +421,7 @@ void Test_M2MObjectInstance::test_handle_get_request()
     memcpy(coap_header->options_list_ptr->observe_ptr,&obs,sizeof(obs));
     coap_header->options_list_ptr->observe_len = 0;
     m2mbase_stub::uint16_value = 0x1c1c;
+    m2mbase_stub::uint8_value = 99;
 
     CHECK(object->handle_get_request(NULL,coap_header,handler) != NULL);
 
@@ -458,6 +462,7 @@ void Test_M2MObjectInstance::test_handle_get_request()
 
     obs = 1;
     memcpy(coap_header->options_list_ptr->observe_ptr,&obs,sizeof(obs));
+    m2mbase_stub::uint8_value = 99;
     CHECK(object->handle_get_request(NULL,coap_header,handler) != NULL);
 
     if(common_stub::coap_header->content_type_ptr) {
@@ -514,6 +519,11 @@ void Test_M2MObjectInstance::test_handle_get_request()
 
     delete name;
     name = NULL;
+
+    if(m2mtlvserializer_stub::uint8_value) {
+        free(m2mtlvserializer_stub::uint8_value);
+    }
+    m2mtlvserializer_stub::clear();
 
     m2mbase_stub::clear();
     common_stub::clear();
