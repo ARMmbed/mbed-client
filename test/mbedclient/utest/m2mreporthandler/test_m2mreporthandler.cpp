@@ -107,8 +107,8 @@ void Test_M2MReportHandler::test_parse_notification_attribute()
     CHECK(true == _handler->parse_notification_attribute(val4_real, M2MBase::Resource ));
     CHECK(false == _handler->_notif_params_set);
 
-    char* val_real = {"st=6&pmax=30&lt=1&gt=100&pmin=0"};
-    CHECK(true == _handler->parse_notification_attribute(val_real, M2MBase::Resource ));
+    char* val5_real = {"st=6&pmax=30&lt=1&gt=100&pmin=0"};
+    CHECK(true == _handler->parse_notification_attribute(val5_real, M2MBase::Resource ));
 
     _handler->set_value(12);
     _handler->timer_expired(M2MTimerObserver::PMinTimer);

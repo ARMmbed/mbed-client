@@ -263,7 +263,11 @@ private:
 
     M2MInterface::Error interface_error(sn_coap_hdr_s *coap_header);
 
-    void send_observation(M2MResourceInstance *resource);
+    void send_object_observation(M2MObject *object);
+
+    void send_object_instance_observation(M2MObjectInstance *object_instance);
+
+    void send_resource_observation(M2MResourceInstance *resource);
 
 private:
 

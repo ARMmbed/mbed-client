@@ -237,59 +237,61 @@ sn_coap_hdr_s* M2MObject::handle_get_request(nsdl_s *nsdl,
                 coap_response->options_list_ptr = (sn_coap_options_list_s*)malloc(sizeof(sn_coap_options_list_s));
                 memset(coap_response->options_list_ptr, 0, sizeof(sn_coap_options_list_s));
 
-
-                if(received_coap_header->token_ptr) {
-                    tr_debug("M2MResource::handle_get_request - Sets Observation Token to resource");
-                    set_observation_token(received_coap_header->token_ptr,
-                                          received_coap_header->token_len);
-                }
-
-                if(received_coap_header->options_list_ptr) {
-                    if(received_coap_header->options_list_ptr->observe) {
-                        uint32_t number = 0;
-                        uint8_t observe_option = 0;
-                        if(received_coap_header->options_list_ptr->observe_ptr) {
-                            observe_option = *received_coap_header->options_list_ptr->observe_ptr;
-                        }
-                        if(START_OBSERVATION == observe_option) {
-                            tr_debug("M2MResource::handle_get_request - Starts Observation");
-                            // If the observe length is 0 means register for observation.
-                            if(received_coap_header->options_list_ptr->observe_len == 0) {
-                                set_under_observation(true,observation_handler);
-                            }
-                            else {
-                            for(int i=0;i < received_coap_header->options_list_ptr->observe_len; i++) {
-                                number = (*(received_coap_header->options_list_ptr->observe_ptr + i) & 0xff) <<
-                                         8*(received_coap_header->options_list_ptr->observe_len- 1 - i);
-                                }
-                            }
-                            // If the observe value is 0 means register for observation.
-                            if(number == 0) {
-                                tr_debug("M2MResource::handle_get_request - Put Resource under Observation");
-                                set_under_observation(true,observation_handler);
-                                uint8_t *obs_number = (uint8_t*)malloc(3);
-                                memset(obs_number,0,3);
-                                uint8_t observation_number_length = 1;
-
-                                uint16_t number = observation_number();
-
-                                tr_debug("M2MResource::handle_get_request - Observation Number %d", number);
-                                obs_number[0] = ((number>>8) & 0xFF);
-                                obs_number[1] = (number & 0xFF);
-
-                                if(number > 0xFF) {
-                                    observation_number_length = 2;
-                                }
-                                coap_response->options_list_ptr->observe_ptr = obs_number;
-                                coap_response->options_list_ptr->observe_len = observation_number_length;
-                            }
-                        } else if (STOP_OBSERVATION == observe_option) {
-                            tr_debug("M2MResource::handle_get_request - Stops Observation");
-                            // If the observe options_list_ptr->observe_ptr value is 1 means de-register from observation.
-                            set_under_observation(false,NULL);
-                        }
+                if(data){
+                    if(received_coap_header->token_ptr) {
+                        tr_debug("M2MResource::handle_get_request - Sets Observation Token to resource");
+                        set_observation_token(received_coap_header->token_ptr,
+                                              received_coap_header->token_len);
                     }
 
+                    if(received_coap_header->options_list_ptr) {
+                        if(received_coap_header->options_list_ptr->observe) {
+                            uint32_t number = 0;
+                            uint8_t observe_option = 0;
+                            if(received_coap_header->options_list_ptr->observe_ptr) {
+                                observe_option = *received_coap_header->options_list_ptr->observe_ptr;
+                            }
+                            if(START_OBSERVATION == observe_option) {
+                                tr_debug("M2MResource::handle_get_request - Starts Observation");
+                                // If the observe length is 0 means register for observation.
+                                if(received_coap_header->options_list_ptr->observe_len == 0) {
+                                    set_under_observation(true,observation_handler);
+                                }
+                                else {
+                                for(int i=0;i < received_coap_header->options_list_ptr->observe_len; i++) {
+                                    number = (*(received_coap_header->options_list_ptr->observe_ptr + i) & 0xff) <<
+                                             8*(received_coap_header->options_list_ptr->observe_len- 1 - i);
+                                    }
+                                }
+                                // If the observe value is 0 means register for observation.
+                                if(number == 0) {
+                                    tr_debug("M2MResource::handle_get_request - Put Resource under Observation");
+                                    set_under_observation(true,observation_handler);
+                                    uint8_t *obs_number = (uint8_t*)malloc(3);
+                                    memset(obs_number,0,3);
+                                    uint8_t observation_number_length = 1;
+
+                                    uint16_t number = observation_number();
+
+                                    tr_debug("M2MResource::handle_get_request - Observation Number %d", number);
+                                    obs_number[0] = ((number>>8) & 0xFF);
+                                    obs_number[1] = (number & 0xFF);
+
+                                    if(number > 0xFF) {
+                                        observation_number_length = 2;
+                                    }
+                                    coap_response->options_list_ptr->observe_ptr = obs_number;
+                                    coap_response->options_list_ptr->observe_len = observation_number_length;
+                                }
+                            } else if (STOP_OBSERVATION == observe_option) {
+                                tr_debug("M2MResource::handle_get_request - Stops Observation");
+                                // If the observe options_list_ptr->observe_ptr value is 1 means de-register from observation.
+                                set_under_observation(false,NULL);
+                            }
+                        }
+                    }
+                } else {
+                    coap_response->msg_code = COAP_MSG_CODE_RESPONSE_UNSUPPORTED_CONTENT_FORMAT; // Content format not supported
                 }
             }
         }else {
@@ -318,23 +320,22 @@ sn_coap_hdr_s* M2MObject::handle_put_request(nsdl_s *nsdl,
     if(received_coap_header) {
         if ((operation() & SN_GRS_PUT_ALLOWED) != 0) {
             sn_coap_msg_code_e msg_code = COAP_MSG_CODE_RESPONSE_CHANGED; // 2.04
-            if(received_coap_header->payload_ptr) {
-                tr_debug("M2MObject::handle_put_request() - Update Object with new values");
+            if(received_coap_header->content_type_ptr) {
                 if(*received_coap_header->content_type_ptr == COAP_CONTENT_OMA_TLV_TYPE) {
                     M2MTLVDeserializer *deserializer = new M2MTLVDeserializer();
                     if(deserializer) {
                         if(deserializer->is_object_instance(received_coap_header->payload_ptr)) {
                             deserializer->deserialise_object_instances(received_coap_header->payload_ptr,
-                                                                       received_coap_header->payload_len,
-                                                                       _instance_list);
+                                                       received_coap_header->payload_len,
+                                                       _instance_list);
                         } else {
                             msg_code = COAP_MSG_CODE_RESPONSE_BAD_REQUEST; // 4.00
                         }
-                        delete deserializer;
+                            delete deserializer;
                     }
                 } else {
-                        msg_code = COAP_MSG_CODE_RESPONSE_UNSUPPORTED_CONTENT_FORMAT;
-                    }
+                    msg_code = COAP_MSG_CODE_RESPONSE_UNSUPPORTED_CONTENT_FORMAT;
+                }
                 if(observation_handler) {
                     observation_handler->value_updated(this);
                 }

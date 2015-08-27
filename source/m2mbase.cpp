@@ -217,7 +217,7 @@ const String& M2MBase::name() const
     return _name;
 }
 
-int M2MBase::name_id() const
+int32_t M2MBase::name_id() const
 {
     return _name_id;
 }

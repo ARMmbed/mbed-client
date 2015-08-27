@@ -20,6 +20,7 @@ TEST_SRC_FILES = \
         ../stub/m2mtimer_stub.cpp \
         ../stub/common_stub.cpp \
         ../stub/nsdlaccesshelper_stub.cpp \
+        ../stub/m2mtlvserializer_stub.cpp \
 	m2mnsdlinterfacetest.cpp \
         test_m2mnsdlinterface.cpp
 

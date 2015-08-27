@@ -86,15 +86,15 @@ private :
 
     uint8_t* serialize_object_instances(M2MObjectInstanceList object_instance_list, uint32_t &size);
 
-    uint8_t* serialize_resources(M2MResourceList resource_list, uint32_t &size);
+    uint8_t* serialize_resources(M2MResourceList resource_list, uint32_t &size, bool &valid);
 
     void serialize(uint16_t id, M2MObjectInstance *object_instance, uint8_t *&data, uint32_t &size);
     
-    void serialize (M2MResource *resource, uint8_t *&data, uint32_t &size);
+    bool serialize (M2MResource *resource, uint8_t *&data, uint32_t &size);
 
-    void serialize_resource(M2MResource *resource, uint8_t *&data, uint32_t &size);
+    bool serialize_resource(M2MResource *resource, uint8_t *&data, uint32_t &size);
 
-    void serialize_multiple_resource(M2MResource *resource, uint8_t *&data, uint32_t &size);
+    bool serialize_multiple_resource(M2MResource *resource, uint8_t *&data, uint32_t &size);
 
     void serialize_resource_instance(uint16_t id, M2MResourceInstance *resource, uint8_t *&data, uint32_t &size);
     
