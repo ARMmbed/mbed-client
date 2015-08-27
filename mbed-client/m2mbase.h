@@ -185,7 +185,7 @@ public:
      * @brief Returns object name in integer.
      * @return Name for the object in integer.
      */
-    virtual int name_id() const;
+    virtual int32_t name_id() const;
 
     /**
      * @brief Returns object's Instance ID.
@@ -339,7 +339,7 @@ private:
     M2MBase::BaseType           _base_type;
     String                      _name;
     String                      _resource_type;
-    int                         _name_id;
+    int32_t                     _name_id;
     String                      _interface_description;
     uint8_t                     _coap_content_type;
     uint16_t                    _instance_id;

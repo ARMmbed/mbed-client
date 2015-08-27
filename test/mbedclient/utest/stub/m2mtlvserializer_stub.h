@@ -21,7 +21,6 @@
 //some internal test related stuff
 namespace m2mtlvserializer_stub
 {
-    extern bool bool_value;
     extern uint8_t* uint8_value;
     void clear();
 }

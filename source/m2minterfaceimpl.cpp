@@ -61,8 +61,7 @@ M2MInterfaceImpl::M2MInterfaceImpl(M2MInterfaceObserver& observer,
 
     _connection_handler = M2MConnectionHandlerFactory::createConnectionHandler(*this,stack);
 
-    //TODO: Handle NULL return value
-     _connection_handler->bind_connection(_listen_port);
+    _connection_handler->bind_connection(_listen_port);
      tr_debug("M2MInterfaceImpl::M2MInterfaceImpl() -OUT");
 }
 

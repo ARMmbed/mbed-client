@@ -27,6 +27,7 @@ public:
 	void setup();
 	void set_endpoint_name(const char *name);
 
+	m2m::String& get_domain();
 	m2m::String& get_bootstrap_server();
 	m2m::String& get_mds_server();
 	m2m::String& get_endpoint_name();
@@ -38,6 +39,7 @@ private:
 
 	int _port;
 	int _lifetime;
+	m2m::String _domain;
 	m2m::String _endpointName;
 	m2m::String _endpointType;
 	m2m::String _bootstrapAddress;
