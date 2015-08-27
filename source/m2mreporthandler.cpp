@@ -22,29 +22,23 @@
 
 M2MReportHandler::M2MReportHandler(M2MReportObserver &observer)
 : _observer(observer),
-  _under_observation(false),
-  _value(0.0f),
+  _under_observation(false),  
   _pmax(-1.0f),
   _pmin(1.0f),
   _gt(0.0f),
   _lt(0.0f),
   _st(0.0f),
   _pmin_exceeded(false),
-  _pmin_trigger(false),
   _pmax_exceeded(false),
   _report_scheduled(false),
   _pmin_timer(NULL),
-  _pmax_timer(NULL),
-  _num_limits(2),
-  _last_band(0),
+  _pmax_timer(NULL),  
   _high_step(0.0f),
   _low_step(0.0f),
   _current_value(0.0f),
   _last_value(0.0f),
-  _notif_params_set(false),
-  _pmax_set(false),
-  _pmin_set(false),
-  _gt_set(false)
+  _attribute_state(0),
+  _value_not_in_range(false)
 {
     tr_debug("M2MReportHandler::M2MReportHandler()");
     _pmax_timer = new M2MTimer(*this);
@@ -70,8 +64,14 @@ void M2MReportHandler::set_under_observation(bool observed)
     stop_timers();
     if(observed) {
         // initializes and sends an update if observing is on, don't change observing state
-        // allows cancel to turn off observing and update state without sending a notification.        
-        handle_timers();
+        // allows cancel to turn off observing and update state without sending a notification.
+        if (check_threshold_values()) {
+            handle_timers();
+        }
+        else {
+            _value_not_in_range = true;
+            tr_debug("M2MReportHandler::set_under_observation - current value doesn't meet treshold limits");
+        }
     }
     else {        
         set_default_values();
@@ -84,13 +84,17 @@ void M2MReportHandler::set_value(float value)
     _current_value = value;
     if(_current_value != _last_value && _under_observation) {
         _last_value = _current_value;
-
-        if (band(_current_value) != _last_band ||
-            _current_value >= _high_step       ||
-            _current_value <= _low_step) { // test limits
-            // schedule reporting
-            tr_debug("M2MReportHandler::set_value - schedule reporting");
+        if (check_threshold_values()) {
             schedule_report(_current_value);
+        }
+        else {
+            tr_debug("M2MReportHandler::set_value - value not in range");
+            if ((_attribute_state & M2MReportHandler::Lt) == M2MReportHandler::Lt ||
+                    (_attribute_state & M2MReportHandler::Gt) == M2MReportHandler::Gt) {
+                tr_debug("M2MReportHandler::set_value - clear timers");
+                _value_not_in_range = true;
+                stop_timers();
+            }
         }
     }
 }
@@ -112,7 +116,7 @@ bool M2MReportHandler::parse_notification_attribute(char *&query,
             }
             strncpy(query_options[num_options], rest, len);
             sep_pos++;
-            query_options[num_options++][len+1] = '\0';
+            query_options[num_options++][len] = '\0';
             rest = sep_pos;
             sep_pos = strchr(rest, '&');
         }
@@ -151,6 +155,7 @@ bool M2MReportHandler::parse_notification_attribute(char *&query,
             success = true;
         }
     }
+
     return success;
 }
 
@@ -159,10 +164,11 @@ void M2MReportHandler::timer_expired(M2MTimerObserver::Type type)
     tr_debug("M2MReportHandler::timer_expired(type %d)", (int)type);
     switch(type) {
         case M2MTimerObserver::PMinTimer: {
-            if (_report_scheduled || (_pmin_set && !_pmax_set)){
+            if (_report_scheduled ||
+                    ((_attribute_state & M2MReportHandler::Pmin) == M2MReportHandler::Pmin &&
+                     (_attribute_state & M2MReportHandler::Pmax) != M2MReportHandler::Pmax)){
                 tr_debug("M2MReportHandler::timer_expired - PMinTimer _report_scheduled true");
                 _report_scheduled = false;
-                _pmin_trigger = true;
                 _pmax_timer->stop_timer();
                 report(_current_value);
             }
@@ -206,44 +212,44 @@ bool M2MReportHandler::set_notification_attribute(char* option,
 
     if (strcmp(attribute, PMIN.c_str()) == 0) {
         sscanf(value, "%f", &_pmin);
-        success = true;        
-        _pmin_set = true;
+        success = true;
+        _attribute_state |= M2MReportHandler::Pmin;
         tr_debug("M2MReportHandler::set_notification_attribute %s to %f", attribute, _pmin);
     }
     else if(strcmp(attribute, PMAX.c_str()) == 0) {
         sscanf(value, "%f", &_pmax);
-        success = true;
-        _pmax_set = true;
+        success = true;        
+        _attribute_state |= M2MReportHandler::Pmax;
         tr_debug("M2MReportHandler::set_notification_attribute %s to %f", attribute, _pmax);
     }
     else if(strcmp(attribute, GT.c_str()) == 0 &&
             M2MBase::Resource == type){
         sscanf(value, "%f", &_gt);
-        success = true;
-        _gt_set = true;
+        success = true;        
+        _attribute_state |= M2MReportHandler::Gt;
         tr_debug("M2MReportHandler::set_notification_attribute %s to %f", attribute, _gt);
     }
     else if(strcmp(attribute, LT.c_str()) == 0 &&
             M2MBase::Resource == type){
         sscanf(value, "%f", &_lt);
         success = true;
+        _attribute_state |= M2MReportHandler::Lt;
         tr_debug("M2MReportHandler::set_notification_attribute %s to %f", attribute, _lt);
     }
     else if(strcmp(attribute, ST.c_str()) == 0 &&
             M2MBase::Resource == type){
         sscanf(value, "%f", &_st);
         success = true;
+        _attribute_state |= M2MReportHandler::St;
         tr_debug("M2MReportHandler::set_notification_attribute %s to %f", attribute, _st);
     }
     else if(strcmp(attribute, CANCEL.c_str()) == 0) {
         observation = false;
         success = true;
+        _attribute_state |= M2MReportHandler::Cancel;
     }
 
     if(success) {
-        if (observation) {
-            _notif_params_set = true;
-        }
         tr_debug("M2MReportHandler::set_notification_attribute %s - set under observation", attribute);
         set_under_observation(observation);
     }
@@ -259,6 +265,10 @@ void M2MReportHandler::schedule_report(float value)
             tr_debug("M2MReportHandler::schedule_report - report value");
             report(value);
         }
+        else if(_value_not_in_range) {
+            _report_scheduled = true;
+            handle_timers();
+        }
         else {
             tr_debug("M2MReportHandler::schedule_report - set true");
             _report_scheduled = true;
@@ -272,8 +282,7 @@ void M2MReportHandler::report(float value)
     if(_under_observation) {
         _pmin_exceeded = false;
         _pmax_exceeded = false;
-        _pmin_trigger = false;
-        _last_band = band(value);
+        _value_not_in_range = false;
         _high_step = value + _st;
         _low_step = value - _st;
         _observer.observation_to_be_sent();
@@ -281,14 +290,9 @@ void M2MReportHandler::report(float value)
     handle_timers();
 }
 
-int M2MReportHandler::band(float sample)
-{
-    return _num_limits;
-}
-
 void M2MReportHandler::handle_timers()
-{    
-    if (!_notif_params_set) {
+{
+    if (_attribute_state == 0) {
         tr_debug("M2MReportHandler::handle_timers() - params not set!");
         return;
     }
@@ -316,13 +320,13 @@ void M2MReportHandler::handle_timers()
 bool M2MReportHandler::check_attribute_validity()
 {
     bool success = true;
-    if (_pmax_set &&
+    if ((_attribute_state & M2MReportHandler::Pmax) == M2MReportHandler::Pmax &&
             ((_pmax >= -1.0f) && (_pmin > _pmax))) {
         success = false;
     }
-
-    if (_gt_set &&
-            ((_lt + 2 * _st) > _gt)) {
+    float low = _lt + 2 * _st;
+    if ((_attribute_state & M2MReportHandler::Gt) == M2MReportHandler::Gt &&
+            (low >= _gt)) {
         success = false;
     }
     return success;
@@ -331,6 +335,8 @@ bool M2MReportHandler::check_attribute_validity()
 void M2MReportHandler::stop_timers()
 {
     tr_debug("M2MReportHandler::stop_timers()");
+    _pmin_exceeded = false;
+    _pmax_exceeded = false;
     if (_pmin_timer) {
         _pmin_timer->stop_timer();
     }
@@ -341,18 +347,59 @@ void M2MReportHandler::stop_timers()
 
 void M2MReportHandler::set_default_values()
 {
-    _notif_params_set = false;
-    _pmax_set = false;
-    _pmin_set = false;
-    _gt_set = false;
     _pmax = -1.0f;
     _pmin = 1.0f;
     _gt = 0.0f;
     _lt = 0.0f;
     _st = 0.0f;
-    _pmin_exceeded = false;
-    _pmin_trigger = false;
+    _pmin_exceeded = false;    
     _pmax_exceeded = false;
     _report_scheduled = false;
     _last_value = 0.0f;
+    _attribute_state = 0;
+}
+
+bool M2MReportHandler::check_threshold_values()
+{
+    tr_debug("M2MReportHandler::check_threshold_values");
+    bool can_send = false;
+    if ((_current_value >= _high_step ||
+        _current_value <= _low_step)) {
+        can_send = true;
+        // GT & LT set.
+        if ((_attribute_state & (M2MReportHandler::Lt | M2MReportHandler::Gt))
+                 == (M2MReportHandler::Lt | M2MReportHandler::Gt)) {
+            if (_current_value > _gt || _current_value < _lt) {
+                can_send = true;
+            }
+            else {
+                can_send = false;
+            }
+        }
+        // Only LT
+        else if ((_attribute_state & M2MReportHandler::Lt) == M2MReportHandler::Lt &&
+               (_attribute_state & M2MReportHandler::Gt) == 0 ) {
+            if (_current_value < _lt) {
+                can_send = true;
+            }
+            else {
+                can_send = false;
+            }
+        }
+        // Only GT
+        else if ((_attribute_state & M2MReportHandler::Gt) == M2MReportHandler::Gt &&
+               (_attribute_state & M2MReportHandler::Lt) == 0 ) {
+            if (_current_value > _gt) {
+                can_send = true;
+            }
+            else {
+                can_send = false;
+            }
+        }
+        // GT & LT not set.
+        else {
+            can_send = true;
+        }        
+    }
+    return can_send;
 }

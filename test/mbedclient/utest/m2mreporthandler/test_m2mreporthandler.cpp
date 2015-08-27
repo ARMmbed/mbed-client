@@ -91,8 +91,7 @@ void Test_M2MReportHandler::test_parse_notification_attribute()
     CHECK(false == _handler->parse_notification_attribute(val3, M2MBase::ObjectInstance ));
 
     char* val_real = {"st=6&pmax=3&lt=1&gt=100"};
-    CHECK(true == _handler->parse_notification_attribute(val_real, M2MBase::Resource ));
-    CHECK(true == _handler->_notif_params_set);
+    CHECK(true == _handler->parse_notification_attribute(val_real, M2MBase::Resource ));    
 
     char* val_real1 = {"a=1&pmin=2&pmax=3&gt=4&lt=5&st=6&cancel"};
     CHECK(false == _handler->parse_notification_attribute(val_real1, M2MBase::Resource ));
@@ -104,8 +103,7 @@ void Test_M2MReportHandler::test_parse_notification_attribute()
     CHECK(true == _handler->parse_notification_attribute(val3_real, M2MBase::Resource ));
 
     char* val4_real = {"cancel"};
-    CHECK(true == _handler->parse_notification_attribute(val4_real, M2MBase::Resource ));
-    CHECK(false == _handler->_notif_params_set);
+    CHECK(true == _handler->parse_notification_attribute(val4_real, M2MBase::Resource ));    
 
     char* val5_real = {"pmin=10"};
     CHECK(true == _handler->parse_notification_attribute(val5_real, M2MBase::Resource ));
@@ -141,8 +139,7 @@ void Test_M2MReportHandler::test_timer_expired()
 
     _observer->visited = false;
     _handler->_report_scheduled = true;
-    _handler->timer_expired(M2MTimerObserver::PMinTimer);
-    CHECK(_handler->_pmin_trigger == false);
+    _handler->timer_expired(M2MTimerObserver::PMinTimer);    
     CHECK(_observer->visited == true);
 
     _handler->_under_observation = true;
@@ -162,12 +159,8 @@ void Test_M2MReportHandler::test_set_value()
     _handler->_high_step = 100;
     _handler->_low_step = 2;
 
-    _handler->_limits[0] = 10;
-    _handler->_limits[1] = 50;
-
     _handler->set_value(8);
 
-    _handler->_last_band = 2;
     _handler->set_value(1);
     CHECK(_handler->_report_scheduled == true);
 
