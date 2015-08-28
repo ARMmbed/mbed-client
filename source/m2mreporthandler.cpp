@@ -65,13 +65,13 @@ void M2MReportHandler::set_under_observation(bool observed)
     if(observed) {
         // initializes and sends an update if observing is on, don't change observing state
         // allows cancel to turn off observing and update state without sending a notification.
-        if (check_threshold_values()) {
+        //if (check_threshold_values()) {
             handle_timers();
-        }
-        else {
+        //}
+        /*else {
             _value_not_in_range = true;
             tr_debug("M2MReportHandler::set_under_observation - current value doesn't meet treshold limits");
-        }
+        }*/
     }
     else {
         set_default_values();
@@ -90,7 +90,8 @@ void M2MReportHandler::set_value(float value)
         else {
             tr_debug("M2MReportHandler::set_value - value not in range");
             if ((_attribute_state & M2MReportHandler::Lt) == M2MReportHandler::Lt ||
-                    (_attribute_state & M2MReportHandler::Gt) == M2MReportHandler::Gt) {
+                    (_attribute_state & M2MReportHandler::Gt) == M2MReportHandler::Gt ||
+                    (_attribute_state & M2MReportHandler::St) == M2MReportHandler::St) {
                 tr_debug("M2MReportHandler::set_value - clear pmin timer");
                 _value_not_in_range = true;
                 _pmin_timer->stop_timer();
@@ -241,7 +242,7 @@ bool M2MReportHandler::set_notification_attribute(char* option,
             M2MBase::Resource == type){
         sscanf(value, "%f", &_st);
         success = true;
-        _attribute_state |= M2MReportHandler::St;
+        _attribute_state |= M2MReportHandler::St;        
         tr_debug("M2MReportHandler::set_notification_attribute %s to %f", attribute, _st);
     }
     else if(strcmp(attribute, CANCEL.c_str()) == 0) {
@@ -266,10 +267,10 @@ void M2MReportHandler::schedule_report(float value)
             tr_debug("M2MReportHandler::schedule_report - report value");
             report(value);
         }
-        else if(_value_not_in_range) {
+        /*else if(_value_not_in_range) {
             _report_scheduled = true;
             handle_timers();
-        }
+        }*/
         else {
             tr_debug("M2MReportHandler::schedule_report - set true");
             _report_scheduled = true;
@@ -288,13 +289,15 @@ void M2MReportHandler::report(float value)
         _low_step = value - _st;
         _observer.observation_to_be_sent();
     }
+    tr_debug("M2MReportHandler::report() - HIGH = %f", _high_step);
+    tr_debug("M2MReportHandler::report() - LOW = %f", _low_step);
     handle_timers();
 }
 
 void M2MReportHandler::handle_timers()
 {
     uint64_t time_interval = 0;
-    if(_pmin > 0) {
+    if(_pmin > 0 && check_threshold_values()) {
         time_interval = (uint64_t)(_pmin * 1000);
         tr_debug("M2MReportHandler::handle_timers() - Start PMinTimer");        
         _pmin_timer->start_timer(time_interval,
@@ -359,43 +362,77 @@ bool M2MReportHandler::check_threshold_values()
 {
     tr_debug("M2MReportHandler::check_threshold_values");
     bool can_send = false;
-    if ((_current_value >= _high_step ||
-        _current_value <= _low_step)) {
-        can_send = true;
-        // GT & LT set.
-        if ((_attribute_state & (M2MReportHandler::Lt | M2MReportHandler::Gt))
-                 == (M2MReportHandler::Lt | M2MReportHandler::Gt)) {
-            if (_current_value > _gt || _current_value < _lt) {
-                can_send = true;
-            }
-            else {
-                can_send = false;
-            }
-        }
-        // Only LT
-        else if ((_attribute_state & M2MReportHandler::Lt) == M2MReportHandler::Lt &&
-               (_attribute_state & M2MReportHandler::Gt) == 0 ) {
-            if (_current_value < _lt) {
-                can_send = true;
-            }
-            else {
-                can_send = false;
-            }
-        }
-        // Only GT
-        else if ((_attribute_state & M2MReportHandler::Gt) == M2MReportHandler::Gt &&
-               (_attribute_state & M2MReportHandler::Lt) == 0 ) {
-            if (_current_value > _gt) {
-                can_send = true;
-            }
-            else {
-                can_send = false;
-            }
-        }
-        // GT & LT not set.
-        else {
+    // Check step condition
+    if ((_attribute_state & M2MReportHandler::St) == M2MReportHandler::St) {
+        if ((_current_value >= _high_step ||
+            _current_value <= _low_step)) {
+            tr_debug("M2MReportHandler::check_threshold_values - st set and matching");
+            tr_debug("M2MReportHandler::check_threshold_values - cur value:%f, high_step:%f, low:%f", _current_value, _high_step, _low_step);
             can_send = true;
-        }        
+        }
+        else {
+            tr_debug("M2MReportHandler::check_threshold_values - st set and NOT matching");
+            if ((_attribute_state & M2MReportHandler::Lt) == M2MReportHandler::Lt ||
+                    (_attribute_state & M2MReportHandler::Gt) == M2MReportHandler::Gt ) {
+                can_send = check_gt_lt_params();
+            }
+            else {
+                can_send = false;
+            }
+        }
+    }
+    else {
+        tr_debug("M2MReportHandler::check_threshold_values - st NOT set");
+        can_send = check_gt_lt_params();
+    }
+    tr_debug("M2MReportHandler::check_threshold_values - cansend=%d", (int)can_send);
+    return can_send;
+}
+
+bool M2MReportHandler::check_gt_lt_params()
+{
+    tr_debug("M2MReportHandler::check_gt_lt_params");
+    bool can_send = false;
+    // GT & LT set.
+    if ((_attribute_state & (M2MReportHandler::Lt | M2MReportHandler::Gt))
+             == (M2MReportHandler::Lt | M2MReportHandler::Gt)) {
+        if (_current_value > _gt || _current_value < _lt) {
+            tr_debug("M2MReportHandler::check_gt_lt_params - GT LT set and matching");
+            can_send = true;
+        }
+        else {
+            tr_debug("M2MReportHandler::check_gt_lt_params - GT LT set and NOT matching");
+            can_send = false;
+        }
+    }
+    // Only LT
+    else if ((_attribute_state & M2MReportHandler::Lt) == M2MReportHandler::Lt &&
+           (_attribute_state & M2MReportHandler::Gt) == 0 ) {
+        if (_current_value < _lt) {
+            tr_debug("M2MReportHandler::check_gt_lt_params - LT set and matching");
+            can_send = true;
+        }
+        else {
+            tr_debug("M2MReportHandler::check_gt_lt_params - LT set and NOT matching");
+            can_send = false;
+        }
+    }
+    // Only GT
+    else if ((_attribute_state & M2MReportHandler::Gt) == M2MReportHandler::Gt &&
+           (_attribute_state & M2MReportHandler::Lt) == 0 ) {
+        if (_current_value > _gt) {
+            tr_debug("M2MReportHandler::check_gt_lt_params - GT set and matching");
+            can_send = true;
+        }
+        else {
+            tr_debug("M2MReportHandler::check_gt_lt_params - GT set and NOT matching");
+            can_send = false;
+        }
+    }
+    // GT & LT not set.
+    else {
+        tr_debug("M2MReportHandler::check_gt_lt_params - GT LT NOT set");
+        can_send = true;
     }
     return can_send;
 }

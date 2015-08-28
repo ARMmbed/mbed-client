@@ -131,6 +131,8 @@ private:
      */
     bool check_threshold_values();
 
+    bool check_gt_lt_params();
+
 private:
 
     M2MReportObserver           &_observer;
