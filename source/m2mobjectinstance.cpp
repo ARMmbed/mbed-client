@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 #include "mbed-client/m2mobjectinstance.h"
+#include "mbed-client/m2mobject.h"
 #include "mbed-client/m2mconstants.h"
 #include "mbed-client/m2mresource.h"
 #include "mbed-client/m2mresource.h"
@@ -21,6 +22,7 @@
 #include "include/m2mtlvserializer.h"
 #include "include/m2mtlvdeserializer.h"
 #include "include/nsdllinker.h"
+#include "include/m2mreporthandler.h"
 #include "ns_trace.h"
 
 M2MObjectInstance& M2MObjectInstance::operator=(const M2MObjectInstance& other)
@@ -40,13 +42,16 @@ M2MObjectInstance& M2MObjectInstance::operator=(const M2MObjectInstance& other)
 }
 
 M2MObjectInstance::M2MObjectInstance(const M2MObjectInstance& other)
-: M2MBase(other)
+: M2MBase(other),
+  _object_callback(other._object_callback)
 {
     this->operator=(other);
 }
 
-M2MObjectInstance::M2MObjectInstance(const String &object_name)
-: M2MBase(object_name,M2MBase::Dynamic)
+M2MObjectInstance::M2MObjectInstance(const String &object_name,
+                                     M2MObjectCallback &object_callback)
+: M2MBase(object_name,M2MBase::Dynamic),
+  _object_callback(object_callback)
 {
     M2MBase::set_base_type(M2MBase::ObjectInstance);
     if(M2MBase::name_id() != -1) {
@@ -82,7 +87,7 @@ M2MResource* M2MObjectInstance::create_static_resource(const String &resource_na
     if( resource_name.empty() ){
         return res;
     }
-    res = new M2MResource(resource_name, resource_type, type,
+    res = new M2MResource(*this,resource_name, resource_type, type,
                                value, value_length, multiple_instance);
     if(res) {
         _resource_list.push_back(res);
@@ -101,7 +106,7 @@ M2MResource* M2MObjectInstance::create_dynamic_resource(const String &resource_n
     if( resource_name.empty() ){
         return res;
     }
-    res = new M2MResource(resource_name, resource_type, type,
+    res = new M2MResource(*this,resource_name, resource_type, type,
                           observable, multiple_instance);
     if(res) {
         _resource_list.push_back(res);
@@ -123,13 +128,13 @@ M2MResourceInstance* M2MObjectInstance::create_static_resource_instance(const St
     }
     M2MResource *res = resource(resource_name);
     if(!res) {
-        res = new M2MResource(resource_name, resource_type, type,
+        res = new M2MResource(*this,resource_name, resource_type, type,
                               value, value_length, true);
         _resource_list.push_back(res);
     }
     if(res->supports_multiple_instances()&& (res->resource_instance(instance_id) == NULL)) {
         instance = new M2MResourceInstance(resource_name, resource_type, type,
-                                           value, value_length);
+                                           value, value_length,*this);
         if(instance) {
             instance->set_operation(M2MBase::GET_ALLOWED);
             instance->set_observable(false);
@@ -153,12 +158,12 @@ M2MResourceInstance* M2MObjectInstance::create_dynamic_resource_instance(const S
     }
     M2MResource *res = resource(resource_name);
     if(!res) {
-        res = new M2MResource(resource_name, resource_type, type,
+        res = new M2MResource(*this,resource_name, resource_type, type,
                           observable, true);
         _resource_list.push_back(res);
     }
     if(res->supports_multiple_instances() && (res->resource_instance(instance_id) == NULL)) {
-        instance = new M2MResourceInstance(resource_name, resource_type, type);
+        instance = new M2MResourceInstance(resource_name, resource_type, type,*this);
         if(instance) {
             instance->set_operation(M2MBase::GET_PUT_ALLOWED);
             instance->set_observable(observable);
@@ -329,18 +334,28 @@ M2MBase::BaseType M2MObjectInstance::base_type() const
     return M2MBase::base_type();
 }
 
-bool M2MObjectInstance::handle_observation_attribute(char *&query)
+void M2MObjectInstance::add_observation_level(M2MBase::Observation observation_level)
 {
-    bool success = false;
+    M2MBase::add_observation_level(observation_level);
     if(!_resource_list.empty()) {
         M2MResourceList::const_iterator it;
         it = _resource_list.begin();
-        for ( ; it != _resource_list.end(); it++ ) {
-            tr_debug("M2MObjectInstance::handle_observation_attribute()");
-            success = (*it)->handle_observation_attribute(query);
+        for ( ; it != _resource_list.end(); it++ ) {            
+            (*it)->add_observation_level(observation_level);
         }
     }
-    return success;
+}
+
+void M2MObjectInstance::remove_observation_level(M2MBase::Observation observation_level)
+{
+    M2MBase::remove_observation_level(observation_level);
+    if(!_resource_list.empty()) {
+        M2MResourceList::const_iterator it;
+        it = _resource_list.begin();
+        for ( ; it != _resource_list.end(); it++ ) {            
+            (*it)->remove_observation_level(observation_level);
+        }
+    }
 }
 
 sn_coap_hdr_s* M2MObjectInstance::handle_get_request(nsdl_s *nsdl,
@@ -417,9 +432,7 @@ sn_coap_hdr_s* M2MObjectInstance::handle_get_request(nsdl_s *nsdl,
                             if(START_OBSERVATION == observe_option) {
                                 tr_debug("M2MObjectInstance::handle_get_request - Starts Observation");
                                 // If the observe length is 0 means register for observation.
-                                if(received_coap_header->options_list_ptr->observe_len == 0) {
-                                    set_under_observation(true,observation_handler);
-                                } else {
+                                if(received_coap_header->options_list_ptr->observe_len != 0) {
                                     for(int i=0;i < received_coap_header->options_list_ptr->observe_len; i++) {
                                         number = (*(received_coap_header->options_list_ptr->observe_ptr + i) & 0xff) <<
                                                  8*(received_coap_header->options_list_ptr->observe_len- 1 - i);
@@ -429,6 +442,8 @@ sn_coap_hdr_s* M2MObjectInstance::handle_get_request(nsdl_s *nsdl,
                                 if(number == 0) {
                                     tr_debug("M2MResource::handle_get_request - Put Resource under Observation");
                                     set_under_observation(true,observation_handler);
+                                    add_observation_level(M2MBase::OI_Attribute);
+
                                     uint8_t *obs_number = (uint8_t*)malloc(3);
                                     memset(obs_number,0,3);
                                     uint8_t observation_number_length = 1;
@@ -448,6 +463,8 @@ sn_coap_hdr_s* M2MObjectInstance::handle_get_request(nsdl_s *nsdl,
                             } else if (STOP_OBSERVATION == observe_option) {
                                 tr_debug("M2MResource::handle_get_request - Stops Observation");
                                 set_under_observation(false,NULL);
+                                remove_observation_level(M2MBase::OI_Attribute);
+
                             }
                         }
                     }
@@ -548,4 +565,16 @@ sn_coap_hdr_s* M2MObjectInstance::handle_post_request(nsdl_s *nsdl,
                                            received_coap_header,
                                            msg_code);
     return coap_response;
+}
+
+void M2MObjectInstance::notification_update(M2MBase::Observation observation_level)
+{
+    if(M2MBase::O_Attribute == observation_level) {
+        _object_callback.notification_update();
+    } else {
+        M2MReportHandler *report_handler = M2MBase::report_handler();
+        if(report_handler) {
+            report_handler->trigger_object_notification();
+        }
+    }
 }

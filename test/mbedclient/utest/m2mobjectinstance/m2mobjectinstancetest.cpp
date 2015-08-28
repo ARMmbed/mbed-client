@@ -96,11 +96,6 @@ TEST(M2MObjectInstance, base_type)
     m2m_object_instance->test_base_type();
 }
 
-TEST(M2MObjectInstance, handle_observation_attribute)
-{
-    m2m_object_instance->test_handle_observation_attribute();
-}
-
 TEST(M2MObjectInstance, handle_get_request)
 {
     m2m_object_instance->test_handle_get_request();
@@ -114,4 +109,9 @@ TEST(M2MObjectInstance, handle_put_request)
 TEST(M2MObjectInstance, handle_post_request)
 {
     m2m_object_instance->test_handle_post_request();
+}
+
+TEST(M2MObjectInstance, notification_update)
+{
+    m2m_object_instance->test_notification_update();
 }

@@ -26,6 +26,7 @@ String *m2mbase_stub::string_value;
 M2MBase::BaseType m2mbase_stub::base_type;
 M2MBase::Operation m2mbase_stub::operation;
 M2MBase::Mode m2mbase_stub::mode_value;
+M2MBase::Observation m2mbase_stub::observation_level_value;
 
 void *m2mbase_stub::void_value;
 M2MObservationHandler *m2mbase_stub::observe;
@@ -41,6 +42,7 @@ void m2mbase_stub::clear()
     name_id_value = -1;
     mode_value = M2MBase::Static;
     base_type = M2MBase::Object;
+    observation_level_value = M2MBase::None;
     bool_value = false;
     m2mbase_stub::operation = M2MBase::NOT_ALLOWED;
     void_value = NULL;
@@ -134,6 +136,14 @@ void M2MBase::set_observable(bool /*observable*/)
 {
 }
 
+void M2MBase::add_observation_level(M2MBase::Observation)
+{
+}
+
+void M2MBase::remove_observation_level(M2MBase::Observation)
+{
+}
+
 void M2MBase::set_under_observation(bool /*observed*/,
                                    M2MObservationHandler */*handler*/)
 {
@@ -147,6 +157,11 @@ void M2MBase::set_observation_token(const uint8_t */*token*/,
 bool M2MBase::is_observable() const
 {
     return m2mbase_stub::bool_value;
+}
+
+M2MBase::Observation M2MBase::observation_level() const
+{
+    return m2mbase_stub::observation_level_value;
 }
 
 void M2MBase::get_observation_token(uint8_t *&/*token*/,

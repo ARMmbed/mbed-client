@@ -34,7 +34,7 @@ M2MBase& M2MBase::operator=(const M2MBase& other)
         _instance_id = other._instance_id;
         _observable = other._observable;
         _observation_number = other._observation_number;
-
+        _observation_level = other._observation_level;
         _observation_handler = other._observation_handler;
 
         if(_token) {
@@ -77,6 +77,7 @@ M2MBase::M2MBase(const M2MBase& other) :
     _observable = other._observable;
     _observation_handler = other._observation_handler;
     _observation_number = other._observation_number;
+    _observation_level = other._observation_level;
 
     _token_length = other._token_length;
     if(other._token) {
@@ -96,8 +97,9 @@ M2MBase::M2MBase(const String & resource_name,
                  M2MBase::Mode mde)
 : _report_handler(NULL),
   _observation_handler(NULL),
-  _operation(M2MBase::NOT_ALLOWED),
+  _operation(M2MBase::NOT_ALLOWED),  
   _mode(mde),
+  _observation_level(M2MBase::None),
   _name(resource_name),
   _coap_content_type(0),
   _instance_id(0),
@@ -155,6 +157,16 @@ void M2MBase::set_coap_content_type(const uint8_t con_type)
 void M2MBase::set_observable(bool observable)
 {
    _observable = observable;
+}
+
+void M2MBase::add_observation_level(M2MBase::Observation observation_level)
+{
+    _observation_level = (M2MBase::Observation)(_observation_level | observation_level);
+}
+
+void M2MBase::remove_observation_level(M2MBase::Observation observation_level)
+{
+    _observation_level = (M2MBase::Observation)(_observation_level ^ observation_level);
 }
 
 void M2MBase::set_under_observation(bool observed,
@@ -245,6 +257,11 @@ uint8_t M2MBase::coap_content_type() const
 bool M2MBase::is_observable() const
 {
     return _observable;
+}
+
+M2MBase::Observation M2MBase::observation_level() const
+{
+    return _observation_level;
 }
 
 void M2MBase::get_observation_token(uint8_t *&token, uint32_t &token_length)

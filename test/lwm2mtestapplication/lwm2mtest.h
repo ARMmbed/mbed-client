@@ -58,7 +58,9 @@ public:
                        bool new_instance,
                        uint8_t object_operation,
                        uint8_t object_instance_operation,
-					   uint16_t object_instance_id);
+                       uint16_t object_instance_id,
+                       bool object_observable,
+                       bool object_instance_observable);
 
     bool create_static_resource_string(const char *name,
                                        const char *value,

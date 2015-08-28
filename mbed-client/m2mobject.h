@@ -18,9 +18,9 @@
 
 #include "mbed-client/m2mvector.h"
 #include "mbed-client/m2mbase.h"
+#include "mbed-client/m2mobjectinstance.h"
 
 //FORWARD DECLARATION
-class M2MObjectInstance;
 typedef Vector<M2MObjectInstance *> M2MObjectInstanceList;
 
 /**
@@ -30,7 +30,9 @@ typedef Vector<M2MObjectInstance *> M2MObjectInstanceList;
  *  instances associated with the given object.
  */
 
-class M2MObject : public M2MBase {
+class M2MObject : public M2MBase,
+                  public M2MObjectCallback
+{
 
 friend class M2MInterfaceFactory;
 
@@ -98,11 +100,16 @@ public:
     M2MBase::BaseType base_type() const;
 
     /**
-     * @brief Parses the received query for notification
-     * attribute.
-     * @return true if required attributes are present else false.
+     * @brief Adds the observation level for the object.
+     * @param observation_level, Level of the observation.
      */
-    virtual bool handle_observation_attribute(char *&query);
+    virtual void add_observation_level(M2MBase::Observation observation_level);
+
+    /**
+     * @brief Removes the observation level for the object.
+     * @param observation_level, Level of the observation.
+     */
+    virtual void remove_observation_level(M2MBase::Observation observation_level);
 
     /**
      * @brief Handles GET request for the registered objects.
@@ -138,6 +145,10 @@ public:
     virtual sn_coap_hdr_s* handle_post_request(nsdl_s *nsdl,
                                                sn_coap_hdr_s *received_coap_header,
                                                M2MObservationHandler *observation_handler = NULL);
+
+protected :
+
+     virtual void notification_update();
 
 private:
 

@@ -275,7 +275,7 @@ bool M2MNsdlInterface::send_update_registration(const uint32_t lifetime)
         _registration_timer->start_timer(registration_time() * 1000,
                                          M2MTimerObserver::Registration,
                                          false);
-        if(_update_id == 0 && _nsdl_handle &&
+        if(_nsdl_handle &&
            _endpoint && _endpoint->lifetime_ptr) {
             _update_id = sn_nsdl_update_registration(_nsdl_handle,
                                                      _endpoint->lifetime_ptr,
@@ -284,12 +284,11 @@ bool M2MNsdlInterface::send_update_registration(const uint32_t lifetime)
             success = _update_id != 0;
         }
     } else {
-        if(_update_id == 0 && _nsdl_handle) {
+        if(_nsdl_handle) {
             _update_id = sn_nsdl_update_registration(_nsdl_handle, NULL, 0);
             tr_debug("M2MNsdlInterface::send_update_registration - regular update- _update_id %d", _update_id);
             success = _update_id != 0;
         }
-
     }
     return success;
 }
@@ -381,6 +380,7 @@ uint8_t M2MNsdlInterface::received_from_server_callback(struct nsdl_s * /*nsdl_h
                     }
                 }
                 if(_endpoint->lifetime_ptr) {
+                    _registration_timer->stop_timer();
                     _registration_timer->start_timer(registration_time() * 1000,
                                                      M2MTimerObserver::Registration,
                                                      false);
@@ -738,7 +738,7 @@ bool M2MNsdlInterface::create_nsdl_object_structure(M2MObject *object)
     tr_debug("M2MNsdlInterface::create_nsdl_object_structure()");
     bool success = false;
     if(object) {
-        object->set_under_observation(false,this);
+        //object->set_under_observation(false,this);
         M2MObjectInstanceList instance_list = object->instances();
         tr_debug("M2MNsdlInterface::create_nsdl_object_structure - Objecy Instance count %d", instance_list.size());
         if(!instance_list.empty()) {
@@ -772,7 +772,7 @@ bool M2MNsdlInterface::create_nsdl_object_instance_structure(M2MObjectInstance *
         free(inst_id);
 
 
-        object_instance->set_under_observation(false,this);
+        //object_instance->set_under_observation(false,this);
 
         M2MResourceList res_list = object_instance->resources();
         tr_debug("M2MNsdlInterface::create_nsdl_object_instance_structure - ResourceBase count %d", res_list.size());

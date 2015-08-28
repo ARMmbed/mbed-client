@@ -43,13 +43,15 @@ M2MObjectInstance& M2MObjectInstance::operator=(const M2MObjectInstance& )
 }
 
 M2MObjectInstance::M2MObjectInstance(const M2MObjectInstance& other)
-: M2MBase(other)
+: M2MBase(other),
+  _object_callback(other._object_callback)
 {
     *this = other;
 }
 
-M2MObjectInstance::M2MObjectInstance(const String &object_name)
-: M2MBase(object_name,M2MBase::Dynamic)
+M2MObjectInstance::M2MObjectInstance(const String &object_name, M2MObjectCallback &object_callback)
+: M2MBase(object_name,M2MBase::Dynamic),
+  _object_callback(object_callback)
 {
 }
 
@@ -130,8 +132,12 @@ M2MBase::BaseType M2MObjectInstance::base_type() const
     return m2mobjectinstance_stub::base_type;
 }
 
-bool M2MObjectInstance::handle_observation_attribute(char *&){
-    return m2mobjectinstance_stub::bool_value;
+void M2MObjectInstance::add_observation_level(M2MBase::Observation)
+{
+}
+
+void M2MObjectInstance::remove_observation_level(M2MBase::Observation)
+{
 }
 
 sn_coap_hdr_s* M2MObjectInstance::handle_get_request(nsdl_s *,
@@ -153,4 +159,8 @@ sn_coap_hdr_s* M2MObjectInstance::handle_post_request(nsdl_s *,
                                    M2MObservationHandler *)
 {
     return m2mobjectinstance_stub::header;
+}
+
+void M2MObjectInstance::notification_update(M2MBase::Observation)
+{
 }

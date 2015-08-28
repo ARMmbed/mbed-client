@@ -20,6 +20,7 @@
 #include "mbed-client/m2mresourceinstance.h"
 
 //FORWARD DECLARATION
+class M2MObjectInstance;
 typedef Vector<M2MResourceInstance *> M2MResourceInstanceList;
 
 /**
@@ -46,7 +47,8 @@ private: // Constructor and destructor are private
      * @param value_length, Length of the value pointer
      * @param multiple_instance, True if resource supports instances.
      */
-    M2MResource(const String &resource_name,
+    M2MResource(M2MObjectInstanceCallback &object_instance_callback,
+                const String &resource_name,
                 const String &resource_type,
                 M2MResourceInstance::ResourceType type,
                 const uint8_t *value,
@@ -57,7 +59,8 @@ private: // Constructor and destructor are private
      * @brief Constructor
      * @param name, name of the object
      */
-    M2MResource(const String &resource_name,
+    M2MResource(M2MObjectInstanceCallback &object_instance_callback,
+                const String &resource_name,
                 const String &resource_type,
                 M2MResourceInstance::ResourceType type,
                 bool observable,
@@ -126,6 +129,19 @@ public:
      * @return true if required attributes are present else false.
      */
     virtual bool handle_observation_attribute(char *&query);
+
+    /**
+     * @brief Adds the observation level for the object.
+     * @param observation_level, Level of the observation.
+     */
+    virtual void add_observation_level(M2MBase::Observation observation_level);
+
+    /**
+     * @brief Removes the observation level for the object.
+     * @param observation_level, Level of the observation.
+     */
+    virtual void remove_observation_level(M2MBase::Observation observation_level);
+
 
 private:
 

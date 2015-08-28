@@ -44,6 +44,8 @@
                                     "   Options for custom object\n"\
                                     "   --name <name>       Object name\n"\
                                     "   --new_instance <n>  If you need new instance 0=false(default), 1=true\n"\
+                                    "   --object_observable <n>    Object is observable false=0(default), true=1\n"\
+                                    "   --object_instance_observable <n>    Object Instance is observable false=0(default), true=1\n"\
 									"   --object_instance_id <n> Instance id of object instance 0=(default)\n"\
                                     "   --object_operation <n> Operation Mode, Default is  0, NOT_ALLOWED = 0, GET_ALLOWED = 1,\n"\
                                     "PUT_ALLOWED = 2, GET_PUT_ALLOWED = 3, POST_ALLOWED = 4,GET_POST_ALLOWED = 5,\n"\
@@ -168,6 +170,8 @@ void  lwm2m_command_init(void)
   cmd_alias_add("lwm2m-client-test-device", "lwm2m-client device --manufacturer ARM --model_number 2015 --serial_number 12345");
   cmd_alias_add("lwm2m-client-test-bootstrap-object", "lwm2m-client bootstrap_object --address coap://10.45.3.10:5693");
   cmd_alias_add("lwm2m-client-test-register-object", "lwm2m-client register_object --address coap://10.45.3.10:5683");
+  cmd_alias_add("lwm2m-client-test-object", "lwm2m-client object --name 10 --object_observable 1 --object_instance_observable 1 --object_operation 3 --object_instance_operation 3");
+  cmd_alias_add("lwm2m-client-test-dynamic_resource", "lwm2m-client dynamic_resource --name 1 --resource_operation 3 --observable 0");
   cmd_alias_add("lwm2m-client-test-secure-register-object", "lwm2m-client register_object --address coap://10.45.3.10:5684 --secure 1");
   cmd_add("exit", exit_command, "exit command", EXIT_MANUAL);
 }
@@ -465,13 +469,24 @@ int lwm2m_client_object_command(int argc, char *argv[])
     int32_t object_operation = 0;
     int32_t object_instance_operation = 0;
     int32_t object_instance_id = 0;
+    int32_t object_observable = 0;
+    int32_t object_instance_observable = 0;
 
     if(cmd_parameter_val(argc, argv, "--name", &object_name)) {
         cmd_parameter_int(argc, argv, "--new_instance", &new_instance);
         cmd_parameter_int(argc, argv, "--object_operation", &object_operation);
         cmd_parameter_int(argc, argv, "--object_instance_operation", &object_instance_operation);
         cmd_parameter_int(argc, argv, "--object_instance_id", &object_instance_id);
-        if(!lwm2m_client.create_object(object_name,new_instance,object_operation,object_instance_operation, object_instance_id)) {
+        cmd_parameter_int(argc, argv, "--object_observable", &object_observable);
+        cmd_parameter_int(argc, argv, "--object_instance_observable", &object_instance_observable);
+
+        if(!lwm2m_client.create_object(object_name,
+                                       new_instance,
+                                       object_operation,
+                                       object_instance_operation,
+                                       object_instance_id,
+                                       object_observable,
+                                       object_instance_observable)) {
             return_code = CMDLINE_RETCODE_INVALID_PARAMETERS;
          }
     }

@@ -23,6 +23,11 @@
 typedef Vector<M2MResource *> M2MResourceList;
 typedef Vector<M2MResourceInstance *> M2MResourceInstanceList;
 
+class M2MObjectCallback {
+public:
+    virtual void notification_update() = 0;
+};
+
 /**
  *  @brief M2MObjectInstance.
  *  This class is the instance class for mbed Client Objects based on which all defined
@@ -30,7 +35,9 @@ typedef Vector<M2MResourceInstance *> M2MResourceInstanceList;
  *  instances associated with the given object.
  */
 
-class M2MObjectInstance : public M2MBase {
+class M2MObjectInstance : public M2MBase,
+                          public M2MObjectInstanceCallback
+{
 
 friend class M2MObject;
 
@@ -42,7 +49,8 @@ private: // Constructor and destructor are private
      * @brief Constructor
      * @param name, name of the object
      */
-    M2MObjectInstance(const String &object_name);
+    M2MObjectInstance(const String &object_name,
+                      M2MObjectCallback &object_callback);
 
 
     // Prevents the use of default constructor.
@@ -179,11 +187,16 @@ public:
     M2MBase::BaseType base_type() const;
 
     /**
-     * @brief Parses the received query for notification
-     * attribute.
-     * @return true if required attributes are present else false.
+     * @brief Adds the observation level for the object.
+     * @param observation_level, Level of the observation.
      */
-    virtual bool handle_observation_attribute(char *&query);
+    virtual void add_observation_level(M2MBase::Observation observation_level);
+
+    /**
+     * @brief Removes the observation level for the object.
+     * @param observation_level, Level of the observation.
+     */
+    virtual void remove_observation_level(M2MBase::Observation observation_level);
 
     /**
      * @brief Handles GET request for the registered objects.
@@ -220,8 +233,14 @@ public:
                                                sn_coap_hdr_s *received_coap_header,
                                                M2MObservationHandler *observation_handler = NULL);
 
+
+protected :
+
+    virtual void notification_update(M2MBase::Observation observation_level);
+
 private:
 
+    M2MObjectCallback   &_object_callback;
     M2MResourceList     _resource_list; // owned
 
     friend class Test_M2MObjectInstance;

@@ -19,6 +19,7 @@
 #include "m2mresourceinstance.h"
 
 class Handler;
+class Callback;
 
 class Test_M2MResourceInstance
 {
@@ -58,6 +59,8 @@ public:
     void test_handle_post_request();
 
     M2MResourceInstance* resource_instance;
+
+    Callback *callback;
 
     Handler* handler;
 };

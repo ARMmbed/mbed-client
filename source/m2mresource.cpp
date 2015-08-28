@@ -41,13 +41,15 @@ M2MResource::M2MResource(const M2MResource& other)
     this->operator=(other);
 }
 
-M2MResource::M2MResource(const String &resource_name,
+M2MResource::M2MResource(M2MObjectInstanceCallback &object_instance_callback,
+                         const String &resource_name,
                          const String &resource_type,
                          M2MResourceInstance::ResourceType type,
                          const uint8_t *value,
                          const uint8_t value_length,
                          bool multiple_instance)
-: M2MResourceInstance(resource_name, resource_type, type, value, value_length),
+: M2MResourceInstance(resource_name, resource_type, type, value, value_length,
+                      object_instance_callback),
   _has_multiple_instances(multiple_instance)
 {
     M2MBase::set_base_type(M2MBase::Resource);
@@ -55,12 +57,14 @@ M2MResource::M2MResource(const String &resource_name,
     M2MBase::set_observable(false);
 }
 
-M2MResource::M2MResource(const String &resource_name,
+M2MResource::M2MResource(M2MObjectInstanceCallback &object_instance_callback,
+                         const String &resource_name,
                          const String &resource_type,
                          M2MResourceInstance::ResourceType type,
                          bool observable,
                          bool multiple_instance)
-: M2MResourceInstance(resource_name, resource_type, type),
+: M2MResourceInstance(resource_name, resource_type, type,
+                      object_instance_callback),
   _has_multiple_instances(multiple_instance)
 {
     M2MBase::set_base_type(M2MBase::Resource);
@@ -160,6 +164,30 @@ bool M2MResource::handle_observation_attribute(char *&query)
             success = M2MBase::handle_observation_attribute(query);
     }
     return success;
+}
+
+void M2MResource::add_observation_level(M2MBase::Observation observation_level)
+{
+    M2MBase::add_observation_level(observation_level);
+    if(!_resource_instance_list.empty()) {
+        M2MResourceInstanceList::const_iterator inst;
+        inst = _resource_instance_list.begin();
+        for ( ; inst != _resource_instance_list.end(); inst++ ) {
+            (*inst)->add_observation_level(observation_level);
+        }
+    }
+}
+
+void M2MResource::remove_observation_level(M2MBase::Observation observation_level)
+{
+    M2MBase::remove_observation_level(observation_level);
+    if(!_resource_instance_list.empty()) {
+        M2MResourceInstanceList::const_iterator inst;
+        inst = _resource_instance_list.begin();
+        for ( ; inst != _resource_instance_list.end(); inst++ ) {
+            (*inst)->remove_observation_level(observation_level);
+        }
+    }
 }
 
 void M2MResource::add_resource_instance(M2MResourceInstance *res)

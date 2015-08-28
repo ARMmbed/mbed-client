@@ -40,13 +40,13 @@ public:
 
     void test_base_type();
 
-    void test_handle_observation_attribute();
-
     void test_handle_get_request();
 
     void test_handle_put_request();
 
     void test_handle_post_request();
+
+    void test_notification_update();
 
     M2MObject* object;
 

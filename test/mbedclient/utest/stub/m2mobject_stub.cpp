@@ -81,8 +81,14 @@ M2MBase::BaseType M2MObject::base_type() const
     return m2mobject_stub::base_type;
 }
 
-bool M2MObject::handle_observation_attribute(char *&){
-    return m2mobject_stub::bool_value;
+void M2MObject::add_observation_level(M2MBase::Observation)
+{
+
+}
+
+void M2MObject::remove_observation_level(M2MBase::Observation)
+{
+
 }
 
 sn_coap_hdr_s* M2MObject::handle_get_request(nsdl_s *,
@@ -104,4 +110,8 @@ sn_coap_hdr_s* M2MObject::handle_post_request(nsdl_s *,
                                    M2MObservationHandler *)
 {
     return m2mobject_stub::header;
+}
+
+void M2MObject::notification_update()
+{
 }

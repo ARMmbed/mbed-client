@@ -19,6 +19,7 @@
 #include "m2mobjectinstance.h"
 
 class Handler;
+class Callback;
 
 class Test_M2MObjectInstance
 {
@@ -51,17 +52,19 @@ public:
 
     void test_base_type();
 
-    void test_handle_observation_attribute();
-
     void test_handle_get_request();
 
     void test_handle_put_request();
 
     void test_handle_post_request();
 
+    void test_notification_update();
+
     M2MObjectInstance* object;
 
     Handler* handler;
+
+    Callback* callback;
 };
 
 #endif // TEST_M2M_OBJECT_INSTANCE_H
