@@ -131,6 +131,10 @@ private:
      */
     bool check_threshold_values();
 
+    /**
+     * @brief Check whether current value matches with GT & LT.
+     * @return True if current value match with GT or LT values.
+     */
     bool check_gt_lt_params();
 
 private:
@@ -142,7 +146,7 @@ private:
     float                       _gt;
     float                       _lt;
     float                       _st;
-    bool                        _pmin_exceeded;    
+    bool                        _pmin_exceeded;
     bool                        _pmax_exceeded;
     bool                        _report_scheduled;    
     M2MTimer                    *_pmin_timer;
@@ -151,8 +155,8 @@ private:
     float                       _low_step;
     float                       _current_value;
     float                       _last_value;    
-    int                         _attribute_state;
-    bool                        _value_not_in_range;
+    int                         _attribute_state;    
+    bool                        _notify;
 
 friend class Test_M2MReportHandler;
 
