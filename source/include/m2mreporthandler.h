@@ -82,6 +82,15 @@ protected : // from M2MTimerObserver
 
 private:
 
+    enum {
+        Cancel = 1,
+        Pmin = 2,
+        Pmax = 4,
+        Lt = 8,
+        Gt = 16,
+        St = 32
+    };
+
     bool set_notification_attribute(char* option, M2MBase::BaseType type);
 
     /**
@@ -95,12 +104,6 @@ private:
     * @brief Reports a sample that satisfies the reporting criteria.
     */
     void report(float value);
-
-    /**
-    * @brief Determine which band [0..num_limits] the provided sample is in
-    * works with any number of bands 2 to MAX_LIMITS+1
-    */
-    int band(float value);
 
     /**
     * @brief Manage timers for pmin and pmax.
@@ -117,30 +120,43 @@ private:
     */
     void stop_timers();
 
+    /**
+    * @brief Set back to default values.
+    */
+    void set_default_values();
+
+    /**
+     * @brief Check if current value match threshold values.
+     * @return True if notify can be send otherwise false.
+     */
+    bool check_threshold_values();
+
+    /**
+     * @brief Check whether current value matches with GT & LT.
+     * @return True if current value match with GT or LT values.
+     */
+    bool check_gt_lt_params();
+
 private:
 
     M2MReportObserver           &_observer;
-    bool                        _under_observation;
-    float                       _value;
+    bool                        _under_observation;    
     float                       _pmax;
     float                       _pmin;
     float                       _gt;
     float                       _lt;
     float                       _st;
     bool                        _pmin_exceeded;
-    bool                        _pmin_trigger;
     bool                        _pmax_exceeded;
     bool                        _report_scheduled;    
     M2MTimer                    *_pmin_timer;
-    M2MTimer                    *_pmax_timer;
-    int                         _num_limits;
-    float                       _limits[MAX_LIMITS];
-    int                         _last_band;
+    M2MTimer                    *_pmax_timer;        
     float                       _high_step;
     float                       _low_step;
     float                       _current_value;
-    float                       _last_value;
-    bool                        _notif_params_set;
+    float                       _last_value;    
+    int                         _attribute_state;    
+    bool                        _notify;
 
 friend class Test_M2MReportHandler;
 
