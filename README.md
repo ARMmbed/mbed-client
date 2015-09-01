@@ -8,7 +8,7 @@ The mbed Device Client API allows mbed OS developers to create applications with
 
 The API is written in C++ to allow quick application development.
 
-There are three interfaces between the mDS and mbed Client:
+There are three interfaces between mDS and mbed Client:
 
 - Client registration and deregistration.
 - Device management and service enabler.
