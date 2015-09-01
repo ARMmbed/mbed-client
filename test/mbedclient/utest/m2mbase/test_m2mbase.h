@@ -43,11 +43,17 @@ public:
 
     void test_set_observable();
 
+    void test_add_observation_level();
+
+    void test_remove_observation_level();
+
     void test_set_under_observation();
 
     void test_set_observation_token();
 
     void test_is_observable();
+
+    void test_observation_level();
 
     void test_get_observation_token();
 
@@ -71,11 +77,7 @@ public:
 
     void test_base_type();
 
-//    void test_set_value();
-
     void test_set_observation_number();
-
-//    void test_get_value();
 
     void test_handle_observation_attribute();
 

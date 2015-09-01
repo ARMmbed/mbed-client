@@ -96,6 +96,32 @@ void M2MReportHandler::set_value(float value)
     }
 }
 
+void M2MReportHandler::trigger_object_notification()
+{
+    tr_debug("M2MReportHandler::trigger_notification()");
+    if(_under_observation) {
+        if (_pmin_exceeded) {
+            tr_debug("M2MReportHandler::trigger_notification - report value");
+            report_object_notification();
+        }
+        else {
+           tr_debug("M2MReportHandler::trigger_notification - set true");
+            _report_scheduled = true;
+        }
+    }
+}
+
+void M2MReportHandler::report_object_notification()
+{
+    tr_debug("M2MReportHandler::report_object_notification()");
+    if(_under_observation) {
+        _pmin_exceeded = false;
+        _pmax_exceeded = false;        
+        _observer.observation_to_be_sent();
+    }
+    handle_timers();
+}
+
 bool M2MReportHandler::parse_notification_attribute(char *&query,
                                                     M2MBase::BaseType type)
 {

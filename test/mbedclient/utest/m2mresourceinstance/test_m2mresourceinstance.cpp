@@ -55,19 +55,36 @@ public:
     bool visited;
 };
 
+class Callback : public M2MObjectInstanceCallback {
+
+public:
+
+    Callback(){}
+    ~Callback(){}
+    void notification_update(M2MBase::Observation) {
+        visited = true;
+    }
+
+    void clear() {visited = false;}
+    bool visited;
+};
+
 
 Test_M2MResourceInstance::Test_M2MResourceInstance()
 {
+    callback = new Callback();
     handler = new Handler();
     resource_instance = new M2MResourceInstance("name",
                                                 "resource_type",
-                                                 M2MResourceInstance::STRING);
+                                                 M2MResourceInstance::STRING,
+                                                *callback);
 }
 
 Test_M2MResourceInstance::~Test_M2MResourceInstance()
 {
     delete resource_instance;
     delete handler;
+    delete callback;
 }
 
 void Test_M2MResourceInstance::test_copy_constructor()
@@ -92,8 +109,9 @@ void Test_M2MResourceInstance::test_assignment_constructor()
     resource_instance->set_value(value,(u_int32_t)sizeof(value));
 
     M2MResourceInstance* res = new M2MResourceInstance("name",
-                                                        "resource_type",
-                                                         M2MResourceInstance::STRING);
+                                                       "resource_type",
+                                                       M2MResourceInstance::STRING,
+                                                       *callback);
 
     u_int8_t value1[] = {"value1"};
     res->set_value(value1,(u_int32_t)sizeof(value1));
@@ -122,7 +140,8 @@ void Test_M2MResourceInstance::test_static_resource_instance()
     u_int8_t value[] = {"value"};
     M2MResourceInstance *res = new M2MResourceInstance("name1", "type1",
                                                        M2MResourceInstance::INTEGER,
-                                                       value, (uint32_t)sizeof(value));
+                                                       value, (uint32_t)sizeof(value),
+                                                       *callback);
 
     CHECK(res != NULL);
     delete res;
@@ -176,17 +195,33 @@ void Test_M2MResourceInstance::test_set_value()
     u_int8_t value2[] = {"12"};
     CHECK(resource_instance->set_value(value2,(u_int32_t)sizeof(value2)) == true);
 
-//    delete m2mbase_stub::observe;
-//    m2mbase_stub::observe = NULL;
-
     TestReportObserver obs;
     m2mbase_stub::report = new M2MReportHandler(obs);
+
+    m2mbase_stub::observation_level_value = M2MBase::O_Attribute;
 
     resource_instance->_resource_type = M2MResourceInstance::INTEGER;
 
     m2mbase_stub::mode_value = M2MBase::Dynamic;
 
     CHECK(resource_instance->set_value(value2,(u_int32_t)sizeof(value2)) == true);
+
+    m2mbase_stub::observation_level_value = M2MBase::OI_Attribute;
+
+    resource_instance->_resource_type = M2MResourceInstance::INTEGER;
+
+    m2mbase_stub::mode_value = M2MBase::Dynamic;
+
+    CHECK(resource_instance->set_value(value2,(u_int32_t)sizeof(value2)) == true);
+
+    m2mbase_stub::observation_level_value = M2MBase::OOI_Attribute;
+
+    resource_instance->_resource_type = M2MResourceInstance::INTEGER;
+
+    m2mbase_stub::mode_value = M2MBase::Dynamic;
+
+    CHECK(resource_instance->set_value(value2,(u_int32_t)sizeof(value2)) == true);
+
 
     delete m2mbase_stub::report;
     m2mbase_stub::report = NULL;
@@ -263,6 +298,10 @@ void Test_M2MResourceInstance::test_handle_get_request()
         free(common_stub::coap_header->content_type_ptr);
         common_stub::coap_header->content_type_ptr = NULL;
     }
+    if(common_stub::coap_header->options_list_ptr->max_age_ptr) {
+        free(common_stub::coap_header->options_list_ptr->max_age_ptr);
+        common_stub::coap_header->options_list_ptr->max_age_ptr = NULL;
+    }
     if(common_stub::coap_header->options_list_ptr) {
         free(common_stub::coap_header->options_list_ptr);
         common_stub::coap_header->options_list_ptr = NULL;
@@ -275,6 +314,10 @@ void Test_M2MResourceInstance::test_handle_get_request()
     if(common_stub::coap_header->content_type_ptr) {
         free(common_stub::coap_header->content_type_ptr);
         common_stub::coap_header->content_type_ptr = NULL;
+    }
+    if(common_stub::coap_header->options_list_ptr->max_age_ptr) {
+        free(common_stub::coap_header->options_list_ptr->max_age_ptr);
+        common_stub::coap_header->options_list_ptr->max_age_ptr = NULL;
     }
     if(common_stub::coap_header->options_list_ptr) {
         free(common_stub::coap_header->options_list_ptr);
@@ -289,6 +332,10 @@ void Test_M2MResourceInstance::test_handle_get_request()
         free(common_stub::coap_header->content_type_ptr);
         common_stub::coap_header->content_type_ptr = NULL;
     }
+    if(common_stub::coap_header->options_list_ptr->max_age_ptr) {
+        free(common_stub::coap_header->options_list_ptr->max_age_ptr);
+        common_stub::coap_header->options_list_ptr->max_age_ptr = NULL;
+    }
     if(common_stub::coap_header->options_list_ptr) {
         free(common_stub::coap_header->options_list_ptr);
         common_stub::coap_header->options_list_ptr = NULL;
@@ -301,6 +348,10 @@ void Test_M2MResourceInstance::test_handle_get_request()
     if(common_stub::coap_header->content_type_ptr) {
         free(common_stub::coap_header->content_type_ptr);
         common_stub::coap_header->content_type_ptr = NULL;
+    }
+    if(common_stub::coap_header->options_list_ptr->max_age_ptr) {
+        free(common_stub::coap_header->options_list_ptr->max_age_ptr);
+        common_stub::coap_header->options_list_ptr->max_age_ptr = NULL;
     }
     if(common_stub::coap_header->options_list_ptr) {
         free(common_stub::coap_header->options_list_ptr);
@@ -321,12 +372,14 @@ void Test_M2MResourceInstance::test_handle_get_request()
         free(common_stub::coap_header->content_type_ptr);
         common_stub::coap_header->content_type_ptr = NULL;
     }
-
     if(common_stub::coap_header->options_list_ptr->observe_ptr) {
         free(common_stub::coap_header->options_list_ptr->observe_ptr);
         common_stub::coap_header->options_list_ptr->observe_ptr = NULL;
     }
-
+    if(common_stub::coap_header->options_list_ptr->max_age_ptr) {
+        free(common_stub::coap_header->options_list_ptr->max_age_ptr);
+        common_stub::coap_header->options_list_ptr->max_age_ptr = NULL;
+    }
     if(common_stub::coap_header->options_list_ptr) {
         free(common_stub::coap_header->options_list_ptr);
         common_stub::coap_header->options_list_ptr = NULL;
@@ -345,7 +398,10 @@ void Test_M2MResourceInstance::test_handle_get_request()
         free(common_stub::coap_header->options_list_ptr->observe_ptr);
         common_stub::coap_header->options_list_ptr->observe_ptr = NULL;
     }
-
+    if(common_stub::coap_header->options_list_ptr->max_age_ptr) {
+        free(common_stub::coap_header->options_list_ptr->max_age_ptr);
+        common_stub::coap_header->options_list_ptr->max_age_ptr = NULL;
+    }
     if(common_stub::coap_header->options_list_ptr) {
         free(common_stub::coap_header->options_list_ptr);
         common_stub::coap_header->options_list_ptr = NULL;
@@ -365,7 +421,10 @@ void Test_M2MResourceInstance::test_handle_get_request()
         free(common_stub::coap_header->options_list_ptr->observe_ptr);
         common_stub::coap_header->options_list_ptr->observe_ptr = NULL;
     }
-
+    if(common_stub::coap_header->options_list_ptr->max_age_ptr) {
+        free(common_stub::coap_header->options_list_ptr->max_age_ptr);
+        common_stub::coap_header->options_list_ptr->max_age_ptr = NULL;
+    }
     if(common_stub::coap_header->options_list_ptr) {
         free(common_stub::coap_header->options_list_ptr);
         common_stub::coap_header->options_list_ptr = NULL;

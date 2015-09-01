@@ -19,6 +19,11 @@
 #include "mbed-client/m2mbase.h"
 #include "mbed-client/functionpointer.h"
 
+class M2MObjectInstanceCallback {
+public:
+    virtual void notification_update(M2MBase::Observation observation_level) = 0;
+};
+
 /**
  *  @brief M2MResourceInstance.
  *  This class is the base class for mbed Client Resources based on which all defined
@@ -59,7 +64,8 @@ private: // Constructor and destructor are private
      */
     M2MResourceInstance(const String &resource_name,
                         const String &resource_type,
-                        M2MResourceInstance::ResourceType type);
+                        M2MResourceInstance::ResourceType type,
+                        M2MObjectInstanceCallback &object_instance_callback);
 
     /**
      * @brief Constructor for creating resource.
@@ -73,7 +79,8 @@ private: // Constructor and destructor are private
                         const String &resource_type,
                         M2MResourceInstance::ResourceType type,
                         const uint8_t *value,
-                        const uint8_t value_length);
+                        const uint8_t value_length,
+                        M2MObjectInstanceCallback &object_instance_callback);
 
     // Prevents the use of default constructor.
     M2MResourceInstance();
@@ -188,10 +195,11 @@ public:
 
 private:
 
-    execute_callback        _execute_callback;
-    uint8_t                *_value;
-    uint32_t                _value_length;
-    ResourceType            _resource_type;
+    M2MObjectInstanceCallback               &_object_instance_callback;
+    execute_callback                        _execute_callback;
+    uint8_t                                 *_value;
+    uint32_t                                _value_length;
+    ResourceType                            _resource_type;
 
     friend class Test_M2MResourceInstance;
     friend class Test_M2MResource;

@@ -49,6 +49,21 @@ public:
     } BaseType;
 
     /**
+      * Enum to define observation level
+      */
+    typedef enum {
+        None                 = 0x0,
+        R_Attribute          = 0x01,
+        OI_Attribute         = 0x02,
+        OIR_Attribute        = 0x03,
+        O_Attribute          = 0x04,
+        OR_Attribute         = 0x05,
+        OOI_Attribute        = 0x06,
+        OOIR_Attribute       = 0x07
+    } Observation;
+
+
+    /**
      * @brief Enum defining operation which can be
      * supported by a given resource.
     */
@@ -132,6 +147,18 @@ public:
     virtual void set_observable(bool observable);
 
     /**
+     * @brief Adds the observation level for the object.
+     * @param observation_level, Level of the observation.
+     */
+    virtual void add_observation_level(M2MBase::Observation observation_level);
+
+    /**
+     * @brief Removes the observation level for the object.
+     * @param observation_level, Level of the observation.
+     */
+    virtual void remove_observation_level(M2MBase::Observation observation_level);
+
+    /**
      * @brief Sets that object is under observation.
      * @param observed for the observation.
      * @param handler, Handler object for sending
@@ -161,7 +188,6 @@ public:
      * @param observation_number, Observation number of the object.
      */
     virtual void set_observation_number(const uint16_t observation_number);
-
 
     /**
      * @brief Returns object type.
@@ -216,6 +242,12 @@ public:
      * @return True if observable else false.
      */
     virtual bool is_observable() const;
+
+    /**
+     * @brief Returns the observation level of the object.
+     * @return Observation level of the object.
+     */
+    virtual M2MBase::Observation observation_level() const;
 
     /**
      * @brief Provides the observation token of the object.
@@ -337,6 +369,7 @@ private:
     M2MBase::Operation          _operation;
     M2MBase::Mode               _mode;
     M2MBase::BaseType           _base_type;
+    M2MBase::Observation        _observation_level;
     String                      _name;
     String                      _resource_type;
     int32_t                     _name_id;

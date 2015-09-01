@@ -71,11 +71,6 @@ TEST(M2MObject, instances)
     m2m_object->test_instances();
 }
 
-TEST(M2MObject, handle_observation_attribute)
-{
-    m2m_object->test_handle_observation_attribute();
-}
-
 TEST(M2MObject, handle_get_request)
 {
     m2m_object->test_handle_get_request();
@@ -90,3 +85,9 @@ TEST(M2MObject, handle_post_request)
 {
     m2m_object->test_handle_post_request();
 }
+
+TEST(M2MObject, notification_update)
+{
+    m2m_object->test_notification_update();
+}
+

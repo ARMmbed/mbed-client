@@ -21,13 +21,29 @@
 #include "m2mresourceinstance_stub.h"
 #include "m2mbase_stub.h"
 
+class Callback : public M2MObjectCallback {
+
+public:
+
+    Callback(){}
+    ~Callback(){}
+    void notification_update() {
+        visited = true;
+    }
+
+    void clear() {visited = false;}
+    bool visited;
+};
+
+
 Test_M2MDevice::Test_M2MDevice()
 {
-    m2mobject_stub::inst = new M2MObjectInstance("name");
-    m2mobjectinstance_stub::resource = new M2MResource("name","type",M2MResourceInstance::STRING,M2MBase::Dynamic);   
-    m2mobjectinstance_stub::create_resource_instance= new M2MResourceInstance("name","type",M2MResourceInstance::STRING);
+    callback = new Callback();
+    m2mobject_stub::inst = new M2MObjectInstance("name",*callback);
+    m2mobjectinstance_stub::resource = new M2MResource(*m2mobject_stub::inst,"name","type",M2MResourceInstance::STRING,M2MBase::Dynamic);
+    m2mobjectinstance_stub::create_resource_instance= new M2MResourceInstance("name","type",M2MResourceInstance::STRING,*m2mobject_stub::inst);
     m2mresource_stub::bool_value = true;
-    m2mobjectinstance_stub::create_resource = new M2MResource("name","type",M2MResourceInstance::STRING,M2MBase::Dynamic);
+    m2mobjectinstance_stub::create_resource = new M2MResource(*m2mobject_stub::inst,"name","type",M2MResourceInstance::STRING,M2MBase::Dynamic);
     device = M2MDevice::get_instance();
 
     delete m2mobjectinstance_stub::create_resource;
@@ -47,11 +63,12 @@ Test_M2MDevice::~Test_M2MDevice()
 
     M2MDevice::delete_instance();
     device = NULL;
+    delete callback;
 }
 
 void Test_M2MDevice::test_create_resource_instance()
 {
-    m2mobjectinstance_stub::create_resource_instance = new M2MResourceInstance("name","type",M2MResourceInstance::INTEGER);
+    m2mobjectinstance_stub::create_resource_instance = new M2MResourceInstance("name","type",M2MResourceInstance::INTEGER,*m2mobject_stub::inst);
 
     CHECK(device->create_resource_instance(M2MDevice::ErrorCode,5,1) != NULL);
 
@@ -78,12 +95,12 @@ void Test_M2MDevice::test_create_resource_string()
     CHECK(device->create_resource(M2MDevice::ErrorCode,"test") == NULL);
     CHECK(device->create_resource(M2MDevice::SupportedBindingMode,"test") == NULL);
 
-    m2mobjectinstance_stub::create_resource = new M2MResource("name","type",M2MResourceInstance::STRING,M2MBase::Dynamic);
+    m2mobjectinstance_stub::create_resource = new M2MResource(*m2mobject_stub::inst,"name","type",M2MResourceInstance::STRING,M2MBase::Dynamic);
 
     CHECK(device->create_resource(M2MDevice::Manufacturer,"test") != NULL);
     CHECK(M2MBase::GET_ALLOWED == m2mbase_stub::operation);
 
-    m2mobjectinstance_stub::resource = new M2MResource("name","type",M2MResourceInstance::STRING,M2MBase::Dynamic);
+    m2mobjectinstance_stub::resource = new M2MResource(*m2mobject_stub::inst,"name","type",M2MResourceInstance::STRING,M2MBase::Dynamic);
     m2mresource_stub::bool_value = false;
     //Duplicate resource
     CHECK(device->create_resource(M2MDevice::Manufacturer,"test") == NULL);
@@ -139,7 +156,7 @@ void Test_M2MDevice::test_create_resource_string()
 
 void Test_M2MDevice::test_create_resource_int()
 {
-    m2mobjectinstance_stub::create_resource = new M2MResource("name","type",M2MResourceInstance::INTEGER,M2MBase::Dynamic);
+    m2mobjectinstance_stub::create_resource = new M2MResource(*m2mobject_stub::inst,"name","type",M2MResourceInstance::INTEGER,M2MBase::Dynamic);
 
     CHECK(device->create_resource(M2MDevice::Reboot,10) == NULL);
     CHECK(device->create_resource(M2MDevice::SupportedBindingMode,10) == NULL);
@@ -185,7 +202,7 @@ void Test_M2MDevice::test_create_resource_int()
 
 void Test_M2MDevice::test_create_resource_no_param()
 {
-    m2mobjectinstance_stub::create_resource = new M2MResource("name","type",M2MResourceInstance::STRING,M2MBase::Dynamic);
+    m2mobjectinstance_stub::create_resource = new M2MResource(*m2mobject_stub::inst,"name","type",M2MResourceInstance::STRING,M2MBase::Dynamic);
 
     CHECK(device->create_resource(M2MDevice::Reboot) == NULL);
     CHECK(device->create_resource(M2MDevice::ErrorCode) == NULL);
@@ -250,7 +267,7 @@ void Test_M2MDevice::test_set_resource_value_string()
     m2mbase_stub::bool_value = true;
     m2mresourceinstance_stub::bool_value = true;
 
-    m2mobjectinstance_stub::resource = new M2MResource("name","type",M2MResourceInstance::STRING,M2MBase::Dynamic);
+    m2mobjectinstance_stub::resource = new M2MResource(*m2mobject_stub::inst,"name","type",M2MResourceInstance::STRING,M2MBase::Dynamic);
     m2mresource_stub::bool_value = false;
 
     m2mbase_stub::void_value = malloc(20);
@@ -289,7 +306,7 @@ void Test_M2MDevice::test_set_resource_value_int()
 {
     m2mresourceinstance_stub::bool_value = true;
 
-    m2mobjectinstance_stub::resource = new M2MResource("name","type",M2MResourceInstance::INTEGER,M2MBase::Dynamic);
+    m2mobjectinstance_stub::resource = new M2MResource(*m2mobject_stub::inst,"name","type",M2MResourceInstance::INTEGER,M2MBase::Dynamic);
     m2mresource_stub::bool_value = false;
 
     m2mbase_stub::void_value = malloc(20);
@@ -328,7 +345,7 @@ void Test_M2MDevice::test_resource_value_int()
     memcpy(m2mresourceinstance_stub::value,value,sizeof(value));
     m2mresourceinstance_stub::int_value = (uint32_t)sizeof(value);
 
-    m2mobjectinstance_stub::resource = new M2MResource("name","type",M2MResourceInstance::INTEGER,M2MBase::Dynamic);
+    m2mobjectinstance_stub::resource = new M2MResource(*m2mobject_stub::inst,"name","type",M2MResourceInstance::INTEGER,M2MBase::Dynamic);
 
     m2mresourceinstance_stub::bool_value = true;
     m2mresource_stub::bool_value = false;
@@ -345,7 +362,7 @@ void Test_M2MDevice::test_resource_value_int()
     CHECK(device->resource_value_int(M2MDevice::PowerSourceCurrent) == 10);
     CHECK(device->resource_value_int(M2MDevice::Manufacturer) == -1);
 
-    m2mresource_stub::instance = new M2MResourceInstance("name","type",M2MResourceInstance::INTEGER);
+    m2mresource_stub::instance = new M2MResourceInstance("name","type",M2MResourceInstance::INTEGER,*m2mobject_stub::inst);
     m2mresource_stub::bool_value = true;
     CHECK(device->resource_value_int(M2MDevice::AvailablePowerSources,1) == 10);
 
@@ -369,7 +386,7 @@ void Test_M2MDevice::test_resource_value_string()
     memcpy(m2mresourceinstance_stub::value,value,sizeof(value));
     m2mresourceinstance_stub::int_value = (uint32_t)sizeof(value);
 
-    m2mobjectinstance_stub::resource = new M2MResource("name","type",M2MResourceInstance::STRING,M2MBase::Dynamic);
+    m2mobjectinstance_stub::resource = new M2MResource(*m2mobject_stub::inst,"name","type",M2MResourceInstance::STRING,M2MBase::Dynamic);
 
     m2mresourceinstance_stub::bool_value = true;
     m2mresource_stub::bool_value = false;
@@ -397,7 +414,7 @@ void Test_M2MDevice::test_resource_value_string()
 
 void Test_M2MDevice::test_is_resource_present()
 {
-    m2mobjectinstance_stub::resource = new M2MResource("name","type",M2MResourceInstance::STRING,M2MBase::Dynamic);
+    m2mobjectinstance_stub::resource = new M2MResource(*m2mobject_stub::inst,"name","type",M2MResourceInstance::STRING,M2MBase::Dynamic);
     m2mresource_stub::bool_value = false;
     CHECK(device->is_resource_present(M2MDevice::Reboot) == true);
 
@@ -420,10 +437,10 @@ void Test_M2MDevice::test_per_resource_count()
 
 void Test_M2MDevice::test_total_resource_count()
 {
-    M2MResource res("test","test",M2MResourceInstance::STRING,M2MBase::Dynamic);
+    M2MResource res(*m2mobject_stub::inst,"test","test",M2MResourceInstance::STRING,M2MBase::Dynamic);
 
     m2mobjectinstance_stub::resource_list.push_back(&res);
-    M2MResource res2("test","test",M2MResourceInstance::STRING,M2MBase::Dynamic);
+    M2MResource res2(*m2mobject_stub::inst,"test","test",M2MResourceInstance::STRING,M2MBase::Dynamic);
 
     m2mobjectinstance_stub::resource_list.push_back(&res2);
 

@@ -176,12 +176,16 @@ uint8_t* M2MTLVSerializer::serialize_id(uint16_t id, uint32_t &size)
 {
     uint32_t id_size = id > 255 ? 2 : 1;
     uint8_t *id_ptr = (uint8_t*)malloc(id_size);
+    memset(id_ptr, 0 , id_size);
     size += id_size;
     if(id > 255) {
         *id_ptr = (id & 0xFF00) >> 8;
         id_ptr++;
+        *id_ptr = id & 0xFF;
+        id_ptr--;
+    } else {
+        *id_ptr = id & 0xFF;
     }
-    *id_ptr = id & 0xFF;
     return id_ptr;
 }
 
@@ -197,12 +201,15 @@ uint8_t* M2MTLVSerializer::serialize_length(uint32_t length, uint32_t &size)
         *length_ptr = (length & 0xFF00) >> 8;
         length_ptr++;
         *length_ptr = length & 0xFF;
+        length_ptr--;
+        length_ptr--;
     } else if (length > 255) {
         length_size = 2;
         length_ptr = (uint8_t*)malloc(length_size);
         *length_ptr = (length & 0xFF00) >> 8;
         length_ptr++;
         *length_ptr = length & 0xFF;
+        length_ptr--;
     } else if (length > 7) {
         length_size = 1;
         length_ptr = (uint8_t*)malloc(length_size);

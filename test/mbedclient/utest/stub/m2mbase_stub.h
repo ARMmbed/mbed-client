@@ -33,6 +33,7 @@ namespace m2mbase_stub
     extern void *void_value;
     extern M2MObservationHandler *observe;
     extern M2MReportHandler *report;
+    extern M2MBase::Observation observation_level_value;
     void clear();
 }
 

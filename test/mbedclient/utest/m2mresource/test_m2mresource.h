@@ -18,6 +18,8 @@
 
 #include "m2mresource.h"
 
+class Callback;
+
 class Test_M2MResource
 {
 public:
@@ -45,7 +47,12 @@ public:
 
     void test_resource_instance_count();
 
+    void test_add_observation_level();
+
+    void test_remove_observation_level();
+
     M2MResource* resource;
+    Callback *callback;
 };
 
 #endif // TEST_M2M_RESOURCE_H

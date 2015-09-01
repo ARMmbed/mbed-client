@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 #include "mbed-client/m2mobject.h"
-#include "mbed-client/m2mobjectinstance.h"
 #include "mbed-client/m2mobservationhandler.h"
 #include "mbed-client/m2mconstants.h"
 #include "include/m2mtlvserializer.h"
 #include "include/m2mtlvdeserializer.h"
 #include "include/nsdllinker.h"
+#include "include/m2mreporthandler.h"
 #include "ns_trace.h"
 
 M2MObject::M2MObject(const String &object_name)
@@ -89,7 +89,7 @@ M2MObjectInstance* M2MObject::create_object_instance(uint16_t instance_id)
     tr_debug("M2MObject::create_object_instance()");
     M2MObjectInstance *instance = NULL;
     if(!object_instance(instance_id)) {
-        instance = new M2MObjectInstance(this->name());
+        instance = new M2MObjectInstance(this->name(),*this);
         instance->set_instance_id(instance_id);
         _instance_list.push_back(instance);
     }
@@ -167,18 +167,28 @@ M2MBase::BaseType M2MObject::base_type() const
     return M2MBase::base_type();
 }
 
-bool M2MObject::handle_observation_attribute(char *&query)
+void M2MObject::add_observation_level(M2MBase::Observation observation_level)
 {
-    tr_debug("M2MObject::handle_observation_attribute(query %s)", query);
-    bool success = false;
+    M2MBase::add_observation_level(observation_level);
     if(!_instance_list.empty()) {
         M2MObjectInstanceList::const_iterator it;
         it = _instance_list.begin();
         for ( ; it != _instance_list.end(); it++ ) {
-            success = (*it)->handle_observation_attribute(query);
+            (*it)->add_observation_level(observation_level);
         }
     }
-    return success;
+}
+
+void M2MObject::remove_observation_level(M2MBase::Observation observation_level)
+{
+    M2MBase::remove_observation_level(observation_level);
+    if(!_instance_list.empty()) {
+        M2MObjectInstanceList::const_iterator it;
+        it = _instance_list.begin();
+        for ( ; it != _instance_list.end(); it++ ) {
+            (*it)->remove_observation_level(observation_level);
+        }
+    }
 }
 
 sn_coap_hdr_s* M2MObject::handle_get_request(nsdl_s *nsdl,
@@ -237,6 +247,10 @@ sn_coap_hdr_s* M2MObject::handle_get_request(nsdl_s *nsdl,
                 coap_response->options_list_ptr = (sn_coap_options_list_s*)malloc(sizeof(sn_coap_options_list_s));
                 memset(coap_response->options_list_ptr, 0, sizeof(sn_coap_options_list_s));
 
+                coap_response->options_list_ptr->max_age_ptr = (uint8_t*)malloc(1);
+                memset(coap_response->options_list_ptr->max_age_ptr,0,1);
+                coap_response->options_list_ptr->max_age_len = 1;
+
                 if(data){
                     if(received_coap_header->token_ptr) {
                         tr_debug("M2MResource::handle_get_request - Sets Observation Token to resource");
@@ -254,11 +268,8 @@ sn_coap_hdr_s* M2MObject::handle_get_request(nsdl_s *nsdl,
                             if(START_OBSERVATION == observe_option) {
                                 tr_debug("M2MResource::handle_get_request - Starts Observation");
                                 // If the observe length is 0 means register for observation.
-                                if(received_coap_header->options_list_ptr->observe_len == 0) {
-                                    set_under_observation(true,observation_handler);
-                                }
-                                else {
-                                for(int i=0;i < received_coap_header->options_list_ptr->observe_len; i++) {
+                                if(received_coap_header->options_list_ptr->observe_len != 0) {
+                                    for(int i=0;i < received_coap_header->options_list_ptr->observe_len; i++) {
                                     number = (*(received_coap_header->options_list_ptr->observe_ptr + i) & 0xff) <<
                                              8*(received_coap_header->options_list_ptr->observe_len- 1 - i);
                                     }
@@ -267,6 +278,7 @@ sn_coap_hdr_s* M2MObject::handle_get_request(nsdl_s *nsdl,
                                 if(number == 0) {
                                     tr_debug("M2MResource::handle_get_request - Put Resource under Observation");
                                     set_under_observation(true,observation_handler);
+                                    add_observation_level(M2MBase::O_Attribute);
                                     uint8_t *obs_number = (uint8_t*)malloc(3);
                                     memset(obs_number,0,3);
                                     uint8_t observation_number_length = 1;
@@ -287,6 +299,7 @@ sn_coap_hdr_s* M2MObject::handle_get_request(nsdl_s *nsdl,
                                 tr_debug("M2MResource::handle_get_request - Stops Observation");
                                 // If the observe options_list_ptr->observe_ptr value is 1 means de-register from observation.
                                 set_under_observation(false,NULL);
+                                remove_observation_level(M2MBase::O_Attribute);
                             }
                         }
                     }
@@ -439,4 +452,12 @@ sn_coap_hdr_s* M2MObject::handle_post_request(nsdl_s *nsdl,
                                            received_coap_header,
                                            msg_code);
     return coap_response;
+}
+
+void M2MObject::notification_update()
+{
+    M2MReportHandler *report_handler = M2MBase::report_handler();
+    if(report_handler) {
+        report_handler->trigger_object_notification();
+    }
 }

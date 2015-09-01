@@ -18,6 +18,7 @@
 #include "CppUTest/MemoryLeakDetectorMallocMacros.h"
 #include "m2mbase_stub.h"
 #include "m2mresourceinstance_stub.h"
+#include "m2mobjectinstance_stub.h"
 
 class MyTest{
 public:
@@ -28,9 +29,25 @@ public:
     bool visited;
 };
 
+class Callback : public M2MObjectInstanceCallback {
+
+public:
+
+    Callback(){}
+    ~Callback(){}
+    void notification_update(M2MBase::Observation) {
+        visited = true;
+    }
+
+    void clear() {visited = false;}
+    bool visited;
+};
+
 Test_M2MResource::Test_M2MResource()
 {
-    resource = new M2MResource("name",
+    callback = new Callback();
+    resource = new M2MResource(*callback,
+                               "name",
                                "resource_type",
                                M2MResourceInstance::INTEGER,
                                false,false);
@@ -41,7 +58,7 @@ void Test_M2MResource::test_copy_constructor()
     u_int8_t value[] = {"value"};
     resource->set_value(value,(u_int32_t)sizeof(value));
 
-    M2MResourceInstance *res = new M2MResourceInstance("name","type",M2MResourceInstance::STRING);
+    M2MResourceInstance *res = new M2MResourceInstance("name","type",M2MResourceInstance::STRING,*callback);
     resource->add_resource_instance(res);
 
     M2MResource* copy = new M2MResource(*resource);
@@ -67,12 +84,14 @@ void Test_M2MResource::test_copy_constructor()
 Test_M2MResource::~Test_M2MResource()
 {
     delete resource;
+    delete callback;
 }
 
 void Test_M2MResource::test_static_resource()
 {
     u_int8_t value[] = {"value"};
-    M2MResource *res = new M2MResource("name",
+    M2MResource *res = new M2MResource(*callback,
+                                       "name",
                                       "resource_type",
                                       M2MResourceInstance::INTEGER,
                                       value,(uint32_t)sizeof(value),
@@ -104,7 +123,7 @@ void Test_M2MResource::test_handle_observation_attribute()
     m2mresourceinstance_stub::resource_type = M2MResourceInstance::FLOAT;
     CHECK(false == resource->handle_observation_attribute(d));
 
-    M2MResourceInstance *res = new M2MResourceInstance("name","type",M2MResourceInstance::INTEGER);
+    M2MResourceInstance *res = new M2MResourceInstance("name","type",M2MResourceInstance::INTEGER,*callback);
     resource->add_resource_instance(res);
 
     CHECK(false == resource->handle_observation_attribute(d));
@@ -112,28 +131,28 @@ void Test_M2MResource::test_handle_observation_attribute()
 
 void Test_M2MResource::test_add_resource_instance()
 {
-    M2MResourceInstance *res = new M2MResourceInstance("name","type",M2MResourceInstance::STRING);
+    M2MResourceInstance *res = new M2MResourceInstance("name","type",M2MResourceInstance::STRING,*callback);
     resource->add_resource_instance(res);
     CHECK(resource->_resource_instance_list.size() == 1);
 }
 
 void Test_M2MResource::test_remove_resource_instance()
 {
-    M2MResourceInstance *res = new M2MResourceInstance("name","type",M2MResourceInstance::STRING);
+    M2MResourceInstance *res = new M2MResourceInstance("name","type",M2MResourceInstance::STRING,*callback);
     resource->_resource_instance_list.push_back(res);
     CHECK(resource->remove_resource_instance(0) == true);
 }
 
 void Test_M2MResource::test_resource_instance()
 {
-    M2MResourceInstance *res = new M2MResourceInstance("name","type",M2MResourceInstance::STRING);
+    M2MResourceInstance *res = new M2MResourceInstance("name","type",M2MResourceInstance::STRING,*callback);
     resource->_resource_instance_list.push_back(res);
     CHECK(resource->resource_instance(0) != NULL);
 }
 
 void Test_M2MResource::test_resource_instances()
 {
-    M2MResourceInstance *res = new M2MResourceInstance("name","type",M2MResourceInstance::STRING);
+    M2MResourceInstance *res = new M2MResourceInstance("name","type",M2MResourceInstance::STRING,*callback);
     resource->_resource_instance_list.push_back(res);
     M2MResourceInstanceList list = resource->resource_instances();
     CHECK(list.size() ==1);
@@ -141,7 +160,27 @@ void Test_M2MResource::test_resource_instances()
 
 void Test_M2MResource::test_resource_instance_count()
 {
-    M2MResourceInstance *res = new M2MResourceInstance("name","type",M2MResourceInstance::STRING);
+    M2MResourceInstance *res = new M2MResourceInstance("name","type",M2MResourceInstance::STRING,*callback);
     resource->_resource_instance_list.push_back(res);
     CHECK(resource->resource_instance_count() ==1);
+}
+
+void Test_M2MResource::test_add_observation_level()
+{
+    M2MResourceInstance *res = new M2MResourceInstance("name","type",M2MResourceInstance::STRING,*callback);
+    resource->_resource_instance_list.push_back(res);
+
+    M2MBase::Observation obs_level = M2MBase::R_Attribute;
+
+    resource->add_observation_level(obs_level);
+}
+
+void Test_M2MResource::test_remove_observation_level()
+{
+    M2MResourceInstance *res = new M2MResourceInstance("name","type",M2MResourceInstance::STRING,*callback);
+    resource->_resource_instance_list.push_back(res);
+
+    M2MBase::Observation obs_level = M2MBase::R_Attribute;
+
+    resource->remove_observation_level(obs_level);
 }

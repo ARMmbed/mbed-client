@@ -66,6 +66,11 @@ public:
     virtual void set_value(float value);
 
     /**
+     * @brief Triggers object or object instance notification.
+     */
+    void trigger_object_notification();
+
+    /**
      * @brief Parses the received query for notification
      * attribute.
      * @param query Query to be parsed for attributes.
@@ -104,6 +109,11 @@ private:
     * @brief Reports a sample that satisfies the reporting criteria.
     */
     void report(float value);
+
+    /**
+     * @brief Reports that object or object instance satisfies the reporting criteria.
+    */
+    void report_object_notification();
 
     /**
     * @brief Manage timers for pmin and pmax.

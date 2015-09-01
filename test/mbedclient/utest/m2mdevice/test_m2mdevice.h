@@ -16,9 +16,10 @@
 #ifndef TEST_M2M_DEVICE_H
 #define TEST_M2M_DEVICE_H
 
-//#include "test_defines.h"
 
 #include <m2mdevice.h>
+
+class Callback;
 
 class Test_M2MDevice
 {
@@ -53,6 +54,7 @@ public:
     void test_total_resource_count();
 
     M2MDevice* device;
+    Callback *callback;
 };
 
 #endif // TEST_M2M_DEVICE_H

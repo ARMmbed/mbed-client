@@ -37,16 +37,19 @@ M2MResourceInstance& M2MResourceInstance::operator=(const M2MResourceInstance&)
 }
 
 M2MResourceInstance::M2MResourceInstance(const M2MResourceInstance& other)
-: M2MBase(other)
+: M2MBase(other),
+  _object_instance_callback(other._object_instance_callback)
 {
     this->operator=(other);
 }
 
 M2MResourceInstance::M2MResourceInstance(const String &res_name,
                                          const String &,
-                                         M2MResourceInstance::ResourceType)
+                                         M2MResourceInstance::ResourceType,
+                                         M2MObjectInstanceCallback &object_instance_callback)
 : M2MBase(res_name,
-          M2MBase::Dynamic)
+          M2MBase::Dynamic),
+  _object_instance_callback(object_instance_callback)
 {
 }
 
@@ -54,9 +57,11 @@ M2MResourceInstance::M2MResourceInstance(const String &res_name,
                                          const String &,
                                          M2MResourceInstance::ResourceType,
                                          const uint8_t *,
-                                         const uint8_t)
+                                         const uint8_t,
+                                         M2MObjectInstanceCallback &object_instance_callback)
 : M2MBase(res_name,
-          M2MBase::Static)
+          M2MBase::Static),
+_object_instance_callback(object_instance_callback)
 {
 }
 

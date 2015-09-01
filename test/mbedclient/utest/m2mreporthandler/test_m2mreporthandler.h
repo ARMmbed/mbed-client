@@ -35,6 +35,8 @@ public:
 
     void test_set_value();
 
+    void test_trigger_object_notification();
+
     M2MReportHandler *_handler;
     Observer         * _observer;
 };

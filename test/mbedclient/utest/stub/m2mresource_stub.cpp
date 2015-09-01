@@ -39,22 +39,26 @@ M2MResource::M2MResource(const M2MResource& other)
     *this = other;
 }
 
-M2MResource::M2MResource(const String &resource_name,
+M2MResource::M2MResource(M2MObjectInstanceCallback & object_instance_callback,
+                         const String &resource_name,
                          const String &resource_type,
                          M2MResourceInstance::ResourceType type,
                          const uint8_t *value,
                          const uint8_t value_length,
                          bool)
-: M2MResourceInstance(resource_name, resource_type, type, value, value_length)
+: M2MResourceInstance(resource_name, resource_type, type, value, value_length,
+                      object_instance_callback)
 {
 }
 
-M2MResource::M2MResource(const String &resource_name,
+M2MResource::M2MResource(M2MObjectInstanceCallback & object_instance_callback,
+                         const String &resource_name,
                          const String &resource_type,
                          M2MResourceInstance::ResourceType type,
                          bool,
                          bool )
-: M2MResourceInstance(resource_name, resource_type, type)
+: M2MResourceInstance(resource_name, resource_type, type,
+                      object_instance_callback)
 {
 }
 
@@ -93,5 +97,13 @@ bool M2MResource::handle_observation_attribute(char *&query)
 }
 
 void M2MResource::add_resource_instance(M2MResourceInstance *)
+{
+}
+
+void M2MResource::add_observation_level(M2MBase::Observation)
+{
+}
+
+void M2MResource::remove_observation_level(M2MBase::Observation)
 {
 }

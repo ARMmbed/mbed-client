@@ -97,6 +97,11 @@ TEST(M2MBase, is_observable)
     m2m_base->test_is_observable();
 }
 
+TEST(M2MBase, observation_level)
+{
+    m2m_base->test_observation_level();
+}
+
 TEST(M2MBase, set_observation_token)
 {
     m2m_base->test_set_observation_token();
@@ -110,6 +115,16 @@ TEST(M2MBase, set_under_observation)
 TEST(M2MBase, set_observable)
 {
     m2m_base->test_set_observable();
+}
+
+TEST(M2MBase, add_observation_level)
+{
+    m2m_base->test_add_observation_level();
+}
+
+TEST(M2MBase, remove_observation_level)
+{
+    m2m_base->test_remove_observation_level();
 }
 
 TEST(M2MBase, operation)
@@ -152,20 +167,10 @@ TEST(M2MBase, test_base_type)
     m2m_base->test_base_type();
 }
 
-//TEST(M2MBase, set_value)
-//{
-//    m2m_base->test_set_value();
-//}
-
 TEST(M2MBase, test_set_observation_number)
 {
     m2m_base->test_set_observation_number();
 }
-
-//TEST(M2MBase, get_value)
-//{
-//    m2m_base->test_get_value();
-//}
 
 TEST(M2MBase, test_handle_observation_attribute)
 {

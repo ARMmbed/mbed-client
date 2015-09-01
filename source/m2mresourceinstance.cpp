@@ -17,6 +17,7 @@
 #include "mbed-client/m2mresource.h"
 #include "mbed-client/m2mconstants.h"
 #include "mbed-client/m2mobservationhandler.h"
+#include "mbed-client/m2mobjectinstance.h"
 #include "include/m2mreporthandler.h"
 #include "include/nsdllinker.h"
 #include "ns_trace.h"
@@ -43,16 +44,19 @@ M2MResourceInstance& M2MResourceInstance::operator=(const M2MResourceInstance& o
 }
 
 M2MResourceInstance::M2MResourceInstance(const M2MResourceInstance& other)
-: M2MBase(other)
+: M2MBase(other),
+  _object_instance_callback(other._object_instance_callback)
 {
     this->operator=(other);
 }
 
 M2MResourceInstance::M2MResourceInstance(const String &res_name,
                                          const String &resource_type,
-                                         M2MResourceInstance::ResourceType type)
+                                         M2MResourceInstance::ResourceType type,
+                                         M2MObjectInstanceCallback &object_instance_callback)
 : M2MBase(res_name,
           M2MBase::Dynamic),
+  _object_instance_callback(object_instance_callback),
   _execute_callback(NULL),
  _value(NULL),
  _value_length(0),
@@ -66,9 +70,11 @@ M2MResourceInstance::M2MResourceInstance(const String &res_name,
                                          const String &resource_type,
                                          M2MResourceInstance::ResourceType type,
                                          const uint8_t *value,
-                                         const uint8_t value_length)
+                                         const uint8_t value_length,
+                                         M2MObjectInstanceCallback &object_instance_callback)
 : M2MBase(res_name,
           M2MBase::Static),
+  _object_instance_callback(object_instance_callback),
   _execute_callback(NULL),
  _value(NULL),
  _value_length(0),
@@ -143,6 +149,12 @@ bool M2MResourceInstance::set_value(const uint8_t *value,
                 M2MReportHandler *report_handler = M2MBase::report_handler();
                 if( report_handler && _resource_type != M2MResourceInstance::STRING) {
                     report_handler->set_value(atof((const char*)_value));
+                    M2MBase::Observation  observation_level = M2MBase::observation_level();
+                    if(M2MBase::O_Attribute == observation_level ||
+                       M2MBase::OI_Attribute == observation_level||
+                       M2MBase::OOI_Attribute == observation_level) {
+                        _object_instance_callback.notification_update(observation_level);
+                    }
                 }
             } else if(M2MBase::Static == mode()) {
                 M2MObservationHandler *observation_handler = M2MBase::observation_handler();
@@ -222,6 +234,10 @@ sn_coap_hdr_s* M2MResourceInstance::handle_get_request(nsdl_s *nsdl,
                 coap_response->options_list_ptr = (sn_coap_options_list_s*)malloc(sizeof(sn_coap_options_list_s));
                 memset(coap_response->options_list_ptr, 0, sizeof(sn_coap_options_list_s));
 
+                coap_response->options_list_ptr->max_age_ptr = (uint8_t*)malloc(1);
+                memset(coap_response->options_list_ptr->max_age_ptr,0,1);
+                coap_response->options_list_ptr->max_age_len = 1;
+
                 if(received_coap_header->token_ptr) {
                     tr_debug("M2MResourceInstance::handle_get_request - Sets Observation Token to resource");
                     set_observation_token(received_coap_header->token_ptr,
@@ -248,6 +264,7 @@ sn_coap_hdr_s* M2MResourceInstance::handle_get_request(nsdl_s *nsdl,
                             if(number == 0) {
                                 tr_debug("M2MResourceInstance::handle_get_request - Put Resource under Observation");
                                 set_under_observation(true,observation_handler);
+                                M2MBase::add_observation_level(M2MBase::R_Attribute);
                                 uint8_t *obs_number = (uint8_t*)malloc(3);
                                 memset(obs_number,0,3);
                                 uint8_t observation_number_length = 1;
@@ -267,6 +284,7 @@ sn_coap_hdr_s* M2MResourceInstance::handle_get_request(nsdl_s *nsdl,
                         } else if (STOP_OBSERVATION == observe_option) {
                             tr_debug("M2MResourceInstance::handle_get_request - Stops Observation");
                             set_under_observation(false,NULL);
+                            M2MBase::remove_observation_level(M2MBase::R_Attribute);
                         }
                     }
 

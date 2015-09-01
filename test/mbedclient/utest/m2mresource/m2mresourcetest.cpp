@@ -85,3 +85,13 @@ TEST(M2MResource, test_resource_instance)
 {
     m2m_resource->test_resource_instance();
 }
+
+TEST(M2MResource, test_add_observation_level)
+{
+    m2m_resource->test_add_observation_level();
+}
+
+TEST(M2MResource, test_remove_observation_level)
+{
+    m2m_resource->test_remove_observation_level();
+}

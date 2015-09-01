@@ -128,9 +128,10 @@ void Test_M2MNsdlInterface::test_create_nsdl_list_structure()
     common_stub::int_value = 0;
     m2mbase_stub::int_value = 0;
     M2MObject *object = new M2MObject(*name);
-    M2MObjectInstance* instance = new M2MObjectInstance(*name);
+    M2MObjectInstance* instance = new M2MObjectInstance(*name,*object);
 
-    M2MResource* create_resource = new M2MResource(*name,
+    M2MResource* create_resource = new M2MResource(*instance,
+                                                   *name,
                                                    *name,
                                                    M2MResourceInstance::INTEGER,
                                                    M2MResource::Dynamic,
@@ -138,7 +139,8 @@ void Test_M2MNsdlInterface::test_create_nsdl_list_structure()
 
     M2MResourceInstance* res_instance = new M2MResourceInstance(*name,
                                                                 *name,
-                                                                M2MResourceInstance::INTEGER);
+                                                                M2MResourceInstance::INTEGER,
+                                                                *instance);
 
     m2mobject_stub::instance_list.clear();
     m2mobject_stub::instance_list.push_back(instance);
@@ -575,8 +577,9 @@ void Test_M2MNsdlInterface::test_resource_callback_put()
     common_stub::int_value = 0;
     m2mbase_stub::string_value = name;
     M2MObject *object = new M2MObject(*name);
-    M2MObjectInstance* instance = new M2MObjectInstance(*name);
-    M2MResource* create_resource = new M2MResource(*name,
+    M2MObjectInstance* instance = new M2MObjectInstance(*name,*object);
+    M2MResource* create_resource = new M2MResource(*instance,
+                                                   *name,
                                                    *name,
                                                    M2MResourceInstance::INTEGER,
                                                    M2MResource::Dynamic,false);
@@ -665,8 +668,9 @@ void Test_M2MNsdlInterface::test_resource_callback_post()
     common_stub::int_value = 0;
     m2mbase_stub::string_value = name;
     M2MObject *object = new M2MObject(*name);
-    M2MObjectInstance* instance = new M2MObjectInstance(*name);
-    M2MResource* create_resource = new M2MResource(*name,
+    M2MObjectInstance* instance = new M2MObjectInstance(*name,*object);
+    M2MResource* create_resource = new M2MResource(*instance,
+                                                   *name,
                                                    *name,
                                                    M2MResourceInstance::INTEGER,
                                                    M2MResource::Dynamic,false);
@@ -762,7 +766,7 @@ void Test_M2MNsdlInterface::test_resource_callback_delete()
     common_stub::int_value = 0;
     m2mbase_stub::string_value = new String("name");
     M2MObject *object = new M2MObject(*name);
-    M2MObjectInstance* instance = new M2MObjectInstance(*name);
+    M2MObjectInstance* instance = new M2MObjectInstance(*name,*object);
     m2mbase_stub::int_value = 0;
     m2mobject_stub::int_value = 1;
     m2mobject_stub::instance_list.push_back(instance);
@@ -1049,7 +1053,10 @@ void Test_M2MNsdlInterface::test_timer_expired()
 
 void Test_M2MNsdlInterface::test_observation_to_be_sent()
 {
-    M2MResource *res = new M2MResource("name","name",
+    M2MObject *object = new M2MObject("name");
+    M2MObjectInstance* instance = new M2MObjectInstance("name",*object);
+    M2MResource *res = new M2MResource(*instance,
+                                       "name","name",
                                        M2MResourceInstance::INTEGER,
                                        M2MBase::Dynamic,false);
 
@@ -1066,9 +1073,7 @@ void Test_M2MNsdlInterface::test_observation_to_be_sent()
     //CHECK if nothing crashes
     nsdl->observation_to_be_sent(res);
 
-
-    M2MObject *object = new M2MObject("name");
-    M2MObjectInstance *object_instance = new M2MObjectInstance("name");
+    M2MObjectInstance *object_instance = new M2MObjectInstance("name",*object);
 
     m2mobject_stub::int_value = 1;
     m2mobject_stub::instance_list.push_back(object_instance);
@@ -1104,6 +1109,9 @@ void Test_M2MNsdlInterface::test_observation_to_be_sent()
 
     delete object;
     object = NULL;
+
+    delete instance;
+    instance = NULL;
 }
 
 void Test_M2MNsdlInterface::test_resource_to_be_deleted()
@@ -1115,8 +1123,9 @@ void Test_M2MNsdlInterface::test_resource_to_be_deleted()
 void Test_M2MNsdlInterface::test_value_updated()
 {
     M2MObject *object = new M2MObject("name");
-    M2MObjectInstance *object_instance = new M2MObjectInstance("name");
-    M2MResource *resource = new M2MResource("resource_name",
+    M2MObjectInstance *object_instance = new M2MObjectInstance("name",*object);
+    M2MResource *resource = new M2MResource(*object_instance,
+                                            "resource_name",
                                             "resource_type",
                                             M2MResourceInstance::INTEGER,
                                             false);
@@ -1170,15 +1179,17 @@ void Test_M2MNsdlInterface::test_find_resource()
 {
     m2mbase_stub::string_value = new String("name");
     M2MObject *object = new M2MObject("name");
-    M2MObjectInstance *object_instance = new M2MObjectInstance("name");
-    M2MResource *resource = new M2MResource("resource_name",
+    M2MObjectInstance *object_instance = new M2MObjectInstance("name",*object);
+    M2MResource *resource = new M2MResource(*object_instance,
+                                            "resource_name",
                                             "resource_type",
                                             M2MResourceInstance::INTEGER,
                                             false);
 
     M2MResourceInstance *resource_instance = new M2MResourceInstance("name",
                                                                      "resource_type",
-                                                                      M2MResourceInstance::INTEGER);
+                                                                      M2MResourceInstance::INTEGER,
+                                                                     *object_instance);
 
 
     m2mobject_stub::instance_list.push_back(object_instance);

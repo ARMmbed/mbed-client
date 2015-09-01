@@ -48,3 +48,7 @@ bool M2MReportHandler::parse_notification_attribute(char *&,
 void M2MReportHandler::timer_expired(M2MTimerObserver::Type )
 {
 }
+
+void M2MReportHandler::trigger_object_notification()
+{
+}

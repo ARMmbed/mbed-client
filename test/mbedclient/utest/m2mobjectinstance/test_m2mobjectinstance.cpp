@@ -21,6 +21,7 @@
 #include "m2mbase_stub.h"
 #include "m2mtlvdeserializer_stub.h"
 #include "m2mtlvserializer_stub.h"
+#include "m2mreporthandler_stub.h"
 
 class Handler : public M2MObservationHandler {
 
@@ -39,15 +40,37 @@ public:
     bool visited;
 };
 
+class TestReportObserver :  public M2MReportObserver{
+public :
+    TestReportObserver() {}
+    ~TestReportObserver() {}
+    void observation_to_be_sent(){ }
+};
+
+class Callback : public M2MObjectCallback {
+
+public:
+
+    Callback(){}
+    ~Callback(){}
+    void notification_update() {
+        visited = true;
+    }
+
+    void clear() {visited = false;}
+    bool visited;
+};
+
 Test_M2MObjectInstance::Test_M2MObjectInstance()
 {
     handler = new Handler();
-    object = new M2MObjectInstance("name");    
+    callback = new Callback();
+    object = new M2MObjectInstance("name",*callback);
 }
 
 void Test_M2MObjectInstance::test_copy_constructor()
 {
-    M2MResource *res = new M2MResource("name","type",M2MResourceInstance::STRING,M2MBase::Static);
+    M2MResource *res = new M2MResource(*object,"name","type",M2MResourceInstance::STRING,M2MBase::Static);
     object->_resource_list.push_back(res);
 
     M2MObjectInstance* copy = new M2MObjectInstance(*object);
@@ -62,6 +85,7 @@ Test_M2MObjectInstance::~Test_M2MObjectInstance()
     m2mresource_stub::clear();
     m2mbase_stub::clear();
     delete object;
+    delete callback;
     delete handler;
 }
 
@@ -178,7 +202,7 @@ void Test_M2MObjectInstance::test_remove_resource()
 {
     CHECK(false == object->remove_resource("name"));
 
-    M2MResource *res = new M2MResource("name","type",M2MResourceInstance::STRING,M2MBase::Static,true);
+    M2MResource *res = new M2MResource(*object,"name","type",M2MResourceInstance::STRING,M2MBase::Static,true);
     object->_resource_list.push_back(res);
 
     String *name = new String("name");
@@ -199,7 +223,7 @@ void Test_M2MObjectInstance::test_remove_resource_instance()
 {
     CHECK(false == object->remove_resource_instance("name",0));
 
-    M2MResource *res = new M2MResource("name","type",M2MResourceInstance::STRING,M2MBase::Static,true);
+    M2MResource *res = new M2MResource(*object,"name","type",M2MResourceInstance::STRING,M2MBase::Static,true);
     object->_resource_list.push_back(res);
 
     String *name = new String("name");
@@ -209,7 +233,7 @@ void Test_M2MObjectInstance::test_remove_resource_instance()
 
     m2mresource_stub::bool_value = true;
 
-    M2MResourceInstance *ins = new M2MResourceInstance("name","type",M2MResourceInstance::STRING);
+    M2MResourceInstance *ins = new M2MResourceInstance("name","type",M2MResourceInstance::STRING,*object);
 
     m2mresource_stub::list.push_back(ins);
 
@@ -228,7 +252,7 @@ void Test_M2MObjectInstance::test_remove_resource_instance()
 
 void Test_M2MObjectInstance::test_resource()
 {
-    M2MResource *res = new M2MResource("name","type",M2MResourceInstance::STRING,M2MBase::Static,true);
+    M2MResource *res = new M2MResource(*object,"name","type",M2MResourceInstance::STRING,M2MBase::Static,true);
     object->_resource_list.push_back(res);
 
     String *name = new String("name");
@@ -238,7 +262,7 @@ void Test_M2MObjectInstance::test_resource()
     M2MResource *result = object->resource("name");
     CHECK(result != NULL);
 
-    res = new M2MResource("name","type",M2MResourceInstance::STRING,M2MBase::Static,true);
+    res = new M2MResource(*object,"name","type",M2MResourceInstance::STRING,M2MBase::Static,true);
     object->_resource_list.push_back(res);
 
     m2mbase_stub::int_value = 1;
@@ -252,10 +276,10 @@ void Test_M2MObjectInstance::test_resource()
 
 void Test_M2MObjectInstance::test_resources()
 {
-    M2MResource *res = new M2MResource("name","type",M2MResourceInstance::STRING,M2MBase::Static,true);
+    M2MResource *res = new M2MResource(*object,"name","type",M2MResourceInstance::STRING,M2MBase::Static,true);
     object->_resource_list.push_back(res);
 
-    res = new M2MResource("name","type",M2MResourceInstance::STRING,M2MBase::Static,true);
+    res = new M2MResource(*object,"name","type",M2MResourceInstance::STRING,M2MBase::Static,true);
     object->_resource_list.push_back(res);
 
     M2MResourceList resources =object->resources();
@@ -265,10 +289,10 @@ void Test_M2MObjectInstance::test_resources()
 
 void Test_M2MObjectInstance::test_resource_count()
 {
-    M2MResource *res = new M2MResource("name","type",M2MResourceInstance::STRING,M2MBase::Static,true);
+    M2MResource *res = new M2MResource(*object,"name","type",M2MResourceInstance::STRING,M2MBase::Static,true);
     object->_resource_list.push_back(res);
 
-    res = new M2MResource("name","type",M2MResourceInstance::STRING,M2MBase::Static,true);
+    res = new M2MResource(*object,"name","type",M2MResourceInstance::STRING,M2MBase::Static,true);
     object->_resource_list.push_back(res);
 
     String *name = new String("name");
@@ -290,10 +314,10 @@ void Test_M2MObjectInstance::test_resource_count()
 
 void Test_M2MObjectInstance::test_total_resource_count()
 {
-    M2MResource *res = new M2MResource("name","type",M2MResourceInstance::STRING,M2MBase::Static,true);
+    M2MResource *res = new M2MResource(*object,"name","type",M2MResourceInstance::STRING,M2MBase::Static,true);
     object->_resource_list.push_back(res);
 
-    res = new M2MResource("name1","type1",M2MResourceInstance::STRING,M2MBase::Static,true);
+    res = new M2MResource(*object,"name1","type1",M2MResourceInstance::STRING,M2MBase::Static,true);
     object->_resource_list.push_back(res);
 
     m2mresource_stub::bool_value = true;
@@ -312,22 +336,11 @@ void Test_M2MObjectInstance::test_base_type()
     CHECK(M2MBase::ObjectInstance == object->base_type());
 }
 
-void Test_M2MObjectInstance::test_handle_observation_attribute()
-{
-    char* c = {"value"};
-    bool ret = object->handle_observation_attribute(c);
-    CHECK(ret == false);
-
-    M2MResource *res = new M2MResource("name","type",M2MResourceInstance::STRING,M2MBase::Static,true);
-    object->_resource_list.push_back(res);
-
-    m2mresource_stub::bool_value = true;
-    ret = object->handle_observation_attribute(c);
-    CHECK(ret == true);
-}
-
 void Test_M2MObjectInstance::test_handle_get_request()
 {
+    M2MResource *res = new M2MResource(*object,"name1","type1",M2MResourceInstance::STRING,M2MBase::Static,true);
+    object->_resource_list.push_back(res);
+
     uint8_t value[] = {"name"};
     sn_coap_hdr_s *coap_header = (sn_coap_hdr_s *)malloc(sizeof(sn_coap_hdr_s));
     memset(coap_header, 0, sizeof(sn_coap_hdr_s));
@@ -396,6 +409,10 @@ void Test_M2MObjectInstance::test_handle_get_request()
         free(common_stub::coap_header->content_type_ptr);
         common_stub::coap_header->content_type_ptr = NULL;
     }
+    if(common_stub::coap_header->options_list_ptr->max_age_ptr) {
+        free(common_stub::coap_header->options_list_ptr->max_age_ptr);
+        common_stub::coap_header->options_list_ptr->max_age_ptr = NULL;
+    }
     if(common_stub::coap_header->options_list_ptr) {
         free(common_stub::coap_header->options_list_ptr);
         common_stub::coap_header->options_list_ptr = NULL;
@@ -434,7 +451,10 @@ void Test_M2MObjectInstance::test_handle_get_request()
         free(common_stub::coap_header->options_list_ptr->observe_ptr);
         common_stub::coap_header->options_list_ptr->observe_ptr = NULL;
     }
-
+    if(common_stub::coap_header->options_list_ptr->max_age_ptr) {
+        free(common_stub::coap_header->options_list_ptr->max_age_ptr);
+        common_stub::coap_header->options_list_ptr->max_age_ptr = NULL;
+    }
     if(common_stub::coap_header->options_list_ptr) {
         free(common_stub::coap_header->options_list_ptr);
         common_stub::coap_header->options_list_ptr = NULL;
@@ -453,7 +473,10 @@ void Test_M2MObjectInstance::test_handle_get_request()
         free(common_stub::coap_header->options_list_ptr->observe_ptr);
         common_stub::coap_header->options_list_ptr->observe_ptr = NULL;
     }
-
+    if(common_stub::coap_header->options_list_ptr->max_age_ptr) {
+        free(common_stub::coap_header->options_list_ptr->max_age_ptr);
+        common_stub::coap_header->options_list_ptr->max_age_ptr = NULL;
+    }
     if(common_stub::coap_header->options_list_ptr) {
         free(common_stub::coap_header->options_list_ptr);
         common_stub::coap_header->options_list_ptr = NULL;
@@ -474,7 +497,10 @@ void Test_M2MObjectInstance::test_handle_get_request()
         free(common_stub::coap_header->options_list_ptr->observe_ptr);
         common_stub::coap_header->options_list_ptr->observe_ptr = NULL;
     }
-
+    if(common_stub::coap_header->options_list_ptr->max_age_ptr) {
+        free(common_stub::coap_header->options_list_ptr->max_age_ptr);
+        common_stub::coap_header->options_list_ptr->max_age_ptr = NULL;
+    }
     if(common_stub::coap_header->options_list_ptr) {
         free(common_stub::coap_header->options_list_ptr);
         common_stub::coap_header->options_list_ptr = NULL;
@@ -605,4 +631,22 @@ void Test_M2MObjectInstance::test_handle_post_request()
 
     free(common_stub::coap_header);
     common_stub::clear();
+}
+
+void Test_M2MObjectInstance::test_notification_update()
+{
+    M2MBase::Observation obs_level = M2MBase::O_Attribute;
+
+    object->notification_update(obs_level);
+    CHECK(callback->visited == true);
+
+    obs_level = M2MBase::OI_Attribute;
+
+    TestReportObserver obs;
+    m2mbase_stub::report = new M2MReportHandler(obs);
+
+    object->notification_update(obs_level);
+
+    delete m2mbase_stub::report;
+    m2mbase_stub::report = NULL;
 }

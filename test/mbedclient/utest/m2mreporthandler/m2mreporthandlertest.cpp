@@ -56,3 +56,8 @@ TEST(M2MReportHandler, test_set_value)
 {
     m2m_reporthandler->test_set_value();
 }
+
+TEST(M2MReportHandler, test_trigger_object_notification)
+{
+    m2m_reporthandler->test_trigger_object_notification();
+}

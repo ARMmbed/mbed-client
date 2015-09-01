@@ -69,11 +69,6 @@ void Test_M2MBase::test_copy_constructor()
     Test_M2MBase* test = new Test_M2MBase();
     test->_interface_description = test_string;
 
-//    u_int8_t value[] = {"value1"};
-//    this->_value = (u_int8_t*)malloc(sizeof(u_int8_t));
-
-//    test->set_value(value,(u_int32_t)sizeof(value));
-
     test->_token_length = 3;
     test->_token = (u_int8_t *)malloc(test->_token_length);
 
@@ -83,8 +78,6 @@ void Test_M2MBase::test_copy_constructor()
     Test_M2MBase* copy = new Test_M2MBase(*test);
 
     CHECK(copy->_interface_description.compare(0,test_string.size(),test_string) == 0);
-
-//    CHECK(copy->_value_length == 7);
 
     CHECK(copy->_token != NULL);
 
@@ -106,16 +99,9 @@ void Test_M2MBase::test_assignment_operator()
     Test_M2MBase* test = new Test_M2MBase();
     Test_M2MBase* test2 = new Test_M2MBase();
     Test_M2MBase* test3 = new Test_M2MBase();
-//    test->_value_length = 2;
-//    test->_value = (u_int8_t *)malloc(test->_value_length);
 
     test->operator=(*test3);
     delete test3;
-
-//    CHECK(test->_value == NULL);
-
-//    test->_value_length = 2;
-//    test->_value = (u_int8_t *)malloc(test->_value_length);
 
     test->_token_length = 3;
     test->_token = (u_int8_t *)malloc(test->_token_length);
@@ -123,18 +109,13 @@ void Test_M2MBase::test_assignment_operator()
     Observer obs;
     test->_report_handler = new M2MReportHandler(obs);
 
-//    test2->_value_length = 7;
-//    test2->_value = (u_int8_t *)malloc(test2->_value_length);
-
     test2->_token_length = 8;
     test2->_token = (u_int8_t *)malloc(test2->_token_length);
 
     Observer obs2;
     test2->_report_handler = new M2MReportHandler(obs2);
 
-
     *test = *test2;
-//    CHECK(test->_value_length == 7);
 
     CHECK(test->_token != NULL);
 
@@ -205,6 +186,26 @@ void Test_M2MBase::test_set_observable()
     CHECK(test == this->_observable);
 }
 
+void Test_M2MBase::test_add_observation_level()
+{
+    add_observation_level(M2MBase::R_Attribute);
+    CHECK(M2MBase::R_Attribute == this->_observation_level);
+
+    add_observation_level(M2MBase::O_Attribute);
+    CHECK(M2MBase::OR_Attribute == this->_observation_level);
+}
+
+void Test_M2MBase::test_remove_observation_level()
+{
+    this->_observation_level = M2MBase::OR_Attribute;
+    remove_observation_level(M2MBase::R_Attribute);
+    CHECK(M2MBase::O_Attribute == this->_observation_level);
+
+    remove_observation_level(M2MBase::O_Attribute);
+    CHECK(M2MBase::None == this->_observation_level);
+}
+
+
 void Test_M2MBase::test_set_under_observation()
 {
     Handler handler;
@@ -242,6 +243,12 @@ void Test_M2MBase::test_is_observable()
     this->_observable = test;
 
     CHECK(test == is_observable());
+}
+
+void Test_M2MBase::test_observation_level()
+{
+    this->_observation_level = M2MBase::OR_Attribute;
+    CHECK(M2MBase::OR_Attribute == this->observation_level());
 }
 
 void Test_M2MBase::test_get_observation_token()
