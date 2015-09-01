@@ -213,6 +213,10 @@ void Test_M2MObject::test_handle_get_request()
         free(common_stub::coap_header->content_type_ptr);
         common_stub::coap_header->content_type_ptr = NULL;
     }
+    if(common_stub::coap_header->options_list_ptr->max_age_ptr) {
+        free(common_stub::coap_header->options_list_ptr->max_age_ptr);
+        common_stub::coap_header->options_list_ptr->max_age_ptr = NULL;
+    }
     if(common_stub::coap_header->options_list_ptr) {
         free(common_stub::coap_header->options_list_ptr);
         common_stub::coap_header->options_list_ptr = NULL;
@@ -225,6 +229,10 @@ void Test_M2MObject::test_handle_get_request()
     if(common_stub::coap_header->content_type_ptr) {
         free(common_stub::coap_header->content_type_ptr);
         common_stub::coap_header->content_type_ptr = NULL;
+    }
+    if(common_stub::coap_header->options_list_ptr->max_age_ptr) {
+        free(common_stub::coap_header->options_list_ptr->max_age_ptr);
+        common_stub::coap_header->options_list_ptr->max_age_ptr = NULL;
     }
     if(common_stub::coap_header->options_list_ptr) {
         free(common_stub::coap_header->options_list_ptr);
@@ -239,6 +247,10 @@ void Test_M2MObject::test_handle_get_request()
         free(common_stub::coap_header->content_type_ptr);
         common_stub::coap_header->content_type_ptr = NULL;
     }
+    if(common_stub::coap_header->options_list_ptr->max_age_ptr) {
+        free(common_stub::coap_header->options_list_ptr->max_age_ptr);
+        common_stub::coap_header->options_list_ptr->max_age_ptr = NULL;
+    }
     if(common_stub::coap_header->options_list_ptr) {
         free(common_stub::coap_header->options_list_ptr);
         common_stub::coap_header->options_list_ptr = NULL;
@@ -251,6 +263,10 @@ void Test_M2MObject::test_handle_get_request()
     if(common_stub::coap_header->content_type_ptr) {
         free(common_stub::coap_header->content_type_ptr);
         common_stub::coap_header->content_type_ptr = NULL;
+    }
+    if(common_stub::coap_header->options_list_ptr->max_age_ptr) {
+        free(common_stub::coap_header->options_list_ptr->max_age_ptr);
+        common_stub::coap_header->options_list_ptr->max_age_ptr = NULL;
     }
     if(common_stub::coap_header->options_list_ptr) {
         free(common_stub::coap_header->options_list_ptr);
@@ -277,7 +293,10 @@ void Test_M2MObject::test_handle_get_request()
         free(common_stub::coap_header->options_list_ptr->observe_ptr);
         common_stub::coap_header->options_list_ptr->observe_ptr = NULL;
     }
-
+    if(common_stub::coap_header->options_list_ptr->max_age_ptr) {
+        free(common_stub::coap_header->options_list_ptr->max_age_ptr);
+        common_stub::coap_header->options_list_ptr->max_age_ptr = NULL;
+    }
     if(common_stub::coap_header->options_list_ptr) {
         free(common_stub::coap_header->options_list_ptr);
         common_stub::coap_header->options_list_ptr = NULL;
@@ -295,6 +314,10 @@ void Test_M2MObject::test_handle_get_request()
     if(common_stub::coap_header->options_list_ptr->observe_ptr) {
         free(common_stub::coap_header->options_list_ptr->observe_ptr);
         common_stub::coap_header->options_list_ptr->observe_ptr = NULL;
+    }
+    if(common_stub::coap_header->options_list_ptr->max_age_ptr) {
+        free(common_stub::coap_header->options_list_ptr->max_age_ptr);
+        common_stub::coap_header->options_list_ptr->max_age_ptr = NULL;
     }
 
     if(common_stub::coap_header->options_list_ptr) {
@@ -315,6 +338,10 @@ void Test_M2MObject::test_handle_get_request()
     if(common_stub::coap_header->options_list_ptr->observe_ptr) {
         free(common_stub::coap_header->options_list_ptr->observe_ptr);
         common_stub::coap_header->options_list_ptr->observe_ptr = NULL;
+    }
+    if(common_stub::coap_header->options_list_ptr->max_age_ptr) {
+        free(common_stub::coap_header->options_list_ptr->max_age_ptr);
+        common_stub::coap_header->options_list_ptr->max_age_ptr = NULL;
     }
 
     if(common_stub::coap_header->options_list_ptr) {
