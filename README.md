@@ -4,7 +4,7 @@
 
 mbed Client is an OS-agnostic embedded software library that provides the means to connect and manage constrained embedded devices to web applications through the mbed Device Server (mDS). 
 
-The mbed Device Client API allows mbed OS developers to create applications with LWM2M features. These features are described in the [Lightweight Machine to Machine Technical Specification](http://technical.openmobilealliance.org/Technical/technical-information/release-program/current-releases/oma-lightweightm2m-v1-0); they include high level APIs to manage devices on the mbed Device Server, securely communicate with internet services over the industry standard TLS/DTLS, and fully control the endpoint and application logic. 
+The mbed Device Client API allows mbed OS developers to create applications with LWM2M features. These features are described in the [Lightweight Machine to Machine Technical Specification](http://technical.openmobilealliance.org/Technical/technical-information/release-program/current-releases/oma-lightweightm2m-v1-0); they include high level APIs to manage devices on mDS, securely communicate with internet services over the industry standard TLS/DTLS, and fully control the endpoint and application logic. 
 
 The API is written in C++ to allow quick application development.
 
@@ -19,7 +19,7 @@ There are three interfaces between the mDS and mbed Client:
 - Device management and service enablement
 - Information reporting
 
-The API provides an interface to define the application endpoint information. This information will be delivered to mbed Device Server during the registration operation (explained below).
+The API provides an interface to define the application endpoint information. This information will be delivered to mDS during the registration operation (explained below).
 
 To create an interface for your endpoint:
 
@@ -79,7 +79,7 @@ First you need to create an mDS object. This object contains information about m
         }
 ```
 
-**Note**: This API supports both non-secure and secure mode operations. For secure mode , you will also need to provide certificate, private key and server public key through the API.
+**Note**: This API supports both non-secure and secure mode operations. For secure mode, you will also need to provide certificate, private key and server public key through the API.
 
 Next, you need to register all the resources that you would like to monitor or follow via mDS. To do this, create the resource objects and pass them to the Register API for registration purposes.
 
@@ -154,7 +154,7 @@ void error(M2MInterface::Error error)
 
 ### Deregister
 
-The client can deregister from mDS when it no longer requires access to the server. When mDS receives the Deregister message it removes the device's registration information from its database. When the client next needs mDS, it will have to register again.
+The client can deregister from mDS when it no longer requires access to the server. When mDS receives the Deregister message it removes the device's registration information from its database. When the client needs mDS again, it will have to register again.
 
 To deregister your endpoint client:
 
@@ -322,7 +322,7 @@ The interface supports the following sub-features:
 
 mDS initiates an observation request to change the value of a dynamic Resource.
 
-Tip: related parameters for the **Observe** operation are described in the [Write Attributes](#write-attributes) section.
+**Tip:** Related parameters for the **Observe** operation are described in the [Write Attributes](#write-attributes) section.
 
 To make your Resource observable, you need to set the Observable parameter of your object to TRUE:
 
@@ -343,7 +343,7 @@ The mbed Client will handle the observation part once you have defined the Resou
 
 ### Notify
 
-The client sends the **Notify** operation to mDS during a valid observation on a Resource, once the notification conditions are met.
+The client sends the **Notify** operation to mDS during a valid observation on a Resource, when the notification conditions are met.
 
 ### Cancel
 
