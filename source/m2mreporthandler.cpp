@@ -18,6 +18,7 @@
 #include "mbed-client/m2mtimer.h"
 #include "include/m2mreporthandler.h"
 #include "ns_trace.h"
+#include <stdio.h>
 #include <string.h>
 
 M2MReportHandler::M2MReportHandler(M2MReportObserver &observer)
