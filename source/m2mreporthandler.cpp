@@ -139,7 +139,7 @@ bool M2MReportHandler::parse_notification_attribute(char *&query,
             if( len > 19 ){
                 len = 19;
             }
-            memcpy ( query_options[num_options], rest, len );
+            memcpy(query_options[num_options], rest, len);
             sep_pos++;            
             rest = sep_pos;
             sep_pos = strchr(rest, '&');
@@ -150,7 +150,7 @@ bool M2MReportHandler::parse_notification_attribute(char *&query,
             if( len > 19 ){
                 len = 19;
             }
-            memcpy ( query_options[num_options++], rest, len );
+            memcpy(query_options[num_options++], rest, len);
         }
         float pmin = _pmin;
         float pmax = _pmax;
@@ -227,11 +227,11 @@ bool M2MReportHandler::set_notification_attribute(char* option,
 
     char* pos = strstr(option, EQUAL.c_str());
     if( pos != NULL ){
-        memcpy ( attribute, option, (size_t)(pos-option) );
+        memcpy(attribute, option, (size_t)(pos-option));
         pos++;
-        memcpy ( value, pos, 20 );
+        memcpy(value, pos, 20 );
     }else{
-        memcpy ( attribute, option, (size_t)strlen(option) + 1 );
+        memcpy(attribute, option, (size_t)strlen(option) + 1);
     }
 
     if (strcmp(attribute, PMIN.c_str()) == 0) {
