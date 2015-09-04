@@ -132,24 +132,25 @@ bool M2MReportHandler::parse_notification_attribute(char *&query,
     char* rest = query;
     if( sep_pos != NULL ){
         char query_options[5][20];
+        memset(query_options, 0, sizeof(query_options[0][0]) * 5 * 20);
         uint8_t num_options = 0;
         while( sep_pos != NULL && num_options < 5){
             size_t len = (size_t)(sep_pos-rest);
             if( len > 19 ){
                 len = 19;
             }
-            strncpy(query_options[num_options], rest, len);
-            sep_pos++;
-            query_options[num_options++][len] = '\0';
+            memcpy ( query_options[num_options], rest, len );
+            sep_pos++;            
             rest = sep_pos;
             sep_pos = strchr(rest, '&');
+            num_options++;
         }
         if( num_options < 5 && strlen(rest) > 0){
             size_t len = (size_t)strlen(rest);
             if( len > 19 ){
                 len = 19;
             }
-            strncpy(query_options[num_options++], rest, len);
+            memcpy ( query_options[num_options++], rest, len );
         }
         float pmin = _pmin;
         float pmax = _pmax;
@@ -219,17 +220,18 @@ bool M2MReportHandler::set_notification_attribute(char* option,
     tr_debug("M2MReportHandler::set_notification_attribute()");
     bool success = false;
     bool observation = true;
-    char attribute[20] = {'\0'};
-    char value[20] = {'\0'};
+    char attribute[20];
+    char value[20];
+    memset(&attribute, 0, 20);
+    memset(&value, 0, 20);
 
     char* pos = strstr(option, EQUAL.c_str());
     if( pos != NULL ){
-        strncpy(attribute, option, (size_t)(pos-option));
+        memcpy ( attribute, option, (size_t)(pos-option) );
         pos++;
-        attribute[pos-option] = '\0';
-        strncpy(value, pos, 20);
+        memcpy ( value, pos, 20 );
     }else{
-        strncpy(attribute, option, (size_t)strlen(option));
+        memcpy ( attribute, option, (size_t)strlen(option) + 1 );
     }
 
     if (strcmp(attribute, PMIN.c_str()) == 0) {
