@@ -664,7 +664,7 @@ void M2MNsdlInterface::stop_timers()
 void M2MNsdlInterface::timer_expired(M2MTimerObserver::Type type)
 {
     if(M2MTimerObserver::NsdlExecution == type) {
-        sn_nsdl_exec(_counter_for_nsdl);
+        sn_nsdl_exec(_nsdl_handle, _counter_for_nsdl);
         _counter_for_nsdl++;
     } else if(M2MTimerObserver::Registration == type) {
         tr_debug("M2MNsdlInterface::timer_expired - M2MTimerObserver::Registration - Send update registration");
@@ -860,8 +860,8 @@ bool M2MNsdlInterface::create_nsdl_resource(M2MBase *base, const String &name)
                     }
                     resource->resource = buffer;
                     resource->resourcelen = length;
-                    sn_nsdl_update_resource(_nsdl_handle,resource);                    
-                }                
+                    sn_nsdl_update_resource(_nsdl_handle,resource);
+                }
             }
         } else if(_resource) {
             base->set_under_observation(false,this);
