@@ -249,6 +249,7 @@ private:
     friend class Test_M2MSecurity;
     friend class Test_M2MServer;
     friend class Test_M2MNsdlInterface;
+    friend class Test_M2MTLVSerializer;
 };
 
 #endif // M2M_OBJECT_INSTANCE_H
