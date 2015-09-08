@@ -26,8 +26,13 @@
 // TODO: Remove when yotta supports init.
 #include "lwipv4_init.h"
 
+// Minar for event scheduling
+#include "minar/minar.h"
+
 const String &MANUFACTURER = "ARM";
 const String &TYPE = "type";
+
+static bool test_result = false;
 
 // Dynamic resource variables
 const String &DYNAMIC_RESOURCE_NAME = "Dynamic";
@@ -38,6 +43,12 @@ const uint8_t STATIC_VALUE[] = "Static value";
 
 //TODO: should this be configured in .json conf file, and communicated via host test to here?
 int CALLBACK_TIMEOUT = 5;
+int MINAR_DELAY = 10000;
+
+#define SUITE_TEST_INFO(test_name, info)		printf("Suite-%s: %s\n", test_name, info)
+#define SUITE_TEST_RESULT(test_name, result)	printf("Suite-%s: result %s\n", test_name, result ? "PASSED" : "FAILED")
+#define SUITE_RESULT(result)					printf("Suite: result %s\n", result ? "success" : "failure")
+
 
 class MbedClient: public M2MInterfaceObserver {
 public:
@@ -119,6 +130,17 @@ public:
         return _registration_updated;
     }
 
+    void check_result(const char* result) {
+        if(_registered && _registration_updated && _unregistered) {
+            SUITE_TEST_RESULT(result, true);
+            test_result = true;
+        } else {
+           SUITE_TEST_RESULT(result, false);
+           test_result = false;
+        }
+        minar::Scheduler::stop();
+    }
+
     M2MSecurity* create_register_object() {
         // Creates server object with LWM2M server address and other parameters
         // required for client to connect to LWM2M server.
@@ -138,14 +160,11 @@ public:
         }
     }
 
-    bool test_update_register(const uint32_t lifetime)
+    void test_update_register(const uint32_t lifetime)
     {
-        bool success = false;
         if(_interface && _register_security) {
-            success = true;
             _interface->update_registration(_register_security,lifetime);
-        }
-        return success;
+        }        
     }
 
     void test_unregister(){
@@ -213,7 +232,6 @@ public:
     // to which the resources are registered and registered objects.
     void object_registered(M2MSecurity */*security_object*/, const M2MServer &/*server_object*/){
         _registered = true;
-        _unregistered = false;
     }
 
     //Callback from mbed client stack when the registration update
@@ -227,8 +245,7 @@ public:
     // is successful, it returns the mbed Device Server object
     // to which the resources were unregistered.
     void object_unregistered(M2MSecurity */*server_object*/){
-        _unregistered = true;
-        _registered = false;
+        _unregistered = true;        
     }
 
     //Callback from mbed client stack if any value has changed
@@ -261,11 +278,6 @@ private:
     int                 _resource_value;
     TestConfig			*_test_config;
 };
-
-#define SUITE_TEST_INFO(test_name, info)		printf("Suite-%s: %s\n", test_name, info)
-#define SUITE_TEST_RESULT(test_name, result)	printf("Suite-%s: result %s\n", test_name, result ? "PASSED" : "FAILED")
-#define SUITE_RESULT(result)					printf("Suite: result %s\n", result ? "success" : "failure")
-
 
 #define WAIT_CALLBACK(X, TIMEOUT)                                  \
 {int _timer = 0;\
@@ -325,31 +337,27 @@ bool test_bootStrap(TestConfig *test_config) {
     return _result;
 }
 
-bool test_deviceObject(TestConfig *test_config) {
-    bool _result = true;
+void test_deviceObject(TestConfig *test_config) {
     const char* _tn = "TC2_deviceObject";
 
     SUITE_TEST_INFO(_tn, "STARTED");
 
     // Instantiate the class which implements
     // LWM2M Client API
-    MbedClient *mbed_client = new MbedClient(test_config);
+    MbedClient mbed_client(test_config);// = new MbedClient(test_config);
 
     SUITE_TEST_INFO(_tn, "client done");
 
-    // Wait 5 seconds
-    wait_ms(5000);
-
     // Create LWM2M Client API interface for M2M server
-    _result &= mbed_client->create_interface();
+    mbed_client.create_interface();
 
-    M2MSecurity *register_object = mbed_client->create_register_object();
+    M2MSecurity *register_object = mbed_client.create_register_object();
 
-    mbed_client->set_register_object(register_object);
+    mbed_client.set_register_object(register_object);
 
     // Create LWM2M device object specifying device resources
     // as per OMA LWM2M specification.
-    M2MDevice* device_object = mbed_client->create_device_object();
+    M2MDevice* device_object = mbed_client.create_device_object();
 
     // Add the device object that we want to register
     // into the list and pass the list for register API.
@@ -357,33 +365,26 @@ bool test_deviceObject(TestConfig *test_config) {
     object_list.push_back(device_object);
 
     // Issue register command.
-    mbed_client->test_register(object_list);
-    SUITE_TEST_INFO(_tn, "register done");
 
-    SUITE_TEST_INFO(_tn, "waiting register callback...");
-    wait_ms(1000);
-    // Callback comes in object_registered()
-    WAIT_CALLBACK(mbed_client->register_successful(), CALLBACK_TIMEOUT);
-    SUITE_TEST_INFO(_tn, "register callback done");
+    FunctionPointer1<void, M2MObjectList> tr(&mbed_client, &MbedClient::test_register);
+    minar::Scheduler::postCallback(tr.bind(object_list));
 
-    // Wait 1 seconds
-    wait_ms(1000);
+    // Issue update register command.
 
-    //TODO move this to callback when that can be taken in use
-    _result &= mbed_client->test_update_register(2222);
-    SUITE_TEST_INFO(_tn, "update register done");
+    uint32_t lifetime = 2222;
 
-    SUITE_TEST_INFO(_tn, "waiting update register callback...");
-    // Callback comes in object_updated()
-    WAIT_CALLBACK(mbed_client->update_register_successful(), CALLBACK_TIMEOUT);
+    FunctionPointer1<void, uint32_t> ur(&mbed_client, &MbedClient::test_update_register);
+    minar::Scheduler::postCallback(ur.bind(lifetime)).delay(MINAR_DELAY);
 
     // Issue unregister command.
-    mbed_client->test_unregister();
-    SUITE_TEST_INFO(_tn, "unregister done");
 
-    SUITE_TEST_INFO(_tn, "waiting unregister callback...");
-    // Callback comes in object_unregistered().
-    WAIT_CALLBACK(mbed_client->unregister_successful(), CALLBACK_TIMEOUT);
+    FunctionPointer0<void> tur(&mbed_client, &MbedClient::test_unregister);
+    minar::Scheduler::postCallback(tur.bind()).delay(MINAR_DELAY*2);
+
+    FunctionPointer1<void, const char*> cus(&mbed_client, &MbedClient::check_result);
+    minar::Scheduler::postCallback(cus.bind(_tn)).delay(MINAR_DELAY*3);
+
+    minar::Scheduler::start();
 
     // Delete device object created for registering device
     // resources.
@@ -391,14 +392,6 @@ bool test_deviceObject(TestConfig *test_config) {
     if(device_object) {
         M2MDevice::delete_instance();
     }
-
-    if (mbed_client) {
-        delete mbed_client;
-    }
-
-    SUITE_TEST_RESULT(_tn, _result);
-    return _result;
-
 }
 
 bool test_resource(TestConfig *test_config) {
@@ -407,22 +400,22 @@ bool test_resource(TestConfig *test_config) {
     SUITE_TEST_INFO(_tn, "STARTED");
 
     // Instantiate the class which implements LWM2M Client API
-    MbedClient *mbed_client = new MbedClient(test_config);
+    MbedClient mbed_client(test_config);
     SUITE_TEST_INFO(_tn, "client done");
 
     // Create LWM2M Client API interface for M2M server
-    _result &= mbed_client->create_interface();
+    _result &= mbed_client.create_interface();
 
-    M2MSecurity *register_object = mbed_client->create_register_object();
+    M2MSecurity *register_object = mbed_client.create_register_object();
 
-    mbed_client->set_register_object(register_object);
+    mbed_client.set_register_object(register_object);
 
     // Create LWM2M device object specifying device resources
     // as per OMA LWM2M specification.
-    M2MDevice* device_object = mbed_client->create_device_object();
+    M2MDevice* device_object = mbed_client.create_device_object();
 
     // Create LWM2M generic object for resource
-    M2MObject* resource_object = mbed_client->create_generic_object();
+    M2MObject* resource_object = mbed_client.create_generic_object();
 
     // Add the device object that we want to register
     // into the list and pass the list for register API.
@@ -431,23 +424,26 @@ bool test_resource(TestConfig *test_config) {
     object_list.push_back(resource_object);
 
     // Issue register command.
-    mbed_client->test_register(object_list);
-    SUITE_TEST_INFO(_tn, "register done");
 
-    SUITE_TEST_INFO(_tn, "waiting register callback...");
-    // Callback comes in object_registered()
-    WAIT_CALLBACK(mbed_client->register_successful(), CALLBACK_TIMEOUT);
+    FunctionPointer1<void, M2MObjectList> tr(&mbed_client, &MbedClient::test_register);
+    minar::Scheduler::postCallback(tr.bind(object_list));
 
-    // Wait 5 seconds
-    wait_ms(5000);
+    // Issue update register command.
+
+    uint32_t lifetime = 2222;
+
+    FunctionPointer1<void, uint32_t> ur(&mbed_client, &MbedClient::test_update_register);
+    minar::Scheduler::postCallback(ur.bind(lifetime)).delay(MINAR_DELAY);
 
     // Issue unregister command.
-    mbed_client->test_unregister();
-    SUITE_TEST_INFO(_tn, "unregister done");
 
-    SUITE_TEST_INFO(_tn, "waiting unregister callback...");
-    // Callback comes in object_unregistered().
-    WAIT_CALLBACK(mbed_client->unregister_successful(), CALLBACK_TIMEOUT);
+    FunctionPointer0<void> tur(&mbed_client, &MbedClient::test_unregister);
+    minar::Scheduler::postCallback(tur.bind()).delay(MINAR_DELAY*2);
+
+    FunctionPointer1<void, const char*> cus(&mbed_client, &MbedClient::check_result);
+    minar::Scheduler::postCallback(cus.bind(_tn)).delay(MINAR_DELAY*3);
+
+    minar::Scheduler::start();
 
     // Delete device object created for registering device resources.
     if(device_object) {
@@ -458,19 +454,11 @@ bool test_resource(TestConfig *test_config) {
     if(resource_object) {
         delete resource_object;
     }
-
-    if (mbed_client) {
-        delete mbed_client;
-    }
-
-    SUITE_TEST_RESULT(_tn, _result);
-    return _result;
 }
 
 
 
 void app_start(int /*argc*/, char* /*argv*/[]) {
-    bool result = true;
     DigitalOut _led = DigitalOut(LED3);
     _led = 1;
 
@@ -495,15 +483,14 @@ void app_start(int /*argc*/, char* /*argv*/[]) {
 
     // Bootstrap test is uncommented, until it will be supported.
     //result &= test_bootStrap(&test_config);
-    result &= test_deviceObject(&test_config);
-    result &= test_resource(&test_config);
+    test_deviceObject(&test_config);
+    test_resource(&test_config);
 
     _led = 1;
 
     // Disconnect and teardown the network interface
     eth.disconnect();
 
-    // Communicate test result
-    SUITE_RESULT(result);
+    SUITE_RESULT(test_result);
 }
 

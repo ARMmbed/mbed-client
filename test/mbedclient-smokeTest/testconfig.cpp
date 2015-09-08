@@ -32,9 +32,9 @@ TestConfig::~TestConfig() {	}
 
 void TestConfig::setup() {
 	_bootstrapAddress = m2m::String("dummy");
-	_mdsAddress = m2m::String("ds-test.dev.mbed.com");
+	_mdsAddress = m2m::String("coap://ds-test.dev.mbed.com:5683");
 	_endpointName = m2m::String(MBED_ENDPOINT_NAME);
-	_endpointType = m2m::String("test");
+	_endpointType = m2m::String("test2");
 	_domain = m2m::String(MBED_DOMAIN);
 	_port = 5683;
 	_lifetime = 2222;
