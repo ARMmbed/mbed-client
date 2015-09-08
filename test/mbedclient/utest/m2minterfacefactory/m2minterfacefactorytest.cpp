@@ -56,3 +56,8 @@ TEST(M2MInterfaceFactory, create_object)
 {
     m2m_factory->test_create_object();
 }
+
+TEST(M2MInterfaceFactory, create_firmware)
+{
+    m2m_factory->test_create_firmware();
+}

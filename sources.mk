@@ -17,6 +17,7 @@ SRCS += \
 	source/m2mtlvdeserializer.cpp \
 	source/m2mtlvserializer.cpp \
 	source/nsdlaccesshelper.cpp \
+	source/m2mfirmware.cpp \
 	../lwm2m-client-linux/source/m2mconnectionhandler.cpp \
 	../lwm2m-client-linux/source/m2mconnectionhandlerpimpl.cpp \
 	../lwm2m-client-linux/source/m2mtimer.cpp \
