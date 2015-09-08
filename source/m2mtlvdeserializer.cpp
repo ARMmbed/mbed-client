@@ -63,29 +63,28 @@ void M2MTLVDeserializer::deserialize_resources(uint8_t *tlv, uint32_t tlv_size, 
 
 void M2MTLVDeserializer::deserialize_object_instances(uint8_t *tlv, uint32_t tlv_size, uint32_t offset, M2MObjectInstanceList &list)
 {
-    TypeIdLength *til = TypeIdLength::createTypeIdLength(tlv, offset)->deserialize();
-    offset = til->_offset;
+    if(is_object_instance(tlv)) {
+        TypeIdLength *til = TypeIdLength::createTypeIdLength(tlv, offset)->deserialize();
+        offset = til->_offset;
 
-    M2MObjectInstanceList::const_iterator it;
-    it = list.begin();
+        M2MObjectInstanceList::const_iterator it;
+        it = list.begin();
 
-    if (til->_type == TYPE_OBJECT_INSTANCE) {
-        for (; it!=list.end(); it++) {
-            if((*it)->instance_id() == til->_id) {
-                M2MResourceList resource_list = (*it)->resources();
-                deserialize_resources(tlv, tlv_size-offset-til->_length, 0, resource_list);
+        if (til->_type == TYPE_OBJECT_INSTANCE) {
+            for (; it!=list.end(); it++) {
+                if((*it)->instance_id() == til->_id) {
+                    M2MResourceList resource_list = (*it)->resources();
+                    deserialize_resources(tlv, tlv_size-offset, offset, resource_list);
+                }
             }
+            offset += til->_length;
+
+            if(offset < tlv_size) {
+                deserialize_object_instances(tlv, tlv_size-offset, offset, list);
+            }
+            delete til;
         }
-    } else {
-        return;
     }
-
-    offset += til->_length;
-
-    if(offset < tlv_size) {
-        deserialize_object_instances(tlv, tlv_size-offset, offset, list);
-    }
-    delete til;
 }
 
 void M2MTLVDeserializer::deserialize_resources(uint8_t *tlv, uint32_t tlv_size, uint32_t offset, M2MResourceList &list)
@@ -153,7 +152,8 @@ void M2MTLVDeserializer::deserialize_resource_instances(uint8_t *tlv, uint32_t t
 
 bool M2MTLVDeserializer::is_object_instance(uint8_t *tlv, uint32_t offset)
 {
-    return (tlv[offset] & TYPE_OBJECT_INSTANCE) == TYPE_OBJECT_INSTANCE;
+    uint8_t value = tlv[offset];
+    return (value & TYPE_RESOURCE) == TYPE_OBJECT_INSTANCE;
 }
 
 bool M2MTLVDeserializer::is_resource(uint8_t *tlv, uint32_t offset)
@@ -163,12 +163,12 @@ bool M2MTLVDeserializer::is_resource(uint8_t *tlv, uint32_t offset)
     
 bool M2MTLVDeserializer::is_multiple_resource(uint8_t *tlv, uint32_t offset)
 {
-    return (tlv[offset] & TYPE_MULTIPLE_RESOURCE) == TYPE_MULTIPLE_RESOURCE;
+    return (tlv[offset] & TYPE_RESOURCE) == TYPE_MULTIPLE_RESOURCE;
 }
     
 bool M2MTLVDeserializer::is_resource_instance(uint8_t *tlv, uint32_t offset)
 {
-    return (tlv[offset] & TYPE_RESOURCE_INSTANCE) == TYPE_RESOURCE_INSTANCE;
+    return (tlv[offset] & TYPE_RESOURCE) == TYPE_RESOURCE_INSTANCE;
 }
 
 TypeIdLength* TypeIdLength::createTypeIdLength(uint8_t *tlv, uint32_t offset)
