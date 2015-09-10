@@ -23,11 +23,13 @@ echo
 rm -rf coverages
 mkdir coverages
 cd coverages
-
+gcovr --object-directory ./ --exclude test  -x -o gcovr.xml
 lcov -d ../build -c -o app.info
 lcov -q -r app.info "/test*" -o app.info
 lcov -q -r app.info "/usr*" -o app.info
 genhtml -q --no-branch-coverage app.info
+rm -f *.gcno
+rm -f *.gcda
 cd ..
 echo
 echo
