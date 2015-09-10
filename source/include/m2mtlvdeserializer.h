@@ -134,4 +134,5 @@ public:
     uint16_t            _id;
     uint32_t            _length;
 
+    friend class Test_M2MTLVDeserializer;
 };
