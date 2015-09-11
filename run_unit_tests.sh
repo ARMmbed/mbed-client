@@ -16,20 +16,20 @@ echo Create results
 echo
 mkdir results
 find ./ -name '*.xml' | xargs cp -t ./results/
-
+find ./ -name '*.gcno' | xargs cp -t ./results/
+find ./ -name '*.gcda' | xargs cp -t ./results/
+gcovr --object-directory ./results --exclude test  -x -o ./results/gcovr.xml
 echo
 echo Create coverage document
 echo
 rm -rf coverages
 mkdir coverages
 cd coverages
-gcovr --object-directory ./ --exclude test  -x -o gcovr.xml
+#gcovr --object-directory ./ --exclude test  -x -o gcovr.xml
 lcov -d ../build -c -o app.info
 lcov -q -r app.info "/test*" -o app.info
 lcov -q -r app.info "/usr*" -o app.info
 genhtml -q --no-branch-coverage app.info
-rm -f *.gcno
-rm -f *.gcda
 cd ..
 echo
 echo
