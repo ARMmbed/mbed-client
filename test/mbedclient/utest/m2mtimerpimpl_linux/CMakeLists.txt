@@ -15,7 +15,9 @@ target_link_libraries(m2mtimerpimpl_linux
     CppUTest
     CppUTestExt
 )
-
+set_target_properties(m2mtimerpimpl_linux
+PROPERTIES COMPILE_FLAGS "${CMAKE_CXX_FLAGS} -g -O0 --coverage -fprofile-arcs -ftest-coverage -D__thumb2__ -w"
+           LINK_FLAGS "-fprofile-arcs")
 add_test(m2mtimerpimpl_linux m2mtimerpimpl_linux)
 
 endif()

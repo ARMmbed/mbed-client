@@ -1,13 +1,9 @@
 if(TARGET_LIKE_LINUX AND DEFINED ENV{RUN_UNIT_TESTS})
-SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -g -O0 --coverage -fprofile-arcs -ftest-coverage")
-SET(CMAKE_CXX_FLAGS "-g -O0 --coverage -fprofile-arcs -ftest-coverage -D__thumb2__ -w")
-SET(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -g -O0 --coverage -fprofile-arcs -ftest-coverage")
 SET(MY_CURRENT_DIR "./mbedclient/utest")
 include_directories($ENV{CPPUTEST_HOME}/include)
 link_directories($ENV{CPPUTEST_HOME}/lib) 
 MACRO(SUBDIRLIST result curdir)
   FILE(GLOB children RELATIVE ${curdir} ${curdir}/*)
-
   SET(dirlist "")
   FOREACH(child ${children})
     IF(IS_DIRECTORY ${curdir}/${child})
@@ -24,7 +20,6 @@ SUBDIRLIST(SUBDIRS ${CMAKE_CURRENT_SOURCE_DIR}/mbedclient/utest)
 FOREACH(subdir ${SUBDIRS})
     ADD_SUBDIRECTORY(${subdir})
 ENDFOREACH()
-
 
 endif()
 

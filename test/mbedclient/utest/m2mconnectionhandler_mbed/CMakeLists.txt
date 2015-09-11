@@ -15,5 +15,8 @@ target_link_libraries(m2mconnectionhandler_mbed
     CppUTest
     CppUTestExt
 )
+set_target_properties(m2mconnectionhandler_mbed
+PROPERTIES COMPILE_FLAGS "${CMAKE_CXX_FLAGS} -g -O0 --coverage -fprofile-arcs -ftest-coverage -D__thumb2__ -w"
+           LINK_FLAGS "-fprofile-arcs")
 add_test(m2mconnectionhandler_mbed m2mconnectionhandler_mbed)
 endif()

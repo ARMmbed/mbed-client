@@ -13,6 +13,8 @@ target_link_libraries(threadhelper
     CppUTest
     CppUTestExt
 )
-
+set_target_properties(threadhelper
+PROPERTIES COMPILE_FLAGS "${CMAKE_CXX_FLAGS} -g -O0 --coverage -fprofile-arcs -ftest-coverage -D__thumb2__ -w"
+           LINK_FLAGS "-fprofile-arcs")
 add_test(threadhelper threadhelper)
 endif()
