@@ -11,30 +11,30 @@ yt clean
 yt build
 yt test --no-build -- -ojunit
 unset RUN_UNIT_TESTS
+
 echo
 echo Create results
 echo
+
+rm -rf results
+rm -rf coverage
 mkdir results
+mkdir coverage
+
 find ./ -name '*.xml' | xargs cp -t ./results/
-find ./ -name '*.gcno' | xargs cp -t ./results/
-find ./ -name '*.gcda' | xargs cp -t ./results/
-gcovr --object-directory ./results --exclude test  -x -o ./results/gcovr.xml
+find ./ -name '*.gcno' | xargs cp -t ./coverage/
+find ./ -name '*.gcda' | xargs cp -t ./coverage/
+exclude_files="${PWD}/test/"
+gcovr --object-directory ./coverage --exclude '/usr' --exclude $exclude_files  -x -o ./results/gcovr.xml
+
 echo
 echo Create coverage document
 echo
-rm -rf coverages
-mkdir coverages
-cd coverages
-#gcovr --object-directory ./ --exclude test  -x -o gcovr.xml
-lcov -d ../build -c -o app.info
-lcov -q -r app.info "/test*" -o app.info
-lcov -q -r app.info "/usr*" -o app.info
-genhtml -q --no-branch-coverage app.info
-cd ..
-echo
-echo
-echo
-echo Have a nice bug hunt!
-echo
-echo
-echo
+
+lcov -d ./coverage -c -o ./coverage/app.info
+lcov -q -r ./coverage/app.info "/test/mbedclient/*" -o ./coverage/app.info
+lcov -q -r ./coverage/app.info "/usr*" -o ./coverage/app.info
+genhtml -q --no-branch-coverage ./coverage/app.info -o ./coverage
+rm -f ./coverage/*.gcno
+rm -f ./coverage/*.gcda
+
