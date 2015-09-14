@@ -1,4 +1,5 @@
 if(TARGET_LIKE_LINUX AND DEFINED ENV{RUN_UNIT_TESTS})
+SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -include /usr/include/CppUTest/MemoryLeakDetectorMallocMacros.h -include /usr/include/CppUTest/MemoryLeakDetectorNewMacros.h")
 SET(MY_CURRENT_DIR "./mbedclient/utest")
 include_directories($ENV{CPPUTEST_HOME}/include)
 link_directories($ENV{CPPUTEST_HOME}/lib) 
