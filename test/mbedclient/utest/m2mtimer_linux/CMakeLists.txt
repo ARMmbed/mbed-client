@@ -10,7 +10,6 @@ add_executable(m2mtimer_linux
 )
 
 target_link_libraries(m2mtimer_linux
-    mbed-client
     CppUTest
     CppUTestExt
 )

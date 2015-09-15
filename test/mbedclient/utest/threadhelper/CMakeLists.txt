@@ -9,7 +9,6 @@ add_executable(threadhelper
 )
 
 target_link_libraries(threadhelper
-    mbed-client
     CppUTest
     CppUTestExt
 )

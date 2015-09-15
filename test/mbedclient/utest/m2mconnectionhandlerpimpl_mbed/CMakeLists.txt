@@ -12,9 +12,9 @@ add_executable(m2mconnectionhandlerpimpl_mbed
         "../stub/m2mconnectionsecurity_stub.cpp"
         "../stub/m2msecurity_stub.cpp"
         "../stub/m2mbase_stub.cpp"
+        "../stub/m2mobject_stub.cpp"
 )
 target_link_libraries(m2mconnectionhandlerpimpl_mbed
-    mbed-client
     CppUTest
     CppUTestExt
 )

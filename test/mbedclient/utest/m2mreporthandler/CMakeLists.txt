@@ -13,7 +13,6 @@ add_executable(m2mreporthandler
 
 )
 target_link_libraries(m2mreporthandler
-    mbed-client
     CppUTest
     CppUTestExt
 )

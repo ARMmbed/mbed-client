@@ -13,8 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef M2M_CONNECTION_HANDLER_IMPL_MBED_STUB_H
-#define M2M_CONNECTION_HANDLER_IMPL_MBED_STUB_H
+#ifndef M2M_CONNECTION_HANDLER_IMPL_STUB_H
+#define M2M_CONNECTION_HANDLER_IMPL_STUB_H
 
 #include "m2mconnectionhandler.h"
 

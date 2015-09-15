@@ -11,10 +11,10 @@ add_executable(m2mtlvdeserializer
         "../stub/m2mresourceinstance_stub.cpp"
         "../stub/m2mobjectinstance_stub.cpp"
         "../stub/m2mobject_stub.cpp"
+        "../stub/m2mtlvserializer_stub.cpp"
 )
 
 target_link_libraries(m2mtlvdeserializer
-    mbed-client
     CppUTest
     CppUTestExt
 )

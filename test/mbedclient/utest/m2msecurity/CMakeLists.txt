@@ -14,7 +14,6 @@ add_executable(m2msecurity
         "../../../../source/m2mconstants.cpp"
 )
 target_link_libraries(m2msecurity
-    mbed-client
     CppUTest
     CppUTestExt
 )

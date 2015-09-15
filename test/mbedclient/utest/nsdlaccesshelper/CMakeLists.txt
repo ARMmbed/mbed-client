@@ -10,7 +10,6 @@ add_executable(nsdlaccesshelper
 )
 
 target_link_libraries(nsdlaccesshelper
-    mbed-client
     CppUTest
     CppUTestExt
 )

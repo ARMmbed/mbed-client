@@ -8,7 +8,6 @@ add_executable(m2mstring
 )
 
 target_link_libraries(m2mstring
-    mbed-client
     CppUTest
     CppUTestExt
 )

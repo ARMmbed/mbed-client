@@ -15,7 +15,6 @@ add_executable(m2mserver
 )
 
 target_link_libraries(m2mserver
-    mbed-client
     CppUTest
     CppUTestExt
 )

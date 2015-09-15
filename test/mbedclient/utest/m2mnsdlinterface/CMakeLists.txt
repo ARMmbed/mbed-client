@@ -13,6 +13,8 @@ add_executable(m2mnsdlinterface
         "../stub/m2mobjectinstance_stub.cpp"
         "../stub/m2mstring_stub.cpp"
         "../stub/m2msecurity_stub.cpp"
+        "../stub/m2mconnectionsecurity_stub.cpp"
+	"../stub/m2mconnectionhandler_stub.cpp"
         "../stub/m2mtimer_stub.cpp"
         "../stub/common_stub.cpp"
         "../stub/nsdlaccesshelper_stub.cpp"
@@ -21,7 +23,6 @@ add_executable(m2mnsdlinterface
         "../../../../source/m2mconstants.cpp"
 )
 target_link_libraries(m2mnsdlinterface
-    mbed-client
     CppUTest
     CppUTestExt
 )

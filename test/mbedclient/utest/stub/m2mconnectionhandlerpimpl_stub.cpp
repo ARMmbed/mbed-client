@@ -80,3 +80,7 @@ int M2MConnectionHandlerPimpl::sendToSocket(const unsigned char *, size_t ){
 int M2MConnectionHandlerPimpl::receiveFromSocket(unsigned char *buf, size_t len){
     return m2mconnectionhandlerpimpl_stub::int_value;
 }
+void M2MConnectionHandlerPimpl::data_receive(void *object)
+{
+
+}

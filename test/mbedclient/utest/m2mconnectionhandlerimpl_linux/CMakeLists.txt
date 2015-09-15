@@ -1,4 +1,4 @@
-if(!TARGET_LIKE_LINUX)
+if(TARGET_LIKE_LINUX)
 include("../includes.txt")
 add_executable(m2mconnectionhandlerimpl_linux
         "../../../../yotta_modules/mbed-client-linux/source/m2mconnectionhandler.cpp"
@@ -13,7 +13,6 @@ add_executable(m2mconnectionhandlerimpl_linux
        "../stub/m2mconnectionsecurity_stub.cpp"
 )
 target_link_libraries(m2mconnectionhandlerimpl_linux
-   mbed-client
    CppUTest
    CppUTestExt
 )

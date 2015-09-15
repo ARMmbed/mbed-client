@@ -206,16 +206,17 @@ void Test_M2MConnectionHandlerPimpl_mbed::test_dns_handler()
     m2mconnectionsecurityimpl_stub::int_value = -5;
     m2msecurity_stub::int_value = M2MSecurity::Psk;
 
+    M2MSecurity* sec = new M2MSecurity(M2MSecurity::M2MServer);
+    handler->_security = sec;
     handler->dns_handler(NULL,sa,NULL);
     CHECK(false == handler->_is_handshaking);
-
     m2mconnectionsecurityimpl_stub::int_value = 5;
     handler->dns_handler(NULL,sa,NULL);
     CHECK(true == handler->_is_handshaking);
 
     handler->_security_impl = NULL;
     delete conSec;
-
+    delete sec;
     free(common_stub::event);
 }
 
