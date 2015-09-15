@@ -157,6 +157,8 @@ private:
 friend class Test_M2MObject;
 friend class Test_M2MInterfaceImpl;
 friend class Test_M2MNsdlInterface;
+friend class Test_M2MTLVSerializer;
+friend class Test_M2MTLVDeserializer;
 
 };
 

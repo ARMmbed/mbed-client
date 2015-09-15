@@ -29,7 +29,8 @@ void m2mconnectionhandler_stub::clear()
 }
 
 M2MConnectionHandler::M2MConnectionHandler(M2MConnectionObserver &observer,
-                                                   M2MConnectionSecurity* sec,
+                                           M2MConnectionSecurity* sec,
+                                           M2MInterface::BindingMode,
                                            M2MInterface::NetworkStack)
 :_observer(observer)
 {

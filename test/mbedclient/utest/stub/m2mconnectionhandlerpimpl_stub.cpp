@@ -30,8 +30,9 @@ void m2mconnectionhandlerpimpl_stub::clear()
 }
 
 M2MConnectionHandlerPimpl::M2MConnectionHandlerPimpl(M2MConnectionHandler* base, M2MConnectionObserver &observer,
-                                                   M2MConnectionSecurity* sec,
-                                           M2MInterface::NetworkStack)
+                                                     M2MConnectionSecurity* sec,
+                                                     M2MInterface::BindingMode,
+                                                     M2MInterface::NetworkStack)
 :_observer(observer)
 {
     if( sec ){
