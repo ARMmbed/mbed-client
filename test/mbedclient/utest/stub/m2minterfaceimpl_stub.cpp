@@ -33,7 +33,7 @@ M2MInterfaceImpl::M2MInterfaceImpl(M2MInterfaceObserver& observer,
                                    const int32_t,
                                    const uint16_t,
                                    const String &,
-                                   BindingMode ,
+                                   M2MInterface::BindingMode,
                                    M2MInterface::NetworkStack,
                                    const String &)
 : _observer(observer),

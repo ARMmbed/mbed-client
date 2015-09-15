@@ -38,6 +38,7 @@ public:
      * @return Platform specific connection handler.
      */
     static M2MConnectionHandler* createConnectionHandler(M2MConnectionObserver &observer,
+                                                         M2MInterface::BindingMode mode,
                                                          M2MInterface::NetworkStack stack);
 };
 
