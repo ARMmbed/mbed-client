@@ -23,6 +23,7 @@
 #include "m2mconnectionhandler.h"
 
 M2MConnectionHandler* M2MConnectionHandlerFactory::createConnectionHandler(M2MConnectionObserver &observer,
+                                                                           M2MInterface::BindingMode mode,
                                                                            M2MInterface::NetworkStack stack){
     //TODO: return expected object
     M2MConnectionHandler* ret = NULL;
@@ -30,7 +31,7 @@ M2MConnectionHandler* M2MConnectionHandlerFactory::createConnectionHandler(M2MCo
 
     sec = new M2MConnectionSecurity();
 
-    ret = new M2MConnectionHandler(observer, sec, stack);
+    ret = new M2MConnectionHandler(observer, sec, mode, stack);
 
     return ret;
 }
