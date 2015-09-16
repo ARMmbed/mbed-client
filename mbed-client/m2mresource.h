@@ -158,6 +158,7 @@ friend class Test_M2MNsdlInterface;
 friend class Test_M2MFirmware;
 friend class Test_M2MTLVSerializer;
 friend class Test_M2MTLVDeserializer;
+
 };
 
 #endif // M2M_RESOURCE_H
