@@ -13,29 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef TEST_M2M_INTERFACE_FACTORY_H
-#define TEST_M2M_INTERFACE_FACTORY_H
+#ifndef M2M_FIRMWARE_STUB_H
+#define M2M_FIRMWARE_STUB_H
 
-#include "m2minterfacefactory.h"
+#include "m2mfirmware.h"
 
-class Test_M2MInterfaceFactory
+//some internal test related stuff
+namespace m2mfirmware_stub
 {
+    extern uint32_t int_value;
+    extern M2MResource* resource;
+    extern String string_value;
+    extern bool bool_value;
+    void clear();
+    extern bool has_value;
+}
 
-public:
-    Test_M2MInterfaceFactory();
-    virtual ~Test_M2MInterfaceFactory();
+#endif // M2M_FIRMWARE_STUB_H
 
-    void test_create_interface();
-
-    void test_create_security();
-
-    void test_create_device();
-
-    void test_create_firmware();
-
-    void test_create_server();
-
-    void test_create_object();
-};
-
-#endif // TEST_M2M_INTERFACE_FACTORY_H

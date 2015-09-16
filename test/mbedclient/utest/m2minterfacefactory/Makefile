@@ -13,6 +13,7 @@ TEST_SRC_FILES = \
         ../stub/m2mstring_stub.cpp \
         ../stub/m2mobjectinstance_stub.cpp \
         ../stub/m2mdevice_stub.cpp \
+        ../stub/m2mfirmware_stub.cpp \
         ../stub/m2msecurity_stub.cpp \
         ../stub/m2mserver_stub.cpp \
         ../stub/m2minterfaceimpl_stub.cpp \

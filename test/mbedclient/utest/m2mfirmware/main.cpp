@@ -13,29 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef TEST_M2M_INTERFACE_FACTORY_H
-#define TEST_M2M_INTERFACE_FACTORY_H
-
-#include "m2minterfacefactory.h"
-
-class Test_M2MInterfaceFactory
+#include "CppUTest/CommandLineTestRunner.h"
+#include "CppUTest/TestPlugin.h"
+#include "CppUTest/TestRegistry.h"
+#include "CppUTestExt/MockSupportPlugin.h"
+int main(int ac, char** av)
 {
+	return CommandLineTestRunner::RunAllTests(ac, av);
+}
 
-public:
-    Test_M2MInterfaceFactory();
-    virtual ~Test_M2MInterfaceFactory();
-
-    void test_create_interface();
-
-    void test_create_security();
-
-    void test_create_device();
-
-    void test_create_firmware();
-
-    void test_create_server();
-
-    void test_create_object();
-};
-
-#endif // TEST_M2M_INTERFACE_FACTORY_H
+IMPORT_TEST_GROUP( M2MFirmware );

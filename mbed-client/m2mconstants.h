@@ -120,6 +120,16 @@ extern const String SERVER_NOTIFICATION_STORAGE;
 extern const String SERVER_BINDING;
 extern const String SERVER_REGISTRATION_UPDATE;
 
+//FIRMWARE RESOURCES
+extern const String FIRMWARE_PACKAGE;
+extern const String FIRMWARE_PACKAGE_URI;
+extern const String FIRMWARE_UPDATE;
+extern const String FIRMWARE_STATE;
+extern const String FIRMWARE_UPDATE_SUPPORTED_OBJECTS;
+extern const String FIRMWARE_UPDATE_RESULT;
+extern const String FIRMWARE_PACKAGE_NAME;
+extern const String FIRMWARE_PACKAGE_VERSION;
+
 // TLV serializer / deserializer
 const uint8_t TYPE_RESOURCE = 0xC0;
 const uint8_t TYPE_MULTIPLE_RESOURCE = 0x80;

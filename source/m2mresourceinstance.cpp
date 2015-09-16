@@ -331,7 +331,7 @@ sn_coap_hdr_s* M2MResourceInstance::handle_put_request(nsdl_s *nsdl,
                         received_coap_header->options_list_ptr->uri_query_ptr,
                         received_coap_header->options_list_ptr->uri_query_len);
                     memset(query + received_coap_header->options_list_ptr->uri_query_len,'\0',1);//String terminator
-                   tr_debug("M2MResourceInstance::handle_put_request() - Query %s", query);
+                    tr_debug("M2MResourceInstance::handle_put_request() - Query %s", query);
                     // if anything was updated, re-initialize the stored notification attributes
                     if (!handle_observation_attribute(query)){
                         tr_debug("M2MResourceInstance::handle_put_request() - Invalid query");
