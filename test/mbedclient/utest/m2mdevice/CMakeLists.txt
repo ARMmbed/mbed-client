@@ -18,8 +18,8 @@ target_link_libraries(m2mdevice
     CppUTestExt
 )
 set_target_properties(m2mdevice
-PROPERTIES COMPILE_FLAGS "${CMAKE_CXX_FLAGS} -g -O0 --coverage -fprofile-arcs -ftest-coverage -D__thumb2__ -w"
-           LINK_FLAGS "-fprofile-arcs")
+PROPERTIES COMPILE_FLAGS "${UTEST_COMPILE_FLAGS}"
+           LINK_FLAGS "${UTEST_LINK_FLAGS}")
 add_test(m2mdevice m2mdevice)
 
 endif()
