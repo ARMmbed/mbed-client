@@ -1,0 +1,13 @@
+{
+  "name": "mbed-client-linux-unit-tests",
+  "version": "0.0.1",
+  "inherits": {
+    "x86-linux-native": "~0.0.2"
+  },
+  "licenses": [
+    {
+      "url": "https://spdx.org/licenses/Apache-2.0",
+      "type": "Apache-2.0"
+    }
+  ]  
+}

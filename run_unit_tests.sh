@@ -16,15 +16,14 @@
 echo
 echo "Build mbed Client API unit tests"
 echo
-export RUN_UNIT_TESTS=1
 yt target frdm-k64f-gcc
 yt up
 yt target x86-linux-native
 yt up
 yt clean
+yt target mbed-client-linux-unit-tests
 yt build
 yt test --no-build -- -ojunit
-unset RUN_UNIT_TESTS
 echo
 echo Create results
 echo
