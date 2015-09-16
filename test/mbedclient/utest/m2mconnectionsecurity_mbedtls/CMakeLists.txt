@@ -1,0 +1,26 @@
+if(TARGET_LIKE_LINUX)
+include("../includes.txt")
+add_executable(m2mconnectionsecurity_mbedtls
+        "../../../../yotta_modules/mbed-client-mbedtls/source/m2mconnectionsecurity.cpp"
+        "main.cpp"
+        "m2mconnectionsecurity_mbedtlstest.cpp"
+        "test_m2mconnectionsecurity_mbedtls.cpp"
+        "../stub/m2msecurity_stub.cpp"
+        "../stub/m2mstring_stub.cpp"
+        "../stub/m2mobject_stub.cpp"
+        "../stub/m2mbase_stub.cpp"
+        "../stub/m2mtimer_stub.cpp"
+        "../stub/mbedtls_stub.cpp"
+        "../stub/m2mconnectionhandler_stub.cpp"
+        "../stub/m2mconnectionsecuritypimpl_stub.cpp"
+)
+target_link_libraries(m2mconnectionsecurity_mbedtls
+    CppUTest
+    CppUTestExt
+)
+set_target_properties(m2mconnectionsecurity_mbedtls
+PROPERTIES COMPILE_FLAGS "${CMAKE_CXX_FLAGS} -g -O0 --coverage -fprofile-arcs -ftest-coverage -D__thumb2__ -w"
+           LINK_FLAGS "-fprofile-arcs")
+add_test(m2mconnectionsecurity_mbedtls m2mconnectionsecurity_mbedtls)
+
+endif()
