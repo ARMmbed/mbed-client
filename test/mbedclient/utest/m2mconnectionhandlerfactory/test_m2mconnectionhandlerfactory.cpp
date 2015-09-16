@@ -49,7 +49,7 @@ Test_M2MConnectionHandlerFactory::~Test_M2MConnectionHandlerFactory()
 void Test_M2MConnectionHandlerFactory::test_createConnectionHandler()
 {
     TestObserver obs;
-    M2MConnectionHandler* obj = M2MConnectionHandlerFactory::createConnectionHandler(obs, M2MInterface::LwIP_IPv4);
+    M2MConnectionHandler* obj = M2MConnectionHandlerFactory::createConnectionHandler(obs, M2MInterface::NOT_SET,M2MInterface::LwIP_IPv4);
     CHECK(obj != NULL );
     delete obj;
 }
