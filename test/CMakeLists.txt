@@ -1,27 +1,53 @@
-if(TARGET_LIKE_LINUX)
-add_executable(mbed-client-test-mbedclient_linux 
-        "mbedclient_linux/main.cpp"
-)
-target_link_libraries(mbed-client-test-mbedclient_linux
-    mbed-client-c
-    mbed-client-linux
-    mbed-client
-)
-add_test(mbed-client-test-mbedclient_linux mbed-client-test-mbedclient_linux)
-add_dependencies(all_tests mbed-client-test-mbedclient_linux)
+if(TARGET_LIKE_LINUX AND DEFINED ENV{RUN_UNIT_TESTS})
+SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -include /usr/include/CppUTest/MemoryLeakDetectorMallocMacros.h -include /usr/include/CppUTest/MemoryLeakDetectorNewMacros.h")
+SET(MY_CURRENT_DIR "./mbedclient/utest")
+include_directories($ENV{CPPUTEST_HOME}/include)
+link_directories($ENV{CPPUTEST_HOME}/lib) 
+MACRO(SUBDIRLIST result curdir)
+  FILE(GLOB children RELATIVE ${curdir} ${curdir}/*)
+  SET(dirlist "")
+  FOREACH(child ${children})
+    IF(IS_DIRECTORY ${curdir}/${child})
+      if(EXISTS "${curdir}/${child}/CMakeLists.txt")
+        LIST(APPEND dirlist ${curdir}/${child})
+      endif()
+    ENDIF()
+  ENDFOREACH()
+  SET(${result} ${dirlist})
+ENDMACRO()
 
-add_executable(mbed-client-test-helloworld-mbedclient 
-        "helloworld-mbedclient/main.cpp"
-        "helloworld-mbedclient/mbedclient.cpp"
-        "helloworld-mbedclient/to_be_ported.c"
-)
-target_link_libraries(mbed-client-test-helloworld-mbedclient
-    mbed-client-c
-    mbed-client-linux
-    mbed-client
-)
-add_test(mbed-client-test-helloworld-mbedclient mbed-client-test-helloworld-mbedclient)
-add_dependencies(all_tests mbed-client-test-helloworld-mbedclient)
+SUBDIRLIST(SUBDIRS ${CMAKE_CURRENT_SOURCE_DIR}/mbedclient/utest)
+
+FOREACH(subdir ${SUBDIRS})
+    ADD_SUBDIRECTORY(${subdir})
+ENDFOREACH()
+
+endif()
+
+if(TARGET_LIKE_LINUX)
+#add_executable(mbed-client-test-mbedclient_linux 
+#        "mbedclient_linux/main.cpp"
+#)
+#target_link_libraries(mbed-client-test-mbedclient_linux
+#    mbed-client-c
+#    mbed-client-linux
+#    mbed-client
+#)
+#add_test(mbed-client-test-mbedclient_linux mbed-client-test-mbedclient_linux)
+#add_dependencies(all_tests mbed-client-test-mbedclient_linux)
+
+#add_executable(mbed-client-test-helloworld-mbedclient 
+#        "helloworld-mbedclient/main.cpp"
+#        "helloworld-mbedclient/mbedclient.cpp"
+#        "helloworld-mbedclient/to_be_ported.c"
+#)
+#target_link_libraries(mbed-client-test-helloworld-mbedclient
+#    mbed-client-c
+#    mbed-client-linux
+#    mbed-client
+#)
+#add_test(mbed-client-test-helloworld-mbedclient mbed-client-test-helloworld-mbedclient)
+#add_dependencies(all_tests mbed-client-test-helloworld-mbedclient)
 
 endif()
 
@@ -77,5 +103,3 @@ add_test(mbed-client-test-helloworld-mbedclient mbed-client-test-helloworld-mbed
 add_dependencies(all_tests mbed-client-test-helloworld-mbedclient)
 
 endif()
-
-

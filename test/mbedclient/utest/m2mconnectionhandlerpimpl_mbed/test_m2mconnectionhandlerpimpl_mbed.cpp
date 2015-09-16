@@ -51,7 +51,7 @@ Test_M2MConnectionHandlerPimpl_mbed::Test_M2MConnectionHandlerPimpl_mbed()
     observer = new TestObserver();
     m2mconnectionsecurityimpl_stub::clear();
     common_stub::clear();
-    handler = new M2MConnectionHandlerPimpl(NULL,*observer,NULL,M2MInterface::Uninitialized);
+    handler = new M2MConnectionHandlerPimpl(NULL,*observer,NULL,M2MInterface::NOT_SET,M2MInterface::Uninitialized);
 }
 
 Test_M2MConnectionHandlerPimpl_mbed::~Test_M2MConnectionHandlerPimpl_mbed()
@@ -63,22 +63,22 @@ Test_M2MConnectionHandlerPimpl_mbed::~Test_M2MConnectionHandlerPimpl_mbed()
 void Test_M2MConnectionHandlerPimpl_mbed::test_constructor()
 {
     TestObserver obs;
-    M2MConnectionHandlerPimpl impl = M2MConnectionHandlerPimpl(NULL,obs,NULL,M2MInterface::Uninitialized);
+    M2MConnectionHandlerPimpl impl = M2MConnectionHandlerPimpl(NULL,obs,NULL,M2MInterface::NOT_SET,M2MInterface::Uninitialized);
     CHECK(impl._socket_stack == SOCKET_STACK_UNINIT);
 
-    M2MConnectionHandlerPimpl impl2 = M2MConnectionHandlerPimpl(NULL,obs,NULL,M2MInterface::LwIP_IPv4);
+    M2MConnectionHandlerPimpl impl2 = M2MConnectionHandlerPimpl(NULL,obs,NULL,M2MInterface::NOT_SET,M2MInterface::LwIP_IPv4);
     CHECK(impl2._socket_stack == SOCKET_STACK_LWIP_IPV4);
 
-    M2MConnectionHandlerPimpl impl3 = M2MConnectionHandlerPimpl(NULL,obs,NULL,M2MInterface::LwIP_IPv6);
+    M2MConnectionHandlerPimpl impl3 = M2MConnectionHandlerPimpl(NULL,obs,NULL,M2MInterface::NOT_SET,M2MInterface::LwIP_IPv6);
     CHECK(impl3._socket_stack == SOCKET_STACK_LWIP_IPV6);
 
-    M2MConnectionHandlerPimpl impl4 = M2MConnectionHandlerPimpl(NULL,obs,NULL,M2MInterface::Reserved);
+    M2MConnectionHandlerPimpl impl4 = M2MConnectionHandlerPimpl(NULL,obs,NULL,M2MInterface::NOT_SET,M2MInterface::Reserved);
     CHECK(impl4._socket_stack == SOCKET_STACK_RESERVED);
 
-    M2MConnectionHandlerPimpl impl5 = M2MConnectionHandlerPimpl(NULL,obs,NULL,M2MInterface::Nanostack_IPv6);
+    M2MConnectionHandlerPimpl impl5 = M2MConnectionHandlerPimpl(NULL,obs,NULL,M2MInterface::NOT_SET,M2MInterface::Nanostack_IPv6);
     CHECK(impl5._socket_stack == SOCKET_STACK_NANOSTACK_IPV6);
 
-    M2MConnectionHandlerPimpl impl6 = M2MConnectionHandlerPimpl(NULL,obs,NULL,M2MInterface::Unknown);
+    M2MConnectionHandlerPimpl impl6 = M2MConnectionHandlerPimpl(NULL,obs,NULL,M2MInterface::NOT_SET,M2MInterface::Unknown);
     CHECK(impl6._socket_stack == SOCKET_STACK_MAX);
 }
 
@@ -206,16 +206,17 @@ void Test_M2MConnectionHandlerPimpl_mbed::test_dns_handler()
     m2mconnectionsecurityimpl_stub::int_value = -5;
     m2msecurity_stub::int_value = M2MSecurity::Psk;
 
+    M2MSecurity* sec = new M2MSecurity(M2MSecurity::M2MServer);
+    handler->_security = sec;
     handler->dns_handler(NULL,sa,NULL);
     CHECK(false == handler->_is_handshaking);
-
     m2mconnectionsecurityimpl_stub::int_value = 5;
     handler->dns_handler(NULL,sa,NULL);
     CHECK(true == handler->_is_handshaking);
 
     handler->_security_impl = NULL;
     delete conSec;
-
+    delete sec;
     free(common_stub::event);
 }
 

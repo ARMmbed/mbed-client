@@ -48,7 +48,7 @@ public:
 Test_M2MConnectionHandler_mbed::Test_M2MConnectionHandler_mbed()
 {
     observer = new TestObserver();
-    handler = new M2MConnectionHandler(*observer, NULL,M2MInterface::Uninitialized);
+    handler = new M2MConnectionHandler(*observer, NULL,M2MInterface::NOT_SET,M2MInterface::Uninitialized);
 }
 
 Test_M2MConnectionHandler_mbed::~Test_M2MConnectionHandler_mbed()

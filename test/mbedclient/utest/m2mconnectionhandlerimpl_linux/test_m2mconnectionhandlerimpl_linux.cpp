@@ -52,7 +52,7 @@ Test_M2MConnectionHandler_linux::Test_M2MConnectionHandler_linux()
     observer = new M2MConnection_TestObserver();
     common_stub::int_value = 0;
     common_stub::thread = 14;
-    handler = new M2MConnectionHandler(*observer, NULL ,M2MInterface::Uninitialized);
+    handler = new M2MConnectionHandler(*observer, NULL ,M2MInterface::NOT_SET,M2MInterface::Uninitialized);
 }
 
 Test_M2MConnectionHandler_linux::~Test_M2MConnectionHandler_linux()
