@@ -59,14 +59,15 @@ uint8_t* M2MTLVSerializer::serialize_resources(M2MResourceList resource_list, ui
         M2MResourceList::const_iterator it;
         it = resource_list.begin();
         for (; it!=resource_list.end(); it++) {
-            if(!serialize(*it, data, size)) {
+            if((*it)->name_id() == -1) {
                 valid = false;
-                if(data) {
-                    size = 0;
-                    free(data);
-                    data = NULL;
-                    break;
-                }
+                break;
+            }
+        }
+        if(valid) {
+            it = resource_list.begin();
+            for (; it!=resource_list.end(); it++) {
+                serialize(*it, data, size);
             }
         }
     }
@@ -83,6 +84,7 @@ void M2MTLVSerializer::serialize(uint16_t id, M2MObjectInstance *object_instance
     if(valid) {
         serialize_TILV(TYPE_OBJECT_INSTANCE, id, resource_data, resource_size, data, size);
     }
+    free(resource_data);
 }
 
 bool M2MTLVSerializer::serialize (M2MResource *resource, uint8_t *&data, uint32_t &size)
@@ -153,11 +155,14 @@ void M2MTLVSerializer::serialize_TILV(uint8_t type, uint16_t id, uint8_t *value,
     if(data) {
         memcpy(tlv, data, size);
     }
-    memcpy(tlv+size, &type, type_length);
+    memcpy(tlv+size, tlv_type, type_length);
     memcpy(tlv+size+type_length, id_ptr, id_size);
     memcpy(tlv+size+type_length+id_size, length_ptr, length_size);
     memcpy(tlv+size+type_length+id_size+length_size, value, value_length);
 
+    if(tlv_type) {
+        free(tlv_type) ;
+    }
     if(length_ptr) {
         free(length_ptr);
     }

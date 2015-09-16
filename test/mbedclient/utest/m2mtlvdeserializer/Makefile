@@ -12,6 +12,7 @@ TEST_SRC_FILES = \
         ../stub/m2mresourceinstance_stub.cpp \
         ../stub/m2mobjectinstance_stub.cpp \
         ../stub/m2mobject_stub.cpp \
+        ../../../../source/m2mtlvdeserializer.cpp \
 	m2mtlvdeserializertest.cpp \
         test_m2mtlvdeserializer.cpp
 

@@ -49,6 +49,7 @@ public:
     */
     M2MConnectionHandler(M2MConnectionObserver &observer,
                          M2MConnectionSecurity* sec,
+                         M2MInterface::BindingMode mode,
                          M2MInterface::NetworkStack stack);
 
     /**
