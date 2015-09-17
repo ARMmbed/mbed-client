@@ -1,6 +1,5 @@
 SRCS += \
 	source/m2mbase.cpp \
-	source/m2mconnectionhandlerfactory.cpp \
 	source/m2mconstants.cpp \
 	source/m2mdevice.cpp \
 	source/m2minterfacefactory.cpp \

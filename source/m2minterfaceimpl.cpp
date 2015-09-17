@@ -18,7 +18,7 @@
 #include "include/eventdata.h"
 #include "mbed-client/m2minterfaceobserver.h"
 #include "mbed-client/m2mconnectionhandler.h"
-#include "mbed-client/m2mconnectionhandlerfactory.h"
+#include "mbed-client/m2mconnectionsecurity.h"
 #include "include/m2mnsdlinterface.h"
 #include "mbed-client/m2msecurity.h"
 #include "mbed-client/m2mconstants.h"
@@ -66,7 +66,7 @@ M2MInterfaceImpl::M2MInterfaceImpl(M2MInterfaceObserver& observer,
                                      _context_address);
 
     //Here we must use TCP still
-    _connection_handler = M2MConnectionHandlerFactory::createConnectionHandler(*this, mode,stack);
+    _connection_handler = new M2MConnectionHandler(*this, new M2MConnectionSecurity(), mode, stack);
 
     _connection_handler->bind_connection(_listen_port);
      tr_debug("M2MInterfaceImpl::M2MInterfaceImpl() -OUT");
