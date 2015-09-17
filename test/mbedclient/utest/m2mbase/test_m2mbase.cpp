@@ -118,6 +118,7 @@ void Test_M2MBase::test_assignment_operator()
     *test = *test2;
 
     CHECK(test->_token != NULL);
+
     CHECK(test->_report_handler != NULL);
 
     delete test2;
