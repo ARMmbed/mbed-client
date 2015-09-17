@@ -31,12 +31,12 @@ popd
 if [ ! -e "$PWD/master/module.json" ]
 then
 	echo "$PWD/master/module.json not found."
-        exit 0
+        exit 1
 fi
 if [ ! -e "$PWD/pull_req/module.json" ]
 then
 	echo "$PWD/pull_req/module.json not found."
-        exit 0
+        exit 1
 fi
 
 OLD_VERSION=`sed -n 's#version##p' master/module.json | sed 's|[^0-9]*\([0-9\.]*\)|\1 |g'`
