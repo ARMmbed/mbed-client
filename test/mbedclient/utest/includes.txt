@@ -1,0 +1,18 @@
+if(TARGET_LIKE_LINUX)
+include_directories(
+        "../common"
+        "../stub"
+        "../../../../mbed-client"
+        "../../../../source"
+        "../../../../source/include"
+        "../../../../yotta_modules/mbed-client-mbedtls"
+        "../../../../yotta_modules/mbedtls/include"
+	"../../../../yotta_modules/mbed-client-linux/mbed-client-linux"
+        "../../../../yotta_modules/mbed-client-mbed-os"
+	"../../../../yotta_modules/mbed-client-c"
+	"usr/include"
+	"$ENV{CPPUTEST_HOME}/include"
+)
+SET(UTEST_COMPILE_FLAGS "${CMAKE_CXX_FLAGS} -g -O0 --coverage -fprofile-arcs -ftest-coverage -D__thumb2__ -w")
+SET(UTEST_LINK_FLAGS "-fprofile-arcs")
+endif()

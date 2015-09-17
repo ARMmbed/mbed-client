@@ -172,7 +172,7 @@ void Test_M2MConnectionSecurityPimpl::test_connect()
     m2mtimer_stub::bool_value = true;
 
     TestObserver obs;
-    M2MConnectionHandler* obj = new M2MConnectionHandler(obs, NULL, M2MInterface::LwIP_IPv4);
+    M2MConnectionHandler* obj = new M2MConnectionHandler(obs, NULL, M2MInterface::NOT_SET,M2MInterface::LwIP_IPv4);
 
     mbedtls_stub::expected_uint32_value = 12;
     mbedtls_stub::counter = 0;
@@ -213,7 +213,7 @@ void Test_M2MConnectionSecurityPimpl::test_start_connecting_non_blocking()
     CHECK( -1 == impl.start_connecting_non_blocking(NULL));
 
     TestObserver obs;
-    M2MConnectionHandler* obj = new M2MConnectionHandler(obs, NULL, M2MInterface::LwIP_IPv4);
+    M2MConnectionHandler* obj = new M2MConnectionHandler(obs, NULL, M2MInterface::NOT_SET, M2MInterface::LwIP_IPv4);
 
     m2mtimer_stub::total_bool_value = true;
     mbedtls_stub::expected_uint32_value = 12;

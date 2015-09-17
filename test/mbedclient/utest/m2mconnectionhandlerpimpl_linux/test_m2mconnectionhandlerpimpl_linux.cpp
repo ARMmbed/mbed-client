@@ -61,7 +61,8 @@ Test_M2MConnectionHandlerPimpl_linux::Test_M2MConnectionHandlerPimpl_linux()
     m2mconnectionsecurityimpl_stub::clear();
     common_stub::int_value = 0;
     common_stub::thread = 14;
-    handler = new M2MConnectionHandlerPimpl(NULL, *observer, NULL ,M2MInterface::Uninitialized);
+    handler = new M2MConnectionHandlerPimpl(NULL, *observer, NULL , M2MInterface::NOT_SET, M2MInterface::Uninitialized);
+
 }
 
 Test_M2MConnectionHandlerPimpl_linux::~Test_M2MConnectionHandlerPimpl_linux()
@@ -153,7 +154,11 @@ void Test_M2MConnectionHandlerPimpl_linux::test_data_receive()
 {
     handler->data_receive(NULL);
 
-    M2MConnectionHandlerPimpl *obj = new M2MConnectionHandlerPimpl(NULL, *observer, NULL,M2MInterface::Uninitialized);
+    M2MConnectionHandlerPimpl *obj = new M2MConnectionHandlerPimpl(NULL,
+                                                                   *observer,
+                                                                   NULL,
+                                                                   M2MInterface::NOT_SET,
+                                                                   M2MInterface::Uninitialized);
 
     handler->_receive_data = true;
     observer->error = false;

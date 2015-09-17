@@ -140,7 +140,7 @@ int8_t sn_nsdl_process_coap(struct nsdl_s *, uint8_t *, uint16_t , sn_nsdl_addr_
     return common_stub::int_value;
 }
 
-int8_t sn_nsdl_exec(uint32_t)
+int8_t sn_nsdl_exec(struct nsdl_s *, uint32_t)
 {
     return common_stub::int_value;
 }
