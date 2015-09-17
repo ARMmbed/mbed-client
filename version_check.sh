@@ -23,17 +23,17 @@ function version_gt() {
     test "$(echo "$@" | tr " " "\n" | sort -V | tail -n 1)" == "$1"; 
 }
 
-git clone $1 $PWD/master
-git clone $1 $PWD/pull_req
+git clone --depth 1 $1 $PWD/master
+git clone --depth 1 $1 $PWD/pull_req
 pushd $PWD/pull_req
 git checkout $2
 popd
-if [ -f "$PWD/master/module.json" ]
+if [ ! -e "$PWD/master/module.json" ]
 then
 	echo "$PWD/master/module.json not found."
         exit 0
 fi
-if [ -f "$PWD/pull_req/module.json" ]
+if [ ! -e "$PWD/pull_req/module.json" ]
 then
 	echo "$PWD/pull_req/module.json not found."
         exit 0
