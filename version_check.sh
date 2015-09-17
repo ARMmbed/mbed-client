@@ -17,17 +17,21 @@ echo
 echo "Check version in module json"
 echo
 function version_gt() { test "$(echo "$@" | tr " " "\n" | sort -V | tail -n 1)" == "$1"; }
-GIT_URL="git@github.com:ARMmbed/mbed-client.git $PWD/master"
-git clone $GIT_URL
+echo $1
+echo $2
+git clone $1 $PWD/master
+git clone $1 $PWD/pull_req
+pushd $PWD/pull_req
+git checkout $2
+popd
 
 OLD_VERSION=`sed -n 's#version##p' master/module.json | sed 's|[^0-9]*\([0-9\.]*\)|\1 |g'`
-NEW_VERSION=`sed -n 's#version##p' module.json | sed 's|[^0-9]*\([0-9\.]*\)|\1 |g'`
+NEW_VERSION=`sed -n 's#version##p' pull_req/module.json | sed 's|[^0-9]*\([0-9\.]*\)|\1 |g'`
 echo "Version in master branch: $OLD_VERSION"
 echo "New version: $NEW_VERSION"
 
 if [[ "$OLD_VERSION" != "$NEW_VERSION" ]]; then
-    if version_gt $NEW_VERSION $OLD_VERSION; then
-        echo "Newer!"
+    if version_gt $NEW_VERSION $OLD_VERSION; then    
         exit 0
     else
         echo "Update version in module.json"
