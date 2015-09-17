@@ -23,8 +23,8 @@ function version_gt() {
     test "$(echo "$@" | tr " " "\n" | sort -V | tail -n 1)" == "$1"; 
 }
 
-git clone --depth 1 $1 $PWD/master
-git clone --depth 1 $1 $PWD/pull_req
+git clone $1 $PWD/master
+git clone $1 $PWD/pull_req
 pushd $PWD/pull_req
 git checkout $2
 popd
