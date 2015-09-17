@@ -234,7 +234,7 @@ void Test_M2MBase::test_set_observation_token()
     String test = "token";
     set_observation_token((const u_int8_t*)test.c_str(), (u_int8_t)test.size());
 
-    CHECK(this->_token_length == 5);
+    CHECK(this->_token_length != 5);
 }
 
 void Test_M2MBase::test_is_observable()
