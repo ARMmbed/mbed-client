@@ -16,17 +16,32 @@
 echo
 echo "Check version in module json"
 echo
-function version_gt() { test "$(echo "$@" | tr " " "\n" | sort -V | tail -n 1)" == "$1"; }
 echo $1
 echo $2
+
+function version_gt() { 
+    test "$(echo "$@" | tr " " "\n" | sort -V | tail -n 1)" == "$1"; 
+}
+
 git clone $1 $PWD/master
 git clone $1 $PWD/pull_req
 pushd $PWD/pull_req
 git checkout $2
 popd
+if [ -f "$PWD/master/module.json" ]
+then
+	echo "$PWD/master/module.json not found."
+        exit 0
+fi
+if [ -f "$PWD/pull_req/module.json" ]
+then
+	echo "$PWD/pull_req/module.json not found."
+        exit 0
+fi
 
 OLD_VERSION=`sed -n 's#version##p' master/module.json | sed 's|[^0-9]*\([0-9\.]*\)|\1 |g'`
 NEW_VERSION=`sed -n 's#version##p' pull_req/module.json | sed 's|[^0-9]*\([0-9\.]*\)|\1 |g'`
+
 echo "Version in master branch: $OLD_VERSION"
 echo "New version: $NEW_VERSION"
 
@@ -34,13 +49,10 @@ if [[ "$OLD_VERSION" != "$NEW_VERSION" ]]; then
     if version_gt $NEW_VERSION $OLD_VERSION; then    
         exit 0
     else
-        echo "Update version in module.json"
+        echo "Update version in module.json!"
         exit 1        
 fi
 else
-    echo "Update version in module.json"
+    echo "Update version in module.json!"
     exit 1
 fi
-
-
-
