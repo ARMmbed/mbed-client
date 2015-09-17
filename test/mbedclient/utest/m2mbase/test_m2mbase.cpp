@@ -324,6 +324,7 @@ void Test_M2MBase::test_interface_description()
 
     CHECK(test == interface_description());
 
+
 }
 
 void Test_M2MBase::test_resource_type()
