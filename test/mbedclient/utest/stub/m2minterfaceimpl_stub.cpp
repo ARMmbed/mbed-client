@@ -67,6 +67,11 @@ void M2MInterfaceImpl::unregister_object(M2MSecurity*)
 {
 }
 
+void M2MInterfaceImpl::set_queue_sleep_handler(callback_handler)
+{
+
+}
+
 void M2MInterfaceImpl::coap_message_ready(uint8_t *,
                                 uint16_t ,
                                 sn_nsdl_addr_s *)
@@ -127,6 +132,10 @@ void M2MInterfaceImpl::data_sent()
 {
 }
 
+void M2MInterfaceImpl::timer_expired(M2MTimerObserver::Type)
+{
+
+}
 
 void M2MInterfaceImpl::registration_updated(const M2MServer &)
 {

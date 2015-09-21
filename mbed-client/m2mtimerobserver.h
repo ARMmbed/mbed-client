@@ -33,7 +33,8 @@ public:
         NsdlExecution,
         PMinTimer,
         PMaxTimer,
-        Dtls
+        Dtls,
+        QueueSleep
     }Type;
 
     /**

@@ -19,6 +19,7 @@
 #include <stdint.h>
 #include "mbed-client/m2mvector.h"
 #include "mbed-client/m2mconfig.h"
+#include "mbed-client/functionpointer.h"
 
 //FORWARD DECLARATION
 class M2MSecurity;
@@ -26,6 +27,7 @@ class M2MObject;
 class M2MInterfaceObserver;
 
 typedef Vector<M2MObject *> M2MObjectList;
+typedef FP callback_handler;
 
 /**
  *  @brief M2MInterface.
@@ -136,6 +138,14 @@ public:
      * then this parameter can be NULL.
      */
     virtual void unregister_object(M2MSecurity* security_object = NULL) = 0;
+
+    /**
+     * @brief Sets the function which will be called indicating client
+     * is going to sleep when the Binding mode is selected with Queue mode.
+     * @param callback, Function pointer which will be called when client
+     * goes to seleep.
+     */
+    virtual void set_queue_sleep_handler(callback_handler handler) = 0;
 
 };
 

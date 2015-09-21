@@ -296,7 +296,7 @@ void M2MReportHandler::schedule_report(float value)
     }
 }
 
-void M2MReportHandler::report(float value)
+void M2MReportHandler::report(float /*value*/)
 {
     tr_debug("M2MReportHandler::report()");
     if(_under_observation && _current_value != _last_value && _notify) {

@@ -66,6 +66,12 @@ TEST(M2MInterfaceImpl, unregister_object)
     m2m_interface_impl->test_unregister_object();
 }
 
+
+TEST(M2MInterfaceImpl, set_queue_sleep_handler)
+{
+    m2m_interface_impl->test_set_queue_sleep_handler();
+}
+
 TEST(M2MInterfaceImpl, coap_message_ready)
 {
     m2m_interface_impl->test_coap_message_ready();
@@ -131,3 +137,7 @@ TEST(M2MInterfaceImpl, data_sent)
     m2m_interface_impl->test_data_sent();
 }
 
+TEST(M2MInterfaceImpl, timer_expired)
+{
+    m2m_interface_impl->test_timer_expired();
+}

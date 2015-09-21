@@ -302,6 +302,17 @@ void Test_M2MInterfaceImpl::test_unregister_object()
     CHECK(observer->error_occured == true);
 }
 
+void Test_M2MInterfaceImpl::test_set_queue_sleep_handler()
+{
+    callback_handler cb(this,&Test_M2MInterfaceImpl::test_callback_handler);
+    impl->set_queue_sleep_handler(cb);
+    CHECK(impl->_callback_handler != NULL);
+
+    callback_handler cb1(NULL);
+    impl->set_queue_sleep_handler(cb1);
+    CHECK(impl->_callback_handler == NULL);
+}
+
 void Test_M2MInterfaceImpl::test_coap_message_ready()
 {
     m2mconnectionhandler_stub::bool_value = true;
@@ -506,4 +517,42 @@ void Test_M2MInterfaceImpl::test_data_sent()
     CHECK(impl->_current_state == M2MInterfaceImpl::STATE_WAITING);
     CHECK(observer->error_occured == false);
 
+    impl->_callback_handler = callback_handler(this, &Test_M2MInterfaceImpl::test_callback_handler);
+
+    m2mconnectionhandler_stub::bool_value = true;
+
+    impl->_binding_mode = M2MInterface::UDP_QUEUE;
+    impl->data_sent();
+    CHECK(impl->_current_state == M2MInterfaceImpl::STATE_WAITING);
+
+    impl->_binding_mode = M2MInterface::TCP_QUEUE;
+    impl->data_sent();
+    CHECK(impl->_current_state == M2MInterfaceImpl::STATE_WAITING);
+
+    impl->_binding_mode = M2MInterface::SMS_QUEUE;
+    impl->data_sent();
+    CHECK(impl->_current_state == M2MInterfaceImpl::STATE_WAITING);
+
+    impl->_binding_mode = M2MInterface::UDP_SMS_QUEUE;
+    impl->data_sent();
+    CHECK(impl->_current_state == M2MInterfaceImpl::STATE_WAITING);
+}
+
+void Test_M2MInterfaceImpl::test_timer_expired()
+{
+    visited = false;
+    impl->_callback_handler = NULL;
+    impl->timer_expired(M2MTimerObserver::QueueSleep);
+    CHECK(visited == false);
+
+    impl->_callback_handler = callback_handler(this, &Test_M2MInterfaceImpl::test_callback_handler);
+
+    visited = false;
+    impl->timer_expired(M2MTimerObserver::QueueSleep);
+    CHECK(visited == true);
+}
+
+void Test_M2MInterfaceImpl::test_callback_handler()
+{
+    visited = true;
 }

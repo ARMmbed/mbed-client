@@ -83,8 +83,9 @@ public:
     R operator ()(void) {
         return call();
     }
-    operator bool(void) const {
-        return (_membercaller != NULL ? _p.object : (void*)_p.function) != NULL;
+    operator bool(void) {
+        void *q = &_p.function;
+        return (_membercaller != NULL) && _p.object != NULL && (*static_cast<void **>(q) != NULL);
     }
 
 private:
