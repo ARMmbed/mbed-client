@@ -177,7 +177,7 @@ M2MResource* M2MDevice::create_resource(DeviceResource resource, int64_t value)
             if(res) {
                 char *buffer = (char*)memory_alloc(20);
                 if(buffer) {
-                    int size = snprintf(buffer, 20,"%ld",value);
+                    int size = snprintf(buffer, 20,"%lld",value);
 
                     res->set_operation(operation);
                     res->set_value((const uint8_t*)buffer,

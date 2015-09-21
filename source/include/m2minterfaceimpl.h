@@ -20,11 +20,13 @@
 #include "mbed-client/m2mserver.h"
 #include "mbed-client/m2mconnectionobserver.h"
 #include "include/m2mnsdlobserver.h"
+#include "mbed-client/m2mtimerobserver.h"
 
 //FORWARD DECLARATION
 class M2MNsdlInterface;
 class M2MConnectionHandler;
 class EventData;
+class M2MTimer;
 
 /**
  *  @brief M2MInterfaceImpl.
@@ -36,7 +38,8 @@ class EventData;
 
 class  M2MInterfaceImpl : public M2MInterface,
                           public M2MNsdlObserver,
-                          public M2MConnectionObserver
+                          public M2MConnectionObserver,
+                          public M2MTimerObserver
 {
 private:
     // Prevents the use of assignment operator by accident.
@@ -124,6 +127,14 @@ public:
      */
     void unregister_object(M2MSecurity* security = NULL);
 
+    /**
+     * @brief Sets the function which will be called indicating client
+     * is going to sleep when the Binding mode is selected with Queue mode.
+     * @param callback, Function pointer which will be called when client
+     * goes to seleep.
+     */
+    void set_queue_sleep_handler(callback_handler handler);
+
 protected: // From M2MNsdlObserver
 
     virtual void coap_message_ready(uint8_t *data_ptr,
@@ -159,6 +170,10 @@ protected: // From M2MConnectionObserver
                                const uint16_t server_port);
 
     void data_sent();
+
+protected: // from M2MTimerObserver
+
+    void timer_expired(M2MTimerObserver::Type type);
 
 private: // state machine state functions
 
@@ -336,6 +351,8 @@ private:
     bool                        _event_ignored;
     bool                        _register_ongoing;
     bool                        _update_register_ongoing;
+    M2MTimer                    *_queue_sleep_timer;
+    callback_handler            _callback_handler;
 
    friend class Test_M2MInterfaceImpl;
 

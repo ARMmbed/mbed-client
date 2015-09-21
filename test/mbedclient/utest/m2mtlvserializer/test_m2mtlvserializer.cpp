@@ -172,7 +172,6 @@ void Test_M2MTLVSerializer::test_serialize_object_instance()
     data = serializer->serialize( m2mobjectinstance_stub::resource_list,size);
     CHECK(data != NULL);
 
-    printf("\ndata : %s\n", (char*)data);
     if(data) {
         free(data);
         data = NULL;
