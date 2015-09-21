@@ -16,6 +16,7 @@
 #include "mbed-client/m2minterfacefactory.h"
 #include "mbed-client/m2mserver.h"
 #include "mbed-client/m2mdevice.h"
+#include "mbed-client/m2mfirmware.h"
 #include "mbed-client/m2mobject.h"
 #include "mbed-client/m2mconstants.h"
 #include "mbed-client/m2mconfig.h"
@@ -80,6 +81,13 @@ M2MDevice* M2MInterfaceFactory::create_device()
     tr_debug("M2MInterfaceFactory::create_device");
     M2MDevice* device = M2MDevice::get_instance();
     return device;
+}
+
+M2MFirmware* M2MInterfaceFactory::create_firmware()
+{
+    tr_debug("M2MInterfaceFactory::create_firmware");
+    M2MFirmware* firmware = M2MFirmware::get_instance();
+    return firmware;
 }
 
 M2MObject* M2MInterfaceFactory::create_object(const String &name)

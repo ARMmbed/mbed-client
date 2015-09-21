@@ -25,6 +25,7 @@
 class M2MDevice;
 class M2MServer;
 class M2MInterfaceImpl;
+class M2MFirmware;
 
 /**
  *  @brief M2MInterfaceFactory.
@@ -92,6 +93,14 @@ public:
      * @return M2MDevice, Object to manage other client operations.
      */
     static M2MDevice *create_device();
+
+    /**
+     * @brief Creates firmware object for mbed Client Inteface using which
+     * client can manage firmware resources used for client operations
+     * like Client Registration, Device Management and Information Reporting.
+     * @return M2MFirmware, Object to manage other client operations.
+     */
+    static M2MFirmware *create_firmware();
 
     /**
      * @brief Creates generic object for mbed Client Inteface using which

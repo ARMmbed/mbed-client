@@ -13,8 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef TEST_M2M_SECURITY_H
-#define TEST_M2M_SECURITY_H
+#ifndef TEST_M2M_INTERFACE_FACTORY_H
+#define TEST_M2M_INTERFACE_FACTORY_H
 
 #include "m2minterfacefactory.h"
 
@@ -31,9 +31,11 @@ public:
 
     void test_create_device();
 
+    void test_create_firmware();
+
     void test_create_server();
 
     void test_create_object();
 };
 
-#endif // TEST_M2M_SECURITY_H
+#endif // TEST_M2M_INTERFACE_FACTORY_H

@@ -18,6 +18,7 @@
 #include "m2minterfaceobserver.h"
 #include "m2mserver.h"
 #include "m2mdevice.h"
+#include "m2mfirmware.h"
 
 class TestObserver : public M2MInterfaceObserver {
 
@@ -82,6 +83,14 @@ void Test_M2MInterfaceFactory::test_create_security()
 void Test_M2MInterfaceFactory::test_create_device()
 {
     M2MDevice *test = M2MInterfaceFactory::create_device();
+    CHECK(test != NULL);
+    delete test;
+    test = NULL;
+}
+
+void Test_M2MInterfaceFactory::test_create_firmware()
+{
+    M2MFirmware *test = M2MInterfaceFactory::create_firmware();
     CHECK(test != NULL);
     delete test;
     test = NULL;

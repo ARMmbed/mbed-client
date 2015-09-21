@@ -30,8 +30,9 @@ void m2mconnectionhandlerpimpl_stub::clear()
 }
 
 M2MConnectionHandlerPimpl::M2MConnectionHandlerPimpl(M2MConnectionHandler* base, M2MConnectionObserver &observer,
-                                                   M2MConnectionSecurity* sec,
-                                           M2MInterface::NetworkStack)
+                                                     M2MConnectionSecurity* sec,
+                                                     M2MInterface::BindingMode,
+                                                     M2MInterface::NetworkStack)
 :_observer(observer)
 {
     if( sec ){
@@ -79,4 +80,8 @@ int M2MConnectionHandlerPimpl::sendToSocket(const unsigned char *, size_t ){
 
 int M2MConnectionHandlerPimpl::receiveFromSocket(unsigned char *buf, size_t len){
     return m2mconnectionhandlerpimpl_stub::int_value;
+}
+void M2MConnectionHandlerPimpl::data_receive(void *object)
+{
+
 }

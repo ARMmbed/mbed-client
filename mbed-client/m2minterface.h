@@ -67,7 +67,9 @@ public:
         UDP_QUEUE = 0x03,
         SMS = 0x04,
         SMS_QUEUE =0x06,
-        UDP_SMS_QUEUE = 0x07
+        UDP_SMS_QUEUE = 0x07,
+        TCP = 0x08, //not real value, spec does not have one!
+        TCP_QUEUE = 0x09 //not real value, spec does not have one!
     }BindingMode;
 
     /**
@@ -92,14 +94,14 @@ public:
      * server information.
      * NOTE: This API is not supported for developers!!
      * @param security_object, Security object which contains information
-     * required for successful bootstrapping of the client.     
+     * required for successful bootstrapping of the client.
      */
     virtual void bootstrap(M2MSecurity *security_object) = 0;
 
     /**
      * @brief Cancels on going bootstrapping operation of the client. If the client has
      * already successfully bootstrapped then this function deletes existing
-     * bootstrap information from the client.     
+     * bootstrap information from the client.
      * NOTE: This API is not supported for developers!!
      */
     virtual void cancel_bootstrap() = 0;

@@ -45,7 +45,11 @@ M2MResourceInstance& M2MResourceInstance::operator=(const M2MResourceInstance& o
 
 M2MResourceInstance::M2MResourceInstance(const M2MResourceInstance& other)
 : M2MBase(other),
-  _object_instance_callback(other._object_instance_callback)
+  _object_instance_callback(other._object_instance_callback),
+  _execute_callback(NULL),
+  _value(NULL),
+  _value_length(0),
+  _resource_type(M2MResourceInstance::STRING)
 {
     this->operator=(other);
 }
@@ -56,8 +60,8 @@ M2MResourceInstance::M2MResourceInstance(const String &res_name,
                                          M2MObjectInstanceCallback &object_instance_callback)
 : M2MBase(res_name,
           M2MBase::Dynamic),
-  _object_instance_callback(object_instance_callback),
-  _execute_callback(NULL),
+ _object_instance_callback(object_instance_callback),
+ _execute_callback(NULL),
  _value(NULL),
  _value_length(0),
  _resource_type(type)
@@ -74,8 +78,8 @@ M2MResourceInstance::M2MResourceInstance(const String &res_name,
                                          M2MObjectInstanceCallback &object_instance_callback)
 : M2MBase(res_name,
           M2MBase::Static),
-  _object_instance_callback(object_instance_callback),
-  _execute_callback(NULL),
+ _object_instance_callback(object_instance_callback),
+ _execute_callback(NULL),
  _value(NULL),
  _value_length(0),
  _resource_type(type)
@@ -331,7 +335,7 @@ sn_coap_hdr_s* M2MResourceInstance::handle_put_request(nsdl_s *nsdl,
                         received_coap_header->options_list_ptr->uri_query_ptr,
                         received_coap_header->options_list_ptr->uri_query_len);
                     memset(query + received_coap_header->options_list_ptr->uri_query_len,'\0',1);//String terminator
-                   tr_debug("M2MResourceInstance::handle_put_request() - Query %s", query);
+                    tr_debug("M2MResourceInstance::handle_put_request() - Query %s", query);
                     // if anything was updated, re-initialize the stored notification attributes
                     if (!handle_observation_attribute(query)){
                         tr_debug("M2MResourceInstance::handle_put_request() - Invalid query");
