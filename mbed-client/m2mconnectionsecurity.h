@@ -29,6 +29,12 @@ class M2MConnectionSecurityPimpl;
  */
 
 class M2MConnectionSecurity {
+public:
+    typedef enum {
+        NO_SECURITY = 0,
+        TLS,
+        DTLS
+    } SecurityMode;
 
 private:
     // Prevents the use of assignment operator by accident.
@@ -40,7 +46,7 @@ public:
     /**
      * @brief Default Constructor.
      */
-    M2MConnectionSecurity();
+    M2MConnectionSecurity(SecurityMode mode);
 
     /**
      * @brief Default Destructor.

@@ -12,11 +12,11 @@
   "targetDependencies": {
     "arm": {
       "mbed-client-mbed-os": "~1.0.0",
-      "mbed-client-mbedtls": "~0.0.2"
+      "mbed-client-mbedtls": "~1.0.0"
     },
     "linux": {
       "mbed-client-linux": "~1.0.0",
-      "mbed-client-mbedtls": "~0.0.2"
+      "mbed-client-mbedtls": "~1.0.0"
     }
   }
 }

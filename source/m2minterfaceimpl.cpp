@@ -51,11 +51,14 @@ M2MInterfaceImpl::M2MInterfaceImpl(M2MInterfaceObserver& observer,
   _register_ongoing(false),
   _update_register_ongoing(false)
 {
+    M2MConnectionSecurity::SecurityMode sec_mode = M2MConnectionSecurity::DTLS;
     //Hack for now
     if( _binding_mode == M2MInterface::TCP ){
         _binding_mode = M2MInterface::UDP;
+        sec_mode = M2MConnectionSecurity::TLS;
     }else if( _binding_mode == M2MInterface::TCP_QUEUE ){
         _binding_mode = M2MInterface::UDP_QUEUE;
+        sec_mode = M2MConnectionSecurity::TLS;
     }
     tr_debug("M2MInterfaceImpl::M2MInterfaceImpl() -IN");
     _nsdl_interface->create_endpoint(_endpoint_name,
@@ -66,7 +69,7 @@ M2MInterfaceImpl::M2MInterfaceImpl(M2MInterfaceObserver& observer,
                                      _context_address);
 
     //Here we must use TCP still
-    _connection_handler = new M2MConnectionHandler(*this, new M2MConnectionSecurity(), mode, stack);
+    _connection_handler = new M2MConnectionHandler(*this, new M2MConnectionSecurity(sec_mode), mode, stack);
 
     _connection_handler->bind_connection(_listen_port);
      tr_debug("M2MInterfaceImpl::M2MInterfaceImpl() -OUT");

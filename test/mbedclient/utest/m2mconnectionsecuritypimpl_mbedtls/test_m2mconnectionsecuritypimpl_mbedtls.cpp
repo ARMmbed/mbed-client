@@ -52,20 +52,20 @@ Test_M2MConnectionSecurityPimpl::~Test_M2MConnectionSecurityPimpl()
 
 void Test_M2MConnectionSecurityPimpl::test_constructor()
 {
-    M2MConnectionSecurityPimpl impl = M2MConnectionSecurityPimpl();
+    M2MConnectionSecurityPimpl impl = M2MConnectionSecurityPimpl(MBEDTLS_SSL_TRANSPORT_STREAM);
     CHECK(impl._timmer != NULL);
 }
 
 void Test_M2MConnectionSecurityPimpl::test_destructor()
 {
-    M2MConnectionSecurityPimpl* impl = new M2MConnectionSecurityPimpl();
+    M2MConnectionSecurityPimpl* impl = new M2MConnectionSecurityPimpl(MBEDTLS_SSL_TRANSPORT_STREAM);
     delete impl;
     //Memory leak detector will report an error if leaks
 }
 
 void Test_M2MConnectionSecurityPimpl::test_reset()
 {
-    M2MConnectionSecurityPimpl impl = M2MConnectionSecurityPimpl();
+    M2MConnectionSecurityPimpl impl = M2MConnectionSecurityPimpl(MBEDTLS_SSL_TRANSPORT_STREAM);
     impl._init_done = true;
     impl.reset();
     CHECK(impl._init_done == false);
@@ -73,7 +73,7 @@ void Test_M2MConnectionSecurityPimpl::test_reset()
 
 void Test_M2MConnectionSecurityPimpl::test_init()
 {
-    M2MConnectionSecurityPimpl impl = M2MConnectionSecurityPimpl();
+    M2MConnectionSecurityPimpl impl = M2MConnectionSecurityPimpl(MBEDTLS_SSL_TRANSPORT_STREAM);
     CHECK( -1 == impl.init(NULL) );
 
     m2msecurity_stub::int_value = 5;
@@ -150,7 +150,7 @@ void Test_M2MConnectionSecurityPimpl::test_init()
 
 void Test_M2MConnectionSecurityPimpl::test_connect()
 {
-    M2MConnectionSecurityPimpl impl = M2MConnectionSecurityPimpl();
+    M2MConnectionSecurityPimpl impl = M2MConnectionSecurityPimpl(MBEDTLS_SSL_TRANSPORT_STREAM);
     CHECK( -1 == impl.connect(NULL));
 
     impl._init_done = true;
@@ -192,7 +192,7 @@ void Test_M2MConnectionSecurityPimpl::test_connect()
 
 void Test_M2MConnectionSecurityPimpl::test_start_connecting_non_blocking()
 {
-    M2MConnectionSecurityPimpl impl = M2MConnectionSecurityPimpl();
+    M2MConnectionSecurityPimpl impl = M2MConnectionSecurityPimpl(MBEDTLS_SSL_TRANSPORT_STREAM);
     CHECK( -1 == impl.start_connecting_non_blocking(NULL));
 
     m2mtimer_stub::total_bool_value = false;
@@ -235,7 +235,7 @@ void Test_M2MConnectionSecurityPimpl::test_start_connecting_non_blocking()
 
 void Test_M2MConnectionSecurityPimpl::test_continue_connecting()
 {
-    M2MConnectionSecurityPimpl impl = M2MConnectionSecurityPimpl();
+    M2MConnectionSecurityPimpl impl = M2MConnectionSecurityPimpl(MBEDTLS_SSL_TRANSPORT_STREAM);
 
     mbedtls_stub::expected_int = MBEDTLS_ERR_SSL_WANT_READ;
     CHECK( M2MConnectionHandler::CONNECTION_ERROR_WANTS_READ == impl.continue_connecting());
@@ -247,7 +247,7 @@ void Test_M2MConnectionSecurityPimpl::test_continue_connecting()
 
 void Test_M2MConnectionSecurityPimpl::test_send_message()
 {
-    M2MConnectionSecurityPimpl impl = M2MConnectionSecurityPimpl();
+    M2MConnectionSecurityPimpl impl = M2MConnectionSecurityPimpl(MBEDTLS_SSL_TRANSPORT_STREAM);
     unsigned char msg[6] = "hello";
     CHECK( -1 == impl.send_message(msg, 5) );
     impl._init_done = true;
@@ -263,7 +263,7 @@ void Test_M2MConnectionSecurityPimpl::test_send_message()
 void Test_M2MConnectionSecurityPimpl::test_read()
 
 {
-    M2MConnectionSecurityPimpl impl = M2MConnectionSecurityPimpl();
+    M2MConnectionSecurityPimpl impl = M2MConnectionSecurityPimpl(MBEDTLS_SSL_TRANSPORT_STREAM);
     unsigned char msg[50];
     CHECK( 0 == impl.read(msg, 49));
 
@@ -278,7 +278,7 @@ void Test_M2MConnectionSecurityPimpl::test_read()
 
 void Test_M2MConnectionSecurityPimpl::test_timer_expired()
 {
-    M2MConnectionSecurityPimpl impl = M2MConnectionSecurityPimpl();
+    M2MConnectionSecurityPimpl impl = M2MConnectionSecurityPimpl(MBEDTLS_SSL_TRANSPORT_STREAM);
     impl.timer_expired(M2MTimerObserver::Dtls);
     //Nothing to test for now
 }
