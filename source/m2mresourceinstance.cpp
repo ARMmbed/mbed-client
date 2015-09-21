@@ -44,12 +44,12 @@ M2MResourceInstance& M2MResourceInstance::operator=(const M2MResourceInstance& o
 }
 
 M2MResourceInstance::M2MResourceInstance(const M2MResourceInstance& other)
-: M2MBase(other),  
+: M2MBase(other),
+  _object_instance_callback(other._object_instance_callback),
   _execute_callback(NULL),
   _value(NULL),
   _value_length(0),
-  _resource_type(M2MResourceInstance::STRING),
-  _object_instance_callback(other._object_instance_callback)
+  _resource_type(M2MResourceInstance::STRING)
 {
     this->operator=(other);
 }
