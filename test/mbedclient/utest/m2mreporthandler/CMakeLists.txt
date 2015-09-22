@@ -20,6 +20,7 @@ target_link_libraries(m2mreporthandler
 set_target_properties(m2mreporthandler
 PROPERTIES COMPILE_FLAGS "${UTEST_COMPILE_FLAGS}"
            LINK_FLAGS "${UTEST_LINK_FLAGS}")
-add_test(m2mreporthandler m2mreporthandler)
+set(binary "m2mreporthandler -ojunit")
+add_test(m2mreporthandler ${binary})
 
 endif()

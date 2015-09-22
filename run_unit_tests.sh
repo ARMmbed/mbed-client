@@ -27,8 +27,7 @@ if [ -z $1 ]||[ "no_up" != $1 ]
 fi
 
 yt target mbed-client-linux-unit-tests
-yt build
-yt test --no-build -- -ojunit
+yt test
 echo
 echo Create results
 echo

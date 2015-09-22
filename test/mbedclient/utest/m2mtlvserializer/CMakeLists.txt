@@ -21,7 +21,8 @@ target_link_libraries(m2mtlvserializer
 set_target_properties(m2mtlvserializer
 PROPERTIES COMPILE_FLAGS "${UTEST_COMPILE_FLAGS}"
            LINK_FLAGS "${UTEST_LINK_FLAGS}")
-add_test(m2mtlvserializer m2mtlvserializer)
 
+set(binary "m2mtlvserializer -ojunit")
+add_test(m2mtlvserializer ${binary})
 
 endif()

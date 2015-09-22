@@ -16,6 +16,8 @@ target_link_libraries(m2mtimer_linux
 set_target_properties(m2mtimer_linux
 PROPERTIES COMPILE_FLAGS "${UTEST_COMPILE_FLAGS}"
            LINK_FLAGS "${UTEST_LINK_FLAGS}")
-add_test(m2mtimer_linux m2mtimer_linux)
+
+set(binary "m2mtimer_linux -ojunit")
+add_test(m2mtimer_linux ${binary})
 
 endif()

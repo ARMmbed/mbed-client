@@ -21,6 +21,7 @@ target_link_libraries(m2mserver
 set_target_properties(m2mserver
 PROPERTIES COMPILE_FLAGS "${UTEST_COMPILE_FLAGS}"
            LINK_FLAGS "${UTEST_LINK_FLAGS}")
-add_test(m2mserver m2mserver)
+set(binary "m2mserver -ojunit")
+add_test(m2mserver ${binary})
 
 endif()

@@ -28,6 +28,7 @@ target_link_libraries(m2mnsdlinterface
 set_target_properties(m2mnsdlinterface
 PROPERTIES COMPILE_FLAGS "${UTEST_COMPILE_FLAGS}"
            LINK_FLAGS "${UTEST_LINK_FLAGS}")
-add_test(m2mnsdlinterface m2mnsdlinterface)
+set(binary "m2mnsdlinterface -ojunit")
+add_test(m2mnsdlinterface ${binary})
 
 endif()

@@ -24,6 +24,7 @@ set_target_properties(m2mobject
 PROPERTIES COMPILE_FLAGS "${UTEST_COMPILE_FLAGS}"
            LINK_FLAGS "${UTEST_LINK_FLAGS}")
 
-add_test(m2mobject m2mobject)
+set(binary "m2mobject -ojunit")
+add_test(m2mobject ${binary})
 
 endif()
