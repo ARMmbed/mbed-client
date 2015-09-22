@@ -15,5 +15,7 @@ target_link_libraries(threadhelper
 set_target_properties(threadhelper
 PROPERTIES COMPILE_FLAGS "${UTEST_COMPILE_FLAGS}"
            LINK_FLAGS "${UTEST_LINK_FLAGS}")
-add_test(threadhelper threadhelper)
+
+set(binary "threadhelper -ojunit")
+add_test(threadhelper ${binary})
 endif()

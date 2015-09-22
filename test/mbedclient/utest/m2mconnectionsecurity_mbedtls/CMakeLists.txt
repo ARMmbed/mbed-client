@@ -21,6 +21,7 @@ target_link_libraries(m2mconnectionsecurity_mbedtls
 set_target_properties(m2mconnectionsecurity_mbedtls
 PROPERTIES COMPILE_FLAGS "${UTEST_COMPILE_FLAGS}"
            LINK_FLAGS "${UTEST_LINK_FLAGS}")
-add_test(m2mconnectionsecurity_mbedtls m2mconnectionsecurity_mbedtls)
+set(binary "m2mconnectionsecurity_mbedtls -ojunit")
+add_test(m2mconnectionsecurity_mbedtls ${binary})
 
 endif()

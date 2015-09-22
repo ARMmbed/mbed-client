@@ -16,7 +16,8 @@ target_link_libraries(nsdlaccesshelper
 set_target_properties(nsdlaccesshelper
 PROPERTIES COMPILE_FLAGS "${UTEST_COMPILE_FLAGS}"
            LINK_FLAGS "${UTEST_LINK_FLAGS}")
-add_test(nsdlaccesshelper nsdlaccesshelper)
 
+set(binary "nsdlaccesshelper -ojunit")
+add_test(nsdlaccesshelper ${binary})
 
 endif()

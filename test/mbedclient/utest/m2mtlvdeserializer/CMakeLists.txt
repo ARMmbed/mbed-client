@@ -21,6 +21,8 @@ target_link_libraries(m2mtlvdeserializer
 set_target_properties(m2mtlvdeserializer
 PROPERTIES COMPILE_FLAGS "${UTEST_COMPILE_FLAGS}"
            LINK_FLAGS "${UTEST_LINK_FLAGS}")
-add_test(m2mtlvdeserializer m2mtlvdeserializer)
+
+set(binary "m2mtlvdeserializer -ojunit")
+add_test(m2mtlvdeserializer ${binary})
 
 endif()

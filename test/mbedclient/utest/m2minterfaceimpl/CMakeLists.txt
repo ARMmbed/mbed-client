@@ -26,6 +26,7 @@ target_link_libraries(m2minterfaceimpl
 set_target_properties(m2minterfaceimpl
 PROPERTIES COMPILE_FLAGS "${UTEST_COMPILE_FLAGS}"
            LINK_FLAGS "${UTEST_LINK_FLAGS}")
-add_test(m2minterfaceimpl m2minterfaceimpl)
+set(binary "m2minterfaceimpl -ojunit")
+add_test(m2minterfaceimpl ${binary})
 
 endif()

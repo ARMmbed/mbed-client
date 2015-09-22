@@ -21,7 +21,7 @@ target_link_libraries(m2mconnectionhandlerpimpl_mbed
 set_target_properties(m2mconnectionhandlerpimpl_mbed
 PROPERTIES COMPILE_FLAGS "${UTEST_COMPILE_FLAGS}"
            LINK_FLAGS "${UTEST_LINK_FLAGS}")
-add_test(m2mconnectionhandlerpimpl_mbed m2mconnectionhandlerpimpl_mbed)
-
+set(binary "m2mconnectionhandlerpimpl_mbed -ojunit")
+add_test(m2mconnectionhandlerpimpl_mbed ${binary})
 
 endif()
