@@ -33,3 +33,4 @@ yotta_targets
 build
 lcov/*
 output/*
+.yotta.json

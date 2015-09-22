@@ -16,11 +16,16 @@
 echo
 echo "Build mbed Client API unit tests"
 echo
-yt target frdm-k64f-gcc
-yt up
-yt target x86-linux-native
-yt up
-yt clean
+
+if [ -z $1 ]||[ "no_up" != $1 ]
+  then
+    yt target frdm-k64f-gcc
+    yt up
+    yt target x86-linux-native
+    yt up
+    yt clean
+fi
+
 yt target mbed-client-linux-unit-tests
 yt build
 yt test --no-build -- -ojunit

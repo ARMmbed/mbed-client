@@ -27,6 +27,8 @@ public:
 
     virtual ~Test_M2MInterfaceImpl();
 
+    void test_constructor();
+
     void test_bootstrap();
 
     void test_cancel_bootstrap();
