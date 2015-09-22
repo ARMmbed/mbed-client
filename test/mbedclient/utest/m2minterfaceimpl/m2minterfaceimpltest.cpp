@@ -31,10 +31,14 @@ TEST_GROUP(M2MInterfaceImpl)
   }
 };
 
-
 TEST(M2MInterfaceImpl, create)
 {
     CHECK(m2m_interface_impl->impl != NULL);
+}
+
+TEST(M2MInterfaceImpl, test_constructor)
+{
+    m2m_interface_impl->test_constructor();
 }
 
 TEST(M2MInterfaceImpl, bootstrap)

@@ -78,9 +78,35 @@ Test_M2MInterfaceImpl::Test_M2MInterfaceImpl()
 }
 
 Test_M2MInterfaceImpl:: ~Test_M2MInterfaceImpl()
-{    
+{
     delete observer;
     delete impl;
+}
+
+void Test_M2MInterfaceImpl::test_constructor()
+{
+    TestObserver obs;
+
+    M2MInterfaceImpl* obj = new M2MInterfaceImpl(obs,
+                                            "endpoint_name",
+                                            "endpoint_type",
+                                            120,
+                                            8000,
+                                            "domain",
+                                            M2MInterface::TCP);
+    CHECK(obj->_current_state == 0);
+    //TODO: Check rest of variables
+    delete obj;
+
+    obj = new M2MInterfaceImpl(obs,
+                                            "endpoint_name",
+                                            "endpoint_type",
+                                            120,
+                                            8000,
+                                            "domain",
+                                            M2MInterface::TCP_QUEUE);
+
+    delete obj;
 }
 
 void Test_M2MInterfaceImpl::test_bootstrap()
@@ -210,7 +236,7 @@ void Test_M2MInterfaceImpl::test_register_object()
 }
 
 void Test_M2MInterfaceImpl::test_update_registration()
-{    
+{
     impl->_current_state = M2MInterfaceImpl::STATE_REGISTERED;
     m2mnsdlinterface_stub::bool_value = true;
     impl->update_registration(NULL,120);

@@ -32,7 +32,7 @@ void m2mconnectionsecurityimpl_stub::clear()
     inc_int_value = 0;
 }
 
-M2MConnectionSecurity::M2MConnectionSecurity(SecurityMode mode)
+M2MConnectionSecurity::M2MConnectionSecurity(M2MConnectionSecurity::SecurityMode mode)
 {
 
 }

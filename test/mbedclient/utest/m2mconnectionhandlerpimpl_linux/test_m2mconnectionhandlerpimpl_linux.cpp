@@ -87,6 +87,18 @@ void Test_M2MConnectionHandlerPimpl_linux::test_resolve_server_address()
     common_stub::addrinfo->ai_family = AF_INET;
     common_stub::addrinfo->ai_addr = (sockaddr*)malloc(sizeof(sockaddr));
     M2MSecurity* sec = new M2MSecurity(M2MSecurity::M2MServer);
+
+    M2MConnectionHandlerPimpl* tcp_handler = new M2MConnectionHandlerPimpl(NULL, *observer, NULL , M2MInterface::TCP, M2MInterface::Uninitialized);
+    CHECK(tcp_handler->resolve_server_address("10", 7, M2MConnectionObserver::LWM2MServer, sec) == false);
+    free(common_stub::addrinfo->ai_addr);
+    free(common_stub::addrinfo);
+    common_stub::addrinfo = NULL;
+    delete tcp_handler;
+
+    common_stub::error = SOCKET_ERROR_NONE;
+    common_stub::addrinfo = (addrinfo*)malloc(sizeof(addrinfo));
+    common_stub::addrinfo->ai_family = AF_INET;
+    common_stub::addrinfo->ai_addr = (sockaddr*)malloc(sizeof(sockaddr));
     CHECK(handler->resolve_server_address("10", 7, M2MConnectionObserver::LWM2MServer, sec) == false);
     free(common_stub::addrinfo->ai_addr);
     free(common_stub::addrinfo);
@@ -98,8 +110,19 @@ void Test_M2MConnectionHandlerPimpl_linux::test_resolve_server_address()
     common_stub::addrinfo->ai_addr = (sockaddr*)malloc(sizeof(sockaddr));
     handler->_socket_server = -1;
     CHECK(handler->resolve_server_address("10", 7, M2MConnectionObserver::LWM2MServer, sec) == false);
+    free(common_stub::addrinfo->ai_addr);
+    free(common_stub::addrinfo);
 
-    M2MConnectionSecurity* conSec = new M2MConnectionSecurity();
+    tcp_handler = new M2MConnectionHandlerPimpl(NULL, *observer, NULL , M2MInterface::TCP, M2MInterface::Uninitialized);
+    common_stub::error = SOCKET_ERROR_NONE;
+    common_stub::addrinfo = (addrinfo*)malloc(sizeof(addrinfo));
+    common_stub::addrinfo->ai_family = AF_INET6;
+    common_stub::addrinfo->ai_addr = (sockaddr*)malloc(sizeof(sockaddr));
+    tcp_handler->_socket_server = -1;
+    CHECK(tcp_handler->resolve_server_address("10", 7, M2MConnectionObserver::LWM2MServer, sec) == false);
+    delete tcp_handler;
+
+    M2MConnectionSecurity* conSec = new M2MConnectionSecurity(M2MConnectionSecurity::TLS);
     handler->_security_impl = conSec;
     m2mconnectionsecurityimpl_stub::int_value = 0;
 
@@ -123,25 +146,32 @@ void Test_M2MConnectionHandlerPimpl_linux::test_send_data()
 {
     sn_nsdl_addr_s* addr = (sn_nsdl_addr_s*)malloc(sizeof(sn_nsdl_addr_s));
     memset(addr, 0, sizeof(sn_nsdl_addr_s));
-    CHECK( false == handler->send_data(NULL, 0 , NULL));
+    uint8_t* data = (uint8_t*)malloc(5);
+    CHECK( false == handler->send_data(data, 0 , NULL));
 
     common_stub::int_value = 4;
-    CHECK(true == handler->send_data(NULL, 0 , addr));
+    CHECK(true == handler->send_data(data, 0 , addr));
+
+    M2MConnectionHandlerPimpl* tcp_handler = new M2MConnectionHandlerPimpl(NULL, *observer, NULL , M2MInterface::TCP, M2MInterface::Uninitialized);
+    common_stub::int_value = 4;
+    CHECK(true == tcp_handler->send_data(data, 0 , addr));
+    delete tcp_handler;
 
     common_stub::int_value = -1;
-    CHECK(false == handler->send_data(NULL, 0 , addr));
+    CHECK(false == handler->send_data(data, 0 , addr));
 
 
-    M2MConnectionSecurity* conSec = new M2MConnectionSecurity();
+    M2MConnectionSecurity* conSec = new M2MConnectionSecurity(M2MConnectionSecurity::TLS);
     handler->_security_impl = conSec;
     handler->_use_secure_connection = true;
     m2mconnectionsecurityimpl_stub::int_value = 0;
-    CHECK(false == handler->send_data(NULL, 0 , addr));
+    CHECK(false == handler->send_data(data, 0 , addr));
     m2mconnectionsecurityimpl_stub::int_value = 5;
-    CHECK(true == handler->send_data(NULL, 0 , addr));
+    CHECK(true == handler->send_data(data, 0 , addr));
     handler->_security_impl = NULL;
     delete conSec;
 
+    free(data);
     free(addr);
 }
 
@@ -157,7 +187,7 @@ void Test_M2MConnectionHandlerPimpl_linux::test_data_receive()
     M2MConnectionHandlerPimpl *obj = new M2MConnectionHandlerPimpl(NULL,
                                                                    *observer,
                                                                    NULL,
-                                                                   M2MInterface::NOT_SET,
+                                                                   M2MInterface::TCP_QUEUE,
                                                                    M2MInterface::Uninitialized);
 
     handler->_receive_data = true;
@@ -167,6 +197,25 @@ void Test_M2MConnectionHandlerPimpl_linux::test_data_receive()
     CHECK(observer->error == true);
     CHECK(handler->_receive_data == false);
 
+    M2MConnectionHandlerPimpl* tcp_handler = new M2MConnectionHandlerPimpl(NULL, *observer, NULL , M2MInterface::TCP, M2MInterface::Uninitialized);
+    tcp_handler->_receive_data = true;
+    observer->error = false;
+    common_stub::int_value = 2;
+    tcp_handler->data_receive(obj);
+    CHECK(observer->error == true);
+    CHECK(tcp_handler->_receive_data == false);
+    delete tcp_handler;
+
+    tcp_handler = new M2MConnectionHandlerPimpl(NULL, *observer, NULL , M2MInterface::TCP, M2MInterface::Uninitialized);
+    tcp_handler->_receive_data = true;
+    observer->error = false;
+    observer->set_class_object(tcp_handler);
+    common_stub::int_value = 6;
+    tcp_handler->data_receive(obj);
+    CHECK(observer->error == false);
+    CHECK(tcp_handler->_receive_data == false);
+    delete tcp_handler;
+
     observer->set_class_object(handler);
     handler->_receive_data = true;
     observer->dataAvailable = false;
@@ -174,7 +223,7 @@ void Test_M2MConnectionHandlerPimpl_linux::test_data_receive()
     handler->data_receive(obj);
     CHECK(observer->dataAvailable == true);
 
-    M2MConnectionSecurity* conSec = new M2MConnectionSecurity();
+    M2MConnectionSecurity* conSec = new M2MConnectionSecurity(M2MConnectionSecurity::TLS);
     handler->_security_impl = conSec;
     handler->_use_secure_connection = true;
     handler->_receive_data = true;

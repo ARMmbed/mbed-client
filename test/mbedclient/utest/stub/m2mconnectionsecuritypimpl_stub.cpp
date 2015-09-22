@@ -29,7 +29,7 @@ void m2mconnectionsecuritypimpl_stub::clear()
     int_value = -1;
 }
 
-M2MConnectionSecurityPimpl::M2MConnectionSecurityPimpl(SecurityMode mode)
+M2MConnectionSecurityPimpl::M2MConnectionSecurityPimpl(M2MConnectionSecurity::SecurityMode mode)
 {
 
 }
