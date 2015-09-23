@@ -2,7 +2,7 @@
 
 This section explains how to create different types of Objects, Object Instances and Resources for the client to comply with the OMA LWM2M specifications.
 
-In order for the client to communicate its resources to the mbed Device Server (mDS), it needs to create Objects, Object Instances and Resources. This can be done very easily with the Client C++ APIs, where the client can define its resources in a similar structure to the one defined in the LWM2M specification.
+In order for the client to communicate its resources to the mbed Device Server (mbed DS), it needs to create Objects, Object Instances and Resources. This can be done very easily with the Client C++ APIs, where the client can define its resources in a similar structure to the one defined in the LWM2M specification.
 
 This quick guide will explain how you can create and configure these resources using the C++ API.
 
@@ -40,18 +40,18 @@ As per the OMA LWM2M specification, the client must have defined Objects, under 
 
 ```static M2MObject *create_object(const String &name);```
 
-You need to pass the name of the Object that you would like to create (like ```Test```); this will create an object with that name in mDS.
+You need to pass the name of the Object that you would like to create (like ```Test```); this will create an object with that name in mbed DS.
 
 
 ####Configuring the Object
 
-Once you have created an Object (whether OMA specific or custom), you can configure various parameters in that object so that they can be controlled or modified to affect communication with mDS.
+Once you have created an Object (whether OMA specific or custom), you can configure various parameters in that object so that they can be controlled or modified to affect communication with mbed DS.
 
 Here, we discuss a few of the most important parameters, which you must configure properly in order to work with the objects.
 
 #####Setting Operation Mode
 
-You can set the objects' operation mode so that they can handle GET, PUT, POST, DELETE or a combination of these requests coming from mDS.
+You can set the objects' operation mode so that they can handle GET, PUT, POST, DELETE or a combination of these requests coming from mbed DS.
 
 The API that sets the operation mode (present in the M2MBase class) is
 
@@ -95,21 +95,21 @@ You can create an M2M Object Instance using this API from the M2MObject class:
 
 ``` M2MObject::create_object_instance(uint16_t instance_id);```
 
-You can pass an Object Instance ID to create appropriate Object Instances. Normally, Object Instances will start from ```0``` and increment. So the Object Instance structure on the mDS side would look like 
+You can pass an Object Instance ID to create appropriate Object Instances. Normally, Object Instances will start from ```0``` and increment. So the Object Instance structure on the mbed DS side would look like 
 
 ```Object/Object Instance ID```
 
-You need to pass the name of the Object Instance ID that you would like to create (like ```0```); this will create an object like ```/Test/0``` in mDS.
+You need to pass the name of the Object Instance ID that you would like to create (like ```0```); this will create an object like ```/Test/0``` in mbed DS.
 
 ###Configuring the Object Instance
 
-Once you have created an Object Instance (whether OMA-specific or custom), you can configure various parameters in that object so that they can be controlled or modified to affect communication with mDS.
+Once you have created an Object Instance (whether OMA-specific or custom), you can configure various parameters in that object so that they can be controlled or modified to affect communication with mbed DS.
 
 Here, we discuss a few of the most important parameters, which you must configure properly in order to work with the object instances.
 
 ####Setting operation mode
 
-You can set the Object Instances' operation mode so that they can handle GET, PUT, POST, DELETE or a combination of these requests coming from mDS.
+You can set the Object Instances' operation mode so that they can handle GET, PUT, POST, DELETE or a combination of these requests coming from mbed DS.
 
 The API that can be used to set the operation mode (present in the M2MBase class) is:
 
@@ -244,13 +244,13 @@ These APIs take different parameters, which you can see in their documentation.
 
 ####Configuring the Resource and Resource Instance
 
-Once you have created a Resource or Resource Instance (whether OMA-specific or custom), you can configure various parameters so they can be controlled or modified to affect communication with mDS.
+Once you have created a Resource or Resource Instance (whether OMA-specific or custom), you can configure various parameters so they can be controlled or modified to affect communication with mbed DS.
 
 Here, we discuss a few of the most important parameters that you must configure properly in order to work with the Resource and Resource Instance.
 
 #####Setting Operation Mode
 
-You can set the Resource or Resource Instance operation mode so that they can handle GET, PUT, POST, DELETE or a combination of these requests coming from mDS.
+You can set the Resource or Resource Instance operation mode so that they can handle GET, PUT, POST, DELETE or a combination of these requests coming from mbed DS.
 
 The API that can be used to set the operation mode (present in the M2MBase class) is
 
@@ -258,7 +258,7 @@ The API that can be used to set the operation mode (present in the M2MBase class
 
 #####Setting the value of a dynamic Resource or Resource Instance
 
-You can set the value of a dynamic Resource or Resource Instance so that they can be sent to mDS using GET requests.
+You can set the value of a dynamic Resource or Resource Instance so that they can be sent to mbed DS using GET requests.
 
 The API used to set the values (present in the M2MResourceInstance class) is
 
@@ -266,7 +266,7 @@ The API used to set the values (present in the M2MResourceInstance class) is
 
 #####Setting an executable function
 
-For Dynamic Resources, you can pass a function pointer to the Resource or Resource Instance, which will get executed when mDS calls a POST method on that resource. The Resource or Resource Instance must support the POST operation mode for this feature to work.
+For Dynamic Resources, you can pass a function pointer to the Resource or Resource Instance, which will get executed when mbed DS calls a POST method on that resource. The Resource or Resource Instance must support the POST operation mode for this feature to work.
 
 You can pass the function pointer using this API:
 
