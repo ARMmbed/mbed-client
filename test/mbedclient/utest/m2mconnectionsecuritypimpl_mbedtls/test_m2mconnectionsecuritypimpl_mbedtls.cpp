@@ -197,6 +197,7 @@ void Test_M2MConnectionSecurityPimpl::test_start_connecting_non_blocking()
 
     m2mtimer_stub::total_bool_value = false;
     impl._init_done = true;
+    impl._sec_mode = M2MConnectionSecurity::TLS;
     CHECK( -1 == impl.start_connecting_non_blocking(NULL));
 
     m2msecurity_stub::int_value = 5;
