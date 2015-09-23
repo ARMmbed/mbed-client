@@ -46,7 +46,7 @@ command](http://docs.yottabuild.org/reference/commands.html).
 **Note**: In this case, we have listed the dependencies for the `x86-linux-native`
 compilation target. Different modules are needed for different compilation target.
 
-If you list the modules included in the Mbed Client linux example, you can see that
+If you list the modules included in the mbed Client linux example, you can see that
 it depends directly only on the `mbed-client` and `mbed-client-linux` modules. These modules depend internally on various other modules.
 
 ```
