@@ -399,7 +399,7 @@ bool M2MLWClient::create_dynamic_resource_string(const char *name,
         if(inst) {
             M2MResource *res = inst->create_dynamic_resource(name,"resource",
                                                              M2MResourceInstance::STRING,
-                                                             observable);
+                                                             observable, multiple_instance);
             if(res) {
                 success = true;
                 res->set_operation(int_to_operation(resource_operation));
@@ -425,7 +425,7 @@ bool M2MLWClient::create_dynamic_resource_int(const char *name,
         if(inst) {
             M2MResource *res = inst->create_dynamic_resource(name,"resource",
                                                              M2MResourceInstance::INTEGER,
-                                                             observable);
+                                                             observable, multiple_instance);
             if(res) {
                 success = true;
                 res->set_operation(int_to_operation(resource_operation));
