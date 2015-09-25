@@ -152,14 +152,18 @@ bool M2MReportHandler::parse_notification_attribute(char *&query,
             }
             memcpy(query_options[num_options++], rest, len);
         }
+
         float pmin = _pmin;
         float pmax = _pmax;
         float lt = _lt;
         float gt = _gt;
         float st = _st;
+        float high = _high_step;
+        float low = _low_step;
+        int attr = _attribute_state;
+
         for (int option = 0; option < num_options; option++) {
-            if(set_notification_attribute(query_options[option],type)) {
-                tr_debug("M2MReportHandler::parse_notification_attribute - Set Notification Attribute True");
+            if(set_notification_attribute(query_options[option],type)) {        
                 success = true;
             }
         }
@@ -172,11 +176,17 @@ bool M2MReportHandler::parse_notification_attribute(char *&query,
             _st = st;
             _lt = lt;
             _gt = gt;
+            _high_step = high;
+            _low_step = low;
+            _attribute_state = attr;
         }
+        else {
+            set_under_observation(!(_attribute_state & M2MReportHandler::Cancel) == M2MReportHandler::Cancel);
+            }
     }
     else {
-        if(set_notification_attribute(query, type)) {
-            tr_debug("M2MReportHandler::parse_notification_attribute - Set Notification Attribute True");
+        if(set_notification_attribute(query, type)) {            
+            set_under_observation(!(_attribute_state & M2MReportHandler::Cancel) == M2MReportHandler::Cancel);
             success = true;
         }
     }
@@ -219,7 +229,6 @@ bool M2MReportHandler::set_notification_attribute(char* option,
 {
     tr_debug("M2MReportHandler::set_notification_attribute()");
     bool success = false;
-    bool observation = true;
     char attribute[20];
     char value[20];
     memset(&attribute, 0, 20);
@@ -229,7 +238,7 @@ bool M2MReportHandler::set_notification_attribute(char* option,
     if( pos != NULL ){
         memcpy(attribute, option, (size_t)(pos-option));
         pos++;
-        memcpy(value, pos, 20 );
+        memcpy(value, pos, 20);
     }else{
         memcpy(attribute, option, (size_t)strlen(option) + 1);
     }
@@ -270,15 +279,9 @@ bool M2MReportHandler::set_notification_attribute(char* option,
         tr_debug("M2MReportHandler::set_notification_attribute %s to %f", attribute, _st);
     }
     else if(strcmp(attribute, CANCEL.c_str()) == 0) {
-        observation = false;
         success = true;
         _attribute_state |= M2MReportHandler::Cancel;
-    }
-
-    if(success) {
-        tr_debug("M2MReportHandler::set_notification_attribute %s - set under observation", attribute);
-        set_under_observation(observation);
-    }
+    }   
     return success;
 }
 
@@ -296,7 +299,7 @@ void M2MReportHandler::schedule_report(float value)
     }
 }
 
-void M2MReportHandler::report(float value)
+void M2MReportHandler::report(float /*value*/)
 {
     tr_debug("M2MReportHandler::report()");
     if(_under_observation && _current_value != _last_value && _notify) {
@@ -343,7 +346,7 @@ bool M2MReportHandler::check_attribute_validity()
 {
     bool success = true;
     if ((_attribute_state & M2MReportHandler::Pmax) == M2MReportHandler::Pmax &&
-            ((_pmax >= -1.0f) && (_pmin > _pmax))) {
+            ((_pmax >= -1.0f) && (_pmin >= _pmax))) {
         success = false;
     }
     float low = _lt + 2 * _st;
