@@ -1290,8 +1290,8 @@ void M2MNsdlInterface::send_resource_observation(M2MResourceInstance *resource)
 
         uint16_t number = resource->observation_number();
 
-        observation_number[0] = ((number>>8) & 0xFF);
-        observation_number[1] = (number & 0xFF);
+        observation_number[0] = (number & 0xFF);
+        observation_number[1] = ((number>>8) & 0xFF);
 
         if(number > 0xFF) {
             observation_number_length = 2;
