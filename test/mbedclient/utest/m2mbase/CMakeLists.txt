@@ -16,7 +16,8 @@ target_link_libraries(m2mbase
 set_target_properties(m2mbase
 PROPERTIES COMPILE_FLAGS "${UTEST_COMPILE_FLAGS}"
            LINK_FLAGS "${UTEST_LINK_FLAGS}")
-add_test(m2mbase m2mbase)
+set(binary "m2mbase -ojunit")
+add_test(m2mbase ${binary})
 
 
 endif()

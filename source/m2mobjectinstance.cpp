@@ -559,7 +559,7 @@ sn_coap_hdr_s* M2MObjectInstance::handle_put_request(nsdl_s *nsdl,
 
 sn_coap_hdr_s* M2MObjectInstance::handle_post_request(nsdl_s *nsdl,
                                                       sn_coap_hdr_s *received_coap_header,
-                                                      M2MObservationHandler *observation_handler)
+                                                      M2MObservationHandler */*observation_handler*/)
 {
     tr_debug("M2MObjectInstance::handle_post_request()");
     sn_coap_hdr_s * coap_response = NULL;

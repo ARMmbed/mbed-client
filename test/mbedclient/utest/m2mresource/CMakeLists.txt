@@ -18,6 +18,7 @@ target_link_libraries(m2mresource
 set_target_properties(m2mresource
 PROPERTIES COMPILE_FLAGS "${UTEST_COMPILE_FLAGS}"
            LINK_FLAGS "${UTEST_LINK_FLAGS}")
-add_test(m2mresource m2mresource)
+set(binary "m2mresource -ojunit")
+add_test(m2mresource ${binary})
 
 endif()

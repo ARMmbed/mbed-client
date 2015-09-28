@@ -14,6 +14,8 @@ target_link_libraries(m2mstring
 set_target_properties(m2mstring
 PROPERTIES COMPILE_FLAGS "${UTEST_COMPILE_FLAGS}"
            LINK_FLAGS "${UTEST_LINK_FLAGS}")
-add_test(m2mstring m2mstring)
+
+set(binary "m2mstring -ojunit")
+add_test(m2mstring ${binary})
 
 endif()

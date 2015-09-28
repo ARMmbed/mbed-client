@@ -16,7 +16,6 @@ add_executable(m2minterfaceimpl
         "../stub/m2mnsdlinterface_stub.cpp"
         "../stub/m2mconnectionhandler_stub.cpp"
         "../stub/m2mconnectionsecurity_stub.cpp"
-        "../stub/m2mconnectionhandlerfactory_stub.cpp"
         "../../../../source/m2minterfaceimpl.cpp"
         "../../../../source/m2mconstants.cpp"
 )
@@ -27,6 +26,7 @@ target_link_libraries(m2minterfaceimpl
 set_target_properties(m2minterfaceimpl
 PROPERTIES COMPILE_FLAGS "${UTEST_COMPILE_FLAGS}"
            LINK_FLAGS "${UTEST_LINK_FLAGS}")
-add_test(m2minterfaceimpl m2minterfaceimpl)
+set(binary "m2minterfaceimpl -ojunit")
+add_test(m2minterfaceimpl ${binary})
 
 endif()

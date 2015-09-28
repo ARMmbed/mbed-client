@@ -31,10 +31,14 @@ TEST_GROUP(M2MInterfaceImpl)
   }
 };
 
-
 TEST(M2MInterfaceImpl, create)
 {
     CHECK(m2m_interface_impl->impl != NULL);
+}
+
+TEST(M2MInterfaceImpl, test_constructor)
+{
+    m2m_interface_impl->test_constructor();
 }
 
 TEST(M2MInterfaceImpl, bootstrap)
@@ -60,6 +64,12 @@ TEST(M2MInterfaceImpl, update_registration)
 TEST(M2MInterfaceImpl, unregister_object)
 {
     m2m_interface_impl->test_unregister_object();
+}
+
+
+TEST(M2MInterfaceImpl, set_queue_sleep_handler)
+{
+    m2m_interface_impl->test_set_queue_sleep_handler();
 }
 
 TEST(M2MInterfaceImpl, coap_message_ready)
@@ -127,3 +137,7 @@ TEST(M2MInterfaceImpl, data_sent)
     m2m_interface_impl->test_data_sent();
 }
 
+TEST(M2MInterfaceImpl, timer_expired)
+{
+    m2m_interface_impl->test_timer_expired();
+}

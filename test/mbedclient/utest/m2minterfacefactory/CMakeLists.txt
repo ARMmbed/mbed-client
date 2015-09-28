@@ -24,7 +24,7 @@ target_link_libraries(m2minterfacefactorytest
 set_target_properties(m2minterfacefactorytest
 PROPERTIES COMPILE_FLAGS "${UTEST_COMPILE_FLAGS}"
            LINK_FLAGS "${UTEST_LINK_FLAGS}")
-add_test(m2minterfacefactorytest m2minterfacefactorytest)
-
+set(binary "m2minterfacefactorytest -ojunit")
+add_test(m2minterfacefactorytest ${binary})
 
 endif()

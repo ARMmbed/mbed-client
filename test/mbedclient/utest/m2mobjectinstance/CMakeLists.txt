@@ -22,6 +22,7 @@ target_link_libraries(m2mobjectinstance
 set_target_properties(m2mobjectinstance
 PROPERTIES COMPILE_FLAGS "${UTEST_COMPILE_FLAGS}"
            LINK_FLAGS "${UTEST_LINK_FLAGS}")
-add_test(m2mobjectinstance m2mobjectinstance)
+set(binary "m2mobjectinstance -ojunit")
+add_test(m2mobjectinstance ${binary})
 
 endif()

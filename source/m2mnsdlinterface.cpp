@@ -368,7 +368,7 @@ uint8_t M2MNsdlInterface::received_from_server_callback(struct nsdl_s * /*nsdl_h
                     if( max_time > 0) {
                         char *buffer = (char*)memory_alloc(20);
                         if(buffer) {
-                            int size = snprintf(buffer, 20,"%d",(uint32_t)max_time);
+                            int size = snprintf(buffer, 20,"%lu",(uint32_t)max_time);
                             _endpoint->lifetime_ptr = (uint8_t*)memory_alloc(size+1);
                             if(_endpoint->lifetime_ptr) {
                                 memset(_endpoint->lifetime_ptr, 0, size+1);
@@ -1290,8 +1290,8 @@ void M2MNsdlInterface::send_resource_observation(M2MResourceInstance *resource)
 
         uint16_t number = resource->observation_number();
 
-        observation_number[0] = ((number>>8) & 0xFF);
-        observation_number[1] = (number & 0xFF);
+        observation_number[0] = (number & 0xFF);
+        observation_number[1] = ((number>>8) & 0xFF);
 
         if(number > 0xFF) {
             observation_number_length = 2;

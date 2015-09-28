@@ -27,6 +27,8 @@ public:
 
     virtual ~Test_M2MInterfaceImpl();
 
+    void test_constructor();
+
     void test_bootstrap();
 
     void test_cancel_bootstrap();
@@ -36,6 +38,8 @@ public:
     void test_update_registration();
 
     void test_unregister_object();
+
+    void test_set_queue_sleep_handler();
 
     void test_coap_message_ready();
 
@@ -63,8 +67,13 @@ public:
 
     void test_data_sent();
 
+    void test_timer_expired();
+
+    void test_callback_handler();
+
     M2MInterfaceImpl*   impl;
     TestObserver        *observer;
+    bool visited;
 };
 
 #endif // TEST_M2M_INTERFACE_IMPL_H

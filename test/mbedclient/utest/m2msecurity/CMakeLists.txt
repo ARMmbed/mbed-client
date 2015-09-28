@@ -20,6 +20,8 @@ target_link_libraries(m2msecurity
 set_target_properties(m2msecurity
 PROPERTIES COMPILE_FLAGS "${UTEST_COMPILE_FLAGS}"
            LINK_FLAGS "${UTEST_LINK_FLAGS}")
-add_test(m2msecurity m2msecurity)
+
+set(binary "m2msecurity -ojunit")
+add_test(m2msecurity ${binary})
 
 endif()

@@ -20,6 +20,7 @@ target_link_libraries(m2mdevice
 set_target_properties(m2mdevice
 PROPERTIES COMPILE_FLAGS "${UTEST_COMPILE_FLAGS}"
            LINK_FLAGS "${UTEST_LINK_FLAGS}")
-add_test(m2mdevice m2mdevice)
+set(binary "m2mdevice -ojunit")
+add_test(m2mdevice ${binary})
 
 endif()

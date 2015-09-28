@@ -4,7 +4,6 @@ add_executable(m2mnsdlinterface
         "main.cpp"
         "m2mnsdlinterfacetest.cpp"
         "test_m2mnsdlinterface.cpp"
-        "../stub/m2mconnectionhandlerfactory_stub.cpp"
         "../stub/m2mbase_stub.cpp"
         "../stub/m2mobject_stub.cpp"
         "../stub/m2mserver_stub.cpp"
@@ -14,7 +13,7 @@ add_executable(m2mnsdlinterface
         "../stub/m2mstring_stub.cpp"
         "../stub/m2msecurity_stub.cpp"
         "../stub/m2mconnectionsecurity_stub.cpp"
-	"../stub/m2mconnectionhandler_stub.cpp"
+        "../stub/m2mconnectionhandler_stub.cpp"
         "../stub/m2mtimer_stub.cpp"
         "../stub/common_stub.cpp"
         "../stub/nsdlaccesshelper_stub.cpp"
@@ -29,6 +28,7 @@ target_link_libraries(m2mnsdlinterface
 set_target_properties(m2mnsdlinterface
 PROPERTIES COMPILE_FLAGS "${UTEST_COMPILE_FLAGS}"
            LINK_FLAGS "${UTEST_LINK_FLAGS}")
-add_test(m2mnsdlinterface m2mnsdlinterface)
+set(binary "m2mnsdlinterface -ojunit")
+add_test(m2mnsdlinterface ${binary})
 
 endif()

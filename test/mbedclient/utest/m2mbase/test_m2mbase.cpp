@@ -495,6 +495,5 @@ void Test_M2MBase::test_observation_handler()
 void Test_M2MBase::test_id_number()
 {
     M2MBase b("10", M2MBase::Static);
-    printf("name ID %d", b.name_id());
     CHECK(b.name_id() == 10);
 }
