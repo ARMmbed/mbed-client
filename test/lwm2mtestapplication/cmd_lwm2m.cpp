@@ -125,7 +125,7 @@
                                     "   --state <n>      State of firmware update\n"\
                                     "   --update_supported_objects <bool>        Send update registration message after fw update\n"\
                                     "   --update_results <n>   Result of downloading or updating firmware\n"\
-                                    "   --packag_name <name>   Package name\n"\
+                                    "   --package_name <name>   Package name\n"\
                                     "   --package_version <name>   Package version\n"\
                                     "register_object <p> [options]\n"\
                                     "<p>:\n"\
@@ -150,7 +150,11 @@
                                     "   --name <name>               Resource name (Mandatory)\n"\
                                     "   --value <value>             Resource value (Mandatory)\n"\
                                     "   --object_instance <n>       Instance ID of object this resource is associated with, default is 0\n"\
-                                    "   --resource_instance <n>     Instance ID of object of the resource, default is 0\n"
+                                    "   --resource_instance <n>     Instance ID of object of the resource, default is 0\n"\
+                                    "resource_value <p> [options]\n"\
+                                    "<p>:\n"\
+                                    "   Options for resource_value command\n"\
+                                    "   --firmware <n>               Resource instance id in Firmware object\n"\
 
 #define EXIT_MANUAL         "exit :closes the application\n"
 
@@ -172,6 +176,7 @@ int lwm2m_client_unregister_command();
 int lwm2m_client_set_value_command(int argc, char *argv[]);
 int lwm2m_client_set_value_instance_command(int argc, char *argv[]);
 int lwm2m_client_firmware_command(int argc, char *argv[]);
+int lwm2m_client_resource_value(int argc, char *argv[]);
 int exit_command(int argc, char *argv[]);
 
 void  lwm2m_command_init(void)
@@ -211,6 +216,10 @@ int lwm2m_client_command(int argc, char *argv[])
     else if( strcmp(argv[1], "firmware") == 0 )
     {
       return lwm2m_client_firmware_command(argc, argv);
+    }
+    else if( strcmp(argv[1], "resource_value") == 0 )
+    {
+      return lwm2m_client_resource_value(argc, argv);
     }
     else if( strcmp(argv[1], "object") == 0 )
     {
@@ -490,8 +499,9 @@ int lwm2m_client_firmware_command(int argc, char *argv[])
     lwm2m_client.create_firmware_object();
 
     if(cmd_parameter_val(argc, argv, "--package", &package)) {
+        uint16_t length = (uint16_t)sizeof(package);
         if(!lwm2m_client.create_firmware_object(M2MFirmware::Package,
-                                          package)) {
+                                          (const uint8_t*)package, length)) {
             return CMDLINE_RETCODE_INVALID_PARAMETERS;
         }
     }
@@ -534,6 +544,23 @@ int lwm2m_client_firmware_command(int argc, char *argv[])
     }
     lwm2m_client.set_fw_execute_function();
     return return_code;
+}
+
+int lwm2m_client_resource_value(int argc, char *argv[])
+{
+    int resource = 0;
+    if(cmd_parameter_int(argc, argv, "--firmware", &resource)) {
+        if (resource == 3 || resource == 4 || resource == 5) {
+            lwm2m_client.firmware_resource_int(resource);
+        }
+        else if (resource == 0) {
+            lwm2m_client.firmware_resource_buffer();
+        }
+        else {
+            lwm2m_client.firmware_resource_string(resource);
+        }
+    }
+    return CMDLINE_RETCODE_SUCCESS;
 }
 
 int lwm2m_client_object_command(int argc, char *argv[])

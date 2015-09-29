@@ -63,6 +63,15 @@ public:
     bool create_firmware_object(M2MFirmware::FirmwareResource resource,
                               int64_t value);
 
+    bool create_firmware_object(M2MFirmware::FirmwareResource resource,
+                                const uint8_t *value,
+                                const uint32_t length);
+
+    void firmware_resource_int(int resource);
+    void firmware_resource_string(int resource);
+
+    void firmware_resource_buffer();
+
     bool create_object(const char *name,
                        bool new_instance,
                        uint8_t object_operation,

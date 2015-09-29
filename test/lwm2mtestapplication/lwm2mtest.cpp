@@ -274,6 +274,20 @@ bool M2MLWClient::create_firmware_object(M2MFirmware::FirmwareResource resource,
     return success;
 }
 
+bool M2MLWClient::create_firmware_object(M2MFirmware::FirmwareResource resource,
+                                         const uint8_t *value,
+                                         const uint32_t length)
+{
+    bool success = false;
+    if(!_firmware) {
+        _firmware = M2MInterfaceFactory::create_firmware();
+    }
+    if(_firmware) {
+            success = _firmware->set_resource_value(resource, value, length);
+    }
+    return success;
+}
+
 void M2MLWClient::set_fw_execute_function()
 {
     if(_firmware) {
@@ -821,4 +835,25 @@ void M2MLWClient::fw_execute_function(void *argument)
         cmd_printf("Received %s!!\n", arguments);
     }
     cmd_printf("Firmware update executed\n");
+}
+
+void M2MLWClient::firmware_resource_int(int resource)
+{
+    cmd_printf("Firmware resource value int\n");
+    cmd_printf("%ld\n", _firmware->resource_value_int(static_cast<M2MFirmware::FirmwareResource>(resource)));
+}
+
+void M2MLWClient::firmware_resource_string(int resource)
+{
+    cmd_printf("Firmware resource value string\n");
+    cmd_printf("%s\n", _firmware->resource_value_string(static_cast<M2MFirmware::FirmwareResource>(resource)).c_str());
+}
+
+void M2MLWClient::firmware_resource_buffer()
+{
+    cmd_printf("Firmware resource value buffer\n");
+    uint8_t *value = 0;
+    uint32_t valueSize = _firmware->resource_value_buffer(M2MFirmware::Package, value);
+    cmd_printf("%s\n", value);
+    free(value);
 }
