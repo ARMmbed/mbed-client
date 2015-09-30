@@ -79,7 +79,7 @@ void Test_M2MFirmware::test_create_resource_string()
                                                               M2MBase::Dynamic);
 
     CHECK(firmware->create_resource(M2MFirmware::PackageUri,"test") != NULL);
-    CHECK(M2MBase::POST_ALLOWED == m2mbase_stub::operation);
+    CHECK(M2MBase::PUT_ALLOWED == m2mbase_stub::operation);
 
     m2mobjectinstance_stub::resource = new M2MResource(*m2mobject_stub::inst,
                                                        "name",
