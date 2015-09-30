@@ -134,41 +134,40 @@ void M2MResourceInstance::set_execute_function(execute_callback callback)
 }
 
 bool M2MResourceInstance::set_value(const uint8_t *value,
-                                    const uint32_t value_length)
+                                   const uint32_t value_length)
 {
-    bool success = false;
-    if( value != NULL && value_length > 0 ) {
-        success = true;
-        if(_value) {
-             free(_value);
-             _value = NULL;
-             _value_length = 0;
-        }
-        _value = (uint8_t *)malloc(value_length+1);
-        if(_value) {
-            memset(_value, 0, value_length+1);
-            memcpy((uint8_t *)_value, (uint8_t *)value, value_length);
-            _value_length = value_length;
-            if(M2MBase::Dynamic == mode()) {
-                M2MReportHandler *report_handler = M2MBase::report_handler();
-                if( report_handler && _resource_type != M2MResourceInstance::STRING) {
-                    report_handler->set_value(atof((const char*)_value));
-                    M2MBase::Observation  observation_level = M2MBase::observation_level();
-                    if(M2MBase::O_Attribute == observation_level ||
-                       M2MBase::OI_Attribute == observation_level||
-                       M2MBase::OOI_Attribute == observation_level) {
-                        _object_instance_callback.notification_update(observation_level);
-                    }
-                }
-            } else if(M2MBase::Static == mode()) {
-                M2MObservationHandler *observation_handler = M2MBase::observation_handler();
-                if(observation_handler) {
-                    observation_handler->value_updated(this);
-                }
-            }
-        }
-    }
-    return success;
+   bool success = true;
+   if(_value) {
+        free(_value);
+        _value = NULL;
+        _value_length = 0;
+   }
+   if( value != NULL && value_length > 0 ) {
+       _value = (uint8_t *)malloc(value_length+1);
+       if(_value) {
+           memset(_value, 0, value_length+1);
+           memcpy((uint8_t *)_value, (uint8_t *)value, value_length);
+           _value_length = value_length;
+       }
+   }
+   if(M2MBase::Dynamic == mode()) {
+       M2MReportHandler *report_handler = M2MBase::report_handler();
+       if( report_handler && _resource_type != M2MResourceInstance::STRING) {
+           report_handler->set_value(atof((const char*)_value));
+           M2MBase::Observation  observation_level = M2MBase::observation_level();
+           if(M2MBase::O_Attribute == observation_level ||
+              M2MBase::OI_Attribute == observation_level||
+              M2MBase::OOI_Attribute == observation_level) {
+               _object_instance_callback.notification_update(observation_level);
+           }
+       }
+   } else if(M2MBase::Static == mode()) {
+       M2MObservationHandler *observation_handler = M2MBase::observation_handler();
+       if(observation_handler) {
+           observation_handler->value_updated(this);
+       }
+   }
+   return success;
 }
 
 void M2MResourceInstance::execute(void *arguments)

@@ -59,7 +59,7 @@ void M2MFirmware::create_mandatory_resources()
                                                                  M2MResourceInstance::OPAQUE,
                                                                  false);
     if(res) {
-        res->set_operation(M2MBase::POST_ALLOWED);
+        res->set_operation(M2MBase::PUT_ALLOWED);
     }
 
     res = _firmware_instance->create_dynamic_resource(FIRMWARE_PACKAGE_URI,
@@ -67,7 +67,7 @@ void M2MFirmware::create_mandatory_resources()
                                                     M2MResourceInstance::STRING,
                                                     false);
     if(res) {
-        res->set_operation(M2MBase::POST_ALLOWED);
+        res->set_operation(M2MBase::PUT_ALLOWED);
     }
 
     res = _firmware_instance->create_dynamic_resource(FIRMWARE_UPDATE,
@@ -104,7 +104,7 @@ M2MResource* M2MFirmware::create_resource(FirmwareResource resource, const Strin
         switch(resource) {
             case PackageUri:
                 firmware_id = FIRMWARE_PACKAGE_URI;
-                operation = M2MBase::POST_ALLOWED;
+                operation = M2MBase::PUT_ALLOWED;
                 break;
             case PackageName:
                 firmware_id = FIRMWARE_PACKAGE_NAME;
