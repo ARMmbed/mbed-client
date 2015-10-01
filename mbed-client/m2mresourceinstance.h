@@ -133,6 +133,11 @@ public:
     virtual bool set_value(const uint8_t *value, const uint32_t value_length);
 
     /**
+     * @brief Clears the value of the given resource.
+     */
+    virtual void clear_value();
+
+    /**
      * @brief Executes the function which is set in "set_execute_function".
      * @param arguments, arguments that will be passed to execute which
      * needs to be executed.
