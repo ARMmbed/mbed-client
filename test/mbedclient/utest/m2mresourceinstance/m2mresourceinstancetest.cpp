@@ -81,6 +81,11 @@ TEST(M2MResourceInstance, test_set_value)
     m2m_resourceinstance->test_set_value();
 }
 
+TEST(M2MResourceInstance, test_clear_value)
+{
+    m2m_resourceinstance->test_clear_value();
+}
+
 TEST(M2MResourceInstance, test_get_value)
 {
     m2m_resourceinstance->test_get_value();

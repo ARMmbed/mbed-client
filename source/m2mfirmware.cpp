@@ -125,8 +125,12 @@ M2MResource* M2MFirmware::create_resource(FirmwareResource resource, const Strin
 
             if(res) {
                 res->set_operation(operation);
-                res->set_value((const uint8_t*)value.c_str(),
-                               (uint32_t)value.length());
+                if(value.empty()) {
+                    res->clear_value();
+                } else {
+                    res->set_value((const uint8_t*)value.c_str(),
+                                   (uint32_t)value.length());
+                }
             }
         }
     }
@@ -193,7 +197,12 @@ bool M2MFirmware::set_resource_value(FirmwareResource resource,
            M2MFirmware::PackageName == resource ||
            M2MFirmware::PackageVersion == resource) {
             if (value.size() < 256) {
-                success = res->set_value((const uint8_t*)value.c_str(),(uint32_t)value.length());
+                if(value.empty()) {
+                    res->clear_value();
+                    success = true;
+                } else {
+                    success = res->set_value((const uint8_t*)value.c_str(),(uint32_t)value.length());
+                }
             }
         }
     }

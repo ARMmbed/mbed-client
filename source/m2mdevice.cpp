@@ -128,8 +128,12 @@ M2MResource* M2MDevice::create_resource(DeviceResource resource, const String &v
 
             if(res ) {
                 res->set_operation(operation);
-                res->set_value((const uint8_t*)value.c_str(),
-                               (uint32_t)value.length());
+                if (value.empty()) {
+                    res->clear_value();
+                } else {
+                    res->set_value((const uint8_t*)value.c_str(),
+                                   (uint32_t)value.length());
+                }
             }
         }
     }
@@ -297,8 +301,12 @@ bool M2MDevice::set_resource_value(DeviceResource resource,
            M2MDevice::SoftwareVersion == resource       ||
            M2MDevice::UTCOffset == resource             ||
            M2MDevice::Timezone == resource) {
-
-            success = res->set_value((const uint8_t*)value.c_str(),(uint32_t)value.length());
+                if (value.empty()) {
+                    res->clear_value();
+                    success = true;
+                } else {
+                    success = res->set_value((const uint8_t*)value.c_str(),(uint32_t)value.length());
+                }
         }
     }
     return success;

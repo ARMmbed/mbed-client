@@ -281,6 +281,7 @@ bool M2MReportHandler::set_notification_attribute(char* option,
     else if(strcmp(attribute, CANCEL.c_str()) == 0) {
         success = true;
         _attribute_state |= M2MReportHandler::Cancel;
+        tr_debug("M2MReportHandler::set_notification_attribute cancel");
     }   
     return success;
 }

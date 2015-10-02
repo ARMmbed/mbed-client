@@ -46,6 +46,8 @@ public:
 
     void test_set_value();
 
+    void test_clear_value();
+
     void test_get_value();
 
     void test_value();

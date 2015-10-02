@@ -133,6 +133,11 @@ public:
     virtual bool set_value(const uint8_t *value, const uint32_t value_length);
 
     /**
+     * @brief Clears the value of the given resource.
+     */
+    virtual void clear_value();
+
+    /**
      * @brief Executes the function which is set in "set_execute_function".
      * @param arguments, arguments that will be passed to execute which
      * needs to be executed.
@@ -192,6 +197,10 @@ public:
     virtual sn_coap_hdr_s* handle_post_request(nsdl_s *nsdl,
                                                sn_coap_hdr_s *received_coap_header,
                                                M2MObservationHandler *observation_handler = NULL);
+
+private:
+
+    void report(float value);
 
 private:
 
