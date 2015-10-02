@@ -227,23 +227,33 @@ void Test_M2MResourceInstance::test_set_value()
     m2mbase_stub::report = NULL;
 }
 
+void Test_M2MResourceInstance::test_clear_value()
+{
+    u_int8_t value[] = {"value"};
+    resource_instance->_value = (u_int8_t*)malloc(sizeof(u_int8_t));
+
+    CHECK(resource_instance->set_value(value,(u_int32_t)sizeof(value)) == true);
+    CHECK( resource_instance->_value_length == sizeof(value));
+    CHECK( *resource_instance->_value == *value);
+    resource_instance->clear_value();
+
+    CHECK( resource_instance->_value_length == 0);
+    CHECK( resource_instance->_value == NULL);
+}
+
 void Test_M2MResourceInstance::test_get_value()
 {
     u_int8_t test_value[] = {"value3"};
     u_int32_t value_length((u_int32_t)sizeof(test_value));
 
-    u_int8_t* out_value = (u_int8_t *)malloc(1);
-    u_int32_t out_size = 1;
-
     resource_instance->_value = (u_int8_t *)malloc(value_length);
     resource_instance->_value_length = value_length;
     memcpy((u_int8_t *)resource_instance->_value, (u_int8_t *)test_value, value_length);
 
-    resource_instance->get_value(out_value,out_size);
+    resource_instance->clear_value();
 
-    CHECK(out_size == value_length);
+    CHECK(resource_instance->_value == NULL);
 
-    free(out_value);
 }
 
 void Test_M2MResourceInstance::test_value()

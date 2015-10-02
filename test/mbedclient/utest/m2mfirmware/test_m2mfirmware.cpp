@@ -95,6 +95,7 @@ void Test_M2MFirmware::test_create_resource_string()
 
     CHECK(firmware->create_resource(M2MFirmware::PackageName,"test") != NULL);
     CHECK(M2MBase::GET_ALLOWED == m2mbase_stub::operation);
+    CHECK(firmware->create_resource(M2MFirmware::PackageName,"") != NULL);
 
     // Check size limit
     String test = "";
@@ -194,6 +195,7 @@ void Test_M2MFirmware::test_set_resource_value_string()
     CHECK(firmware->set_resource_value(M2MFirmware::PackageName,"test") == true);
     CHECK(firmware->set_resource_value(M2MFirmware::PackageVersion,"test") == true);
     CHECK(firmware->set_resource_value(M2MFirmware::PackageUri,"test") == true);
+    CHECK(firmware->set_resource_value(M2MFirmware::PackageUri,"") == true);
 
     // Check size limit
     String test = "";

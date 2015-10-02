@@ -200,6 +200,10 @@ public:
 
 private:
 
+    void report(float value);
+
+private:
+
     M2MObjectInstanceCallback               &_object_instance_callback;
     execute_callback                        _execute_callback;
     uint8_t                                 *_value;

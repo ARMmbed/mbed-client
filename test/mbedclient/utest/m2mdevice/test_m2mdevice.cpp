@@ -110,6 +110,7 @@ void Test_M2MDevice::test_create_resource_string()
 
     CHECK(device->create_resource(M2MDevice::DeviceType,"test") != NULL);
     CHECK(M2MBase::GET_ALLOWED == m2mbase_stub::operation);
+    CHECK(device->create_resource(M2MDevice::DeviceType,"") != NULL);
 
 
     CHECK(device->create_resource(M2MDevice::ModelNumber,"test") != NULL);
@@ -277,6 +278,7 @@ void Test_M2MDevice::test_set_resource_value_string()
     CHECK(device->set_resource_value(M2MDevice::SupportedBindingMode,"test") == false);
 
     CHECK(device->set_resource_value(M2MDevice::Manufacturer,"test") == true);
+    CHECK(device->set_resource_value(M2MDevice::Manufacturer,"") == true);
     CHECK(device->set_resource_value(M2MDevice::DeviceType,"test") == true);
     CHECK(device->set_resource_value(M2MDevice::ModelNumber,"test") == true);
     CHECK(device->set_resource_value(M2MDevice::SerialNumber,"test") == true);
@@ -285,6 +287,7 @@ void Test_M2MDevice::test_set_resource_value_string()
     CHECK(device->set_resource_value(M2MDevice::SoftwareVersion,"test") == true);
     CHECK(device->set_resource_value(M2MDevice::UTCOffset,"test") == true);
     CHECK(device->set_resource_value(M2MDevice::Timezone,"test") == true);
+    CHECK(device->set_resource_value(M2MDevice::Timezone,"") == true);
 
     CHECK(device->set_resource_value(M2MDevice::BatteryLevel,"test") == false);
     CHECK(device->set_resource_value(M2MDevice::BatteryStatus,"test") == false);
