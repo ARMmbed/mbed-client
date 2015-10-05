@@ -122,6 +122,9 @@ void Test_M2MReportHandler::test_parse_notification_attribute()
     char* val10_real = {"pmax=30&lt=10&gt=19&pmin=1&st=4"};
     CHECK(true == _handler->parse_notification_attribute(val10_real, M2MBase::Resource ));
 
+    char* val11_real = {"pmax=30&pmin=30"};
+    CHECK(true == _handler->parse_notification_attribute(val11_real, M2MBase::Resource ));
+
     char* val4_real = {"cancel"};
     CHECK(true == _handler->parse_notification_attribute(val4_real, M2MBase::Resource ));
     DOUBLES_EQUAL(0,_handler->_lt,0);
