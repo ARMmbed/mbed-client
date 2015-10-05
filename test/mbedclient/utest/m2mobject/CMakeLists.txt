@@ -24,7 +24,7 @@ set_target_properties(m2mobject
 PROPERTIES COMPILE_FLAGS "${CMAKE_CXX_FLAGS}"
            LINK_FLAGS "${UTEST_LINK_FLAGS}")
 
-set(binary "m2mobject")
+set(binary "m2mobject -ojunit")
 add_test(m2mobject ${binary})
 
 endif()

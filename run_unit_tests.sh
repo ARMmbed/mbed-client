@@ -18,8 +18,7 @@ echo "Build mbed Client API unit tests"
 echo
 yt target x86-linux-native-coverage
 yt clean
-yt build
-yt test --no-build -- -ojunit
+yt test
 echo
 echo Create results
 echo
@@ -28,7 +27,7 @@ rm -rf coverage
 mkdir results
 mkdir coverage
 
-find ./ -name '*.xml' | xargs cp -t ./results/
+find ./build -name '*.xml' | xargs cp -t ./results/
 find ./build -name '*.gcno' | xargs cp -t ./coverage/
 find ./build -name '*.gcda' | xargs cp -t ./coverage/
 exclude_files="${PWD}/test/"

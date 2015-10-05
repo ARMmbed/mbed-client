@@ -16,7 +16,7 @@ target_link_libraries(m2mbase
 set_target_properties(m2mbase
 PROPERTIES COMPILE_FLAGS "${CMAKE_CXX_FLAGS}"
            LINK_FLAGS "${UTEST_LINK_FLAGS}")
-set(binary "m2mbase")
+set(binary "m2mbase -ojunit")
 add_test(m2mbase ${binary})
 
 
