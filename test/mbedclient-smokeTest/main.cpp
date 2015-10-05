@@ -29,6 +29,7 @@
 // Minar for event scheduling
 #include "minar/minar.h"
 
+using namespace mbed::util;
 const String &MANUFACTURER = "ARM";
 const String &TYPE = "type";
 

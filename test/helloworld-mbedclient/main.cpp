@@ -32,6 +32,7 @@
 #include "test_env.h"
 // TODO: Remove when yotta supports init.
 #include "lwipv4_init.h"
+using namespace mbed::util;
 #endif
 
 #include "mbed-client/m2minterfacefactory.h"
