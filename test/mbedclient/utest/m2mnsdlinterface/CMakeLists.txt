@@ -26,7 +26,7 @@ target_link_libraries(m2mnsdlinterface
     CppUTestExt
 )
 set_target_properties(m2mnsdlinterface
-PROPERTIES COMPILE_FLAGS "${UTEST_COMPILE_FLAGS}"
+PROPERTIES COMPILE_FLAGS "${CMAKE_CXX_FLAGS}"
            LINK_FLAGS "${UTEST_LINK_FLAGS}")
 set(binary "m2mnsdlinterface -ojunit")
 add_test(m2mnsdlinterface ${binary})

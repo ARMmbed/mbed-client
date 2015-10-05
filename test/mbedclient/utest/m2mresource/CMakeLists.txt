@@ -16,7 +16,7 @@ target_link_libraries(m2mresource
     CppUTestExt
 )
 set_target_properties(m2mresource
-PROPERTIES COMPILE_FLAGS "${UTEST_COMPILE_FLAGS}"
+PROPERTIES COMPILE_FLAGS "${CMAKE_CXX_FLAGS}"
            LINK_FLAGS "${UTEST_LINK_FLAGS}")
 set(binary "m2mresource -ojunit")
 add_test(m2mresource ${binary})

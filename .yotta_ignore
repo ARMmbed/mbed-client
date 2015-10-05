@@ -3,3 +3,5 @@
 # ignore linux test application
 test/lwm2mtestapplication/*
 test/lwm2m/*
+coverage/*
+results/*

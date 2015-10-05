@@ -1,5 +1,5 @@
-if(TARGET_LIKE_MBED_CLIENT_LINUX_UNIT_TESTS)
-SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -include /usr/include/CppUTest/MemoryLeakDetectorMallocMacros.h -include /usr/include/CppUTest/MemoryLeakDetectorNewMacros.h")
+if(TARGET_LIKE_X86_LINUX_NATIVE_COVERAGE)
+SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -include /usr/include/CppUTest/MemoryLeakDetectorMallocMacros.h -include /usr/include/CppUTest/MemoryLeakDetectorNewMacros.h -D__thumb2__ -w")
 include_directories($ENV{CPPUTEST_HOME}/include)
 link_directories($ENV{CPPUTEST_HOME}/lib) 
 MACRO(SUBDIRLIST result curdir)

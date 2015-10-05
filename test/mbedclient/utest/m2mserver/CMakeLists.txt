@@ -19,7 +19,7 @@ target_link_libraries(m2mserver
     CppUTestExt
 )
 set_target_properties(m2mserver
-PROPERTIES COMPILE_FLAGS "${UTEST_COMPILE_FLAGS}"
+PROPERTIES COMPILE_FLAGS "${CMAKE_CXX_FLAGS}"
            LINK_FLAGS "${UTEST_LINK_FLAGS}")
 set(binary "m2mserver -ojunit")
 add_test(m2mserver ${binary})
