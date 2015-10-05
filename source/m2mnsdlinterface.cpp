@@ -454,15 +454,12 @@ uint8_t M2MNsdlInterface::received_from_server_callback(struct nsdl_s * /*nsdl_h
                             if(base) {
                                 M2MObject* object = (M2MObject*)base;
                                 object->create_object_instance(instance_id);
-                                coap_response = object->handle_post_request(_nsdl_handle,
-                                                                            coap_header,
-                                                                            this);
+                                value_updated(object);
                             } else {
                                 coap_response = sn_nsdl_build_response(_nsdl_handle,
                                                                        coap_header,
                                                                        COAP_MSG_CODE_RESPONSE_METHOD_NOT_ALLOWED);
                             }
-
                         }
                     }else{
                         coap_response = sn_nsdl_build_response(_nsdl_handle,
@@ -827,6 +824,8 @@ bool M2MNsdlInterface::create_nsdl_resource_structure(M2MResource *res,
 
                     success = create_nsdl_resource((*it),inst_name);
                 }
+                // Register the main Resource as well along with ResourceInstances
+                success = create_nsdl_resource(res,res_name);
             }
         } else {
             tr_debug("M2MNsdlInterface::create_nsdl_resource_structure - res_name %s", res_name.c_str());

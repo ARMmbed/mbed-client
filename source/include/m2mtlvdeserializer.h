@@ -29,6 +29,19 @@ class M2MTLVDeserializer {
 
 public :
 
+    typedef enum {
+        None,
+        NotFound,
+        NotAllowed,
+        NotValid
+    } Error;
+
+    typedef enum {
+        Put,
+        Post
+    } Operation;
+
+
     /**
     * Constructor.
     */
@@ -79,33 +92,61 @@ public :
     /**
      * Deserialises the given binary that must encode object instances. Binary
      * array can be checked before invoking this method with 
-     * {@link #isObjectInstance(byte[])}.
-     * @param tlv Binary in OMA-TLV format
-     * @return List of <code>M2MObjectInstance</code> objects.
-     * @throws IllegalArgumentException if given binary is not a valid OMA-TLV
-     *         or it encodes a structure other than object instances.
-     * @see #deserializeResources(byte[])
      */
-    void deserialise_object_instances(uint8_t* tlv, uint32_t tlv_size, M2MObjectInstanceList &list);
+    M2MTLVDeserializer::Error deserialise_object_instances(uint8_t* tlv,
+                                                           uint32_t tlv_size,
+                                                           M2MObject &object,
+                                                           M2MTLVDeserializer::Operation operation);
 
     /**
      * Deserialises the given binary that must encode resources. Binary array 
-     * can be checked before invoking this method with {@link #isResource(byte[])}.
-     * @param tlv Binary in OMA-TLV format
-     * @return List of <code>M2MObjectInstance</code> objects.
-     * @throws IllegalArgumentException if given binary is not a valid OMA-TLV
-     *         or it encodes a structure other than object instances.
-     * @see #deserializeResources(byte[])
+     * can be checked before invoking this method.
      */
-    void deserialize_resources(uint8_t *tlv, uint32_t tlv_size, M2MResourceList &list);
+    M2MTLVDeserializer::Error deserialize_resources(uint8_t *tlv,
+                                                    uint32_t tlv_size,
+                                                    M2MObjectInstance &object_instance,
+                                                    M2MTLVDeserializer::Operation operation);
+
+    /**
+     * Deserialises the given binary that must encode resource instances. Binary array
+     * can be checked before invoking this method.
+     */
+    M2MTLVDeserializer::Error deserialize_resource_instances(uint8_t *tlv,
+                                                             uint32_t tlv_size,
+                                                             M2MResource &resource,
+                                                             M2MTLVDeserializer::Operation operation);
+
     
 private:
 
-    void deserialize_object_instances(uint8_t *tlv, uint32_t tlv_size, uint32_t offset, M2MObjectInstanceList &list);
+    M2MTLVDeserializer::Error deserialize_object_instances(uint8_t *tlv,
+                                                           uint32_t tlv_size,
+                                                           uint32_t offset,
+                                                           M2MObject &object,
+                                                           M2MTLVDeserializer::Operation operation,
+                                                           bool update_value);
     
-    void deserialize_resources(uint8_t *tlv, uint32_t tlv_size, uint32_t offset, M2MResourceList &list);
-    
-    void deserialize_resource_instances(uint8_t *tlv, uint32_t tlv_size, uint32_t offset, M2MResourceInstanceList &list);
+    M2MTLVDeserializer::Error deserialize_resources(uint8_t *tlv,
+                                                    uint32_t tlv_size,
+                                                    uint32_t offset,
+                                                    M2MObjectInstance &object_instance,
+                                                    M2MTLVDeserializer::Operation operation,
+                                                    bool update_value);
+
+    M2MTLVDeserializer::Error deserialize_resource_instances(uint8_t *tlv,
+                                                             uint32_t tlv_size,
+                                                             uint32_t offset,
+                                                             M2MResource &resource,
+                                                             M2MObjectInstance &object_instance,
+                                                             M2MTLVDeserializer::Operation operation,
+                                                             bool update_value);
+
+    M2MTLVDeserializer::Error deserialize_resource_instances(uint8_t *tlv,
+                                                             uint32_t tlv_size,
+                                                             uint32_t offset,
+                                                             M2MResource &resource,
+                                                             M2MTLVDeserializer::Operation operation,
+                                                             bool update_value);
 
     bool is_object_instance(uint8_t *tlv, uint32_t offset);
     

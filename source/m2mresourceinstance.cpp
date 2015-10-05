@@ -173,6 +173,12 @@ void M2MResourceInstance::report(float value)
         M2MReportHandler *report_handler = M2MBase::report_handler();
         if( report_handler && _resource_type != M2MResourceInstance::STRING) {
             report_handler->set_value(value);
+        }
+    }
+    if(M2MBase::Dynamic == mode()) {
+        M2MReportHandler *report_handler = M2MBase::report_handler();
+        if( report_handler && _resource_type != M2MResourceInstance::STRING) {
+            report_handler->set_value(atof((const char*)_value));
             M2MBase::Observation  observation_level = M2MBase::observation_level();
             if(M2MBase::O_Attribute == observation_level ||
                M2MBase::OI_Attribute == observation_level||
@@ -238,6 +244,7 @@ sn_coap_hdr_s* M2MResourceInstance::handle_get_request(nsdl_s *nsdl,
                                                    received_coap_header,
                                                    COAP_MSG_CODE_RESPONSE_CONTENT);
             if(coap_response) {
+
                 char *content_type = (char*)malloc(20);
                 int content_type_size = snprintf(content_type, 20,"%x",coap_content_type());
 
@@ -314,11 +321,11 @@ sn_coap_hdr_s* M2MResourceInstance::handle_get_request(nsdl_s *nsdl,
                 }
             }
         }else {
-            tr_error("M2MResourceInstance::handle_get_request - Return COAP_MSG_CODE_RESPONSE_BAD_REQUEST");
+            tr_error("M2MResourceInstance::handle_get_request - Return COAP_MSG_CODE_RESPONSE_METHOD_NOT_ALLOWED");
             // Operation is not allowed.
             coap_response = sn_nsdl_build_response(nsdl,
                                                    received_coap_header,
-                                                   COAP_MSG_CODE_RESPONSE_BAD_REQUEST);
+                                                   COAP_MSG_CODE_RESPONSE_METHOD_NOT_ALLOWED);
             if(coap_response) {
                 coap_response->options_list_ptr = 0;
                 coap_response->content_type_ptr = 0;
@@ -368,10 +375,10 @@ sn_coap_hdr_s* M2MResourceInstance::handle_put_request(nsdl_s *nsdl,
                                                    msg_code);
         } else {
             // Operation is not allowed.
-            tr_error("M2MResourceInstance::handle_put_request() - COAP_MSG_CODE_RESPONSE_BAD_REQUEST");
+            tr_error("M2MResourceInstance::handle_put_request() - COAP_MSG_CODE_RESPONSE_METHOD_NOT_ALLOWED");
             coap_response = sn_nsdl_build_response(nsdl,
                                                    received_coap_header,
-                                                   COAP_MSG_CODE_RESPONSE_BAD_REQUEST);
+                                                   COAP_MSG_CODE_RESPONSE_METHOD_NOT_ALLOWED);
             if(coap_response) {
                 coap_response->options_list_ptr = 0;
                 coap_response->content_type_ptr = 0;

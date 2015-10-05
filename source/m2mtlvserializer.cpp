@@ -36,6 +36,13 @@ uint8_t* M2MTLVSerializer::serialize(M2MResourceList resource_list, uint32_t &si
     return serialize_resources(resource_list, size,valid);
 }
 
+uint8_t* M2MTLVSerializer::serialize(M2MResource *resource, uint32_t &size)
+{
+    uint8_t* data = NULL;
+    serialize(resource, data, size);
+    return data;
+}
+
 uint8_t* M2MTLVSerializer::serialize_object_instances(M2MObjectInstanceList object_instance_list, uint32_t &size)
 {
     uint8_t *data = NULL;

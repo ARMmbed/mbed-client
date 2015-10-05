@@ -187,7 +187,7 @@ public:
                                               M2MObservationHandler *observation_handler = NULL);
 
     /**
-     * @brief Handles GET request for the registered objects.
+     * @brief Handles POST request for the registered objects.
      * @param nsdl, NSDL handler for the Coap library.
      * @param received_coap_header, Received CoAP message from the server.
      * @param observation_handler, Handler object for sending

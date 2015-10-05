@@ -185,7 +185,7 @@ public:
 
     bool create_generic_object() {
         bool success = false;
-        _object = M2MInterfaceFactory::create_object("Test");
+        _object = M2MInterfaceFactory::create_object("10");
         if(_object) {
             _object->set_operation(M2MBase::GET_PUT_POST_ALLOWED);
             M2MObjectInstance* inst = _object->create_object_instance();
@@ -437,11 +437,11 @@ int main() {
         printf("\nGeneric object created\n");
     }
 
-    printf("Bootstrapping endpoint\n");
-    mbed_client.test_bootstrap();
+//    printf("Bootstrapping endpoint\n");
+//    mbed_client.test_bootstrap();
 
-//    printf("Registering endpoint\n");
-//    mbed_client.test_register();
+    printf("Registering endpoint\n");
+    mbed_client.test_register();
 
 
     pthread_create(&bootstrap_thread, NULL, &wait_for_bootstrap, (void*) &mbed_client);

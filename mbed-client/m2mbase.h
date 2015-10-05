@@ -78,15 +78,23 @@ public:
      * supported by a given resource.
     */
     typedef enum {
-        NOT_ALLOWED           = 0x00,
-        GET_ALLOWED           = 0x01,
-        PUT_ALLOWED           = 0x02,
-        GET_PUT_ALLOWED       = 0x03,
-        POST_ALLOWED          = 0x04,
-        GET_POST_ALLOWED      = 0x05,
-        PUT_POST_ALLOWED      = 0x06,
-        GET_PUT_POST_ALLOWED  = 0x07,
-        DELETE_ALLOWED        = 0x08
+        NOT_ALLOWED                 = 0x00,
+        GET_ALLOWED                 = 0x01,
+        PUT_ALLOWED                 = 0x02,
+        GET_PUT_ALLOWED             = 0x03,
+        POST_ALLOWED                = 0x04,
+        GET_POST_ALLOWED            = 0x05,
+        PUT_POST_ALLOWED            = 0x06,
+        GET_PUT_POST_ALLOWED        = 0x07,
+        DELETE_ALLOWED              = 0x08,
+        GET_DELETE_ALLOWED          = 0x09,
+        PUT_DELETE_ALLOWED          = 0x0A,
+        GET_PUT_DELETE_ALLOWED      = 0x0B,
+        POST_DELETE_ALLOWED         = 0x0C,
+        GET_POST_DELETE_ALLOWED     = 0x0D,
+        PUT_POST_DELETE_ALLOWED     = 0x0E,
+        GET_PUT_POST_DELETE_ALLOWED = 0x0F,
+
     }Operation;
 
 protected:
