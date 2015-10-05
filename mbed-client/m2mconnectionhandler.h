@@ -108,7 +108,7 @@ public:
      * @param len Length of a buffer.
      * @return Number of bytes sent or -1 if failed.
      */
-    int sendToSocket(const unsigned char *buf, size_t len);
+    int send_to_socket(const unsigned char *buf, size_t len);
 
     /**
      * @brief receiveFromSocket Receives directly from a socket. This
@@ -117,7 +117,7 @@ public:
      * @param len Length of a buffer.
      * @return Number of bytes read or -1 if failed.
      */
-    int receiveFromSocket(unsigned char *buf, size_t len);
+    int receive_from_socket(unsigned char *buf, size_t len);
 
 
     /**

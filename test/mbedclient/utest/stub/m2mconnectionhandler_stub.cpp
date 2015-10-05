@@ -73,10 +73,10 @@ void M2MConnectionHandler::stop_listening()
 {
 }
 
-int M2MConnectionHandler::sendToSocket(const unsigned char *, size_t ){
+int M2MConnectionHandler::send_to_socket(const unsigned char *, size_t ){
     return m2mconnectionhandler_stub::int_value;
 }
 
-int M2MConnectionHandler::receiveFromSocket(unsigned char *buf, size_t len){
+int M2MConnectionHandler::receive_from_socket(unsigned char *, size_t){
     return m2mconnectionhandler_stub::int_value;
 }
