@@ -327,12 +327,16 @@ void M2MReportHandler::handle_timers()
 {
     uint64_t time_interval = 0;    
     if(_pmin > 0) {
-        _pmin_exceeded = false;
-        time_interval = (uint64_t)(_pmin * 1000);
-        tr_debug("M2MReportHandler::handle_timers() - Start PMIN interval: %d", (int)time_interval);
-        _pmin_timer->start_timer(time_interval,
-                                 M2MTimerObserver::PMinTimer,
-                                 true);
+        if (_pmin == _pmax) {
+            _pmin_exceeded = true;
+        } else {
+            _pmin_exceeded = false;
+            time_interval = (uint64_t)(_pmin * 1000);
+            tr_debug("M2MReportHandler::handle_timers() - Start PMIN interval: %d", (int)time_interval);
+            _pmin_timer->start_timer(time_interval,
+                                     M2MTimerObserver::PMinTimer,
+                                     true);
+        }
     }
     if (_pmax > 0) {
         time_interval = (uint64_t)(_pmax * 1000);
@@ -347,7 +351,7 @@ bool M2MReportHandler::check_attribute_validity()
 {
     bool success = true;
     if ((_attribute_state & M2MReportHandler::Pmax) == M2MReportHandler::Pmax &&
-            ((_pmax >= -1.0f) && (_pmin >= _pmax))) {
+            ((_pmax >= -1.0f) && (_pmin > _pmax))) {
         success = false;
     }
     float low = _lt + 2 * _st;

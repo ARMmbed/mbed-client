@@ -23,7 +23,7 @@ ENDFOREACH()
 
 endif()
 
-if(TARGET_LIKE_LINUX)
+if(TARGET_LIKE_LINUX AND NOT TARGET_LIKE_X86_LINUX_NATIVE_COVERAGE)
 add_executable(mbed-client-test-mbedclient_linux 
         "mbedclient_linux/main.cpp"
 )
