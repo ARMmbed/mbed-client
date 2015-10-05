@@ -14,10 +14,10 @@ target_link_libraries(nsdlaccesshelper
     CppUTestExt
 )
 set_target_properties(nsdlaccesshelper
-PROPERTIES COMPILE_FLAGS "${UTEST_COMPILE_FLAGS}"
+PROPERTIES COMPILE_FLAGS "${CMAKE_CXX_FLAGS}"
            LINK_FLAGS "${UTEST_LINK_FLAGS}")
 
-set(binary "nsdlaccesshelper -ojunit")
+set(binary "nsdlaccesshelper")
 add_test(nsdlaccesshelper ${binary})
 
 endif()

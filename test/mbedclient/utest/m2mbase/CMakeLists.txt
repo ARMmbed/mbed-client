@@ -14,9 +14,9 @@ target_link_libraries(m2mbase
     CppUTestExt
 )
 set_target_properties(m2mbase
-PROPERTIES COMPILE_FLAGS "${UTEST_COMPILE_FLAGS}"
+PROPERTIES COMPILE_FLAGS "${CMAKE_CXX_FLAGS}"
            LINK_FLAGS "${UTEST_LINK_FLAGS}")
-set(binary "m2mbase -ojunit")
+set(binary "m2mbase")
 add_test(m2mbase ${binary})
 
 

@@ -18,9 +18,9 @@ target_link_libraries(m2mreporthandler
 )
 
 set_target_properties(m2mreporthandler
-PROPERTIES COMPILE_FLAGS "${UTEST_COMPILE_FLAGS}"
+PROPERTIES COMPILE_FLAGS "${CMAKE_CXX_FLAGS}"
            LINK_FLAGS "${UTEST_LINK_FLAGS}")
-set(binary "m2mreporthandler -ojunit")
+set(binary "m2mreporthandler")
 add_test(m2mreporthandler ${binary})
 
 endif()
