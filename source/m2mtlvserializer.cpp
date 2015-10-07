@@ -94,11 +94,15 @@ void M2MTLVSerializer::serialize(uint16_t id, M2MObjectInstance *object_instance
     free(resource_data);
 }
 
-bool M2MTLVSerializer::serialize (M2MResource *resource, uint8_t *&data, uint32_t &size)
+bool M2MTLVSerializer::serialize(M2MResource *resource, uint8_t *&data, uint32_t &size)
 {
-    return resource->supports_multiple_instances() ?
-            serialize_multiple_resource(resource, data, size) :
-            serialize_resource(resource, data, size);
+    bool success = false;
+    if(resource->name_id() != -1) {
+        success = resource->supports_multiple_instances() ?
+                serialize_multiple_resource(resource, data, size) :
+                serialize_resource(resource, data, size);
+    }
+    return success;
 }
 
 bool M2MTLVSerializer::serialize_resource(M2MResource *resource, uint8_t *&data, uint32_t &size)

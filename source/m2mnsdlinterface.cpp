@@ -499,7 +499,11 @@ uint8_t M2MNsdlInterface::resource_callback(struct nsdl_s */*nsdl_handle*/,
         } else if(COAP_MSG_CODE_REQUEST_PUT == received_coap_header->msg_code) {
             coap_response = base->handle_put_request(_nsdl_handle, received_coap_header,this);
         } else if(COAP_MSG_CODE_REQUEST_POST == received_coap_header->msg_code) {
-            coap_response = base->handle_post_request(_nsdl_handle, received_coap_header,this);
+            if(base->base_type() == M2MBase::ResourceInstance) {
+                msg_code = COAP_MSG_CODE_RESPONSE_BAD_REQUEST;
+            } else {
+                coap_response = base->handle_post_request(_nsdl_handle, received_coap_header,this);
+            }
         } else if(COAP_MSG_CODE_REQUEST_DELETE == received_coap_header->msg_code) {
             // Delete the object instance
             tr_debug("M2MNsdlInterface::resource_callback() - DELETE the object instance");

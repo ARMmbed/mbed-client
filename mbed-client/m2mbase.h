@@ -45,7 +45,8 @@ public:
     typedef enum {
         Object = 0x0,
         Resource = 0x1,
-        ObjectInstance = 0x2
+        ObjectInstance = 0x2,
+        ResourceInstance = 0x3
     } BaseType;
 
     /**

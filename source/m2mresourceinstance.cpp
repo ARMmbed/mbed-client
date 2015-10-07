@@ -67,7 +67,7 @@ M2MResourceInstance::M2MResourceInstance(const String &res_name,
  _resource_type(type)
 {
     M2MBase::set_resource_type(resource_type);
-    M2MBase::set_base_type(M2MBase::Resource);
+    M2MBase::set_base_type(M2MBase::ResourceInstance);
 }
 
 M2MResourceInstance::M2MResourceInstance(const String &res_name,
@@ -388,41 +388,3 @@ sn_coap_hdr_s* M2MResourceInstance::handle_put_request(nsdl_s *nsdl,
     return coap_response;
 }
 
-sn_coap_hdr_s* M2MResourceInstance::handle_post_request(nsdl_s *nsdl,
-                                                sn_coap_hdr_s *received_coap_header,
-                                                M2MObservationHandler */*observation_handler*/)
-{
-    tr_debug("M2MResourceInstance::handle_post_request()");
-    sn_coap_hdr_s * coap_response = NULL;
-    sn_coap_msg_code_e msg_code = COAP_MSG_CODE_RESPONSE_CHANGED; // 2.04
-    // process the POST if we have registered a callback for it
-    if(received_coap_header) {
-        if ((operation() & SN_GRS_POST_ALLOWED) != 0) {
-            void *arguments = NULL;
-            if(received_coap_header->options_list_ptr) {
-                if(received_coap_header->options_list_ptr->uri_query_ptr) {
-                    arguments = (void*)malloc(received_coap_header->options_list_ptr->uri_query_len+1);
-                    if (arguments){
-                        memset(arguments, 0, received_coap_header->options_list_ptr->uri_query_len+1);
-                        memcpy(arguments,
-                            received_coap_header->options_list_ptr->uri_query_ptr,
-                            received_coap_header->options_list_ptr->uri_query_len);
-                    }
-                }
-            }
-            tr_debug("M2MResourceInstance::handle_post_request - Execute resource function");
-            execute(arguments);
-            free(arguments);
-        } else { // if ((object->operation() & SN_GRS_POST_ALLOWED) != 0)
-            tr_error("M2MResourceInstance::handle_post_request - COAP_MSG_CODE_RESPONSE_METHOD_NOT_ALLOWED");
-            msg_code = COAP_MSG_CODE_RESPONSE_METHOD_NOT_ALLOWED; // 4.05
-        }
-    } else { //if(object && received_coap_header)
-        tr_error("M2MResourceInstance::handle_post_request - COAP_MSG_CODE_RESPONSE_NOT_FOUND");
-        msg_code = COAP_MSG_CODE_RESPONSE_NOT_FOUND; // 4.01
-    }
-    coap_response = sn_nsdl_build_response(nsdl,
-                                           received_coap_header,
-                                           msg_code);
-    return coap_response;
-}

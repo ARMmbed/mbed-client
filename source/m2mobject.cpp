@@ -27,7 +27,7 @@ M2MObject::M2MObject(const String &object_name)
 {
     M2MBase::set_base_type(M2MBase::Object);
     if(M2MBase::name_id() != -1) {
-        M2MBase::set_coap_content_type(99);
+        M2MBase::set_coap_content_type(COAP_CONTENT_OMA_TLV_TYPE);
     }
 }
 
