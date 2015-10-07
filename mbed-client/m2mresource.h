@@ -175,6 +175,7 @@ public:
     virtual sn_coap_hdr_s* handle_post_request(nsdl_s *nsdl,
                                                sn_coap_hdr_s *received_coap_header,
                                                M2MObservationHandler *observation_handler = NULL);
+
 private:
 
     M2MResourceInstanceList     _resource_instance_list; // owned
