@@ -23,6 +23,9 @@
 #include "m2mtlvserializer_stub.h"
 #include "m2mreporthandler_stub.h"
 
+// Length is 65
+String max_length = "65656565656565656565656565656565656565656565656565656565656565656";
+
 class Handler : public M2MObservationHandler {
 
 public:
@@ -104,6 +107,9 @@ void Test_M2MObjectInstance::test_create_static_resource()
     res = object->create_static_resource("","type",M2MResourceInstance::STRING,value,(u_int32_t)sizeof(value));
     CHECK(res == NULL);
 
+    res = object->create_static_resource(max_length,"type",M2MResourceInstance::STRING,value,(u_int32_t)sizeof(value));
+    CHECK(res == NULL);
+
     delete name;
     name = NULL;
 }
@@ -141,6 +147,13 @@ void Test_M2MObjectInstance::test_create_static_resource_instance()
                                                   (u_int32_t)sizeof(value),0);
     CHECK(ins == NULL);
 
+    delete ins;
+
+    ins = object->create_static_resource_instance(max_length,"type",
+                                                  M2MResourceInstance::STRING,value,
+                                                  (u_int32_t)sizeof(value),0);
+    CHECK(ins == NULL);
+
     delete name;
     name = NULL;
 }
@@ -174,6 +187,12 @@ void Test_M2MObjectInstance::test_create_dynamic_resource_instance()
 
     CHECK(ins == NULL);
 
+    ins = object->create_dynamic_resource_instance(max_length,"type",
+                                                   M2MResourceInstance::STRING,
+                                                   false,1);
+    CHECK(ins == NULL);
+
+
     delete name;
     name = NULL;
 }
@@ -193,6 +212,9 @@ void Test_M2MObjectInstance::test_create_dynamic_resource()
 
     M2MResource * res2 = object->create_dynamic_resource("","type",M2MResourceInstance::STRING,false,false);
     CHECK(res2 == NULL);
+
+    M2MResource * res3 = object->create_dynamic_resource(max_length,"type",M2MResourceInstance::STRING,false,false);
+    CHECK(res3 == NULL);
 
     delete name;
     name = NULL;

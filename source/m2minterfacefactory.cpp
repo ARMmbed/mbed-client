@@ -42,15 +42,24 @@ M2MInterface* M2MInterfaceFactory::create_interface(M2MInterfaceObserver &observ
     tr_debug("M2MInterfaceFactory::create_interface - parameters NetworkStack : %d",(int)stack);
     M2MInterfaceImpl *interface = NULL;
 
+
     bool endpoint_type_valid = true;
     if(!endpoint_type.empty()) {
-        if(endpoint_type.size() > ENDPOINT_LENGTH){
+        if(endpoint_type.size() > MAX_ALLOWED_STRING_LENGTH){
             endpoint_type_valid = false;
         }
     }
+
+    bool domain_valid = true;
+    if(!domain.empty()) {
+        if(domain.size() > MAX_ALLOWED_STRING_LENGTH){
+            domain_valid = false;
+        }
+    }
+
     if(((life_time == -1) || (life_time >= MINIMUM_REGISTRATION_TIME)) &&
-       !endpoint_name.empty() && (endpoint_name.size() <= ENDPOINT_LENGTH) &&
-       endpoint_type_valid) {
+       !endpoint_name.empty() && (endpoint_name.size() <= MAX_ALLOWED_STRING_LENGTH) &&
+       endpoint_type_valid && domain_valid) {
         tr_debug("M2MInterfaceFactory::create_interface - Creating M2MInterfaceImpl");
         interface = new M2MInterfaceImpl(observer, endpoint_name,
                                          endpoint_type, life_time,
@@ -93,9 +102,10 @@ M2MFirmware* M2MInterfaceFactory::create_firmware()
 M2MObject* M2MInterfaceFactory::create_object(const String &name)
 {
     tr_debug("M2MInterfaceFactory::create_object : Name : %s", name.c_str());
-    if( name.empty() ){
+    if(name.size() > MAX_ALLOWED_STRING_LENGTH || name.empty()){
         return NULL;
     }
+
     M2MObject *object = NULL;
     object = new M2MObject(name);
     return object;
