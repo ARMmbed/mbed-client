@@ -82,6 +82,8 @@ public:
      */
     uint8_t* serialize(M2MResourceList resource_list, uint32_t &size);
 
+    uint8_t* serialize(M2MResource *resource, uint32_t &size);
+
 private :
 
     uint8_t* serialize_object_instances(M2MObjectInstanceList object_instance_list, uint32_t &size);

@@ -454,15 +454,12 @@ uint8_t M2MNsdlInterface::received_from_server_callback(struct nsdl_s * /*nsdl_h
                             if(base) {
                                 M2MObject* object = (M2MObject*)base;
                                 object->create_object_instance(instance_id);
-                                coap_response = object->handle_post_request(_nsdl_handle,
-                                                                            coap_header,
-                                                                            this);
+                                value_updated(object);
                             } else {
                                 coap_response = sn_nsdl_build_response(_nsdl_handle,
                                                                        coap_header,
                                                                        COAP_MSG_CODE_RESPONSE_METHOD_NOT_ALLOWED);
                             }
-
                         }
                     }else{
                         coap_response = sn_nsdl_build_response(_nsdl_handle,
@@ -502,7 +499,11 @@ uint8_t M2MNsdlInterface::resource_callback(struct nsdl_s */*nsdl_handle*/,
         } else if(COAP_MSG_CODE_REQUEST_PUT == received_coap_header->msg_code) {
             coap_response = base->handle_put_request(_nsdl_handle, received_coap_header,this);
         } else if(COAP_MSG_CODE_REQUEST_POST == received_coap_header->msg_code) {
-            coap_response = base->handle_post_request(_nsdl_handle, received_coap_header,this);
+            if(base->base_type() == M2MBase::ResourceInstance) {
+                msg_code = COAP_MSG_CODE_RESPONSE_BAD_REQUEST;
+            } else {
+                coap_response = base->handle_post_request(_nsdl_handle, received_coap_header,this);
+            }
         } else if(COAP_MSG_CODE_REQUEST_DELETE == received_coap_header->msg_code) {
             // Delete the object instance
             tr_debug("M2MNsdlInterface::resource_callback() - DELETE the object instance");
@@ -827,6 +828,8 @@ bool M2MNsdlInterface::create_nsdl_resource_structure(M2MResource *res,
 
                     success = create_nsdl_resource((*it),inst_name);
                 }
+                // Register the main Resource as well along with ResourceInstances
+                success = create_nsdl_resource(res,res_name);
             }
         } else {
             tr_debug("M2MNsdlInterface::create_nsdl_resource_structure - res_name %s", res_name.c_str());

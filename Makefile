@@ -41,8 +41,6 @@ ifeq ($(DEBUG),1)
 override CFLAGS += -DHAVE_DEBUG
 endif
 
-TESTDIRS := $(UNITTESTS:%=build-%)
-CLEANTESTDIRS := $(UNITTESTS:%=clean-%)
 COVERAGEFILE := ./lcov/coverage.info
 
 #
@@ -55,37 +53,7 @@ $(eval $(call generate_rules,$(LIB),$(SRCS)))
 # Extend default clean rule
 clean: clean-extra
 
-.PHONY: release
-release:
-	7z a nanostack_$(VERSION).zip *.a *.lib include
-
-$(TESTDIRS):
-	@make -C $(@:build-%=%)
-
 $(CLEANDIRS):
 	@make -C $(@:clean-%=%) clean
 
-$(CLEANTESTDIRS):
-	@make -C $(@:clean-%=%) clean
-
-.PHONY: test
-test: $(TESTDIRS)
-	@mkdir -p lcov
-	@mkdir -p lcov/results
-	@rm -f lcov/results/*
-	@find ./test -name '*.xml' | xargs cp -t ./lcov/results/
-	@rm -f lcov/index.xml
-	@./xsl_script.sh
-	@cp junit_xsl.xslt lcov/.
-	@xsltproc -o lcov/testresults.html lcov/junit_xsl.xslt lcov/index.xml
-	@rm -f lcov/junit_xsl.xslt
-	@rm -f lcov/index.xml
-	@rm -rf lcov/results
-	@lcov -d test/. -c -o $(COVERAGEFILE)
-	@lcov -q -r $(COVERAGEFILE) "/usr*" -o $(COVERAGEFILE)
-	@lcov -q -r $(COVERAGEFILE) "/test*" -o $(COVERAGEFILE)
-	@genhtml -q $(COVERAGEFILE) --show-details --prefix $(CURDIR:%/applications/libService=%) --output-directory lcov/html
-	@echo LibService unit tests built
-
-clean-extra: $(CLEANDIRS) \
-	$(CLEANTESTDIRS)
+clean-extra: $(CLEANDIRS)

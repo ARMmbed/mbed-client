@@ -110,6 +110,9 @@ M2MBase::M2MBase(const String & resource_name,
 {
     if(is_integer(_name) && _name.size() <= MAX_ALLOWED_STRING_LENGTH) {
         _name_id = strtoul(_name.c_str(), NULL, 10);
+        if(_name_id > 65535){
+            _name_id = -1;
+        }
     } else {
         _name_id = -1;
     }

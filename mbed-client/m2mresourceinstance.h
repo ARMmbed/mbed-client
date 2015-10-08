@@ -186,18 +186,6 @@ public:
                                               sn_coap_hdr_s *received_coap_header,
                                               M2MObservationHandler *observation_handler = NULL);
 
-    /**
-     * @brief Handles GET request for the registered objects.
-     * @param nsdl, NSDL handler for the Coap library.
-     * @param received_coap_header, Received CoAP message from the server.
-     * @param observation_handler, Handler object for sending
-     * observation callbacks.
-     * @return sn_coap_hdr_s,  Message that needs to be sent to server.
-     */
-    virtual sn_coap_hdr_s* handle_post_request(nsdl_s *nsdl,
-                                               sn_coap_hdr_s *received_coap_header,
-                                               M2MObservationHandler *observation_handler = NULL);
-
 private:
 
     void report(float value);
