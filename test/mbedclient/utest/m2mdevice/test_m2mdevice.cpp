@@ -94,10 +94,15 @@ void Test_M2MDevice::test_create_resource_string()
     CHECK(device->create_resource(M2MDevice::Reboot,"test") == NULL);
     CHECK(device->create_resource(M2MDevice::ErrorCode,"test") == NULL);
     CHECK(device->create_resource(M2MDevice::SupportedBindingMode,"test") == NULL);
+    // Length 65, should fail
+    String max_lenght = "65656565656565656565656565656565656565656565656565656565656565656";
 
     m2mobjectinstance_stub::create_resource = new M2MResource(*m2mobject_stub::inst,"name","type",M2MResourceInstance::STRING,M2MBase::Dynamic);
 
     CHECK(device->create_resource(M2MDevice::Manufacturer,"test") != NULL);
+    CHECK(M2MBase::GET_ALLOWED == m2mbase_stub::operation);
+
+    CHECK(device->create_resource(M2MDevice::Manufacturer,max_lenght) == NULL);
     CHECK(M2MBase::GET_ALLOWED == m2mbase_stub::operation);
 
     m2mobjectinstance_stub::resource = new M2MResource(*m2mobject_stub::inst,"name","type",M2MResourceInstance::STRING,M2MBase::Dynamic);
@@ -111,34 +116,41 @@ void Test_M2MDevice::test_create_resource_string()
     CHECK(device->create_resource(M2MDevice::DeviceType,"test") != NULL);
     CHECK(M2MBase::GET_ALLOWED == m2mbase_stub::operation);
     CHECK(device->create_resource(M2MDevice::DeviceType,"") != NULL);
-
+    CHECK(device->create_resource(M2MDevice::DeviceType,max_lenght) == NULL);
 
     CHECK(device->create_resource(M2MDevice::ModelNumber,"test") != NULL);
     CHECK(M2MBase::GET_ALLOWED == m2mbase_stub::operation);
+    CHECK(device->create_resource(M2MDevice::ModelNumber,max_lenght) == NULL);
 
 
     CHECK(device->create_resource(M2MDevice::SerialNumber,"test") != NULL);
     CHECK(M2MBase::GET_ALLOWED == m2mbase_stub::operation);
+    CHECK(device->create_resource(M2MDevice::SerialNumber,max_lenght) == NULL);
 
 
     CHECK(device->create_resource(M2MDevice::HardwareVersion,"test") != NULL);
     CHECK(M2MBase::GET_ALLOWED == m2mbase_stub::operation);
+    CHECK(device->create_resource(M2MDevice::HardwareVersion,max_lenght) == NULL);
 
 
     CHECK(device->create_resource(M2MDevice::FirmwareVersion,"test") != NULL);
     CHECK(M2MBase::GET_ALLOWED == m2mbase_stub::operation);
+    CHECK(device->create_resource(M2MDevice::FirmwareVersion,max_lenght) == NULL);
 
 
     CHECK(device->create_resource(M2MDevice::SoftwareVersion,"test") != NULL);
     CHECK(M2MBase::GET_ALLOWED == m2mbase_stub::operation);
+    CHECK(device->create_resource(M2MDevice::SoftwareVersion,max_lenght) == NULL);
 
 
     CHECK(device->create_resource(M2MDevice::UTCOffset,"test") != NULL);
     CHECK(M2MBase::GET_PUT_ALLOWED == m2mbase_stub::operation);
+    CHECK(device->create_resource(M2MDevice::UTCOffset,max_lenght) == NULL);
 
 
     CHECK(device->create_resource(M2MDevice::Timezone,"test") != NULL);
     CHECK(M2MBase::GET_PUT_ALLOWED == m2mbase_stub::operation);
+    CHECK(device->create_resource(M2MDevice::Timezone,max_lenght) == NULL);
 
     CHECK(device->create_resource(M2MDevice::BatteryLevel,"test") == NULL);
     CHECK(device->create_resource(M2MDevice::BatteryStatus,"test") == NULL);
@@ -265,6 +277,8 @@ void Test_M2MDevice::test_delete_resource_instance()
 
 void Test_M2MDevice::test_set_resource_value_string()
 {
+    // Length 65, should fail
+    String max_lenght = "65656565656565656565656565656565656565656565656565656565656565656";
     m2mbase_stub::bool_value = true;
     m2mresourceinstance_stub::bool_value = true;
 
@@ -279,14 +293,23 @@ void Test_M2MDevice::test_set_resource_value_string()
 
     CHECK(device->set_resource_value(M2MDevice::Manufacturer,"test") == true);
     CHECK(device->set_resource_value(M2MDevice::Manufacturer,"") == true);
+    CHECK(device->set_resource_value(M2MDevice::Manufacturer,max_lenght) == false);
     CHECK(device->set_resource_value(M2MDevice::DeviceType,"test") == true);
+    CHECK(device->set_resource_value(M2MDevice::DeviceType,max_lenght) == false);
     CHECK(device->set_resource_value(M2MDevice::ModelNumber,"test") == true);
+    CHECK(device->set_resource_value(M2MDevice::ModelNumber,max_lenght) == false);
     CHECK(device->set_resource_value(M2MDevice::SerialNumber,"test") == true);
+    CHECK(device->set_resource_value(M2MDevice::SerialNumber,max_lenght) == false);
     CHECK(device->set_resource_value(M2MDevice::HardwareVersion,"test") == true);
+    CHECK(device->set_resource_value(M2MDevice::HardwareVersion,max_lenght) == false);
     CHECK(device->set_resource_value(M2MDevice::FirmwareVersion,"test") == true);
+    CHECK(device->set_resource_value(M2MDevice::FirmwareVersion,max_lenght) == false);
     CHECK(device->set_resource_value(M2MDevice::SoftwareVersion,"test") == true);
+    CHECK(device->set_resource_value(M2MDevice::SoftwareVersion,max_lenght) == false);
     CHECK(device->set_resource_value(M2MDevice::UTCOffset,"test") == true);
+    CHECK(device->set_resource_value(M2MDevice::UTCOffset,max_lenght) == false);
     CHECK(device->set_resource_value(M2MDevice::Timezone,"test") == true);
+    CHECK(device->set_resource_value(M2MDevice::Timezone,max_lenght) == false);
     CHECK(device->set_resource_value(M2MDevice::Timezone,"") == true);
 
     CHECK(device->set_resource_value(M2MDevice::BatteryLevel,"test") == false);

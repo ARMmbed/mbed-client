@@ -70,6 +70,16 @@ void Test_M2MInterfaceFactory::test_create_interface()
     CHECK(test == NULL);
     delete test;
 
+    // Domain length more than 64 characters
+    test = M2MInterfaceFactory::create_interface(test_obs,
+                                                "endpoint_name",
+                                                "endpoint_type",
+                                                120,
+                                                8000,
+                                                "domaidomaindomaindomaindomaindomaindomaindomaindomaindomaindomaindomaindomaindomain");
+    CHECK(test == NULL);
+    delete test;
+
 }
 
 void Test_M2MInterfaceFactory::test_create_security()
@@ -110,5 +120,9 @@ void Test_M2MInterfaceFactory::test_create_object()
     CHECK(test != NULL);
     delete test;
     test = NULL;
+
+    // Length 65, should fail
+    String max_lenght = "65656565656565656565656565656565656565656565656565656565656565656";
     CHECK(M2MInterfaceFactory::create_object("") == NULL);
+    CHECK(M2MInterfaceFactory::create_object(max_lenght) == NULL);
 }

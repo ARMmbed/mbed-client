@@ -84,7 +84,7 @@ M2MResource* M2MDevice::create_resource(DeviceResource resource, const String &v
     M2MResource* res = NULL;
     String device_id = "";
     M2MBase::Operation operation = M2MBase::GET_ALLOWED;
-    if(!is_resource_present(resource)) {
+    if(!is_resource_present(resource) && value.size() <= MAX_ALLOWED_STRING_LENGTH) {
         switch(resource) {
             case Manufacturer:
                device_id = DEVICE_MANUFACTURER;
@@ -291,7 +291,7 @@ bool M2MDevice::set_resource_value(DeviceResource resource,
 {
     bool success = false;
     M2MResourceInstance* res = get_resource_instance(resource,instance_id);
-    if(res) {
+    if(res && value.size() <= MAX_ALLOWED_STRING_LENGTH) {
         if(M2MDevice::Manufacturer == resource          ||
            M2MDevice::ModelNumber == resource           ||
            M2MDevice::DeviceType == resource            ||
