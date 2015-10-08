@@ -448,7 +448,7 @@ sn_coap_hdr_s* M2MResource::handle_post_request(nsdl_s *nsdl,
         if ((operation() & SN_GRS_POST_ALLOWED) != 0) {
             void *arguments = NULL;
             if(received_coap_header->payload_ptr) {
-                if(received_coap_header->options_list_ptr->uri_query_ptr) {
+                if(received_coap_header->payload_ptr) {
                     arguments = (void*)malloc(received_coap_header->payload_len+1);
                     if (arguments){
                         memset(arguments, 0, received_coap_header->payload_len+1);
