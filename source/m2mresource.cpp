@@ -367,10 +367,10 @@ sn_coap_hdr_s* M2MResource::handle_put_request(nsdl_s *nsdl,
                         M2MTLVDeserializer *deserializer = new M2MTLVDeserializer();
                         if(deserializer) {
                             M2MTLVDeserializer::Error error = M2MTLVDeserializer::None;
-                            deserializer->deserialize_resource_instances(received_coap_header->payload_ptr,
-                                                                received_coap_header->payload_len,
-                                                                *this,
-                                                                M2MTLVDeserializer::Put);
+                            error = deserializer->deserialize_resource_instances(received_coap_header->payload_ptr,
+                                                                                 received_coap_header->payload_len,
+                                                                                 *this,
+                                                                                 M2MTLVDeserializer::Put);
                             switch(error) {
                                 case M2MTLVDeserializer::None:
                                     if(observation_handler) {
