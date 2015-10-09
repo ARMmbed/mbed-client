@@ -52,7 +52,7 @@ endif()
 
 if(TARGET_LIKE_MBED)
 
-add_executable(mbed-client-test-mbedclient-smokeTest 
+add_executable(mbed-client-test-mbedclient-smokeTest EXCLUDE_FROM_ALL
         "mbedclient-smokeTest/main.cpp"
         "mbedclient-smokeTest/testconfig.cpp"
         "mbedclient-smokeTest/testconfig.h"
@@ -77,7 +77,7 @@ if(YOTTA_POSTPROCESS_COMMAND)
     )
 endif()
 
-add_executable(mbed-client-test-helloworld-mbedclient 
+add_executable(mbed-client-test-helloworld-mbedclient EXCLUDE_FROM_ALL
         "helloworld-mbedclient/main.cpp"
         "helloworld-mbedclient/mbedclient.cpp"
         "helloworld-mbedclient/to_be_ported.c"
