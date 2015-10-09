@@ -164,7 +164,6 @@ public:
     virtual sn_coap_hdr_s* handle_put_request(nsdl_s *nsdl,
                                               sn_coap_hdr_s *received_coap_header,
                                               M2MObservationHandler *observation_handler = NULL);
-
     /**
      * @brief Handles POST request for the registered objects.
      * @param nsdl, NSDL handler for the Coap library.
