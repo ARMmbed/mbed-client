@@ -26,6 +26,7 @@ namespace m2mresource_stub
     extern M2MResourceInstanceList list;
     extern M2MResourceInstance *instance;
     void clear();
+    extern sn_coap_hdr_s *header;
 }
 
 #endif // M2M_RESOURCE_STUB_H
