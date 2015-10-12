@@ -446,7 +446,7 @@ uint8_t M2MNsdlInterface::received_from_server_callback(struct nsdl_s * /*nsdl_h
                         if( object_name.find_last_of('/') != -1){
                             coap_response = sn_nsdl_build_response(_nsdl_handle,
                                                                    coap_header,
-                                                                   COAP_MSG_CODE_RESPONSE_METHOD_NOT_ALLOWED);
+                                                                   COAP_MSG_CODE_RESPONSE_NOT_FOUND);
                         }else{
                             uint16_t instance_id = atoi(resource_name.substr(slash_found+1,
                                                      resource_name.size()-object_name.size()).c_str());
