@@ -71,11 +71,14 @@ void Test_M2MDevice::test_create_resource_instance()
     m2mobjectinstance_stub::create_resource_instance = new M2MResourceInstance("name","type",M2MResourceInstance::INTEGER,*m2mobject_stub::inst);
 
     CHECK(device->create_resource_instance(M2MDevice::ErrorCode,5,1) != NULL);
+    CHECK(device->create_resource_instance(M2MDevice::ErrorCode,-1,1) == NULL);
+    CHECK(device->create_resource_instance(M2MDevice::ErrorCode,9,1) == NULL);
 
     m2mbase_stub::void_value = malloc(20);
 
-
-    CHECK(device->create_resource_instance(M2MDevice::AvailablePowerSources,6,0) != NULL);
+    CHECK(device->create_resource_instance(M2MDevice::AvailablePowerSources,-1,0) == NULL);
+    CHECK(device->create_resource_instance(M2MDevice::AvailablePowerSources,8,0) == NULL);
+    CHECK(device->create_resource_instance(M2MDevice::AvailablePowerSources,7,0) != NULL);
     CHECK(M2MBase::GET_ALLOWED == m2mbase_stub::operation);
 
     CHECK(device->create_resource_instance(M2MDevice::PowerSourceVoltage,10,0) != NULL);
@@ -350,8 +353,12 @@ void Test_M2MDevice::test_set_resource_value_int()
     CHECK(device->set_resource_value(M2MDevice::UTCOffset,10) == false);
     CHECK(device->set_resource_value(M2MDevice::Timezone,10) == false);
 
+    CHECK(device->set_resource_value(M2MDevice::BatteryLevel,-1) == false);
     CHECK(device->set_resource_value(M2MDevice::BatteryLevel,10) == true);
-    CHECK(device->set_resource_value(M2MDevice::BatteryStatus,10) == true);
+    CHECK(device->set_resource_value(M2MDevice::BatteryLevel,101) == false);
+    CHECK(device->set_resource_value(M2MDevice::BatteryStatus,6) == true);
+    CHECK(device->set_resource_value(M2MDevice::BatteryStatus,-1) == false);
+    CHECK(device->set_resource_value(M2MDevice::BatteryStatus,7) == false);
     CHECK(device->set_resource_value(M2MDevice::MemoryFree,10) == true);
     CHECK(device->set_resource_value(M2MDevice::MemoryTotal,10) == true);
     CHECK(device->set_resource_value(M2MDevice::CurrentTime,10) == true);
@@ -474,3 +481,4 @@ void Test_M2MDevice::test_total_resource_count()
 
     m2mobjectinstance_stub::resource_list.clear();
 }
+

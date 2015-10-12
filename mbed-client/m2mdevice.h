@@ -234,6 +234,8 @@ private:
 
     String resource_name(DeviceResource resource) const;
 
+    bool check_value_range(DeviceResource resource, const int64_t value) const;
+
 private :
 
     M2MObjectInstance*    _device_instance;     //Not owned

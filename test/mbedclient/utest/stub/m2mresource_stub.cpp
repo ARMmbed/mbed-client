@@ -19,7 +19,7 @@ uint32_t m2mresource_stub::int_value;
 bool m2mresource_stub::bool_value;
 M2MResourceInstanceList m2mresource_stub::list;
 M2MResourceInstance *m2mresource_stub::instance;
-
+sn_coap_hdr_s *m2mresource_stub::header;
 void m2mresource_stub::clear()
 {
     int_value = 0;
@@ -106,4 +106,24 @@ void M2MResource::add_observation_level(M2MBase::Observation)
 
 void M2MResource::remove_observation_level(M2MBase::Observation)
 {
+}
+sn_coap_hdr_s* M2MResource::handle_get_request(nsdl_s *,
+                                               sn_coap_hdr_s *,
+                                               M2MObservationHandler *)
+{
+    return m2mresource_stub::header;
+}
+
+sn_coap_hdr_s* M2MResource::handle_put_request(nsdl_s *,
+                                               sn_coap_hdr_s *,
+                                               M2MObservationHandler *)
+{
+    return m2mresource_stub::header;
+}
+
+sn_coap_hdr_s* M2MResource::handle_post_request(nsdl_s *,
+                                               sn_coap_hdr_s *,
+                                               M2MObservationHandler *)
+{
+    return m2mresource_stub::header;
 }

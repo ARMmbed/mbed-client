@@ -146,14 +146,14 @@ M2MResource* M2MDevice::create_resource(DeviceResource resource, int64_t value)
     String device_id = "";
     M2MBase::Operation operation = M2MBase::GET_ALLOWED;
     if(!is_resource_present(resource)) {
-        switch(resource) {
+        switch(resource) {        
         case BatteryLevel:
-            if(0 <= value && value <= 100) {
+            if(check_value_range(resource, value)) {
                 device_id = DEVICE_BATTERY_LEVEL;
             }
             break;
         case BatteryStatus:
-            if(0 <= value && value <= 6) {
+            if(check_value_range(resource, value)) {
                 device_id = DEVICE_BATTERY_STATUS;
             }
             break;
@@ -201,7 +201,7 @@ M2MResourceInstance* M2MDevice::create_resource_instance(DeviceResource resource
     String device_id = "";    
     // For these resources multiple instance can exist
     if(AvailablePowerSources == resource) {
-        if(0 <= value && value <= 7) {
+        if(check_value_range(resource, value)) {
             device_id = DEVICE_AVAILABLE_POWER_SOURCES;
         }
     } else if(PowerSourceVoltage == resource) {
@@ -209,7 +209,7 @@ M2MResourceInstance* M2MDevice::create_resource_instance(DeviceResource resource
     } else if(PowerSourceCurrent == resource) {
         device_id = DEVICE_POWER_SOURCE_CURRENT;
     } else if(ErrorCode == resource) {
-        if(0 <= value && value <= 8) {
+        if(check_value_range(resource, value)) {
             device_id = DEVICE_ERROR_CODE;
         }
     }
@@ -330,13 +330,14 @@ bool M2MDevice::set_resource_value(DeviceResource resource,
            M2MDevice::PowerSourceCurrent == resource) {
             // If it is any of the above resource
             // set the value of the resource.
-
-            char *buffer = (char*)memory_alloc(20);
-            if(buffer) {
-                int size = snprintf(buffer, 20,"%lld",value);
-                success = res->set_value((const uint8_t*)buffer,
-                                         (const uint32_t)size);
-                memory_free(buffer);
+            if (check_value_range(resource, value)) {
+                char *buffer = (char*)memory_alloc(20);
+                if(buffer) {
+                    int size = snprintf(buffer, 20,"%lld",value);
+                    success = res->set_value((const uint8_t*)buffer,
+                                             (const uint32_t)size);
+                    memory_free(buffer);
+                }
             }
         }
     }
@@ -528,4 +529,35 @@ String M2MDevice::resource_name(DeviceResource resource) const
             break;
     }
     return res_name;
+}
+
+bool M2MDevice::check_value_range(DeviceResource resource, int64_t value) const
+{
+    bool success = false;
+    switch (resource) {
+        case AvailablePowerSources:
+            if(value >= 0 && value <= 7) {
+                success = true;
+            }
+            break;
+        case BatteryLevel:
+            if (value >= 0 && value <= 100) {
+                success = true;
+            }
+            break;
+        case BatteryStatus:
+            if (value >= 0 && value <= 6) {
+                success = true;
+            }
+            break;
+        case ErrorCode:
+            if (value >= 0 && value <= 8) {
+                success = true;
+            }
+            break;
+    default:
+        success = true;
+        break;
+    }
+    return success;
 }
