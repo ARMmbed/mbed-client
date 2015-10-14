@@ -31,7 +31,7 @@ find ./build -name '*.xml' | xargs cp -t ./results/
 find ./build -name '*.gcno' | xargs cp -t ./coverage/
 find ./build -name '*.gcda' | xargs cp -t ./coverage/
 exclude_files="${PWD}/test/"
-gcovr -r ./ --gcov-filter='.*source*.' --exclude $exclude_files --object-directory ./coverage -x -o ./results/gcovr.xml
+gcovr -r ./ --gcov-filter='.*source*.' --exclude-unreachable-branches --exclude $exclude_files --object-directory ./coverage -x -o ./results/gcovr.xml
 echo
 echo "Create coverage document"
 echo
