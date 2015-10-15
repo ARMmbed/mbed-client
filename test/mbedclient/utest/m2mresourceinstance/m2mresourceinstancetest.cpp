@@ -110,8 +110,3 @@ TEST(M2MResourceInstance, test_handle_put_request)
 {
     m2m_resourceinstance->test_handle_put_request();
 }
-
-TEST(M2MResourceInstance, test_handle_post_request)
-{
-    m2m_resourceinstance->test_handle_post_request();
-}

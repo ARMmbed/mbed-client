@@ -501,25 +501,77 @@ void Test_M2MObject::test_handle_post_request()
 
     m2mbase_stub::bool_value = false;
 
-    CHECK(object->handle_post_request(NULL,coap_header,handler) != NULL);
+    sn_coap_hdr_s * coap_response = NULL;
+    coap_response = object->handle_post_request(NULL,coap_header,handler);
+
+    CHECK( coap_response != NULL);
+    if(coap_response) {
+        if(coap_response->content_type_ptr) {
+            free(coap_response->content_type_ptr);
+            coap_response->content_type_ptr = NULL;
+        }
+    }
 
     m2mtlvdeserializer_stub::bool_value = false;
 
-    CHECK(object->handle_post_request(NULL,coap_header,handler) != NULL);
+    coap_response = object->handle_post_request(NULL,coap_header,handler);
+
+    CHECK( coap_response != NULL);
+    if(coap_response) {
+        if(coap_response->content_type_ptr) {
+            free(coap_response->content_type_ptr);
+            coap_response->content_type_ptr = NULL;
+        }
+    }
+
 
     *coap_header->content_type_ptr = 100;
 
-    CHECK(object->handle_post_request(NULL,coap_header,handler) != NULL);
+    coap_response = object->handle_post_request(NULL,coap_header,handler);
+
+    CHECK( coap_response != NULL);
+    if(coap_response) {
+        if(coap_response->content_type_ptr) {
+            free(coap_response->content_type_ptr);
+            coap_response->content_type_ptr = NULL;
+        }
+    }
+
 
     m2mbase_stub::bool_value = true;
 
-    CHECK(object->handle_post_request(NULL,coap_header,handler) != NULL);
+    coap_response = object->handle_post_request(NULL,coap_header,handler);
+
+    CHECK( coap_response != NULL);
+    if(coap_response) {
+        if(coap_response->content_type_ptr) {
+            free(coap_response->content_type_ptr);
+            coap_response->content_type_ptr = NULL;
+        }
+    }
+
 
     m2mbase_stub::operation = M2MBase::NOT_ALLOWED;
 
-    CHECK(object->handle_post_request(NULL,coap_header,handler) != NULL);
+    coap_response = object->handle_post_request(NULL,coap_header,handler);
 
-    CHECK(object->handle_post_request(NULL,NULL,handler) != NULL);
+    CHECK( coap_response != NULL);
+    if(coap_response) {
+        if(coap_response->content_type_ptr) {
+            free(coap_response->content_type_ptr);
+            coap_response->content_type_ptr = NULL;
+        }
+    }
+
+    coap_response = object->handle_post_request(NULL,NULL,handler);
+
+    CHECK( coap_response != NULL);
+    if(coap_response) {
+        if(coap_response->content_type_ptr) {
+            free(coap_response->content_type_ptr);
+            coap_response->content_type_ptr = NULL;
+        }
+    }
 
     free(coap_header->content_type_ptr);
     free(coap_header->options_list_ptr);

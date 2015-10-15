@@ -95,3 +95,8 @@ TEST(M2MResource, test_remove_observation_level)
 {
     m2m_resource->test_remove_observation_level();
 }
+
+TEST(M2MResource, test_handle_post_request)
+{
+    m2m_resource->test_handle_post_request();
+}

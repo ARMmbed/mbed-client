@@ -19,6 +19,7 @@
 #include "m2mresource.h"
 
 class Callback;
+class Handler;
 
 class Test_M2MResource
 {
@@ -51,8 +52,12 @@ public:
 
     void test_remove_observation_level();
 
+    void test_handle_post_request();
+
     M2MResource* resource;
     Callback *callback;
+
+    Handler* handler;
 };
 
 #endif // TEST_M2M_RESOURCE_H

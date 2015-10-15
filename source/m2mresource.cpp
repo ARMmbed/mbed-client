@@ -421,6 +421,8 @@ sn_coap_hdr_s* M2MResource::handle_put_request(nsdl_s *nsdl,
                 tr_error("M2MResource::handle_put_request() - COAP_MSG_CODE_RESPONSE_METHOD_NOT_ALLOWED");
                 msg_code = COAP_MSG_CODE_RESPONSE_METHOD_NOT_ALLOWED;
             }
+        } else {
+            msg_code = COAP_MSG_CODE_RESPONSE_METHOD_NOT_ALLOWED;
         }
         if(coap_response) {
             coap_response->msg_code = msg_code;
@@ -465,8 +467,8 @@ sn_coap_hdr_s* M2MResource::handle_post_request(nsdl_s *nsdl,
             msg_code = COAP_MSG_CODE_RESPONSE_METHOD_NOT_ALLOWED; // 4.05
         }
     } else { //if(object && received_coap_header)
-        tr_error("M2MResource::handle_post_request - COAP_MSG_CODE_RESPONSE_NOT_FOUND");
-        msg_code = COAP_MSG_CODE_RESPONSE_NOT_FOUND; // 4.01
+        tr_error("M2MResource::handle_post_request - COAP_MSG_CODE_RESPONSE_METHOD_NOT_ALLOWED");
+        msg_code = COAP_MSG_CODE_RESPONSE_METHOD_NOT_ALLOWED; // 4.01
     }
     if(coap_response) {
         coap_response->msg_code = msg_code;
