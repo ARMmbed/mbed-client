@@ -58,8 +58,6 @@ public:
 
     void test_handle_put_request();
 
-    void test_handle_post_request();
-
     M2MResourceInstance* resource_instance;
 
     Callback *callback;
