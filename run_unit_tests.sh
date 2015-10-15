@@ -18,6 +18,7 @@ echo "Build mbed Client API unit tests"
 echo
 yt target x86-linux-native-coverage
 yt clean
+yt build
 yt test --no-build -- -ojunit
 echo
 echo Create results
