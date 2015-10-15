@@ -90,8 +90,13 @@ M2MObjectInstance* M2MObject::create_object_instance(uint16_t instance_id)
     M2MObjectInstance *instance = NULL;
     if(!object_instance(instance_id)) {
         instance = new M2MObjectInstance(this->name(),*this);
-        instance->set_instance_id(instance_id);
-        _instance_list.push_back(instance);
+        if(instance) {
+            instance->set_instance_id(instance_id);
+            _instance_list.push_back(instance);
+            if(M2MBase::name_id() != -1) {
+                instance->set_coap_content_type(COAP_CONTENT_OMA_TLV_TYPE);
+            }
+        }
     }
     return instance;
 }
@@ -211,7 +216,9 @@ sn_coap_hdr_s* M2MObject::handle_get_request(nsdl_s *nsdl,
         if ((operation() & SN_GRS_GET_ALLOWED) != 0) {
             if(coap_response) {
                 uint16_t coap_content_type = 0;
+                bool content_type_present = false;
                 if(received_coap_header->content_type_ptr) {
+                    content_type_present = true;
                     coap_response->content_type_ptr = (uint8_t*)malloc(received_coap_header->content_type_len);
                     if(coap_response->content_type_ptr) {
                         memset(coap_response->content_type_ptr, 0, received_coap_header->content_type_len);
@@ -222,17 +229,11 @@ sn_coap_hdr_s* M2MObject::handle_get_request(nsdl_s *nsdl,
                         for(uint8_t i = 0; i < coap_response->content_type_len; i++) {
                             coap_content_type = (coap_content_type << 8) + (coap_response->content_type_ptr[i] & 0xFF);
                         }
-                     }
-                } else {
-                    uint8_t content_type = M2MBase::coap_content_type();
-
-                    coap_response->content_type_ptr = (uint8_t*)malloc(1);
-                    if(coap_response->content_type_ptr) {
-                        memset(coap_response->content_type_ptr, 0, 1);
-                        memcpy(coap_response->content_type_ptr,&content_type,1);
-                        coap_response->content_type_len = 1;
                     }
-                    coap_content_type = content_type;
+                }
+                if(!content_type_present &&
+                   M2MBase::coap_content_type() == COAP_CONTENT_OMA_TLV_TYPE) {
+                    coap_content_type = COAP_CONTENT_OMA_TLV_TYPE;
                 }
                 // fill in the CoAP response payload
                 if(COAP_CONTENT_OMA_TLV_TYPE == coap_content_type) {
@@ -326,7 +327,7 @@ sn_coap_hdr_s* M2MObject::handle_get_request(nsdl_s *nsdl,
 
 sn_coap_hdr_s* M2MObject::handle_put_request(nsdl_s *nsdl,
                                              sn_coap_hdr_s *received_coap_header,
-                                             M2MObservationHandler *observation_handler)
+                                             M2MObservationHandler */*observation_handler*/)
 {
     tr_debug("M2MObject::handle_put_request()");
     sn_coap_msg_code_e msg_code = COAP_MSG_CODE_RESPONSE_CHANGED; // 2.04
@@ -381,7 +382,9 @@ sn_coap_hdr_s* M2MObject::handle_post_request(nsdl_s *nsdl,
             if(received_coap_header->payload_ptr) {
                 tr_debug("M2MObject::handle_post_request() - Update Object with new values");
                 uint16_t coap_content_type = 0;
+                bool content_type_present = false;
                 if(received_coap_header->content_type_ptr) {
+                    content_type_present = true;
                     if(coap_response) {
                         coap_response->content_type_ptr = (uint8_t*)malloc(received_coap_header->content_type_len);
                         if(coap_response->content_type_ptr) {
@@ -395,6 +398,11 @@ sn_coap_hdr_s* M2MObject::handle_post_request(nsdl_s *nsdl,
                             }
                         }
                     }
+                    if(!content_type_present &&
+                       M2MBase::coap_content_type() == COAP_CONTENT_OMA_TLV_TYPE) {
+                        coap_content_type = COAP_CONTENT_OMA_TLV_TYPE;
+                    }
+
                     if(COAP_CONTENT_OMA_TLV_TYPE == coap_content_type) {
                         uint16_t instance_id = 0;
                         for(instance_id = 0; instance_id <= 65535; instance_id++) {
@@ -417,6 +425,7 @@ sn_coap_hdr_s* M2MObject::handle_post_request(nsdl_s *nsdl,
                                                                            received_coap_header->payload_len,
                                                                            *this,
                                                                            M2MTLVDeserializer::Post);
+
                                 switch(error) {
                                     case M2MTLVDeserializer::None:
                                         if(observation_handler) {

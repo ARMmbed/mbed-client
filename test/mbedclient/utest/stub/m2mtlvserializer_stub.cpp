@@ -39,3 +39,8 @@ uint8_t* M2MTLVSerializer::serialize(M2MResourceList resource_list, uint32_t &si
 {
     return m2mtlvserializer_stub::uint8_value;
 }
+
+uint8_t* M2MTLVSerializer::serialize(M2MResource *, uint32_t &)
+{
+    return m2mtlvserializer_stub::uint8_value;
+}

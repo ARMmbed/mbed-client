@@ -17,6 +17,7 @@
 #include "include/m2mtlvdeserializer.h"
 #include "mbed-client/m2mconstants.h"
 #include "include/nsdllinker.h"
+#include "ns_trace.h"
 
 M2MTLVDeserializer::M2MTLVDeserializer()
 {
@@ -53,11 +54,13 @@ M2MTLVDeserializer::Error M2MTLVDeserializer::deserialise_object_instances(uint8
 {
     M2MTLVDeserializer::Error error = M2MTLVDeserializer::None;
     if (is_object_instance(tlv) ) {
+        tr_debug("M2MTLVDeserializer::deserialise_object_instances");
         error = deserialize_object_instances(tlv, tlv_size, 0, object,operation,false);
         if(M2MTLVDeserializer::None == error) {
             error = deserialize_object_instances(tlv, tlv_size, 0, object,operation,true);
         }
     } else {
+        tr_debug("M2MTLVDeserializer::deserialise_object_instances ::NotValid");
         error = M2MTLVDeserializer::NotValid;
     }
     return error;
@@ -86,12 +89,27 @@ M2MTLVDeserializer::Error M2MTLVDeserializer::deserialize_resource_instances(uin
                                                                              M2MTLVDeserializer::Operation operation)
 {
     M2MTLVDeserializer::Error error = M2MTLVDeserializer::None;
-    if (!is_resource_instance(tlv)) {
+    if (!is_multiple_resource(tlv)) {
         error = M2MTLVDeserializer::NotValid;
     } else {
-        error = deserialize_resource_instances(tlv, tlv_size, 0, resource, operation,false);
+        tr_debug("M2MTLVDeserializer::deserialize_resource_instances()");
+        uint8_t offset = 2;
+
+        ((tlv[0] & 0x20) == 0) ? offset : offset++;
+
+        uint8_t length = tlv[0] & 0x18;
+        if(length == 0x08) {
+        offset+= 1;
+        } else if(length == 0x10) {
+        offset+= 2;
+        } else if(length == 0x18) {
+        offset+= 3;
+        }
+
+        tr_debug("M2MTLVDeserializer::deserialize_resource_instances() Offset %d", offset);
+        error = deserialize_resource_instances(tlv, tlv_size, offset, resource, operation,false);
         if(M2MTLVDeserializer::None == error) {
-            error = deserialize_resource_instances(tlv, tlv_size, 0, resource, operation,true);
+            error = deserialize_resource_instances(tlv, tlv_size, offset, resource, operation,true);
         }
     }
     return error;
@@ -104,6 +122,7 @@ M2MTLVDeserializer::Error M2MTLVDeserializer::deserialize_object_instances(uint8
                                                                            M2MTLVDeserializer::Operation operation,
                                                                            bool update_value)
 {
+    tr_debug("M2MTLVDeserializer::deserialize_object_instances()");
     M2MTLVDeserializer::Error error = M2MTLVDeserializer::None;
     if(is_object_instance(tlv)) {
         TypeIdLength *til = TypeIdLength::createTypeIdLength(tlv, offset)->deserialize();
@@ -127,6 +146,7 @@ M2MTLVDeserializer::Error M2MTLVDeserializer::deserialize_object_instances(uint8
             delete til;
         }
     } else {
+        tr_debug("M2MTLVDeserializer::deserialize_object_instances() : NotValid");
         error = M2MTLVDeserializer::NotValid;
     }
     return error;
@@ -139,6 +159,7 @@ M2MTLVDeserializer::Error M2MTLVDeserializer::deserialize_resources(uint8_t *tlv
                                                                     M2MTLVDeserializer::Operation operation,
                                                                     bool update_value)
 {
+    tr_debug("M2MTLVDeserializer::deserialize_resources()");
     M2MTLVDeserializer::Error error = M2MTLVDeserializer::None;
     TypeIdLength *til = TypeIdLength::createTypeIdLength(tlv, offset)->deserialize();
     offset = til->_offset;
@@ -151,11 +172,19 @@ M2MTLVDeserializer::Error M2MTLVDeserializer::deserialize_resources(uint8_t *tlv
         bool found = false;
         for (; it!=list.end(); it++) {
             if((*it)->name_id() == til->_id){
+                tr_debug("M2MTLVDeserializer::deserialize_resources() - Resource ID %d ", til->_id);
                 found = true;
                 if(update_value) {
-                    (*it)->set_value(tlv+offset, til->_length);
+                    if(til->_length > 0) {
+                        tr_debug("M2MTLVDeserializer::deserialize_resources() - Update value");
+                        (*it)->set_value(tlv+offset, til->_length);
+                    } else {
+                        tr_debug("M2MTLVDeserializer::deserialize_resources() - Clear Value");
+                        (*it)->clear_value();
+                    }
                     break;
                 } else if(0 == ((*it)->operation() & SN_GRS_PUT_ALLOWED)) {
+                    tr_debug("M2MTLVDeserializer::deserialize_resources() - NOT_ALLOWED");
                     error = M2MTLVDeserializer::NotAllowed;
                     break;
                 }
@@ -219,7 +248,11 @@ M2MTLVDeserializer::Error M2MTLVDeserializer::deserialize_resource_instances(uin
             if((*it)->instance_id() == til->_id) {
                 found = true;
                 if(update_value) {
-                    (*it)->set_value(tlv+offset, til->_length);
+                    if(til->_length > 0) {
+                        (*it)->set_value(tlv+offset, til->_length);
+                    } else {
+                        (*it)->clear_value();
+                    }
                     break;
                 } else if(0 == ((*it)->operation() & SN_GRS_PUT_ALLOWED)) {
                     error = M2MTLVDeserializer::NotAllowed;
@@ -276,7 +309,11 @@ M2MTLVDeserializer::Error M2MTLVDeserializer::deserialize_resource_instances(uin
             if((*it)->instance_id() == til->_id) {
                 found = true;
                 if(update_value) {
+                    if(til->_length > 0) {
                     (*it)->set_value(tlv+offset, til->_length);
+                    } else {
+                        (*it)->clear_value();
+                    }
                     break;
                 } else if(0 == ((*it)->operation() & SN_GRS_PUT_ALLOWED)) {
                     error = M2MTLVDeserializer::NotAllowed;

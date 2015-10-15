@@ -169,16 +169,15 @@ bool M2MResourceInstance::set_value(const uint8_t *value,
 
 void M2MResourceInstance::report(float value)
 {
+    tr_debug("M2MResourceInstance::report()");
     if(M2MBase::Dynamic == mode()) {
         M2MReportHandler *report_handler = M2MBase::report_handler();
         if( report_handler && _resource_type != M2MResourceInstance::STRING) {
-            report_handler->set_value(value);
-        }
-    }
-    if(M2MBase::Dynamic == mode()) {
-        M2MReportHandler *report_handler = M2MBase::report_handler();
-        if( report_handler && _resource_type != M2MResourceInstance::STRING) {
-            report_handler->set_value(atof((const char*)_value));
+            if(_value) {
+                report_handler->set_value(atof((const char*)_value));
+            } else {
+                report_handler->set_value(0);
+            }
             M2MBase::Observation  observation_level = M2MBase::observation_level();
             if(M2MBase::O_Attribute == observation_level ||
                M2MBase::OI_Attribute == observation_level||
@@ -342,30 +341,50 @@ sn_coap_hdr_s* M2MResourceInstance::handle_put_request(nsdl_s *nsdl,
                                                            msg_code);
     // process the PUT if we have registered a callback for it
     if(received_coap_header) {
-        if ((operation() & SN_GRS_PUT_ALLOWED) != 0) {            
-            set_value(received_coap_header->payload_ptr, received_coap_header->payload_len);
-            if(received_coap_header->payload_ptr) {
-               tr_debug("M2MResourceInstance::handle_put_request() - Update Resource with new values");
-                if(observation_handler) {
-                    observation_handler->value_updated(this);
+        if ((operation() & SN_GRS_PUT_ALLOWED) != 0) {
+            uint16_t coap_content_type = 0;
+            if(received_coap_header->content_type_ptr) {
+                if(coap_response) {
+                    coap_response->content_type_ptr = (uint8_t*)malloc(received_coap_header->content_type_len);
+                    if(coap_response->content_type_ptr) {
+                        memset(coap_response->content_type_ptr, 0, received_coap_header->content_type_len);
+                        memcpy(coap_response->content_type_ptr,
+                               received_coap_header->content_type_ptr,
+                               received_coap_header->content_type_len);
+                        coap_response->content_type_len = received_coap_header->content_type_len;
+                        for(uint8_t i = 0; i < coap_response->content_type_len; i++) {
+                            coap_content_type = (coap_content_type << 8) + (coap_response->content_type_ptr[i] & 0xFF);
+                        }
+                    }
                 }
             }
-            if(received_coap_header->options_list_ptr &&
-               received_coap_header->options_list_ptr->uri_query_ptr) {
-                char *query = (char*)malloc(received_coap_header->options_list_ptr->uri_query_len+1);
-                if (query){
-                    memset(query, 0, received_coap_header->options_list_ptr->uri_query_len+1);
-                    memcpy(query,
-                        received_coap_header->options_list_ptr->uri_query_ptr,
-                        received_coap_header->options_list_ptr->uri_query_len);
-                    memset(query + received_coap_header->options_list_ptr->uri_query_len,'\0',1);//String terminator
-                    tr_debug("M2MResourceInstance::handle_put_request() - Query %s", query);
-                    // if anything was updated, re-initialize the stored notification attributes
-                    if (!handle_observation_attribute(query)){
-                        tr_debug("M2MResourceInstance::handle_put_request() - Invalid query");
-                        msg_code = COAP_MSG_CODE_RESPONSE_BAD_REQUEST; // 4.00
+            if(COAP_CONTENT_OMA_TLV_TYPE == coap_content_type) {
+                msg_code = COAP_MSG_CODE_RESPONSE_UNSUPPORTED_CONTENT_FORMAT;
+            } else {
+                set_value(received_coap_header->payload_ptr, received_coap_header->payload_len);
+                if(received_coap_header->payload_ptr) {
+                   tr_debug("M2MResourceInstance::handle_put_request() - Update Resource with new values");
+                    if(observation_handler) {
+                        observation_handler->value_updated(this);
                     }
-                    free(query);
+                }
+                if(received_coap_header->options_list_ptr &&
+                   received_coap_header->options_list_ptr->uri_query_ptr) {
+                    char *query = (char*)malloc(received_coap_header->options_list_ptr->uri_query_len+1);
+                    if (query){
+                        memset(query, 0, received_coap_header->options_list_ptr->uri_query_len+1);
+                        memcpy(query,
+                            received_coap_header->options_list_ptr->uri_query_ptr,
+                            received_coap_header->options_list_ptr->uri_query_len);
+                        memset(query + received_coap_header->options_list_ptr->uri_query_len,'\0',1);//String terminator
+                        tr_debug("M2MResourceInstance::handle_put_request() - Query %s", query);
+                        // if anything was updated, re-initialize the stored notification attributes
+                        if (!handle_observation_attribute(query)){
+                            tr_debug("M2MResourceInstance::handle_put_request() - Invalid query");
+                            msg_code = COAP_MSG_CODE_RESPONSE_BAD_REQUEST; // 4.00
+                        }
+                        free(query);
+                    }
                 }
             }
         } else {
