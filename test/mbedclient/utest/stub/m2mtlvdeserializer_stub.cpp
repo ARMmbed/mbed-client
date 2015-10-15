@@ -16,10 +16,12 @@
 #include "m2mtlvdeserializer_stub.h"
 
 bool m2mtlvdeserializer_stub::bool_value;
+M2MTLVDeserializer::Error m2mtlvdeserializer_stub::error;
 
 void m2mtlvdeserializer_stub::clear()
 {
     bool_value = false;
+    error = M2MTLVDeserializer::None;
 }
 
 M2MTLVDeserializer::M2MTLVDeserializer()
@@ -50,12 +52,28 @@ bool M2MTLVDeserializer::is_resource_instance(uint8_t *)
     return m2mtlvdeserializer_stub::bool_value;
 }
 
-void M2MTLVDeserializer::deserialise_object_instances(uint8_t* , uint32_t , M2MObjectInstanceList &)
+M2MTLVDeserializer::Error M2MTLVDeserializer::deserialize_resources(uint8_t*,
+                                                                    uint32_t,
+                                                                    M2MObjectInstance &,
+                                                                    M2MTLVDeserializer::Operation )
 {
+    return m2mtlvdeserializer_stub::error;
 }
 
-void M2MTLVDeserializer::deserialize_resources(uint8_t *, uint32_t , M2MResourceList &list)
+M2MTLVDeserializer::Error M2MTLVDeserializer::deserialize_resource_instances(uint8_t *,
+                                                                             uint32_t,
+                                                                             M2MResource &,
+                                                                             M2MTLVDeserializer::Operation )
 {
+    return m2mtlvdeserializer_stub::error;
+}
+
+M2MTLVDeserializer::Error M2MTLVDeserializer::deserialise_object_instances(uint8_t*,
+                                                                           uint32_t ,
+                                                                           M2MObject &,
+                                                                           M2MTLVDeserializer::Operation)
+{
+    return m2mtlvdeserializer_stub::error;
 }
 
 TypeIdLength* TypeIdLength::createTypeIdLength(uint8_t *, uint32_t)

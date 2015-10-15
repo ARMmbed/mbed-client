@@ -256,21 +256,24 @@ bool M2MReportHandler::set_notification_attribute(char* option,
         tr_debug("M2MReportHandler::set_notification_attribute %s to %f", attribute, _pmax);
     }
     else if(strcmp(attribute, GT.c_str()) == 0 &&
-            M2MBase::Resource == type){
+            (M2MBase::Resource == type ||
+            M2MBase::ResourceInstance == type)){
         sscanf(value, "%f", &_gt);
         success = true;        
         _attribute_state |= M2MReportHandler::Gt;
         tr_debug("M2MReportHandler::set_notification_attribute %s to %f", attribute, _gt);
     }
     else if(strcmp(attribute, LT.c_str()) == 0 &&
-            M2MBase::Resource == type){
+            (M2MBase::Resource == type ||
+            M2MBase::ResourceInstance == type)){
         sscanf(value, "%f", &_lt);
         success = true;
         _attribute_state |= M2MReportHandler::Lt;
         tr_debug("M2MReportHandler::set_notification_attribute %s to %f", attribute, _lt);
     }
     else if(strcmp(attribute, ST.c_str()) == 0 &&
-            M2MBase::Resource == type){
+            (M2MBase::Resource == type ||
+            M2MBase::ResourceInstance == type)){
         sscanf(value, "%f", &_st);
         success = true;
         _high_step = _current_value + _st;
