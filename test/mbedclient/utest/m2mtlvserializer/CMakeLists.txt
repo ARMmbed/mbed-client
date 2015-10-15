@@ -22,7 +22,7 @@ set_target_properties(m2mtlvserializer
 PROPERTIES COMPILE_FLAGS "${CMAKE_CXX_FLAGS}"
            LINK_FLAGS "${UTEST_LINK_FLAGS}")
 
-set(binary "m2mtlvserializer -ojunit")
+set(binary "m2mtlvserializer")
 add_test(m2mtlvserializer ${binary})
 
 endif()

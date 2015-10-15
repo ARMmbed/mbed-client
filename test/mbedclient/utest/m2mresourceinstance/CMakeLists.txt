@@ -19,7 +19,7 @@ target_link_libraries(m2mresourceinstance
 set_target_properties(m2mresourceinstance
 PROPERTIES COMPILE_FLAGS "${CMAKE_CXX_FLAGS}"
            LINK_FLAGS "${UTEST_LINK_FLAGS}")
-set(binary "m2mresourceinstance -ojunit")
+set(binary "m2mresourceinstance")
 add_test(m2mresourceinstance ${binary})
 
 

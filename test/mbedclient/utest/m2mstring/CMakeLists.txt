@@ -15,7 +15,7 @@ set_target_properties(m2mstring
 PROPERTIES COMPILE_FLAGS "${CMAKE_CXX_FLAGS}"
            LINK_FLAGS "${UTEST_LINK_FLAGS}")
 
-set(binary "m2mstring -ojunit")
+set(binary "m2mstring")
 add_test(m2mstring ${binary})
 
 endif()

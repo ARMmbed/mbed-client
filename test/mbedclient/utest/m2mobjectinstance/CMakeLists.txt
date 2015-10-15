@@ -22,7 +22,7 @@ target_link_libraries(m2mobjectinstance
 set_target_properties(m2mobjectinstance
 PROPERTIES COMPILE_FLAGS "${CMAKE_CXX_FLAGS}"
            LINK_FLAGS "${UTEST_LINK_FLAGS}")
-set(binary "m2mobjectinstance -ojunit")
+set(binary "m2mobjectinstance")
 add_test(m2mobjectinstance ${binary})
 
 endif()

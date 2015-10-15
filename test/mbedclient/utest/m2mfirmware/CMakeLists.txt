@@ -20,7 +20,7 @@ target_link_libraries(m2mfirmware
 set_target_properties(m2mfirmware
 PROPERTIES COMPILE_FLAGS "${CMAKE_CXX_FLAGS}"
            LINK_FLAGS "${UTEST_LINK_FLAGS}")
-set(binary "m2mfirmware -ojunit")
+set(binary "m2mfirmware")
 add_test(m2mfirmware ${binary})
 
 endif()

@@ -24,7 +24,7 @@ target_link_libraries(m2minterfacefactorytest
 set_target_properties(m2minterfacefactorytest
 PROPERTIES COMPILE_FLAGS "${CMAKE_CXX_FLAGS}"
            LINK_FLAGS "${UTEST_LINK_FLAGS}")
-set(binary "m2minterfacefactorytest -ojunit")
+set(binary "m2minterfacefactorytest")
 add_test(m2minterfacefactorytest ${binary})
 
 endif()
