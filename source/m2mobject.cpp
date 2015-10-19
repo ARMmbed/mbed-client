@@ -455,6 +455,9 @@ sn_coap_hdr_s* M2MObject::handle_post_request(nsdl_s *nsdl,
                 } else {
                     msg_code =COAP_MSG_CODE_RESPONSE_UNSUPPORTED_CONTENT_FORMAT;
                 } // if(received_coap_header->content_type_ptr)
+            } else {
+                tr_error("M2MObject::handle_post_request - COAP_MSG_CODE_RESPONSE_BAD_REQUEST - Missing Payload");
+                msg_code = COAP_MSG_CODE_RESPONSE_BAD_REQUEST; //
             }
         } else { // if ((object->operation() & SN_GRS_POST_ALLOWED) != 0)
             tr_error("M2MObject::handle_post_request - COAP_MSG_CODE_RESPONSE_METHOD_NOT_ALLOWED");

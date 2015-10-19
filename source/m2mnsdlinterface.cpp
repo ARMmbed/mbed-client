@@ -447,14 +447,21 @@ uint8_t M2MNsdlInterface::received_from_server_callback(struct nsdl_s * /*nsdl_h
                             coap_response = sn_nsdl_build_response(_nsdl_handle,
                                                                    coap_header,
                                                                    COAP_MSG_CODE_RESPONSE_NOT_FOUND);
-                        }else{
+                        } else {
                             uint16_t instance_id = atoi(resource_name.substr(slash_found+1,
                                                      resource_name.size()-object_name.size()).c_str());
                             M2MBase* base = find_resource(object_name);
                             if(base) {
-                                M2MObject* object = (M2MObject*)base;
-                                object->create_object_instance(instance_id);
-                                value_updated(object);
+                                if(coap_header->payload_ptr) {
+                                    M2MObject* object = (M2MObject*)base;
+                                    object->create_object_instance(instance_id);
+                                    value_updated(object);
+                                } else {
+                                    tr_debug("M2MNsdlInterface::received_from_server_callback - Missing Payload - Cannot create");
+                                    coap_response = sn_nsdl_build_response(_nsdl_handle,
+                                                                           coap_header,
+                                                                           COAP_MSG_CODE_RESPONSE_BAD_REQUEST);
+                                }
                             } else {
                                 coap_response = sn_nsdl_build_response(_nsdl_handle,
                                                                        coap_header,
