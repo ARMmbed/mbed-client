@@ -18,8 +18,7 @@
 
 #include <sys/types.h>
 #include <netdb.h>
-//#include "UDPSocket.h"
-#include "mbed-net-sockets/UDPSocket.h"
+#include "sockets/UDPSocket.h"
 #include "nsdlaccesshelper.h"
 #include "ip6string.h"
 #include "Ticker.h"
