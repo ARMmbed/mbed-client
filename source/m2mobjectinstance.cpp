@@ -545,9 +545,9 @@ sn_coap_hdr_s* M2MObjectInstance::handle_put_request(nsdl_s *nsdl,
             }
 
             if(COAP_CONTENT_OMA_TLV_TYPE == coap_content_type) {
+                M2MTLVDeserializer::Error error = M2MTLVDeserializer::None;
                 M2MTLVDeserializer *deserializer = new M2MTLVDeserializer();
-                if(deserializer) {
-                    M2MTLVDeserializer::Error error = M2MTLVDeserializer::None;
+                if(deserializer && received_coap_header->payload_ptr) {
                     error = deserializer->deserialize_resources(received_coap_header->payload_ptr,
                                                                 received_coap_header->payload_len,
                                                                 *this,
@@ -576,7 +576,8 @@ sn_coap_hdr_s* M2MObjectInstance::handle_put_request(nsdl_s *nsdl,
             } else {
                 msg_code =COAP_MSG_CODE_RESPONSE_UNSUPPORTED_CONTENT_FORMAT;
             } // if(COAP_CONTENT_OMA_TLV_TYPE == coap_content_type)
-            if(received_coap_header->options_list_ptr &&
+            if(!received_coap_header->payload_ptr &&
+               received_coap_header->options_list_ptr &&
                received_coap_header->options_list_ptr->uri_query_ptr) {
                 char *query = (char*)malloc(received_coap_header->options_list_ptr->uri_query_len+1);
                 if (query){
@@ -588,8 +589,10 @@ sn_coap_hdr_s* M2MObjectInstance::handle_put_request(nsdl_s *nsdl,
                    tr_debug("M2MObjectInstance::handle_put_request() - Query %s", query);
                     // if anything was updated, re-initialize the stored notification attributes
                     if (!handle_observation_attribute(query)){
-                        tr_debug("M2MResourceInstance::handle_put_request() - Invalid query");
+                        tr_debug("M2MObjectInstance::handle_put_request() - Invalid query");
                         msg_code = COAP_MSG_CODE_RESPONSE_BAD_REQUEST; // 4.00
+                    } else {
+                        msg_code =COAP_MSG_CODE_RESPONSE_CHANGED;
                     }
                     free(query);
                 }
