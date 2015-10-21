@@ -235,6 +235,9 @@ sn_coap_hdr_s* M2MObject::handle_get_request(nsdl_s *nsdl,
                    M2MBase::coap_content_type() == COAP_CONTENT_OMA_TLV_TYPE) {
                     coap_content_type = COAP_CONTENT_OMA_TLV_TYPE;
                 }
+
+                tr_debug("M2MObject::handle_get_request() - Request Content-Type %d", coap_content_type);
+
                 // fill in the CoAP response payload
                 if(COAP_CONTENT_OMA_TLV_TYPE == coap_content_type) {
                     M2MTLVSerializer *serializer = new M2MTLVSerializer();
@@ -406,6 +409,8 @@ sn_coap_hdr_s* M2MObject::handle_post_request(nsdl_s *nsdl,
                        M2MBase::coap_content_type() == COAP_CONTENT_OMA_TLV_TYPE) {
                         coap_content_type = COAP_CONTENT_OMA_TLV_TYPE;
                     }
+
+                    tr_debug("M2MObject::handle_post_request() - Request Content-Type %d", coap_content_type);
 
                     if(COAP_CONTENT_OMA_TLV_TYPE == coap_content_type) {
                         uint16_t instance_id = 0;
