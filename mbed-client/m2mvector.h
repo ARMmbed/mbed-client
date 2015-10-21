@@ -27,7 +27,6 @@ template <typename ObjectTemplate>
 class Vector
 {
   public:
-
     explicit Vector( int init_size = 0)
             : _size( init_size ),
               _index(0),
@@ -77,14 +76,13 @@ class Vector
             _object_template[k] = old_array[k];
         }
         _capacity = new_capacity;
-
         delete [] old_array;
     }
 
     ObjectTemplate & operator[](int idx) {
         return _object_template[idx];
     }
-    
+
     const ObjectTemplate& operator[](int idx) const {
         return _object_template[idx];
     }
@@ -92,11 +90,11 @@ class Vector
     bool empty() const{
         return size() == 0;
     }
-    
+
     int size() const {
         return _size;
     }
-    
+
     int capacity() const {
         return _capacity;
     }
@@ -146,6 +144,12 @@ class Vector
         if(position <= _size) {
             _object_template[position] = 0;
             _size--;
+            if(position < _index) {
+                for(int k = position; k < _index; k++) {
+                    _object_template[k] = _object_template[k+1];
+                }
+            }
+            _index--;
         }
     }
 

@@ -125,13 +125,13 @@ bool M2MObject::remove_object_instance(uint16_t inst_id)
 
                     free(obj_inst_id);
 
+                    delete obj;
+                    obj = NULL;
+                    _instance_list.erase(pos);
+                    success = true;
+
                     remove_resource_from_coap(obj_name);
                 }
-
-                delete obj;
-                obj = NULL;
-                _instance_list.erase(pos);
-                success = true;
                 break;
             }
         }
