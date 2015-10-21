@@ -360,6 +360,9 @@ sn_coap_hdr_s* M2MResourceInstance::handle_put_request(nsdl_s *nsdl,
                     }
                 }
             }
+
+            tr_debug("M2MResourceInstance::handle_put_request() - Request Content-Type %d", coap_content_type);
+
             if(COAP_CONTENT_OMA_TLV_TYPE == coap_content_type) {
                 msg_code = COAP_MSG_CODE_RESPONSE_UNSUPPORTED_CONTENT_FORMAT;
             } else {
