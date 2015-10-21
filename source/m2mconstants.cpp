@@ -40,7 +40,7 @@ const String M2M_CONNECTIVITY_STATISTICS_ID = "7";
 const String RESERVED_ID = "8";
 
 //OMA RESOURCE TYPE
-const String OMA_RESOURCE_TYPE = "oma.lwm2m";
+const String OMA_RESOURCE_TYPE = ""; //oma.lwm2m
 
 //DEVICE RESOURCES
 const String DEVICE_MANUFACTURER = "0";

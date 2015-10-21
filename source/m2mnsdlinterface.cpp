@@ -462,16 +462,18 @@ uint8_t M2MNsdlInterface::received_from_server_callback(struct nsdl_s * /*nsdl_h
                                                                            coap_header,
                                                                            COAP_MSG_CODE_RESPONSE_BAD_REQUEST);
                                 }
-                            } else {
+                            } else { //if(base)
+                                tr_debug("M2MNsdlInterface::received_from_server_callback - Missing BASE - Cannot create");
                                 coap_response = sn_nsdl_build_response(_nsdl_handle,
                                                                        coap_header,
                                                                        COAP_MSG_CODE_RESPONSE_METHOD_NOT_ALLOWED);
                             }
                         }
-                    }else{
+                    } else{ // if(slash_found != -1)
+                        tr_debug("M2MNsdlInterface::received_from_server_callback - slash_found - Cannot create");
                         coap_response = sn_nsdl_build_response(_nsdl_handle,
                                                                coap_header,
-                                                               COAP_MSG_CODE_RESPONSE_METHOD_NOT_ALLOWED);
+                                                               COAP_MSG_CODE_RESPONSE_NOT_FOUND);
                     }
                     if(coap_response) {
                         tr_debug("M2MNsdlInterface::received_from_server_callback - send CoAP response");
