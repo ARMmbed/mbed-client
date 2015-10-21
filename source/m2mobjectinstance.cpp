@@ -174,7 +174,7 @@ M2MResourceInstance* M2MObjectInstance::create_dynamic_resource_instance(const S
                           observable, true);
         _resource_list.push_back(res);
         res->set_operation(M2MBase::GET_PUT_ALLOWED);
-        res->set_observable(observable);
+        res->set_observable(false);
         if(M2MBase::coap_content_type() == COAP_CONTENT_OMA_TLV_TYPE) {
             res->set_coap_content_type(COAP_CONTENT_OMA_TLV_TYPE);
         }

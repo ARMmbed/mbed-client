@@ -430,11 +430,22 @@ sn_coap_hdr_s* M2MObject::handle_post_request(nsdl_s *nsdl,
                             M2MTLVDeserializer *deserializer = new M2MTLVDeserializer();
                             if(deserializer) {
                                 M2MTLVDeserializer::Error error = M2MTLVDeserializer::None;
-                                error = deserializer->deserialise_object_instances(received_coap_header->payload_ptr,
-                                                                           received_coap_header->payload_len,
-                                                                           *this,
-                                                                           M2MTLVDeserializer::Post);
-
+                                if(deserializer->is_object_instance(received_coap_header->payload_ptr)) {
+                                    tr_debug("M2MObject::handle_post_request() - TLV data contains ObjectInstance");
+                                    error = deserializer->deserialise_object_instances(received_coap_header->payload_ptr,
+                                                                               received_coap_header->payload_len,
+                                                                               *this,
+                                                                               M2MTLVDeserializer::Post);
+                                } else if(deserializer->is_resource(received_coap_header->payload_ptr) ||
+                                          deserializer->is_multiple_resource(received_coap_header->payload_ptr)) {
+                                    tr_debug("M2MObject::handle_post_request() - TLV data contains Resources");
+                                    error = deserializer->deserialize_resources(received_coap_header->payload_ptr,
+                                                                                received_coap_header->payload_len,
+                                                                                *obj_instance,
+                                                                                M2MTLVDeserializer::Post);
+                                } else {
+                                    error = M2MTLVDeserializer::NotValid;
+                                }
                                 switch(error) {
                                     case M2MTLVDeserializer::None:
                                         if(observation_handler) {
