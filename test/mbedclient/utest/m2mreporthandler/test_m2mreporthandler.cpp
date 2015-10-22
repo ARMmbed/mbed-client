@@ -255,8 +255,5 @@ void Test_M2MReportHandler::test_trigger_object_notification()
     _handler->_pmin_exceeded = true;
     _handler->trigger_object_notification();
     CHECK(_handler->_pmin_exceeded == false);
-
-    _handler->_under_observation = true;
-    _handler->trigger_object_notification();
-    CHECK(_handler->_report_scheduled == true);
+    CHECK(_observer->visited == true);
 }

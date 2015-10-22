@@ -103,19 +103,11 @@ void M2MReportHandler::trigger_object_notification()
     tr_debug("M2MReportHandler::trigger_object_notification()");
     if(_under_observation) {
         tr_debug("M2MReportHandler::trigger_object_notification - report value");
-        report_object_notification();
-    }
-}
-
-void M2MReportHandler::report_object_notification()
-{
-    tr_debug("M2MReportHandler::report_object_notification()");
-    if(_under_observation) {
         _pmin_exceeded = false;
-        _pmax_exceeded = false;        
+        _pmax_exceeded = false;
         _observer.observation_to_be_sent();
+        handle_timers();
     }
-    handle_timers();
 }
 
 bool M2MReportHandler::parse_notification_attribute(char *&query,

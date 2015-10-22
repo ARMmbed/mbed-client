@@ -111,11 +111,6 @@ private:
     void report(float value);
 
     /**
-     * @brief Reports that object or object instance satisfies the reporting criteria.
-    */
-    void report_object_notification();
-
-    /**
     * @brief Manage timers for pmin and pmax.
     */
     void handle_timers();
