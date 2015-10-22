@@ -467,7 +467,7 @@ sn_coap_hdr_s* M2MObjectInstance::handle_get_request(nsdl_s *nsdl,
                                 }
                                 // If the observe value is 0 means register for observation.
                                 if(number == 0) {
-                                    tr_debug("M2MResource::handle_get_request - Put Resource under Observation");
+                                    tr_debug("M2MObjectInstance::handle_get_request - Put Resource under Observation");
                                     set_under_observation(true,observation_handler);
                                     add_observation_level(M2MBase::OI_Attribute);
 

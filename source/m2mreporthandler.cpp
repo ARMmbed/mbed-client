@@ -75,7 +75,8 @@ void M2MReportHandler::set_value(float value)
 {
     tr_debug("M2MReportHandler::set_value()");
     _current_value = value;    
-    if(_current_value != _last_value && _under_observation) {               
+    if(_current_value != _last_value && _under_observation) {
+        tr_debug("M2MReportHandler::set_value() - UNDER OBSERVATION");
         if (check_threshold_values()) {
             _notify = true;
             schedule_report(_current_value);
@@ -99,16 +100,10 @@ void M2MReportHandler::set_value(float value)
 
 void M2MReportHandler::trigger_object_notification()
 {
-    tr_debug("M2MReportHandler::trigger_notification()");
+    tr_debug("M2MReportHandler::trigger_object_notification()");
     if(_under_observation) {
-        if (_pmin_exceeded) {
-            tr_debug("M2MReportHandler::trigger_notification - report value");
-            report_object_notification();
-        }
-        else {
-           tr_debug("M2MReportHandler::trigger_notification - set true");
-            _report_scheduled = true;
-        }
+        tr_debug("M2MReportHandler::trigger_object_notification - report value");
+        report_object_notification();
     }
 }
 
