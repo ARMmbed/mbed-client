@@ -692,7 +692,8 @@ void M2MNsdlInterface::observation_to_be_sent(M2MBase *object)
             send_object_observation((M2MObject*)object);
         } else if(type == M2MBase::ObjectInstance) {
             send_object_instance_observation((M2MObjectInstance*)object);
-        } else if(type == M2MBase::Resource) {
+        } else if(type == M2MBase::Resource ||
+                  type == M2MBase::ResourceInstance) {
             send_resource_observation((M2MResourceInstance*)object);
         }
     }
@@ -1319,7 +1320,7 @@ void M2MNsdlInterface::send_resource_observation(M2MResourceInstance *resource)
                                               observation_number,
                                               observation_number_length,
                                               COAP_MSG_TYPE_CONFIRMABLE,
-                                              resource->coap_content_type());
+                                              0);
         memory_free(value);
         memory_free(token);
     }
