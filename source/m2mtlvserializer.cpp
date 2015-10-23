@@ -153,7 +153,8 @@ void M2MTLVSerializer::serialize_TILV(uint8_t type, uint16_t id, uint8_t *value,
     type += value_length < 8 ? value_length :
             value_length < 256 ? LENGTH8 :
             value_length < 65536 ? LENGTH16 : LENGTH24;
-    uint8_t *tlv_type = (uint8_t*)malloc(type_length);
+    uint8_t *tlv_type = (uint8_t*)malloc(type_length+1);
+    memset(tlv_type,0,type_length+1);
     *tlv_type = type & 0xFF;
 
     uint32_t id_size = 0;
@@ -162,7 +163,8 @@ void M2MTLVSerializer::serialize_TILV(uint8_t type, uint16_t id, uint8_t *value,
     uint32_t length_size = 0;
     uint8_t* length_ptr = serialize_length(value_length, length_size);
 
-    tlv = (uint8_t*)malloc(size + type_length + id_size + length_size + value_length);
+    tlv = (uint8_t*)malloc(size + type_length + id_size + length_size + value_length+1);
+    memset(tlv,0,size + type_length + id_size + length_size + value_length+1);
     if(data) {
         memcpy(tlv, data, size);
     }
@@ -211,7 +213,8 @@ uint8_t* M2MTLVSerializer::serialize_length(uint32_t length, uint32_t &size)
     uint32_t length_size = 0;
     if (length > 65535) {
         length_size = 3;
-        length_ptr = (uint8_t*)malloc(length_size);
+        length_ptr = (uint8_t*)malloc(length_size+1);
+        memset(length_ptr,0,length_size+1);
         *length_ptr = (length & 0xFF0000) >> 16;
         length_ptr++;
         *length_ptr = (length & 0xFF00) >> 8;
@@ -221,14 +224,16 @@ uint8_t* M2MTLVSerializer::serialize_length(uint32_t length, uint32_t &size)
         length_ptr--;
     } else if (length > 255) {
         length_size = 2;
-        length_ptr = (uint8_t*)malloc(length_size);
+        length_ptr = (uint8_t*)malloc(length_size+1);
+        memset(length_ptr,0,length_size+1);
         *length_ptr = (length & 0xFF00) >> 8;
         length_ptr++;
         *length_ptr = length & 0xFF;
         length_ptr--;
     } else if (length > 7) {
         length_size = 1;
-        length_ptr = (uint8_t*)malloc(length_size);
+        length_ptr = (uint8_t*)malloc(length_size+1);
+        memset(length_ptr,0,length_size+1);
         *length_ptr = length & 0xFF;
     }
     size += length_size;

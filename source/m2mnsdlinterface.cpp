@@ -540,6 +540,10 @@ uint8_t M2MNsdlInterface::resource_callback(struct nsdl_s */*nsdl_handle*/,
     if(coap_response) {
         tr_debug("M2MNsdlInterface::resource_callback() - send CoAP response");
         (sn_nsdl_send_coap_message(_nsdl_handle, address, coap_response) == 0) ? result = 0 : result = 1;
+        if(coap_response->payload_ptr) {
+            free(coap_response->payload_ptr);
+            coap_response->payload_ptr = NULL;
+        }
         sn_nsdl_release_allocated_coap_msg_mem(_nsdl_handle, coap_response);
     }
     return result;
