@@ -23,7 +23,7 @@
 #include <pthread.h>
 #include <signal.h> /* For SIGIGN and SIGINT */
 #else
-#include "mbed-net-sockets/UDPSocket.h"
+#include "sockets/UDPSocket.h"
 #ifdef SIXLOWPAN_INTERFACE
 #include "atmel-rf-driver/driverRFPhy.h"    // rf_device_register
 #include "mbed-mesh-api/Mesh6LoWPAN_ND.h"

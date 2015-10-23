@@ -751,7 +751,7 @@ bool M2MNsdlInterface::create_nsdl_object_structure(M2MObject *object)
     if(object) {
         //object->set_under_observation(false,this);
         M2MObjectInstanceList instance_list = object->instances();
-        tr_debug("M2MNsdlInterface::create_nsdl_object_structure - Objecy Instance count %d", instance_list.size());
+        tr_debug("M2MNsdlInterface::create_nsdl_object_structure - Object Instance count %d", instance_list.size());
         if(!instance_list.empty()) {
            M2MObjectInstanceList::const_iterator it;
            it = instance_list.begin();

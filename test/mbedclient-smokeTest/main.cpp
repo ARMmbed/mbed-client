@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "mbed-net-sockets/UDPSocket.h"
+#include "sockets/UDPSocket.h"
 #include "EthernetInterface.h"
 #include "test_env.h"
 #include "mbed-client/m2minterfacefactory.h"
