@@ -420,6 +420,7 @@ sn_coap_hdr_s* M2MObject::handle_post_request(nsdl_s *nsdl,
                             }
                             if(instance_id == 65535) {
                                 msg_code = COAP_MSG_CODE_RESPONSE_METHOD_NOT_ALLOWED;
+                                break;
                             }
                         }
                         if(COAP_MSG_CODE_RESPONSE_CHANGED == msg_code) {

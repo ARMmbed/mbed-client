@@ -243,17 +243,11 @@ sn_coap_hdr_s* M2MResourceInstance::handle_get_request(nsdl_s *nsdl,
         // process the GET if we have registered a callback for it
         if ((operation() & SN_GRS_GET_ALLOWED) != 0) {
             if(coap_response) {
-                char *content_type = (char*)malloc(20);
-                int content_type_size = snprintf(content_type, 20,"%x",coap_content_type());
-
-                coap_response->content_type_ptr = (uint8_t*)malloc(content_type_size);
+                coap_response->content_type_ptr = (uint8_t*)malloc(1);
                 if(coap_response->content_type_ptr) {
-                    memset(coap_response->content_type_ptr, 0, content_type_size);
-                    memcpy(coap_response->content_type_ptr,content_type,content_type_size);
-                    coap_response->content_type_len = (uint8_t)content_type_size;
+                    memset(coap_response->content_type_ptr, 0, 1);
+                    coap_response->content_type_len = 1;
                 }
-
-                free(content_type);
 
                 // fill in the CoAP response payload
                 coap_response->payload_len = value_length();
