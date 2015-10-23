@@ -207,10 +207,11 @@ sn_coap_hdr_s* M2MResource::handle_get_request(nsdl_s *nsdl,
 {
     tr_debug("M2MResource::handle_get_request()");
     sn_coap_msg_code_e msg_code = COAP_MSG_CODE_RESPONSE_CONTENT;
-    sn_coap_hdr_s * coap_response = sn_nsdl_build_response(nsdl,
-                                                           received_coap_header,
-                                                           msg_code);
+    sn_coap_hdr_s * coap_response = NULL;
     if(_has_multiple_instances) {
+        coap_response = sn_nsdl_build_response(nsdl,
+                                               received_coap_header,
+                                               msg_code);
         if(received_coap_header) {
             // process the GET if we have registered a callback for it
             if ((operation() & SN_GRS_GET_ALLOWED) != 0) {
