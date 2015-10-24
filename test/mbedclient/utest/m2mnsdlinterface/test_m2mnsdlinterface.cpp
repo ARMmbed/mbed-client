@@ -682,7 +682,7 @@ void Test_M2MNsdlInterface::test_resource_callback_post()
 
     nsdl->_object_list.push_back(object);
 
-    m2mbase_stub::operation = M2MBase::PUT_ALLOWED;
+    m2mbase_stub::operation = M2MBase::POST_ALLOWED;
 
     coap_header->options_list_ptr = (sn_coap_options_list_s*)malloc(sizeof(sn_coap_options_list_s));
 
@@ -699,6 +699,10 @@ void Test_M2MNsdlInterface::test_resource_callback_post()
 
     m2mobject_stub::base_type = M2MBase::Resource;
     m2mbase_stub::base_type = M2MBase::Resource;
+    CHECK(nsdl->resource_callback(NULL,coap_header,address,SN_NSDL_PROTOCOL_HTTP) ==0);
+
+    m2mobject_stub::base_type = M2MBase::ResourceInstance;
+    m2mbase_stub::base_type = M2MBase::ResourceInstance;
     CHECK(nsdl->resource_callback(NULL,coap_header,address,SN_NSDL_PROTOCOL_HTTP) ==0);
 
     m2mobject_stub::base_type = M2MBase::ObjectInstance;
