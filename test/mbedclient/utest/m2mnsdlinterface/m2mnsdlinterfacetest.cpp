@@ -103,20 +103,20 @@ TEST(M2MNsdlInterface, resource_callback)
     m2m_nsdl_interface->test_resource_callback();
 }
 
-//TEST(M2MNsdlInterface, resource_callback_get)
-//{
-//    m2m_nsdl_interface->test_resource_callback_get();
-//}
+TEST(M2MNsdlInterface, resource_callback_get)
+{
+    m2m_nsdl_interface->test_resource_callback_get();
+}
 
-//TEST(M2MNsdlInterface, resource_callback_put)
-//{
-//    m2m_nsdl_interface->test_resource_callback_put();
-//}
+TEST(M2MNsdlInterface, resource_callback_put)
+{
+    m2m_nsdl_interface->test_resource_callback_put();
+}
 
-//TEST(M2MNsdlInterface, resource_callback_post)
-//{
-//    m2m_nsdl_interface->test_resource_callback_post();
-//}
+TEST(M2MNsdlInterface, resource_callback_post)
+{
+    m2m_nsdl_interface->test_resource_callback_post();
+}
 
 TEST(M2MNsdlInterface, resource_callback_delete)
 {

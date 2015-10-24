@@ -250,8 +250,10 @@ sn_coap_hdr_s* M2MResourceInstance::handle_get_request(nsdl_s *nsdl,
                 }
 
                 // fill in the CoAP response payload
-                coap_response->payload_len = value_length();
-                coap_response->payload_ptr = value();
+                coap_response->payload_ptr = NULL;
+                uint32_t payload_len = 0;
+                get_value(coap_response->payload_ptr,payload_len);
+                coap_response->payload_len = payload_len;
 
                 coap_response->options_list_ptr = (sn_coap_options_list_s*)malloc(sizeof(sn_coap_options_list_s));
                 memset(coap_response->options_list_ptr, 0, sizeof(sn_coap_options_list_s));
