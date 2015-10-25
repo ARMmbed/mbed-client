@@ -331,7 +331,7 @@ uint8_t M2MNsdlInterface::send_to_server_callback(struct nsdl_s * /*nsdl_handle*
     return 1;
 }
 
-uint8_t M2MNsdlInterface::received_from_server_callback(struct nsdl_s * /*nsdl_handle*/,
+uint8_t M2MNsdlInterface::received_from_server_callback(struct nsdl_s * nsdl_handle,
                                                         sn_coap_hdr_s *coap_header,
                                                         sn_nsdl_addr_s *address)
 {
@@ -352,31 +352,41 @@ uint8_t M2MNsdlInterface::received_from_server_callback(struct nsdl_s * /*nsdl_h
 
                 _observer.client_registered(_server);
                 // If lifetime is less than zero then leave the field empty
-                if(coap_header->options_list_ptr &&
-                    coap_header->options_list_ptr->max_age_ptr) {
-                    if(_endpoint->lifetime_ptr) {
-                        memory_free(_endpoint->lifetime_ptr);
-                        _endpoint->lifetime_ptr = NULL;
-                        _endpoint->lifetime_len = 0;
-                    }
-                    uint32_t max_time = 0;
-                    for(int i=0;i < coap_header->options_list_ptr->max_age_len; i++) {
-                        max_time += (*(coap_header->options_list_ptr->max_age_ptr + i) & 0xff) <<
-                                 8*(coap_header->options_list_ptr->max_age_len- 1 - i);
+                if(coap_header->options_list_ptr) {
+                    if(coap_header->options_list_ptr->max_age_ptr) {
+                        if(_endpoint->lifetime_ptr) {
+                            memory_free(_endpoint->lifetime_ptr);
+                            _endpoint->lifetime_ptr = NULL;
+                            _endpoint->lifetime_len = 0;
                         }
-                    // If lifetime is less than zero then leave the field empty
-                    if( max_time > 0) {
-                        char *buffer = (char*)memory_alloc(20);
-                        if(buffer) {
-                            int size = snprintf(buffer, 20,"%lu",(uint32_t)max_time);
-                            _endpoint->lifetime_ptr = (uint8_t*)memory_alloc(size+1);
-                            if(_endpoint->lifetime_ptr) {
-                                memset(_endpoint->lifetime_ptr, 0, size+1);
-                                memcpy(_endpoint->lifetime_ptr,buffer,size);
-                                _endpoint->lifetime_len =  size;
+                        uint32_t max_time = 0;
+                        for(int i=0;i < coap_header->options_list_ptr->max_age_len; i++) {
+                            max_time += (*(coap_header->options_list_ptr->max_age_ptr + i) & 0xff) <<
+                                     8*(coap_header->options_list_ptr->max_age_len- 1 - i);
                             }
-                            memory_free(buffer);
+                        // If lifetime is less than zero then leave the field empty
+                        if( max_time > 0) {
+                            char *buffer = (char*)memory_alloc(20);
+                            if(buffer) {
+                                int size = snprintf(buffer, 20,"%lu",(uint32_t)max_time);
+                                _endpoint->lifetime_ptr = (uint8_t*)memory_alloc(size+1);
+                                if(_endpoint->lifetime_ptr) {
+                                    memset(_endpoint->lifetime_ptr, 0, size+1);
+                                    memcpy(_endpoint->lifetime_ptr,buffer,size);
+                                    _endpoint->lifetime_len =  size;
+                                }
+                                memory_free(buffer);
+                            }
                         }
+                    }
+                    if(coap_header->options_list_ptr->location_path_ptr) {
+                        _endpoint->location_ptr = (uint8_t*)memory_alloc(coap_header->options_list_ptr->location_path_len+1);
+                        memset(_endpoint->location_ptr,0,coap_header->options_list_ptr->location_path_len+1);
+                        memcpy(_endpoint->location_ptr,
+                               coap_header->options_list_ptr->location_path_ptr,
+                               coap_header->options_list_ptr->location_path_len);
+                        _endpoint->location_len = coap_header->options_list_ptr->location_path_len ;
+                        sn_nsdl_set_endpoint_location(_nsdl_handle,_endpoint->location_ptr,_endpoint->location_len);
                     }
                 }
                 if(_endpoint->lifetime_ptr) {
@@ -448,14 +458,21 @@ uint8_t M2MNsdlInterface::received_from_server_callback(struct nsdl_s * /*nsdl_h
                                                                    coap_header,
                                                                    COAP_MSG_CODE_RESPONSE_NOT_FOUND);
                         } else {
-                            uint16_t instance_id = atoi(resource_name.substr(slash_found+1,
+                            int32_t instance_id = atoi(resource_name.substr(slash_found+1,
                                                      resource_name.size()-object_name.size()).c_str());
                             M2MBase* base = find_resource(object_name);
-                            if(base) {
+                            if(base && (instance_id >= 0) && (instance_id < 65536)) {
                                 if(coap_header->payload_ptr) {
                                     M2MObject* object = (M2MObject*)base;
-                                    object->create_object_instance(instance_id);
-                                    value_updated(object);
+                                    M2MObjectInstance *obj_instance = object->create_object_instance(instance_id);
+                                    if(obj_instance) {
+                                        obj_instance->set_operation(M2MBase::GET_PUT_ALLOWED);
+                                    }
+                                    coap_response = object->handle_post_request(_nsdl_handle,coap_header,this);
+                                    if(coap_response->msg_code != COAP_MSG_CODE_RESPONSE_CREATED) {
+                                        //Invalid request so remove created ObjectInstance
+                                        object->remove_object_instance(instance_id);
+                                    }
                                 } else {
                                     tr_debug("M2MNsdlInterface::received_from_server_callback - Missing Payload - Cannot create");
                                     coap_response = sn_nsdl_build_response(_nsdl_handle,
