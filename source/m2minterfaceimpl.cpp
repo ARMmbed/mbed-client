@@ -381,11 +381,11 @@ void M2MInterfaceImpl::data_sent()
 void M2MInterfaceImpl::timer_expired(M2MTimerObserver::Type type)
 {
     tr_debug("M2MInterfaceImpl::timer_expired()");
-    if(M2MTimerObserver::QueueSleep == type) {
-        _queue_sleep_timer->stop_timer();
+    if(M2MTimerObserver::QueueSleep == type) {        
         if(_callback_handler) {
             _callback_handler();
         }
+    _queue_sleep_timer->stop_timer();
     }
 }
 
