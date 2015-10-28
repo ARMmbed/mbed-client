@@ -119,11 +119,16 @@ public:
      */
     int receive_from_socket(unsigned char *buf, size_t len);
 
-
     /**
     * @brief Closes the open connection.
     */
     void close_connection();
+
+    /**
+    * @brief Error handling for DTLS connectivity.
+    * @param error, Error code from TLS library
+    */
+    void handle_connection_error(int error);
 
 private:
 
