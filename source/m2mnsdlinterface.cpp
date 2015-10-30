@@ -235,13 +235,13 @@ bool M2MNsdlInterface::send_register_message(uint8_t* address,
 {
     tr_debug("M2MNsdlInterface::send_register_message()");
     bool success = false;
-    if(set_NSP_address(_nsdl_handle,address, port, address_type) == 0) {
+    /*if(set_NSP_address(_nsdl_handle,address, port, address_type) == 0) {
         if(_register_id == 0) {
             _register_id = sn_nsdl_register_endpoint(_nsdl_handle,_endpoint);
             tr_debug("M2MNsdlInterface::send_register_message - _register_id %d", _register_id);
             success = _register_id != 0;
         }
-    }
+    }*/
     return success;
 }
 
