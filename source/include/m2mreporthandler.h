@@ -71,6 +71,11 @@ public:
     void trigger_object_notification();
 
     /**
+     * @brief Sets notification trigger for String resources.
+     */
+    void set_string_notification_trigger();
+
+    /**
      * @brief Parses the received query for notification
      * attribute.
      * @param query Query to be parsed for attributes.
@@ -103,12 +108,12 @@ private:
      * then report immediately else store the state to be
      * reported once the time fires.
      */
-    void schedule_report(float value);
+    void schedule_report();
 
     /**
     * @brief Reports a sample that satisfies the reporting criteria.
     */
-    void report(float value);
+    void report();
 
     /**
     * @brief Manage timers for pmin and pmax.

@@ -37,6 +37,8 @@ public:
 
     void test_trigger_object_notification();
 
+    void test_set_string_notification_trigger();
+
     M2MReportHandler *_handler;
     Observer         * _observer;
 };

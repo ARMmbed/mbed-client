@@ -188,7 +188,9 @@ public:
 
 private:
 
-    void report(float value);
+    void report();
+
+    bool is_value_changed(const uint8_t* value, const uint32_t value_len);
 
 private:
 
