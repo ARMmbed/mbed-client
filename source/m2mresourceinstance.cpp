@@ -141,13 +141,19 @@ void M2MResourceInstance::clear_value()
          _value = NULL;
          _value_length = 0;
     }
-    report(0);
+    report();
 }
 
 bool M2MResourceInstance::set_value(const uint8_t *value,
                                     const uint32_t value_length)
 {
     bool success = false;
+    bool string_value_changed = false;
+    if(_resource_type == M2MResourceInstance::STRING) {
+        if(is_value_changed(value,value_length)) {
+            string_value_changed = true;
+        }
+    }
     if( value != NULL && value_length > 0 ) {
         success = true;
         if(_value) {
@@ -160,14 +166,22 @@ bool M2MResourceInstance::set_value(const uint8_t *value,
             memset(_value, 0, value_length+1);
             memcpy((uint8_t *)_value, (uint8_t *)value, value_length);
             _value_length = value_length;
-            report(atof((const char*)_value));
+            if(string_value_changed) {
+                M2MReportHandler *report_handler = M2MBase::report_handler();
+                if(report_handler) {
+                    report_handler->set_string_notification_trigger();
+                }
+            } else {
+                report();
+            }
         }
     }
+
     return success;
 }
 
 
-void M2MResourceInstance::report(float value)
+void M2MResourceInstance::report()
 {
     tr_debug("M2MResourceInstance::report()");
     if(M2MBase::Dynamic == mode()) {
@@ -193,6 +207,22 @@ void M2MResourceInstance::report(float value)
     } else {
         tr_debug("Not supported mode");
     }
+}
+
+bool M2MResourceInstance::is_value_changed(const uint8_t* value, const uint32_t value_len)
+{
+    tr_debug("M2MResourceInstance::is_value_changed()");
+    bool changed = false;
+    if(value_len != _value_length) {
+        changed = true;
+    } else if(value && !_value) {
+        changed = true;
+    } else if(_value && !value) {
+        changed = true;
+    } else if(*_value != *value){
+        changed = true;
+    }
+    return changed;
 }
 
 void M2MResourceInstance::execute(void *arguments)

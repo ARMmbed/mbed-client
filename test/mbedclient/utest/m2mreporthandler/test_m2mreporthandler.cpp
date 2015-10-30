@@ -296,3 +296,11 @@ void Test_M2MReportHandler::test_trigger_object_notification()
     CHECK(_handler->_pmin_exceeded == false);
     CHECK(_observer->visited == true);
 }
+
+void Test_M2MReportHandler::test_set_string_notification_trigger()
+{
+    _handler->_under_observation = true;
+    _handler->_pmin_exceeded = true;
+    _handler->set_string_notification_trigger();
+    CHECK(_handler->_pmin_exceeded == false);
+}
