@@ -120,6 +120,11 @@ uint16_t sn_nsdl_send_observation_notification(struct nsdl_s *, uint8_t *, uint8
     return common_stub::uint_value;
 }
 
+int8_t sn_nsdl_set_endpoint_location(struct nsdl_s *, uint8_t *, uint8_t)
+{
+    return common_stub::int_value;
+}
+
 int8_t sn_nsdl_destroy(struct nsdl_s *handle)
 {
     return common_stub::int_value;

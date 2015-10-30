@@ -79,8 +79,13 @@ M2MNsdlInterface::~M2MNsdlInterface()
             memory_free(_endpoint->lifetime_ptr);
             _endpoint->lifetime_ptr = NULL;
         }
+        if(_endpoint->location_ptr) {
+            memory_free(_endpoint->location_ptr);
+            _endpoint->location_ptr = NULL;
+        }
         memory_free(_endpoint);
         _endpoint = NULL;
+
     }
     delete _nsdl_exceution_timer;
     delete _registration_timer;
@@ -469,7 +474,7 @@ uint8_t M2MNsdlInterface::received_from_server_callback(struct nsdl_s * nsdl_han
                                         obj_instance->set_operation(M2MBase::GET_PUT_ALLOWED);
                                     }
                                     coap_response = object->handle_post_request(_nsdl_handle,coap_header,this);
-                                    if(coap_response->msg_code != COAP_MSG_CODE_RESPONSE_CREATED) {
+                                    if(coap_response && coap_response->msg_code != COAP_MSG_CODE_RESPONSE_CREATED) {
                                         //Invalid request so remove created ObjectInstance
                                         object->remove_object_instance(instance_id);
                                     }

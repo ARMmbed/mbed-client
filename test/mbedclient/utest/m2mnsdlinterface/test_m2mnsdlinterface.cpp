@@ -281,6 +281,10 @@ void Test_M2MNsdlInterface::test_received_from_server_callback()
     coap_header->options_list_ptr->max_age_ptr = (uint8_t *)malloc(sizeof(coap_header->options_list_ptr->max_age_len));
     memset(coap_header->options_list_ptr->max_age_ptr, 0, sizeof(coap_header->options_list_ptr->max_age_len));
 
+    coap_header->options_list_ptr->location_path_len = 2;
+    coap_header->options_list_ptr->location_path_ptr = (uint8_t *)malloc(sizeof(coap_header->options_list_ptr->location_path_len));
+    memset(coap_header->options_list_ptr->location_path_ptr, 0, sizeof(coap_header->options_list_ptr->location_path_len));
+
     observer->data_processed = false;
     observer->registered = false;
     nsdl->received_from_server_callback(NULL,coap_header,NULL);
@@ -289,6 +293,9 @@ void Test_M2MNsdlInterface::test_received_from_server_callback()
 
     free(nsdl->_endpoint->lifetime_ptr);
     nsdl->_endpoint->lifetime_ptr = NULL;
+
+    free(nsdl->_endpoint->location_ptr);
+    nsdl->_endpoint->location_ptr = NULL;
 
     uint8_t life1[] = {"120"};
     nsdl->_endpoint->lifetime_ptr = (uint8_t*)malloc(sizeof(life1));
@@ -303,6 +310,9 @@ void Test_M2MNsdlInterface::test_received_from_server_callback()
 
     free(coap_header->options_list_ptr->max_age_ptr);
     coap_header->options_list_ptr->max_age_ptr = NULL;
+
+    free(coap_header->options_list_ptr->location_path_ptr);
+    coap_header->options_list_ptr->location_path_ptr = NULL;
 
     free(coap_header->options_list_ptr);
     coap_header->options_list_ptr = NULL;
@@ -483,6 +493,8 @@ void Test_M2MNsdlInterface::test_received_from_server_callback()
     coap_header->uri_path_ptr = object_instance;
     coap_header->uri_path_len = sizeof(object_instance);
 
+    coap_header->payload_ptr = (uint8_t*)malloc(1);
+
     CHECK(0== nsdl->received_from_server_callback(NULL,coap_header,NULL));
 
     M2MObject *obj = new M2MObject("name");
@@ -491,12 +503,51 @@ void Test_M2MNsdlInterface::test_received_from_server_callback()
 
     nsdl->_object_list.push_back(obj);
 
+    m2mobject_stub::inst = new M2MObjectInstance("name",*obj);
+
+    m2mobject_stub::header = (sn_coap_hdr_s*) malloc(sizeof(sn_coap_hdr_s));
+    memset(m2mobject_stub::header,0,sizeof(sn_coap_hdr_s));
+
     CHECK(0== nsdl->received_from_server_callback(NULL,coap_header,NULL));
 
+    free(coap_header->payload_ptr);
+    coap_header->payload_ptr = NULL;
+
+    CHECK(0== nsdl->received_from_server_callback(NULL,coap_header,NULL));
+
+    delete m2mobject_stub::inst;
     delete m2mbase_stub::string_value;
     m2mbase_stub::string_value = NULL;
     nsdl->_object_list.clear();
     delete obj;
+
+    free(coap_header->payload_ptr);
+
+    uint8_t object_instance1[] = {"name/65536"};
+
+    coap_header->uri_path_ptr = object_instance1;
+    coap_header->uri_path_len = sizeof(object_instance1);
+
+    obj = new M2MObject("name");
+
+    m2mbase_stub::string_value = new String("name");
+
+    nsdl->_object_list.push_back(obj);
+
+    m2mobject_stub::inst = new M2MObjectInstance("name",*obj);
+
+    m2mobject_stub::header = (sn_coap_hdr_s*) malloc(sizeof(sn_coap_hdr_s));
+    memset(m2mobject_stub::header,0,sizeof(sn_coap_hdr_s));
+
+    CHECK(0== nsdl->received_from_server_callback(NULL,coap_header,NULL));
+
+    delete m2mobject_stub::inst;
+    delete m2mbase_stub::string_value;
+    m2mbase_stub::string_value = NULL;
+    nsdl->_object_list.clear();
+    delete obj;
+
+    free(m2mobject_stub::header);
 
     uint8_t resource[] = {"name/0/resource"};
 
@@ -518,6 +569,9 @@ void Test_M2MNsdlInterface::test_resource_callback()
 
     common_stub::coap_header = (sn_coap_hdr_ *)malloc(sizeof(sn_coap_hdr_));
     memset(common_stub::coap_header,0,sizeof(sn_coap_hdr_));
+
+    common_stub::coap_header->payload_ptr =(uint8_t*)malloc(1);
+    common_stub::coap_header->payload_len = 1;
 
     coap_header->uri_path_ptr = value;
     coap_header->uri_path_len = sizeof(value);
@@ -1135,13 +1189,15 @@ void Test_M2MNsdlInterface::test_value_updated()
                                             false);
 
     m2mobject_stub::base_type = M2MBase::Object;
+    m2mbase_stub::string_value = new String("name");
+    m2mbase_stub::operation = M2MBase::GET_ALLOWED;
+
     nsdl->value_updated(object);
     CHECK(observer->value_update == true);
     observer->value_update = false;
 
     m2mobjectinstance_stub::base_type = M2MBase::ObjectInstance;
 
-    m2mbase_stub::string_value = new String("name");
     nsdl->value_updated(object_instance);
     CHECK(observer->value_update == true);
     observer->value_update = false;
