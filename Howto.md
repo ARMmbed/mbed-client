@@ -215,13 +215,24 @@ As per the OMA LWM2M specification, the client must have created Resources under
 
 - You can create a single-instance Resource with a static value using this API:
 
-	```M2MResource* create_static_resource(const String &resource_name,const String &resource_type,M2MResourceInstance::ResourceType type,
-                                        const uint8_t *value,const uint8_t value_length,bool multiple_instance = false);```
+	``` 
+	M2MResource* create_static_resource(const String &resource_name,
+	                                    const String &resource_type,
+	                                    M2MResourceInstance::ResourceType type,
+                                            const uint8_t *value,
+                                            const uint8_t value_length,
+                                            bool multiple_instance = false);
+        ```
 
 - You can create a single-instance Resource with a dynamic value, which can be set later on, using this API:
 
-	```M2MResource* create_dynamic_resource(const String &resource_name,const String &resource_type,M2MResourceInstance::ResourceType type,
-                                        bool observable,bool multiple_instance = false);```
+	```
+	M2MResource* create_dynamic_resource(const String &resource_name,
+	                                     const String &resource_type,
+	                                     M2MResourceInstance::ResourceType type,
+                                             bool observable,
+                                             bool multiple_instance = false);
+        ```
 
 These APIs take different parameters, which you can see in their documentation.
 
@@ -232,13 +243,24 @@ You can create M2MResourceInstance from the M2MObjectInstance class.
 
 - You can create a Resource Instance with a static value using this API:
 
-	```M2MResourceInstance* create_static_resource_instance(const String &resource_name,const String &resource_type,M2MResourceInstance::ResourceType type,
-                                                         const uint8_t *value,const uint8_t value_length,uint16_t instance_id);```
+	```
+	M2MResourceInstance* create_static_resource_instance(const String &resource_name,
+							     const String &resource_type,
+							     M2MResourceInstance::ResourceType type,
+                                                             const uint8_t *value,
+                                                             const uint8_t value_length,
+                                                             uint16_t instance_id);
+        ```
 
 - You can create a Resource Instance with a dynamic value, which can be set later on, using this API:
 
-	```M2MResourceInstance* create_dynamic_resource_instance(const String &resource_name,const String &resource_type,M2MResourceInstance::ResourceType type,
-                                                          bool observable,uint16_t instance_id);```
+	```
+	M2MResourceInstance* create_dynamic_resource_instance(const String &resource_name,
+							      const String &resource_type,
+							      M2MResourceInstance::ResourceType type,
+                                                              bool observable,
+                                                              uint16_t instance_id);
+        ```
 
 These APIs take different parameters, which you can see in their documentation.
 
