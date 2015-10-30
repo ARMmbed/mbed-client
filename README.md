@@ -31,7 +31,7 @@ M2MInterface* interface = M2MInterfaceFactory::create_interface(*this,
                                                   "mbed-endpoint",
                                                   "test",
                                                   3600,
-                                                  8000,
+                                                  5684,
                                                   "",
                                                   M2MInterface::UDP,
                                                   M2MInterface::LwIP_IPv4,
@@ -71,7 +71,7 @@ First you need to create an mbed DS object. This object contains information abo
 
 ```
 #include "mbed-client/m2msecurity.h"
- M2MSecurity *security = M2MInterfaceFactory::create_security(M2MSecurity::LWM2M);
+ M2MSecurity *security = M2MInterfaceFactory::create_security(M2MSecurity::M2MServer);
         if(security) {
             security->set_resource_value(M2MSecurity::M2MServerUri, LWM2M_SERVER_ADDRESS);
             security->set_resource_value(M2MSecurity::BootstrapServer, 0);
@@ -80,6 +80,22 @@ First you need to create an mbed DS object. This object contains information abo
 ```
 
 **Note**: This API supports both non-secure and secure mode operations. For secure mode, you will also need to provide certificate, private key and server public key through the API.
+
+For creating secure mode operation, you can create object like this
+
+```
+#include "mbed-client/m2msecurity.h"
+ M2MSecurity *security = M2MInterfaceFactory::create_security(M2MSecurity::M2MServer);
+        if(security) {
+            security->set_resource_value(M2MSecurity::M2MServerUri, LWM2M_SERVER_ADDRESS);
+            security->set_resource_value(M2MSecurity::BootstrapServer, 0);
+            security->set_resource_value(M2MSecurity::SecurityMode, M2MSecurity::Certificate);
+            security->set_resource_value(M2MSecurity::ServerPublicKey,<SERVER_CERT>,sizeof(<SERVER_CERT>));
+            security->set_resource_value(M2MSecurity::PublicKey,<CERT>,sizeof(<CERT>));
+            security->set_resource_value(M2MSecurity::Secretkey,<KEY>,sizeof(<KEY>));   
+        }
+```
+
 
 Next, you need to register all the resources that you would like to monitor or follow via mbed DS. To do this, create the resource objects and pass them to the Register API for registration purposes.
 
@@ -335,6 +351,7 @@ If you want a dynamic resource to be observable, do the following when creating 
 ```
 M2MResource* create_dynamic_resource(const String &resource_name,
                                          const String &resource_type,
+                                         M2MResourceInstance::ResourceType type,
                                          bool observable,
                                          bool multiple_instance =false);
 ```
@@ -362,5 +379,6 @@ You can generate Doxygen API documentation for these APIs from a doxy file prese
 
 ## Example application
 
-An example application is available [here](https://github.com/ARMmbed/mbed-client-examples).
+An example application running on mbedOS is available [here](https://github.com/ARMmbed/mbed-client-examples).
+An example application running on Ubuntu is available [here](https://github.com/ARMmbed/mbed-client-linux-example).
 
