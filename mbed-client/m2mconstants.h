@@ -146,4 +146,6 @@ const uint8_t LENGTH24 = 0x18;
 const uint8_t COAP_CONTENT_OMA_TLV_TYPE = 99;
 const uint8_t COAP_CONTENT_OMA_JSON_TYPE = 100;
 
+const uint16_t MAX_UNINT_16_COUNT = 65535;
+
 #endif // M2MCONSTANTS_H

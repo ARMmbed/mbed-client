@@ -219,8 +219,12 @@ bool M2MResourceInstance::is_value_changed(const uint8_t* value, const uint32_t 
         changed = true;
     } else if(_value && !value) {
         changed = true;
-    } else if(*_value != *value){
-        changed = true;
+    } else {
+        String val((const char*)value);
+        String tmp_val((const char*)_value);
+        if(!(val == tmp_val)){
+            changed = true;
+        }
     }
     return changed;
 }

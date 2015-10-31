@@ -195,6 +195,24 @@ void Test_M2MResourceInstance::test_set_value()
     u_int8_t value2[] = {"12"};
     CHECK(resource_instance->set_value(value2,(u_int32_t)sizeof(value2)) == true);
 
+    u_int8_t value3[] = {"13"};
+    CHECK(resource_instance->set_value(value3,(u_int32_t)sizeof(value3)) == true);
+
+    free(resource_instance->_value);
+    resource_instance->_value_length = 0;
+
+    CHECK(resource_instance->set_value(NULL,0) == false);
+
+    CHECK(resource_instance->set_value(NULL,0) == false);
+
+    resource_instance->_value = (u_int8_t*)malloc(sizeof(value)+1);
+    memset(resource_instance->_value,0,sizeof(value)+1);
+    memcpy(resource_instance->_value,value,sizeof(value));
+    resource_instance->_value_length = sizeof(value);
+
+    u_int8_t value4[] = {"value4"};
+    CHECK(resource_instance->set_value(value4,(u_int32_t)sizeof(value4)) == true);
+
     TestReportObserver obs;
     m2mbase_stub::report = new M2MReportHandler(obs);
 
@@ -231,6 +249,7 @@ void Test_M2MResourceInstance::test_clear_value()
     u_int8_t value[] = {"value"};
     resource_instance->_value = (u_int8_t*)malloc(sizeof(u_int8_t));
 
+    m2mbase_stub::observe = handler;
 
     TestReportObserver obs;
     m2mbase_stub::report = new M2MReportHandler(obs);

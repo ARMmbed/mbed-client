@@ -29,6 +29,10 @@ public:
 
     void test_serialize_object_instance();
 
+    void test_serialize_resource();
+
+    void test_serialize_resource_instance();
+
     M2MTLVSerializer *serializer;
 };
 

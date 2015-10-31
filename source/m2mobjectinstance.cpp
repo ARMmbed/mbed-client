@@ -425,9 +425,6 @@ sn_coap_hdr_s* M2MObjectInstance::handle_get_request(nsdl_s *nsdl,
                         data = serializer->serialize(_resource_list, data_length);
                         delete serializer;
                     }
-                } else if(COAP_CONTENT_OMA_JSON_TYPE == coap_content_type) {
-                    // TOD0: Implement JSON Format.
-                    msg_code = COAP_MSG_CODE_RESPONSE_UNSUPPORTED_CONTENT_FORMAT; // Content format not supported
                 } else {
                     msg_code = COAP_MSG_CODE_RESPONSE_UNSUPPORTED_CONTENT_FORMAT; // Content format not supported
                 }
@@ -573,8 +570,6 @@ sn_coap_hdr_s* M2MObjectInstance::handle_put_request(nsdl_s *nsdl,
                         case M2MTLVDeserializer::NotValid:
                             msg_code = COAP_MSG_CODE_RESPONSE_BAD_REQUEST;
                             break;
-                        default:
-                            break;
                     }
                     delete deserializer;
                 }
@@ -626,7 +621,7 @@ sn_coap_hdr_s* M2MObjectInstance::handle_post_request(nsdl_s *nsdl,
                                                            received_coap_header,
                                                            msg_code);
     if(received_coap_header) {
-        if ((operation() & SN_GRS_PUT_ALLOWED) != 0) {            
+        if ((operation() & SN_GRS_POST_ALLOWED) != 0) {
             uint16_t coap_content_type = 0;
             bool content_type_present = false;
             if(received_coap_header->content_type_ptr) {
