@@ -23,7 +23,8 @@
 #include "ns_trace.h"
 
 M2MObject::M2MObject(const String &object_name)
-: M2MBase(object_name,M2MBase::Dynamic)
+: M2MBase(object_name,M2MBase::Dynamic),
+  _max_instance_count(MAX_UNINT_16_COUNT)
 {
     M2MBase::set_base_type(M2MBase::Object);
     if(M2MBase::name_id() != -1) {
@@ -79,7 +80,8 @@ M2MObject& M2MObject::operator=(const M2MObject& other)
 }
 
 M2MObject::M2MObject(const M2MObject& other)
-: M2MBase(other)
+: M2MBase(other),
+  _max_instance_count(MAX_UNINT_16_COUNT)
 {
     this->operator=(other);
 }
@@ -243,10 +245,7 @@ sn_coap_hdr_s* M2MObject::handle_get_request(nsdl_s *nsdl,
                     M2MTLVSerializer *serializer = new M2MTLVSerializer();
                     data = serializer->serialize(_instance_list, data_length);
                     delete serializer;
-                } else if(COAP_CONTENT_OMA_JSON_TYPE  == coap_content_type) {
-                    // TOD0: Implement JSON Format.
-                    msg_code = COAP_MSG_CODE_RESPONSE_UNSUPPORTED_CONTENT_FORMAT; // Content format not supported
-                } else {
+                } else { // TOD0: Implement JSON Format.
                     msg_code = COAP_MSG_CODE_RESPONSE_UNSUPPORTED_CONTENT_FORMAT; // Content format not supported
                 }
 
@@ -405,73 +404,72 @@ sn_coap_hdr_s* M2MObject::handle_post_request(nsdl_s *nsdl,
                             }
                         }
                     }
-                    if(!content_type_present &&
-                       M2MBase::coap_content_type() == COAP_CONTENT_OMA_TLV_TYPE) {
-                        coap_content_type = COAP_CONTENT_OMA_TLV_TYPE;
+                } // if(received_coap_header->content_type_ptr)
+                if(!content_type_present &&
+                   M2MBase::coap_content_type() == COAP_CONTENT_OMA_TLV_TYPE) {
+                    coap_content_type = COAP_CONTENT_OMA_TLV_TYPE;
+                }
+
+                tr_debug("M2MObject::handle_post_request() - Request Content-Type %d", coap_content_type);
+
+                if(COAP_CONTENT_OMA_TLV_TYPE == coap_content_type) {
+                    uint16_t instance_id = 0;
+                    for(instance_id = 0; instance_id <= _max_instance_count; instance_id++) {
+                        if(NULL == object_instance(instance_id)) {
+                            break;
+                        }
+                        if(instance_id == _max_instance_count) {
+                            msg_code = COAP_MSG_CODE_RESPONSE_METHOD_NOT_ALLOWED;
+                            break;
+                        }
                     }
-
-                    tr_debug("M2MObject::handle_post_request() - Request Content-Type %d", coap_content_type);
-
-                    if(COAP_CONTENT_OMA_TLV_TYPE == coap_content_type) {
-                        uint16_t instance_id = 0;
-                        for(instance_id = 0; instance_id <= 65535; instance_id++) {
-                            if(NULL == object_instance(instance_id)) {
-                                break;
-                            }
-                            if(instance_id == 65535) {
-                                msg_code = COAP_MSG_CODE_RESPONSE_METHOD_NOT_ALLOWED;
-                                break;
-                            }
+                    if(COAP_MSG_CODE_RESPONSE_CHANGED == msg_code) {
+                        M2MObjectInstance *obj_instance = create_object_instance(instance_id);
+                        if(obj_instance) {
+                            obj_instance->set_operation(M2MBase::GET_PUT_ALLOWED);
                         }
-                        if(COAP_MSG_CODE_RESPONSE_CHANGED == msg_code) {
-                            M2MObjectInstance *obj_instance = create_object_instance(instance_id);
-                            if(obj_instance) {
-                                obj_instance->set_operation(M2MBase::GET_PUT_ALLOWED);
+                        M2MTLVDeserializer *deserializer = new M2MTLVDeserializer();
+                        if(deserializer) {
+                            M2MTLVDeserializer::Error error = M2MTLVDeserializer::None;
+                            if(deserializer->is_object_instance(received_coap_header->payload_ptr)) {
+                                tr_debug("M2MObject::handle_post_request() - TLV data contains ObjectInstance");
+                                error = deserializer->deserialise_object_instances(received_coap_header->payload_ptr,
+                                                                           received_coap_header->payload_len,
+                                                                           *this,
+                                                                           M2MTLVDeserializer::Post);
+                            } else if(deserializer->is_resource(received_coap_header->payload_ptr) ||
+                                      deserializer->is_multiple_resource(received_coap_header->payload_ptr)) {
+                                tr_debug("M2MObject::handle_post_request() - TLV data contains Resources");
+                                error = deserializer->deserialize_resources(received_coap_header->payload_ptr,
+                                                                            received_coap_header->payload_len,
+                                                                            *obj_instance,
+                                                                            M2MTLVDeserializer::Post);
+                            } else {
+                                error = M2MTLVDeserializer::NotValid;
                             }
-                            M2MTLVDeserializer *deserializer = new M2MTLVDeserializer();
-                            if(deserializer) {
-                                M2MTLVDeserializer::Error error = M2MTLVDeserializer::None;
-                                if(deserializer->is_object_instance(received_coap_header->payload_ptr)) {
-                                    tr_debug("M2MObject::handle_post_request() - TLV data contains ObjectInstance");
-                                    error = deserializer->deserialise_object_instances(received_coap_header->payload_ptr,
-                                                                               received_coap_header->payload_len,
-                                                                               *this,
-                                                                               M2MTLVDeserializer::Post);
-                                } else if(deserializer->is_resource(received_coap_header->payload_ptr) ||
-                                          deserializer->is_multiple_resource(received_coap_header->payload_ptr)) {
-                                    tr_debug("M2MObject::handle_post_request() - TLV data contains Resources");
-                                    error = deserializer->deserialize_resources(received_coap_header->payload_ptr,
-                                                                                received_coap_header->payload_len,
-                                                                                *obj_instance,
-                                                                                M2MTLVDeserializer::Post);
-                                } else {
-                                    error = M2MTLVDeserializer::NotValid;
-                                }
-                                switch(error) {
-                                    case M2MTLVDeserializer::None:
-                                        if(observation_handler) {
-                                            observation_handler->value_updated(this);
-                                        }
-                                        msg_code = COAP_MSG_CODE_RESPONSE_CREATED;
-                                        break;
-                                    case M2MTLVDeserializer::NotAllowed:
-                                        msg_code = COAP_MSG_CODE_RESPONSE_METHOD_NOT_ALLOWED;
-                                        break;
-                                    case M2MTLVDeserializer::NotValid:
-                                        msg_code = COAP_MSG_CODE_RESPONSE_BAD_REQUEST;
-                                        break;
-                                    default:
-                                        break;
-                                }
-                                delete deserializer;
+                            switch(error) {
+                                case M2MTLVDeserializer::None:
+                                    if(observation_handler) {
+                                        observation_handler->value_updated(this);
+                                    }
+                                    msg_code = COAP_MSG_CODE_RESPONSE_CREATED;
+                                    break;
+                                case M2MTLVDeserializer::NotAllowed:
+                                    msg_code = COAP_MSG_CODE_RESPONSE_METHOD_NOT_ALLOWED;
+                                    break;
+                                case M2MTLVDeserializer::NotValid:
+                                    msg_code = COAP_MSG_CODE_RESPONSE_BAD_REQUEST;
+                                    break;
+                                case M2MTLVDeserializer::NotFound:
+                                    msg_code = COAP_MSG_CODE_RESPONSE_NOT_FOUND;
+                                    break;
                             }
+                            delete deserializer;
                         }
-                    } else {
-                        msg_code =COAP_MSG_CODE_RESPONSE_UNSUPPORTED_CONTENT_FORMAT;
-                    } // if(COAP_CONTENT_OMA_TLV_TYPE == coap_content_type)
+                    }
                 } else {
                     msg_code =COAP_MSG_CODE_RESPONSE_UNSUPPORTED_CONTENT_FORMAT;
-                } // if(received_coap_header->content_type_ptr)
+                } // if(COAP_CONTENT_OMA_TLV_TYPE == coap_content_type)
             } else {
                 tr_error("M2MObject::handle_post_request - COAP_MSG_CODE_RESPONSE_BAD_REQUEST - Missing Payload");
                 msg_code = COAP_MSG_CODE_RESPONSE_BAD_REQUEST; //

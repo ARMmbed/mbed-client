@@ -47,3 +47,12 @@ TEST(M2MTLVSerializer, serialize_object_instance)
     m2m_serializer->test_serialize_object_instance();
 }
 
+TEST(M2MTLVSerializer, serialize_resource)
+{
+    m2m_serializer->test_serialize_resource();
+}
+
+TEST(M2MTLVSerializer, serialize_resource_instance)
+{
+    m2m_serializer->test_serialize_resource_instance();
+}
