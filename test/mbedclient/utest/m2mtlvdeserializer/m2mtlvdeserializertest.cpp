@@ -16,7 +16,7 @@
 //CppUTest includes should be after your and system includes
 #include "CppUTest/TestHarness.h"
 #include "test_m2mtlvdeserializer.h"
-
+#include "test_m2mtlvserializer.h"
 
 TEST_GROUP(M2MTLVDeserializer)
 {
@@ -31,6 +31,45 @@ TEST_GROUP(M2MTLVDeserializer)
     delete m2m_deserializer;
   }
 };
+
+TEST_GROUP(M2MTLVSerializer)
+{
+  Test_M2MTLVSerializer* m2m_serializer;
+
+  void setup()
+  {
+    m2m_serializer = new Test_M2MTLVSerializer();
+  }
+  void teardown()
+  {
+    delete m2m_serializer;
+  }
+};
+
+TEST(M2MTLVSerializer, Create)
+{
+    CHECK(m2m_serializer != NULL);
+}
+
+TEST(M2MTLVSerializer, serialize_object)
+{
+    m2m_serializer->test_serialize_object();
+}
+
+TEST(M2MTLVSerializer, serialize_object_instance)
+{
+    m2m_serializer->test_serialize_object_instance();
+}
+
+TEST(M2MTLVSerializer, serialize_resource)
+{
+    m2m_serializer->test_serialize_resource();
+}
+
+TEST(M2MTLVSerializer, serialize_resource_instance)
+{
+    m2m_serializer->test_serialize_resource_instance();
+}
 
 TEST(M2MTLVDeserializer, Create)
 {
@@ -66,3 +105,14 @@ TEST(M2MTLVDeserializer, deserialize_resources)
 {
     m2m_deserializer->test_deserialize_resources();
 }
+
+TEST(M2MTLVDeserializer, test_deserialize_resource_instance_1)
+{
+    m2m_deserializer->test_deserialize_resource_instance_1();
+}
+
+TEST(M2MTLVDeserializer, test_deserialize_resource_instance)
+{
+    m2m_deserializer->test_deserialize_resource_instance();
+}
+

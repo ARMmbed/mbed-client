@@ -37,6 +37,10 @@ public:
 
     void test_deserialize_resources();
 
+    void test_deserialize_resource_instance_1();
+
+    void test_deserialize_resource_instance();
+
     M2MTLVDeserializer *deserializer;
 };
 
