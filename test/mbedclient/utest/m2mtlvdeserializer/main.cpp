@@ -23,3 +23,4 @@ int main(int ac, char** av)
 }
 
 IMPORT_TEST_GROUP( M2MTLVDeserializer);
+IMPORT_TEST_GROUP( M2MTLVSerializer);
