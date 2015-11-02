@@ -133,13 +133,13 @@ private:
                                                     M2MTLVDeserializer::Operation operation,
                                                     bool update_value);
 
-    M2MTLVDeserializer::Error deserialize_resource_instances(uint8_t *tlv,
-                                                             uint32_t tlv_size,
-                                                             uint32_t offset,
-                                                             M2MResource &resource,
-                                                             M2MObjectInstance &object_instance,
-                                                             M2MTLVDeserializer::Operation operation,
-                                                             bool update_value);
+//    M2MTLVDeserializer::Error deserialize_resource_instances(uint8_t *tlv,
+//                                                             uint32_t tlv_size,
+//                                                             uint32_t offset,
+//                                                             M2MResource &resource,
+//                                                             M2MObjectInstance &object_instance,
+//                                                             M2MTLVDeserializer::Operation operation,
+//                                                             bool update_value);
 
     M2MTLVDeserializer::Error deserialize_resource_instances(uint8_t *tlv,
                                                              uint32_t tlv_size,

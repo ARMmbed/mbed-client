@@ -249,9 +249,6 @@ sn_coap_hdr_s* M2MResource::handle_get_request(nsdl_s *nsdl,
                             data = serializer->serialize(this, data_length);
                             delete serializer;
                         }
-                    } else if(*coap_response->content_type_ptr == COAP_CONTENT_OMA_JSON_TYPE) {
-                        // TOD0: Implement JSON Format.
-                        msg_code = COAP_MSG_CODE_RESPONSE_UNSUPPORTED_CONTENT_FORMAT; // Content format not supported
                     } else {
                         msg_code = COAP_MSG_CODE_RESPONSE_UNSUPPORTED_CONTENT_FORMAT; // Content format not supported
                     }

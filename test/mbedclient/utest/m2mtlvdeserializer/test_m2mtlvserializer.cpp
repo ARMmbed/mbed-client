@@ -192,3 +192,108 @@ void Test_M2MTLVSerializer::test_serialize_object_instance()
     m2mobjectinstance_stub::clear();
     m2mobject_stub::clear();
 }
+
+void Test_M2MTLVSerializer::test_serialize_resource()
+{
+    String *name = new String("1");
+    M2MObject *object = new M2MObject(*name);
+    M2MObjectInstance* instance = new M2MObjectInstance(*name,*object);
+
+    uint32_t size = 0;
+    uint8_t *data = 0;
+    m2mbase_stub::name_id_value = 0;
+    M2MResource* resource = new M2MResource(*instance,
+                                                   *name,
+                                                   *name,
+                                                   M2MResourceInstance::INTEGER,
+                                                   M2MResource::Dynamic,
+                                                   false);
+
+    M2MResourceInstance* res_instance = new M2MResourceInstance(*name,
+                                                                *name,
+                                                                M2MResourceInstance::INTEGER,
+                                                                *instance);
+
+
+    m2mobjectinstance_stub::resource_list.clear();
+    m2mobjectinstance_stub::resource_list.push_back(resource);
+
+    m2mresource_stub::bool_value = true;
+    m2mresource_stub::list.push_back(res_instance);
+
+    data = serializer->serialize( resource,size);
+    CHECK(data != NULL);
+
+    if(data) {
+        free(data);
+        data = NULL;
+    }
+
+
+    m2mbase_stub::name_id_value = -1;
+    data = serializer->serialize( m2mobject_stub::instance_list,size);
+    CHECK(data == NULL);
+
+    delete name;
+    delete res_instance;
+    delete resource;
+    delete instance;
+    delete object;
+
+    m2mresource_stub::clear();
+    m2mobjectinstance_stub::clear();
+    m2mobject_stub::clear();
+
+}
+
+void Test_M2MTLVSerializer::test_serialize_resource_instance()
+{
+    String *name = new String("1");
+    M2MObject *object = new M2MObject(*name);
+    M2MObjectInstance* instance = new M2MObjectInstance(*name,*object);
+
+    uint32_t size = 0;
+    uint8_t *data = 0;
+    m2mbase_stub::name_id_value = 0;
+    M2MResource* resource = new M2MResource(*instance,
+                                                   *name,
+                                                   *name,
+                                                   M2MResourceInstance::INTEGER,
+                                                   M2MResource::Dynamic,
+                                                   false);
+
+    M2MResourceInstance* res_instance = new M2MResourceInstance(*name,
+                                                                *name,
+                                                                M2MResourceInstance::INTEGER,
+                                                                *instance);
+
+
+    m2mobjectinstance_stub::resource_list.clear();
+    m2mobjectinstance_stub::resource_list.push_back(resource);
+
+    m2mresource_stub::bool_value = true;
+    m2mresource_stub::list.push_back(res_instance);
+
+    data = serializer->serialize( m2mobjectinstance_stub::resource_list,size);
+    CHECK(data != NULL);
+
+    if(data) {
+        free(data);
+        data = NULL;
+    }
+
+
+    m2mbase_stub::name_id_value = -1;
+    data = serializer->serialize( m2mobject_stub::instance_list,size);
+    CHECK(data == NULL);
+
+    delete name;
+    delete res_instance;
+    delete resource;
+    delete instance;
+    delete object;
+
+    m2mresource_stub::clear();
+    m2mobjectinstance_stub::clear();
+    m2mobject_stub::clear();
+}

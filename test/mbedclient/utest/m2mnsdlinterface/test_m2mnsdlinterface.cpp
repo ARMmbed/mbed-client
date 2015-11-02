@@ -522,6 +522,7 @@ void Test_M2MNsdlInterface::test_received_from_server_callback()
     delete obj;
 
     free(coap_header->payload_ptr);
+    free(m2mobject_stub::header);
 
     uint8_t object_instance1[] = {"name/65536"};
 

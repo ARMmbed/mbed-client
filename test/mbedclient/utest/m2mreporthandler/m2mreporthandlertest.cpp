@@ -61,3 +61,8 @@ TEST(M2MReportHandler, test_trigger_object_notification)
 {
     m2m_reporthandler->test_trigger_object_notification();
 }
+
+TEST(M2MReportHandler, test_set_string_notification_trigger)
+{
+    m2m_reporthandler->test_set_string_notification_trigger();
+}

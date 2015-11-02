@@ -496,4 +496,8 @@ void Test_M2MBase::test_id_number()
 {
     M2MBase b("10", M2MBase::Static);
     CHECK(b.name_id() == 10);
+    M2MBase * test1 = new M2MBase("66567",M2MBase::Static);
+    CHECK(test1->name_id() == -1);
+    delete test1;
+
 }

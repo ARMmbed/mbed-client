@@ -52,7 +52,12 @@ public:
 
     void test_remove_observation_level();
 
+    void test_handle_get_request();
+
+    void test_handle_put_request();
+
     void test_handle_post_request();
+
 
     M2MResource* resource;
     Callback *callback;

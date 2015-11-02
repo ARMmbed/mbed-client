@@ -16,11 +16,13 @@
 #include "m2mtlvdeserializer_stub.h"
 
 bool m2mtlvdeserializer_stub::bool_value;
+bool m2mtlvdeserializer_stub::is_object_bool_value;
 M2MTLVDeserializer::Error m2mtlvdeserializer_stub::error;
 
 void m2mtlvdeserializer_stub::clear()
 {
     bool_value = false;
+    is_object_bool_value = false;
     error = M2MTLVDeserializer::None;
 }
 
@@ -34,7 +36,7 @@ M2MTLVDeserializer::~M2MTLVDeserializer()
 
 bool M2MTLVDeserializer::is_object_instance(uint8_t *)
 {
-    return m2mtlvdeserializer_stub::bool_value;
+    return m2mtlvdeserializer_stub::is_object_bool_value;
 }
 
 bool M2MTLVDeserializer::is_resource(uint8_t *)

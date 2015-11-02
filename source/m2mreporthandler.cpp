@@ -79,7 +79,7 @@ void M2MReportHandler::set_value(float value)
         tr_debug("M2MReportHandler::set_value() - UNDER OBSERVATION");
         if (check_threshold_values()) {
             _notify = true;
-            schedule_report(_current_value);
+            schedule_report();
         }
         else {
             tr_debug("M2MReportHandler::set_value - value not in range");
@@ -95,6 +95,18 @@ void M2MReportHandler::set_value(float value)
         }
         _high_step = _current_value + _st;
         _low_step = _current_value - _st;
+    }
+}
+
+void M2MReportHandler::set_string_notification_trigger()
+{
+    tr_debug("M2MReportHandler::set_string_notification_trigger()");
+    if(_under_observation) {
+        tr_debug("M2MReportHandler::set_string_notification_trigger()- UNDER OBSERVATION");
+        _current_value = 0.0f;
+        _last_value = 1.0f;
+        _notify = true;
+        schedule_report();
     }
 }
 
@@ -191,7 +203,7 @@ void M2MReportHandler::timer_expired(M2MTimerObserver::Type type)
                      (_attribute_state & M2MReportHandler::Pmax) != M2MReportHandler::Pmax)){
                 tr_debug("M2MReportHandler::timer_expired - PMIN --> report");
                 _report_scheduled = false;                
-                report(_current_value);
+                report();
             }
             else{                
                 _pmin_exceeded = true;
@@ -202,7 +214,7 @@ void M2MReportHandler::timer_expired(M2MTimerObserver::Type type)
             tr_debug("M2MReportHandler::timer_expired - PMAX");
             _pmax_exceeded = true;
             if (_pmin_exceeded) {
-                report(_current_value);
+                report();
             }
         }
         break;
@@ -276,12 +288,12 @@ bool M2MReportHandler::set_notification_attribute(char* option,
     return success;
 }
 
-void M2MReportHandler::schedule_report(float value)
+void M2MReportHandler::schedule_report()
 {
     tr_debug("M2MReportHandler::schedule_report()");
     if(_under_observation) {
         if (_pmin_exceeded) {
-            report(value);
+            report();
         }
         else {
             tr_debug("M2MReportHandler::schedule_report() - schedule");
@@ -290,7 +302,7 @@ void M2MReportHandler::schedule_report(float value)
     }
 }
 
-void M2MReportHandler::report(float /*value*/)
+void M2MReportHandler::report()
 {
     tr_debug("M2MReportHandler::report()");
     if(_under_observation && _current_value != _last_value && _notify) {
