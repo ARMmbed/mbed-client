@@ -1,4 +1,4 @@
-site_name: ARM mbed Device Server User Guide
+site_name: ARM mbed Client Guide
 theme: readthedocs
 use directory_urls: false
 pages:
