@@ -1,6 +1,7 @@
-#How to create Objects, Object Instances and Resources for the client
+#How to use the mbed Client API
 
-This section explains how to create different types of Objects, Object Instances and Resources for the client to comply with the OMA LWM2M specifications.
+This section explains how to create different types of Objects, Object Instances and Resources for the client to comply with the OMA LWM2M 
+specifications.
 
 In order for the client to communicate its resources to the mbed Device Server (mbed DS), it needs to create Objects, Object Instances and Resources. This can be done very easily with the Client C++ APIs, where the client can define its resources in a similar structure to the one defined in the LWM2M specification.
 
