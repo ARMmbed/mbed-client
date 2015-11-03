@@ -1,0 +1,11 @@
+site_name: ARM mbed Device Server User Guide
+theme: readthedocs
+use directory_urls: false
+pages:
+- ['introduction.md','Introduction to mbed Client','mbed Client overview']
+- ['porting-guide.md','Porting mbed Client', 'Porting mbed Client for different platforms']
+- ['Howto.md','Using mbed Client API','Quick start guide for using mbed Client API']
+
+
+
+
