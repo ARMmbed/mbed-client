@@ -92,7 +92,7 @@ As per the OMA LWM2M specification, the client must have created Object Instance
 
 You can create an M2M Object Instance using this API from the M2MObject class:
 
-` M2MObject::create_object_instance(uint16_t instance_id);`
+`M2MObject::create_object_instance(uint16_t instance_id);`
 
 You can pass an Object Instance ID to create appropriate Object Instances. Normally, Object Instances will start from `0` and increment. So the Object Instance structure on the mbed DS side would look like this:
 
@@ -146,15 +146,15 @@ There are direct APIs to create and set values for the Device Resources. You can
 
 - For Resources that take `string` values:
 
-	M2MResource* create_resource(DeviceResource resource, const String &value);
+`M2MResource* create_resource(DeviceResource resource, const String &value);`
 
 - For Resources that take `integer` values:
 
-	M2MResource* create_resource(DeviceResource resource, uint32_t value);
+`M2MResource* create_resource(DeviceResource resource, uint32_t value);`
 
 - There are a few resources that can have multiple instances. To create these resources, use these APIs:
 
-	M2MResourceInstance* create_resource_instance(DeviceResource resource, uint32_t value,uint16_t instance_id);
+`M2MResourceInstance* create_resource_instance(DeviceResource resource, uint32_t value,uint16_t instance_id);`
 
 Where `instance_id` is the Resource Instance ID, for example `/3/0/11/0`.
 
@@ -170,19 +170,19 @@ Most of the mandatory resources are created automatically when you create an M2M
 
 - For resources that take `integer` values:
 
-	bool set_resource_value(SecurityResource resource,uint32_t value);
+`bool set_resource_value(SecurityResource resource,uint32_t value);`
 
 - For resources that take `string` values:
 
-	bool set_resource_value(SecurityResource resource,const String &value);
+`bool set_resource_value(SecurityResource resource,const String &value);`
 
 - For resources that take binary values, like setting public keys and certificates:
 
-	bool set_resource_value(SecurityResource resource,onst uint8_t *value,const uint16_t length);
+`bool set_resource_value(SecurityResource resource,onst uint8_t *value,const uint16_t length);`
 
 - You can create and set values for Resources that are not mandatory, and which take an `integer` value, using this API:
 
-	M2MResource* create_resource(SecurityResource resource, uint32_t value);
+`M2MResource* create_resource(SecurityResource resource, uint32_t value);`
 
 Check the M2MSecurity API documentation to find which enums are supported for `integer`, `string` or `uint8_t*` value types.
 
@@ -271,7 +271,7 @@ You can set the Resource or Resource Instance operation mode so that they can ha
 
 The API that you can use to set the operation mode (present in the M2MBase class) is:
 
-	virtual void set_operation(M2MBase::Operation operation);
+`virtual void set_operation(M2MBase::Operation operation);`
 
 ##### Setting the value of a dynamic Resource or Resource Instance
 
@@ -279,7 +279,7 @@ You can set the value of a dynamic Resource or Resource Instance so that they ca
 
 The API used to set the values (present in the M2MResourceInstance class) is:
 
-	virtual bool set_value(const uint8_t *value, const uint32_t value_length);
+`virtual bool set_value(const uint8_t *value, const uint32_t value_length);`
 
 ##### Setting an executable function
 
@@ -287,7 +287,7 @@ For Dynamic Resources, you can pass a function pointer to the Resource or Resour
 
 You can pass the function pointer using this API:
 
-	virtual void set_execute_function(execute_callback callback);
+`virtual void set_execute_function(execute_callback callback);`
 
 Apart from this, there are multiple APIs that provide getter and remove functions for Resource and Resource Instances in the M2MResource and M2MResourceInstance classes. Check the API documentation for their usage. 
 
