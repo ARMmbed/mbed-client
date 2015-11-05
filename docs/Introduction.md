@@ -1,4 +1,4 @@
-# mbed Client
+# mbed Client API
 
 ## Introduction
 
@@ -8,13 +8,10 @@ The mbed Device Client API allows mbed OS developers to create applications with
 
 The API is written in C++ to allow quick application development.
 
+## mbed Client interfaces
+
 There are three interfaces between mbed DS and mbed Client:
 
-- Client registration and deregistration.
-- Device management and service enabler.
-- Information reporting.
-
-##mbed Client interfaces
 - Client registration and deregistration
 - Device management and service enablement
 - Information reporting
@@ -37,6 +34,7 @@ M2MInterface* interface = M2MInterfaceFactory::create_interface(*this,
                                                   M2MInterface::LwIP_IPv4,
                                                   "");
 ```
+
 When you have created the interface, you can proceed to execute operations.
 
 ### Client Registration Interface
@@ -81,7 +79,7 @@ First you need to create an mbed DS object. This object contains information abo
 
 **Note**: This API supports both non-secure and secure mode operations. For secure mode, you will also need to provide certificate, private key and server public key through the API.
 
-For creating secure mode operation, you can create object like this
+Create a secure mode operation as follows:
 
 ```
 #include "mbed-client/m2msecurity.h"
@@ -95,7 +93,6 @@ For creating secure mode operation, you can create object like this
             security->set_resource_value(M2MSecurity::Secretkey,<KEY>,sizeof(<KEY>));   
         }
 ```
-
 
 Next, you need to register all the resources that you would like to monitor or follow via mbed DS. To do this, create the resource objects and pass them to the Register API for registration purposes.
 
@@ -114,13 +111,13 @@ if(device) {
 
 **Note:** You can register other resources, including custom resources. Please check the API documentation for a detailed description of the M2MObject, M2MObjectInstance and M2MResource classes.
 
-You have the registration server object and resources that you want to register. Now you need to call the register API and pass the following objects as parameters:
+You have the registration server object and resources that you want to register. Now, you need to call the register API and pass the following objects as parameters:
 
 ```
 M2MInterface::register_object(M2MSecurity* register_object, M2MObjectList object_list);
 ```
 
-___Success or failure callback___
+**Success or failure callback**
 
 Because this is an asynchronous operation, you will receive the result of this operation through a callback defined in `m2minterfaceobserver.h` in your application.
 
@@ -142,7 +139,7 @@ You will get more information about the error from the `error` parameter passed 
 
 ### Update
 
-Periodically, or in response to events within the client or as initiated by mbed DS, the client updates its registration information with mbed DS. It does this by sending an **Update** operation to mbed DS.
+Periodically, or in response to events within the client or as initiated by mbed DS, the client updates its registration information with mbed DS. It sends an **Update** operation to mbed DS.
 
 To update your registration:
 
@@ -152,7 +149,7 @@ M2MInterface::update_registration(M2MSecurity* security_object, const uint32_t l
 
 Normally, the enabler will update the registration automatically, but if you want to renew the registration before that, you can use this API.
 
-___Success or failure callback___
+**Success or failure callback**
 
 If the update operation is successful, your application will receive the following callback:
 
@@ -170,7 +167,7 @@ void error(M2MInterface::Error error)
 
 ### Deregister
 
-The client can deregister from mbed DS when it no longer requires access to the server. When mbed DS receives the Deregister message it removes the device's registration information from its database. When the client needs mbed DS again, it will have to register again.
+The client can deregister from mbed DS when it no longer requires access to the server. When mbed DS receives the **Deregister** message it removes the device's registration information from its database. When the client needs mbed DS again, it will have to register again.
 
 To deregister your endpoint client:
 
@@ -180,7 +177,7 @@ If the endpoint has multiple server registrations, you need to provide the `serv
 M2MInterface::unregister_object(M2MSecurity *object);
 ```
 
-___Success or failure callback___
+**Success or failure callback**
 
 Because this is an asynchronous operation, you will receive the result of this operation through a callback defined in `m2minterfaceobserver.h` in your application.
 
@@ -215,21 +212,19 @@ Currently, support for the Create and Delete actions is limited to Object Instan
 
 The Device Management and Service Enabler Interface supports the following data types:
 
-* Text - for Resources.
-
-* TLV - for Object and Object Instances.
+- Text - for Resources.
+- TLV - for Object and Object Instances.
 
 ### Read
 
 The Client API allows setting values to Resources, an array of Resource Instances, an Object Instance or all the Object Instances of an Object (TLV format supported). mbed DS can then read these values using the **Read** operation.
 
-___Creating Resources___
+**Creating Resources**
 
 There are two types of resources you can create:
 
 - Static: you set the value of the resource once and it does not change during the course of operations.
-
-- Dynamic: the value is expected to change during the course of operations. Therefore, the value is fetched from setter APIs every time the server requests a GET operation.
+- Dynamic: the value is expected to change during the course of operations. Therefore, the value is fetched from setter APIs every time the server requests a `GET` operation.
 
 Here is an example of creating a custom static Resource:
 
@@ -271,13 +266,13 @@ For more information on different resource functionalities, please check the API
 
 The **Write** operation is used to overwrite the value of a Resource, an array of Resource Instances or multiple Resources from an Object Instance. 
 
-Whenever there is a valid PUT operation for any of the resources, the application will receive a callback:
+Whenever there is a valid `PUT` operation for any of the resources, the application will receive a callback:
 
 ```
 void value_updated(M2MBase *base, M2MBase::BaseType type) 
 ```
 
-Where `M2MBase` is the object whose value has been updated and `M2MBase::BaseType` is the object's type.
+Where `M2MBase` is the object whose value has been updated and `M2MBase::BaseType` is the object type.
 
 ### Write Attributes
 
@@ -322,7 +317,7 @@ if(_object) {
         res->set_execute_function(execute_callback(this,&M2MLWClient::execute_function));
 ```
 
-When the client receives the POST request for Execute from mbed DS for this resource, this function will be called and executed.
+When the client receives the `POST` request for Execute from mbed DS for this resource, this function will be called and executed.
 
 ### Information Reporting Interface
 
@@ -340,7 +335,7 @@ mbed DS initiates an observation request to change the value of a dynamic Resour
 
 **Tip:** Related parameters for the **Observe** operation are described in the [Write Attributes](#write-attributes) section.
 
-To make your Resource observable, you need to set the Observable parameter of your object to TRUE:
+To make your Resource observable, you need to set the Observable parameter of your object to `true`:
 
 ```
  object->set_observable(true);
@@ -371,7 +366,7 @@ mbed DS sends the **Cancel Observation** operation to the client to end an obser
 This API is based on OMA LWM2M specification. You can get the specification [here](http://technical.openmobilealliance.org/Technical/technical-information/release-program/current-releases/oma-lightweightm2m-v1-0).
 
 ## How to use the API
-More information on how to use the API effectively to create and configure Objects, Object Instances and Resources, can be found [here](https://github.com/ARMmbed/mbed-client/blob/master/docs/Howto.md)
+More information on how to use the API effectively to create and configure Objects, Object Instances and Resources, can be found [here](#Howto.md).
 
 ## API documentation
 
