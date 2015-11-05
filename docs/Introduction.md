@@ -375,5 +375,6 @@ You can generate Doxygen API documentation for these APIs from a doxy file prese
 ## Example application
 
 An example application running on mbedOS is available [here](https://github.com/ARMmbed/mbed-client-examples).
+
 An example application running on Ubuntu is available [here](https://github.com/ARMmbed/mbed-client-linux-example).
 
