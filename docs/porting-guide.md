@@ -1,21 +1,10 @@
 # Introduction to mbed Client
 
-mbed Client is structured as a set of modules. Each module declares which other
-modules it depends on. When you build a module, our build system `yotta`
-looks at these dependencies and installs the necessary modules before
-completing the build.
+mbed Client is structured as a set of modules. Each module declares which other modules it depends on. When you build a module, our build system `yotta` looks at these dependencies and installs the necessary modules before completing the build.
 
-This is also the process to build applications for the mbed Client
-(including the example application in the release). The application declares
-dependencies on the mbed Client and when it is built,
-`yotta` ensures that the modules (and anything that they depend on, recursively)
-are present before building. 
+This is also the process to build applications for the mbed Client (including the example application in the release). The application declares dependencies on the mbed Client and when it is built, `yotta` ensures that the modules (and anything that they depend on, recursively) are present before building. 
 
-In this release, all the necessary modules for the examples (the ones that the
-examples depend on) have been pre-installed in the `yotta_modules` directory of
-each example program, so you do not need to download them separately. In
-general, `yotta` downloads and installs the necessary modules over the internet from the public yotta Registry 
-(which saves published versions of modules) or from a specified source control URL.
+In this release, all the necessary modules for the examples (the ones that the examples depend on) have been pre-installed in the `yotta_modules` directory of each example program, so you do not need to download them separately. In general, `yotta` downloads and installs the necessary modules over the internet from the public yotta Registry (which saves published versions of modules) or from a specified source control URL.
 
 # Building and testing mbed Client
 
@@ -40,14 +29,11 @@ mbed-client x.x.x
 |_mbed-client-linux x.x.x
 ```
 
-To list the dependency trees, give [`yotta list --all`
-command](http://docs.yottabuild.org/reference/commands.html).
+To list the dependency trees, give [`yotta list --all` command](http://docs.yottabuild.org/reference/commands.html).
 
-**Note**: In this case, we have listed the dependencies for the `x86-linux-native`
-compilation target. Different modules are needed for different compilation target.
+**Note**: In this case, we have listed the dependencies for the `x86-linux-native` compilation target. Different modules are needed for different compilation target.
 
-If you list the modules included in the mbed Client linux example, you can see that
-it depends directly only on the `mbed-client` and `mbed-client-linux` modules. These modules depend internally on various other modules.
+If you list the modules included in the mbed Client linux example, you can see that it depends directly only on the `mbed-client` and `mbed-client-linux` modules. These modules depend internally on various other modules.
 
 ```
 mbed-client-linux-example x.x.x
@@ -66,9 +52,7 @@ This release supports only one compilation target:
 
  * `x86-linux-native`: to compile for linux OS, using the gcc toolchain.
 
-To select the compilation target used for compiling a library or example
-program, give the command `yotta target x86-linux-native` before building. More
-documentation on target descriptions can be found on the [yotta
+To select the compilation target used for compiling a library or an example program, give the command `yotta target x86-linux-native` before building. More documentation on target descriptions can be found on the [yotta
 documentation site](http://docs.yottabuild.org/tutorial/targets.html).
 
 # Porting mbed Client to different platform
@@ -81,24 +65,17 @@ To port mbed Client to a new platform, perform the following steps:
  4. Make sure that your port is updated into `module.json` of the `mbed-client` module.
  5. Verify that your implementation is correct.
 
-The `yotta` build system is designed for easy reuse of generic modules.
-If you intend to support multiple platforms that share common features, it is recommended to store the common 
-functionality into a separate module and use it for each platform.
-
+The `yotta` build system is designed for easy reuse of generic modules. If you intend to support multiple platforms that share common features, it is recommended to store the common functionality into a separate module and use it for each platform.
 
 # Step 1: Creating development repositories
 
 We provide private git repositories to our partners porting mbed Client. Only the members of the mbed Client team and relevant partner contacts and engineers have access to these repositories.
 
-When you contact `support@mbed.org`, a repository will be created for your
-module. You also need to provide the target description of your board:
+When you contact `support@mbed.org`, a repository will be created for your module. You also need to provide the target description of your board as follows:
 
-- **`mbed-client-<platform-name>`** is the module that provides the `mbed-client-xxx`
-   implementation for your platform. You may choose to split it into further modules in the future, to enable sharing
-   of code, but we recommend that you implement the port for your first board in this module itself. 
+- **`mbed-client-<platform-name>`** is the module that provides the `mbed-client-xxx` implementation for your platform. You may choose to split it into further modules in the future, to enable sharing of code, but we recommend that you implement the port for your first board in this module itself. 
 
-- **`target-<targetname>`** contains the yotta target description of the
-   target you are porting to. This is usually your platform name.
+- **`target-<targetname>`** contains the yotta target description of the target you are porting to. This is usually your platform name.
 
 # Step 2: Creating a yotta compilation target
 
@@ -107,16 +84,13 @@ To compile for a target board, you need a [target description](http://docs.yotta
 The `mbed-client` module uses the platform name that each target defines, to choose which `mbed-client-<platform-name>` module to depend on to provide the platform-specific implementation.
 
 The target description contains:
- * `target.json` - the target description file
- * a [CMake toolchain
-   file](http://www.cmake.org/cmake/help/v3.0/manual/cmake-toolchains.7.html)
-   (and any dependencies it needs) that describes how to run the compiler
- * a linker script file
+* `target.json` - the target description file
+* a [CMake toolchain file](http://www.cmake.org/cmake/help/v3.0/manual/cmake-toolchains.7.html) (and any dependencies it needs) that describes how to run the compiler
+* a linker script file
 
 To select the target description, run `yotta target <targetname>`. yotta needs this to set up the build.
 
-The documentation for target descriptions is available on the [yotta
-documentation site](http://docs.yottabuild.org/tutorial/targets.html).
+The documentation for target descriptions is available on the [yotta documentation site](http://docs.yottabuild.org/tutorial/targets.html).
 
 An example on compiling for linux target can be found in the `yotta_targets` directory of the example application.
 
@@ -142,7 +116,7 @@ The directory structure of a typical target description is:
     |_newtarget.ld
 ```
 
-Where the `target.json` file specifies the path to the CMake toolchain (`toolchain.cmake`) that uses the standard CMake mechanisms for including compiler, platform and language specific configuration.
+Where the `target.json` file specifies the path to the CMake toolchain (`toolchain.cmake`) that uses the standard CMake mechanisms for including compiler, platform and language-specific configuration.
 
 **Note**: Improvements are planned to the yotta target description to allow more reuse of the descriptions between targets.
 
@@ -159,12 +133,12 @@ You can then give `yotta link-target <targetname>` command to make the globally 
 
 First, clone your `mbed-client-<your-platform-name>` module and `mbed-client` modules from GitHub.
 
-The `mbed-client-<your-platform-name>` module needs to provide a socket and timer implementation for
-your target platform. The mbed-client-xxx module should include files `m2mconnectionhandler.h`and `m2mtimer.h` from `mbed-client` and implement a corresponding `.cpp` file that points to the platform-specific private implementations of the timer and the socket.
+The `mbed-client-<your-platform-name>` module needs to provide a socket and timer implementation for your target platform. The `mbed-client-xxx` module should include files `m2mconnectionhandler.h`and `m2mtimer.h` from `mbed-client` and implement a corresponding `.cpp` file that points to the platform-specific private implementations of the timer and the socket.
 
 **Note**: Private implementation classes MUST be named as `M2MConnectionHandlerPimpl` and `M2MTimerPimpl`, because of forward declarations.
 
 An example of mbed-client-platform core:
+
 ```
 |_module.json
 |
@@ -179,9 +153,7 @@ An example of mbed-client-platform core:
     |_m2mtimerpimpl.cpp
 ```
 
-To make your module available to other modules that you want to build, you
-need to give [`yotta link`](http://docs.yottabuild.org/reference/commands.html#yotta-link) command
-to link it to the module where you want to test it out.
+To make your module available to other modules that you want to build, you need to give [`yotta link`](http://docs.yottabuild.org/reference/commands.html#yotta-link) command to link it to the module where you want to test it out.
 
 To use your local your in-development mbed-client implementation, give the command `yotta link mbed-client-xxx` in the main `mbed-client` module.
 
@@ -196,8 +168,8 @@ Your `mbed-client-xxx` module must provide a platform-specific implementation fo
 
 There are two header files that require porting for your platform:
 
-1. `m2mconnectionhandler.h`
-2. `m2mtimer.h` 
+- `m2mconnectionhandler.h`
+- `m2mtimer.h` 
 
 To see how this is done in Linux, check the `mbed-client-linux` module available in this package.
 
