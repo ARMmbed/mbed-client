@@ -6,9 +6,20 @@ This is the list of known issues for the 15.11 release of [mbed Client](https://
 
 The purpose of this document is to provide that single view of all the key issues we are aware of. It isn’t a complete list; it’s a filtered and reviewed list, focusing on the issues we thought you’d want to be aware of. Each item explains the problem, as well as workarounds if those are possible. For items filed through GitHub, we’ve included a link to the issue so that you can follow the discussion and code - or even suggest a solution.
 
+For more information about an issue, contact us on the [mbed forums](http://forums.mbed.com).
+
 ### Other information not in this document
 
 We’re still very actively building mbed Client and the 15.11 release is a technology preview. As such there are some other limitations of the release that you can find described in the [release note](https://www.mbed.com/en/development/software/mbed-client/releases/mbed-client1511).
+
+#### Important Note for Windows Users
+
+If you are using this release on Microsoft Windows, please be advised that
+because of the way Windows handles filename and paths, you may have problems
+if you attempt to use this in a deep directory hierarchy with a long
+path name (e.g. `c:\some\very\long\path`). If you experience problems
+unpacking or building this release, please try it in a location with a
+shorter path before filing a bug. Thanks.
 
 ***
 ### mbed Client API may not be fully interoperable with other LWM2M servers.
