@@ -366,7 +366,7 @@ mbed DS sends the **Cancel Observation** operation to the client to end an obser
 This API is based on OMA LWM2M specification. You can get the specification [here](http://technical.openmobilealliance.org/Technical/technical-information/release-program/current-releases/oma-lightweightm2m-v1-0).
 
 ## How to use the API
-More information on how to use the API effectively to create and configure Objects, Object Instances and Resources, can be found [here](#Howto.md).
+More information on how to use the API effectively to create and configure Objects, Object Instances and Resources, can be found [here](Howto.md).
 
 ## API documentation
 
