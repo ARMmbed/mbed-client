@@ -41,7 +41,7 @@ This release comprises the following yotta modules and their versions:
  
 
 | Module                           |  Version   |
-|----------------------------------+------------|
+|----------------------------------|------------|
 | `mbed-client`                    |   1.2.1	   |
 | `mbed-client-c`                  |   1.1.1	   |
 | `mbed-client-libservice`         |   3.0.8	   |
