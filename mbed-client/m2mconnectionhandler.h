@@ -26,7 +26,7 @@ class M2MConnectionHandlerPimpl;
 
 /**
  * @brief M2MConnectionHandler.
- * This class handles the socket connection for LWM2M Client
+ * This class handles the socket connection for the LWM2M Client.
  */
 
 class M2MConnectionHandler {
@@ -34,7 +34,7 @@ public:
 
     /**
      * @enum ConnectionError
-     * This enum defines error which can come from
+     * This enum defines an error that can come from
      * socket read and write operation.
      */
     typedef enum {
@@ -60,19 +60,19 @@ public:
     /**
     * @brief This binds the socket connection.
     * @param listen_port Port to listen for incoming connection.
-    * @return true if successful else false.
+    * @return true if successful, else false.
     */
     bool bind_connection(const uint16_t listen_port);
 
     /**
     * @brief This resolves the server address. Output is
-    * returned through callback
+    * returned through a callback.
     * @param String server address.
     * @param uint16_t Server port.
     * @param ServerType, Server Type to be resolved.
-    * @param security, M2MSecurity object which determines what
-    * kind of secure connection will be used by socket.
-    * @return true if address is valid else false.
+    * @param security, M2MSecurity object that determines what
+    * type of secure connection will be used by the socket.
+    * @return True if address is valid, else false.
     */
     bool resolve_server_address(const String& server_address,
                                 const uint16_t server_port,
@@ -84,15 +84,15 @@ public:
     * @param data_ptr, Data to be sent.
     * @param data_len, Length of data to be sent.
     * @param address_ptr, Address structure where data has to be sent.
-    * @return True if data sent is successful else false.
+    * @return True if data sent is successful, else false.
     */
     bool send_data(uint8_t *data_ptr,
                            uint16_t data_len,
                            sn_nsdl_addr_s *address_ptr);
 
     /**
-    * @brief Listens for incoming data from remote server
-    * @return true if successful else false.
+    * @brief Listens for incoming data from remote server.
+    * @return True if successful, else false.
     */
     bool start_listening_for_data();
 
@@ -103,7 +103,7 @@ public:
 
     /**
      * @brief sendToSocket Sends directly to socket. This is used by
-     * security classes to send after data has been encrypted.
+     * security classes to send after the data has been encrypted.
      * @param buf Buffer to send.
      * @param len Length of a buffer.
      * @return Number of bytes sent or -1 if failed.
@@ -112,7 +112,7 @@ public:
 
     /**
      * @brief receiveFromSocket Receives directly from a socket. This
-     * is used by security classes to receive raw data to be decrypted.
+     * is used by the security classes to receive raw data to be decrypted.
      * @param buf Buffer to send.
      * @param len Length of a buffer.
      * @return Number of bytes read or -1 if failed.
