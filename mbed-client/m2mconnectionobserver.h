@@ -29,8 +29,8 @@ class M2MConnectionObserver
 public :
 
     /**
-      * @enum ServerType, Defines the type of
-      * server client wants to use.
+      * @enum ServerType, Defines the type of the
+      * server that the client wants to use.
       */
     typedef enum {
         Bootstrap,
@@ -50,24 +50,24 @@ public :
     };
 
     /**
-    * @brief Indicates data is available from socket.
-    * @param data, data read from socket.
-    * @param data_size, length of data read from socket.
-    * @param address, Server Address from where data is coming.
+    * @brief Indicates that data is available from socket.
+    * @param data, The data read from the socket.
+    * @param data_size, The length of the data read from the socket.
+    * @param address, Address of the server where the data is coming from.
     */
     virtual void data_available(uint8_t* data,
                                 uint16_t data_size,
                                 const M2MConnectionObserver::SocketAddress &address) = 0;
 
     /**
-    * @brief Indicates some error occured in socket.
+    * @brief Indicates an error occured in socket.
     * @param error_code, Error code from socket,
     * it cannot be used any further.
     */
     virtual void socket_error(uint8_t error_code) = 0;
 
     /**
-    * @brief Indicates server address resolving is ready.
+    * @brief Indicates that the server address resolving is ready.
     * @param address, Resolved socket address.
     * @param server_type, Type of server.
     * @param server_port, Port of the resolved server address.
@@ -77,7 +77,7 @@ public :
                                const uint16_t server_port) = 0;
 
     /**
-    * @brief Indicates data has been sent successfully.
+    * @brief Indicates that data has been sent successfully.
     */
     virtual void data_sent() = 0;
 };
