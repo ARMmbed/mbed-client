@@ -104,7 +104,7 @@ private:
     R (*_membercaller)(void*, uintptr_t*); // registered membercaller function to convert back and call _m.member on _object
 };
 
-/* If we had variaditic templates, this wouldn't be a problem, but until C++11 is enabled, we are stuck with multiple classes... */
+/* If we had variadic templates, this wouldn't be a problem, but until C++11 is enabled, we are stuck with multiple classes... */
 
 /** A class for storing and calling a pointer to a static or member void function
  */
