@@ -31,7 +31,7 @@ class M2MReportHandler;
 
 /**
  *  @brief M2MBase.
- *  This class is the base class based on which all LWM2M object model
+ *  This class is the base class based on which all LWM2M object models
  *  can be created. This serves base class for Object, ObjectInstances and Resources.
  */
 
@@ -40,7 +40,7 @@ class M2MBase : public M2MReportObserver {
 public:
 
     /**
-      * Enum to define the type of object
+      * Enum to define the type of object.
       */
     typedef enum {
         Object = 0x0,
@@ -50,7 +50,7 @@ public:
     } BaseType;
 
     /**
-      * Enum to define observation level
+      * Enum to define observation level.
       */
     typedef enum {
         None                 = 0x0,
@@ -65,7 +65,7 @@ public:
 
 
     /**
-     * @brief Enum defining operation which can be
+     * @brief Enum defining an operation that can be
      * supported by a given resource.
     */
     typedef enum {
@@ -75,7 +75,7 @@ public:
     }Mode;
 
     /**
-     * Enum defining operation which can be
+     * Enum defining an operation that can be
      * supported by a given resource.
     */
     typedef enum {
@@ -111,8 +111,8 @@ protected:
 
     /**
      * @brief Constructor
-     * @param baseType, Type of object created
-     * @param name, name of the object
+     * @param baseType, Type of the object created
+     * @param name, Name of the object
      * @param id, ID of the object
      */
     M2MBase(const String &name,
@@ -125,8 +125,8 @@ public:
     virtual ~M2MBase();
 
     /**
-     * @brief Sets the operation type for object.
-     * @param operation, Operation to be set
+     * @brief Sets the operation type for an object.
+     * @param operation, Operation to be set.
      */
     virtual void set_operation(M2MBase::Operation operation);
 
@@ -143,7 +143,7 @@ public:
     virtual void set_resource_type(const String &resource_type);
 
     /**
-     * @brief Sets the coap content type of the object.
+     * @brief Sets the CoAP content type of the object.
      * @param content_type, Content Type to be set based on
      * CoAP specifications.
      */
@@ -168,7 +168,7 @@ public:
     virtual void remove_observation_level(M2MBase::Observation observation_level);
 
     /**
-     * @brief Sets that object is under observation.
+     * @brief Sets the object under observation.
      * @param observed for the observation.
      * @param handler, Handler object for sending
      * observation callbacks.
@@ -179,7 +179,7 @@ public:
                                        M2MObservationHandler *handler);
 
     /**
-     * @brief Sets observation token value.
+     * @brief Sets the observation token value.
      * @param token, Pointer to the token of the resource.
      * @param length , Length of the token pointer.
      */
@@ -187,13 +187,13 @@ public:
                                        const uint8_t length);
 
     /**
-     * Sets instance ID of the object.
+     * Sets the instance ID of the object.
      * @param instance_id, Instance ID of the object.
      */
     virtual void set_instance_id(const uint16_t instance_id);
 
     /**
-     * Sets Observation number of the object.
+     * Sets the observation number of the object.
      * @param observation_number, Observation number of the object.
      */
     virtual void set_observation_number(const uint16_t observation_number);
@@ -211,44 +211,44 @@ public:
     virtual M2MBase::Operation operation() const;
 
     /**
-     * @brief Returns object name.
+     * @brief Returns the object name.
      * @return Name for the object.
      */
     virtual const String &name() const;
 
     /**
-     * @brief Returns object name in integer.
+     * @brief Returns the object name in integer.
      * @return Name for the object in integer.
      */
     virtual int32_t name_id() const;
 
     /**
-     * @brief Returns object's Instance ID.
+     * @brief Returns the object's Instance ID.
      * @returns Instance ID of the object.
      */
     virtual uint16_t instance_id() const;
 
     /**
-     * @brief Returns interface description of the object.
+     * @brief Returns the interface description of the object.
      * @return Description of the object.
      */
     virtual const String& interface_description() const;
 
     /**
-     * @brief Returns resource type of the object.
-     * @return Resource Type of the object.
+     * @brief Returns the resource type of the object.
+     * @return Resource type of the object.
      */
     virtual const String& resource_type() const;
 
     /**
-     * @brief Returns coap content type of the object.
-     * @return Content Type of the object.
+     * @brief Returns the CoAP content type of the object.
+     * @return Content type of the object.
      */
     virtual uint8_t coap_content_type() const;
 
     /**
      * @brief Returns the observation status of the object.
-     * @return True if observable else false.
+     * @return True if observable, else false.
      */
     virtual bool is_observable() const;
 
@@ -260,8 +260,8 @@ public:
 
     /**
      * @brief Provides the observation token of the object.
-     * @param value[OUT], pointer to the value of token.
-     * @param value_length[OUT], length to the token pointer.
+     * @param value[OUT], pointer to the value of the token.
+     * @param value_length[OUT], length of the token pointer.
      */
     virtual void get_observation_token(uint8_t *&token, uint32_t &token_length);
 
@@ -273,21 +273,21 @@ public:
 
     /**
      * @brief Returns the observation number.
-     * @return observation number for the object.
+     * @return Observation number for the object.
      */
     virtual uint16_t observation_number() const;
 
     /**
-     * @brief Parses the received query for notification
+     * @brief Parses the received query for the notification
      * attribute.
-     * @param query, Query which needs to be parsed.
-     * @return true if required attributes are present else false.
+     * @param query, Query that needs to be parsed.
+     * @return True if required attributes are present, else false.
      */
     virtual bool handle_observation_attribute(char *&query);
 
     /**
      * @brief Handles GET request for the registered objects.
-     * @param nsdl, NSDL handler for the Coap library.
+     * @param nsdl, NSDL handler for the CoAP library.
      * @param received_coap_header, Received CoAP message from the server.
      * @param observation_handler, Handler object for sending
      * observation callbacks.
@@ -298,7 +298,7 @@ public:
                                               M2MObservationHandler *observation_handler = NULL);
     /**
      * @brief Handles PUT request for the registered objects.
-     * @param nsdl, NSDL handler for the Coap library.
+     * @param nsdl, NSDL handler for the CoAP library.
      * @param received_coap_header, Received CoAP message from the server.
      * @param observation_handler, Handler object for sending
      * observation callbacks.
@@ -310,7 +310,7 @@ public:
 
     /**
      * @brief Handles GET request for the registered objects.
-     * @param nsdl, NSDL handler for the Coap library.
+     * @param nsdl, NSDL handler for the CoAP library.
      * @param received_coap_header, Received CoAP message from the server.
      * @param observation_handler, Handler object for sending
      * observation callbacks.
@@ -332,7 +332,7 @@ protected:
     virtual void set_base_type(M2MBase::BaseType type);
 
     /**
-     * @brief Removes resource from coap structure.
+     * @brief Removes resource from the CoAP structure.
      * @param resource_name, Name of the resource.
      */
     virtual void remove_resource_from_coap(const String &resource_name);
