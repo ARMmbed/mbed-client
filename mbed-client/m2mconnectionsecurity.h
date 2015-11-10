@@ -22,9 +22,9 @@ class M2MConnectionSecurityPimpl;
 
 /**
  * @brief M2MConnectionSecurity.
- * This class provides method to create secure socket connection
- * to handle connectivity for mbed Client. It will handle send, receive
- * and establishing secure conenction for mbed Client on top of
+ * This class provides a method to create a secure socket connection
+ * to handle connectivity for the mbed Client. It will handle sending, receiving
+ * and establishing a secure connection for the mbed Client on top of the
  * normal socket connection.
  */
 
@@ -39,7 +39,7 @@ public:
 private:
     // Prevents the use of assignment operator by accident.
     M2MConnectionSecurity& operator=( const M2MConnectionSecurity& /*other*/ );
-    // Prevents the use of copy constructor by accident
+    // Prevents the use of copy constructor by accident.
     M2MConnectionSecurity( const M2MConnectionSecurity& /*other*/ );
 
 public:
@@ -64,9 +64,9 @@ public:
     int init(const M2MSecurity *security);
 
     /**
-     * @brief Starts the connection in non blocking mode.
-     * @param connHandler, ConnectionHandler object which maintains the socket.
-     * @return Returns the state if the connection is successful or not.
+     * @brief Starts the connection in non-blocking mode.
+     * @param connHandler, ConnectionHandler object that maintains the socket.
+     * @return Returns the state of the connection. Successful or not.
      */
     int start_connecting_non_blocking(M2MConnectionHandler* connHandler);
 
@@ -77,9 +77,9 @@ public:
     int continue_connecting();
 
     /**
-     * @brief Connects the client to server.
-     * @param connHandler, ConnectionHandler object which maintains the socket.
-     * @return Returns the state if the connection is successful or not.
+     * @brief Connects the client to the server.
+     * @param connHandler, ConnectionHandler object that maintains the socket.
+     * @return Returns the state of the connection. Successful or not.
      */
     int connect(M2MConnectionHandler* connHandler);
 
@@ -87,15 +87,15 @@ public:
      * @brief Sends data to the server.
      * @param message, Data to be sent.
      * @param len, Length of the data.
-     * @return Returns if the data is sent successfully or not.
+     * @return Indicates whether the data is sent successfully or not.
      */
     int send_message(unsigned char *message, int len);
 
     /**
-     * @brief Reads the data received from server.
+     * @brief Reads the data received from the server.
      * @param message, Data to be read.
      * @param len, Length of the data.
-     * @return Returns if the data is read successfully or not.
+     * @return Indicates whether the data is read successfully or not.
      */
     int read(unsigned char* buffer, uint16_t len);
 
