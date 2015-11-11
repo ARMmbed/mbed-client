@@ -29,8 +29,8 @@ class M2MFirmware;
 
 /**
  *  @brief M2MInterfaceFactory.
- *  This is a factory class provides interface for creating mbed Client Interface
- *  object for application to utilize LWM2M features provided by the client.
+ *  This is a factory class that provides an interface for creating an mbed Client Interface
+ *  object for an application to utilize the LWM2M features provided by the client.
  */
 
 class  M2MInterfaceFactory {
@@ -44,17 +44,17 @@ private:
 public:
 
     /**
-     * @brief Creates interface object for mbed Client Inteface using which
+     * @brief Creates an interface object for the mbed Client Inteface. With this, the
      * client can handle client operations like Bootstrapping, Client
      * Registration, Device Management and Information Reporting.
      * @param endpoint_name, Endpoint name of the mbed client.
-     * @param endpoint_type, Endpoint type of the mbed client,default is empty.
+     * @param endpoint_type, Endpoint type of the mbed client, default is empty.
      * @param life_time, Lifetime of the endpoint in seconds,
-     *        if -1 then it is optional
+     *        if -1 it is optional.
      * @param listen_port, Listening port for the endpoint, default is 5683.
-     * @param domain, Domain of the endpoint,default is empty.
-     * @param mode, Binding Mode of the endpoint, default is NOT_SET
-     * @param stack, Select the underlying network stack to be used for connection
+     * @param domain, Domain of the endpoint, default is empty.
+     * @param mode, Binding Mode of the endpoint, default is NOT_SET.
+     * @param stack, Select the underlying network stack to be used for the connection,
      * default is LwIP_IPv4.
      * @param context_address, Context address for M2M-HTTP, not used currently.
      * @return M2MInterfaceImpl , Object to manage other client operations.
@@ -70,44 +70,44 @@ public:
                                               const String &context_address = "");
 
     /**
-     * @brief Creates security object for mbed Client Inteface using which
-     * client can manage client operations bootstrapping and Client Registration.
-     * @param ServerType, Type of Security Object whether bootstrap or LWM2M server.
+     * @brief Creates a security object for the mbed Client Inteface. With this, the
+     * client can manage Bootstrapping and Client Registration.
+     * @param ServerType, Type of the Security Object, bootstrap or LWM2M server.
      * @return M2MSecurity, Object to manage other client operations.
      */
     static M2MSecurity *create_security(M2MSecurity::ServerType server_type);
 
     /**
-     * @brief Creates server object for mbed Client Inteface using which
-     * client can manage server resources used for client operations
-     * like Client Registration, server lifetime etc.
+     * @brief Creates a server object for the mbed Client Inteface. With this, the 
+     * client can manage the server resources used for client operations
+     * such as Client Registration, server lifetime etc.
      * @return M2MServer, Object to manage server client operations.
      */
     static M2MServer *create_server();
 
     /**
-     * @brief Creates device object for mbed Client Inteface using which
-     * client can manage device resources used for client operations
-     * like Client Registration, Device Management and Information Reporting.
-     * @param name, Name of the device object
+     * @brief Creates a device object for the mbed Client Inteface. With this, the
+     * client can manage the device resources used for client operations
+     * such as Client Registration, Device Management and Information Reporting.
+     * @param name, Name of the device object.
      * @return M2MDevice, Object to manage other client operations.
      */
     static M2MDevice *create_device();
 
     /**
-     * @brief Creates firmware object for mbed Client Inteface using which
-     * client can manage firmware resources used for client operations
-     * like Client Registration, Device Management and Information Reporting.
+     * @brief Creates a firmware object for the mbed Client Inteface. With this, the
+     * client can manage the firmware resources used for the client operations
+     * such as Client Registration, Device Management and Information Reporting.
      * @return M2MFirmware, Object to manage other client operations.
      */
     static M2MFirmware *create_firmware();
 
     /**
-     * @brief Creates generic object for mbed Client Inteface using which
+     * @brief Creates a generic object for the mbed Client Inteface. With this, the
      * client can manage its own customized resources used for registering
-     * device Management and Information Reporting for those resources.
-     * @param name, Name of the object
-     * @param id, Unique ID for the object, it should be other than reserved
+     * Device Management and Information Reporting for those resources.
+     * @param name, Name of the object.
+     * @param id, Unique ID for the object. It should be other than the reserved
      * LWM2M object IDs.
      * @return M2MObject, Object to manage other mbed Client operations.
      */
