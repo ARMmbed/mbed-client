@@ -24,10 +24,10 @@ class M2MResourceInstance;
 
 /**
  *  @brief M2MFirmware.
- *  This class represents the Firmware Object model of LWM2M framework.
- *  This class will provide interface for handling the firmware object
- *  and all its corresponding resources.There can be only one instance
- *  of Firmware Object.
+ *  This class represents the Firmware Object model of the LWM2M framework.
+ *  This class provides an interface for handling the firmware object
+ *  and all its corresponding resources. There can be only one instance
+ *  of a Firmware Object.
  */
 class  M2MFirmware : public M2MObject {
 
@@ -36,8 +36,8 @@ friend class M2MInterfaceFactory;
 public:
 
      /**
-      * @brief Enum defining all the resources associated with
-      * Firmware Object in LWM2M framework.
+      * @brief Enum defining all the resources associated with a
+      * Firmware Object in the LWM2M framework.
       */
     typedef enum {
         Package,
@@ -51,7 +51,7 @@ public:
     } FirmwareResource;
 
     /**
-     * @brief Enum defining state of firmware update.
+     * @brief Enum defining the state of the firmware update.
      */
     typedef enum {
        Idle = 1,
@@ -60,7 +60,7 @@ public:
     } UpdateState;
 
     /**
-     * @brief Enum defining result of firmware update.
+     * @brief Enum defining the result of the firmware update.
      */
     typedef enum {
        Default = 0,
@@ -83,7 +83,7 @@ private:
     // Prevents the use of assignment operator.
     M2MFirmware& operator=( const M2MFirmware& /*other*/ );
 
-    // Prevents the use of copy constructor
+    // Prevents the use of copy constructor.
     M2MFirmware( const M2MFirmware& /*other*/ );
 
     /**
@@ -102,60 +102,60 @@ public:
 
     /**
      * @brief Creates a new resource for given resource enum.
-     * @param resource, List of resource names which can be created using this function are
+     * @param resource, List of resource names that can be created using this function:
      * 'PackageUri', 'PackageName','PackageVersion'.
      * @param value, Value to be set on the resource, in String format.
-     * @return M2MResource if created successfully else NULL.
+     * @return M2MResource if created successfully, else NULL.
      */
     M2MResource* create_resource(FirmwareResource resource, const String &value);
 
     /**
      * @brief Creates a new resource for given resource enum.
-     * @param resource, List of resource names which can be created using this function are
+     * @param resource, List of resource names that can be created using this function:
      * 'State','UpdateSupportedObjects','UpdateResult'.
      * @param value, Value to be set on the resource, in Integer format.
-     * @return M2MResource if created successfully else NULL.
+     * @return M2MResource if created successfully, else NULL.
      */
     M2MResource* create_resource(FirmwareResource resource, int64_t value);
 
     /**
-     * @brief Deletes the resource with the given resource enum,
-     * it cannot not delete the mandatory resources.
+     * @brief Deletes the resource with the given resource enum.
+     * Mandatory resources cannot be deleted.
      * @param resource, Name of the resource to be deleted.
-     * @return True if deleted else false.
+     * @return True if deleted, else false.
      */
     bool delete_resource(FirmwareResource resource);
 
     /**
      * @brief Sets the value of the given resource enum.
-     * @param resource, List of resource name for which value can be set
-     * using this function are
+     * @param resource, List of resource names for which a value can be set
+     * using this function:
      * 'Package', 'PackageUri', 'PackageName','PackageVersion'.
      * @param value, Value to be set on the key, in String format.     
-     * @return True if successfully set else false.
+     * @return True if successfully set, else false.
      */
     bool set_resource_value(FirmwareResource resource,
                             const String &value);
 
     /**
      * @brief Sets the value of the given resource enum.
-     * @param resource, List of resource name for which value can be set
-     * using this function are
+     * @param resource, List of resource names for which a value can be set
+     * using this function:
      * 'State','UpdateSupportedObjects','UpdateResult'.
-     * @param value, Value to be set on the key, in Integer format
-     * @return True if successfully set else false.
+     * @param value, Value to be set on the key, in Integer format.
+     * @return True if successfully set, else false.
      */
     bool set_resource_value(FirmwareResource resource,
                             int64_t value);
 
     /**
      * @brief Sets the value of the given resource enum.
-     * @param resource, List of resource name for which value can be set
-     * using this function are
+     * @param resource, List of resource names for which a value can be set
+     * using this function:
      * 'Package'.
      * @param value, Value to be set on the key, in uint8_t format.
-     * @param size, size of the buffer value to be set on the key.
-     * @return True if successfully set else false.
+     * @param size, Size of the buffer value to be set on the key.
+     * @return True if successfully set, else false.
      */
     bool set_resource_value(FirmwareResource resource,
                             const uint8_t *value,
@@ -163,7 +163,7 @@ public:
 
     /**
      * @brief Returns the value of the given resource enum, in String.
-     * @param resource, List of resource names which can return value using this function are
+     * @param resource, List of resource names that can return value using this function:
      * 'PackageUri', 'PackageName','PackageVersion'.
      * @return Value associated with that key, if key is not valid it returns NULL.
      */
@@ -171,7 +171,7 @@ public:
 
     /**
      * @brief Returns the value of the given resource key name, in Integer.
-     * @param resource, List of resource names which can return value using this function are
+     * @param resource, List of resource names that can return a value using this function:
      * 'State','UpdateSupportedObjects','UpdateResult'.     
      * @return Value associated with that key, if key is not valid it returns -1.
      */
@@ -179,32 +179,32 @@ public:
 
     /**
      * @brief Populates the data buffer and returns the size of the buffer.
-     * @param resource, List of resource names which can return value using this function are
+     * @param resource, List of resource names that can return a value using this function:
      * 'Package'.
-     * @param [OUT] data, Data buffer which will contain the value.
-     * @return Size of the buffer populated .
+     * @param [OUT] data, Data buffer containing the value.
+     * @return Size of the buffer populated.
      */
     uint32_t resource_value_buffer(FirmwareResource resource,
                                    uint8_t *&data) const;
 
     /**
-     * @brief Returns if the resource instance with given resource enum exists or not.
-     * @param resource, resource enum.
-     * @return True if at least one instance exists else false.
+     * @brief Returns whether the resource instance with given resource enum exists or not.
+     * @param resource, Resource enum.
+     * @return True if at least one instance exists, else false.
      */
     bool is_resource_present(FirmwareResource resource) const;
 
     /**
-     * @brief Returns number of resources for whole firmware object.
-     * @return Total number of resources belonging to firmware object.
+     * @brief Returns number of resources for the whole firmware object.
+     * @return Total number of resources belonging to the firmware object.
      */
     uint16_t total_resource_count() const;
 
     /**
-     * @brief Returns number of resources for given resource enum.
-     * @param resource, resource enum.
-     * @return Number of resources for a given resource enum returns 1 for
-     * mandatory resources else can be 0 as well if no instance exists for an
+     * @brief Returns number of resources for a given resource enum.
+     * @param resource, Resource enum.
+     * @return Number of resources for a given resource enum returns 1 for the
+     * mandatory resources, else can be 0 as well if no instance exists for an
      * optional resource.
      */
     uint16_t per_resource_count(FirmwareResource resource) const;
