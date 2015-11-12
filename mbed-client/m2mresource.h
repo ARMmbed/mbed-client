@@ -25,8 +25,8 @@ typedef Vector<M2MResourceInstance *> M2MResourceInstanceList;
 
 /**
  *  @brief M2MResource.
- *  This class is the base class for mbed Client Resources based on which all defined
- *  LWM2M objects model can be created. This class will also hold all resources
+ *  This class is the base class for mbed Client Resources. All defined
+ *  LWM2M object models can be created using it. This class will also hold all resources
  *  instances associated with the given object.
  */
 
@@ -35,8 +35,8 @@ class M2MResource : public M2MResourceInstance {
 friend class M2MObjectInstance;
 
 private: // Constructor and destructor are private
-         // so that these objects can be created or
-         // deleted only through function provided by M2MObjectInstance.
+         // which means that these objects can be created or
+         // deleted only through a function provided by the M2MObjectInstance.
 
     /**
      * @brief Constructor
@@ -57,7 +57,7 @@ private: // Constructor and destructor are private
 
     /**
      * @brief Constructor
-     * @param name, name of the object
+     * @param name, Name of the object
      */
     M2MResource(M2MObjectInstanceCallback &object_instance_callback,
                 const String &resource_name,
@@ -89,88 +89,88 @@ public:
     void add_resource_instance(M2MResourceInstance *resource_instance);
 
     /**
-     * @brief Returns if the resource is having multiple
-     * resource instance or not.
-     * @return True if resource base is having multiple instance
+     * @brief Returns whether the resource has multiple
+     * resource instances or not.
+     * @return True if resource base has multiple instances,
      * else false.
      */
     bool supports_multiple_instances() const;
 
     /**
-     * @brief Removes the resource with given name.
+     * @brief Removes the resource with the given name.
      * @param name, Name of the resource to be removed.
      * @param instance_id, Instance ID of resource to be removed, default is 0.
-     * @return True if removed else false.
+     * @return True if removed, else false.
      */
     virtual bool remove_resource_instance(uint16_t instance_id = 0);
 
     /**
      * @brief Returns resource instance with the given name.
      * @param instance_id, Instance ID of the requested resource, default is 0
-     * @return M2MResourceInstance object if found else NULL.
+     * @return M2MResourceInstance object if found, else NULL.
      */
     virtual M2MResourceInstance* resource_instance(uint16_t instance_id = 0) const;
 
     /**
-     * @brief Returns list of resources.
+     * @brief Returns a list of resources.
      * @return List of resources with the object.
      */
     virtual const M2MResourceInstanceList& resource_instances() const;
 
     /**
-     * @brief Returns total number of resources with the object.
-     * @return Total count of the resources.
+     * @brief Returns the total number of resources with the object.
+     * @return Total number of resources.
      */
     virtual uint16_t resource_instance_count() const;
 
     /**
-     * @brief Parses the received query for notification
+     * @brief Parses the received query for a notification
      * attribute.
-     * @return true if required attributes are present else false.
+     * @return True if required attributes are present, else false.
      */
     virtual bool handle_observation_attribute(char *&query);
 
     /**
      * @brief Adds the observation level for the object.
-     * @param observation_level, Level of the observation.
+     * @param observation_level, Level of observation.
      */
     virtual void add_observation_level(M2MBase::Observation observation_level);
 
     /**
-     * @brief Removes the observation level for the object.
-     * @param observation_level, Level of the observation.
+     * @brief Removes the observation level from the object.
+     * @param observation_level, Level of observation.
      */
     virtual void remove_observation_level(M2MBase::Observation observation_level);
 
     /**
      * @brief Handles GET request for the registered objects.
-     * @param nsdl, NSDL handler for the Coap library.
-     * @param received_coap_header, Received CoAP message from the server.
+     * @param nsdl, NSDL handler for the CoAP library.
+     * @param received_coap_header, CoAP message received from the server.
      * @param observation_handler, Handler object for sending
      * observation callbacks.
-     * @return sn_coap_hdr_s,  Message that needs to be sent to server.
+     * @return sn_coap_hdr_s,  Message that needs to be sent to the server.
      */
     virtual sn_coap_hdr_s* handle_get_request(nsdl_s *nsdl,
                                               sn_coap_hdr_s *received_coap_header,
                                               M2MObservationHandler *observation_handler = NULL);
     /**
      * @brief Handles PUT request for the registered objects.
-     * @param nsdl, NSDL handler for the Coap library.
-     * @param received_coap_header, Received CoAP message from the server.
+     * @param nsdl, NSDL handler for the CoAP library.
+     * @param received_coap_header, CoAP message received from the server.
      * @param observation_handler, Handler object for sending
      * observation callbacks.
-     * @return sn_coap_hdr_s,  Message that needs to be sent to server.
+     * @return sn_coap_hdr_s,  Message that needs to be sent to the server.
      */
     virtual sn_coap_hdr_s* handle_put_request(nsdl_s *nsdl,
                                               sn_coap_hdr_s *received_coap_header,
                                               M2MObservationHandler *observation_handler = NULL);
     /**
      * @brief Handles POST request for the registered objects.
-     * @param nsdl, NSDL handler for the Coap library.
-     * @param received_coap_header, Received CoAP message from the server.
+     * @param nsdl, NSDL handler for the CoAP library.
+     * @param received_coap_header, CoAP message received from the server.
      * @param observation_handler, Handler object for sending
      * observation callbacks.
-     * @return sn_coap_hdr_s,  Message that needs to be sent to server.
+     * @return sn_coap_hdr_s,  Message that needs to be sent to the server.
      */
     virtual sn_coap_hdr_s* handle_post_request(nsdl_s *nsdl,
                                                sn_coap_hdr_s *received_coap_header,
