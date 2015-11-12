@@ -30,8 +30,8 @@ public:
 
 /**
  *  @brief M2MObjectInstance.
- *  This class is the instance class for mbed Client Objects based on which all defined
- *  LWM2M objects model can be created. This class will also hold all resources
+ *  This class is the instance class for mbed Client Objects. All defined
+ *  LWM2M object models can be created based on it. This class also holds all resource
  *  instances associated with the given object.
  */
 
@@ -41,13 +41,13 @@ class M2MObjectInstance : public M2MBase,
 
 friend class M2MObject;
 
-private: // Constructor and destructor are private
-         // so that these objects can be created or
+private: // Constructor and destructor are private which means
+         // that these objects can be created or
          // deleted only through function provided by M2MObject.
 
     /**
      * @brief Constructor
-     * @param name, name of the object
+     * @param name, Name of the object
      */
     M2MObjectInstance(const String &object_name,
                       M2MObjectCallback &object_callback);
@@ -59,7 +59,7 @@ private: // Constructor and destructor are private
     // Prevents the use of assignment operator.
     M2MObjectInstance& operator=( const M2MObjectInstance& /*other*/ );
 
-    // Prevents the use of copy constructor
+    // Prevents the use of copy constructor.
     M2MObjectInstance( const M2MObjectInstance& /*other*/ );
 
     /**
@@ -70,15 +70,15 @@ private: // Constructor and destructor are private
 public:
 
     /**
-     * @brief Creates static resource for a given object mbed Client Inteface using which
+     * @brief Creates a static resource for a given mbed Client Inteface object. With this, the
      * client can respond to server's GET methods with the provided value.
      * @param resource_name, Name of the resource.
      * @param resource_type, Type of the resource.
-     * @param value, pointer to the value of the resource.
-     * @param value_length, length to the value in pointer.
+     * @param value, Pointer to the value of the resource.
+     * @param value_length, Length of the value in the pointer.
      * @param multiple_instance, Resource can have
-     *        multiple instances,default is false.
-     * @return M2MResource, Resource to manage other client operations.
+     *        multiple instances, default is false.
+     * @return M2MResource, Resource for managing other client operations.
      */
     M2MResource* create_static_resource(const String &resource_name,
                                         const String &resource_type,
@@ -88,15 +88,15 @@ public:
                                         bool multiple_instance = false);
 
     /**
-     * @brief Creates dynamic resource for a given object mbed Client Inteface using which
-     * client can respond to different queries from server (GET,PUT etc).Also,
-     * this type of resource is observable and will carry callbacks.
+     * @brief Creates a dynamic resource for a given mbed Client Inteface object. With this,
+     * the client can respond to different queries from the server (GET,PUT etc).
+     * This type of resource is also observable and carries callbacks.
      * @param resource_name, Name of the resource.
      * @param resource_type, Type of the resource.
-     * @param observable, whether resource is observable or not.
+     * @param observable, Indication, whether the resource is observable or not.
      * @param multiple_instance, Resource can have
      *        multiple instances, default is false.
-     * @return M2MResource, Resource to manage other client operations.
+     * @return M2MResource, Resource for managing other client operations.
      */
     M2MResource* create_dynamic_resource(const String &resource_name,
                                          const String &resource_type,
@@ -106,14 +106,14 @@ public:
 
 
     /**
-     * @brief Creates static resource instance for a given object mbed Client Inteface using which
-     * client can respond to server's GET methods with the provided value.
+     * @brief Creates a static resource instance for a given mbed Client Inteface object. With this,
+     * the client can respond to server's GET methods with the provided value.
      * @param resource_name, Name of the resource.
      * @param resource_type, Type of the resource.
-     * @param value, pointer to the value of the resource.
-     * @param value_length, length to the value in pointer.
+     * @param value, Pointer to the value of the resource.
+     * @param value_length, Length of the value in pointer.
      * @param instance_id, Instance Id of the resource.
-     * @return M2MResourceInstance, Resource Instance to manage other client operations.
+     * @return M2MResourceInstance, Resource Instance for managing other client operations.
      */
     M2MResourceInstance* create_static_resource_instance(const String &resource_name,
                                                          const String &resource_type,
@@ -123,14 +123,14 @@ public:
                                                          uint16_t instance_id);
 
     /**
-     * @brief Creates dynamic resource instance for a given object mbed Client Inteface using which
-     * client can respond to different queries from server (GET,PUT etc).Also,
-     * this type of resource is observable and will carry callbacks.
+     * @brief Creates a dynamic resource instance for a given mbed Client Inteface object. With this,
+     * the client can respond to different queries from the server (GET,PUT etc).
+     * This type of resource is also observable and carries callbacks.
      * @param resource_name, Name of the resource.
      * @param resource_type, Type of the resource.
-     * @param observable, whether resource is observable or not.
+     * @param observable, Indicates, whether the resource is observable or not.
      * @param instance_id, Instance Id of the resource.
-     * @return M2MResourceInstance, Resource Instance to manage other client operations.
+     * @return M2MResourceInstance, Resource Instance for managing other client operations.
      */
     M2MResourceInstance* create_dynamic_resource_instance(const String &resource_name,
                                                           const String &resource_type,
@@ -139,17 +139,17 @@ public:
                                                           uint16_t instance_id);
 
     /**
-     * @brief Removes the resource with given name.
+     * @brief Removes the resource with the given name.
      * @param name, Name of the resource to be removed.
-     * @return True if removed else false.
+     * @return True if removed, else false.
      */
     virtual bool remove_resource(const String &name);
 
     /**
-     * @brief Removes the resource instance with given name.
+     * @brief Removes the resource instance with the given name.
      * @param resource_name, Name of the resource instance to be removed.
      * @param instance_id, Instance Id of the instance.
-     * @return True if removed else false.
+     * @return True if removed, else false.
      */
     virtual bool remove_resource_instance(const String &resource_name,
                                           uint16_t instance_id);
@@ -157,26 +157,26 @@ public:
     /**
      * @brief Returns resource with the given name.
      * @param name, Name of the requested resource.
-     * @return Resource reference if found else NULL.
+     * @return Resource reference if found, else NULL.
      */
     virtual M2MResource* resource(const String &name) const;
 
     /**
-     * @brief Returns list of M2MResourceBase objects.
+     * @brief Returns a list of M2MResourceBase objects.
      * @return List of Resource base with the object instance.
      */
     virtual const M2MResourceList& resources() const;
 
     /**
-     * @brief Returns total number of resources with the object.
-     * @return Total count of the resources.
+     * @brief Returns the total number of resources with the object.
+     * @return Total number of the resources.
      */
     virtual uint16_t resource_count() const;
 
     /**
-     * @brief Returns total instance of single resource.
+     * @brief Returns the total number of single resource instances.
      * @param resource, Name of the resource.
-     * @return Total count of the resources.
+     * @return Total number of the resources.
      */
     virtual uint16_t resource_count(const String& resource) const;
 
@@ -188,34 +188,34 @@ public:
 
     /**
      * @brief Adds the observation level for the object.
-     * @param observation_level, Level of the observation.
+     * @param observation_level, Level of observation.
      */
     virtual void add_observation_level(M2MBase::Observation observation_level);
 
     /**
-     * @brief Removes the observation level for the object.
-     * @param observation_level, Level of the observation.
+     * @brief Removes the observation level from the object.
+     * @param observation_level, Level of observation.
      */
     virtual void remove_observation_level(M2MBase::Observation observation_level);
 
     /**
      * @brief Handles GET request for the registered objects.
-     * @param nsdl, NSDL handler for the Coap library
-     * @param received_coap_header, Received CoAP message from the server
+     * @param nsdl, NSDL handler for the CoAP library.
+     * @param received_coap_header, CoAP message received from the server.
      * @param observation_handler, Handler object for sending
      * observation callbacks.
-     * @return sn_coap_hdr_s,  Message that needs to be sent to server.
+     * @return sn_coap_hdr_s,  Message that needs to be sent to the server.
      */
     virtual sn_coap_hdr_s* handle_get_request(nsdl_s *nsdl,
                                               sn_coap_hdr_s *received_coap_header,
                                               M2MObservationHandler *observation_handler = NULL);
     /**
      * @brief Handles PUT request for the registered objects.
-     * @param nsdl, NSDL handler for the Coap library
-     * @param received_coap_header, Received CoAP message from the server
+     * @param nsdl, NSDL handler for the CoAP library.
+     * @param received_coap_header, CoAP message received from the server.
      * @param observation_handler, Handler object for sending
      * observation callbacks.
-     * @return sn_coap_hdr_s,  Message that needs to be sent to server.
+     * @return sn_coap_hdr_s,  Message that needs to be sent to the server.
      */
     virtual sn_coap_hdr_s* handle_put_request(nsdl_s *nsdl,
                                               sn_coap_hdr_s *received_coap_header,
@@ -223,11 +223,11 @@ public:
 
     /**
      * @brief Handles GET request for the registered objects.
-     * @param nsdl, NSDL handler for the Coap library
-     * @param received_coap_header, Received CoAP message from the server
+     * @param nsdl, NSDL handler for the CoAP library.
+     * @param received_coap_header, CoAP message received from the server.
      * @param observation_handler, Handler object for sending
      * observation callbacks.
-     * @return sn_coap_hdr_s,  Message that needs to be sent to server.
+     * @return sn_coap_hdr_s,  Message that needs to be sent to the server.
      */
     virtual sn_coap_hdr_s* handle_post_request(nsdl_s *nsdl,
                                                sn_coap_hdr_s *received_coap_header,
