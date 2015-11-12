@@ -21,8 +21,8 @@ class M2MResourceInstance;
 
 /**
  * @brief M2MReportObserver
- * An interface to report to the base class
- * when to send the report to the server.
+ * An interface for inviting the base class
+ * to send a report to the server.
  *
  */
 class M2MReportObserver
@@ -31,8 +31,7 @@ class M2MReportObserver
 
     /**
      * @brief Observation callback to be sent to the
-     * server because some of the observed parameter has
-     * changed.
+     * server due to a change in the observed parameter.
      */
     virtual void observation_to_be_sent() = 0;
 
