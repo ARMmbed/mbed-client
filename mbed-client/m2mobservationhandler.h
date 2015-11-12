@@ -23,7 +23,7 @@ class M2MResourceInstance;
 
 /**
  * @brief M2MObservationHandler
- * An interface to handle the observation
+ * An interface for handling observation
  * callbacks from different objects.
  *
  */
@@ -33,28 +33,27 @@ class M2MObservationHandler
 
     /**
      * @brief Observation callback to be sent to the
-     * server because some of the observed parameter has
-     * changed.
+     * server due to a change in a parameter under observation.
      * @param object, Observed object whose information
-     * has to be sent.
+     * needs to be sent.
      */
     virtual void observation_to_be_sent(M2MBase *object) = 0;
 
     /**
-     * @brief NSDL resource needs to be deleted.
+     * @brief Callback for deleting an NSDL resource.
      * @param resource_name, Name of the observed object whose information
      * needs to be deleted.
      */
     virtual void resource_to_be_deleted(const String &resource_name) = 0;
 
     /**
-     * @brief Callback informing that the value of the resource object is updated by server.
+     * @brief Callback indicating that the value of the resource object is updated by server.
      * @param base, Object whose value is updated.
      */
     virtual void value_updated(M2MBase *base) = 0;
 
     /**
-     * @brief Object to be removed from list.
+     * @brief Callback for removing an object from the list.
      * @param object, M2MObject to be removed.
      */
     virtual void remove_object(M2MBase *object) = 0;
