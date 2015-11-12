@@ -169,9 +169,7 @@ public:
 
     /**
      * @brief Sets the object under observation.
-     * @param observed for the observation.
-     * @param handler, Handler object for sending
-     * observation callbacks.
+     * @param observed, for the observation.
      * @param handler, Handler object for sending
      * observation callbacks.
      */
