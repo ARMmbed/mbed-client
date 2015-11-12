@@ -26,8 +26,8 @@ public:
 
 /**
  *  @brief M2MResourceInstance.
- *  This class is the base class for mbed Client Resources based on which all defined
- *  LWM2M resource model can be created.
+ *  This class is the base class for mbed Client Resources. All defined
+ *  LWM2M resource models can be created based on it.
  */
 typedef FP1<void,void*> execute_callback;
 
@@ -39,7 +39,7 @@ friend class M2MResource;
 public:
 
     /**
-     * Enum defining resource type which can be
+     * Enum defining a resource type that can be
      * supported by a given resource.
     */
     typedef enum {
@@ -54,11 +54,11 @@ public:
 
 
 private: // Constructor and destructor are private
-         // so that these objects can be created or
-         // deleted only through function provided by M2MObjectInstance.
+         // which means that these objects can be created or
+         // deleted only through a function provided by the M2MObjectInstance.
     /**
      * @brief Constructor for creating resource.
-     * @param resource_name, name of the resource.
+     * @param resource_name, Name of the resource.
      * @param resource_type, Resource Type.
      * @param type, Resource Data Type of the object.
      */
@@ -68,12 +68,12 @@ private: // Constructor and destructor are private
                         M2MObjectInstanceCallback &object_instance_callback);
 
     /**
-     * @brief Constructor for creating resource.
-     * @param resource_name, name of the resource
+     * @brief Constructor for creating a resource.
+     * @param resource_name, Name of the resource.
      * @param resource_type, Resource Type.
      * @param type, Resource Data Type of the object.
      * @param value, Value pointer of the object.
-     * @param value_length, Length of the value pointer
+     * @param value_length, Length of the value pointer.
      */
     M2MResourceInstance(const String &resource_name,
                         const String &resource_type,
@@ -111,16 +111,16 @@ public:
     virtual M2MResourceInstance::ResourceType resource_instance_type() const;
 
     /**
-     * @brief Parses the received query for notification
+     * @brief Parses the received query for a notification
      * attribute.
-     * @return true if required attributes are present else false.
+     * @return True if required attributes are present, else false.
      */
     virtual bool handle_observation_attribute(char *&query);
 
     /**
-     * @brief Sets the function which should be executed when this
-     * resource will receive POST command for this resource.
-     * @param callback, Function pointer which needs to be executed.
+     * @brief Sets the function that should be executed when this
+     * resource receives a POST command.
+     * @param callback, Function pointer that needs to be executed.
      */
     virtual void set_execute_function(execute_callback callback);
 
@@ -128,7 +128,7 @@ public:
      * @brief Sets the value of the given resource.
      * @param value, Pointer to the value to be set on the resource.
      * @param value_length , Length of the value pointer.
-     * @return True if successfully set else false.
+     * @return True if successfully set, else false.
      */
     virtual bool set_value(const uint8_t *value, const uint32_t value_length);
 
@@ -138,16 +138,15 @@ public:
     virtual void clear_value();
 
     /**
-     * @brief Executes the function which is set in "set_execute_function".
-     * @param arguments, arguments that will be passed to execute which
-     * needs to be executed.
+     * @brief Executes the function that is set in "set_execute_function".
+     * @param arguments, Arguments that will be passed to be executed.
      */
     void execute(void *arguments);
 
     /**
      * @brief Provides the value of the given resource.
-     * @param value[OUT], pointer to the value of resource.
-     * @param value_length[OUT], length to the value pointer.
+     * @param value[OUT], Pointer to the resource value.
+     * @param value_length[OUT], Length of the value pointer.
      */
     virtual void get_value(uint8_t *&value, uint32_t &value_length);
 
@@ -165,22 +164,22 @@ public:
 
     /**
      * @brief Handles GET request for the registered objects.
-     * @param nsdl, NSDL handler for the Coap library.
-     * @param received_coap_header, Received CoAP message from the server.
+     * @param nsdl, NSDL handler for the CoAP library.
+     * @param received_coap_header, CoAP message received from the server.
      * @param observation_handler, Handler object for sending
      * observation callbacks.
-     * @return sn_coap_hdr_s,  Message that needs to be sent to server.
+     * @return sn_coap_hdr_s,  Message that needs to be sent to the server.
      */
     virtual sn_coap_hdr_s* handle_get_request(nsdl_s *nsdl,
                                               sn_coap_hdr_s *received_coap_header,
                                               M2MObservationHandler *observation_handler = NULL);
     /**
      * @brief Handles PUT request for the registered objects.
-     * @param nsdl, NSDL handler for the Coap library.
-     * @param received_coap_header, Received CoAP message from the server.
+     * @param nsdl, NSDL handler for the CoAP library.
+     * @param received_coap_header, CoAP message received from the server.
      * @param observation_handler, Handler object for sending
      * observation callbacks.
-     * @return sn_coap_hdr_s,  Message that needs to be sent to server.
+     * @return sn_coap_hdr_s,  Message that needs to be sent to the server.
      */
     virtual sn_coap_hdr_s* handle_put_request(nsdl_s *nsdl,
                                               sn_coap_hdr_s *received_coap_header,
