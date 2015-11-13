@@ -18,7 +18,7 @@
 
 /**
  *  @brief M2MTimerObserver
- *  Observer class for informing timer expiry to the parent class
+ *  Observer class for indicating the timer expiry to the parent class.
  */
 class M2MTimerObserver
 {
