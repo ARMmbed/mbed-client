@@ -21,14 +21,14 @@ class Test_M2MString;
 namespace m2m
 {
 
-  /** @brief Simple C++ string class,used as replacement for
+  /** @brief Simple C++ string class, used as replacement for
    std::string.
    */
   class String
   {
     char*     p;           ///< The data
-    size_t    allocated_;  ///< The allocated memory size (including trailing NUL)
-    size_t    size_;       ///< The currently used memory size (excluding trailing NUL)
+    size_t    allocated_;  ///< The allocated memory size (including trailing NULL)
+    size_t    size_;       ///< The currently used memory size (excluding trailing NULL)
 
   public:
     typedef size_t size_type;
@@ -55,7 +55,7 @@ namespace m2m
 
     void     clear();       // set string to empty string (memory remains reserved)
 
-    size_type size()   const   { return size_; }   ///< size without terminating NUL
+    size_type size()   const   { return size_; }   ///< size without terminating NULL
     size_type length() const   { return size_; }   ///< as size()
 
     /// size if fully used
@@ -66,20 +66,20 @@ namespace m2m
     const char*  c_str() const { return p; } ///< raw data
 
     /** Reserve internal string memory so that n characters can be put into the
-        string (plus 1 for the NUL char). If there is already enough memory,
+        string (plus 1 for the NULL char). If there is already enough memory,
         nothing happens, if not, the memory will be realloated to exactly this
         amount.
         */
     void reserve( size_type n);
 
     /** Resize string. If n is less than the current size, the string will be truncated.
-        If n is larger, then the memory will be reallocated to exactly this amount, and
-        the additional characters will be NUL characters.
+        If n is larger, the memory will be reallocated to exactly this amount, and
+        the additional characters will be NULL characters.
         */
     void resize( size_type n);
 
     /** Resize string. If n is less than the current size, the string will be truncated.
-        If n is larger, then the memory will be reallocated to exactly this amount, and
+        If n is larger, the memory will be reallocated to exactly this amount, and
         the additional characters will be c characters.
         */
     void resize( size_type n, char c);
