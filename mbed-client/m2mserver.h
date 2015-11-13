@@ -23,8 +23,8 @@ class M2MResource;
 
 /**
  *  @brief M2MServer.
- *  This class represents interface for the Server Object model of LWM2M framework.
- *  This class will handle the server object and all its corresponding
+ *  This class represents an interface for the Server Object model of the LWM2M framework.
+ *  This class handles the server object and all its corresponding
  *  resources.
  */
 
@@ -37,8 +37,8 @@ friend class M2MNsdlInterface;
 public:
 
     /**
-     * @brief Enum defining all the resources associdated with
-     * Server Object in LWM2M framework.
+     * @brief Enum defining all resources associated with
+     * a Server Object in the LWM2M framework.
      */
     typedef enum {
         ShortServerID,
@@ -74,44 +74,44 @@ public:
     virtual ~M2MServer();
 
     /**
-     * @brief Creates a new resource for given resource enum.
-     * @param resource, List of resource names which can set value using this function are
+     * @brief Creates a new resource for a given resource enum.
+     * @param resource, With this function, a value can be set to the following resources:
      *  'ShortServerID','Lifetime','DefaultMinPeriod','DefaultMaxPeriod','DisableTimeout',
      *  'NotificationStorage'.
      * @param value, Value to be set on the resource, in Integer format.
-     * @return M2MResource if created successfully else NULL.
+     * @return M2MResource if created successfully, else NULL.
      */
     M2MResource* create_resource(ServerResource resource, uint32_t value);
 
     /**
-     * @brief Creates a new resource for given resource enum.
-     * @param resource, List of resource names which can be created using this function are
+     * @brief Creates a new resource for a given resource enum.
+     * @param resource, With this function, the following resources can be created:
      * 'Disable', 'RegistrationUpdate'
-     * @return M2MResource if created successfully else NULL.
+     * @return M2MResource if created successfully, else NULL.
      */
     M2MResource* create_resource(ServerResource resource);
 
     /**
      * @brief Deletes the resource with the given resource enum.
-     * It cannot delete the mandatory resources.
+     * Mandatory resources cannot be deleted.
      * @param resource, Name of the resource to be deleted.
-     * @return True if deleted else false.
+     * @return True if deleted, else false.
      */
     bool delete_resource(ServerResource rescource);
 
     /**
      * @brief Sets the value of the given resource enum.
-     * @param resource, List of resource names which can set value using this function are
+     * @param resource, With this function, a value can be set on the following resources: 
      * 'Binding'.
      * @param value, Value to be set on the resource, in String format.
-     * @return True if successfully set else false.
+     * @return True if successfully set, else false.
      */
     bool set_resource_value(ServerResource resource,
                             const String &value);
 
     /**
      * @brief Sets the value of the given resource enum.
-     * @param resource, List of resource names which can set value using this function are
+     * @param resource, With this function, a value can be set to the following resources:
      *  'ShortServerID','Lifetime','DefaultMinPeriod','DefaultMaxPeriod','DisableTimeout',
      *  'NotificationStorage'.
      * @param value, Value to be set on the resource, in Integer format.
@@ -121,30 +121,30 @@ public:
                             uint32_t value);
     /**
      * @brief Returns the value of the given resource enum, in String.
-     * @param resource, List of resource names which can return value using this function are
+     * @param resource, With this function, the following resources can return a value:
      * 'Binding'.
-     * @return Value associated with that resource, if resourceis not valid it returns empty string.
+     * @return Value associated with the resource. If the resource is not valid an empty string is returned.
      */
     String resource_value_string(ServerResource resource) const;
 
     /**
      * @brief Returns the value of the given resource name, in Integer.
-     * @param resource, List of resource names which can return value using this function are
+     * @param resource, With this function, the following resources can return a value:
      *  'ShortServerID','Lifetime','DefaultMinPeriod','DefaultMaxPeriod','DisableTimeout',
      *  'NotificationStorage'
-     * @return Value associated with that resource, if resource is not valid it returns -1.
+     * @return Value associated with the resource. If the resource is not valid -1 is returned.
      */
     uint32_t resource_value_int(ServerResource resource) const;
 
     /**
-     * @brief Returns if the resource instance with given resource enum exists or not.
-     * @param resource, resource enum.
-     * @return True if at least one instance exists else false.
+     * @brief Returns whether the resource instance with the given resource enum exists or not.
+     * @param resource, Resource enum.
+     * @return True if at least one instance exists, else false.
      */
     bool is_resource_present(ServerResource resource)const;
 
     /**
-     * @brief Returns total number of resources for server object.
+     * @brief Returns the total number of resources for the server object.
      * @return Total Number of resources.
      */
     uint16_t total_resource_count()const;
