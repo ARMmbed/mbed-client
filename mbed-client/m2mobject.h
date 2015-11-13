@@ -25,8 +25,8 @@ typedef Vector<M2MObjectInstance *> M2MObjectInstanceList;
 
 /**
  *  @brief M2MObject.
- *  This class is the base class for mbed Client Objects based on which all defined
- *  LWM2M object models can be created. This class will also hold all object
+ *  This class is the base class for the mbed Client Objects. All defined
+ *  LWM2M object models can be created based on it. This class also holds all object
  *  instances associated with the given object.
  */
 
@@ -101,13 +101,13 @@ public:
 
     /**
      * @brief Adds the observation level for the object.
-     * @param observation_level, Level of the observation.
+     * @param observation_level, Level of observation.
      */
     virtual void add_observation_level(M2MBase::Observation observation_level);
 
     /**
      * @brief Removes the observation level from the object.
-     * @param observation_level, Level of the observation.
+     * @param observation_level, Level of observation.
      */
     virtual void remove_observation_level(M2MBase::Observation observation_level);
 
