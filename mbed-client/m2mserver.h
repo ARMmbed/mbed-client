@@ -24,7 +24,7 @@ class M2MResource;
 /**
  *  @brief M2MServer.
  *  This class represents an interface for the Server Object model of the LWM2M framework.
- *  This class handles the server object and all its corresponding
+ *  It handles the server object and all its corresponding
  *  resources.
  */
 
@@ -145,7 +145,7 @@ public:
 
     /**
      * @brief Returns the total number of resources for the server object.
-     * @return Total Number of resources.
+     * @return Total number of resources.
      */
     uint16_t total_resource_count()const;
 
