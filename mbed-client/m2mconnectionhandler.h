@@ -59,15 +59,15 @@ public:
 
     /**
     * @brief This binds the socket connection.
-    * @param listen_port Port to listen for incoming connection.
-    * @return true if successful, else false.
+    * @param listen_port Port to be listened to for an incoming connection.
+    * @return True if successful, else false.
     */
     bool bind_connection(const uint16_t listen_port);
 
     /**
     * @brief This resolves the server address. Output is
     * returned through a callback.
-    * @param String server address.
+    * @param String Server address.
     * @param uint16_t Server port.
     * @param ServerType, Server Type to be resolved.
     * @param security, M2MSecurity object that determines what
@@ -80,30 +80,30 @@ public:
                                 const M2MSecurity* security);
 
     /**
-    * @brief Sends data, to the connected sent to server.
+    * @brief Sends data to the connected server.
     * @param data_ptr, Data to be sent.
     * @param data_len, Length of data to be sent.
     * @param address_ptr, Address structure where data has to be sent.
-    * @return True if data sent is successful, else false.
+    * @return True if data is sent successfully, else false.
     */
     bool send_data(uint8_t *data_ptr,
                            uint16_t data_len,
                            sn_nsdl_addr_s *address_ptr);
 
     /**
-    * @brief Listens for incoming data from remote server.
+    * @brief Listens to the incoming data from a remote server.
     * @return True if successful, else false.
     */
     bool start_listening_for_data();
 
     /**
-    * @brief Stops listening for incoming data.
+    * @brief Stops listening to the incoming data.
     */
     void stop_listening();
 
     /**
      * @brief sendToSocket Sends directly to socket. This is used by
-     * security classes to send after the data has been encrypted.
+     * security classes to send the data after it has been encrypted.
      * @param buf Buffer to send.
      * @param len Length of a buffer.
      * @return Number of bytes sent or -1 if failed.
