@@ -24,7 +24,7 @@ class M2MResource;
 /**
  *  @brief M2MSecurity.
  *  This class represents an interface for the Security Object model of the LWM2M framework.
- *  This class handles the security object instances and all corresponding
+ *  It handles the security object instances and all corresponding
  *  resources.
  */
 
@@ -100,7 +100,7 @@ public:
 
     /**
      * @brief Creates a new resource for given resource enum.
-     * @param rescource, List of resource names that can be created using this function:
+     * @param rescource, With this function, the following resources can be created:
      * ' BootstrapServer', 'SecurityMode', 'SMSSecurityMode',
      * 'M2MServerSMSNumber', 'ShortServerID', 'ClientHoldOffTime'.
      * @param value, Value to be set on the resource, in Integer format.
@@ -118,10 +118,9 @@ public:
 
     /**
      * @brief Sets the value of the given resource enum.
-     * @param resource, List of resource names for which a value can be set
-     * using this function:
+     * @param resource, With this function, a value can be set for the following resources:
      * 'M2MServerUri', 'SMSBindingKey', 'SMSBindingSecretKey'.
-     * @param value, Value to be set on the key, in String format.
+     * @param value, Value to be set on the resource, in String format.
      * @return True if successfully set, else false.
      */
     bool set_resource_value(SecurityResource resource,
@@ -129,8 +128,7 @@ public:
 
     /**
      * @brief Sets the value of the given resource enum.
-     * @param resource, List of resource names for which a value can be set
-     * using this function:
+     * @param resource, With this function, a value can be set for the following resourecs:
      * 'BootstrapServer', 'SecurityMode', 'SMSSecurityMode',
      * 'M2MServerSMSNumber', 'ShortServerID', 'ClientHoldOffTime'.
      * @param value, Value to be set on the resource, in Integer format.
@@ -141,11 +139,10 @@ public:
 
     /**
      * @brief Sets the value of the given resource enum.
-     * @param resource, List of resource names for which a value can be set
-     * using this function:
+     * @param resource, With this function, a value can be set for the follwing resources:
      * 'PublicKey', 'ServerPublicKey', 'Secretkey'.
-     * @param value, Value to be set on the key, in uint8_t format.
-     * @param size, Size of the buffer value to be set on the key.
+     * @param value, Value to be set on the resource, in uint8_t format.
+     * @param size, Size of the buffer value to be set on the resource.
      * @return True if successfully set, else false.
      */
     bool set_resource_value(SecurityResource resource,
@@ -154,15 +151,15 @@ public:
 
     /**
      * @brief Returns the value of the given resource enum, in String.
-     * @param resource, List of resource names that can return a value using this function:
+     * @param resource, With this function, the following resources can return a value:
      * 'M2MServerUri','SMSBindingKey', 'SMSBindingSecretKey'.
-     * @return Value associated with that resource. If the resource is not valid it returns an empty string.
+     * @return Value associated with that resource. If the resource is not valid an empty string is returned.
      */
     String resource_value_string(SecurityResource resource) const;
 
     /**
      * @brief Populates the data buffer and returns the size of the buffer.
-     * @param resource, List of resource names that can return a value using this function:
+     * @param resource, With this fucntion, the following resources can return a value:
      * 'PublicKey', 'ServerPublicKey', 'Secretkey'.
      * @param [OUT] data, Data buffer that contains the value.
      * @return Size of the populated buffer.
@@ -172,7 +169,7 @@ public:
 
     /**
      * @brief Returns the value of the given resource name, in Integer.
-     * @param resource, List of resource names that can return a value using this function:
+     * @param resource, With this function, the following resources can return a value:
      * 'BootstrapServer', 'SecurityMode', 'SMSSecurityMode',
      * 'M2MServerSMSNumber', 'ShortServerID', 'ClientHoldOffTime'.
      * @return Value associated with the resource. If the resource is not valid 0 is returned.
