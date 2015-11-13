@@ -23,8 +23,8 @@ class M2MResource;
 
 /**
  *  @brief M2MSecurity.
- *  This class represents interface for the Security Object model of LWM2M framework.
- *  This class will handle the security object instances and all its corresponding
+ *  This class represents an interface for the Security Object model of the LWM2M framework.
+ *  This class handles the security object instances and all corresponding
  *  resources.
  */
 
@@ -36,8 +36,8 @@ friend class M2MNsdlInterface;
 public:
 
     /**
-     * @brief Enum defining all the resources associdated with
-     * Security Object in LWM2M framework.
+     * @brief Enum defining all resources associated with a
+     * Security Object in the LWM2M framework.
      */
     typedef enum {
         M2MServerUri,
@@ -55,7 +55,7 @@ public:
     }SecurityResource;
 
     /**
-     * @brief Enum defining type of security attribute
+     * @brief Enum defining the type of a security attribute
      * used by the Security Object.
      */
     typedef enum {
@@ -66,7 +66,7 @@ public:
     } SecurityModeType;
 
     /**
-     * @brief Enum defining interface operation which can be
+     * @brief Enum defining an interface operation that can be
      * handled by the Security Object.
      */
     typedef enum {
@@ -78,7 +78,7 @@ private:
 
     /**
      * @brief Constructor
-     * @param server_type, Type of security object created whether bootstrap or LWM2M server
+     * @param server_type, Type of the security object created. Either bootstrap or LWM2M server.
      */
     M2MSecurity(ServerType server_type);
 
@@ -100,53 +100,53 @@ public:
 
     /**
      * @brief Creates a new resource for given resource enum.
-     * @param rescource, List of resource names which can be created using this function are
+     * @param rescource, List of resource names that can be created using this function:
      * ' BootstrapServer', 'SecurityMode', 'SMSSecurityMode',
      * 'M2MServerSMSNumber', 'ShortServerID', 'ClientHoldOffTime'.
-     * @param value, Value to be set on the resource, in Integer format
-     * @return M2MResource if created successfully else NULL.
+     * @param value, Value to be set on the resource, in Integer format.
+     * @return M2MResource if created successfully, else NULL.
      */
     M2MResource* create_resource(SecurityResource rescource, uint32_t value);
 
     /**
      * @brief Deletes the resource with the given resource enum.
-     * It cannot not delete the mandatory resources.
+     * Mandatory resources cannot be deleted.
      * @param resource, Resource to be deleted.
-     * @return True if deleted else false.
+     * @return True if deleted, else false.
      */
     bool delete_resource(SecurityResource rescource);
 
     /**
      * @brief Sets the value of the given resource enum.
-     * @param resource, List of resource name for which value can be set
-     * using this function are
+     * @param resource, List of resource names for which a value can be set
+     * using this function:
      * 'M2MServerUri', 'SMSBindingKey', 'SMSBindingSecretKey'.
      * @param value, Value to be set on the key, in String format.
-     * @return True if successfully set else false.
+     * @return True if successfully set, else false.
      */
     bool set_resource_value(SecurityResource resource,
                             const String &value);
 
     /**
      * @brief Sets the value of the given resource enum.
-     * @param resource, List of resource name for which value can be set
-     * using this function are
+     * @param resource, List of resource names for which a value can be set
+     * using this function:
      * 'BootstrapServer', 'SecurityMode', 'SMSSecurityMode',
      * 'M2MServerSMSNumber', 'ShortServerID', 'ClientHoldOffTime'.
      * @param value, Value to be set on the resource, in Integer format.
-     * @return True if successfully set else false.
+     * @return True if successfully set, else false.
      */
     bool set_resource_value(SecurityResource resource,
                             uint32_t value);
 
     /**
      * @brief Sets the value of the given resource enum.
-     * @param resource, List of resource name for which value can be set
-     * using this function are
+     * @param resource, List of resource names for which a value can be set
+     * using this function:
      * 'PublicKey', 'ServerPublicKey', 'Secretkey'.
      * @param value, Value to be set on the key, in uint8_t format.
-     * @param size, size of the buffer value to be set on the key.
-     * @return True if successfully set else false.
+     * @param size, Size of the buffer value to be set on the key.
+     * @return True if successfully set, else false.
      */
     bool set_resource_value(SecurityResource resource,
                             const uint8_t *value,
@@ -154,47 +154,47 @@ public:
 
     /**
      * @brief Returns the value of the given resource enum, in String.
-     * @param resource, List of resource names which can return value using this function are
+     * @param resource, List of resource names that can return a value using this function:
      * 'M2MServerUri','SMSBindingKey', 'SMSBindingSecretKey'.
-     * @return Value associated with that resource, if resource is not valid it returns empty string.
+     * @return Value associated with that resource. If the resource is not valid it returns an empty string.
      */
     String resource_value_string(SecurityResource resource) const;
 
     /**
      * @brief Populates the data buffer and returns the size of the buffer.
-     * @param resource, List of resource names which can return value using this function are
+     * @param resource, List of resource names that can return a value using this function:
      * 'PublicKey', 'ServerPublicKey', 'Secretkey'.
-     * @param [OUT] data, Data buffer which will contain the value.
-     * @return Size of the buffer populated .
+     * @param [OUT] data, Data buffer that contains the value.
+     * @return Size of the populated buffer.
      */
     uint32_t resource_value_buffer(SecurityResource resource,
                                    uint8_t *&data) const;
 
     /**
      * @brief Returns the value of the given resource name, in Integer.
-     * @param resource, List of resource names which can return value using this function are
+     * @param resource, List of resource names that can return a value using this function:
      * 'BootstrapServer', 'SecurityMode', 'SMSSecurityMode',
      * 'M2MServerSMSNumber', 'ShortServerID', 'ClientHoldOffTime'.
-     * @return Value associated with that resource, if resource is not valid it can returns 0.
+     * @return Value associated with the resource. If the resource is not valid 0 is returned.
      */
     uint32_t resource_value_int(SecurityResource resource) const;
 
 
     /**
-     * @brief Returns if the resource instance with given resource enum exists or not
-     * @param resource, resource enum.
-     * @return True if at least one instance exists else false.
+     * @brief Returns whether the resource instance with given resource enum exists or not
+     * @param resource, Resource enum.
+     * @return True if at least one instance exists, else false.
      */
     bool is_resource_present(SecurityResource resource)const;
 
     /**
-     * @brief Returns total number of resources for security object.
-     * @return Total Number of resources.
+     * @brief Returns the total number of resources for a security object.
+     * @return Total number of resources.
      */
     uint16_t total_resource_count()const;
 
     /**
-     * @brief Returns the type of Security Object. It can be either
+     * @brief Returns the type of the Security Object. It can be either
      * Bootstrap or M2MServer.
      * @return ServerType, Type of the Security Object.
      */
