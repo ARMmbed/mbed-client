@@ -34,7 +34,7 @@ class M2MInterfaceObserver {
 public:
 
     /**
-     * @brief Callback informing that the bootstap has been done successfully.
+     * @brief Callback indicating that the bootstap has been done successfully.
      * @param server_object Server object that contains information fetched
      * about the LWM2M server from the bootstrap server. This object can be used
      * to register to the LWM2M server. The object ownership is passed.
@@ -42,7 +42,7 @@ public:
     virtual void bootstrap_done(M2MSecurity *server_object) = 0;
 
     /**
-     * @brief Callback informing that the device object has been registered
+     * @brief Callback indicating that the device object has been registered
      * successfully to the LWM2M server.
      * @param security_object Server object on which the device object is
      * registered. The object ownership is passed.
@@ -52,16 +52,16 @@ public:
     virtual void object_registered(M2MSecurity *security_object, const M2MServer &server_object) = 0;
 
     /**
-     * @brief Callback informing that the device object has been unregistered
-     * successfully from the LWM2M server.
+     * @brief Callback indicating that the device object has been successfully unregistered
+     * from the LWM2M server.
      * @param server_object Server object from which the device object is
      * unregistered. The object ownership is passed.
      */
     virtual void object_unregistered(M2MSecurity *server_object) = 0;
 
     /**
-     * @brief Callback informing that the device object registration has been
-     * updated successfully on the LWM2M server.
+     * @brief Callback indicating that the device object registration has been successfully
+     * updated on the LWM2M server.
      * @param security_object Server object on which the device object registration
      * updated. The object ownership is passed.
      * @param server_object, Object containing information about the LWM2M server.
@@ -70,13 +70,13 @@ public:
     virtual void registration_updated(M2MSecurity *security_object, const M2MServer & server_object) = 0;
 
     /**
-     * @brief Callback informing that there is some error during the operation.
+     * @brief Callback indicating that there is an error during the operation.
      * @param error Error code informing about the error that occured.
      */
     virtual void error(M2MInterface::Error error) = 0;
 
     /**
-     * @brief Callback informing that the value of the resource object is updated by the server.
+     * @brief Callback indicating that the value of the resource object is updated by the server.
      * @param base Object whose value is updated.
      * @param type Type of object.
      */
