@@ -215,7 +215,7 @@ sn_coap_hdr_s* M2MObject::handle_get_request(nsdl_s *nsdl,
     // Need to first fix C library and then implement on C++ side.
     if(received_coap_header) {
         // process the GET if we have registered a callback for it
-        if ((operation() & SN_GRS_GET_ALLOWED) != 0) {
+        if ((operation() & SN_GRS_GET_ALLOWED) != 0 && is_observable()) {
             if(coap_response) {
                 uint16_t coap_content_type = 0;
                 bool content_type_present = false;
@@ -261,7 +261,7 @@ sn_coap_hdr_s* M2MObject::handle_get_request(nsdl_s *nsdl,
 
                 if(data){
                     if(received_coap_header->token_ptr) {
-                        tr_debug("M2MResource::handle_get_request - Sets Observation Token to resource");
+                        tr_debug("M2MObject::handle_get_request - Sets Observation Token to resource");
                         set_observation_token(received_coap_header->token_ptr,
                                               received_coap_header->token_len);
                     }
@@ -274,7 +274,7 @@ sn_coap_hdr_s* M2MObject::handle_get_request(nsdl_s *nsdl,
                                 observe_option = *received_coap_header->options_list_ptr->observe_ptr;
                             }
                             if(START_OBSERVATION == observe_option) {
-                                tr_debug("M2MResource::handle_get_request - Starts Observation");
+                                tr_debug("M2MObject::handle_get_request - Starts Observation");
                                 // If the observe length is 0 means register for observation.
                                 if(received_coap_header->options_list_ptr->observe_len != 0) {
                                     for(int i=0;i < received_coap_header->options_list_ptr->observe_len; i++) {
@@ -284,7 +284,7 @@ sn_coap_hdr_s* M2MObject::handle_get_request(nsdl_s *nsdl,
                                 }
                                 // If the observe value is 0 means register for observation.
                                 if(number == 0) {
-                                    tr_debug("M2MResource::handle_get_request - Put Resource under Observation");
+                                    tr_debug("M2MObject::handle_get_request - Put Resource under Observation");
                                     set_under_observation(true,observation_handler);
                                     add_observation_level(M2MBase::O_Attribute);
                                     uint8_t *obs_number = (uint8_t*)malloc(3);
@@ -293,7 +293,7 @@ sn_coap_hdr_s* M2MObject::handle_get_request(nsdl_s *nsdl,
 
                                     uint16_t number = observation_number();
 
-                                    tr_debug("M2MResource::handle_get_request - Observation Number %d", number);
+                                    tr_debug("M2MObject::handle_get_request - Observation Number %d", number);
                                     obs_number[0] = ((number>>8) & 0xFF);
                                     obs_number[1] = (number & 0xFF);
 
@@ -304,7 +304,7 @@ sn_coap_hdr_s* M2MObject::handle_get_request(nsdl_s *nsdl,
                                     coap_response->options_list_ptr->observe_len = observation_number_length;
                                 }
                             } else if (STOP_OBSERVATION == observe_option) {
-                                tr_debug("M2MResource::handle_get_request - Stops Observation");
+                                tr_debug("M2MObject::handle_get_request - Stops Observation");
                                 // If the observe options_list_ptr->observe_ptr value is 1 means de-register from observation.
                                 set_under_observation(false,NULL);
                                 remove_observation_level(M2MBase::O_Attribute);

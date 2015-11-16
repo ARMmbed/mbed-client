@@ -189,6 +189,7 @@ void Test_M2MObject::test_handle_get_request()
 
     m2mbase_stub::operation = M2MBase::GET_ALLOWED;
     m2mbase_stub::uint8_value = 200;
+    m2mbase_stub::bool_value = true;
 
     common_stub::coap_header = (sn_coap_hdr_ *)malloc(sizeof(sn_coap_hdr_));
     memset(common_stub::coap_header,0,sizeof(sn_coap_hdr_));
@@ -200,6 +201,7 @@ void Test_M2MObject::test_handle_get_request()
 
     coap_header->options_list_ptr = (sn_coap_options_list_s*)malloc(sizeof(sn_coap_options_list_s));
     coap_header->options_list_ptr->observe = 0;
+
 
     coap_header->content_type_ptr = (uint8_t*)malloc(1);
     coap_header->content_type_len = 1;
