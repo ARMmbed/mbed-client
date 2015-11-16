@@ -78,21 +78,6 @@ void Test_M2MFirmware::test_create_resource_string()
                                                               M2MResourceInstance::STRING,
                                                               M2MBase::Dynamic);
 
-    CHECK(firmware->create_resource(M2MFirmware::PackageUri,"test") != NULL);
-    CHECK(M2MBase::PUT_ALLOWED == m2mbase_stub::operation);
-
-    m2mobjectinstance_stub::resource = new M2MResource(*m2mobject_stub::inst,
-                                                       "name",
-                                                       "type",M2MResourceInstance::STRING,
-                                                       M2MBase::Dynamic);
-    m2mresource_stub::bool_value = false;
-    //Duplicate resource
-    CHECK(firmware->create_resource(M2MFirmware::PackageUri,"test") == NULL);
-
-    delete m2mobjectinstance_stub::resource;
-    m2mobjectinstance_stub::resource = NULL;
-
-
     CHECK(firmware->create_resource(M2MFirmware::PackageName,"test") != NULL);
     CHECK(M2MBase::GET_ALLOWED == m2mbase_stub::operation);
     CHECK(firmware->create_resource(M2MFirmware::PackageName,"") != NULL);
@@ -138,18 +123,6 @@ void Test_M2MFirmware::test_create_resource_int()
     CHECK(firmware->create_resource(M2MFirmware::Update,10) == NULL);
 
     m2mbase_stub::void_value = malloc(20);
-
-    CHECK(firmware->create_resource(M2MFirmware::State,2) != NULL);
-    CHECK(M2MBase::GET_ALLOWED == m2mbase_stub::operation);
-    // Check State range
-    CHECK(firmware->create_resource(M2MFirmware::State,4) == NULL);
-    CHECK(firmware->create_resource(M2MFirmware::State,0) == NULL);
-
-    CHECK(firmware->create_resource(M2MFirmware::UpdateResult,0) != NULL);
-    CHECK(M2MBase::GET_ALLOWED == m2mbase_stub::operation);
-    // Check Update result range
-    CHECK(firmware->create_resource(M2MFirmware::UpdateResult,8) == NULL);
-    CHECK(firmware->create_resource(M2MFirmware::UpdateResult,-1) == NULL);
 
     CHECK(firmware->create_resource(M2MFirmware::UpdateSupportedObjects,false) != NULL);
     CHECK(firmware->create_resource(M2MFirmware::UpdateSupportedObjects,true) != NULL);

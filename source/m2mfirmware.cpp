@@ -102,10 +102,6 @@ M2MResource* M2MFirmware::create_resource(FirmwareResource resource, const Strin
     M2MBase::Operation operation = M2MBase::GET_ALLOWED;
     if(!is_resource_present(resource)) {
         switch(resource) {
-            case PackageUri:
-                firmware_id = FIRMWARE_PACKAGE_URI;
-                operation = M2MBase::PUT_ALLOWED;
-                break;
             case PackageName:
                 firmware_id = FIRMWARE_PACKAGE_NAME;
                 break;
@@ -148,16 +144,6 @@ M2MResource* M2MFirmware::create_resource(FirmwareResource resource, int64_t val
             if(check_value_range(resource, value)) {
                 firmware_id = FIRMWARE_UPDATE_SUPPORTED_OBJECTS;
                 operation = M2MBase::GET_PUT_ALLOWED;
-            }
-            break;
-        case State:
-            if(check_value_range(resource, value)) {
-                firmware_id = FIRMWARE_STATE;
-            }
-            break;
-        case UpdateResult:
-            if(check_value_range(resource, value)) {
-                firmware_id = FIRMWARE_UPDATE_RESULT;
             }
             break;
         default:
