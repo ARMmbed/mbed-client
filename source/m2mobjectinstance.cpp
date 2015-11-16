@@ -393,7 +393,7 @@ sn_coap_hdr_s* M2MObjectInstance::handle_get_request(nsdl_s *nsdl,
     // Need to first fix C library and then implement on C++ side.
     if(received_coap_header) {
         // process the GET if we have registered a callback for it
-        if ((operation() & SN_GRS_GET_ALLOWED) != 0) {
+        if ((operation() & SN_GRS_GET_ALLOWED) != 0 && is_observable()) {
             if(coap_response) {
                 uint16_t coap_content_type = 0;
                 bool content_type_present = false;
@@ -474,7 +474,7 @@ sn_coap_hdr_s* M2MObjectInstance::handle_get_request(nsdl_s *nsdl,
 
                                     uint16_t number = observation_number();
 
-                                    tr_debug("M2MResource::handle_get_request - Observation Number %d", number);
+                                    tr_debug("M2MObjectInstance::handle_get_request - Observation Number %d", number);
                                     obs_number[0] = ((number>>8) & 0xFF);
                                     obs_number[1] = (number & 0xFF);
 
@@ -485,7 +485,7 @@ sn_coap_hdr_s* M2MObjectInstance::handle_get_request(nsdl_s *nsdl,
                                     coap_response->options_list_ptr->observe_len = observation_number_length;
                                 }
                             } else if (STOP_OBSERVATION == observe_option) {
-                                tr_debug("M2MResource::handle_get_request - Stops Observation");
+                                tr_debug("M2MObjectInstance::handle_get_request - Stops Observation");
                                 set_under_observation(false,NULL);
                                 remove_observation_level(M2MBase::OI_Attribute);
 
@@ -497,7 +497,7 @@ sn_coap_hdr_s* M2MObjectInstance::handle_get_request(nsdl_s *nsdl,
                 }
             }
         }else {
-            tr_error("M2MResource::handle_get_request - Return COAP_MSG_CODE_RESPONSE_METHOD_NOT_ALLOWED");
+            tr_error("M2MObjectInstance::handle_get_request - Return COAP_MSG_CODE_RESPONSE_METHOD_NOT_ALLOWED");
             // Operation is not allowed.
             msg_code = COAP_MSG_CODE_RESPONSE_METHOD_NOT_ALLOWED;
         }        

@@ -382,6 +382,7 @@ void Test_M2MObjectInstance::test_handle_get_request()
     String *name = new String("name");
     common_stub::int_value = 0;
     m2mbase_stub::string_value = name;
+    m2mbase_stub::bool_value = true;
 
     m2mbase_stub::operation = M2MBase::GET_ALLOWED;
     m2mbase_stub::uint8_value = 200;

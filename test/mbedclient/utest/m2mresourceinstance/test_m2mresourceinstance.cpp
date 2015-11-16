@@ -315,7 +315,7 @@ void Test_M2MResourceInstance::test_handle_get_request()
 
     m2mbase_stub::operation = M2MBase::GET_ALLOWED;
     m2mbase_stub::uint8_value = 200;
-
+    m2mbase_stub::bool_value = true;
     common_stub::coap_header = (sn_coap_hdr_ *)malloc(sizeof(sn_coap_hdr_));
     memset(common_stub::coap_header,0,sizeof(sn_coap_hdr_));
 

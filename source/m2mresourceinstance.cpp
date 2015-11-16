@@ -275,7 +275,7 @@ sn_coap_hdr_s* M2MResourceInstance::handle_get_request(nsdl_s *nsdl,
                                                           msg_code);
     if(received_coap_header) {
         // process the GET if we have registered a callback for it
-        if ((operation() & SN_GRS_GET_ALLOWED) != 0) {
+        if ((operation() & SN_GRS_GET_ALLOWED) != 0 && is_observable()) {
             if(coap_response) {
                 coap_response->content_type_ptr = (uint8_t*)malloc(1);
                 if(coap_response->content_type_ptr) {
