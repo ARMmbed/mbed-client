@@ -189,7 +189,6 @@ void Test_M2MObject::test_handle_get_request()
 
     m2mbase_stub::operation = M2MBase::GET_ALLOWED;
     m2mbase_stub::uint8_value = 200;
-    m2mbase_stub::bool_value = true;
 
     common_stub::coap_header = (sn_coap_hdr_ *)malloc(sizeof(sn_coap_hdr_));
     memset(common_stub::coap_header,0,sizeof(sn_coap_hdr_));
@@ -286,6 +285,7 @@ void Test_M2MObject::test_handle_get_request()
     coap_header->options_list_ptr->observe_len = 0;
     m2mbase_stub::uint16_value = 0x1c1c;
     m2mbase_stub::uint8_value = 99;
+    m2mbase_stub::bool_value = true;
 
     CHECK(object->handle_get_request(NULL,coap_header,handler) != NULL);
 
