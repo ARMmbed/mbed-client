@@ -275,7 +275,7 @@ sn_coap_hdr_s* M2MResourceInstance::handle_get_request(nsdl_s *nsdl,
                                                           msg_code);
     if(received_coap_header) {
         // process the GET if we have registered a callback for it
-        if ((operation() & SN_GRS_GET_ALLOWED) != 0 && is_observable()) {
+        if ((operation() & SN_GRS_GET_ALLOWED) != 0) {
             if(coap_response) {
                 coap_response->content_type_ptr = (uint8_t*)malloc(1);
                 if(coap_response->content_type_ptr) {
@@ -302,7 +302,7 @@ sn_coap_hdr_s* M2MResourceInstance::handle_get_request(nsdl_s *nsdl,
                                           received_coap_header->token_len);
                 }
 
-                if(received_coap_header->options_list_ptr) {
+                if(received_coap_header->options_list_ptr && is_observable()) {
                     if(received_coap_header->options_list_ptr->observe) {
                         uint32_t number = 0;
                         uint8_t observe_option = 0;
@@ -346,6 +346,8 @@ sn_coap_hdr_s* M2MResourceInstance::handle_get_request(nsdl_s *nsdl,
                         }
                     }
 
+                } else {
+                    msg_code = COAP_MSG_CODE_RESPONSE_METHOD_NOT_ALLOWED;
                 }
             }
         }else {

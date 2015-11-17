@@ -393,7 +393,7 @@ sn_coap_hdr_s* M2MObjectInstance::handle_get_request(nsdl_s *nsdl,
     // Need to first fix C library and then implement on C++ side.
     if(received_coap_header) {
         // process the GET if we have registered a callback for it
-        if ((operation() & SN_GRS_GET_ALLOWED) != 0 && is_observable()) {
+        if ((operation() & SN_GRS_GET_ALLOWED) != 0) {
             if(coap_response) {
                 uint16_t coap_content_type = 0;
                 bool content_type_present = false;
@@ -446,7 +446,7 @@ sn_coap_hdr_s* M2MObjectInstance::handle_get_request(nsdl_s *nsdl,
                         set_observation_token(received_coap_header->token_ptr,
                                               received_coap_header->token_len);
                     }
-                    if(received_coap_header->options_list_ptr) {
+                    if(received_coap_header->options_list_ptr && is_observable()) {
                         if(received_coap_header->options_list_ptr->observe) {
                             uint32_t number = 0;
                             uint8_t observe_option = 0;
@@ -491,6 +491,8 @@ sn_coap_hdr_s* M2MObjectInstance::handle_get_request(nsdl_s *nsdl,
 
                             }
                         }
+                    } else {
+                        msg_code = COAP_MSG_CODE_RESPONSE_METHOD_NOT_ALLOWED;
                     }
                 } else {
                     msg_code = COAP_MSG_CODE_RESPONSE_UNSUPPORTED_CONTENT_FORMAT; // Content format not supported
