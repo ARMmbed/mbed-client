@@ -312,6 +312,7 @@ sn_coap_hdr_s* M2MResource::handle_get_request(nsdl_s *nsdl,
                                     set_under_observation(false,NULL);
                                     M2MBase::remove_observation_level(M2MBase::R_Attribute);
                                 }
+                                msg_code = COAP_MSG_CODE_RESPONSE_CHANGED;
                             }
                             else {
                                 msg_code = COAP_MSG_CODE_RESPONSE_METHOD_NOT_ALLOWED;
@@ -410,6 +411,7 @@ sn_coap_hdr_s* M2MResource::handle_put_request(nsdl_s *nsdl,
                    received_coap_header->options_list_ptr->uri_query_ptr) {
                     char *query = (char*)malloc(received_coap_header->options_list_ptr->uri_query_len+1);
                     if (query){
+                        msg_code = COAP_MSG_CODE_RESPONSE_CHANGED;
                         memset(query, 0, received_coap_header->options_list_ptr->uri_query_len+1);
                         memcpy(query,
                             received_coap_header->options_list_ptr->uri_query_ptr,
