@@ -411,7 +411,18 @@ sn_coap_hdr_s* M2MResource::handle_put_request(nsdl_s *nsdl,
                         switch(error) {
                             case M2MTLVDeserializer::None:
                                 if(observation_handler) {
-                                    observation_handler->value_updated(this);
+                                    String value = "";
+                                    if (received_coap_header->uri_path_ptr != NULL &&
+                                        received_coap_header->uri_path_len > 0) {
+                                        char* buf = (char*)malloc(received_coap_header->uri_path_len+1);
+                                        if(buf) {
+                                            memset(buf,0,received_coap_header->uri_path_len+1);
+                                            memcpy(buf,received_coap_header->uri_path_ptr,received_coap_header->uri_path_len);
+                                            value = String(buf);
+                                            free(buf);
+                                        }
+                                    }
+                                    observation_handler->value_updated(this,value);
                                 }
                                 msg_code = COAP_MSG_CODE_RESPONSE_CHANGED;
                                 break;

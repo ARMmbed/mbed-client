@@ -25,6 +25,7 @@ namespace m2mresourceinstance_stub
     extern uint8_t* value;
     extern bool bool_value;
     extern M2MResourceInstance::ResourceType resource_type;
+    extern M2MBase::BaseType base_type;
     extern sn_coap_hdr_s *header;
     void clear();
 }
