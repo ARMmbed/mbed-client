@@ -20,6 +20,7 @@ bool m2mresourceinstance_stub::bool_value;
 M2MResourceInstance::ResourceType m2mresourceinstance_stub::resource_type;
 sn_coap_hdr_s *m2mresourceinstance_stub::header;
 uint8_t* m2mresourceinstance_stub::value;
+M2MBase::BaseType m2mresourceinstance_stub::base_type;
 
 
 void m2mresourceinstance_stub::clear()
@@ -29,6 +30,7 @@ void m2mresourceinstance_stub::clear()
     resource_type = M2MResourceInstance::STRING;
     header = NULL;
     value = NULL;
+    base_type = M2MBase::ResourceInstance;
 }
 
 M2MResourceInstance& M2MResourceInstance::operator=(const M2MResourceInstance&)
@@ -51,6 +53,7 @@ M2MResourceInstance::M2MResourceInstance(const String &res_name,
           M2MBase::Dynamic),
   _object_instance_callback(object_instance_callback)
 {
+    m2mresourceinstance_stub::base_type = M2MBase::ResourceInstance;
 }
 
 M2MResourceInstance::M2MResourceInstance(const String &res_name,
@@ -71,7 +74,7 @@ M2MResourceInstance::~M2MResourceInstance()
 
 M2MBase::BaseType M2MResourceInstance::base_type() const
 {
-    return M2MBase::Resource;
+    return m2mresourceinstance_stub::base_type;
 }
 
 M2MResourceInstance::ResourceType M2MResourceInstance::resource_instance_type() const

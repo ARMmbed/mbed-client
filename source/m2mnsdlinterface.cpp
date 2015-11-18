@@ -336,7 +336,7 @@ uint8_t M2MNsdlInterface::send_to_server_callback(struct nsdl_s * /*nsdl_handle*
     return 1;
 }
 
-uint8_t M2MNsdlInterface::received_from_server_callback(struct nsdl_s * nsdl_handle,
+uint8_t M2MNsdlInterface::received_from_server_callback(struct nsdl_s * /*nsdl_handle*/,
                                                         sn_coap_hdr_s *coap_header,
                                                         sn_nsdl_addr_s *address)
 {
@@ -731,20 +731,29 @@ void M2MNsdlInterface::resource_to_be_deleted(const String &resource_name)
     delete_nsdl_resource(resource_name);
 }
 
-void M2MNsdlInterface::value_updated(M2MBase *base)
+void M2MNsdlInterface::value_updated(M2MBase *base,
+                                     const String &object_name)
 {
     tr_debug("M2MNsdlInterface::value_updated()");
     if(base) {
         switch(base->base_type()) {
             case M2MBase::Object:
                 create_nsdl_object_structure((M2MObject*)base);
-                break;
+            break;
             case M2MBase::ObjectInstance:
                 create_nsdl_object_instance_structure((M2MObjectInstance*)base);
-                break;
-            case M2MBase::Resource:
-                create_nsdl_resource(base,base->name());
-                break;
+            break;
+            case M2MBase::Resource: {
+                    M2MResource* resource = (M2MResource*)base;
+                    create_nsdl_resource_structure(resource,object_name,
+                                               resource->supports_multiple_instances());
+            }
+            break;
+            case M2MBase::ResourceInstance: {
+                M2MResourceInstance* instance = (M2MResourceInstance*)base;
+                create_nsdl_resource(instance,object_name);
+            }
+            break;
         }
     }
     _observer.value_updated(base);
@@ -890,9 +899,10 @@ bool M2MNsdlInterface::create_nsdl_resource(M2MBase *base, const String &name)
         if(resource) {
             success = true;
             if(resource->mode == SN_GRS_STATIC) {
-                if(M2MBase::Resource == base->base_type() &&
+                if((M2MBase::Resource == base->base_type() ||
+                   M2MBase::ResourceInstance == base->base_type()) &&
                    M2MBase::Static == base->mode()) {
-                    M2MResource *res = (M2MResource*)base;
+                    M2MResourceInstance *res = (M2MResourceInstance*)base;
                     res->get_value(buffer,length);
                     if(resource->resource) {
                         memory_free(resource->resource);
@@ -902,15 +912,18 @@ bool M2MNsdlInterface::create_nsdl_resource(M2MBase *base, const String &name)
                     sn_nsdl_update_resource(_nsdl_handle,resource);
                 }
             }
+            // Update Resource access everytime for existing resource.
+            resource->access = (sn_grs_resource_acl_e)base->operation();
         } else if(_resource) {
             base->set_under_observation(false,this);
             //TODO: implement access control
             // Currently complete access is given
             _resource->access = (sn_grs_resource_acl_e)base->operation();
 
-            if(M2MBase::Resource == base->base_type() &&
+            if((M2MBase::Resource == base->base_type() ||
+                M2MBase::ResourceInstance == base->base_type()) &&
                M2MBase::Static == base->mode()) {
-                M2MResource *res = (M2MResource*)base;
+                M2MResourceInstance *res = (M2MResourceInstance*)base;
                 // Static resource is updated
                 _resource->mode = SN_GRS_STATIC;
 
@@ -999,7 +1012,9 @@ bool M2MNsdlInterface::create_nsdl_resource(M2MBase *base, const String &name)
             }
         }
     }
-    free(buffer);
+    if(buffer) {
+        free(buffer);
+    }
     return success;
 }
 
