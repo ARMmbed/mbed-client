@@ -30,7 +30,7 @@ public:
  *  LWM2M resource models can be created based on it.
  */
 typedef FP1<void,void*> execute_callback;
-
+class M2MResourceCallback;
 class M2MResourceInstance : public M2MBase {
 
 friend class M2MObjectInstance;
@@ -185,6 +185,8 @@ public:
                                               sn_coap_hdr_s *received_coap_header,
                                               M2MObservationHandler *observation_handler = NULL);
 
+    void set_resource_observer(M2MResourceCallback *resource);
+
 private:
 
     void report();
@@ -198,6 +200,7 @@ private:
     uint8_t                                 *_value;
     uint32_t                                _value_length;
     ResourceType                            _resource_type;
+    M2MResourceCallback                     *_resource_callback;
 
     friend class Test_M2MResourceInstance;
     friend class Test_M2MResource;
