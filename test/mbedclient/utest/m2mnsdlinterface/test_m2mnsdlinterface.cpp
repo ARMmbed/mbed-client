@@ -522,7 +522,6 @@ void Test_M2MNsdlInterface::test_received_from_server_callback()
     delete obj;
 
     free(coap_header->payload_ptr);
-    free(m2mobject_stub::header);
 
     uint8_t object_instance1[] = {"name/65536"};
 
@@ -1189,17 +1188,23 @@ void Test_M2MNsdlInterface::test_value_updated()
                                             M2MResourceInstance::INTEGER,
                                             false);
 
+    M2MResourceInstance *resource_instance = new M2MResourceInstance("resource_name",
+                                                                     "resource_type",
+                                                                     M2MResourceInstance::INTEGER,
+                                                                     *object_instance);
+
+
     m2mobject_stub::base_type = M2MBase::Object;
     m2mbase_stub::string_value = new String("name");
     m2mbase_stub::operation = M2MBase::GET_ALLOWED;
 
-    nsdl->value_updated(object);
+    nsdl->value_updated(object,"name");
     CHECK(observer->value_update == true);
     observer->value_update = false;
 
     m2mobjectinstance_stub::base_type = M2MBase::ObjectInstance;
 
-    nsdl->value_updated(object_instance);
+    nsdl->value_updated(object_instance,"name/0");
     CHECK(observer->value_update == true);
     observer->value_update = false;
 
@@ -1215,7 +1220,31 @@ void Test_M2MNsdlInterface::test_value_updated()
     uint8_t value[] = "1";
     m2mresourceinstance_stub::value = value;
 
-    nsdl->value_updated(resource);
+    m2mresourceinstance_stub::base_type = M2MBase::Resource;
+
+    nsdl->value_updated(resource,"name/0/name");
+    CHECK(observer->value_update == true);
+    observer->value_update = false;
+
+    m2mresourceinstance_stub::clear();
+    free(common_stub::resource);
+    common_stub::resource = NULL;
+    common_stub::clear();
+
+    m2mresourceinstance_stub::base_type = M2MBase::ResourceInstance;
+
+    common_stub::resource = (sn_nsdl_resource_info_s*)malloc(sizeof(sn_nsdl_resource_info_s));
+    memset(common_stub::resource,0, sizeof(sn_nsdl_resource_info_s));
+    common_stub::resource->resource = (uint8_t*)malloc(2);
+    memset(common_stub::resource->resource,0, 2);
+
+    common_stub::resource->mode = SN_GRS_STATIC;
+    m2mbase_stub::mode_value = M2MBase::Static;
+
+    m2mresourceinstance_stub::int_value = 2;
+    m2mresourceinstance_stub::value = value;
+
+    nsdl->value_updated(resource_instance,"name/0/name/0");
     CHECK(observer->value_update == true);
     observer->value_update = false;
 
@@ -1231,6 +1260,7 @@ void Test_M2MNsdlInterface::test_value_updated()
     common_stub::resource = NULL;
     common_stub::clear();
 
+    delete resource_instance;
     delete resource;
     delete object_instance;
     delete object;

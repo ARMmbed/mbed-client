@@ -199,14 +199,14 @@ void M2MResourceInstance::report()
                 _object_instance_callback.notification_update(observation_level);
             }
         }
-    } else if(M2MBase::Static == mode()) {
+    }/* else if(M2MBase::Static == mode()) {
         M2MObservationHandler *observation_handler = M2MBase::observation_handler();
         if(observation_handler) {
             observation_handler->value_updated(this);
         }
     } else {
         tr_debug("Not supported mode");
-    }
+    }*/
 }
 
 bool M2MResourceInstance::is_value_changed(const uint8_t* value, const uint32_t value_len)
@@ -403,7 +403,18 @@ sn_coap_hdr_s* M2MResourceInstance::handle_put_request(nsdl_s *nsdl,
                 if(received_coap_header->payload_ptr) {
                    tr_debug("M2MResourceInstance::handle_put_request() - Update Resource with new values");
                     if(observation_handler) {
-                        observation_handler->value_updated(this);
+                        String value = "";
+                        if (received_coap_header->uri_path_ptr != NULL &&
+                            received_coap_header->uri_path_len > 0) {
+                            char* buf = (char*)malloc(received_coap_header->uri_path_len+1);
+                            if(buf) {
+                                memset(buf,0,received_coap_header->uri_path_len+1);
+                                memcpy(buf,received_coap_header->uri_path_ptr,received_coap_header->uri_path_len);
+                                value = String(buf);
+                                free(buf);
+                            }
+                        }
+                        observation_handler->value_updated(this,value);
                     }
                 }
                 if(received_coap_header->options_list_ptr &&
