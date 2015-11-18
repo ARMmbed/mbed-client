@@ -66,7 +66,7 @@ public:
     }
     void resource_to_be_deleted(const String &){visited=true;}
     void remove_object(M2MBase *){visited = true;}
-    void value_updated(M2MBase *){visited = true;}
+    void value_updated(M2MBase *,const String&, bool){visited = true;}
 
     void clear() {visited = false;}
     bool visited;
@@ -136,7 +136,7 @@ void Test_M2MResource::test_static_resource()
 
 void Test_M2MResource::test_base_type()
 {
-    m2mbase_stub::base_type = M2MBase::Resource;
+    m2mresourceinstance_stub::base_type = M2MBase::Resource;
     CHECK(M2MBase::Resource == resource->base_type());
 }
 

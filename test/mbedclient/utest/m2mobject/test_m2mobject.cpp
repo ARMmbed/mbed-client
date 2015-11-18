@@ -41,7 +41,7 @@ public:
     }
     void resource_to_be_deleted(const String &){visited=true;}
     void remove_object(M2MBase *){visited = true;}
-    void value_updated(M2MBase *){visited = true;}
+    void value_updated(M2MBase *,const String&,bool){visited = true;}
 
     void clear() {visited = false;}
     bool visited;
@@ -452,6 +452,12 @@ void Test_M2MObject::test_handle_put_request()
 
     coap_header->payload_ptr = (uint8_t*)malloc(1);
 
+    CHECK(object->handle_put_request(NULL,coap_header,handler) != NULL);
+    free(coap_header->payload_ptr);
+    coap_header->payload_ptr = NULL;
+
+    CHECK(object->handle_put_request(NULL,coap_header,handler) != NULL);
+
     coap_header->options_list_ptr = (sn_coap_options_list_s*)malloc(sizeof(sn_coap_options_list_s));
     coap_header->options_list_ptr->uri_query_ptr = value;
     coap_header->options_list_ptr->uri_query_len = sizeof(value);
@@ -484,8 +490,7 @@ void Test_M2MObject::test_handle_put_request()
     CHECK(object->handle_put_request(NULL,NULL,handler) != NULL);
 
     free(coap_header->content_type_ptr);
-    free(coap_header->options_list_ptr);
-    free(coap_header->payload_ptr);
+    free(coap_header->options_list_ptr);    
     free(common_stub::coap_header);
     delete name;
     free(coap_header);
