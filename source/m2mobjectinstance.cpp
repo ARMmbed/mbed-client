@@ -646,6 +646,7 @@ sn_coap_hdr_s* M2MObjectInstance::handle_post_request(nsdl_s *nsdl,
                     }
                 }
             }
+            //coap_content_type = COAP_CONTENT_OMA_TLV_TYPE;
             if(!content_type_present &&
                M2MBase::coap_content_type() == COAP_CONTENT_OMA_TLV_TYPE) {
                 coap_content_type = COAP_CONTENT_OMA_TLV_TYPE;
@@ -664,9 +665,9 @@ sn_coap_hdr_s* M2MObjectInstance::handle_post_request(nsdl_s *nsdl,
                     switch(error) {
                         case M2MTLVDeserializer::None:
                             if(observation_handler) {
-                                observation_handler->value_updated(this);
+                                observation_handler->value_updated(this,"", true);
                             }
-                            msg_code = COAP_MSG_CODE_RESPONSE_CHANGED;
+                            msg_code = COAP_MSG_CODE_RESPONSE_CREATED;
                             break;
                         case M2MTLVDeserializer::NotAllowed:
                             msg_code = COAP_MSG_CODE_RESPONSE_METHOD_NOT_ALLOWED;
