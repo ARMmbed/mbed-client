@@ -31,6 +31,7 @@ public:
  */
 typedef FP1<void,void*> execute_callback;
 class M2MResourceCallback;
+
 class M2MResourceInstance : public M2MBase {
 
 friend class M2MObjectInstance;
@@ -185,6 +186,10 @@ public:
                                               sn_coap_hdr_s *received_coap_header,
                                               M2MObservationHandler *observation_handler = NULL);
 
+    /**
+     * @brief Set observer for sending notification update.
+     * @param resource, callback handle.
+     */
     void set_resource_observer(M2MResourceCallback *resource);
 
 private:

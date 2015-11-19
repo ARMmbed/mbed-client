@@ -713,14 +713,18 @@ void M2MNsdlInterface::observation_to_be_sent(M2MBase *object)
     tr_debug("M2MNsdlInterface::observation_to_be_sent()");
     if(object) {
         M2MBase::BaseType type = object->base_type();
-
         if(type == M2MBase::Object) {
             send_object_observation((M2MObject*)object);
         } else if(type == M2MBase::ObjectInstance) {
             send_object_instance_observation((M2MObjectInstance*)object);
-        } else if(type == M2MBase::Resource ||
-                  type == M2MBase::ResourceInstance) {
-            send_resource_observation((M2MResourceInstance*)object);
+        } else if(type == M2MBase::Resource/* ||
+                  type == M2MBase::ResourceInstance*/) {
+            M2MResource *res = (M2MResource*)object;
+            if (res->resource_instance_count() > 0) {
+                send_resource_observation((M2MResource*)object);
+            } else {
+                send_resource_observation((M2MResourceInstance*)object);
+            }
         }
     }
 }
@@ -1239,6 +1243,7 @@ M2MInterface::Error M2MNsdlInterface::interface_error(sn_coap_hdr_s *coap_header
 
 void M2MNsdlInterface::send_object_observation(M2MObject *object)
 {
+    tr_debug("M2MNsdlInterface::send_object_observation");
     if(object) {
         uint8_t *value = 0;
         uint32_t length = 0;
@@ -1279,6 +1284,7 @@ void M2MNsdlInterface::send_object_observation(M2MObject *object)
 
 void M2MNsdlInterface::send_object_instance_observation(M2MObjectInstance *object_instance)
 {
+    tr_debug("M2MNsdlInterface::send_object_instance_observation");
     if(object_instance) {
         uint8_t *value = 0;
         uint32_t length = 0;
@@ -1317,8 +1323,50 @@ void M2MNsdlInterface::send_object_instance_observation(M2MObjectInstance *objec
     }
 }
 
+void M2MNsdlInterface::send_resource_observation(M2MResource *resource)
+{
+    tr_debug("M2MNsdlInterface::send_resource_observation - TLV");
+    if(resource) {
+        uint8_t *value = 0;
+        uint32_t length = 0;
+        uint8_t *token = 0;
+        uint32_t token_length = 0;
+        uint8_t observation_number[2];
+        uint8_t observation_number_length = 1;
+
+        uint16_t number = resource->observation_number();
+
+        observation_number[0] = ((number>>8) & 0xFF);
+        observation_number[1] = (number & 0xFF);
+
+        if(number > 0xFF) {
+            observation_number_length = 2;
+        }
+
+        M2MTLVSerializer *serializer = new M2MTLVSerializer();
+        if(serializer) {
+            value = serializer->serialize(resource, length);
+            delete serializer;
+        }
+
+        resource->get_observation_token(token,token_length);
+
+        sn_nsdl_send_observation_notification(_nsdl_handle,
+                                              token,
+                                              token_length,
+                                              value,length,
+                                              observation_number,
+                                              observation_number_length,
+                                              COAP_MSG_TYPE_CONFIRMABLE,
+                                              resource->coap_content_type());
+        memory_free(value);
+        memory_free(token);
+    }
+}
+
 void M2MNsdlInterface::send_resource_observation(M2MResourceInstance *resource)
 {
+    tr_debug("M2MNsdlInterface::send_resource_observation");
     if(resource) {
         uint8_t *value = 0;
         uint32_t length = 0;
