@@ -151,29 +151,18 @@ uint16_t M2MResource::resource_instance_count() const
 
 bool M2MResource::handle_observation_attribute(char *&query)
 {
-    bool success = false;
+    tr_debug("M2MResource::handle_observation_attribute()");
     if(!_resource_instance_list.empty()) {
         M2MResourceInstanceList::const_iterator it;
         it = _resource_instance_list.begin();
         for ( ; it != _resource_instance_list.end(); it++ ) {
-            tr_debug("M2MResource::handle_observation_attribute()");
-            //success = (*it)->handle_observation_attribute(query);
             M2MReportHandler *report_handler = (*it)->report_handler();
             if(report_handler) {
                 report_handler->set_notification_trigger();
             }
         }
-    }/* else {
-        tr_debug("M2MResource::handle_observation_attribute() - else");
-        // Apply write attributes only if resource is numerical
-        M2MResourceInstance::ResourceType type = M2MResourceInstance::resource_instance_type();
-        if (type == M2MResourceInstance::INTEGER ||
-            type == M2MResourceInstance::FLOAT)
-            success = M2MBase::handle_observation_attribute(query);
-    }*/
-
-    success = M2MBase::handle_observation_attribute(query);
-    return success;
+    }
+    return M2MBase::handle_observation_attribute(query);
 }
 
 void M2MResource::add_observation_level(M2MBase::Observation observation_level)
