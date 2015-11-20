@@ -49,10 +49,6 @@ void M2MReportHandler::timer_expired(M2MTimerObserver::Type )
 {
 }
 
-void M2MReportHandler::trigger_object_notification()
-{
-}
-
-void M2MReportHandler::set_string_notification_trigger()
+void M2MReportHandler::set_notification_trigger()
 {
 }

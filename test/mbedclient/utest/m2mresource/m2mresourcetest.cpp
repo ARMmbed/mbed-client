@@ -110,3 +110,8 @@ TEST(M2MResource, test_handle_post_request)
 {
     m2m_resource->test_handle_post_request();
 }
+
+TEST(M2MResource, test_notification_update)
+{
+    m2m_resource->test_notification_update();
+}

@@ -522,7 +522,6 @@ void Test_M2MNsdlInterface::test_received_from_server_callback()
     delete obj;
 
     free(coap_header->payload_ptr);
-    free(m2mobject_stub::header);
 
     uint8_t object_instance1[] = {"name/65536"};
 
@@ -1117,7 +1116,23 @@ void Test_M2MNsdlInterface::test_observation_to_be_sent()
     M2MResource *res = new M2MResource(*instance,
                                        "name","name",
                                        M2MResourceInstance::INTEGER,
-                                       M2MBase::Dynamic,false);
+                                       false,true);
+
+    M2MResource *res2 = new M2MResource(*instance,
+                                           "res2","res2",
+                                           M2MResourceInstance::INTEGER,
+                                           false,true);
+
+    M2MResourceInstance* res_instance = new M2MResourceInstance("res2","res2",
+                                                                M2MResourceInstance::INTEGER,
+                                                                *instance);
+    M2MResourceInstance* res_instance_1 = new M2MResourceInstance("res2","res2",
+                                                                M2MResourceInstance::INTEGER,
+                                                                *instance);
+    m2mresource_stub::list.clear();
+    m2mresource_stub::list.push_back(res_instance);
+    m2mresource_stub::list.push_back(res_instance_1);
+    m2mresource_stub::int_value = 2;
 
     uint8_t value[] = {"value"};
     m2mresourceinstance_stub::value = (uint8_t *)malloc(sizeof(value));
@@ -1128,6 +1143,12 @@ void Test_M2MNsdlInterface::test_observation_to_be_sent()
     m2mbase_stub::uint16_value = 321;
     String *owned = new String("token");
     m2mbase_stub::string_value = owned;
+
+    //CHECK if nothing crashes
+    nsdl->observation_to_be_sent(res2);
+
+    m2mresource_stub::list.clear();
+    m2mresource_stub::int_value = 0;
 
     //CHECK if nothing crashes
     nsdl->observation_to_be_sent(res);
@@ -1159,9 +1180,19 @@ void Test_M2MNsdlInterface::test_observation_to_be_sent()
     m2mresourceinstance_stub::clear();
     m2mobjectinstance_stub::clear();
     m2mobject_stub::clear();
-
+    m2mresource_stub::list.clear();
     delete res;
     res = NULL;
+
+    delete res2;
+    res2 = NULL;
+
+    delete res_instance;
+    res_instance = NULL;
+
+    delete res_instance_1;
+    res_instance_1 = NULL;
+
 
     delete object_instance;
     object_instance = NULL;

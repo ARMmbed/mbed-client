@@ -107,6 +107,11 @@ void M2MResource::add_observation_level(M2MBase::Observation)
 void M2MResource::remove_observation_level(M2MBase::Observation)
 {
 }
+
+void M2MResource::notification_update()
+{
+}
+
 sn_coap_hdr_s* M2MResource::handle_get_request(nsdl_s *,
                                                sn_coap_hdr_s *,
                                                M2MObservationHandler *)

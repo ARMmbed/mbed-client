@@ -106,10 +106,7 @@ M2MResourceInstance::~M2MResourceInstance()
         _value = NULL;
         _value_length = 0;
     }
-    if (_resource_callback) {
-        delete _resource_callback;
-        _resource_callback = NULL;
-    }
+    _resource_callback = NULL;
 }
 
 M2MBase::BaseType M2MResourceInstance::base_type() const
@@ -208,7 +205,7 @@ void M2MResourceInstance::report()
             }
         }
         else {
-            if (_resource_callback) {
+            if (_resource_callback && base_type() == M2MBase::ResourceInstance) {
                 _resource_callback->notification_update();
             }
         }
