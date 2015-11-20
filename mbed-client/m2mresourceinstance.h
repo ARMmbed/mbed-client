@@ -186,6 +186,8 @@ public:
                                               sn_coap_hdr_s *received_coap_header,
                                               M2MObservationHandler *observation_handler = NULL);
 
+protected:
+
     /**
      * @brief Set observer for sending notification update.
      * @param resource, callback handle.
