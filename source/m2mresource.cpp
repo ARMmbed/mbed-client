@@ -16,6 +16,7 @@
 #include "mbed-client/m2mconstants.h"
 #include "mbed-client/m2mresource.h"
 #include "mbed-client/m2mobservationhandler.h"
+#include "include/m2mreporthandler.h"
 #include "include/m2mtlvserializer.h"
 #include "include/m2mtlvdeserializer.h"
 #include "include/nsdllinker.h"
@@ -150,21 +151,19 @@ uint16_t M2MResource::resource_instance_count() const
 
 bool M2MResource::handle_observation_attribute(char *&query)
 {
-    bool success = false;
-    if(!_resource_instance_list.empty()) {
-        M2MResourceInstanceList::const_iterator it;
-        it = _resource_instance_list.begin();
-        for ( ; it != _resource_instance_list.end(); it++ ) {
-            tr_debug("M2MResource::handle_observation_attribute()");
-            success = (*it)->handle_observation_attribute(query);
+    tr_debug("M2MResource::handle_observation_attribute()");
+    bool success = M2MBase::handle_observation_attribute(query);
+    if (success) {
+        if(!_resource_instance_list.empty()) {
+            M2MResourceInstanceList::const_iterator it;
+            it = _resource_instance_list.begin();
+            for ( ; it != _resource_instance_list.end(); it++ ) {
+                M2MReportHandler *report_handler = (*it)->report_handler();
+                if(report_handler) {
+                    report_handler->set_notification_trigger();
+                }
+            }
         }
-    } else {
-        tr_debug("M2MResource::handle_observation_attribute() - else");
-        // Apply write attributes only if resource is numerical
-        M2MResourceInstance::ResourceType type = M2MResourceInstance::resource_instance_type();
-        if (type == M2MResourceInstance::INTEGER ||
-            type == M2MResourceInstance::FLOAT)
-            success = M2MBase::handle_observation_attribute(query);
     }
     return success;
 }
@@ -289,8 +288,16 @@ sn_coap_hdr_s* M2MResource::handle_get_request(nsdl_s *nsdl,
                                     // If the observe value is 0 means register for observation.
                                     if(number == 0) {
                                         tr_debug("M2MResource::handle_get_request - Put Resource under Observation");
+                                        M2MResourceInstanceList::const_iterator it;
+                                        it = _resource_instance_list.begin();
+                                        for (; it!=_resource_instance_list.end(); it++ ) {
+                                            tr_debug("M2MResource::handle_get_request - set_resource_observer");
+                                            (*it)->set_resource_observer(this);
+                                        }
+
                                         set_under_observation(true,observation_handler);
                                         M2MBase::add_observation_level(M2MBase::R_Attribute);
+
                                         uint8_t *obs_number = (uint8_t*)malloc(3);
                                         memset(obs_number,0,3);
                                         uint8_t observation_number_length = 1;
@@ -311,6 +318,11 @@ sn_coap_hdr_s* M2MResource::handle_get_request(nsdl_s *nsdl,
                                     tr_debug("M2MResource::handle_get_request - Stops Observation");
                                     set_under_observation(false,NULL);
                                     M2MBase::remove_observation_level(M2MBase::R_Attribute);
+                                    M2MResourceInstanceList::const_iterator it;
+                                    it = _resource_instance_list.begin();
+                                    for (; it!=_resource_instance_list.end(); it++ ) {
+                                        (*it)->set_resource_observer(NULL);
+                                    }
                                 }
                                 msg_code = COAP_MSG_CODE_RESPONSE_CHANGED;
                             }
@@ -484,4 +496,13 @@ sn_coap_hdr_s* M2MResource::handle_post_request(nsdl_s *nsdl,
         coap_response->msg_code = msg_code;
     }
     return coap_response;
+}
+
+void M2MResource::notification_update()
+{
+    tr_debug("M2MResource::notification_update()");
+    M2MReportHandler *report_handler = M2MBase::report_handler();
+    if(report_handler) {
+        report_handler->set_notification_trigger();
+    }
 }

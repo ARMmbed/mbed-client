@@ -23,6 +23,11 @@
 class M2MObjectInstance;
 typedef Vector<M2MResourceInstance *> M2MResourceInstanceList;
 
+class M2MResourceCallback {
+public:
+    virtual void notification_update() = 0;
+};
+
 /**
  *  @brief M2MResource.
  *  This class is the base class for mbed Client Resources. All defined
@@ -30,7 +35,7 @@ typedef Vector<M2MResourceInstance *> M2MResourceInstanceList;
  *  instances associated with the given object.
  */
 
-class M2MResource : public M2MResourceInstance {
+class M2MResource : public M2MResourceInstance, M2MResourceCallback {
 
 friend class M2MObjectInstance;
 
@@ -175,6 +180,9 @@ public:
     virtual sn_coap_hdr_s* handle_post_request(nsdl_s *nsdl,
                                                sn_coap_hdr_s *received_coap_header,
                                                M2MObservationHandler *observation_handler = NULL);
+
+protected:
+    void notification_update();
 
 private:
 

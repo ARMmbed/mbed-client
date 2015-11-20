@@ -49,7 +49,8 @@ M2MResourceInstance::M2MResourceInstance(const M2MResourceInstance& other)
   _execute_callback(NULL),
   _value(NULL),
   _value_length(0),
-  _resource_type(M2MResourceInstance::STRING)
+  _resource_type(M2MResourceInstance::STRING),
+  _resource_callback(NULL)
 {
     this->operator=(other);
 }
@@ -64,7 +65,8 @@ M2MResourceInstance::M2MResourceInstance(const String &res_name,
  _execute_callback(NULL),
  _value(NULL),
  _value_length(0),
- _resource_type(type)
+ _resource_type(type),
+ _resource_callback(NULL)
 {
     M2MBase::set_resource_type(resource_type);
     M2MBase::set_base_type(M2MBase::ResourceInstance);
@@ -82,7 +84,8 @@ M2MResourceInstance::M2MResourceInstance(const String &res_name,
  _execute_callback(NULL),
  _value(NULL),
  _value_length(0),
- _resource_type(type)
+ _resource_type(type),
+ _resource_callback(NULL)
 {
     M2MBase::set_resource_type(resource_type);
     M2MBase::set_base_type(M2MBase::Resource);
@@ -103,6 +106,7 @@ M2MResourceInstance::~M2MResourceInstance()
         _value = NULL;
         _value_length = 0;
     }
+    _resource_callback = NULL;
 }
 
 M2MBase::BaseType M2MResourceInstance::base_type() const
@@ -147,6 +151,7 @@ void M2MResourceInstance::clear_value()
 bool M2MResourceInstance::set_value(const uint8_t *value,
                                     const uint32_t value_length)
 {
+    tr_debug("M2MResourceInstance::set_value()");
     bool success = false;
     bool string_value_changed = false;
     if(_resource_type == M2MResourceInstance::STRING) {
@@ -169,7 +174,7 @@ bool M2MResourceInstance::set_value(const uint8_t *value,
             if(string_value_changed) {
                 M2MReportHandler *report_handler = M2MBase::report_handler();
                 if(report_handler) {
-                    report_handler->set_string_notification_trigger();
+                    report_handler->set_notification_trigger();
                 }
             } else {
                 report();
@@ -186,7 +191,7 @@ void M2MResourceInstance::report()
     tr_debug("M2MResourceInstance::report()");
     if(M2MBase::Dynamic == mode()) {
         M2MReportHandler *report_handler = M2MBase::report_handler();
-        if( report_handler && _resource_type != M2MResourceInstance::STRING) {
+        if(report_handler && _resource_type != M2MResourceInstance::STRING) {
             if(_value) {
                 report_handler->set_value(atof((const char*)_value));
             } else {
@@ -199,13 +204,18 @@ void M2MResourceInstance::report()
                 _object_instance_callback.notification_update(observation_level);
             }
         }
+        else {
+            if (_resource_callback && base_type() == M2MBase::ResourceInstance) {
+                _resource_callback->notification_update();
+            }
+        }
     } else if(M2MBase::Static == mode()) {
         M2MObservationHandler *observation_handler = M2MBase::observation_handler();
         if(observation_handler) {
             observation_handler->value_updated(this);
         }
     } else {
-        tr_debug("Not supported mode");
+        tr_debug("M2MResourceInstance::report() - Not supported mode");
     }
 }
 
@@ -439,3 +449,7 @@ sn_coap_hdr_s* M2MResourceInstance::handle_put_request(nsdl_s *nsdl,
     return coap_response;
 }
 
+void M2MResourceInstance::set_resource_observer(M2MResourceCallback *resource)
+{
+    _resource_callback = resource;
+}

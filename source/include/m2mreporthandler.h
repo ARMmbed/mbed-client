@@ -66,14 +66,9 @@ public:
     virtual void set_value(float value);
 
     /**
-     * @brief Triggers object or object instance notification.
+     * @brief Sets notification trigger.
      */
-    void trigger_object_notification();
-
-    /**
-     * @brief Sets notification trigger for String resources.
-     */
-    void set_string_notification_trigger();
+    void set_notification_trigger();
 
     /**
      * @brief Parses the received query for notification

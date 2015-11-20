@@ -98,27 +98,15 @@ void M2MReportHandler::set_value(float value)
     }
 }
 
-void M2MReportHandler::set_string_notification_trigger()
+void M2MReportHandler::set_notification_trigger()
 {
-    tr_debug("M2MReportHandler::set_string_notification_trigger()");
+    tr_debug("M2MReportHandler::set_notification_trigger()");
     if(_under_observation) {
-        tr_debug("M2MReportHandler::set_string_notification_trigger()- UNDER OBSERVATION");
+        tr_debug("M2MReportHandler::set_notification_trigger()- UNDER OBSERVATION");
         _current_value = 0.0f;
         _last_value = 1.0f;
         _notify = true;
         schedule_report();
-    }
-}
-
-void M2MReportHandler::trigger_object_notification()
-{
-    tr_debug("M2MReportHandler::trigger_object_notification()");
-    if(_under_observation) {
-        tr_debug("M2MReportHandler::trigger_object_notification - report value");
-        _pmin_exceeded = false;
-        _pmax_exceeded = false;
-        _observer.observation_to_be_sent();
-        handle_timers();
     }
 }
 
@@ -255,24 +243,21 @@ bool M2MReportHandler::set_notification_attribute(char* option,
         tr_debug("M2MReportHandler::set_notification_attribute %s to %f", attribute, _pmax);
     }
     else if(strcmp(attribute, GT.c_str()) == 0 &&
-            (M2MBase::Resource == type ||
-            M2MBase::ResourceInstance == type)){
+            (M2MBase::Resource == type)){
         sscanf(value, "%f", &_gt);
         success = true;        
         _attribute_state |= M2MReportHandler::Gt;
         tr_debug("M2MReportHandler::set_notification_attribute %s to %f", attribute, _gt);
     }
     else if(strcmp(attribute, LT.c_str()) == 0 &&
-            (M2MBase::Resource == type ||
-            M2MBase::ResourceInstance == type)){
+            (M2MBase::Resource == type)){
         sscanf(value, "%f", &_lt);
         success = true;
         _attribute_state |= M2MReportHandler::Lt;
         tr_debug("M2MReportHandler::set_notification_attribute %s to %f", attribute, _lt);
     }
     else if(strcmp(attribute, ST.c_str()) == 0 &&
-            (M2MBase::Resource == type ||
-            M2MBase::ResourceInstance == type)){
+            (M2MBase::Resource == type)){
         sscanf(value, "%f", &_st);
         success = true;
         _high_step = _current_value + _st;

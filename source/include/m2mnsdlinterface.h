@@ -267,7 +267,7 @@ private:
 
     void send_object_instance_observation(M2MObjectInstance *object_instance);
 
-    void send_resource_observation(M2MResourceInstance *resource);
+    void send_resource_observation(M2MResource *resource);
 
 private:
 
