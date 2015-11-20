@@ -310,6 +310,7 @@ sn_coap_hdr_s* M2MObject::handle_get_request(nsdl_s *nsdl,
                                     set_under_observation(false,NULL);
                                     remove_observation_level(M2MBase::O_Attribute);
                                 }
+                                msg_code = COAP_MSG_CODE_RESPONSE_CONTENT;
                             }
                             else {
                                 msg_code = COAP_MSG_CODE_RESPONSE_METHOD_NOT_ALLOWED;
