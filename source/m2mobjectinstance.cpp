@@ -491,7 +491,7 @@ sn_coap_hdr_s* M2MObjectInstance::handle_get_request(nsdl_s *nsdl,
                                     remove_observation_level(M2MBase::OI_Attribute);
 
                                 }
-                                msg_code = COAP_MSG_CODE_RESPONSE_CHANGED;
+                                msg_code = COAP_MSG_CODE_RESPONSE_CONTENT;
                             }
                             else {
                                 msg_code = COAP_MSG_CODE_RESPONSE_METHOD_NOT_ALLOWED;

@@ -324,7 +324,7 @@ sn_coap_hdr_s* M2MResource::handle_get_request(nsdl_s *nsdl,
                                         (*it)->set_resource_observer(NULL);
                                     }
                                 }
-                                msg_code = COAP_MSG_CODE_RESPONSE_CHANGED;
+                                msg_code = COAP_MSG_CODE_RESPONSE_CONTENT;
                             }
                             else {
                                 msg_code = COAP_MSG_CODE_RESPONSE_METHOD_NOT_ALLOWED;
