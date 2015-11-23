@@ -160,7 +160,9 @@ void Test_M2MResource::test_handle_observation_attribute()
     TestReportObserver obs;
     m2mbase_stub::report = new M2MReportHandler(obs);
 
-    m2mbase_stub::bool_value = true;
+    m2mbase_stub::bool_value = true;    
+    CHECK(false == resource->handle_observation_attribute(d));
+    resource->_resource_type = M2MResourceInstance::INTEGER;
     CHECK(true == resource->handle_observation_attribute(d));
 
     delete m2mbase_stub::report;

@@ -152,7 +152,11 @@ uint16_t M2MResource::resource_instance_count() const
 bool M2MResource::handle_observation_attribute(char *&query)
 {
     tr_debug("M2MResource::handle_observation_attribute()");
-    bool success = M2MBase::handle_observation_attribute(query);
+    bool success = false;
+    if (_resource_type == M2MResourceInstance::INTEGER ||
+        _resource_type == M2MResourceInstance::FLOAT ){
+        success = M2MBase::handle_observation_attribute(query);
+    }
     if (success) {
         if(!_resource_instance_list.empty()) {
             M2MResourceInstanceList::const_iterator it;
