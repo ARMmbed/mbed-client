@@ -169,7 +169,7 @@ public:
 
     /**
      * @brief Sets the object under observation.
-     * @param observed, for the observation.
+     * @param observed, Value for the observation. When true, starts observing. When false, ongoing observation is cancelled.
      * @param handler, Handler object for sending
      * observation callbacks.
      */
