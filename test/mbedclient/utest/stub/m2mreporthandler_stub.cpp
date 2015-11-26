@@ -40,7 +40,8 @@ void M2MReportHandler::set_value(float)
 }
 
 bool M2MReportHandler::parse_notification_attribute(char *&,
-                                                    M2MBase::BaseType )
+                                                    M2MBase::BaseType,
+                                                    M2MResourceInstance::ResourceType resource_type)
 {
     return m2mreporthandler_stub::bool_return;
 }
@@ -50,5 +51,9 @@ void M2MReportHandler::timer_expired(M2MTimerObserver::Type )
 }
 
 void M2MReportHandler::set_notification_trigger()
+{
+}
+
+void M2MReportHandler::set_default_values()
 {
 }

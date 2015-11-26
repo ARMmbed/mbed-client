@@ -122,14 +122,19 @@ M2MResourceInstance::ResourceType M2MResourceInstance::resource_instance_type() 
 bool M2MResourceInstance::handle_observation_attribute(char *&query)
 {
     tr_debug("M2MResourceInstance::handle_observation_attribute()");
-    if (_resource_type == M2MResourceInstance::INTEGER ||
-        _resource_type == M2MResourceInstance::FLOAT ){
-        return M2MBase::handle_observation_attribute(query);
+    bool success = false;
+    M2MReportHandler *handler = M2MBase::report_handler();
+    if (handler) {
+        success = handler->parse_notification_attribute(query,
+                M2MBase::base_type(), _resource_type);
+        if (success) {
+            handler->set_under_observation(true);
+        }
+        else {
+            handler->set_default_values();
+        }
     }
-    else {
-        tr_debug("M2MResourceInstance::handle_observation_attribute() - write attribute is not numerical");
-        return false;
-    }
+    return success;
 }
 
 void M2MResourceInstance::set_execute_function(execute_callback callback)

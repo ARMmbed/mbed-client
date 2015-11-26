@@ -20,6 +20,7 @@
 #include "m2mresourceinstance_stub.h"
 #include "m2mobjectinstance_stub.h"
 #include "m2mtlvdeserializer_stub.h"
+#include "m2mreporthandler_stub.h"
 #include "common_stub.h"
 #include "m2mreporthandler.h"
 
@@ -160,7 +161,11 @@ void Test_M2MResource::test_handle_observation_attribute()
     TestReportObserver obs;
     m2mbase_stub::report = new M2MReportHandler(obs);
 
-    m2mbase_stub::bool_value = true;
+    m2mbase_stub::bool_value = true;    
+    CHECK(false == resource->handle_observation_attribute(d));
+
+    resource->_resource_type = M2MResourceInstance::INTEGER;
+    m2mreporthandler_stub::bool_return = true;
     CHECK(true == resource->handle_observation_attribute(d));
 
     delete m2mbase_stub::report;
@@ -495,6 +500,9 @@ void Test_M2MResource::test_handle_put_request()
 {
     uint8_t value[] = {"name"};
     sn_coap_hdr_s *coap_header = (sn_coap_hdr_s *)malloc(sizeof(sn_coap_hdr_s));
+    TestReportObserver obs;
+    m2mbase_stub::report = new M2MReportHandler(obs);
+
     memset(coap_header, 0, sizeof(sn_coap_hdr_s));
 
     coap_header->uri_path_ptr = value;
@@ -646,7 +654,8 @@ void Test_M2MResource::test_handle_put_request()
     free(common_stub::coap_header);
     delete name;
     free(coap_header);
-
+    delete m2mbase_stub::report;
+    m2mbase_stub::report = NULL;
     m2mtlvdeserializer_stub::clear();
     common_stub::clear();
     m2mbase_stub::clear();
