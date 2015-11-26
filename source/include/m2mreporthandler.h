@@ -21,13 +21,12 @@
 #include "mbed-client/m2mconfig.h"
 #include "mbed-client/m2mbase.h"
 #include "mbed-client/m2mtimerobserver.h"
-
-//algorithm can accept any number of limit values and report when signal changes between limit bands
-#define MAX_LIMITS 2
+#include "mbed-client/m2mresourceinstance.h"
 
 //FORWARD DECLARATION
 class M2MReportObserver;
 class M2MTimer;
+class M2MResourceInstance;
 
 /**
  *  @brief M2MReportHandler.
@@ -66,24 +65,27 @@ public:
     virtual void set_value(float value);
 
     /**
-     * @brief Triggers object or object instance notification.
+     * @brief Sets notification trigger.
      */
-    void trigger_object_notification();
-
-    /**
-     * @brief Sets notification trigger for String resources.
-     */
-    void set_string_notification_trigger();
+    void set_notification_trigger();
 
     /**
      * @brief Parses the received query for notification
      * attribute.
      * @param query Query to be parsed for attributes.
      * @param type Type of the Base Object.
+     * @param resource_type Type of the Resource.
      * @return true if required attributes are present else false.
      */
     virtual bool parse_notification_attribute(char *&query,
-                                              M2MBase::BaseType type);
+                                              M2MBase::BaseType type,
+                                              M2MResourceInstance::ResourceType resource_type = M2MResourceInstance::OPAQUE);
+
+    /**
+    * @brief Set back to default values.
+    */
+    void set_default_values();
+
 
 protected : // from M2MTimerObserver
 
@@ -101,7 +103,9 @@ private:
         St = 32
     };
 
-    bool set_notification_attribute(char* option, M2MBase::BaseType type);
+    bool set_notification_attribute(char* option,
+            M2MBase::BaseType type,
+            M2MResourceInstance::ResourceType resource_type);
 
     /**
      * @brief Schedule a report, if the pmin is exceeded
@@ -131,11 +135,6 @@ private:
     void stop_timers();
 
     /**
-    * @brief Set back to default values.
-    */
-    void set_default_values();
-
-    /**
      * @brief Check if current value match threshold values.
      * @return True if notify can be send otherwise false.
      */
@@ -150,7 +149,6 @@ private:
 private:
 
     M2MReportObserver           &_observer;
-    bool                        _under_observation;    
     float                       _pmax;
     float                       _pmin;
     float                       _gt;
@@ -158,14 +156,13 @@ private:
     float                       _st;
     bool                        _pmin_exceeded;
     bool                        _pmax_exceeded;
-    bool                        _report_scheduled;    
     M2MTimer                    *_pmin_timer;
     M2MTimer                    *_pmax_timer;        
     float                       _high_step;
     float                       _low_step;
     float                       _current_value;
     float                       _last_value;    
-    int                         _attribute_state;    
+    uint8_t                     _attribute_state;
     bool                        _notify;
 
 friend class Test_M2MReportHandler;

@@ -20,6 +20,7 @@
 
 class Handler;
 class Callback;
+class ResourceCallback;
 
 class Test_M2MResourceInstance
 {
@@ -57,6 +58,8 @@ public:
     void test_handle_get_request();
 
     void test_handle_put_request();
+
+    void test_set_resource_observer();
 
     M2MResourceInstance* resource_instance;
 

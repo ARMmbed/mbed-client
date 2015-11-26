@@ -58,6 +58,7 @@ public:
 
     void test_handle_post_request();
 
+    void test_notification_update();
 
     M2MResource* resource;
     Callback *callback;

@@ -37,7 +37,7 @@ public:
     }
     void resource_to_be_deleted(const String &){visited=true;}
     void remove_object(M2MBase *){visited = true;}
-    void value_updated(M2MBase *,const String&){visited = true;}
+    void value_updated(M2MBase *,const String&,bool){visited = true;}
 
     void clear() {visited = false;}
     bool visited;
@@ -471,6 +471,30 @@ void Test_M2MObjectInstance::test_handle_get_request()
     m2mbase_stub::bool_value = true;
 
     CHECK(object->handle_get_request(NULL,coap_header,handler) != NULL);
+
+    if(common_stub::coap_header->content_type_ptr) {
+        free(common_stub::coap_header->content_type_ptr);
+        common_stub::coap_header->content_type_ptr = NULL;
+    }
+
+    if(common_stub::coap_header->options_list_ptr->observe_ptr) {
+        free(common_stub::coap_header->options_list_ptr->observe_ptr);
+        common_stub::coap_header->options_list_ptr->observe_ptr = NULL;
+    }
+    if(common_stub::coap_header->options_list_ptr->max_age_ptr) {
+        free(common_stub::coap_header->options_list_ptr->max_age_ptr);
+        common_stub::coap_header->options_list_ptr->max_age_ptr = NULL;
+    }
+    if(common_stub::coap_header->options_list_ptr) {
+        free(common_stub::coap_header->options_list_ptr);
+        common_stub::coap_header->options_list_ptr = NULL;
+    }
+
+    // Not observable
+    m2mbase_stub::bool_value = false;
+    CHECK(object->handle_get_request(NULL,coap_header,handler) != NULL);
+
+    m2mbase_stub::bool_value = true;
 
     if(common_stub::coap_header->content_type_ptr) {
         free(common_stub::coap_header->content_type_ptr);

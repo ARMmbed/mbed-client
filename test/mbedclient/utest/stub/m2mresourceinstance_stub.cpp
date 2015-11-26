@@ -143,3 +143,7 @@ sn_coap_hdr_s* M2MResourceInstance::handle_put_request(nsdl_s *,
     return m2mresourceinstance_stub::header;
 }
 
+void M2MResourceInstance::set_resource_observer(M2MResourceCallback *callback)
+{
+
+}

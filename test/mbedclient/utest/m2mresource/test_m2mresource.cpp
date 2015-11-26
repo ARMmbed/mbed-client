@@ -20,7 +20,17 @@
 #include "m2mresourceinstance_stub.h"
 #include "m2mobjectinstance_stub.h"
 #include "m2mtlvdeserializer_stub.h"
+#include "m2mreporthandler_stub.h"
 #include "common_stub.h"
+#include "m2mreporthandler.h"
+
+class TestReportObserver :  public M2MReportObserver{
+public :
+    TestReportObserver() {}
+    ~TestReportObserver() {}
+    void observation_to_be_sent(){ }
+};
+
 
 class MyTest{
 public:
@@ -56,7 +66,7 @@ public:
     }
     void resource_to_be_deleted(const String &){visited=true;}
     void remove_object(M2MBase *){visited = true;}
-    void value_updated(M2MBase *,const String&){visited = true;}
+    void value_updated(M2MBase *,const String&, bool){visited = true;}
 
     void clear() {visited = false;}
     bool visited;
@@ -148,7 +158,18 @@ void Test_M2MResource::test_handle_observation_attribute()
     M2MResourceInstance *res = new M2MResourceInstance("name","type",M2MResourceInstance::INTEGER,*callback);
     resource->add_resource_instance(res);
 
+    TestReportObserver obs;
+    m2mbase_stub::report = new M2MReportHandler(obs);
+
+    m2mbase_stub::bool_value = true;    
     CHECK(false == resource->handle_observation_attribute(d));
+
+    resource->_resource_type = M2MResourceInstance::INTEGER;
+    m2mreporthandler_stub::bool_return = true;
+    CHECK(true == resource->handle_observation_attribute(d));
+
+    delete m2mbase_stub::report;
+    m2mbase_stub::report = NULL;
 }
 
 void Test_M2MResource::test_add_resource_instance()
@@ -240,10 +261,32 @@ void Test_M2MResource::test_handle_get_request()
 
     m2mresourceinstance_stub::header = NULL;
 
+    M2MResourceInstance* res_instance = new M2MResourceInstance("name","res2",
+                                                                M2MResourceInstance::INTEGER,
+                                                                *callback);
+    M2MResourceInstance* res_instance_1 = new M2MResourceInstance("name","res2",
+                                                                M2MResourceInstance::INTEGER,
+                                                                *callback);
+
     CHECK(resource->handle_get_request(NULL,coap_header,handler) == NULL);
 
     resource->_has_multiple_instances = true;
+    resource->add_resource_instance(res_instance);
+    resource->add_resource_instance(res_instance_1);
 
+    CHECK(resource->handle_get_request(NULL,coap_header,handler) != NULL);
+    if(common_stub::coap_header->content_type_ptr) {
+        free(common_stub::coap_header->content_type_ptr);
+        common_stub::coap_header->content_type_ptr = NULL;
+    }
+    if(common_stub::coap_header->options_list_ptr->max_age_ptr) {
+        free(common_stub::coap_header->options_list_ptr->max_age_ptr);
+        common_stub::coap_header->options_list_ptr->max_age_ptr = NULL;
+    }
+    if(common_stub::coap_header->options_list_ptr) {
+        free(common_stub::coap_header->options_list_ptr);
+        common_stub::coap_header->options_list_ptr = NULL;
+    }
     CHECK(resource->handle_get_request(NULL,coap_header,handler) != NULL);
 
     if(coap_header->content_type_ptr) {
@@ -388,6 +431,27 @@ void Test_M2MResource::test_handle_get_request()
         common_stub::coap_header->options_list_ptr = NULL;
     }
 
+    // Not observable
+    m2mbase_stub::bool_value = false;
+    CHECK(resource->handle_get_request(NULL,coap_header,handler) != NULL);
+
+    if(common_stub::coap_header->content_type_ptr) {
+        free(common_stub::coap_header->content_type_ptr);
+        common_stub::coap_header->content_type_ptr = NULL;
+    }
+    if(common_stub::coap_header->options_list_ptr->observe_ptr) {
+        free(common_stub::coap_header->options_list_ptr->observe_ptr);
+        common_stub::coap_header->options_list_ptr->observe_ptr = NULL;
+    }
+    if(common_stub::coap_header->options_list_ptr->max_age_ptr) {
+        free(common_stub::coap_header->options_list_ptr->max_age_ptr);
+        common_stub::coap_header->options_list_ptr->max_age_ptr = NULL;
+    }
+    if(common_stub::coap_header->options_list_ptr) {
+        free(common_stub::coap_header->options_list_ptr);
+        common_stub::coap_header->options_list_ptr = NULL;
+    }
+
     m2mbase_stub::operation = M2MBase::NOT_ALLOWED;
     CHECK(resource->handle_get_request(NULL,coap_header,handler) != NULL);
 
@@ -436,6 +500,9 @@ void Test_M2MResource::test_handle_put_request()
 {
     uint8_t value[] = {"name"};
     sn_coap_hdr_s *coap_header = (sn_coap_hdr_s *)malloc(sizeof(sn_coap_hdr_s));
+    TestReportObserver obs;
+    m2mbase_stub::report = new M2MReportHandler(obs);
+
     memset(coap_header, 0, sizeof(sn_coap_hdr_s));
 
     coap_header->uri_path_ptr = value;
@@ -587,7 +654,8 @@ void Test_M2MResource::test_handle_put_request()
     free(common_stub::coap_header);
     delete name;
     free(coap_header);
-
+    delete m2mbase_stub::report;
+    m2mbase_stub::report = NULL;
     m2mtlvdeserializer_stub::clear();
     common_stub::clear();
     m2mbase_stub::clear();
@@ -643,4 +711,15 @@ void Test_M2MResource::test_handle_post_request()
 
     m2mbase_stub::clear();
     common_stub::clear();
+}
+
+void Test_M2MResource::test_notification_update()
+{
+    TestReportObserver obs;
+    m2mbase_stub::report = new M2MReportHandler(obs);
+
+    resource->notification_update();
+
+    delete m2mbase_stub::report;
+    m2mbase_stub::report = NULL;
 }

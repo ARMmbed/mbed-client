@@ -471,9 +471,9 @@ uint8_t M2MNsdlInterface::received_from_server_callback(struct nsdl_s * /*nsdl_h
                                     M2MObject* object = (M2MObject*)base;
                                     M2MObjectInstance *obj_instance = object->create_object_instance(instance_id);
                                     if(obj_instance) {
-                                        obj_instance->set_operation(M2MBase::GET_PUT_ALLOWED);
-                                    }
-                                    coap_response = object->handle_post_request(_nsdl_handle,coap_header,this);
+                                        obj_instance->set_operation(M2MBase::GET_PUT_POST_ALLOWED);
+                                        coap_response = obj_instance->handle_post_request(_nsdl_handle,coap_header,this);
+                                    }                                    
                                     if(coap_response && coap_response->msg_code != COAP_MSG_CODE_RESPONSE_CREATED) {
                                         //Invalid request so remove created ObjectInstance
                                         object->remove_object_instance(instance_id);
@@ -713,14 +713,12 @@ void M2MNsdlInterface::observation_to_be_sent(M2MBase *object)
     tr_debug("M2MNsdlInterface::observation_to_be_sent()");
     if(object) {
         M2MBase::BaseType type = object->base_type();
-
         if(type == M2MBase::Object) {
             send_object_observation((M2MObject*)object);
         } else if(type == M2MBase::ObjectInstance) {
             send_object_instance_observation((M2MObjectInstance*)object);
-        } else if(type == M2MBase::Resource ||
-                  type == M2MBase::ResourceInstance) {
-            send_resource_observation((M2MResourceInstance*)object);
+        } else if(type == M2MBase::Resource) {
+                send_resource_observation((M2MResource*)object);
         }
     }
 }
@@ -732,7 +730,8 @@ void M2MNsdlInterface::resource_to_be_deleted(const String &resource_name)
 }
 
 void M2MNsdlInterface::value_updated(M2MBase *base,
-                                     const String &object_name)
+                                     const String &object_name,
+                                     bool update_register)
 {
     tr_debug("M2MNsdlInterface::value_updated()");
     if(base) {
@@ -757,6 +756,9 @@ void M2MNsdlInterface::value_updated(M2MBase *base,
         }
     }
     _observer.value_updated(base);
+    if(update_register) {
+        send_update_registration();
+    }
 }
 
 void M2MNsdlInterface::remove_object(M2MBase *object)
@@ -1254,6 +1256,7 @@ M2MInterface::Error M2MNsdlInterface::interface_error(sn_coap_hdr_s *coap_header
 
 void M2MNsdlInterface::send_object_observation(M2MObject *object)
 {
+    tr_debug("M2MNsdlInterface::send_object_observation");
     if(object) {
         uint8_t *value = 0;
         uint32_t length = 0;
@@ -1294,6 +1297,7 @@ void M2MNsdlInterface::send_object_observation(M2MObject *object)
 
 void M2MNsdlInterface::send_object_instance_observation(M2MObjectInstance *object_instance)
 {
+    tr_debug("M2MNsdlInterface::send_object_instance_observation");
     if(object_instance) {
         uint8_t *value = 0;
         uint32_t length = 0;
@@ -1332,8 +1336,9 @@ void M2MNsdlInterface::send_object_instance_observation(M2MObjectInstance *objec
     }
 }
 
-void M2MNsdlInterface::send_resource_observation(M2MResourceInstance *resource)
+void M2MNsdlInterface::send_resource_observation(M2MResource *resource)
 {
+    tr_debug("M2MNsdlInterface::send_resource_observation");
     if(resource) {
         uint8_t *value = 0;
         uint32_t length = 0;
@@ -1344,15 +1349,24 @@ void M2MNsdlInterface::send_resource_observation(M2MResourceInstance *resource)
 
         uint16_t number = resource->observation_number();
 
-        observation_number[0] = (number & 0xFF);
-        observation_number[1] = ((number>>8) & 0xFF);
+        observation_number[0] = ((number>>8) & 0xFF);
+        observation_number[1] = (number & 0xFF);
 
         if(number > 0xFF) {
             observation_number_length = 2;
         }
 
-        resource->get_value(value,length);
         resource->get_observation_token(token,token_length);
+
+        if (resource->resource_instance_count() > 0) {
+            M2MTLVSerializer *serializer = new M2MTLVSerializer();
+            if(serializer) {
+                value = serializer->serialize(resource, length);
+                delete serializer;
+            }
+        } else {
+            resource->get_value(value,length);
+        }
 
         sn_nsdl_send_observation_notification(_nsdl_handle,
                                               token,
@@ -1361,7 +1375,7 @@ void M2MNsdlInterface::send_resource_observation(M2MResourceInstance *resource)
                                               observation_number,
                                               observation_number_length,
                                               COAP_MSG_TYPE_CONFIRMABLE,
-                                              0);
+                                              resource->coap_content_type());
         memory_free(value);
         memory_free(token);
     }

@@ -19,6 +19,7 @@
 #include "m2mbase_stub.h"
 #include "m2mobservationhandler.h"
 #include "m2mreporthandler.h"
+#include "m2mreporthandler_stub.h"
 #include "common_stub.h"
 #include "m2mtlvdeserializer_stub.h"
 
@@ -38,6 +39,20 @@ public :
     void observation_to_be_sent(){ }
 };
 
+class ResourceCallback : public M2MResourceCallback {
+
+public:
+
+    ResourceCallback(){}
+    ~ResourceCallback(){}
+    void notification_update() {
+        visited = true;
+    }
+
+    void clear() {visited = false;}
+    bool visited;
+};
+
 class Handler : public M2MObservationHandler {
 
 public:
@@ -49,7 +64,7 @@ public:
     }
     void resource_to_be_deleted(const String &){visited=true;}
     void remove_object(M2MBase *){visited = true;}
-    void value_updated(M2MBase *,const String&){visited = true;}
+    void value_updated(M2MBase *,const String&, bool){visited = true;}
 
     void clear() {visited = false;}
     bool visited;
@@ -72,19 +87,20 @@ public:
 
 Test_M2MResourceInstance::Test_M2MResourceInstance()
 {
-    callback = new Callback();
+    callback = new Callback();    
     handler = new Handler();
     resource_instance = new M2MResourceInstance("name",
                                                 "resource_type",
                                                  M2MResourceInstance::STRING,
                                                 *callback);
+    //resource_instance->_resource_callback = new ResourceCallback();
 }
 
 Test_M2MResourceInstance::~Test_M2MResourceInstance()
 {
     delete resource_instance;
     delete handler;
-    delete callback;
+    delete callback;    
 }
 
 void Test_M2MResourceInstance::test_copy_constructor()
@@ -156,6 +172,9 @@ void Test_M2MResourceInstance::test_base_type()
 void Test_M2MResourceInstance::test_handle_observation_attribute()
 {
     char *d = "s";
+    TestReportObserver obs;
+    m2mbase_stub::report = new M2MReportHandler(obs);
+
     CHECK(false == resource_instance->handle_observation_attribute(d));
 
     resource_instance->_resource_type = M2MResourceInstance::INTEGER;
@@ -164,6 +183,11 @@ void Test_M2MResourceInstance::test_handle_observation_attribute()
     resource_instance->_resource_type = M2MResourceInstance::FLOAT;
     CHECK(false == resource_instance->handle_observation_attribute(d));
 
+    m2mreporthandler_stub::bool_return = true;
+    CHECK(true == resource_instance->handle_observation_attribute(d));
+
+    delete m2mbase_stub::report;
+    m2mbase_stub::report = NULL;
 }
 
 void Test_M2MResourceInstance::test_set_execute_function()
@@ -185,6 +209,9 @@ void Test_M2MResourceInstance::test_set_value()
 {
     u_int8_t value[] = {"value2"};
     resource_instance->_value = (u_int8_t*)malloc(sizeof(u_int8_t));
+
+    ResourceCallback *resource_cb = new ResourceCallback();
+    resource_instance->set_resource_observer(resource_cb);
 
     CHECK(resource_instance->set_value(value,(u_int32_t)sizeof(value)) == true);
     CHECK( resource_instance->_value_length == sizeof(value));
@@ -208,19 +235,21 @@ void Test_M2MResourceInstance::test_set_value()
     resource_instance->_value = (u_int8_t*)malloc(sizeof(value)+1);
     memset(resource_instance->_value,0,sizeof(value)+1);
     memcpy(resource_instance->_value,value,sizeof(value));
-    resource_instance->_value_length = sizeof(value);
+    resource_instance->_value_length = sizeof(value);    
 
     u_int8_t value4[] = {"value4"};
     CHECK(resource_instance->set_value(value4,(u_int32_t)sizeof(value4)) == true);
 
+
+    m2mbase_stub::base_type = M2MBase::ResourceInstance;
+    m2mbase_stub::observation_level_value = M2MBase::O_Attribute;
+    resource_instance->_resource_type = M2MResourceInstance::INTEGER;
+    m2mbase_stub::mode_value = M2MBase::Dynamic;
+    CHECK(resource_instance->set_value(value2,(u_int32_t)sizeof(value2)) == true);
+    CHECK(resource_cb->visited == true);
+
     TestReportObserver obs;
     m2mbase_stub::report = new M2MReportHandler(obs);
-
-    m2mbase_stub::observation_level_value = M2MBase::O_Attribute;
-
-    resource_instance->_resource_type = M2MResourceInstance::INTEGER;
-
-    m2mbase_stub::mode_value = M2MBase::Dynamic;
 
     CHECK(resource_instance->set_value(value2,(u_int32_t)sizeof(value2)) == true);
 
@@ -242,6 +271,7 @@ void Test_M2MResourceInstance::test_set_value()
 
     delete m2mbase_stub::report;
     m2mbase_stub::report = NULL;
+    delete resource_cb;
 }
 
 void Test_M2MResourceInstance::test_clear_value()
@@ -426,6 +456,29 @@ void Test_M2MResourceInstance::test_handle_get_request()
         free(common_stub::coap_header->options_list_ptr);
         common_stub::coap_header->options_list_ptr = NULL;
     }
+
+    // Not observable
+    m2mbase_stub::bool_value = false;
+    CHECK(resource_instance->handle_get_request(NULL,coap_header,handler) != NULL);
+
+    if(common_stub::coap_header->content_type_ptr) {
+        free(common_stub::coap_header->content_type_ptr);
+        common_stub::coap_header->content_type_ptr = NULL;
+    }
+    if(common_stub::coap_header->options_list_ptr->observe_ptr) {
+        free(common_stub::coap_header->options_list_ptr->observe_ptr);
+        common_stub::coap_header->options_list_ptr->observe_ptr = NULL;
+    }
+    if(common_stub::coap_header->options_list_ptr->max_age_ptr) {
+        free(common_stub::coap_header->options_list_ptr->max_age_ptr);
+        common_stub::coap_header->options_list_ptr->max_age_ptr = NULL;
+    }
+    if(common_stub::coap_header->options_list_ptr) {
+        free(common_stub::coap_header->options_list_ptr);
+        common_stub::coap_header->options_list_ptr = NULL;
+    }
+
+    m2mbase_stub::bool_value = true;
 
     coap_header->options_list_ptr->observe_len = 1;
 
@@ -628,4 +681,12 @@ void Test_M2MResourceInstance::test_handle_put_request()
     m2mtlvdeserializer_stub::clear();
     common_stub::clear();
     m2mbase_stub::clear();
+}
+
+void Test_M2MResourceInstance::test_set_resource_observer()
+{
+    ResourceCallback *resource_cb = new ResourceCallback();
+    resource_instance->set_resource_observer(resource_cb);
+    CHECK(resource_instance->_resource_callback == resource_cb)
+    delete resource_cb;
 }

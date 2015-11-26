@@ -214,7 +214,7 @@ protected: // from M2MObservationHandler
 
     void resource_to_be_deleted(const String &resource_name);
 
-    void value_updated(M2MBase *base, const String &object_name);
+    void value_updated(M2MBase *base, const String &object_name, bool require_update = false);
 
     void remove_object(M2MBase *object);
 
@@ -267,7 +267,7 @@ private:
 
     void send_object_instance_observation(M2MObjectInstance *object_instance);
 
-    void send_resource_observation(M2MResourceInstance *resource);
+    void send_resource_observation(M2MResource *resource);
 
 private:
 
