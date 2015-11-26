@@ -37,7 +37,7 @@ public:
     }
     void resource_to_be_deleted(const String &){visited=true;}
     void remove_object(M2MBase *){visited = true;}
-    void value_updated(M2MBase *,const String&){visited = true;}
+    void value_updated(M2MBase *,const String&,bool){visited = true;}
 
     void clear() {visited = false;}
     bool visited;

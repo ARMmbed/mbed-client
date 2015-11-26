@@ -146,7 +146,7 @@ void M2MNsdlInterface::resource_to_be_deleted(const String &)
 {
 }
 
-void M2MNsdlInterface::value_updated(M2MBase *, const String&)
+void M2MNsdlInterface::value_updated(M2MBase *, const String&, bool)
 {
 }
 
