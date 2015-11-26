@@ -151,20 +151,28 @@ uint16_t M2MResource::resource_instance_count() const
 
 bool M2MResource::handle_observation_attribute(char *&query)
 {
-    tr_debug("M2MResource::handle_observation_attribute()");
+    tr_debug("M2MResource::handle_observation_attribute");
     bool success = false;
-    if (_resource_type == M2MResourceInstance::INTEGER ||
-        _resource_type == M2MResourceInstance::FLOAT ){
-        success = M2MBase::handle_observation_attribute(query);
-    }
-    if (success) {
-        if(!_resource_instance_list.empty()) {
-            M2MResourceInstanceList::const_iterator it;
-            it = _resource_instance_list.begin();
-            for ( ; it != _resource_instance_list.end(); it++ ) {
-                M2MReportHandler *report_handler = (*it)->report_handler();
-                if(report_handler) {
-                    report_handler->set_notification_trigger();
+    M2MReportHandler *handler = M2MBase::report_handler();
+    if (handler) {
+        success = handler->parse_notification_attribute(query,
+                M2MBase::base_type(), _resource_type);
+        if (success) {
+            handler->set_under_observation(true);
+        }
+        else {
+            handler->set_default_values();
+        }
+
+        if (success) {
+            if(!_resource_instance_list.empty()) {
+                M2MResourceInstanceList::const_iterator it;
+                it = _resource_instance_list.begin();
+                for ( ; it != _resource_instance_list.end(); it++ ) {
+                    M2MReportHandler *report_handler = (*it)->report_handler();
+                    if(report_handler) {
+                        report_handler->set_notification_trigger();
+                    }
                 }
             }
         }

@@ -19,6 +19,7 @@
 #include "m2mbase_stub.h"
 #include "m2mobservationhandler.h"
 #include "m2mreporthandler.h"
+#include "m2mreporthandler_stub.h"
 #include "common_stub.h"
 #include "m2mtlvdeserializer_stub.h"
 
@@ -171,6 +172,9 @@ void Test_M2MResourceInstance::test_base_type()
 void Test_M2MResourceInstance::test_handle_observation_attribute()
 {
     char *d = "s";
+    TestReportObserver obs;
+    m2mbase_stub::report = new M2MReportHandler(obs);
+
     CHECK(false == resource_instance->handle_observation_attribute(d));
 
     resource_instance->_resource_type = M2MResourceInstance::INTEGER;
@@ -179,6 +183,11 @@ void Test_M2MResourceInstance::test_handle_observation_attribute()
     resource_instance->_resource_type = M2MResourceInstance::FLOAT;
     CHECK(false == resource_instance->handle_observation_attribute(d));
 
+    m2mreporthandler_stub::bool_return = true;
+    CHECK(true == resource_instance->handle_observation_attribute(d));
+
+    delete m2mbase_stub::report;
+    m2mbase_stub::report = NULL;
 }
 
 void Test_M2MResourceInstance::test_set_execute_function()
