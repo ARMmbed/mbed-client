@@ -464,7 +464,7 @@ sn_coap_hdr_s* M2MObject::handle_post_request(nsdl_s *nsdl,
                             switch(error) {
                                 case M2MTLVDeserializer::None:
                                     if(observation_handler) {
-                                        observation_handler->value_updated(this, "", true);
+                                        observation_handler->value_updated(this);
                                     }
                                     msg_code = COAP_MSG_CODE_RESPONSE_CREATED;
                                     break;

@@ -50,14 +50,8 @@ class M2MObservationHandler
      * @brief Callback indicating that the value of the resource object is updated by server.
      * @param base, Object whose value is updated.
      * @param object_name, Name of the resource which is updated, default is empty.
-<<<<<<< HEAD
      */
     virtual void value_updated(M2MBase *base, const String &object_name = "") = 0;
-=======
-     * @param require_update, True if update is required to be sent to server else default is false
-     */
-    virtual void value_updated(M2MBase *base, const String &object_name = "", bool require_update = false) = 0;
->>>>>>> 0fe4c05e5b17d55e89a9576344384a415edb4b62
 
     /**
      * @brief Callback for removing an object from the list.
