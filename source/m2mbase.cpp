@@ -299,6 +299,13 @@ bool M2MBase::handle_observation_attribute(char *&query)
     bool success = false;
     if(_report_handler) {
         success = _report_handler->parse_notification_attribute(query,_base_type);
+        if (success) {
+            if ((_report_handler->attribute_flags() & M2MReportHandler::Cancel) == 0) {
+                _report_handler->set_under_observation(true);
+            } else {
+                _report_handler->set_under_observation(false);
+            }
+        }
     }
     return success;
 }

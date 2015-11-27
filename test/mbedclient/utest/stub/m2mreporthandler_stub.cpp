@@ -16,10 +16,12 @@
 #include "m2mreporthandler_stub.h"
 
 bool m2mreporthandler_stub::bool_return;
+u_int8_t m2mreporthandler_stub::int_value;
 
 void m2mreporthandler_stub::clear()
 {
     bool_return = false;
+    int_value = 0;
 }
 
 M2MReportHandler::M2MReportHandler(M2MReportObserver &observer)
@@ -56,4 +58,9 @@ void M2MReportHandler::set_notification_trigger()
 
 void M2MReportHandler::set_default_values()
 {
+}
+
+uint8_t M2MReportHandler::attribute_flags()
+{
+    return m2mreporthandler_stub::int_value;
 }

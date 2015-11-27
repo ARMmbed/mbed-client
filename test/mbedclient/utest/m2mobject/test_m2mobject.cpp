@@ -434,6 +434,7 @@ void Test_M2MObject::test_handle_put_request()
     uint8_t value[] = {"name"};
     sn_coap_hdr_s *coap_header = (sn_coap_hdr_s *)malloc(sizeof(sn_coap_hdr_s));
     memset(coap_header, 0, sizeof(sn_coap_hdr_s));
+    sn_coap_hdr_s * coap_response = NULL;
 
     coap_header->uri_path_ptr = value;
     coap_header->uri_path_len = sizeof(value);
@@ -482,6 +483,45 @@ void Test_M2MObject::test_handle_put_request()
     CHECK(object->handle_put_request(NULL,coap_header,handler) != NULL);
 
     CHECK(object->handle_put_request(NULL,NULL,handler) != NULL);
+
+    m2mbase_stub::operation = M2MBase::PUT_ALLOWED;
+
+
+
+
+    free(coap_header->payload_ptr);
+    coap_header->payload_ptr = NULL;
+    coap_response = object->handle_put_request(NULL,coap_header,handler);
+    CHECK(coap_response != NULL);
+    CHECK(coap_response->msg_code == COAP_MSG_CODE_RESPONSE_CHANGED);
+    if(coap_response) {
+        if(coap_response->content_type_ptr) {
+            free(coap_response->content_type_ptr);
+            coap_response->content_type_ptr = NULL;
+        }
+    }
+    m2mbase_stub::bool_value = false;
+    coap_response = object->handle_put_request(NULL,coap_header,handler);
+    CHECK(coap_response != NULL);
+    CHECK(coap_response->msg_code == COAP_MSG_CODE_RESPONSE_BAD_REQUEST);
+    if(coap_response) {
+        if(coap_response->content_type_ptr) {
+            free(coap_response->content_type_ptr);
+            coap_response->content_type_ptr = NULL;
+        }
+    }
+
+    free(coap_header->options_list_ptr);
+    coap_header->options_list_ptr = NULL;
+    coap_response = object->handle_put_request(NULL,coap_header,handler);
+    CHECK(coap_response != NULL);
+    CHECK(coap_response->msg_code == COAP_MSG_CODE_RESPONSE_BAD_REQUEST);
+    if(coap_response) {
+        if(coap_response->content_type_ptr) {
+            free(coap_response->content_type_ptr);
+            coap_response->content_type_ptr = NULL;
+        }
+    }
 
     free(coap_header->content_type_ptr);
     free(coap_header->options_list_ptr);

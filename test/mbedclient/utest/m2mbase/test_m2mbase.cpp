@@ -403,7 +403,10 @@ void Test_M2MBase::test_handle_observation_attribute()
 
     m2mreporthandler_stub::bool_return = true;
     ret = handle_observation_attribute(s);
+    CHECK(ret == true);
 
+    m2mreporthandler_stub::int_value = M2MReportHandler::Cancel;
+    ret = handle_observation_attribute(s);
     CHECK(ret == true);
 }
 

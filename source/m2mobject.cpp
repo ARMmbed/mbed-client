@@ -346,28 +346,35 @@ sn_coap_hdr_s* M2MObject::handle_put_request(nsdl_s *nsdl,
                                                           msg_code);
     if(received_coap_header) {
         if ((operation() & SN_GRS_PUT_ALLOWED) != 0) {
-
-            if(received_coap_header->options_list_ptr &&
-               received_coap_header->options_list_ptr->uri_query_ptr) {
-                char *query = (char*)malloc(received_coap_header->options_list_ptr->uri_query_len+1);
-                if (query){
-                    memset(query, 0, received_coap_header->options_list_ptr->uri_query_len+1);
-                    memcpy(query,
-                        received_coap_header->options_list_ptr->uri_query_ptr,
-                        received_coap_header->options_list_ptr->uri_query_len);
-                    memset(query + received_coap_header->options_list_ptr->uri_query_len,'\0',1);//String terminator
-                   tr_debug("M2MObject::handle_put_request() - Query %s", query);
-                    // if anything was updated, re-initialize the stored notification attributes
-                    if (!handle_observation_attribute(query)){
-                        tr_debug("M2MObject::handle_put_request() - Invalid query");
-                        msg_code = COAP_MSG_CODE_RESPONSE_BAD_REQUEST; // 4.00
+            if(!received_coap_header->payload_ptr) {
+                if(received_coap_header->options_list_ptr &&
+                   received_coap_header->options_list_ptr->uri_query_ptr) {
+                    char *query = (char*)malloc(received_coap_header->options_list_ptr->uri_query_len+1);
+                    if (query){
+                        memset(query, 0, received_coap_header->options_list_ptr->uri_query_len+1);
+                        memcpy(query,
+                            received_coap_header->options_list_ptr->uri_query_ptr,
+                            received_coap_header->options_list_ptr->uri_query_len);
+                        memset(query + received_coap_header->options_list_ptr->uri_query_len,'\0',1);//String terminator
+                       tr_debug("M2MObject::handle_put_request() - Query %s", query);
+                        // if anything was updated, re-initialize the stored notification attributes
+                        if (!handle_observation_attribute(query)){
+                            tr_debug("M2MObject::handle_put_request() - Invalid query");
+                            msg_code = COAP_MSG_CODE_RESPONSE_BAD_REQUEST; // 4.00
+                        }
+                        free(query);
                     }
-                    free(query);
+                } else {
+                    tr_error("M2MObject::handle_put_request() - COAP_MSG_CODE_RESPONSE_BAD_REQUEST - Empty URI_QUERY");
+                    msg_code = COAP_MSG_CODE_RESPONSE_BAD_REQUEST;
                 }
+            } else {
+                tr_error("M2MObject::handle_put_request() - COAP_MSG_CODE_RESPONSE_BAD_REQUEST -Payload exists");
+                msg_code = COAP_MSG_CODE_RESPONSE_BAD_REQUEST;
             }
         } else {
             // Operation is not allowed.
-            tr_error("M2MObject::handle_put_request() - COAP_MSG_CODE_RESPONSE_BAD_REQUEST");
+            tr_error("M2MObject::handle_put_request() - COAP_MSG_CODE_RESPONSE_METHOD_NOT_ALLOWED");
             msg_code = COAP_MSG_CODE_RESPONSE_METHOD_NOT_ALLOWED;
         }
     } else {
@@ -378,6 +385,7 @@ sn_coap_hdr_s* M2MObject::handle_put_request(nsdl_s *nsdl,
     }
     return coap_response;
 }
+
 
 sn_coap_hdr_s* M2MObject::handle_post_request(nsdl_s *nsdl,
                                               sn_coap_hdr_s *received_coap_header,

@@ -469,3 +469,8 @@ bool M2MReportHandler::check_gt_lt_params()
     tr_debug("M2MReportHandler::check_gt_lt_params - value in range = %d", (int)can_send);
     return can_send;
 }
+
+uint8_t M2MReportHandler::attribute_flags()
+{
+    return _attribute_state;
+}

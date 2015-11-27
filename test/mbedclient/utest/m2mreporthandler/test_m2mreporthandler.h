@@ -41,6 +41,8 @@ public:
 
     void test_timers();
 
+    void test_attribute_flags();
+
     M2MReportHandler *_handler;
     Observer         * _observer;
 };
