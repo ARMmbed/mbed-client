@@ -22,6 +22,7 @@
 namespace m2mreporthandler_stub
 {
     extern bool bool_return;
+    extern u_int8_t int_value;
     void clear();
 }
 

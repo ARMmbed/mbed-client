@@ -369,7 +369,7 @@ sn_coap_hdr_s* M2MObject::handle_put_request(nsdl_s *nsdl,
                     msg_code = COAP_MSG_CODE_RESPONSE_BAD_REQUEST;
                 }
             } else {
-                tr_error("M2MObject::handle_put_request() - COAP_MSG_CODE_RESPONSE_BAD_REQUEST -Payload e");
+                tr_error("M2MObject::handle_put_request() - COAP_MSG_CODE_RESPONSE_BAD_REQUEST -Payload exists");
                 msg_code = COAP_MSG_CODE_RESPONSE_BAD_REQUEST;
             }
         } else {
@@ -385,6 +385,7 @@ sn_coap_hdr_s* M2MObject::handle_put_request(nsdl_s *nsdl,
     }
     return coap_response;
 }
+
 
 sn_coap_hdr_s* M2MObject::handle_post_request(nsdl_s *nsdl,
                                               sn_coap_hdr_s *received_coap_header,

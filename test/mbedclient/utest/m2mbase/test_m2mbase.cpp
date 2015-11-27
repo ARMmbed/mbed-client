@@ -32,7 +32,7 @@ public:
     }
     void resource_to_be_deleted(const String &){visited=true;}
     void remove_object(M2MBase *){visited = true;}
-    void value_updated(M2MBase *,const String&,bool){visited = true;}
+    void value_updated(M2MBase *,const String&){visited = true;}
 
     void clear() {visited = false;}
     bool visited;
@@ -403,7 +403,10 @@ void Test_M2MBase::test_handle_observation_attribute()
 
     m2mreporthandler_stub::bool_return = true;
     ret = handle_observation_attribute(s);
+    CHECK(ret == true);
 
+    m2mreporthandler_stub::int_value = M2MReportHandler::Cancel;
+    ret = handle_observation_attribute(s);
     CHECK(ret == true);
 }
 
