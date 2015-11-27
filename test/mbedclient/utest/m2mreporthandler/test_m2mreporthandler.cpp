@@ -396,3 +396,10 @@ void Test_M2MReportHandler::test_timers()
     CHECK(_handler->_pmax_timer == NULL);
 }
 
+void Test_M2MReportHandler::test_attribute_flags()
+{
+    CHECK(_handler->attribute_flags() == 0);
+    _handler->_attribute_state = M2MReportHandler::Pmax | M2MReportHandler::Pmin |
+            M2MReportHandler::St | M2MReportHandler::Gt | M2MReportHandler::Lt | M2MReportHandler::Cancel;
+    CHECK(_handler->attribute_flags() == (1 << 6) - 1);
+}

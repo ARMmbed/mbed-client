@@ -71,3 +71,9 @@ TEST(M2MReportHandler, test_timers)
 {
     m2m_reporthandler->test_timers();
 }
+
+TEST(M2MReportHandler, test_attribute_flags)
+{
+    m2m_reporthandler->test_attribute_flags();
+}
+

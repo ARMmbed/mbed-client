@@ -128,7 +128,11 @@ bool M2MResourceInstance::handle_observation_attribute(char *&query)
         success = handler->parse_notification_attribute(query,
                 M2MBase::base_type(), _resource_type);
         if (success) {
-            handler->set_under_observation(true);
+            if ((handler->attribute_flags() & M2MReportHandler::Cancel) == 0) {
+                handler->set_under_observation(true);
+            } else {
+                handler->set_under_observation(false);
+            }
         }
         else {
             handler->set_default_values();

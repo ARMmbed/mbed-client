@@ -46,6 +46,18 @@ public:
 public:
 
     /**
+     * Enum defining which write attributes are set.
+    */
+    enum {
+        Cancel = 1,
+        Pmin = 2,
+        Pmax = 4,
+        Lt = 8,
+        Gt = 16,
+        St = 32
+    };
+
+    /**
      * Destructor
      */
     virtual ~M2MReportHandler();
@@ -86,6 +98,10 @@ public:
     */
     void set_default_values();
 
+    /**
+     * @brief Return write attribute flags.
+     */
+    uint8_t attribute_flags();
 
 protected : // from M2MTimerObserver
 
@@ -94,14 +110,7 @@ protected : // from M2MTimerObserver
 
 private:
 
-    enum {
-        Cancel = 1,
-        Pmin = 2,
-        Pmax = 4,
-        Lt = 8,
-        Gt = 16,
-        St = 32
-    };
+
 
     bool set_notification_attribute(char* option,
             M2MBase::BaseType type,
