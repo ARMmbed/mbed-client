@@ -124,7 +124,7 @@ bool M2MResourceInstance::handle_observation_attribute(char *&query)
     tr_debug("M2MResourceInstance::handle_observation_attribute()");
     bool success = false;
     M2MReportHandler *handler = M2MBase::report_handler();
-    if (handler) {        
+    if (handler) {
         success = handler->parse_notification_attribute(query,
                 M2MBase::base_type(), _resource_type);
         if (success) {
