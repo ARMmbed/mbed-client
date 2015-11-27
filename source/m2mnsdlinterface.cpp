@@ -473,7 +473,7 @@ uint8_t M2MNsdlInterface::received_from_server_callback(struct nsdl_s * /*nsdl_h
                                     if(obj_instance) {
                                         obj_instance->set_operation(M2MBase::GET_PUT_POST_ALLOWED);
                                         coap_response = obj_instance->handle_post_request(_nsdl_handle,coap_header,this);
-                                    }                                    
+                                    }
                                     if(coap_response && coap_response->msg_code != COAP_MSG_CODE_RESPONSE_CREATED) {
                                         //Invalid request so remove created ObjectInstance
                                         object->remove_object_instance(instance_id);
@@ -730,8 +730,7 @@ void M2MNsdlInterface::resource_to_be_deleted(const String &resource_name)
 }
 
 void M2MNsdlInterface::value_updated(M2MBase *base,
-                                     const String &object_name,
-                                     bool update_register )
+                                     const String &object_name)
 {
     tr_debug("M2MNsdlInterface::value_updated()");
     if(base) {
@@ -756,9 +755,6 @@ void M2MNsdlInterface::value_updated(M2MBase *base,
         }
     }
     _observer.value_updated(base);
-    if(update_register) {
-        send_update_registration();
-    }
 }
 
 void M2MNsdlInterface::remove_object(M2MBase *object)
