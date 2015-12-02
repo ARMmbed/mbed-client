@@ -198,23 +198,26 @@ bool M2MResourceInstance::set_value(const uint8_t *value,
 void M2MResourceInstance::report()
 {
     tr_debug("M2MResourceInstance::report()");
+    M2MBase::Observation  observation_level = M2MBase::observation_level();
+    if(M2MBase::O_Attribute == observation_level ||
+       M2MBase::OI_Attribute == observation_level||
+       M2MBase::OOI_Attribute == observation_level) {
+        _object_instance_callback.notification_update(observation_level);
+    }
+
     if(M2MBase::Dynamic == mode()) {
-        M2MReportHandler *report_handler = M2MBase::report_handler();
-        if(report_handler && _resource_type != M2MResourceInstance::STRING) {
-            if(_value) {
-                report_handler->set_value(atof((const char*)_value));
-            } else {
-                report_handler->set_value(0);
-            }
-            M2MBase::Observation  observation_level = M2MBase::observation_level();
-            if(M2MBase::O_Attribute == observation_level ||
-               M2MBase::OI_Attribute == observation_level||
-               M2MBase::OOI_Attribute == observation_level) {
-                _object_instance_callback.notification_update(observation_level);
+        if(!_resource_callback && _resource_type != M2MResourceInstance::STRING) {
+            M2MReportHandler *report_handler = M2MBase::report_handler();
+            if (report_handler) {
+                if(_value) {
+                    report_handler->set_value(atof((const char*)_value));
+                } else {
+                    report_handler->set_value(0);
+                }
             }
         }
         else {
-            if (_resource_callback && base_type() == M2MBase::ResourceInstance) {
+            if (base_type() == M2MBase::ResourceInstance) {
                 _resource_callback->notification_update();
             }
         }
@@ -224,7 +227,7 @@ void M2MResourceInstance::report()
             observation_handler->value_updated(this);
         }
     } else {
-        tr_debug("M2MResourceInstance::report() - Not supported mode");
+        tr_debug("M2MResourceInstance::report() - mode = %d, is_observable = %d", mode(), is_observable());
     }
 }
 
