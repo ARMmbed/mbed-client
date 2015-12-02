@@ -466,7 +466,7 @@ uint8_t M2MNsdlInterface::received_from_server_callback(struct nsdl_s * /*nsdl_h
                             int32_t instance_id = atoi(resource_name.substr(slash_found+1,
                                                      resource_name.size()-object_name.size()).c_str());
                             M2MBase* base = find_resource(object_name);
-                            if(base && (instance_id >= 0) && (instance_id < 65536)) {
+                            if(base && (instance_id >= 0) && (instance_id < 65535)) {
                                 if(coap_header->payload_ptr) {
                                     M2MObject* object = (M2MObject*)base;
                                     M2MObjectInstance *obj_instance = object->create_object_instance(instance_id);
