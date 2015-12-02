@@ -214,8 +214,7 @@ void Test_M2MResourceInstance::test_set_value()
     u_int8_t value[] = {"value2"};
     resource_instance->_value = (u_int8_t*)malloc(sizeof(u_int8_t));
 
-    ResourceCallback *resource_cb = new ResourceCallback();
-    resource_instance->set_resource_observer(resource_cb);
+
 
     CHECK(resource_instance->set_value(value,(u_int32_t)sizeof(value)) == true);
     CHECK( resource_instance->_value_length == sizeof(value));
@@ -240,6 +239,8 @@ void Test_M2MResourceInstance::test_set_value()
     memset(resource_instance->_value,0,sizeof(value)+1);
     memcpy(resource_instance->_value,value,sizeof(value));
     resource_instance->_value_length = sizeof(value);    
+    TestReportObserver obs;
+    m2mbase_stub::report = new M2MReportHandler(obs);
 
     u_int8_t value4[] = {"value4"};
     CHECK(resource_instance->set_value(value4,(u_int32_t)sizeof(value4)) == true);
@@ -250,10 +251,10 @@ void Test_M2MResourceInstance::test_set_value()
     resource_instance->_resource_type = M2MResourceInstance::INTEGER;
     m2mbase_stub::mode_value = M2MBase::Dynamic;
     CHECK(resource_instance->set_value(value2,(u_int32_t)sizeof(value2)) == true);
-    CHECK(resource_cb->visited == true);
+    //CHECK(resource_cb->visited == true);
 
-    TestReportObserver obs;
-    m2mbase_stub::report = new M2MReportHandler(obs);
+    ResourceCallback *resource_cb = new ResourceCallback();
+    resource_instance->set_resource_observer(resource_cb);
 
     CHECK(resource_instance->set_value(value2,(u_int32_t)sizeof(value2)) == true);
 

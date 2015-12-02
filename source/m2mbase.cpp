@@ -19,6 +19,7 @@
 #include "mbed-client/m2mtimer.h"
 #include "include/m2mreporthandler.h"
 #include "include/nsdllinker.h"
+#include "ns_trace.h"
 #include <ctype.h>
 #include <string.h>
 
@@ -175,13 +176,15 @@ void M2MBase::remove_observation_level(M2MBase::Observation observation_level)
 void M2MBase::set_under_observation(bool observed,
                                     M2MObservationHandler *handler)
 {
+
+    tr_debug("M2MBase::set_under_observation - observed: %d", observed);
     _observation_handler = handler;
-    if(handler) {
+    if(observed) {
         if (_base_type != M2MBase::ResourceInstance) {
             if(!_report_handler){
                 _report_handler = new M2MReportHandler(*this);
             }
-            _report_handler->set_under_observation(observed);
+            _report_handler->set_under_observation(true);
         }
     } else {
         if(_report_handler) {
@@ -296,6 +299,7 @@ uint16_t M2MBase::observation_number() const
 
 bool M2MBase::handle_observation_attribute(char *&query)
 {
+    tr_debug("M2MBase::handle_observation_attribute");
     bool success = false;
     if(_report_handler) {
         success = _report_handler->parse_notification_attribute(query,_base_type);
