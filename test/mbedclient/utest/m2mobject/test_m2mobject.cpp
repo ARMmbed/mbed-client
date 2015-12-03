@@ -492,9 +492,6 @@ void Test_M2MObject::test_handle_put_request()
 
     m2mbase_stub::operation = M2MBase::PUT_ALLOWED;
 
-
-
-
     free(coap_header->payload_ptr);
     coap_header->payload_ptr = NULL;
     coap_response = object->handle_put_request(NULL,coap_header,handler);
