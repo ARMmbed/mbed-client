@@ -134,6 +134,7 @@ void Test_M2MTLVDeserializer::test_deserialise_object_instances()
     delete serializer;
 
     CHECK(M2MTLVDeserializer::None == deserializer->deserialise_object_instances(data,size,*object,M2MTLVDeserializer::Post));
+    CHECK(M2MTLVDeserializer::None == deserializer->deserialise_object_instances(data,size,*object,M2MTLVDeserializer::Put));
 
     size = 0;
 
@@ -175,11 +176,27 @@ void Test_M2MTLVDeserializer::test_deserialise_object_instances()
     m2mresource_stub::bool_value = true;
     m2mresource_stub::list.push_back(res_instance);
     m2mresource_stub::list.push_back(res_instance_1);
+
+    m2mobject_stub::instance_list.pop_back();
+
     serializer = new M2MTLVSerializer();
     data = serializer->serialize( m2mobject_stub::instance_list,size);
     delete serializer;
 
+    m2mbase_stub::operation = M2MBase::GET_PUT_POST_ALLOWED;
+
+    m2mbase_stub::string_value = new String("name");
+    m2mobjectinstance_stub::create_resource_instance = new M2MResource(*instance,
+                                                                       *name,
+                                                                       *name,
+                                                                       M2MResourceInstance::INTEGER,
+                                                                       M2MResource::Dynamic,
+                                                                       false);
+
     deserializer->deserialise_object_instances(data,size,*object,M2MTLVDeserializer::Post);
+
+    deserializer->deserialise_object_instances(data,size,*object,M2MTLVDeserializer::Put);
+
     size = 0;
     if(data) {
         free(data);
@@ -195,6 +212,7 @@ void Test_M2MTLVDeserializer::test_deserialise_object_instances()
     delete serializer;
 
     deserializer->deserialise_object_instances(data,size,*object, M2MTLVDeserializer::Post);
+    deserializer->deserialise_object_instances(data,size,*object, M2MTLVDeserializer::Put);
     size = 0;
 
     if(data) {
@@ -210,7 +228,8 @@ void Test_M2MTLVDeserializer::test_deserialise_object_instances()
     data = serializer->serialize( m2mobject_stub::instance_list,size);
     delete serializer;
 
-    deserializer->deserialise_object_instances(data,size,*object,M2MTLVDeserializer::Post);
+    deserializer->deserialise_object_instances(data,size,*object,M2MTLVDeserializer::Post);    
+    deserializer->deserialise_object_instances(data,size,*object,M2MTLVDeserializer::Put);
     size = 0;
 
     if(data) {
@@ -227,6 +246,7 @@ void Test_M2MTLVDeserializer::test_deserialise_object_instances()
     delete serializer;
 
    deserializer->deserialise_object_instances(data,size,*object,M2MTLVDeserializer::Post);
+   deserializer->deserialise_object_instances(data,size,*object,M2MTLVDeserializer::Put);
     size = 0;
 
     if(data) {
@@ -236,6 +256,12 @@ void Test_M2MTLVDeserializer::test_deserialise_object_instances()
 
     free(m2mresourceinstance_stub::value);
     m2mresourceinstance_stub::value = NULL;
+
+    delete m2mbase_stub::string_value;
+    m2mbase_stub::string_value = NULL;
+
+    delete m2mobjectinstance_stub::create_resource_instance;
+    m2mobjectinstance_stub::create_resource_instance = NULL;
 
     delete res_instance;
     delete res_instance_1;
@@ -307,20 +333,33 @@ void Test_M2MTLVDeserializer::test_deserialize_resources()
     m2mresource_stub::bool_value = true;
     m2mresource_stub::list.push_back(res_instance);
 
-    M2MResourceInstance* res_instance_1 = new M2MResourceInstance("2",
-                                                                *name,
-                                                                M2MResourceInstance::INTEGER,
-                                                                *instance);
+//    M2MResourceInstance* res_instance_1 = new M2MResourceInstance("2",
+//                                                                *name,
+//                                                                M2MResourceInstance::INTEGER,
+//                                                                *instance);
 
-    m2mresource_stub::list.push_back(res_instance_1);
+//    m2mresource_stub::list.push_back(res_instance_1);
 
     uint8_t data_multiple_resource[] = {0x86,0x6, 0x81,0x0, 0x01, 0x41, 0x01, 0x05};
     CHECK(deserializer->is_multiple_resource(data_multiple_resource) == true);
-    deserializer->deserialize_resources(data_multiple_resource,sizeof(data_resource),*instance,M2MTLVDeserializer::Post);
+    deserializer->deserialize_resources(data_multiple_resource,sizeof(data_multiple_resource),*instance,M2MTLVDeserializer::Post);
 
+    M2MTLVSerializer *serializer = new M2MTLVSerializer();
+
+    m2mbase_stub::name_id_value = 1;
+    uint32_t size = 0;
+    uint8_t* data = serializer->serialize(resource,size);
+
+    delete serializer;
+
+    m2mbase_stub::operation = M2MBase::GET_PUT_POST_ALLOWED;
+
+    deserializer->deserialize_resources(data,size,*instance,M2MTLVDeserializer::Post);
+
+    free(data);
 
     delete res_instance;
-    delete res_instance_1;
+//    delete res_instance_1;
     delete resource;
     delete instance;
     delete object;
@@ -335,6 +374,8 @@ void Test_M2MTLVDeserializer::test_deserialize_resources()
 void Test_M2MTLVDeserializer::test_deserialize_resource_instance_1()
 {
     uint8_t data_resource[] = {0xC3,0x0,'A','R','M'};
+
+    m2mbase_stub::name_id_value = 1;
 
     String *name = new String("1");
     M2MObject *object = new M2MObject(*name);
@@ -384,8 +425,8 @@ void Test_M2MTLVDeserializer::test_deserialize_resource_instance_1()
 
     delete serializer;
 
-    deserializer->deserialize_resource_instances(/*data_multiple_resource,sizeof(data_resource)*/data,size,
-                                        *resource,M2MTLVDeserializer::Put);
+    deserializer->deserialize_resource_instances(data,size,
+                                                *resource,M2MTLVDeserializer::Put);
 
 
     free(data);
@@ -483,15 +524,17 @@ void Test_M2MTLVDeserializer::test_deserialize_resource_instance()
     data = serializer->serialize( resource,size);
     delete serializer;
 
+    m2mbase_stub::operation = M2MBase::GET_ALLOWED;
+
+    deserializer->deserialize_resource_instances(data,size,*resource,M2MTLVDeserializer::Post);
+
     m2mbase_stub::operation = M2MBase::GET_PUT_POST_ALLOWED;
-
-
     deserializer->deserialize_resource_instances(data,size,*resource,M2MTLVDeserializer::Post);
 
     m2mresource_stub::list.pop_back();
     m2mresource_stub::list.pop_back();
 
-    CHECK(M2MTLVDeserializer::NotAllowed == deserializer->deserialize_resource_instances(data,size,*resource,M2MTLVDeserializer::Post));
+    CHECK(M2MTLVDeserializer::NotAllowed ==deserializer->deserialize_resource_instances(data,size,*resource,M2MTLVDeserializer::Post));
 
     CHECK(M2MTLVDeserializer::NotFound == deserializer->deserialize_resource_instances(data,size,*resource,M2MTLVDeserializer::Put));
 
@@ -500,6 +543,18 @@ void Test_M2MTLVDeserializer::test_deserialize_resource_instance()
         free(data);
         data = 0;
     }
+
+    serializer = new M2MTLVSerializer();
+    data = serializer->serialize( resource,size);
+    delete serializer;
+
+    deserializer->deserialize_resource_instances(data,size,*resource,M2MTLVDeserializer::Put);
+    size = 0;
+    if(data) {
+        free(data);
+        data = 0;
+    }
+
     m2mresource_stub::list.push_back(res_instance);
     m2mresource_stub::list.push_back(res_instance_1);
 

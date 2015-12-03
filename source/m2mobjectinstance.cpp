@@ -646,7 +646,6 @@ sn_coap_hdr_s* M2MObjectInstance::handle_post_request(nsdl_s *nsdl,
                     }
                 }
             }
-            //coap_content_type = COAP_CONTENT_OMA_TLV_TYPE;
             if(!content_type_present &&
                M2MBase::coap_content_type() == COAP_CONTENT_OMA_TLV_TYPE) {
                 coap_content_type = COAP_CONTENT_OMA_TLV_TYPE;
