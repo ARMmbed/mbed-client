@@ -748,6 +748,7 @@ void Test_M2MObject::test_notification_update()
 {
     TestReportObserver obs;
     m2mbase_stub::report = new M2MReportHandler(obs);
+    m2mbase_stub::bool_value = true;
 
     object->notification_update();
 
