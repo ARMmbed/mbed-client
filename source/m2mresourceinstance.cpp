@@ -182,7 +182,7 @@ bool M2MResourceInstance::set_value(const uint8_t *value,
             _value_length = value_length;
             if(string_value_changed) {
                 M2MReportHandler *report_handler = M2MBase::report_handler();
-                if(report_handler) {
+                if(report_handler && is_observable()) {
                     report_handler->set_notification_trigger();
                 }
             } else {
@@ -208,7 +208,7 @@ void M2MResourceInstance::report()
     if(M2MBase::Dynamic == mode()) {
         if(!_resource_callback && _resource_type != M2MResourceInstance::STRING) {
             M2MReportHandler *report_handler = M2MBase::report_handler();
-            if (report_handler) {
+            if (report_handler && is_observable()) {
                 if(_value) {
                     report_handler->set_value(atof((const char*)_value));
                 } else {
@@ -217,7 +217,7 @@ void M2MResourceInstance::report()
             }
         }
         else {
-            if (base_type() == M2MBase::ResourceInstance) {
+            if (_resource_callback && base_type() == M2MBase::ResourceInstance) {
                 _resource_callback->notification_update();
             }
         }

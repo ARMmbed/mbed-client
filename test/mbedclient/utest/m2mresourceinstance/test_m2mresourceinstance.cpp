@@ -213,8 +213,7 @@ void Test_M2MResourceInstance::test_set_value()
 {
     u_int8_t value[] = {"value2"};
     resource_instance->_value = (u_int8_t*)malloc(sizeof(u_int8_t));
-
-
+    m2mbase_stub::bool_value = true;
 
     CHECK(resource_instance->set_value(value,(u_int32_t)sizeof(value)) == true);
     CHECK( resource_instance->_value_length == sizeof(value));
@@ -284,8 +283,7 @@ void Test_M2MResourceInstance::test_clear_value()
     u_int8_t value[] = {"value"};
     resource_instance->_value = (u_int8_t*)malloc(sizeof(u_int8_t));
 
-    m2mbase_stub::observe = handler;
-
+    m2mbase_stub::observe = handler;    
     TestReportObserver obs;
     m2mbase_stub::report = new M2MReportHandler(obs);
 
@@ -297,6 +295,7 @@ void Test_M2MResourceInstance::test_clear_value()
     CHECK( resource_instance->_value_length == 0);
     CHECK( resource_instance->_value == NULL);
 
+    m2mbase_stub::bool_value = true;
     m2mbase_stub::mode_value = M2MBase::Dynamic;
     resource_instance->_resource_type = M2MResourceInstance::INTEGER;
     resource_instance->clear_value();

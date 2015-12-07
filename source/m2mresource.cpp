@@ -174,7 +174,7 @@ bool M2MResource::handle_observation_attribute(char *&query)
                 it = _resource_instance_list.begin();
                 for ( ; it != _resource_instance_list.end(); it++ ) {
                     M2MReportHandler *report_handler = (*it)->report_handler();
-                    if(report_handler) {
+                    if(report_handler && is_observable()) {
                         report_handler->set_notification_trigger();
                     }
                 }

@@ -506,7 +506,7 @@ void M2MObject::notification_update()
 {
     tr_debug("M2MObject::notification_update");
     M2MReportHandler *report_handler = M2MBase::report_handler();
-    if(report_handler) {
+    if(report_handler && is_observable()) {
         report_handler->set_notification_trigger();
     }
 }

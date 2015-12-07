@@ -702,7 +702,7 @@ void M2MObjectInstance::notification_update(M2MBase::Observation observation_lev
         _object_callback.notification_update();
     } else {
         M2MReportHandler *report_handler = M2MBase::report_handler();
-        if(report_handler) {
+        if(report_handler && is_observable()) {
             report_handler->set_notification_trigger();
         }
     }
