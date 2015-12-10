@@ -349,6 +349,14 @@ bool M2MTLVDeserializer::is_object_instance(uint8_t *tlv, uint32_t offset)
     return ret;
 }
 
+uint16_t M2MTLVDeserializer::instance_id(uint8_t *tlv)
+{
+    TypeIdLength *til = TypeIdLength::createTypeIdLength(tlv, 0)->deserialize();
+    uint16_t id = til->_id;
+    delete til;
+    return id;
+}
+
 bool M2MTLVDeserializer::is_resource(uint8_t *tlv, uint32_t offset)
 {
     bool ret = false;

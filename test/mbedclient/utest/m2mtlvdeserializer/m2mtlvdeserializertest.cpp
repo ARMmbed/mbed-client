@@ -116,3 +116,8 @@ TEST(M2MTLVDeserializer, test_deserialize_resource_instance)
     m2m_deserializer->test_deserialize_resource_instance();
 }
 
+TEST(M2MTLVDeserializer, test_instance_id)
+{
+    m2m_deserializer->test_instance_id();
+}
+

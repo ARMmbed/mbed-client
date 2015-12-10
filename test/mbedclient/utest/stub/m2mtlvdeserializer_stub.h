@@ -22,6 +22,7 @@
 namespace m2mtlvdeserializer_stub
 {
     extern bool bool_value;
+    extern uint16_t int_value;
     extern bool is_object_bool_value;
     extern M2MTLVDeserializer::Error error;
     void clear();

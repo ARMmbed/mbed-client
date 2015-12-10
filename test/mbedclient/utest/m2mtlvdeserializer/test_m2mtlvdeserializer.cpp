@@ -618,3 +618,12 @@ void Test_M2MTLVDeserializer::test_deserialize_resource_instance()
     delete instance_1;
     delete object;
 }
+
+void Test_M2MTLVDeserializer::test_instance_id()
+{
+    uint8_t data_resource[] = {0xC3,0x1};
+    uint8_t data_object[] = {0x08,0x2};
+
+    CHECK(deserializer->instance_id(data_resource) == 1);
+    CHECK(deserializer->instance_id(data_object) == 2);
+}
