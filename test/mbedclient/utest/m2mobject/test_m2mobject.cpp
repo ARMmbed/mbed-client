@@ -624,6 +624,7 @@ void Test_M2MObject::test_handle_post_request()
     m2mbase_stub::operation = M2MBase::POST_ALLOWED;
     m2mtlvdeserializer_stub::is_object_bool_value = true;
     m2mtlvdeserializer_stub::bool_value = false;
+    m2mtlvdeserializer_stub::int_value = 10;
     m2mbase_stub::bool_value = false;
 
     m2mtlvdeserializer_stub::error = M2MTLVDeserializer::NotAllowed;
@@ -723,6 +724,20 @@ void Test_M2MObject::test_handle_post_request()
     }
 
     coap_response = object->handle_post_request(NULL,NULL,handler);
+
+    CHECK( coap_response != NULL);
+    if(coap_response) {
+        if(coap_response->content_type_ptr) {
+            free(coap_response->content_type_ptr);
+            coap_response->content_type_ptr = NULL;
+        }
+    }
+
+    m2mbase_stub::operation = M2MBase::POST_ALLOWED;
+    m2mtlvdeserializer_stub::int_value = 0;
+    m2mtlvdeserializer_stub::is_object_bool_value = true;
+    *coap_header->content_type_ptr = 99;
+    coap_response = object->handle_post_request(NULL,coap_header,handler);
 
     CHECK( coap_response != NULL);
     if(coap_response) {

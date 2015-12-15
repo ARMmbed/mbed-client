@@ -18,12 +18,14 @@
 bool m2mtlvdeserializer_stub::bool_value;
 bool m2mtlvdeserializer_stub::is_object_bool_value;
 M2MTLVDeserializer::Error m2mtlvdeserializer_stub::error;
+uint16_t m2mtlvdeserializer_stub::int_value;
 
 void m2mtlvdeserializer_stub::clear()
 {
     bool_value = false;
     is_object_bool_value = false;
     error = M2MTLVDeserializer::None;
+    int_value = 0;
 }
 
 M2MTLVDeserializer::M2MTLVDeserializer()
@@ -95,4 +97,9 @@ void TypeIdLength::deserialiseID(uint32_t idLength)
 
 void TypeIdLength::deserialiseLength(uint32_t lengthType)
 {
+}
+
+uint16_t M2MTLVDeserializer::instance_id(uint8_t *tlv)
+{
+    return m2mtlvdeserializer_stub::int_value;
 }

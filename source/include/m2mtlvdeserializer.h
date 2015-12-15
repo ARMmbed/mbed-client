@@ -115,7 +115,12 @@ public :
                                                              uint32_t tlv_size,
                                                              M2MResource &resource,
                                                              M2MTLVDeserializer::Operation operation);
-
+    /**
+     * This method return object instance id or resource id.
+     * @param tlv Binary to be checked
+     * @return Object instance id or resource id.
+     */
+    uint16_t instance_id(uint8_t *tlv);
     
 private:
 
