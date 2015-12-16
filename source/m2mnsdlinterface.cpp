@@ -107,7 +107,7 @@ bool M2MNsdlInterface::initialize()
     bool success = false;
 
     //Sets the packet retransmission attempts and time interval
-    sn_nsdl_set_retransmission_parameters(_nsdl_handle, RETRY_COUNT, RETRY_INTERVAL);
+    sn_coap_protocol_set_retransmission_parameters(RETRY_COUNT,RETRY_INTERVAL);
 
     _nsdl_exceution_timer->start_timer(ONE_SECOND_TIMER * 1000,
                                        M2MTimerObserver::NsdlExecution,
