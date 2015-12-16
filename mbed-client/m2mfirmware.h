@@ -54,7 +54,7 @@ public:
      * @brief Enum defining the state of the firmware update.
      */
     typedef enum {
-       Idle = 1,
+       Idle = 0,
        Downloading,
        Downloaded
     } UpdateState;
