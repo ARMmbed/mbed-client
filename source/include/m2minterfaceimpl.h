@@ -88,14 +88,14 @@ public:
      * @param security_object, Security object which contains information
      * required for successful bootstrapping of the client.
      */
-    void bootstrap(M2MSecurity *security);
+    virtual void bootstrap(M2MSecurity *security);
 
     /**
      * @brief Cancels on going bootstrapping operation of the client. If the client has
      * already successfully bootstrapped then this function deletes existing
      * bootstrap information from the client.
      */
-    void cancel_bootstrap();
+    virtual void cancel_bootstrap();
 
     /**
      * @brief Initiates registration of the provided Security object to the
@@ -107,7 +107,7 @@ public:
      * @param object_list, Objects which contains information
      * which the client want to register to the LWM2M server.
      */
-    void register_object(M2MSecurity *security_object, const M2MObjectList &object_list);
+    virtual void register_object(M2MSecurity *security_object, const M2MObjectList &object_list);
 
     /**
      * @brief Updates or refreshes the client's registration on the LWM2M
@@ -125,7 +125,7 @@ public:
      * needs to be unregistered, if there is only one LWM2M server registered
      * then this parameter can be NULL.
      */
-    void unregister_object(M2MSecurity* security = NULL);
+    virtual void unregister_object(M2MSecurity* security = NULL);
 
     /**
      * @brief Sets the function which will be called indicating client
@@ -133,7 +133,7 @@ public:
      * @param callback, Function pointer which will be called when client
      * goes to seleep.
      */
-    void set_queue_sleep_handler(callback_handler handler);
+    virtual void set_queue_sleep_handler(callback_handler handler);
 
 protected: // From M2MNsdlObserver
 
@@ -143,7 +143,7 @@ protected: // From M2MNsdlObserver
 
     virtual void client_registered(M2MServer *server_object);
 
-    void registration_updated(const M2MServer &server_object);
+    virtual void registration_updated(const M2MServer &server_object);
 
     virtual void registration_error(uint8_t error_code);
 
@@ -169,11 +169,12 @@ protected: // From M2MConnectionObserver
                                M2MConnectionObserver::ServerType server_type,
                                const uint16_t server_port);
 
-    void data_sent();
+    virtual void data_sent();
 
 protected: // from M2MTimerObserver
 
-    void timer_expired(M2MTimerObserver::Type type);
+    virtual void timer_expired(M2MTimerObserver::Type type);
+
 
 private: // state machine state functions
 

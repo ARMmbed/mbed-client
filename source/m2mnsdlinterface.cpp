@@ -107,7 +107,7 @@ bool M2MNsdlInterface::initialize()
     bool success = false;
 
     //Sets the packet retransmission attempts and time interval
-    sn_coap_protocol_set_retransmission_parameters(RETRY_COUNT,RETRY_INTERVAL);
+    sn_nsdl_set_retransmission_parameters(_nsdl_handle, RETRY_COUNT, RETRY_INTERVAL);
 
     _nsdl_exceution_timer->start_timer(ONE_SECOND_TIMER * 1000,
                                        M2MTimerObserver::NsdlExecution,
@@ -373,8 +373,9 @@ uint8_t M2MNsdlInterface::received_from_server_callback(struct nsdl_s * /*nsdl_h
                         if( max_time > 0) {
                             char *buffer = (char*)memory_alloc(20);
                             if(buffer) {
-                                int size = snprintf(buffer, 20,"%lu",(uint32_t)max_time);
+                                int size = snprintf(buffer, 20,"%ld",(long int)max_time);
                                 _endpoint->lifetime_ptr = (uint8_t*)memory_alloc(size+1);
+
                                 if(_endpoint->lifetime_ptr) {
                                     memset(_endpoint->lifetime_ptr, 0, size+1);
                                     memcpy(_endpoint->lifetime_ptr,buffer,size);

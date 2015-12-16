@@ -210,13 +210,13 @@ protected: // from M2MTimerObserver
 
 protected: // from M2MObservationHandler
 
-    void observation_to_be_sent(M2MBase *object);
+    virtual void observation_to_be_sent(M2MBase *object);
 
-    void resource_to_be_deleted(const String &resource_name);
+    virtual void resource_to_be_deleted(const String &resource_name);
 
-    void value_updated(M2MBase *base, const String &object_name);
+    virtual void value_updated(M2MBase *base, const String &object_name);
 
-    void remove_object(M2MBase *object);
+    virtual void remove_object(M2MBase *object);
 
 private:
 

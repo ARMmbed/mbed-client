@@ -160,11 +160,11 @@ M2MResource* M2MFirmware::create_resource(FirmwareResource resource, int64_t val
             if(res) {
                 char *buffer = (char*)memory_alloc(20);
                 if(buffer) {
-                    int size = snprintf(buffer, 20,"%lld",value);
+                    int size = snprintf(buffer, 20,"%lld",(long long int)value);
 
                     res->set_operation(operation);
                     res->set_value((const uint8_t*)buffer,
-                                   (const uint32_t)size);
+                                   (uint32_t)size);
                     memory_free(buffer);
                 }
             }
@@ -209,9 +209,9 @@ bool M2MFirmware::set_resource_value(FirmwareResource resource,
             if (check_value_range(resource, value)) {
                 char *buffer = (char*)memory_alloc(20);
                 if(buffer) {
-                    int size = snprintf(buffer, 20,"%lld",value);
+                    int size = snprintf(buffer, 20,"%lld",(long long int)value);
                     success = res->set_value((const uint8_t*)buffer,
-                                             (const uint32_t)size);
+                                             (uint32_t)size);
                     memory_free(buffer);
                 }
             }

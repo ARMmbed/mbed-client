@@ -182,7 +182,7 @@ public:
                                                M2MObservationHandler *observation_handler = NULL);
 
 protected:
-    void notification_update();
+    virtual void notification_update();
 
 private:
 

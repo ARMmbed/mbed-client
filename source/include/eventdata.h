@@ -37,7 +37,7 @@ class M2MSecurityData : public EventData
 public:
     M2MSecurityData()
     :_object(NULL){}
-    ~M2MSecurityData() {}
+    virtual ~M2MSecurityData() {}
     M2MSecurity  *_object;
 };
 
@@ -47,7 +47,7 @@ public:
     ResolvedAddressData()
     :_address(NULL),
     _port(0){}
-    ~ResolvedAddressData() {}
+    virtual ~ResolvedAddressData() {}
     const M2MConnectionObserver::SocketAddress    *_address;
     uint16_t                                       _port;
 };
@@ -60,7 +60,7 @@ public:
     _size(0),
     _port(0),
     _address(NULL){}
-    ~ReceivedData() {}
+    virtual ~ReceivedData() {}
     uint8_t                                         *_data;
     uint16_t                                        _size;
     uint16_t                                        _port;
@@ -72,7 +72,7 @@ class M2MRegisterData : public EventData
 public:
     M2MRegisterData()
     :_object(NULL){}
-    ~M2MRegisterData() {}
+    virtual ~M2MRegisterData() {}
     M2MSecurity     *_object;
     M2MObjectList    _object_list;
 };
@@ -83,7 +83,7 @@ public:
     M2MUpdateRegisterData()
     :_object(NULL),
     _lifetime(0){}
-    ~M2MUpdateRegisterData() {}
+    virtual ~M2MUpdateRegisterData() {}
     M2MSecurity     *_object;
     uint32_t        _lifetime;
 };
