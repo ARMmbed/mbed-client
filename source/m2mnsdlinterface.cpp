@@ -543,8 +543,16 @@ uint8_t M2MNsdlInterface::resource_callback(struct nsdl_s */*nsdl_handle*/,
                 M2MBase* base_object = find_resource(base->name());
                 if(base_object) {
                     M2MObject *object = (M2MObject*)base_object;
-                    object->remove_object_instance(object->instance_id());
-                    msg_code = COAP_MSG_CODE_RESPONSE_DELETED;
+                    int slash_found = resource_name.find_last_of('/');
+                    // Object instance validty checks done in upper level, no need for error handling
+                    if(slash_found != -1) {
+                        String object_name;
+                        object_name = resource_name.substr(slash_found + 1, resource_name.length());
+                        if (object->remove_object_instance(strtoul(
+                                object_name.c_str(), NULL, 10))) {
+                            msg_code = COAP_MSG_CODE_RESPONSE_DELETED;
+                        }
+                    }
                 }
             } else {
                 msg_code = COAP_MSG_CODE_RESPONSE_BAD_REQUEST; // 4.00
