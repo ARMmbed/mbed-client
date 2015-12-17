@@ -835,6 +835,7 @@ void Test_M2MNsdlInterface::test_resource_callback_delete()
     M2MObjectInstance* instance = new M2MObjectInstance(*name,*object);
     m2mbase_stub::int_value = 0;
     m2mobject_stub::int_value = 1;
+    m2mobject_stub::bool_value = true;
     m2mobject_stub::instance_list.push_back(instance);
 
     nsdl->_object_list.push_back(object);
