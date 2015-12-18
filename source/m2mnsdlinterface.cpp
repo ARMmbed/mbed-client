@@ -1361,9 +1361,10 @@ void M2MNsdlInterface::send_resource_observation(M2MResource *resource)
         }
 
         resource->get_observation_token(token,token_length);
-
+        uint8_t content_type = 0;
         if (resource->resource_instance_count() > 0) {
             M2MTLVSerializer *serializer = new M2MTLVSerializer();
+            content_type = COAP_CONTENT_OMA_TLV_TYPE;
             if(serializer) {
                 value = serializer->serialize(resource, length);
                 delete serializer;
@@ -1379,7 +1380,7 @@ void M2MNsdlInterface::send_resource_observation(M2MResource *resource)
                                               observation_number,
                                               observation_number_length,
                                               COAP_MSG_TYPE_CONFIRMABLE,
-                                              resource->coap_content_type());
+                                              content_type);
         memory_free(value);
         memory_free(token);
     }
