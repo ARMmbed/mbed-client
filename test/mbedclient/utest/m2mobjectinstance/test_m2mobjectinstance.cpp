@@ -811,23 +811,75 @@ void Test_M2MObjectInstance::test_handle_post_request()
 
     coap_response = object->handle_post_request(NULL,coap_header,handler);
     CHECK( coap_response != NULL);
-
+    if(coap_response) {
+        if(coap_response->content_type_ptr) {
+            free(coap_response->content_type_ptr);
+            coap_response->content_type_ptr = NULL;
+        }
+        if (coap_response->options_list_ptr) {
+            if (coap_response->options_list_ptr->location_path_ptr) {
+                free(coap_response->options_list_ptr->location_path_ptr);
+                coap_response->options_list_ptr->location_path_ptr = NULL;
+            }
+            free(coap_response->options_list_ptr);
+            coap_response->options_list_ptr = NULL;
+        }
+    }
 
     m2mbase_stub::uint8_value = 100;
 
     coap_response = object->handle_post_request(NULL,coap_header,handler);
     CHECK( coap_response != NULL);
-
+    if(coap_response) {
+        if(coap_response->content_type_ptr) {
+            free(coap_response->content_type_ptr);
+            coap_response->content_type_ptr = NULL;
+        }
+        if (coap_response->options_list_ptr) {
+            if (coap_response->options_list_ptr->location_path_ptr) {
+                free(coap_response->options_list_ptr->location_path_ptr);
+                coap_response->options_list_ptr->location_path_ptr = NULL;
+            }
+            free(coap_response->options_list_ptr);
+            coap_response->options_list_ptr = NULL;
+        }
+    }
     coap_header->payload_ptr = (uint8_t*)malloc(1);
 
     coap_response = object->handle_post_request(NULL,coap_header,handler);
     CHECK( coap_response != NULL);
-
+    if(coap_response) {
+        if(coap_response->content_type_ptr) {
+            free(coap_response->content_type_ptr);
+            coap_response->content_type_ptr = NULL;
+        }
+        if (coap_response->options_list_ptr) {
+            if (coap_response->options_list_ptr->location_path_ptr) {
+                free(coap_response->options_list_ptr->location_path_ptr);
+                coap_response->options_list_ptr->location_path_ptr = NULL;
+            }
+            free(coap_response->options_list_ptr);
+            coap_response->options_list_ptr = NULL;
+        }
+    }
     m2mbase_stub::uint8_value = 99;
 
     coap_response = object->handle_post_request(NULL,coap_header,handler);
     CHECK( coap_response != NULL);
-
+    if(coap_response) {
+        if(coap_response->content_type_ptr) {
+            free(coap_response->content_type_ptr);
+            coap_response->content_type_ptr = NULL;
+        }
+        if (coap_response->options_list_ptr) {
+            if (coap_response->options_list_ptr->location_path_ptr) {
+                free(coap_response->options_list_ptr->location_path_ptr);
+                coap_response->options_list_ptr->location_path_ptr = NULL;
+            }
+            free(coap_response->options_list_ptr);
+            coap_response->options_list_ptr = NULL;
+        }
+    }
 
     m2mbase_stub::uint8_value = 0;
 
@@ -851,6 +903,14 @@ void Test_M2MObjectInstance::test_handle_post_request()
             free(coap_response->content_type_ptr);
             coap_response->content_type_ptr = NULL;
         }
+        if (coap_response->options_list_ptr) {
+            if (coap_response->options_list_ptr->location_path_ptr) {
+                free(coap_response->options_list_ptr->location_path_ptr);
+                coap_response->options_list_ptr->location_path_ptr = NULL;
+            }
+            free(coap_response->options_list_ptr);
+            coap_response->options_list_ptr = NULL;
+        }
     }
 
     m2mbase_stub::operation = M2MBase::POST_ALLOWED;
@@ -868,6 +928,14 @@ void Test_M2MObjectInstance::test_handle_post_request()
             free(coap_response->content_type_ptr);
             coap_response->content_type_ptr = NULL;
         }
+        if (coap_response->options_list_ptr) {
+            if (coap_response->options_list_ptr->location_path_ptr) {
+                free(coap_response->options_list_ptr->location_path_ptr);
+                coap_response->options_list_ptr->location_path_ptr = NULL;
+            }
+            free(coap_response->options_list_ptr);
+            coap_response->options_list_ptr = NULL;
+        }
     }
 
     m2mtlvdeserializer_stub::error = M2MTLVDeserializer::NotValid;
@@ -879,6 +947,14 @@ void Test_M2MObjectInstance::test_handle_post_request()
         if(coap_response->content_type_ptr) {
             free(coap_response->content_type_ptr);
             coap_response->content_type_ptr = NULL;
+        }
+        if (coap_response->options_list_ptr) {
+            if (coap_response->options_list_ptr->location_path_ptr) {
+                free(coap_response->options_list_ptr->location_path_ptr);
+                coap_response->options_list_ptr->location_path_ptr = NULL;
+            }
+            free(coap_response->options_list_ptr);
+            coap_response->options_list_ptr = NULL;
         }
     }
 
@@ -897,6 +973,14 @@ void Test_M2MObjectInstance::test_handle_post_request()
             free(coap_response->content_type_ptr);
             coap_response->content_type_ptr = NULL;
         }
+        if (coap_response->options_list_ptr) {
+            if (coap_response->options_list_ptr->location_path_ptr) {
+                free(coap_response->options_list_ptr->location_path_ptr);
+                coap_response->options_list_ptr->location_path_ptr = NULL;
+            }
+            free(coap_response->options_list_ptr);
+            coap_response->options_list_ptr = NULL;
+        }
     }
 
     m2mbase_stub::operation = M2MBase::POST_ALLOWED;
@@ -913,6 +997,14 @@ void Test_M2MObjectInstance::test_handle_post_request()
             free(coap_response->content_type_ptr);
             coap_response->content_type_ptr = NULL;
         }
+        if (coap_response->options_list_ptr) {
+            if (coap_response->options_list_ptr->location_path_ptr) {
+                free(coap_response->options_list_ptr->location_path_ptr);
+                coap_response->options_list_ptr->location_path_ptr = NULL;
+            }
+            free(coap_response->options_list_ptr);
+            coap_response->options_list_ptr = NULL;
+        }
     }
 
     m2mbase_stub::operation = M2MBase::POST_ALLOWED;
@@ -925,6 +1017,14 @@ void Test_M2MObjectInstance::test_handle_post_request()
         if(coap_response->content_type_ptr) {
             free(coap_response->content_type_ptr);
             coap_response->content_type_ptr = NULL;
+        }
+        if (coap_response->options_list_ptr) {
+            if (coap_response->options_list_ptr->location_path_ptr) {
+                free(coap_response->options_list_ptr->location_path_ptr);
+                coap_response->options_list_ptr->location_path_ptr = NULL;
+            }
+            free(coap_response->options_list_ptr);
+            coap_response->options_list_ptr = NULL;
         }
     }
 
@@ -939,6 +1039,14 @@ void Test_M2MObjectInstance::test_handle_post_request()
             free(coap_response->content_type_ptr);
             coap_response->content_type_ptr = NULL;
         }
+        if (coap_response->options_list_ptr) {
+            if (coap_response->options_list_ptr->location_path_ptr) {
+                free(coap_response->options_list_ptr->location_path_ptr);
+                coap_response->options_list_ptr->location_path_ptr = NULL;
+            }
+            free(coap_response->options_list_ptr);
+            coap_response->options_list_ptr = NULL;
+        }
     }
 
 
@@ -951,6 +1059,14 @@ void Test_M2MObjectInstance::test_handle_post_request()
         if(coap_response->content_type_ptr) {
             free(coap_response->content_type_ptr);
             coap_response->content_type_ptr = NULL;
+        }
+        if (coap_response->options_list_ptr) {
+            if (coap_response->options_list_ptr->location_path_ptr) {
+                free(coap_response->options_list_ptr->location_path_ptr);
+                coap_response->options_list_ptr->location_path_ptr = NULL;
+            }
+            free(coap_response->options_list_ptr);
+            coap_response->options_list_ptr = NULL;
         }
     }
 
@@ -965,6 +1081,14 @@ void Test_M2MObjectInstance::test_handle_post_request()
             free(coap_response->content_type_ptr);
             coap_response->content_type_ptr = NULL;
         }
+        if (coap_response->options_list_ptr) {
+            if (coap_response->options_list_ptr->location_path_ptr) {
+                free(coap_response->options_list_ptr->location_path_ptr);
+                coap_response->options_list_ptr->location_path_ptr = NULL;
+            }
+            free(coap_response->options_list_ptr);
+            coap_response->options_list_ptr = NULL;
+        }
     }
 
     coap_response = object->handle_post_request(NULL,NULL,handler);
@@ -974,6 +1098,14 @@ void Test_M2MObjectInstance::test_handle_post_request()
         if(coap_response->content_type_ptr) {
             free(coap_response->content_type_ptr);
             coap_response->content_type_ptr = NULL;
+        }
+        if (coap_response->options_list_ptr) {
+            if (coap_response->options_list_ptr->location_path_ptr) {
+                free(coap_response->options_list_ptr->location_path_ptr);
+                coap_response->options_list_ptr->location_path_ptr = NULL;
+            }
+            free(coap_response->options_list_ptr);
+            coap_response->options_list_ptr = NULL;
         }
     }
 
