@@ -104,7 +104,7 @@ M2MResource* M2MServer::create_resource(ServerResource resource, uint32_t value)
                 char *buffer = (char*)malloc(20);
                 if(buffer) {
                     int size = snprintf(buffer, 20,"%ld",(long int)value);
-                    res->set_value((const uint8_t*)buffer,(const uint32_t)size);
+                    res->set_value((const uint8_t*)buffer,(uint32_t)size);
                     free(buffer);
                 }
             }
@@ -189,7 +189,7 @@ bool M2MServer::set_resource_value(ServerResource resource,
             if(buffer) {
                 int size = snprintf(buffer, 20,"%ld",(long int)value);
                 success = res->set_value((const uint8_t*)buffer,
-                                         (const uint32_t)size);
+                                         (uint32_t)size);
                 free(buffer);
             }
         }

@@ -97,7 +97,7 @@ public:
      * @brief Returns object type.
      * @return BaseType.
      */
-    M2MBase::BaseType base_type() const;
+    virtual M2MBase::BaseType base_type() const;
 
     /**
      * @brief Adds the observation level for the object.
