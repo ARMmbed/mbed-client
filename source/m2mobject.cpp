@@ -495,11 +495,15 @@ sn_coap_hdr_s* M2MObject::handle_post_request(nsdl_s *nsdl,
                                         obj_name += obj_inst_id;
 
                                         coap_response->options_list_ptr->location_path_len = obj_name.length();
-                                        coap_response->options_list_ptr->location_path_ptr = (uint8_t*)malloc(coap_response->options_list_ptr->location_path_len);
-
-                                        memcpy(coap_response->options_list_ptr->location_path_ptr,
-                                               obj_name.c_str(),
-                                               coap_response->options_list_ptr->location_path_len);
+                                        if (coap_response->options_list_ptr->location_path_len != 0) {
+                                            coap_response->options_list_ptr->location_path_ptr =
+                                                    (uint8_t*)malloc(coap_response->options_list_ptr->location_path_len);
+                                            if (coap_response->options_list_ptr->location_path_ptr) {
+                                                memcpy(coap_response->options_list_ptr->location_path_ptr,
+                                                       obj_name.c_str(),
+                                                       coap_response->options_list_ptr->location_path_len);
+                                            }
+                                        }
 
                                         msg_code = COAP_MSG_CODE_RESPONSE_CREATED;
                                         free(obj_inst_id);
