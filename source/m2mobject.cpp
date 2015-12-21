@@ -427,8 +427,8 @@ sn_coap_hdr_s* M2MObject::handle_post_request(nsdl_s *nsdl,
 
                 tr_debug("M2MObject::handle_post_request() - Request Content-Type %d", coap_content_type);
 
-                if(COAP_CONTENT_OMA_TLV_TYPE == coap_content_type) {                    
-                    uint16_t instance_id = 0;                    
+                if(COAP_CONTENT_OMA_TLV_TYPE == coap_content_type) {
+                    uint16_t instance_id = 0;
                     // Check next free instance id
                     for(instance_id = 0; instance_id <= _max_instance_count; instance_id++) {
                         if(NULL == object_instance(instance_id)) {
@@ -439,7 +439,7 @@ sn_coap_hdr_s* M2MObject::handle_post_request(nsdl_s *nsdl,
                             break;
                         }
                     }
-                    if(COAP_MSG_CODE_RESPONSE_CHANGED == msg_code) {                        
+                    if(COAP_MSG_CODE_RESPONSE_CHANGED == msg_code) {
                         M2MTLVDeserializer *deserializer = new M2MTLVDeserializer();
                         bool is_obj_instance = false;
                         bool obj_instance_exists = false;
@@ -486,27 +486,28 @@ sn_coap_hdr_s* M2MObject::handle_post_request(nsdl_s *nsdl,
                                             observation_handler->value_updated(this);
                                         }
                                         coap_response->options_list_ptr = (sn_coap_options_list_s*)malloc(sizeof(sn_coap_options_list_s));
-                                        memset(coap_response->options_list_ptr, 0, sizeof(sn_coap_options_list_s));
+                                        if (coap_response->options_list_ptr) {
+                                            memset(coap_response->options_list_ptr, 0, sizeof(sn_coap_options_list_s));
 
-                                        obj_name = M2MBase::name();
-                                        obj_name += String("/");
-                                        obj_inst_id = (char*)malloc(10);
-                                        snprintf(obj_inst_id, 10,"%d",instance_id);
-                                        obj_name += obj_inst_id;
+                                            obj_name = M2MBase::name();
+                                            obj_name += String("/");
+                                            obj_inst_id = (char*)malloc(10);
+                                            snprintf(obj_inst_id, 10,"%d",instance_id);
+                                            obj_name += obj_inst_id;
 
-                                        coap_response->options_list_ptr->location_path_len = obj_name.length();
-                                        if (coap_response->options_list_ptr->location_path_len != 0) {
-                                            coap_response->options_list_ptr->location_path_ptr =
-                                                    (uint8_t*)malloc(coap_response->options_list_ptr->location_path_len);
-                                            if (coap_response->options_list_ptr->location_path_ptr) {
-                                                memcpy(coap_response->options_list_ptr->location_path_ptr,
-                                                       obj_name.c_str(),
-                                                       coap_response->options_list_ptr->location_path_len);
+                                            coap_response->options_list_ptr->location_path_len = obj_name.length();
+                                            if (coap_response->options_list_ptr->location_path_len != 0) {
+                                                coap_response->options_list_ptr->location_path_ptr =
+                                                        (uint8_t*)malloc(coap_response->options_list_ptr->location_path_len);
+                                                if (coap_response->options_list_ptr->location_path_ptr) {
+                                                    memcpy(coap_response->options_list_ptr->location_path_ptr,
+                                                           obj_name.c_str(),
+                                                           coap_response->options_list_ptr->location_path_len);
+                                                }
                                             }
+                                            free(obj_inst_id);
                                         }
-
-                                        msg_code = COAP_MSG_CODE_RESPONSE_CREATED;
-                                        free(obj_inst_id);
+                                        msg_code = COAP_MSG_CODE_RESPONSE_CREATED;                                        
                                         break;
                                     case M2MTLVDeserializer::NotAllowed:
                                         msg_code = COAP_MSG_CODE_RESPONSE_METHOD_NOT_ALLOWED;
