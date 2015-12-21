@@ -397,6 +397,7 @@ sn_coap_hdr_s* M2MObject::handle_post_request(nsdl_s *nsdl,
     sn_coap_hdr_s *coap_response = sn_nsdl_build_response(nsdl,
                                                           received_coap_header,
                                                           msg_code);
+
     if(received_coap_header) {
         if ((operation() & SN_GRS_POST_ALLOWED) != 0) {
             if(received_coap_header->payload_ptr) {
@@ -427,7 +428,7 @@ sn_coap_hdr_s* M2MObject::handle_post_request(nsdl_s *nsdl,
                 tr_debug("M2MObject::handle_post_request() - Request Content-Type %d", coap_content_type);
 
                 if(COAP_CONTENT_OMA_TLV_TYPE == coap_content_type) {
-                    uint16_t instance_id = 0;                    
+                    uint16_t instance_id = 0;
                     // Check next free instance id
                     for(instance_id = 0; instance_id <= _max_instance_count; instance_id++) {
                         if(NULL == object_instance(instance_id)) {
@@ -460,6 +461,8 @@ sn_coap_hdr_s* M2MObject::handle_post_request(nsdl_s *nsdl,
                             }
 
                             if(deserializer) {
+                                String obj_name = "";
+                                char *obj_inst_id = NULL;
                                 M2MTLVDeserializer::Error error = M2MTLVDeserializer::None;
                                 if(is_obj_instance) {
                                     tr_debug("M2MObject::handle_post_request() - TLV data contains ObjectInstance");
@@ -482,7 +485,29 @@ sn_coap_hdr_s* M2MObject::handle_post_request(nsdl_s *nsdl,
                                         if(observation_handler) {
                                             observation_handler->value_updated(this);
                                         }
-                                        msg_code = COAP_MSG_CODE_RESPONSE_CREATED;
+                                        coap_response->options_list_ptr = (sn_coap_options_list_s*)malloc(sizeof(sn_coap_options_list_s));
+                                        if (coap_response->options_list_ptr) {
+                                            memset(coap_response->options_list_ptr, 0, sizeof(sn_coap_options_list_s));
+
+                                            obj_name = M2MBase::name();
+                                            obj_name += String("/");
+                                            obj_inst_id = (char*)malloc(10);
+                                            snprintf(obj_inst_id, 10,"%d",instance_id);
+                                            obj_name += obj_inst_id;
+
+                                            coap_response->options_list_ptr->location_path_len = obj_name.length();
+                                            if (coap_response->options_list_ptr->location_path_len != 0) {
+                                                coap_response->options_list_ptr->location_path_ptr =
+                                                        (uint8_t*)malloc(coap_response->options_list_ptr->location_path_len);
+                                                if (coap_response->options_list_ptr->location_path_ptr) {
+                                                    memcpy(coap_response->options_list_ptr->location_path_ptr,
+                                                           obj_name.c_str(),
+                                                           coap_response->options_list_ptr->location_path_len);
+                                                }
+                                            }
+                                            free(obj_inst_id);
+                                        }
+                                        msg_code = COAP_MSG_CODE_RESPONSE_CREATED;                                        
                                         break;
                                     case M2MTLVDeserializer::NotAllowed:
                                         msg_code = COAP_MSG_CODE_RESPONSE_METHOD_NOT_ALLOWED;
@@ -496,7 +521,8 @@ sn_coap_hdr_s* M2MObject::handle_post_request(nsdl_s *nsdl,
                                 }                                
                             }
                         } else {
-                            msg_code = COAP_MSG_CODE_RESPONSE_METHOD_NOT_ALLOWED;
+                            tr_debug("M2MObject::handle_post_request() - COAP_MSG_CODE_RESPONSE_BAD_REQUEST");
+                            msg_code = COAP_MSG_CODE_RESPONSE_BAD_REQUEST;
                         }
                         delete deserializer;
                     }
@@ -515,6 +541,7 @@ sn_coap_hdr_s* M2MObject::handle_post_request(nsdl_s *nsdl,
         tr_error("M2MObject::handle_post_request - COAP_MSG_CODE_RESPONSE_METHOD_NOT_ALLOWED");
         msg_code = COAP_MSG_CODE_RESPONSE_METHOD_NOT_ALLOWED; // 4.05
     }
+
     if(coap_response) {
         coap_response->msg_code = msg_code;
     }
@@ -529,3 +556,4 @@ void M2MObject::notification_update()
         report_handler->set_notification_trigger();
     }
 }
+
