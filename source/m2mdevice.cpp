@@ -141,8 +141,10 @@ M2MResource* M2MDevice::create_resource(DeviceResource resource, const String &v
     return res;
 }
 
-M2MResource* M2MDevice::create_resource(DeviceResource resource, int64_t value)
+M2MResource* M2MDevice::create_resource(DeviceResource resource, int32_t value)
 {
+    tr_debug("M2MDevice::create_resource with value %ld", (long int) value);
+
     M2MResource* res = NULL;
     String device_id = "";
     M2MBase::Operation operation = M2MBase::GET_ALLOWED;
@@ -182,10 +184,10 @@ M2MResource* M2MDevice::create_resource(DeviceResource resource, int64_t value)
             if(res) {
                 char *buffer = (char*)memory_alloc(20);
                 if(buffer) {
-                    int size = snprintf(buffer, 20,"%lld", (long long int)value);
+                    uint32_t size = snprintf(buffer, 20,"%ld", (long int)value);
                     res->set_operation(operation);
                     res->set_value((const uint8_t*)buffer,
-                                   (uint32_t)size);
+                                   size);
                     memory_free(buffer);
                 }
             }
@@ -194,16 +196,18 @@ M2MResource* M2MDevice::create_resource(DeviceResource resource, int64_t value)
     return res;
 }
 
-M2MResourceInstance* M2MDevice::create_resource_instance(DeviceResource resource, int64_t value,
+M2MResourceInstance* M2MDevice::create_resource_instance(DeviceResource resource, int32_t value,
                                                  uint16_t instance_id)
 {
+    tr_debug("M2MDevice::create_resource with value %ld at instance %d", (long int)value, instance_id);
+
     M2MResourceInstance* res = NULL;
     String device_id = "";    
     // For these resources multiple instance can exist
     if(AvailablePowerSources == resource) {
         if(check_value_range(resource, value)) {
             device_id = DEVICE_AVAILABLE_POWER_SOURCES;
-        }
+    }
     } else if(PowerSourceVoltage == resource) {
         device_id = DEVICE_POWER_SOURCE_VOLTAGE;
     } else if(PowerSourceCurrent == resource) {
@@ -223,11 +227,11 @@ M2MResourceInstance* M2MDevice::create_resource_instance(DeviceResource resource
             if(res) {
                 char *buffer = (char*)memory_alloc(20);
                 if(buffer) {
-                    int size = snprintf(buffer, 20,"%lld", (long long int)value);
+                    uint32_t size = snprintf(buffer, 20,"%ld", (long int)value);
                     // Only read operation is allowed for above resources
                     res->set_operation(M2MBase::GET_ALLOWED);
                     res->set_value((const uint8_t*)buffer,
-                                   (uint32_t)size);
+                                   size);
                     memory_free(buffer);
                 }
             }
@@ -237,6 +241,8 @@ M2MResourceInstance* M2MDevice::create_resource_instance(DeviceResource resource
 }
 M2MResource* M2MDevice::create_resource(DeviceResource resource)
 {
+    tr_debug("M2MDevice::create_resource %d", resource);
+
     M2MResource* res = NULL;
     if(!is_resource_present(resource)) {
         String device_Id;
@@ -289,6 +295,8 @@ bool M2MDevice::set_resource_value(DeviceResource resource,
                                    const String &value,
                                    uint16_t instance_id)
 {
+    tr_debug("M2MDevice::set_resource at instance_id %d", instance_id);
+
     bool success = false;
     M2MResourceInstance* res = get_resource_instance(resource,instance_id);
     if(res && value.size() <= MAX_ALLOWED_STRING_LENGTH) {
@@ -313,9 +321,11 @@ bool M2MDevice::set_resource_value(DeviceResource resource,
 }
 
 bool M2MDevice::set_resource_value(DeviceResource resource,
-                                       int64_t value,
+                                       int32_t value,
                                        uint16_t instance_id)
 {
+    tr_debug("M2MDevice::set_resource with value %ld at instance_id %d", (long int)value, instance_id);
+
     bool success = false;
     M2MResourceInstance* res = get_resource_instance(resource,instance_id);
     if(res) {
@@ -333,9 +343,9 @@ bool M2MDevice::set_resource_value(DeviceResource resource,
             if (check_value_range(resource, value)) {
                 char *buffer = (char*)memory_alloc(20);
                 if(buffer) {
-                    int size = snprintf(buffer, 20,"%lld",(long long int)value);
+                    uint32_t size = snprintf(buffer, 20,"%ld", (long int)value);
                     success = res->set_value((const uint8_t*)buffer,
-                                             (uint32_t)size);
+                                             size);
                     memory_free(buffer);
                 }
             }
@@ -347,6 +357,8 @@ bool M2MDevice::set_resource_value(DeviceResource resource,
 String M2MDevice::resource_value_string(DeviceResource resource,
                                         uint16_t instance_id) const
 {
+    tr_debug("M2MDevice::resource_value_string instance_id %d", instance_id);
+
     String value = "";
     M2MResourceInstance* res = get_resource_instance(resource,instance_id);
     if(res) {
@@ -383,10 +395,12 @@ String M2MDevice::resource_value_string(DeviceResource resource,
     return value;
 }
 
-int64_t M2MDevice::resource_value_int(DeviceResource resource,
+int32_t M2MDevice::resource_value_int(DeviceResource resource,
                                       uint16_t instance_id) const
 {
-    int64_t value = -1;
+    tr_debug("M2MDevice::resource_value_int instance_id %d", instance_id);
+
+    int32_t value = -1;
     M2MResourceInstance* res = get_resource_instance(resource,instance_id);
     if(res) {
         if(M2MDevice::BatteryLevel == resource          ||
@@ -531,7 +545,7 @@ String M2MDevice::resource_name(DeviceResource resource) const
     return res_name;
 }
 
-bool M2MDevice::check_value_range(DeviceResource resource, int64_t value) const
+bool M2MDevice::check_value_range(DeviceResource resource, int32_t value) const
 {
     bool success = false;
     switch (resource) {
