@@ -190,7 +190,7 @@ bool M2MLWClient::create_device_object()
 }
 
 bool M2MLWClient::create_device_object(M2MDevice::DeviceResource resource,
-                          int64_t value)
+                          int32_t value)
 {
     bool success = false;
     if(!_device) {
@@ -207,7 +207,7 @@ bool M2MLWClient::create_device_object(M2MDevice::DeviceResource resource,
 }
 
 bool M2MLWClient::create_device_object(M2MDevice::DeviceResource resource,
-                                       int64_t value,
+                                       int32_t value,
                                        uint16_t instance_id)
 {
     bool success = false;
@@ -258,7 +258,7 @@ bool M2MLWClient::create_firmware_object()
 }
 
 bool M2MLWClient::create_firmware_object(M2MFirmware::FirmwareResource resource,
-                          int64_t value)
+                          int32_t value)
 {
     bool success = false;
     if(!_firmware) {
@@ -367,7 +367,7 @@ bool M2MLWClient::create_static_resource_string(const char *name,
 }
 
 bool M2MLWClient::create_static_resource_int(const char *name,
-                                             int64_t value,
+                                             int32_t value,
                                              bool multiple_instance,
                                              uint16_t object_instance)
 {
