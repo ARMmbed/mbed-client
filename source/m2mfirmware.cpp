@@ -133,7 +133,7 @@ M2MResource* M2MFirmware::create_resource(FirmwareResource resource, const Strin
     return res;
 }
 
-M2MResource* M2MFirmware::create_resource(FirmwareResource resource, int64_t value)
+M2MResource* M2MFirmware::create_resource(FirmwareResource resource, int32_t value)
 {
     M2MResource* res = NULL;
     String firmware_id = "";
@@ -160,11 +160,11 @@ M2MResource* M2MFirmware::create_resource(FirmwareResource resource, int64_t val
             if(res) {
                 char *buffer = (char*)memory_alloc(20);
                 if(buffer) {
-                    int size = snprintf(buffer, 20,"%lld",(long long int)value);
+                    uint32_t size = snprintf(buffer, 20,"%ld",(long int)value);
 
                     res->set_operation(operation);
                     res->set_value((const uint8_t*)buffer,
-                                   (uint32_t)size);
+                                   size);
                     memory_free(buffer);
                 }
             }
@@ -196,7 +196,7 @@ bool M2MFirmware::set_resource_value(FirmwareResource resource,
 }
 
 bool M2MFirmware::set_resource_value(FirmwareResource resource,
-                                       int64_t value)
+                                       int32_t value)
 {
     bool success = false;
     M2MResource* res = get_resource(resource);
@@ -209,9 +209,9 @@ bool M2MFirmware::set_resource_value(FirmwareResource resource,
             if (check_value_range(resource, value)) {
                 char *buffer = (char*)memory_alloc(20);
                 if(buffer) {
-                    int size = snprintf(buffer, 20,"%lld",(long long int)value);
+                    uint32_t size = snprintf(buffer, 20,"%ld",(long int)value);
                     success = res->set_value((const uint8_t*)buffer,
-                                             (uint32_t)size);
+                                             size);
                     memory_free(buffer);
                 }
             }
@@ -356,9 +356,9 @@ bool M2MFirmware::delete_resource(FirmwareResource resource)
     return success;
 }
 
-int64_t M2MFirmware::resource_value_int(FirmwareResource resource) const
+int32_t M2MFirmware::resource_value_int(FirmwareResource resource) const
 {
-    int64_t value = -1;
+    int32_t value = -1;
     M2MResource* res = get_resource(resource);
     if(res) {
         if(M2MFirmware::State == resource          ||
@@ -408,7 +408,7 @@ String M2MFirmware::resource_value_string(FirmwareResource resource) const
     return value;
 }
 
-bool M2MFirmware::check_value_range(FirmwareResource resource, int64_t value) const
+bool M2MFirmware::check_value_range(FirmwareResource resource, int32_t value) const
 {
     bool success = false;
     switch (resource) {

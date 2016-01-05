@@ -82,7 +82,7 @@ bool M2MFirmware::set_resource_value(FirmwareResource,
 }
 
 bool M2MFirmware::set_resource_value(FirmwareResource,
-                                       int64_t)
+                                       int32_t)
 {
     return m2mfirmware_stub::bool_value;
 }
@@ -92,7 +92,7 @@ String M2MFirmware::resource_value_string(FirmwareResource) const
     return m2mfirmware_stub::string_value;
 }
 
-int64_t M2MFirmware::resource_value_int(FirmwareResource) const
+int32_t M2MFirmware::resource_value_int(FirmwareResource) const
 {
     return m2mfirmware_stub::int_value;
 }

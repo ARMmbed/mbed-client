@@ -112,7 +112,7 @@ public:
      * @param value, Value to be set on the resource, in Integer format.
      * @return M2MResource if created successfully, else NULL.
      */
-    M2MResource* create_resource(DeviceResource resource, int64_t value);
+    M2MResource* create_resource(DeviceResource resource, int32_t value);
 
     /**
      * @brief Creates a new resource instance for given resource enum.
@@ -122,7 +122,8 @@ public:
      * @param value, Value to be set on the resource, in Integer format.
      * @return M2MResourceInstance if created successfully, else NULL.
      */
-    M2MResourceInstance* create_resource_instance(DeviceResource resource, int64_t value,
+
+    M2MResourceInstance* create_resource_instance(DeviceResource resource, int32_t value,
                                                   uint16_t instance_id);
 
     /**
@@ -176,7 +177,7 @@ public:
      * @return True if successfully set, else false.
      */
     bool set_resource_value(DeviceResource resource,
-                            int64_t value,
+                            int32_t value,
                             uint16_t instance_id = 0);
 
     /**
@@ -200,7 +201,7 @@ public:
      * @param instance_id, Instance Id of the resource, default is 0
      * @return Value associated with that resource. If the resource is not valid -1 is returned.
      */
-    int64_t resource_value_int(DeviceResource resource,
+    int32_t resource_value_int(DeviceResource resource,
                                uint16_t instance_id = 0) const;
 
     /**
@@ -232,7 +233,7 @@ private:
 
     String resource_name(DeviceResource resource) const;
 
-    bool check_value_range(DeviceResource resource, const int64_t value) const;
+    bool check_value_range(DeviceResource resource, const int32_t value) const;
 
 private :
 

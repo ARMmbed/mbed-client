@@ -116,7 +116,7 @@ public:
      * @param value, Value to be set on the resource, in Integer format.
      * @return M2MResource if created successfully, else NULL.
      */
-    M2MResource* create_resource(FirmwareResource resource, int64_t value);
+    M2MResource* create_resource(FirmwareResource resource, int32_t value);
 
     /**
      * @brief Deletes the resource with the given resource enum.
@@ -144,7 +144,7 @@ public:
      * @return True if successfully set, else false.
      */
     bool set_resource_value(FirmwareResource resource,
-                            int64_t value);
+                            int32_t value);
 
     /**
      * @brief Sets the value of the given resource enum.
@@ -172,7 +172,7 @@ public:
      * 'State','UpdateSupportedObjects','UpdateResult'.     
      * @return Value associated with that resource. If the resource is not valid -1 is returned.
      */
-    int64_t resource_value_int(FirmwareResource resource) const;
+    int32_t resource_value_int(FirmwareResource resource) const;
 
     /**
      * @brief Populates the data buffer and returns the size of the buffer.
@@ -215,7 +215,7 @@ private:
 
     void create_mandatory_resources();
 
-    bool check_value_range(FirmwareResource resource, const int64_t value) const;
+    bool check_value_range(FirmwareResource resource, const int32_t value) const;
 
 private :
 

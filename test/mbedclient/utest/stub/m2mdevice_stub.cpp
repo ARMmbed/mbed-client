@@ -74,7 +74,7 @@ bool M2MDevice::set_resource_value(DeviceResource,
 }
 
 bool M2MDevice::set_resource_value(DeviceResource,
-                                       int64_t,
+                                       int32_t,
                                        uint16_t)
 {
     return m2mdevice_stub::bool_value;
@@ -86,7 +86,7 @@ String M2MDevice::resource_value_string(DeviceResource,
     return m2mdevice_stub::string_value;
 }
 
-int64_t M2MDevice::resource_value_int(DeviceResource,
+int32_t M2MDevice::resource_value_int(DeviceResource,
                                       uint16_t) const
 {
     return m2mdevice_stub::int_value;

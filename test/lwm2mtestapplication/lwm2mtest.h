@@ -49,11 +49,11 @@ public:
                               const char *value);
 
     bool create_device_object(M2MDevice::DeviceResource resource,
-                              int64_t value,
+                              int32_t value,
                               uint16_t instance_id);
 
     bool create_device_object(M2MDevice::DeviceResource resource,
-                              int64_t value);
+                              int32_t value);
 
     bool create_firmware_object();
 
@@ -61,7 +61,7 @@ public:
                               const char *value);
 
     bool create_firmware_object(M2MFirmware::FirmwareResource resource,
-                              int64_t value);
+                              int32_t value);
 
     bool create_firmware_object(M2MFirmware::FirmwareResource resource,
                                 const uint8_t *value,
@@ -86,7 +86,7 @@ public:
                                        uint16_t object_instance = 0);
 
     bool create_static_resource_int(const char *name,
-                                    int64_t value,
+                                    int32_t value,
                                     bool multiple_instance,
                                     uint16_t object_instance = 0);
 
