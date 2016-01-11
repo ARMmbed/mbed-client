@@ -193,12 +193,12 @@ public:
     virtual void set_instance_id(const uint16_t instance_id);
 
     /**
+     * Function is deprecated. Increment of observation number is done internally.
      * Sets the observation number of the object.
      * @param observation_number, Observation number of the object.
      */
-
     virtual void set_observation_number(const uint16_t observation_number)
-        __attribute__ ((deprecated("set_observation_number is deprecated. Observation number is now internally incremented.")));
+        __attribute__ ((deprecated));
 
     /**
      * @brief Returns object type.
