@@ -35,6 +35,8 @@ class M2MReportHandler;
  *  can be created. This serves base class for Object, ObjectInstances and Resources.
  */
 
+
+
 class M2MBase : public M2MReportObserver {
 
 public:
@@ -194,7 +196,9 @@ public:
      * Sets the observation number of the object.
      * @param observation_number, Observation number of the object.
      */
-    virtual void set_observation_number(const uint16_t observation_number);
+
+    virtual void set_observation_number(const uint16_t observation_number)
+        __attribute__ ((deprecated("set_observation_number is deprecated. Observation number is now internally incremented.")));
 
     /**
      * @brief Returns object type.

@@ -218,9 +218,9 @@ void M2MBase::set_instance_id(const uint16_t inst_id)
     _instance_id = inst_id;
 }
 
-void M2MBase::set_observation_number(const uint16_t observation_number)
+
+void M2MBase::set_observation_number(const uint16_t /*observation_number*/)
 {
-    _observation_number = observation_number;
 }
 
 M2MBase::BaseType M2MBase::base_type() const
@@ -319,7 +319,8 @@ void M2MBase::observation_to_be_sent()
 {
     //TODO: Move this to M2MResourceInstance
     if(_observation_handler) {
-       _observation_handler->observation_to_be_sent(this);
+       _observation_number++;
+       _observation_handler->observation_to_be_sent(this, _observation_number);
     }
 }
 

@@ -321,14 +321,23 @@ sn_coap_hdr_s* M2MResource::handle_get_request(nsdl_s *nsdl,
                                         uint16_t number = observation_number();
 
                                         tr_debug("M2MResource::handle_get_request - Observation Number %d", number);
-                                        obs_number[0] = ((number>>8) & 0xFF);
-                                        obs_number[1] = (number & 0xFF);
-
                                         if(number > 0xFF) {
                                             observation_number_length = 2;
+                                            *(obs_number) = (number >> 8) & 0x00FF;
+                                            obs_number[1] = number & 0x00FF;
+                                        } else {
+                                            observation_number_length = 1;
+                                            *(obs_number) = number & 0x00FF;
                                         }
                                         coap_response->options_list_ptr->observe_ptr = obs_number;
                                         coap_response->options_list_ptr->observe_len = observation_number_length;
+                                        if (!coap_response->content_type_ptr) {
+                                            coap_response->content_type_ptr = (uint8_t*)malloc(2);
+                                            coap_response->content_type_len = 1;
+                                            if(coap_response->content_type_ptr) {
+                                                *coap_response->content_type_ptr = coap_content_type;
+                                            }
+                                        }
                                     }
                                 } else if (STOP_OBSERVATION == observe_option) {
                                     tr_debug("M2MResource::handle_get_request - Stops Observation");

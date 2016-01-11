@@ -27,7 +27,7 @@ public:
 
     Handler(){}
     ~Handler(){}
-    void observation_to_be_sent(M2MBase *){
+    void observation_to_be_sent(M2MBase *, uint16_t){
         visited = true;
     }
     void resource_to_be_deleted(const String &){visited=true;}
@@ -363,14 +363,6 @@ void Test_M2MBase::test_base_type()
 //    u_int8_t value2[] = {"12"};
 //    CHECK(set_value(value2,(u_int32_t)sizeof(value2), true) == true);
 //}
-
-void Test_M2MBase::test_set_observation_number()
-{
-    u_int16_t test = 1;
-    set_observation_number(test);
-
-    CHECK(test == this->_observation_number);
-}
 
 //void Test_M2MBase::test_get_value()
 //{

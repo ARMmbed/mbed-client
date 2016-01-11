@@ -59,7 +59,7 @@ public:
 
     Handler(){}
     ~Handler(){}
-    void observation_to_be_sent(M2MBase *){
+    void observation_to_be_sent(M2MBase *, uint16_t){
         visited = true;
     }
     void resource_to_be_deleted(const String &){visited=true;}
