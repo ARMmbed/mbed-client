@@ -206,13 +206,9 @@ sn_coap_hdr_s* M2MObject::handle_get_request(nsdl_s *nsdl,
     sn_coap_msg_code_e msg_code = COAP_MSG_CODE_RESPONSE_CONTENT;
     sn_coap_hdr_s * coap_response = sn_nsdl_build_response(nsdl,
                                                            received_coap_header,
-                                                           msg_code);
-    //TODO: GET for Object is not yet implemented.
-    // Need to first fix C library and then implement on C++ side.
+                                                           msg_code);    
     uint8_t * data = NULL;
     uint32_t  data_length = 0;
-    //TODO: GET for Object is not yet implemented.
-    // Need to first fix C library and then implement on C++ side.
     if(received_coap_header) {
         // process the GET if we have registered a callback for it
         if ((operation() & SN_GRS_GET_ALLOWED) != 0) {

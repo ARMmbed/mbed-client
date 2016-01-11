@@ -1355,7 +1355,7 @@ void M2MNsdlInterface::send_resource_observation(M2MResource *resource,
         uint8_t *token = 0;
         uint32_t token_length = 0;
         uint8_t observation_number[2];
-        uint8_t observation_number_length = 0;        
+        uint8_t observation_number_length = 0;
 
         if(obs_number > 0xFF) {
             observation_number_length = 2;
