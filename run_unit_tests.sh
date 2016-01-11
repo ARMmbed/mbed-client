@@ -31,6 +31,7 @@ mkdir coverage
 find ./build -name '*.xml' | xargs cp -t ./results/
 find ./build -name '*.gcno' | xargs cp -t ./coverage/
 find ./build -name '*.gcda' | xargs cp -t ./coverage/
+touch coverage/*.gcda
 exclude_files="${PWD}/test/"
 gcovr -r ./ --gcov-filter='.*source*.' --exclude-unreachable-branches --exclude $exclude_files --object-directory ./coverage -x -o ./results/gcovr.xml
 echo
