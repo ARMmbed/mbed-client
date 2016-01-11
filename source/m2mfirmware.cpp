@@ -20,6 +20,8 @@
 #include "mbed-client/m2mobjectinstance.h"
 #include "mbed-client/m2mresource.h"
 
+#define BUFFER_SIZE 21
+
 M2MFirmware* M2MFirmware::_instance = NULL;
 
 M2MFirmware* M2MFirmware::get_instance()
@@ -158,13 +160,13 @@ M2MResource* M2MFirmware::create_resource(FirmwareResource resource, int64_t val
                                                             false);
 
             if(res) {
-                char *buffer = (char*)memory_alloc(20);
+                char *buffer = (char*)memory_alloc(BUFFER_SIZE);
                 if(buffer) {
-                    int size = snprintf(buffer, 20,"%lld",(long long int)value);
-
-                    res->set_operation(operation);
-                    res->set_value((const uint8_t*)buffer,
-                                   (uint32_t)size);
+                    uint32_t size = m2m::itoa_c(value, buffer);
+                    if (size <= BUFFER_SIZE) {
+                        res->set_operation(operation);
+                        res->set_value((const uint8_t*)buffer, size);
+                    }
                     memory_free(buffer);
                 }
             }
@@ -207,11 +209,12 @@ bool M2MFirmware::set_resource_value(FirmwareResource resource,
             // If it is any of the above resource
             // set the value of the resource.
             if (check_value_range(resource, value)) {
-                char *buffer = (char*)memory_alloc(20);
+                char *buffer = (char*)memory_alloc(BUFFER_SIZE);
                 if(buffer) {
-                    int size = snprintf(buffer, 20,"%lld",(long long int)value);
-                    success = res->set_value((const uint8_t*)buffer,
-                                             (uint32_t)size);
+                    uint32_t size = m2m::itoa_c(value, buffer);
+                    if (size <= BUFFER_SIZE) {
+                        success = res->set_value((const uint8_t*)buffer, size);
+                    }
                     memory_free(buffer);
                 }
             }

@@ -47,8 +47,9 @@ public:
     void test_append();
     void test_compare();
     void test_find_last_of();
-
     void test_operator_lt();
+    void test_reverse();
+    void test_itoa_c();
 
     String* str;
 };

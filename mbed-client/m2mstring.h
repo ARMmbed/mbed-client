@@ -13,8 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+#ifndef M2M_STRING_H
+#define M2M_STRING_H
+
 #include <stddef.h> // size_t
 #include <stdexcept>
+#include <stdint.h>
 
 class Test_M2MString;
 
@@ -121,4 +125,10 @@ namespace m2m
   bool
   operator<(const String&, const String&);
 
+  void reverse(char s[], uint32_t length);
+
+  uint32_t itoa_c (int64_t n, char s[]);
 } // namespace
+
+
+#endif // M2M_STRING_H

@@ -19,11 +19,14 @@
 #include "mbed-client/m2mresource.h"
 #include "mbed-client/m2mresource.h"
 #include "mbed-client/m2mobservationhandler.h"
+#include "mbed-client/m2mstring.h"
 #include "include/m2mtlvserializer.h"
 #include "include/m2mtlvdeserializer.h"
 #include "include/nsdllinker.h"
 #include "include/m2mreporthandler.h"
 #include "ns_trace.h"
+
+#define BUFFER_SIZE 10
 
 M2MObjectInstance& M2MObjectInstance::operator=(const M2MObjectInstance& other)
 {
@@ -209,24 +212,22 @@ bool M2MObjectInstance::remove_resource(const String &resource_name)
                 // Resource found and deleted.
                 res = *it;
 
-                char *obj_inst_id = (char*)malloc(20);
+                char *obj_inst_id = (char*)malloc(BUFFER_SIZE);
                 if(obj_inst_id) {
-                    snprintf(obj_inst_id, 20,"%d",instance_id());
-
-                    String obj_name = name();
-                    obj_name += String("/");
-                    obj_name += String(obj_inst_id);
-                    obj_name += String("/");
-                    obj_name += (*it)->name();
-
+                    uint32_t size = m2m::itoa_c(instance_id(), obj_inst_id);
+                    if (size <= BUFFER_SIZE) {
+                        String obj_name = name();
+                        obj_name += String("/");
+                        obj_name += String(obj_inst_id);
+                        obj_name += String("/");
+                        obj_name += (*it)->name();
+                        remove_resource_from_coap(obj_name);
+                        delete res;
+                        res = NULL;
+                        _resource_list.erase(pos);
+                        success = true;
+                    }
                     free(obj_inst_id);
-
-
-                    remove_resource_from_coap(obj_name);
-                    delete res;
-                    res = NULL;
-                    _resource_list.erase(pos);
-                    success = true;
                 }
                  break;
              }
@@ -248,9 +249,9 @@ bool M2MObjectInstance::remove_resource_instance(const String &resource_name,
         it = list.begin();
         for ( ; it != list.end(); it++) {
             if((*it)->instance_id() == inst_id) {
-                char *obj_inst_id = (char*)malloc(20);
+                char *obj_inst_id = (char*)malloc(BUFFER_SIZE);
                 if(obj_inst_id) {
-                    snprintf(obj_inst_id, 20,"%d",instance_id());
+                    snprintf(obj_inst_id, BUFFER_SIZE,"%d",instance_id());
 
                     String obj_name = name();
                     obj_name += String("/");
@@ -260,9 +261,9 @@ bool M2MObjectInstance::remove_resource_instance(const String &resource_name,
 
                     free(obj_inst_id);
 
-                    char *res_inst_id = (char*)malloc(20);
+                    char *res_inst_id = (char*)malloc(BUFFER_SIZE);
                     if(res_inst_id) {
-                        snprintf(res_inst_id, 20,"%d",inst_id);
+                        snprintf(res_inst_id, BUFFER_SIZE,"%d",inst_id);
                         obj_name += String("/");
                         obj_name += String(res_inst_id);
 
@@ -675,10 +676,10 @@ sn_coap_hdr_s* M2MObjectInstance::handle_post_request(nsdl_s *nsdl,
                             if (coap_response->options_list_ptr) {
                                 memset(coap_response->options_list_ptr, 0, sizeof(sn_coap_options_list_s));
 
-                                resource_id = (char*)malloc(10);
-                                obj_inst_id = (char*)malloc(10);
-                                snprintf(resource_id, 10, "%d",instance_id);
-                                snprintf(obj_inst_id, 10, "%d",M2MBase::instance_id());
+                                resource_id = (char*)malloc(BUFFER_SIZE);
+                                obj_inst_id = (char*)malloc(BUFFER_SIZE);
+                                snprintf(resource_id, BUFFER_SIZE, "%d",instance_id);
+                                snprintf(obj_inst_id, BUFFER_SIZE, "%d",M2MBase::instance_id());
 
                                 obj_name += M2MBase::name();
                                 obj_name += "/";

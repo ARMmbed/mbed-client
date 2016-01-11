@@ -363,4 +363,38 @@ namespace m2m {
     return strcmp( s1.c_str(), s2.c_str() ) < 0;
   }
 
+  void reverse(char s[], uint32_t length)
+  {
+    uint32_t i, j;
+    char c;
+
+    for (i = 0, j = length-1; i<j; i++, j--) {
+        c = s[i];
+        s[i] = s[j];
+        s[j] = c;
+    }
+  }
+
+  uint32_t itoa_c (int64_t n, char s[])
+  {
+      int64_t sign;
+      uint32_t i;
+
+      if ((sign = n) < 0)
+          n = -n;
+
+      i = 0;
+
+      do {
+          s[i++] = n % 10 + '0';
+      }
+      while ((n /= 10) > 0);
+
+      if (sign < 0)
+          s[i++] = '-';
+
+      s[i] = '\0';
+      m2m::reverse(s, i);
+      return i;
+  }
 } // namespace

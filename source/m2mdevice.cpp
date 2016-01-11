@@ -13,13 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include <cstdio>
+
 #include "mbed-client/m2mdevice.h"
 #include "mbed-client/m2mconstants.h"
 #include "mbed-client/m2mobject.h"
 #include "mbed-client/m2mobjectinstance.h"
 #include "mbed-client/m2mresource.h"
 #include "ns_trace.h"
+
+#define BUFFER_SIZE 21
 
 M2MDevice* M2MDevice::_instance = NULL;
 
@@ -180,12 +182,13 @@ M2MResource* M2MDevice::create_resource(DeviceResource resource, int64_t value)
                                                             false);
 
             if(res) {
-                char *buffer = (char*)memory_alloc(20);
+                char *buffer = (char*)memory_alloc(BUFFER_SIZE);
                 if(buffer) {
-                    int size = snprintf(buffer, 20,"%lld", (long long int)value);
-                    res->set_operation(operation);
-                    res->set_value((const uint8_t*)buffer,
-                                   (uint32_t)size);
+                    uint32_t size = m2m::itoa_c(value, buffer);
+                    if (size <= BUFFER_SIZE) {
+                        res->set_operation(operation);
+                        res->set_value((const uint8_t*)buffer, size);
+                    }
                     memory_free(buffer);
                 }
             }
@@ -221,13 +224,14 @@ M2MResourceInstance* M2MDevice::create_resource_instance(DeviceResource resource
                                                                      false, instance_id);
 
             if(res) {
-                char *buffer = (char*)memory_alloc(20);
+                char *buffer = (char*)memory_alloc(BUFFER_SIZE);
                 if(buffer) {
-                    int size = snprintf(buffer, 20,"%lld", (long long int)value);
-                    // Only read operation is allowed for above resources
-                    res->set_operation(M2MBase::GET_ALLOWED);
-                    res->set_value((const uint8_t*)buffer,
-                                   (uint32_t)size);
+                    uint32_t size = m2m::itoa_c(value, buffer);
+                    if (size <= BUFFER_SIZE) {
+                        res->set_value((const uint8_t*)buffer, size);
+                        // Only read operation is allowed for above resources
+                        res->set_operation(M2MBase::GET_ALLOWED);
+                    }
                     memory_free(buffer);
                 }
             }
@@ -331,11 +335,12 @@ bool M2MDevice::set_resource_value(DeviceResource resource,
             // If it is any of the above resource
             // set the value of the resource.
             if (check_value_range(resource, value)) {
-                char *buffer = (char*)memory_alloc(20);
+                char *buffer = (char*)memory_alloc(BUFFER_SIZE);
                 if(buffer) {
-                    int size = snprintf(buffer, 20,"%lld",(long long int)value);
-                    success = res->set_value((const uint8_t*)buffer,
-                                             (uint32_t)size);
+                    uint32_t size = m2m::itoa_c(value, buffer);
+                    if (size <= BUFFER_SIZE)
+                        success = res->set_value((const uint8_t*)buffer, size);
+
                     memory_free(buffer);
                 }
             }

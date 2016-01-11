@@ -19,7 +19,9 @@
 #include "mbed-client/m2mobject.h"
 #include "mbed-client/m2mobjectinstance.h"
 #include "mbed-client/m2mresource.h"
+#include "mbed-client/m2mstring.h"
 
+#define BUFFER_SIZE 21
 
 M2MServer::M2MServer()
 : M2MObject(M2M_SERVER_ID)
@@ -101,10 +103,12 @@ M2MResource* M2MServer::create_resource(ServerResource resource, uint32_t value)
             if(res) {
                 res->set_operation(M2MBase::GET_PUT_POST_ALLOWED);
                 // If resource is created then set the value.
-                char *buffer = (char*)malloc(20);
+                char *buffer = (char*)malloc(BUFFER_SIZE);
                 if(buffer) {
-                    int size = snprintf(buffer, 20,"%ld",(long int)value);
-                    res->set_value((const uint8_t*)buffer,(uint32_t)size);
+                    uint32_t size = m2m::itoa_c(value, buffer);
+                    if (size <= BUFFER_SIZE) {
+                        res->set_value((const uint8_t*)buffer, size);
+                    }
                     free(buffer);
                 }
             }
@@ -185,11 +189,11 @@ bool M2MServer::set_resource_value(ServerResource resource,
            M2MServer::NotificationStorage == resource) {
             // If it is any of the above resource
             // set the value of the resource.
-            char *buffer = (char*)malloc(20);
+            char *buffer = (char*)malloc(BUFFER_SIZE);
             if(buffer) {
-                int size = snprintf(buffer, 20,"%ld",(long int)value);
-                success = res->set_value((const uint8_t*)buffer,
-                                         (uint32_t)size);
+                uint32_t size = m2m::itoa_c(value, buffer);
+                if (size <= BUFFER_SIZE)
+                    success = res->set_value((const uint8_t*)buffer, size);
                 free(buffer);
             }
         }
