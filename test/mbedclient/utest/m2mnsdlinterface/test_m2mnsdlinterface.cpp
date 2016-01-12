@@ -1156,13 +1156,13 @@ void Test_M2MNsdlInterface::test_observation_to_be_sent()
     m2mresourceinstance_stub::base_type = M2MBase::Resource;
 
     //CHECK if nothing crashes
-    nsdl->observation_to_be_sent(res2);
+    nsdl->observation_to_be_sent(res2, 1);
 
     m2mresource_stub::list.clear();
     m2mresource_stub::int_value = 0;
 
     //CHECK if nothing crashes
-    nsdl->observation_to_be_sent(res);
+    nsdl->observation_to_be_sent(res, 500);
 
     M2MObjectInstance *object_instance = new M2MObjectInstance("name",*object);
 
@@ -1176,10 +1176,12 @@ void Test_M2MNsdlInterface::test_observation_to_be_sent()
     nsdl->_object_list.push_back(object);
 
     //CHECK if nothing crashes
-    nsdl->observation_to_be_sent(object);
+    nsdl->observation_to_be_sent(object, 1);
+    nsdl->observation_to_be_sent(object, 500);
 
     //CHECK if nothing crashes
-    nsdl->observation_to_be_sent(object_instance);
+    nsdl->observation_to_be_sent(object_instance, 1);
+    nsdl->observation_to_be_sent(object_instance, 500);
 
     delete owned;
     owned = NULL;

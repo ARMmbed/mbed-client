@@ -75,9 +75,7 @@ public:
 
     void test_coap_content_type();
 
-    void test_base_type();
-
-    void test_set_observation_number();
+    void test_base_type();    
 
     void test_handle_observation_attribute();
 

@@ -388,9 +388,7 @@ sn_coap_hdr_s* M2MObjectInstance::handle_get_request(nsdl_s *nsdl,
                                                            received_coap_header,
                                                            msg_code);
     uint8_t * data = NULL;
-    uint32_t  data_length = 0;
-    //TODO: GET for Object is not yet implemented.
-    // Need to first fix C library and then implement on C++ side.
+    uint32_t  data_length = 0;    
     if(received_coap_header) {
         // process the GET if we have registered a callback for it
         if ((operation() & SN_GRS_GET_ALLOWED) != 0) {
@@ -476,14 +474,25 @@ sn_coap_hdr_s* M2MObjectInstance::handle_get_request(nsdl_s *nsdl,
                                         uint16_t number = observation_number();
 
                                         tr_debug("M2MObjectInstance::handle_get_request - Observation Number %d", number);
-                                        obs_number[0] = ((number>>8) & 0xFF);
-                                        obs_number[1] = (number & 0xFF);
-
                                         if(number > 0xFF) {
                                             observation_number_length = 2;
+                                            *(obs_number) = (number >> 8) & 0x00FF;
+                                            obs_number[1] = number & 0x00FF;
+                                        } else {
+                                            observation_number_length = 1;
+                                            *(obs_number) = number & 0x00FF;
                                         }
                                         coap_response->options_list_ptr->observe_ptr = obs_number;
                                         coap_response->options_list_ptr->observe_len = observation_number_length;
+
+                                        if (!coap_response->content_type_ptr) {
+                                            coap_response->content_type_ptr = (uint8_t*)malloc(2);
+                                            coap_response->content_type_len = 1;
+                                            if(coap_response->content_type_ptr) {
+                                                *coap_response->content_type_ptr = coap_content_type;
+                                                set_coap_content_type(coap_content_type);
+                                            }
+                                        }                                        
                                     }
                                 } else if (STOP_OBSERVATION == observe_option) {
                                     tr_debug("M2MObjectInstance::handle_get_request - Stops Observation");

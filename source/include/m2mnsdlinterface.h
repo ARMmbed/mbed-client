@@ -210,7 +210,7 @@ protected: // from M2MTimerObserver
 
 protected: // from M2MObservationHandler
 
-    virtual void observation_to_be_sent(M2MBase *object);
+    virtual void observation_to_be_sent(M2MBase *object, uint16_t obs_number);
 
     virtual void resource_to_be_deleted(const String &resource_name);
 
@@ -263,11 +263,11 @@ private:
 
     M2MInterface::Error interface_error(sn_coap_hdr_s *coap_header);
 
-    void send_object_observation(M2MObject *object);
+    void send_object_observation(M2MObject *object, uint16_t obs_number);
 
-    void send_object_instance_observation(M2MObjectInstance *object_instance);
+    void send_object_instance_observation(M2MObjectInstance *object_instance, uint16_t obs_number);
 
-    void send_resource_observation(M2MResource *resource);
+    void send_resource_observation(M2MResource *resource, uint16_t obs_number);
 
 private:
 

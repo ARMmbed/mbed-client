@@ -162,11 +162,9 @@ bool M2MResourceInstance::set_value(const uint8_t *value,
 {
     tr_debug("M2MResourceInstance::set_value()");
     bool success = false;
-    bool string_value_changed = false;
-    if(_resource_type == M2MResourceInstance::STRING) {
-        if(is_value_changed(value,value_length)) {
-            string_value_changed = true;
-        }
+    bool value_changed = false;
+    if(is_value_changed(value,value_length)) {
+        value_changed = true;
     }
     if( value != NULL && value_length > 0 ) {
         success = true;
@@ -180,20 +178,21 @@ bool M2MResourceInstance::set_value(const uint8_t *value,
             memset(_value, 0, value_length+1);
             memcpy((uint8_t *)_value, (uint8_t *)value, value_length);
             _value_length = value_length;
-            if(string_value_changed) {
-                M2MReportHandler *report_handler = M2MBase::report_handler();
-                if(report_handler && is_observable()) {
-                    report_handler->set_notification_trigger();
+            if( value_changed ) {
+                if (_resource_type == M2MResourceInstance::STRING) {
+                    M2MReportHandler *report_handler = M2MBase::report_handler();
+                    if(report_handler && is_observable()) {
+                        report_handler->set_notification_trigger();
+                    }
                 }
-            } else {
-                report();
+                else {
+                    report();
+                }
             }
         }
     }
-
     return success;
 }
-
 
 void M2MResourceInstance::report()
 {

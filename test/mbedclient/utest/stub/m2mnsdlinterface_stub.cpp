@@ -138,7 +138,7 @@ void M2MNsdlInterface::timer_expired(M2MTimerObserver::Type)
 {
 }
 
-void M2MNsdlInterface::observation_to_be_sent(M2MBase *)
+void M2MNsdlInterface::observation_to_be_sent(M2MBase *, uint16_t obs_number)
 {
 }
 
