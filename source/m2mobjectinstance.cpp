@@ -490,6 +490,7 @@ sn_coap_hdr_s* M2MObjectInstance::handle_get_request(nsdl_s *nsdl,
                                             coap_response->content_type_len = 1;
                                             if(coap_response->content_type_ptr) {
                                                 *coap_response->content_type_ptr = coap_content_type;
+                                                set_coap_content_type(coap_content_type);
                                             }
                                         }                                        
                                     }
