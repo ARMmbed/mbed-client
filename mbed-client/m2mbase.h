@@ -321,6 +321,19 @@ public:
     virtual sn_coap_hdr_s* handle_post_request(nsdl_s *nsdl,
                                                sn_coap_hdr_s *received_coap_header,
                                                M2MObservationHandler *observation_handler = NULL);
+
+    /**
+     * @brief Sets whether this resource will be published to server or not.
+     * @param register_uri, True sets the resource as part of registration message.
+     */
+    virtual void set_register_uri( bool register_uri);
+
+    /**
+     * @brief Returns whether this resource will be published to server or not.
+     * @return True if resource is part of registration message else false.
+     */
+    virtual bool register_uri();
+
 protected : // from M2MReportObserver
 
     virtual void observation_to_be_sent(uint16_t obj_instance_id);
@@ -391,6 +404,7 @@ private:
     uint16_t                    _observation_number;
     uint8_t                     *_token;
     uint8_t                     _token_length;
+    bool                        _register_uri;
 
 friend class Test_M2MBase;
 

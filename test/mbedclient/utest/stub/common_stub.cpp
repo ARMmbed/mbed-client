@@ -150,6 +150,11 @@ int8_t sn_nsdl_exec(struct nsdl_s *, uint32_t)
     return common_stub::int_value;
 }
 
+int8_t sn_nsdl_set_retransmission_parameters(struct nsdl_s *, uint8_t, uint8_t)
+{
+    return common_stub::int_value;
+}
+
 void sn_nsdl_release_allocated_coap_msg_mem(struct nsdl_s *, sn_coap_hdr_s *header)
 {
     if(header && header != common_stub::coap_header){

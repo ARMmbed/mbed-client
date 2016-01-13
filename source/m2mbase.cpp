@@ -37,6 +37,7 @@ M2MBase& M2MBase::operator=(const M2MBase& other)
         _observation_number = other._observation_number;
         _observation_level = other._observation_level;
         _observation_handler = other._observation_handler;
+        _register_uri = other._register_uri;
 
         if(_token) {
             free(_token);
@@ -79,6 +80,7 @@ M2MBase::M2MBase(const M2MBase& other) :
     _observation_handler = other._observation_handler;
     _observation_number = other._observation_number;
     _observation_level = other._observation_level;
+    _register_uri = other._register_uri;
 
     _token_length = other._token_length;
     if(other._token) {
@@ -107,7 +109,8 @@ M2MBase::M2MBase(const String & resource_name,
   _observable(false),
   _observation_number(0),
   _token(NULL),
-  _token_length(0)
+  _token_length(0),
+  _register_uri(true)
 {
     if(is_integer(_name) && _name.size() <= MAX_ALLOWED_STRING_LENGTH) {
         _name_id = strtoul(_name.c_str(), NULL, 10);
@@ -391,6 +394,16 @@ M2MReportHandler* M2MBase::report_handler()
 M2MObservationHandler* M2MBase::observation_handler()
 {
     return _observation_handler;
+}
+
+void M2MBase::set_register_uri( bool register_uri)
+{
+    _register_uri = register_uri;
+}
+
+bool M2MBase::register_uri()
+{
+    return _register_uri;
 }
 
 bool M2MBase::is_integer(const String &value)

@@ -44,6 +44,7 @@ void M2MDevice::delete_instance()
 M2MDevice::M2MDevice()
 : M2MObject(M2M_DEVICE_ID)
 {
+    M2MBase::set_register_uri(false);
     _device_instance = M2MObject::create_object_instance();
 
     if(_device_instance) {
@@ -55,16 +56,23 @@ M2MDevice::M2MDevice()
                                                                      false);
         if(res) {
             res->set_operation(M2MBase::POST_ALLOWED);
+            res->set_register_uri(false);
         }
 
         M2MResourceInstance* instance = _device_instance->create_dynamic_resource_instance(DEVICE_ERROR_CODE,
                                                                  OMA_RESOURCE_TYPE,
                                                                  M2MResourceInstance::INTEGER,
-                                                                 false,0);
+                                                                 false,0);       
         if(instance) {
+            M2MResource * dev_res = _device_instance->resource(DEVICE_ERROR_CODE);
+            dev_res->set_register_uri(false);
             instance->set_operation(M2MBase::GET_ALLOWED);
-            instance->set_value((const uint8_t*)ERROR_CODE_VALUE.c_str(),
-                           (uint32_t)ERROR_CODE_VALUE.length());
+            uint32_t size = 0;
+            uint8_t* buffer = String::convert_integer_to_array(0, size);
+            instance->set_value(buffer, size);
+            free(buffer);
+
+            instance->set_register_uri(false);
         }
         res = _device_instance->create_dynamic_resource(DEVICE_SUPPORTED_BINDING_MODE,
                                                         OMA_RESOURCE_TYPE,
@@ -74,6 +82,7 @@ M2MDevice::M2MDevice()
             res->set_operation(M2MBase::GET_ALLOWED);
             res->set_value((const uint8_t*)BINDING_MODE_UDP.c_str(),
                            (uint32_t)BINDING_MODE_UDP.length());
+            res->set_register_uri(false);
         }
     }
 }
@@ -137,6 +146,7 @@ M2MResource* M2MDevice::create_resource(DeviceResource resource, const String &v
                     res->set_value((const uint8_t*)value.c_str(),
                                    (uint32_t)value.length());
                 }
+                res->set_register_uri(false);
             }
         }
     }
@@ -182,15 +192,14 @@ M2MResource* M2MDevice::create_resource(DeviceResource resource, int64_t value)
                                                             false);
 
             if(res) {
-                char *buffer = (char*)memory_alloc(BUFFER_SIZE);
+                uint32_t size = 0;
+                uint8_t* buffer = String::convert_integer_to_array(value, size);
+                res->set_value(buffer, size);
+                res->set_operation(operation);
                 if(buffer) {
-                    uint32_t size = m2m::itoa_c(value, buffer);
-                    if (size <= BUFFER_SIZE) {
-                        res->set_operation(operation);
-                        res->set_value((const uint8_t*)buffer, size);
-                    }
-                    memory_free(buffer);
+                    free(buffer);
                 }
+                res->set_register_uri(false);
             }
         }
     }
@@ -224,16 +233,15 @@ M2MResourceInstance* M2MDevice::create_resource_instance(DeviceResource resource
                                                                      false, instance_id);
 
             if(res) {
-                char *buffer = (char*)memory_alloc(BUFFER_SIZE);
+                uint32_t size = 0;
+                uint8_t* buffer = String::convert_integer_to_array(value, size);
+                res->set_value(buffer, size);
+                // Only read operation is allowed for above resources
+                res->set_operation(M2MBase::GET_ALLOWED);
                 if(buffer) {
-                    uint32_t size = m2m::itoa_c(value, buffer);
-                    if (size <= BUFFER_SIZE) {
-                        res->set_value((const uint8_t*)buffer, size);
-                        // Only read operation is allowed for above resources
-                        res->set_operation(M2MBase::GET_ALLOWED);
-                    }
-                    memory_free(buffer);
+                    free(buffer);
                 }
+                res->set_register_uri(false);
             }
         }
     }
@@ -256,6 +264,7 @@ M2MResource* M2MDevice::create_resource(DeviceResource resource)
                                                             false);
             if(res) {
                 res->set_operation(M2MBase::POST_ALLOWED);
+                res->set_register_uri(false);
             }
         }
     }
@@ -335,13 +344,11 @@ bool M2MDevice::set_resource_value(DeviceResource resource,
             // If it is any of the above resource
             // set the value of the resource.
             if (check_value_range(resource, value)) {
-                char *buffer = (char*)memory_alloc(BUFFER_SIZE);
+                uint32_t size = 0;
+                uint8_t* buffer = String::convert_integer_to_array(value, size);
+                success = res->set_value(buffer, size);
                 if(buffer) {
-                    uint32_t size = m2m::itoa_c(value, buffer);
-                    if (size <= BUFFER_SIZE)
-                        success = res->set_value((const uint8_t*)buffer, size);
-
-                    memory_free(buffer);
+                    free(buffer);
                 }
             }
         }
@@ -408,7 +415,7 @@ int64_t M2MDevice::resource_value_int(DeviceResource resource,
             uint32_t length = 0;
             res->get_value(buffer,length);
             if(buffer) {
-                value = atoi((const char*)buffer);
+                value = String::convert_array_to_integer(buffer,length);
                 free(buffer);
             }
         }
@@ -566,3 +573,4 @@ bool M2MDevice::check_value_range(DeviceResource resource, int64_t value) const
     }
     return success;
 }
+

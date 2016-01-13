@@ -496,3 +496,15 @@ void Test_M2MBase::test_id_number()
     delete test1;
 
 }
+
+void Test_M2MBase::test_set_register_uri()
+{
+    this->set_register_uri(false);
+    CHECK(this->_register_uri == false);
+}
+
+void Test_M2MBase::test_register_uri()
+{
+    this->_register_uri = false;
+    CHECK(this->register_uri() == false);
+}

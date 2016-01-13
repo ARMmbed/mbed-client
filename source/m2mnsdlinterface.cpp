@@ -109,7 +109,7 @@ bool M2MNsdlInterface::initialize()
     bool success = false;
 
     //Sets the packet retransmission attempts and time interval
-    sn_coap_protocol_set_retransmission_parameters(RETRY_COUNT,RETRY_INTERVAL);
+    sn_nsdl_set_retransmission_parameters(_nsdl_handle,RETRY_COUNT,RETRY_INTERVAL);
 
     _nsdl_exceution_timer->start_timer(ONE_SECOND_TIMER * 1000,
                                        M2MTimerObserver::NsdlExecution,
@@ -489,6 +489,9 @@ uint8_t M2MNsdlInterface::received_from_server_callback(struct nsdl_s * /*nsdl_h
                                     if(coap_response && coap_response->msg_code != COAP_MSG_CODE_RESPONSE_CREATED) {
                                         //Invalid request so remove created ObjectInstance
                                         object->remove_object_instance(instance_id);
+                                    } else  {
+                                        tr_debug("M2MNsdlInterface::received_from_server_callback - Send Update registration for Create");
+                                        send_update_registration();
                                     }
                                 } else {
                                     tr_debug("M2MNsdlInterface::received_from_server_callback - Missing Payload - Cannot create");
@@ -815,7 +818,7 @@ bool M2MNsdlInterface::create_nsdl_object_structure(M2MObject *object)
         }
     }
     if((object->operation() != M2MBase::NOT_ALLOWED)) {
-        success = create_nsdl_resource(object,object->name());
+        success = create_nsdl_resource(object,object->name(),object->register_uri());
     }
     return success;
 }
@@ -850,7 +853,7 @@ bool M2MNsdlInterface::create_nsdl_object_instance_structure(M2MObjectInstance *
             }
         }
         if(object_instance->operation() != M2MBase::NOT_ALLOWED) {
-            success = create_nsdl_resource(object_instance,object_name);
+            success = create_nsdl_resource(object_instance,object_name,object_instance->register_uri());
         }
     }
     return success;
@@ -889,20 +892,20 @@ bool M2MNsdlInterface::create_nsdl_resource_structure(M2MResource *res,
 
                     memory_free(inst_id);
 
-                    success = create_nsdl_resource((*it),inst_name);
+                    success = create_nsdl_resource((*it),inst_name,(*it)->register_uri());
                 }
                 // Register the main Resource as well along with ResourceInstances
-                success = create_nsdl_resource(res,res_name);
+                success = create_nsdl_resource(res,res_name,res->register_uri());
             }
         } else {
             tr_debug("M2MNsdlInterface::create_nsdl_resource_structure - res_name %s", res_name.c_str());
-            success = create_nsdl_resource(res,res_name);
+            success = create_nsdl_resource(res,res_name,res->register_uri());
         }
     }
     return success;
 }
 
-bool M2MNsdlInterface::create_nsdl_resource(M2MBase *base, const String &name)
+bool M2MNsdlInterface::create_nsdl_resource(M2MBase *base, const String &name, bool publish_uri)
 {
     tr_debug("M2MNsdlInterface::create_nsdl_resource(name %s)", name.c_str());
     bool success = false;
@@ -927,6 +930,7 @@ bool M2MNsdlInterface::create_nsdl_resource(M2MBase *base, const String &name)
                     }
                     resource->resource = buffer;
                     resource->resourcelen = length;
+                    resource->publish_uri = publish_uri;
                     sn_nsdl_update_resource(_nsdl_handle,resource);
                 }
             }
@@ -1001,7 +1005,7 @@ bool M2MNsdlInterface::create_nsdl_resource(M2MBase *base, const String &name)
                 _resource->resource_parameters_ptr->coap_content_type = base->coap_content_type();
                 _resource->resource_parameters_ptr->observable = (uint8_t)base->is_observable();
             }
-
+            _resource->publish_uri = publish_uri;
             int8_t result = sn_nsdl_create_resource(_nsdl_handle,_resource);
             tr_debug("M2MNsdlInterface::create_nsdl_resource - Creating in NSDL-C result %d", result);
 

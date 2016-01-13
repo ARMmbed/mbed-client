@@ -100,6 +100,10 @@ public:
     void test_observation_handler();
 
     void test_id_number();
+
+    void test_set_register_uri();
+
+    void test_register_uri();
 };
 
 
