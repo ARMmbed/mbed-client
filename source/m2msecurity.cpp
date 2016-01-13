@@ -19,7 +19,9 @@
 #include "mbed-client/m2mobject.h"
 #include "mbed-client/m2mobjectinstance.h"
 #include "mbed-client/m2mresource.h"
+#include "mbed-client/m2mstring.h"
 
+#define BUFFER_SIZE 21
 
 M2MSecurity::M2MSecurity(ServerType ser_type)
 : M2MObject(M2M_SECURITY_ID),
@@ -119,12 +121,13 @@ M2MResource* M2MSecurity::create_resource(SecurityResource resource, uint32_t va
                                                             false);
 
             if(res) {
-                char *buffer = (char*)malloc(20);
+                char *buffer = (char*)malloc(BUFFER_SIZE);
                 if(buffer) {
-                    int size = snprintf(buffer, 20,"%ld",(long int)value);
-                    res->set_operation(M2MBase::NOT_ALLOWED);
-                    res->set_value((const uint8_t*)buffer,
-                                   (uint32_t)size);
+                    uint32_t size = m2m::itoa_c(value, buffer);
+                    if (size <= BUFFER_SIZE) {
+                        res->set_operation(M2MBase::NOT_ALLOWED);
+                        res->set_value((const uint8_t*)buffer, size);
+                    }
                     free(buffer);
                 }
             }
@@ -190,11 +193,11 @@ bool M2MSecurity::set_resource_value(SecurityResource resource,
            M2MSecurity::ClientHoldOffTime == resource) {
             // If it is any of the above resource
             // set the value of the resource.
-            char *buffer = (char*)malloc(20);
+            char *buffer = (char*)malloc(BUFFER_SIZE);
             if(buffer) {
-                int size = snprintf(buffer, 20,"%ld",(long int)value);
-                success = res->set_value((const uint8_t*)buffer,
-                                         (uint32_t)size);
+                uint32_t size = m2m::itoa_c(value, buffer);
+                if (size <= BUFFER_SIZE)
+                    success = res->set_value((const uint8_t*)buffer, size);
                 free(buffer);
             }
         }

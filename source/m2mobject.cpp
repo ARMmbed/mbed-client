@@ -22,6 +22,8 @@
 #include "include/m2mreporthandler.h"
 #include "ns_trace.h"
 
+#define BUFFER_SIZE 10
+
 M2MObject::M2MObject(const String &object_name)
 : M2MBase(object_name,M2MBase::Dynamic),
   _max_instance_count(MAX_UNINT_16_COUNT)
@@ -43,9 +45,9 @@ M2MObject::~M2MObject()
             //Free allocated memory for object instances.
             obj = *it;
 
-            char *obj_inst_id = (char*)malloc(20);
+            char *obj_inst_id = (char*)malloc(BUFFER_SIZE);
             if(obj_inst_id) {
-                snprintf(obj_inst_id, 20,"%d",index);
+                snprintf(obj_inst_id, BUFFER_SIZE,"%d",index);
 
                 String obj_name = M2MBase::name();
                 obj_name += String("/");
@@ -117,9 +119,9 @@ bool M2MObject::remove_object_instance(uint16_t inst_id)
                 // Instance found and deleted.
                 obj = *it;
 
-                char *obj_inst_id = (char*)malloc(20);
+                char *obj_inst_id = (char*)malloc(BUFFER_SIZE);
                 if(obj_inst_id) {
-                    snprintf(obj_inst_id, 20,"%d",obj->instance_id());
+                    snprintf(obj_inst_id, BUFFER_SIZE,"%d",obj->instance_id());
 
                     String obj_name = name();
                     obj_name += String("/");
@@ -497,8 +499,8 @@ sn_coap_hdr_s* M2MObject::handle_post_request(nsdl_s *nsdl,
 
                                             obj_name = M2MBase::name();
                                             obj_name += String("/");
-                                            obj_inst_id = (char*)malloc(10);
-                                            snprintf(obj_inst_id, 10,"%d",instance_id);
+                                            obj_inst_id = (char*)malloc(BUFFER_SIZE);
+                                            snprintf(obj_inst_id, BUFFER_SIZE,"%d",instance_id);
                                             obj_name += obj_inst_id;
 
                                             coap_response->options_list_ptr->location_path_len = obj_name.length();

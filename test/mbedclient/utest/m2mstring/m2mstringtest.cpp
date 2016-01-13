@@ -145,3 +145,13 @@ TEST(M2MString, test_operator_lt)
 {
     m2m_string->test_operator_lt();
 }
+
+TEST(M2MString, test_reverse)
+{
+    m2m_string->test_reverse();
+}
+
+TEST(M2MString, test_itoa_c)
+{
+    m2m_string->test_itoa_c();
+}

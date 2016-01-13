@@ -15,7 +15,8 @@
  */
 #include "CppUTest/TestHarness.h"
 #include "test_m2mstring.h"
-
+#include <stdio.h>
+#include <string.h>
 
 Test_M2MString::Test_M2MString()
 {
@@ -252,4 +253,44 @@ void Test_M2MString::test_operator_lt()
     CHECK( (s < s1 ) == true);
     CHECK( (s1 < s2 ) == false);
 }
+void Test_M2MString::test_reverse()
+{
+    char string1[] = "123";
+    char string2[] = "321";
+    m2m::reverse(string1, strlen(string1));
+    char string3[] = "9223372036854775807";
+    char string4[] = "7085774586302733229";
+    m2m::reverse(string3, strlen(string3));
 
+    CHECK(strcmp(string1, string2) == 0);
+    CHECK(strcmp(string3, string4) == 0);
+}
+void Test_M2MString::test_itoa_c()
+{
+    int64_t value1 = 0;
+    char* string1 = "0";
+    int64_t value2 = -10;
+    char* string2 = "-10";
+    int64_t value3 = 10000;
+    char* string3 = "10000";
+    int64_t value4 = 9223372036854775807;
+    char* string4 = "9223372036854775807";
+    int64_t value5 = -9223372036854775807;
+    char* string5 = "-9223372036854775807";
+
+    char *buffer = (char*)malloc(21);
+
+    if(buffer) {
+        m2m::itoa_c(value1, buffer);
+        CHECK(strcmp(string1, buffer) == 0);
+        m2m::itoa_c(value2, buffer);
+        CHECK(strcmp(string2, buffer) == 0);
+        m2m::itoa_c(value3, buffer);
+        CHECK(strcmp(string3, buffer) == 0);
+        m2m::itoa_c(value4, buffer);
+        CHECK(strcmp(string4, buffer) == 0);
+        m2m::itoa_c(value5, buffer);
+        CHECK(strcmp(string5, buffer) == 0);
+        free(buffer);
+    }
+}

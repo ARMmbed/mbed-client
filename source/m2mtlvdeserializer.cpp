@@ -19,6 +19,8 @@
 #include "include/nsdllinker.h"
 #include "ns_trace.h"
 
+#define BUFFER_SIZE 10
+
 M2MTLVDeserializer::M2MTLVDeserializer()
 {
 }
@@ -188,9 +190,9 @@ M2MTLVDeserializer::Error M2MTLVDeserializer::deserialize_resources(uint8_t *tlv
         if(!found) {
             if(M2MTLVDeserializer::Post == operation) {
                 //Create a new Resource
-                char *buffer = (char*)malloc(10);
+                char *buffer = (char*)malloc(BUFFER_SIZE);
                 if(buffer) {
-                    snprintf(buffer,10, "%d",til->_id);
+                    snprintf(buffer, BUFFER_SIZE, "%d",til->_id);
                     String id(buffer);
                     M2MResource *resource = object_instance.create_dynamic_resource(id,"",M2MResourceInstance::INTEGER,true,false);
                     if(resource) {
