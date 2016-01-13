@@ -27,7 +27,7 @@ class TestReportObserver :  public M2MReportObserver{
 public :
     TestReportObserver() {}
     ~TestReportObserver() {}
-    void observation_to_be_sent(){ }
+    void observation_to_be_sent(uint16_t){ }
 };
 
 class Handler : public M2MObservationHandler {
@@ -36,7 +36,7 @@ public:
 
     Handler(){}
     ~Handler(){}
-    void observation_to_be_sent(M2MBase *, uint16_t){
+    void observation_to_be_sent(M2MBase *, uint16_t, uint16_t){
         visited = true;
     }
     void resource_to_be_deleted(const String &){visited=true;}
@@ -859,7 +859,7 @@ void Test_M2MObject::test_notification_update()
     m2mbase_stub::report = new M2MReportHandler(obs);
     m2mbase_stub::bool_value = true;
 
-    object->notification_update();
+    object->notification_update(0);
 
     delete m2mbase_stub::report;
     m2mbase_stub::report = NULL;

@@ -26,7 +26,7 @@ public:
 
     Observer(){}
     virtual ~Observer(){}
-    void observation_to_be_sent(){
+    void observation_to_be_sent(uint16_t){
         visited = true;
     }
     bool visited;

@@ -315,12 +315,14 @@ bool M2MBase::handle_observation_attribute(char *&query)
     return success;
 }
 
-void M2MBase::observation_to_be_sent()
+void M2MBase::observation_to_be_sent(uint16_t obj_instance_id)
 {
     //TODO: Move this to M2MResourceInstance
     if(_observation_handler) {
        _observation_number++;
-       _observation_handler->observation_to_be_sent(this, _observation_number);
+       _observation_handler->observation_to_be_sent(this,
+                                                    _observation_number,
+                                                    obj_instance_id);
     }
 }
 

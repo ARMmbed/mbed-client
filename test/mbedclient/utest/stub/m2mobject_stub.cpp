@@ -112,6 +112,6 @@ sn_coap_hdr_s* M2MObject::handle_post_request(nsdl_s *,
     return m2mobject_stub::header;
 }
 
-void M2MObject::notification_update()
+void M2MObject::notification_update(uint16_t obj_instance_id)
 {
 }

@@ -1156,32 +1156,28 @@ void Test_M2MNsdlInterface::test_observation_to_be_sent()
     m2mresourceinstance_stub::base_type = M2MBase::Resource;
 
     //CHECK if nothing crashes
-    nsdl->observation_to_be_sent(res2, 1);
+    nsdl->observation_to_be_sent(res2, 1, 0);
 
     m2mresource_stub::list.clear();
     m2mresource_stub::int_value = 0;
 
     //CHECK if nothing crashes
-    nsdl->observation_to_be_sent(res, 500);
+    nsdl->observation_to_be_sent(res, 500, 0);
 
     M2MObjectInstance *object_instance = new M2MObjectInstance("name",*object);
-
-    m2mobject_stub::int_value = 1;
-    m2mobject_stub::instance_list.push_back(object_instance);
-
+    m2mobject_stub::int_value = 1;    
     m2mobject_stub::base_type = M2MBase::Object;
-
+    m2mobject_stub::inst = object_instance;
     m2mobjectinstance_stub::resource_list.push_back(res);
-
     nsdl->_object_list.push_back(object);
 
     //CHECK if nothing crashes
-    nsdl->observation_to_be_sent(object, 1);
-    nsdl->observation_to_be_sent(object, 500);
+    nsdl->observation_to_be_sent(object, 1, 0);
+    nsdl->observation_to_be_sent(object, 500, 0);
 
     //CHECK if nothing crashes
-    nsdl->observation_to_be_sent(object_instance, 1);
-    nsdl->observation_to_be_sent(object_instance, 500);
+    nsdl->observation_to_be_sent(object_instance, 1, 0);
+    nsdl->observation_to_be_sent(object_instance, 500, 0);
 
     delete owned;
     owned = NULL;

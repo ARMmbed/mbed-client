@@ -36,7 +36,7 @@ class TestReportObserver :  public M2MReportObserver{
 public :
     TestReportObserver() {}
     ~TestReportObserver() {}
-    void observation_to_be_sent(){ }
+    void observation_to_be_sent(uint16_t){ }
 };
 
 class ResourceCallback : public M2MResourceCallback {
@@ -59,7 +59,7 @@ public:
 
     Handler(){}
     ~Handler(){}
-    void observation_to_be_sent(M2MBase *, uint16_t){
+    void observation_to_be_sent(M2MBase *, uint16_t, uint16_t){
         visited = true;
     }
     void resource_to_be_deleted(const String &){visited=true;}
@@ -250,12 +250,13 @@ void Test_M2MResourceInstance::test_set_value()
     resource_instance->_resource_type = M2MResourceInstance::INTEGER;
     m2mbase_stub::mode_value = M2MBase::Dynamic;
     CHECK(resource_instance->set_value(value2,(u_int32_t)sizeof(value2)) == true);
-    //CHECK(resource_cb->visited == true);
+
 
     ResourceCallback *resource_cb = new ResourceCallback();
     resource_instance->set_resource_observer(resource_cb);
 
     CHECK(resource_instance->set_value(value2,(u_int32_t)sizeof(value2)) == true);
+    CHECK(resource_cb->visited == true);
 
     m2mbase_stub::observation_level_value = M2MBase::OI_Attribute;
 

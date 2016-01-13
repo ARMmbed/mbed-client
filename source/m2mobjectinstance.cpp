@@ -742,7 +742,7 @@ sn_coap_hdr_s* M2MObjectInstance::handle_post_request(nsdl_s *nsdl,
 void M2MObjectInstance::notification_update(M2MBase::Observation observation_level)
 {
     if(M2MBase::O_Attribute == observation_level) {
-        _object_callback.notification_update();
+        _object_callback.notification_update(instance_id());
     } else {
         M2MReportHandler *report_handler = M2MBase::report_handler();
         if(report_handler && is_observable()) {

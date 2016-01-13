@@ -34,11 +34,13 @@ class M2MObservationHandler
     /**
      * @brief Observation callback to be sent to the
      * server due to a change in a parameter under observation.
-     * @param object, Observed object whose information
+     * @param object, Observed object whose information needs to be sent
      * @param obs_number, Observation number
-     * needs to be sent.
+     * @param obj_instance_id, Object instance id to be sent
      */
-    virtual void observation_to_be_sent(M2MBase *object, uint16_t obs_number) = 0;
+    virtual void observation_to_be_sent(M2MBase *object,
+                                        uint16_t obs_number,
+                                        uint16_t obj_instance_id) = 0;
 
     /**
      * @brief Callback for deleting an NSDL resource.
