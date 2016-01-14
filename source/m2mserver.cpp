@@ -102,11 +102,13 @@ M2MResource* M2MServer::create_resource(ServerResource resource, uint32_t value)
                                                             true);
             if(res) {
                 res->set_operation(M2MBase::GET_PUT_POST_ALLOWED);
-                // If resource is created then set the value.
-                uint32_t size = 0;
-                uint8_t* buffer = String::convert_integer_to_array(value, size);
-                res->set_value(buffer, size);
+                // If resource is created then set the value.                
+                char *buffer = (char*)malloc(BUFFER_SIZE);
                 if(buffer) {
+                    uint32_t size = m2m::itoa_c(value, buffer);
+                    if (size <= BUFFER_SIZE) {
+                        res->set_value((const uint8_t*)buffer, size);
+                    }
                     free(buffer);
                 }
             }
@@ -187,10 +189,12 @@ bool M2MServer::set_resource_value(ServerResource resource,
            M2MServer::NotificationStorage == resource) {
             // If it is any of the above resource
             // set the value of the resource.
-            uint32_t size = 0;
-            uint8_t* buffer = String::convert_integer_to_array(value, size);
-            success = res->set_value(buffer, size);
+            char *buffer = (char*)malloc(BUFFER_SIZE);
             if(buffer) {
+                uint32_t size = m2m::itoa_c(value, buffer);
+                if (size <= BUFFER_SIZE) {
+                    success = res->set_value((const uint8_t*)buffer, size);
+                }
                 free(buffer);
             }
         }
@@ -242,7 +246,7 @@ uint32_t M2MServer::resource_value_int(ServerResource resource) const
             uint32_t length = 0;
             res->get_value(buffer,length);
             if(buffer) {
-                value = String::convert_array_to_integer(buffer,length);
+                value = atoi((const char*)buffer);
                 free(buffer);
             }
         }
