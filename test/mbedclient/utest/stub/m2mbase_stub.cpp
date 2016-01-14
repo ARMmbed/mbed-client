@@ -247,3 +247,12 @@ sn_coap_hdr_s* M2MBase::handle_post_request(nsdl_s */*nsdl*/,
     //Handled in M2MResource, M2MObjectInstance and M2MObject classes
     return NULL;
 }
+
+void M2MBase::set_register_uri( bool register_uri)
+{
+}
+
+bool M2MBase::register_uri()
+{
+    return m2mbase_stub::bool_value;
+}

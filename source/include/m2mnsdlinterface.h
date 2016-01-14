@@ -236,7 +236,7 @@ private:
                                         const String &object_name = "",
                                         bool multiple_instances = false);
 
-    bool create_nsdl_resource(M2MBase *base, const String &name = "");
+    bool create_nsdl_resource(M2MBase *base, const String &name = "", bool publish_uri = true);
 
     String coap_to_string(uint8_t *coap_data_ptr,
                           int coap_data_ptr_length);

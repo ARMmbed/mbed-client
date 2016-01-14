@@ -362,6 +362,161 @@ namespace m2m {
   bool operator<( const String& s1, const String& s2 ) {
     return strcmp( s1.c_str(), s2.c_str() ) < 0;
   }
+  uint8_t* String::convert_integer_to_array(int64_t value, uint32_t &size)
+  {
+      uint8_t* buffer;
+      if(value < 255) { // 0xFF
+          buffer = (uint8_t*)malloc(1);
+          *buffer = value;
+          size = 1;
+      } else if(value < 0xFFFF) { // 0xFFFF
+          buffer = (uint8_t*)malloc(2);
+          *buffer++ = value >> 8;
+          *buffer = value;
+          buffer--;
+          size = 2;
+      } else if(value < 0xFFFFFF) { // 0xFFFFFF 16777215
+          buffer = (uint8_t*)malloc(3);
+          *buffer++ = value >> 16;
+          *buffer++ = value >> 8;
+          *buffer = value;
+          buffer--;
+          buffer--;
+          size = 3;
+      } else if(value < 0xFFFFFFFF) { // 4294967295
+          buffer = (uint8_t*)malloc(4);
+          *buffer++ = value >> 24;
+          *buffer++ = value >> 16;
+          *buffer++ = value >> 8;
+          *buffer = value;
+          buffer--;
+          buffer--;
+          buffer--;
+          size = 4;
+
+      } else if(value < 0xFFFFFFFFFF) { // 1099511627775
+          buffer = (uint8_t*)malloc(5);
+          *buffer++ = value >> 32;
+          *buffer++ = value >> 24;
+          *buffer++ = value >> 16;
+          *buffer++ = value >> 8;
+          *buffer = value;
+          buffer--;
+          buffer--;
+          buffer--;
+          buffer--;
+          size = 5;
+
+      } else if(value < 0xFFFFFFFFFFFF) { // 281474976710655
+          buffer = (uint8_t*)malloc(6);
+          *buffer++ = value >> 40;
+          *buffer++ = value >> 32;
+          *buffer++ = value >> 24;
+          *buffer++ = value >> 16;
+          *buffer++ = value >> 8;
+          *buffer = value;
+          buffer--;
+          buffer--;
+          buffer--;
+          buffer--;
+          buffer--;
+          size = 6;
+
+      } else if(value < 0xFFFFFFFFFFFFFF) { // 72057594037927935
+          buffer = (uint8_t*)malloc(7);
+          *buffer++ = value >> 48;
+          *buffer++ = value >> 40;
+          *buffer++ = value >> 32;
+          *buffer++ = value >> 24;
+          *buffer++ = value >> 16;
+          *buffer++ = value >> 8;
+          *buffer = value;
+          buffer--;
+          buffer--;
+          buffer--;
+          buffer--;
+          buffer--;
+          buffer--;
+          size = 7;
+
+      } else {
+          buffer = (uint8_t*)malloc(8);
+          *buffer++ = value >> 56;
+          *buffer++ = value >> 48;
+          *buffer++ = value >> 40;
+          *buffer++ = value >> 32;
+          *buffer++ = value >> 24;
+          *buffer++ = value >> 16;
+          *buffer++ = value >> 8;
+          *buffer = value;
+          buffer--;
+          buffer--;
+          buffer--;
+          buffer--;
+          buffer--;
+          buffer--;
+          buffer--;
+          size = 8;
+      }
+      return buffer;
+   }
+
+int64_t String::convert_array_to_integer(uint8_t *value, uint32_t size)
+{
+    int64_t temp_64 = 0;
+    if(size == 1) {
+        temp_64 += *value++;
+
+    } else if(size == 2) {
+        temp_64 += (uint64_t)(*value++) << 8;
+        temp_64 += *value++;
+
+    } else if(size == 3) {
+        temp_64 += (uint64_t)(*value++) << 16;
+        temp_64 += (uint64_t)(*value++) << 8;
+        temp_64 += *value++;
+
+    } else if(size == 4) {
+        temp_64 += (uint64_t)(*value++) << 24;
+        temp_64 += (uint64_t)(*value++) << 16;
+        temp_64 += (uint64_t)(*value++) << 8;
+        temp_64 += *value++;
+
+    } else if(size == 5) {
+        temp_64 += (uint64_t)(*value++) << 32;
+        temp_64 += (uint64_t)(*value++) << 24;
+        temp_64 += (uint64_t)(*value++) << 16;
+        temp_64 += (uint64_t)(*value++) << 8;
+        temp_64 += *value++;
+
+    } else if(size == 6) {
+        temp_64 += (uint64_t)(*value++) << 40;
+        temp_64 += (uint64_t)(*value++) << 32;
+        temp_64 += (uint64_t)(*value++) << 24;
+        temp_64 += (uint64_t)(*value++) << 16;
+        temp_64 += (uint64_t)(*value++) << 8;
+        temp_64 += *value++;
+    } else if(size == 7) {
+        temp_64 += (uint64_t)(*value++) << 48;
+        temp_64 += (uint64_t)(*value++) << 40;
+        temp_64 += (uint64_t)(*value++) << 32;
+        temp_64 += (uint64_t)(*value++) << 24;
+        temp_64 += (uint64_t)(*value++) << 16;
+        temp_64 += (uint64_t)(*value++) << 8;
+        temp_64 += *value++;
+    } else if(size == 8) {
+        temp_64 = (uint64_t)(*value++) << 56;
+        temp_64 += (uint64_t)(*value++) << 48;
+        temp_64 += (uint64_t)(*value++) << 40;
+        temp_64 += (uint64_t)(*value++) << 32;
+        temp_64 += (uint64_t)(*value++) << 24;
+        temp_64 += (uint64_t)(*value++) << 16;
+        temp_64 += (uint64_t)(*value++) << 8;
+        temp_64 += *value++;
+    }
+
+    return temp_64;
+}
 
   void reverse(char s[], uint32_t length)
   {

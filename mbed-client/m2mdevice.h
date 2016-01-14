@@ -234,6 +234,8 @@ private:
 
     bool check_value_range(DeviceResource resource, const int64_t value) const;
 
+    uint8_t* convert_integer_to_array(int64_t value, uint32_t &size);
+
 private :
 
     M2MObjectInstance*    _device_instance;     //Not owned

@@ -121,13 +121,11 @@ M2MResource* M2MSecurity::create_resource(SecurityResource resource, uint32_t va
                                                             false);
 
             if(res) {
-                char *buffer = (char*)malloc(BUFFER_SIZE);
+                uint32_t size = 0;
+                uint8_t* buffer = String::convert_integer_to_array(value, size);
+                res->set_operation(M2MBase::NOT_ALLOWED);
+                res->set_value(buffer, size);
                 if(buffer) {
-                    uint32_t size = m2m::itoa_c(value, buffer);
-                    if (size <= BUFFER_SIZE) {
-                        res->set_operation(M2MBase::NOT_ALLOWED);
-                        res->set_value((const uint8_t*)buffer, size);
-                    }
                     free(buffer);
                 }
             }
@@ -193,11 +191,10 @@ bool M2MSecurity::set_resource_value(SecurityResource resource,
            M2MSecurity::ClientHoldOffTime == resource) {
             // If it is any of the above resource
             // set the value of the resource.
-            char *buffer = (char*)malloc(BUFFER_SIZE);
+            uint32_t size = 0;
+            uint8_t* buffer = String::convert_integer_to_array(value, size);
+            success = res->set_value(buffer, size);
             if(buffer) {
-                uint32_t size = m2m::itoa_c(value, buffer);
-                if (size <= BUFFER_SIZE)
-                    success = res->set_value((const uint8_t*)buffer, size);
                 free(buffer);
             }
         }
@@ -280,7 +277,7 @@ uint32_t M2MSecurity::resource_value_int(SecurityResource resource) const
             uint32_t length = 0;
             res->get_value(buffer,length);
             if(buffer) {
-                value = atoi((const char*)buffer);
+                value = String::convert_array_to_integer(buffer,length);
                 free(buffer);
             }
         }
