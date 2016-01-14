@@ -224,11 +224,11 @@ void Test_M2MFirmware::test_set_resource_value_int()
 
 void Test_M2MFirmware::test_resource_value_int()
 {
-    uint8_t value = 10;
+    uint8_t value[] = {"10"};
     uint8_t* ptr = (uint8_t*)malloc((uint32_t)sizeof(value));
     m2mresourceinstance_stub::value = ptr;
     memset(m2mresourceinstance_stub::value,0,(uint32_t)sizeof(value));
-    *m2mresourceinstance_stub::value = value;
+    memcpy(m2mresourceinstance_stub::value, value,sizeof(value));
     m2mresourceinstance_stub::int_value = (uint32_t)sizeof(value);
 
     m2mobjectinstance_stub::resource = new M2MResource(*m2mobject_stub::inst,
