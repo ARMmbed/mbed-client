@@ -27,7 +27,7 @@ public:
 
     Callback(){}
     ~Callback(){}
-    void notification_update() {
+    void notification_update(uint16_t obj_instance_id) {
         visited = true;
     }
 

@@ -148,7 +148,7 @@ public:
 
 protected :
 
-     virtual void notification_update();
+     virtual void notification_update(uint16_t obj_instance_id);
 
 private:
 

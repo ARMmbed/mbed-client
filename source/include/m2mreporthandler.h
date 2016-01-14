@@ -78,8 +78,9 @@ public:
 
     /**
      * @brief Sets notification trigger.
+     * @param obj_instance_id, Object instance id that has changed
      */
-    void set_notification_trigger();
+    void set_notification_trigger(uint16_t obj_instance_id = 0);
 
     /**
      * @brief Parses the received query for notification
@@ -173,6 +174,7 @@ private:
     float                       _last_value;    
     uint8_t                     _attribute_state;
     bool                        _notify;
+    uint16_t                    _obj_instance_id;
 
 friend class Test_M2MReportHandler;
 

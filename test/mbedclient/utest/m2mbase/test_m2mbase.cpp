@@ -27,7 +27,7 @@ public:
 
     Handler(){}
     ~Handler(){}
-    void observation_to_be_sent(M2MBase *, uint16_t){
+    void observation_to_be_sent(M2MBase *, uint16_t, uint16_t){
         visited = true;
     }
     void resource_to_be_deleted(const String &){visited=true;}
@@ -43,7 +43,7 @@ public:
     Observer(){}
     ~Observer(){}
 
-    void observation_to_be_sent(){}
+    void observation_to_be_sent(uint16_t){}
 };
 
 Test_M2MBase::Test_M2MBase()
@@ -406,13 +406,13 @@ void Test_M2MBase::test_observation_to_be_sent()
 {
     Handler handler;
 
-    observation_to_be_sent();
+    observation_to_be_sent(0);
     CHECK(handler.visited == false);
 
     bool test = true;
     set_under_observation(test,&handler);
 
-    observation_to_be_sent();
+    observation_to_be_sent(0);
 
     CHECK(handler.visited == true);
 }

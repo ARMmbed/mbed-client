@@ -25,7 +25,7 @@ typedef Vector<M2MResourceInstance *> M2MResourceInstanceList;
 
 class M2MObjectCallback {
 public:
-    virtual void notification_update() = 0;
+    virtual void notification_update(uint16_t obj_instance_id) = 0;
 };
 
 /**

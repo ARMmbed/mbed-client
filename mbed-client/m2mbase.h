@@ -323,7 +323,7 @@ public:
                                                M2MObservationHandler *observation_handler = NULL);
 protected : // from M2MReportObserver
 
-    virtual void observation_to_be_sent();
+    virtual void observation_to_be_sent(uint16_t obj_instance_id);
 
 protected:
 

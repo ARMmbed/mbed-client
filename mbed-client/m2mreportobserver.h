@@ -16,6 +16,8 @@
 #ifndef M2MREPORTOBSERVER_H
 #define M2MREPORTOBSERVER_H
 
+#include <inttypes.h>
+
 //FORWARD DECLARATION
 class M2MResourceInstance;
 
@@ -32,9 +34,9 @@ class M2MReportObserver
     /**
      * @brief Observation callback to be sent to the
      * server due to a change in the observed parameter.
+     * @param obj_instance_id, Object instance id that has changed
      */
-    virtual void observation_to_be_sent() = 0;
-
+    virtual void observation_to_be_sent(uint16_t obj_instance_id) = 0;
 };
 
 #endif // M2MREPORTOBSERVER_H

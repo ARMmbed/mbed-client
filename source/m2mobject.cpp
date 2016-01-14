@@ -556,12 +556,12 @@ sn_coap_hdr_s* M2MObject::handle_post_request(nsdl_s *nsdl,
     return coap_response;
 }
 
-void M2MObject::notification_update()
+void M2MObject::notification_update(uint16_t obj_instance_id)
 {
     tr_debug("M2MObject::notification_update");
     M2MReportHandler *report_handler = M2MBase::report_handler();
     if(report_handler && is_observable()) {
-        report_handler->set_notification_trigger();
+        report_handler->set_notification_trigger(obj_instance_id);
     }
 }
 

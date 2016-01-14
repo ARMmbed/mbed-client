@@ -728,13 +728,13 @@ void M2MNsdlInterface::timer_expired(M2MTimerObserver::Type type)
     }
 }
 
-void M2MNsdlInterface::observation_to_be_sent(M2MBase *object, uint16_t obs_number)
+void M2MNsdlInterface::observation_to_be_sent(M2MBase *object, uint16_t obs_number, uint16_t obj_instance_id)
 {
     tr_debug("M2MNsdlInterface::observation_to_be_sent()");
     if(object) {
         M2MBase::BaseType type = object->base_type();
         if(type == M2MBase::Object) {
-            send_object_observation((M2MObject*)object, obs_number);
+            send_object_observation((M2MObject*)object, obs_number, obj_instance_id);
         } else if(type == M2MBase::ObjectInstance) {
             send_object_instance_observation((M2MObjectInstance*)object, obs_number);
         } else if(type == M2MBase::Resource) {
@@ -1271,9 +1271,10 @@ M2MInterface::Error M2MNsdlInterface::interface_error(sn_coap_hdr_s *coap_header
 }
 
 void M2MNsdlInterface::send_object_observation(M2MObject *object,
-                                               uint16_t obs_number)
+                                               uint16_t obs_number,
+                                               uint16_t obj_instance_id)
 {
-    tr_debug("M2MNsdlInterface::send_object_observation");
+    tr_debug("M2MNsdlInterface::send_object_observation, instance id: %d", obj_instance_id);
     if(object) {
         uint8_t *value = 0;
         uint32_t length = 0;
@@ -1291,10 +1292,16 @@ void M2MNsdlInterface::send_object_observation(M2MObject *object,
             *(observation_number) = obs_number & 0x00FF;
         }
 
-        M2MTLVSerializer *serializer = new M2MTLVSerializer();
-        if(serializer) {
-            value = serializer->serialize(object->instances(), length);
-            delete serializer;
+        M2MObjectInstance* obj_instance = object->object_instance(obj_instance_id);
+        if (obj_instance){
+            M2MObjectInstanceList list;
+            list.push_back(obj_instance);
+            M2MTLVSerializer *serializer = new M2MTLVSerializer();
+            if(serializer) {
+                value = serializer->serialize(list, length);
+                delete serializer;
+            }
+            list.clear();
         }
 
         object->get_observation_token(token,token_length);
