@@ -249,14 +249,14 @@ void Test_M2MResourceInstance::test_set_value()
     m2mbase_stub::observation_level_value = M2MBase::O_Attribute;
     resource_instance->_resource_type = M2MResourceInstance::INTEGER;
     m2mbase_stub::mode_value = M2MBase::Dynamic;
-    CHECK(resource_instance->set_value(value2,(u_int32_t)sizeof(value2)) == true);
-
-
     ResourceCallback *resource_cb = new ResourceCallback();
     resource_instance->set_resource_observer(resource_cb);
-
     CHECK(resource_instance->set_value(value2,(u_int32_t)sizeof(value2)) == true);
     CHECK(resource_cb->visited == true);
+
+
+    resource_instance->set_resource_observer(NULL);
+    CHECK(resource_instance->set_value(value3,(u_int32_t)sizeof(value3)) == true);
 
     m2mbase_stub::observation_level_value = M2MBase::OI_Attribute;
 
