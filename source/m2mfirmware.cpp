@@ -45,6 +45,7 @@ M2MFirmware::M2MFirmware()
 {
     _firmware_instance = M2MObject::create_object_instance();
     if(_firmware_instance) {
+        _firmware_instance->set_operation(M2MBase::GET_ALLOWED);
         create_mandatory_resources();
     }
 }
