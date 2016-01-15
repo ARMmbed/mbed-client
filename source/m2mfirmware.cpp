@@ -84,15 +84,16 @@ void M2MFirmware::create_mandatory_resources()
     res = _firmware_instance->create_dynamic_resource(FIRMWARE_STATE,
                                                     OMA_RESOURCE_TYPE,
                                                     M2MResourceInstance::INTEGER,
-                                                    false);
-    if(res) {
+                                                    true);
+    set_zero_value(res);
+    if(res) {        
         res->set_operation(M2MBase::GET_ALLOWED);
     }
-
     res = _firmware_instance->create_dynamic_resource(FIRMWARE_UPDATE_RESULT,
                                                     OMA_RESOURCE_TYPE,
                                                     M2MResourceInstance::INTEGER,
-                                                    false);
+                                                    true);
+    set_zero_value(res);
     if(res) {
         res->set_operation(M2MBase::GET_ALLOWED);
     }
@@ -123,6 +124,7 @@ M2MResource* M2MFirmware::create_resource(FirmwareResource resource, const Strin
                                                             false);
 
             if(res) {
+                res->set_observable(true);
                 res->set_operation(operation);
                 if(value.empty()) {
                     res->clear_value();
@@ -146,7 +148,7 @@ M2MResource* M2MFirmware::create_resource(FirmwareResource resource, int64_t val
         case UpdateSupportedObjects:
             if(check_value_range(resource, value)) {
                 firmware_id = FIRMWARE_UPDATE_SUPPORTED_OBJECTS;
-                operation = M2MBase::GET_PUT_ALLOWED;
+                operation = M2MBase::GET_PUT_ALLOWED;                
             }
             break;
         default:
@@ -161,6 +163,7 @@ M2MResource* M2MFirmware::create_resource(FirmwareResource resource, int64_t val
                                                             false);
 
             if(res) {
+                res->set_observable(true);
                 char *buffer = (char*)memory_alloc(BUFFER_SIZE);
                 if(buffer) {
                     uint32_t size = m2m::itoa_c(value, buffer);
@@ -446,3 +449,15 @@ bool M2MFirmware::check_value_range(FirmwareResource resource, int64_t value) co
     return success;
 }
 
+void M2MFirmware::set_zero_value(M2MResource *resource)
+{
+    char *buffer = (char*)memory_alloc(BUFFER_SIZE);
+    int64_t value = 0;
+    if(buffer) {
+        uint32_t size = m2m::itoa_c(value, buffer);
+        if (size <= BUFFER_SIZE) {
+            resource->set_value((const uint8_t*)buffer, size);
+        }
+        memory_free(buffer);
+    }
+}
