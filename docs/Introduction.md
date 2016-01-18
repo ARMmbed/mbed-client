@@ -122,13 +122,17 @@ M2MInterface::register_object(M2MSecurity* register_object, M2MObjectList object
 
 Because this is an asynchronous operation, you will receive the result of this operation through a callback defined in `m2minterfaceobserver.h` in your application.
 
+_Success_
+
 If the register operation is successful and the client can register all your resources to mbed DS, your application will receive the following callback:
 
 ```
 void object_registered(M2MSecurity *server_object, const M2MServer& server)
 ```
 
-The `M2MSecurity *server_object` specifies to which mbed DS instance the client has just registered and `M2MServer &server` contains the data related to mbed DS, including the Short ServerID and the client registration period.
+The `M2MSecurity *server_object` specifies to which mbed Device Server instance the client has just registered and `M2MServer &server` contains the data related to mbed Device Server, including the Short ServerID and the client registration period.
+
+_Failure_
 
 If the registration operation fails for some reason, you will receive the following callback:
 
