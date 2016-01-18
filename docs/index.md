@@ -1,5 +1,11 @@
-ARM mbed Client
+About this document
 =====================
+
+This document introduces the mbed Client and the use of its API. The document is divided into the following chapters:
+
+- [**Introduction**](#introduction.md) - is a brief introduction to the mbed Client and its features.
+- [**Porting mbed Client**](#porting-guide.md) - tells how to build mbed Client and port it for different platforms.
+- [**How to use the mbed Client API**](#Howto.md) - contains detailed instructions on using the mbed Client API.
 
 mbed Client implements a subset of mbed OS functionality and is optimized for constrained networks and devices; it uses the Constrained 
 Application Protocol (CoAP) to provide energy-efficient communication and supports security measures tailored for low-memory devices.
