@@ -66,7 +66,7 @@ When registering, the client:
 
 To provide information to mbed Device Server and issue the register command:
 
-1. Create an mbed DS Object. This object contains information about mbed Device Server, such as its address and security mode.
+**Step 1.** Create an mbed DS Object. This object contains information about mbed Device Server, such as its address and security mode.
 
 ```
 #include "mbed-client/m2msecurity.h"
@@ -78,7 +78,7 @@ To provide information to mbed Device Server and issue the register command:
         }
 ```
 
-2. mbed Client supports both non-secure and secure mode operations. For secure mode, you need to provide a certificate, private key and server public key through the API.
+**Step 2.** mbed Client supports both non-secure and secure mode operations. For secure mode, you need to provide a certificate, private key and server public key through the API.
 
 To create a secure mode operation:
 
@@ -95,7 +95,7 @@ To create a secure mode operation:
         }
 ```
 
-3. Register all the resources that you would like to monitor or follow using mbed Device Server. To do this, create the resource objects and pass them to the Register API for registration purposes.
+**Step 3.** Register all the resources that you would like to monitor or follow using mbed Device Server. To do this, create the resource objects and pass them to the Register API for registration purposes.
 
 For example, if you want to register your OMA LWM2M based Device object, you need to create the object and set the values for mandatory resources as follows:
 
@@ -112,7 +112,7 @@ if(device) {
 
 **Note:** You can register other resources, including custom resources. Please check the [API documentation](https://docs.mbed.com/docs/mbed-client-guide/en/latest/api/annotated.html) for a detailed description of the M2MObject, M2MObjectInstance and M2MResource classes.
 
-4. You have the registration server object and resources that you want to register. Now, you need to call the register API and pass the following objects as parameters:
+**Step 4.** You have the registration server object and resources that you want to register. Now, you need to call the register API and pass the following objects as parameters:
 
 ```
 M2MInterface::register_object(M2MSecurity* register_object, M2MObjectList object_list);
