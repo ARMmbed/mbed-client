@@ -1,4 +1,4 @@
-**Note:** To port mbed Client, you need to [install yotta and its dependencies]()
+**Note:** To port mbed Client, you need to [install yotta and its dependencies](https://github.com/ARMmbed/yotta/blob/master/docs/index.md).
 
 # mbed Client structure and build process
 
