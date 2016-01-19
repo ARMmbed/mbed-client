@@ -20,7 +20,7 @@
 #include "m2mconfig.h"
 
 const int MAX_VALUE_LENGTH = 256;
-const int BUFFER_LENGTH = 1024;
+const int BUFFER_LENGTH = 1152;
 extern const String COAP;
 const int32_t MINIMUM_REGISTRATION_TIME = 60; //in seconds
 const uint64_t ONE_SECOND_TIMER = 1;
