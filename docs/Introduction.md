@@ -50,7 +50,7 @@ The Client Registration Interface includes multiple sub-features. Currently supp
 - [Update](#the-update-feature)
 - [Deregister](#the-deregister-feature)
 
-### The Register feature
+#### The Register feature
 
 This API enables the client registration functionality.
 
