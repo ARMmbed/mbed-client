@@ -14,9 +14,9 @@ The API is written in C++ to allow quick application development.
 
 There are three interfaces between mbed Device Server and mbed Client:
 
-- Client Registration and Deregistration
-- Device Management and Service Enablement
-- Information Reporting
+- [Client Registration and Deregistration](#the-client-registration-feature)
+- [Device Management and Service Enablement](#the-device-management-and-service-enabler-interface)
+- [Information Reporting](#the-information-reporting-interface)
 
 The API also provides an interface to define the application endpoint information. This information will be delivered to mbed Device Server during the registration operation.
 
@@ -46,9 +46,9 @@ Currently, only one-to-one client-server registration is supported. One-to-many 
 
 The Client Registration Interface includes multiple sub-features. Currently supported:
 
-- Register
-- Update 
-- Deregister
+- [Register](#the-register-feature)
+- [Update](#the-update-feature)
+- [Deregister](#the-deregister-feature)
 
 ### The Register feature
 
@@ -214,12 +214,12 @@ You will get more information about the error from the `error` parameter passed 
 
 mbed Device Server uses the Device Management and Service Enabler Interface to access Object Instances and Resources available on the client. The interface provides this access through the following operations:
 
-- Create
+- [Create](#the-create-operation)
 - Delete
-- Read
-- Write
-- Execute
-- Write Attributes
+- [Read](#the-read-operation)
+- [Write](#the-write-operation)
+- [Write Attributes](#the-write-attributes-operation)
+- [Execute](#the-execute-operation)
 
 Currently, support for the Create and Delete actions is limited to Object Instances.
 
@@ -227,8 +227,6 @@ The Device Management and Service Enabler Interface supports the following data 
 
 - Text: for Resources.
 - TLV: for Object and Object Instances.
-
-
 
 #### The Create operation
 
@@ -339,9 +337,9 @@ mbed Device Server uses the Information Reporting Interface to observe any chang
 
 The interface supports the following sub-features:
 
-- Observe
-- Notify
-- Cancel
+- [Observe](#the-observe-feature)
+- [Notify](#the-notify-feature)
+- [Cancel](#cancel)
 
 #### The Observe feature
 
