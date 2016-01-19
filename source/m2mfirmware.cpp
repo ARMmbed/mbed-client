@@ -43,9 +43,11 @@ void M2MFirmware::delete_instance()
 M2MFirmware::M2MFirmware()
 : M2MObject(M2M_FIRMWARE_ID)
 {
+    M2MBase::set_register_uri(true);
+    M2MBase::set_operation(M2MBase::GET_ALLOWED);
     _firmware_instance = M2MObject::create_object_instance();
     if(_firmware_instance) {
-        _firmware_instance->set_operation(M2MBase::GET_ALLOWED);
+        _firmware_instance->set_operation(M2MBase::GET_PUT_ALLOWED);
         create_mandatory_resources();
     }
 }
@@ -87,7 +89,7 @@ void M2MFirmware::create_mandatory_resources()
                                                     true);
     set_zero_value(res);
     if(res) {        
-        res->set_operation(M2MBase::GET_ALLOWED);
+        res->set_operation(M2MBase::GET_PUT_ALLOWED);// GET_ALLOWED
     }
     res = _firmware_instance->create_dynamic_resource(FIRMWARE_UPDATE_RESULT,
                                                     OMA_RESOURCE_TYPE,
@@ -95,7 +97,7 @@ void M2MFirmware::create_mandatory_resources()
                                                     true);
     set_zero_value(res);
     if(res) {
-        res->set_operation(M2MBase::GET_ALLOWED);
+        res->set_operation(M2MBase::GET_PUT_ALLOWED);// GET_ALLOWED
     }
 }
 
@@ -103,7 +105,7 @@ M2MResource* M2MFirmware::create_resource(FirmwareResource resource, const Strin
 {
     M2MResource* res = NULL;
     String firmware_id = "";
-    M2MBase::Operation operation = M2MBase::GET_ALLOWED;
+    M2MBase::Operation operation = M2MBase::GET_PUT_ALLOWED; //GET_ALLOWED
     if(!is_resource_present(resource)) {
         switch(resource) {
             case PackageName:
@@ -142,7 +144,7 @@ M2MResource* M2MFirmware::create_resource(FirmwareResource resource, int64_t val
 {
     M2MResource* res = NULL;
     String firmware_id = "";
-    M2MBase::Operation operation = M2MBase::GET_ALLOWED;
+    M2MBase::Operation operation = M2MBase::GET_PUT_ALLOWED; // GET_ALLOWED
     if(!is_resource_present(resource)) {
         switch(resource) {
         case UpdateSupportedObjects:

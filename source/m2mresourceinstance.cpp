@@ -178,7 +178,7 @@ bool M2MResourceInstance::set_value(const uint8_t *value,
             memset(_value, 0, value_length+1);
             memcpy((uint8_t *)_value, (uint8_t *)value, value_length);
             _value_length = value_length;
-            if( value_changed ) {
+            if( value_changed ) { //
                 if (_resource_type == M2MResourceInstance::STRING) {
                     M2MReportHandler *report_handler = M2MBase::report_handler();
                     if(report_handler && is_observable()) {

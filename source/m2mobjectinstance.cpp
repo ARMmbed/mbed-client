@@ -138,7 +138,7 @@ M2MResourceInstance* M2MObjectInstance::create_static_resource_instance(const St
         res = new M2MResource(*this,resource_name, resource_type, type,
                               value, value_length, true);
         _resource_list.push_back(res);
-        res->set_operation(M2MBase::GET_ALLOWED);
+        res->set_operation(M2MBase::GET_PUT_ALLOWED); //GET_ALLOWED
         res->set_observable(false);
         if(M2MBase::coap_content_type() == COAP_CONTENT_OMA_TLV_TYPE) {
             res->set_coap_content_type(COAP_CONTENT_OMA_TLV_TYPE);
@@ -148,7 +148,7 @@ M2MResourceInstance* M2MObjectInstance::create_static_resource_instance(const St
         instance = new M2MResourceInstance(resource_name, resource_type, type,
                                            value, value_length,*this);
         if(instance) {
-            instance->set_operation(M2MBase::GET_ALLOWED);
+            instance->set_operation(M2MBase::GET_PUT_ALLOWED); //GET_ALLOWED
             instance->set_observable(false);
             instance->set_instance_id(instance_id);
             if(M2MBase::coap_content_type() == COAP_CONTENT_OMA_TLV_TYPE) {
@@ -177,7 +177,6 @@ M2MResourceInstance* M2MObjectInstance::create_dynamic_resource_instance(const S
                           observable, true);
         _resource_list.push_back(res);
         res->set_operation(M2MBase::GET_PUT_ALLOWED);
-        res->set_observable(false);
         if(M2MBase::coap_content_type() == COAP_CONTENT_OMA_TLV_TYPE) {
             res->set_coap_content_type(COAP_CONTENT_OMA_TLV_TYPE);
         }
@@ -562,7 +561,7 @@ sn_coap_hdr_s* M2MObjectInstance::handle_put_request(nsdl_s *nsdl,
 
             tr_debug("M2MObjectInstance::handle_put_request() - Request Content-Type %d", coap_content_type);
 
-            if(COAP_CONTENT_OMA_TLV_TYPE == coap_content_type) {
+            if(1/*COAP_CONTENT_OMA_TLV_TYPE == coap_content_type*/) {
                 M2MTLVDeserializer::Error error = M2MTLVDeserializer::None;
                 M2MTLVDeserializer *deserializer = new M2MTLVDeserializer();
                 if(deserializer && received_coap_header->payload_ptr) {

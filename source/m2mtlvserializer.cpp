@@ -15,6 +15,7 @@
  */
 #include <stdio.h>
 #include "include/m2mtlvserializer.h"
+#include "include/nsdllinker.h"
 #include "mbed-client/m2mconstants.h"
 
 M2MTLVSerializer::M2MTLVSerializer()
@@ -108,9 +109,19 @@ bool M2MTLVSerializer::serialize(M2MResource *resource, uint8_t *&data, uint32_t
 bool M2MTLVSerializer::serialize_resource(M2MResource *resource, uint8_t *&data, uint32_t &size)
 {
     bool success = false;
-    if(resource->name_id() != -1) {
+    if(resource->name_id() != -1 && (resource->operation() & SN_GRS_GET_ALLOWED) != 0 ) {
         success = true;
-        serialize_TILV(TYPE_RESOURCE, resource->name_id(), resource->value(), resource->value_length(), data, size);
+        if(resource->resource_instance_type() == M2MResourceInstance::INTEGER) {
+            int64_t value = atoi((const char*)resource->value());
+            uint32_t val_size = 0;
+            uint8_t* buffer = String::convert_integer_to_array(value, val_size);
+            serialize_TILV(TYPE_RESOURCE, resource->name_id(), buffer, val_size, data, size);
+            if(buffer) {
+                free(buffer);
+            }
+        } else {
+            serialize_TILV(TYPE_RESOURCE, resource->name_id(), resource->value(), resource->value_length(), data, size);
+        }
     }
     return success;
 }
@@ -130,7 +141,7 @@ bool M2MTLVSerializer::serialize_multiple_resource(M2MResource *resource, uint8_
             serialize_resource_instance(id, (*it), nested_data, nested_data_size);            
         }
     }
-    if(resource->name_id() != -1) {
+    if(resource->name_id() != -1 && (resource->operation() & SN_GRS_GET_ALLOWED) != 0) {
         success = true;
         serialize_TILV(TYPE_MULTIPLE_RESOURCE, resource->name_id(), nested_data, nested_data_size, data, size);
     }
@@ -142,7 +153,19 @@ bool M2MTLVSerializer::serialize_multiple_resource(M2MResource *resource, uint8_
 
 void M2MTLVSerializer::serialize_resource_instance(uint16_t id, M2MResourceInstance *resource, uint8_t *&data, uint32_t &size)
 {
-    serialize_TILV(TYPE_RESOURCE_INSTANCE, id, resource->value(), resource->value_length(), data, size);
+    if((resource->operation() & SN_GRS_GET_ALLOWED) != 0) {
+        if(resource->resource_instance_type() == M2MResourceInstance::INTEGER) {
+            int64_t value = atoi((const char*)resource->value());
+            uint32_t val_size = 0;
+            uint8_t* buffer = String::convert_integer_to_array(value, val_size);
+            serialize_TILV(TYPE_RESOURCE_INSTANCE, id, buffer, val_size, data, size);
+            if(buffer) {
+                free(buffer);
+            }
+        } else {
+            serialize_TILV(TYPE_RESOURCE_INSTANCE, id, resource->value(), resource->value_length(), data, size);
+        }
+    }
 }
 
 void M2MTLVSerializer::serialize_TILV(uint8_t type, uint16_t id, uint8_t *value, uint32_t value_length, uint8_t *&data, uint32_t &size)
