@@ -284,7 +284,7 @@ void M2MInterfaceImpl::registration_updated(const M2MServer &server_object)
 
 void M2MInterfaceImpl::registration_error(uint8_t error_code)
 {
-    tr_debug("M2MInterfaceImpl::registration_error(uint8_t error_code) %d", error_code);
+    tr_debug("M2MInterfaceImpl::registration_error code [%d]", error_code);
     internal_event(STATE_IDLE);
     _observer.error((M2MInterface::Error)error_code);
 }
@@ -338,9 +338,9 @@ void M2MInterfaceImpl::data_available(uint8_t* data,
     internal_event(STATE_COAP_DATA_RECEIVED, event);
 }
 
-void M2MInterfaceImpl::socket_error(uint8_t /*error_code*/)
+void M2MInterfaceImpl::socket_error(uint8_t error_code)
 {
-    tr_debug("M2MInterfaceImpl::socket_error(uint8_t error_code)");
+    tr_debug("M2MInterfaceImpl::socket_error code [%d]", error_code);
     internal_event(STATE_IDLE);
     M2MInterface::Error error = M2MInterface::NetworkError;
     _observer.error(error);
