@@ -12,7 +12,7 @@ The API is written in C++ to allow quick application development.
 
 ## Manage devices on mbed Device Server
 
-There are three interfaces between mbed Device Server and mbed Client:
+There are three features supported by mbed Client:
 
 - [Client Registration and Deregistration](#the-client-registration-feature)
 - [Device Management and Service Enablement](#the-device-management-and-service-enabler-interface)
@@ -20,7 +20,7 @@ There are three interfaces between mbed Device Server and mbed Client:
 
 The API also provides an interface to define the application endpoint information. This information will be delivered to mbed Device Server during the registration operation.
 
-To create an interface for your endpoint (client):
+First, you need to create an interface for mbed Client:
 
 ```
 #include "mbed-client/m2minterfacefactory.h"
@@ -38,13 +38,13 @@ M2MInterface* interface = M2MInterfaceFactory::create_interface(*this,
 ```
 
 
-### The Client Registration Interface
+### The Client Registration feature
 
-The client uses the Client Registration Interface to register with mbed Device Server, update registration and deregister.
+The client uses the Client Registration to register with mbed Device Server, update registration and deregister.
 
 Currently, only one-to-one client-server registration is supported. One-to-many client-server registrations will be supported in an upcoming release.
 
-The Client Registration Interface includes multiple sub-features. Currently supported:
+The Client Registration includes multiple sub-features. Currently supported:
 
 - [Register](#the-register-feature)
 - [Update](#the-update-feature)
@@ -58,7 +58,7 @@ When registering, the client:
 
 * Performs the **Register** operation and provides parameters that mbed Device Server requires to register the client (for example Endpoint Name).
 
-* Maintains the registration and session (for example Lifetime, Queue Mode).
+* Maintains the registration and session (for example, it sets the Lifetime and Queue Mode towards mbed Device Server).
 
 * Provides information on the Objects the client supports and existing Object Instances in the client.
 
@@ -210,9 +210,9 @@ void error(M2MInterface::Error error)
 
 You will get more information about the error from the `error` parameter passed with the callback; use it to fix the source of the problem.
 
-### The Device Management and Service Enabler Interface
+### The Device Management and Service Enabler feature
 
-mbed Device Server uses the Device Management and Service Enabler Interface to access Object Instances and Resources available on the client. The interface provides this access through the following operations:
+mbed Device Server uses the Device Management and Service Enabler to access Object Instances and Resources available on the client. The interface provides this access through the following operations:
 
 - [Create](#the-create-operation)
 - Delete
@@ -233,7 +233,7 @@ The Device Management and Service Enabler Interface supports the following data 
 There are two types of resources you can create:
 
 - Static: you set the value of the resource once and it does not change during the course of operations.
-- Dynamic: the value is expected to change during the course of operations. Therefore, the value is fetched from setter APIs every time the server requests a `GET` operation.
+- Dynamic: the value is expected to change during the course of operations. Therefore, the value is fetched from setter APIs every time the server requests a read operation.
 
 Here is an example of creating a custom static Resource:
 
@@ -305,9 +305,9 @@ Check the [LWM2M Specification](http://technical.openmobilealliance.org/Technica
 
 mbed Device Server uses the **Execute** operation to perform an action. This operation can only be performed on individual Resources. 
 
-**Note:** The client **must** return an error when the **Execute** operation is received for Object Instances or Resource Instances.
+**Note:** mbed Client returns an error when the **Execute** operation is received for Object Instances or Resource Instances.
 
-Here is an implementation example for the **Execute** operation. This function is called when the client receives the `POST` request for this resource from mbed Device Server:
+Here is an implementation example for the **Execute** operation. If you want to execute a piece of code in your application, you can do it by passing it the `POST` request from mbed Device Server:
 
 ```
 #include "mbed-client/m2mobject.h"
@@ -331,9 +331,9 @@ if(_object) {
 ```
 
 
-### The Information Reporting Interface
+### The Information Reporting feature
 
-mbed Device Server uses the Information Reporting Interface to observe any changes in a registered Resource on the client.The server registers to observe the Resource. When the Resource changes, it sends a notification with its new value to all servers who asked to observe it.
+mbed Device Server uses the Information Reporting to observe any changes in a registered Resource on the client.The server registers to observe the Resource. When the Resource changes, it sends a notification with its new value to all servers who asked to observe it.
 
 The interface supports the following sub-features:
 
@@ -343,27 +343,9 @@ The interface supports the following sub-features:
 
 #### The Observe feature
 
-mbed Device Server initiates an observation request to see the value of a Dynamic Resource.
+mbed Device Server initiates an observation request to observe the changing value of either an Object, Object Instance or Resource.
 
 **Tip:** Related parameters for the **Observe** operation are described in the [Write Attributes](#write-attributes) section.
-
-To make your Resource observable, you need to set the Observable parameter of your object to `true`:
-
-```
- object->set_observable(true);
-```
-
-If you want a dynamic Resource to be observable, do the following when creating the resource:
-
-```
-M2MResource* create_dynamic_resource(const String &resource_name,
-                                         const String &resource_type,
-                                         M2MResourceInstance::ResourceType type,
-                                         bool observable,
-                                         bool multiple_instance =false);
-```
-
-The mbed Client will handle the observation part once you have defined the Resources to be observable.
 
 #### The Notify feature
 
