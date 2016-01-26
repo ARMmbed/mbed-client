@@ -283,7 +283,7 @@ void M2MReportHandler::schedule_report()
     tr_debug("M2MReportHandler::schedule_report()");
     _notify = true;
     if ((_attribute_state & M2MReportHandler::Pmin) != M2MReportHandler::Pmin ||
-            _pmin_exceeded) {
+         _pmin_exceeded) {
         report();
     }
 }
@@ -394,7 +394,7 @@ void M2MReportHandler::set_default_values()
     _pmin_exceeded = false;
     _pmax_exceeded = false;
     _last_value = 0.0f;
-    _attribute_state = 0;
+    _attribute_state = 2;
 }
 
 bool M2MReportHandler::check_threshold_values()

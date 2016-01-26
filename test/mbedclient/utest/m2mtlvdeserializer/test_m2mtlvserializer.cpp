@@ -169,6 +169,8 @@ void Test_M2MTLVSerializer::test_serialize_object_instance()
     m2mresource_stub::bool_value = true;
     m2mresource_stub::list.push_back(res_instance);
 
+    m2mbase_stub::operation = M2MBase::GET_ALLOWED;
+
     data = serializer->serialize( m2mobjectinstance_stub::resource_list,size);
     CHECK(data != NULL);
 
@@ -220,6 +222,8 @@ void Test_M2MTLVSerializer::test_serialize_resource()
 
     m2mresource_stub::bool_value = true;
     m2mresource_stub::list.push_back(res_instance);
+
+    m2mbase_stub::operation = M2MBase::GET_ALLOWED;
 
     data = serializer->serialize( resource,size);
     CHECK(data != NULL);
@@ -273,6 +277,8 @@ void Test_M2MTLVSerializer::test_serialize_resource_instance()
 
     m2mresource_stub::bool_value = true;
     m2mresource_stub::list.push_back(res_instance);
+
+    m2mbase_stub::operation = M2MBase::GET_ALLOWED;
 
     data = serializer->serialize( m2mobjectinstance_stub::resource_list,size);
     CHECK(data != NULL);

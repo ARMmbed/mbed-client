@@ -64,7 +64,7 @@ void Test_M2MReportHandler::test_set_under_observation()
 
     _handler->set_under_observation(true);
     CHECK(false == _observer->visited);
-    CHECK(_handler->_pmin_timer == NULL);
+    CHECK(_handler->_pmin_timer != NULL);
 
     _observer->visited = false;    
     _handler->set_under_observation(false);
@@ -197,7 +197,7 @@ void Test_M2MReportHandler::test_parse_notification_attribute()
     DOUBLES_EQUAL(0,_handler->_high_step,0);
     DOUBLES_EQUAL(0,_handler->_low_step,0);
     DOUBLES_EQUAL(0,_handler->_last_value,0);
-    DOUBLES_EQUAL(0,_handler->_attribute_state,0);
+    DOUBLES_EQUAL(0,_handler->_attribute_state,2);
     CHECK_FALSE(_handler->_pmin_exceeded);
     CHECK_FALSE(_handler->_pmax_exceeded);
 }
@@ -239,12 +239,14 @@ void Test_M2MReportHandler::test_timer_expired()
 void Test_M2MReportHandler::test_set_value()
 {
     _handler->_notify = true;
-    _handler->_pmin_exceeded = false;
     _observer->visited = false;
 
+    _handler->_pmin_exceeded = true;
     _handler->set_value(1);
     _handler->set_value(10);
     CHECK(_observer->visited == true);
+
+    _handler->_pmin_exceeded = false;
 
     char* query = {"st=6"};
     _handler->_attribute_state = 0;
@@ -291,9 +293,11 @@ void Test_M2MReportHandler::test_set_value()
     CHECK(_observer->visited == true);
 
     char* query3 = {"lt=10"};    
+    _handler->_pmin_exceeded = true;
     _handler->set_default_values();
     CHECK(true == _handler->parse_notification_attribute(query3, M2MBase::Resource, M2MResourceInstance::INTEGER));
     _observer->visited = false;
+    _handler->_pmin_exceeded = true;
     _handler->set_value(9);
     CHECK(_observer->visited == true);
 
@@ -366,7 +370,7 @@ void Test_M2MReportHandler::test_set_string_notification_trigger()
 void Test_M2MReportHandler::test_timers()
 {
     _handler->handle_timers();
-    CHECK(_handler->_pmin_timer == NULL);
+    CHECK(_handler->_pmin_timer != NULL);
 
     _handler->_attribute_state |= M2MReportHandler::Pmin;
     _handler->handle_timers();
@@ -398,7 +402,7 @@ void Test_M2MReportHandler::test_timers()
 
 void Test_M2MReportHandler::test_attribute_flags()
 {
-    CHECK(_handler->attribute_flags() == 0);
+    CHECK(_handler->attribute_flags() == 2);
     _handler->_attribute_state = M2MReportHandler::Pmax | M2MReportHandler::Pmin |
             M2MReportHandler::St | M2MReportHandler::Gt | M2MReportHandler::Lt | M2MReportHandler::Cancel;
     CHECK(_handler->attribute_flags() == (1 << 6) - 1);

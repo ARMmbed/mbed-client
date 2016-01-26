@@ -68,7 +68,7 @@ M2MDevice::M2MDevice()
         if(instance) {
             M2MResource * dev_res = _device_instance->resource(DEVICE_ERROR_CODE);
             dev_res->set_register_uri(false);
-            instance->set_operation(M2MBase::GET_PUT_ALLOWED); // GET_ALLOWED
+            instance->set_operation(M2MBase::GET_ALLOWED);
             uint32_t size = 0;
             uint8_t* buffer = String::convert_integer_to_array(0, size);
             instance->set_value(buffer, size);
@@ -97,7 +97,7 @@ M2MResource* M2MDevice::create_resource(DeviceResource resource, const String &v
 {
     M2MResource* res = NULL;
     String device_id = "";
-    M2MBase::Operation operation = M2MBase::GET_PUT_ALLOWED; // GET_ALLOWED
+    M2MBase::Operation operation = M2MBase::GET_ALLOWED;
     if(!is_resource_present(resource) && value.size() <= MAX_ALLOWED_STRING_LENGTH) {
         switch(resource) {
             case Manufacturer:
@@ -159,7 +159,7 @@ M2MResource* M2MDevice::create_resource(DeviceResource resource, int64_t value)
 {
     M2MResource* res = NULL;
     String device_id = "";
-    M2MBase::Operation operation = M2MBase::GET_PUT_ALLOWED; // GET_ALLOWED
+    M2MBase::Operation operation = M2MBase::GET_ALLOWED;
     if(!is_resource_present(resource)) {
         switch(resource) {        
         case BatteryLevel:
@@ -247,7 +247,7 @@ M2MResourceInstance* M2MDevice::create_resource_instance(DeviceResource resource
                     if (size <= BUFFER_SIZE) {
                         res->set_value((const uint8_t*)buffer, size);
                         // Only read operation is allowed for above resources
-                        res->set_operation(M2MBase::GET_PUT_ALLOWED);
+                        res->set_operation(M2MBase::GET_ALLOWED);
                     }
                     memory_free(buffer);
                 }
