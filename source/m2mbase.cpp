@@ -106,7 +106,7 @@ M2MBase::M2MBase(const String & resource_name,
   _name(resource_name),
   _coap_content_type(0),
   _instance_id(0),
-  _observable(false),
+  _observable(true),
   _observation_number(0),
   _token(NULL),
   _token_length(0),
@@ -161,9 +161,8 @@ void M2MBase::set_coap_content_type(const uint8_t con_type)
     _coap_content_type = con_type;
 }
 
-void M2MBase::set_observable(bool observable)
+void M2MBase::set_observable(bool /*observable*/)
 {
-   _observable = observable;
 }
 
 void M2MBase::add_observation_level(M2MBase::Observation observation_level)

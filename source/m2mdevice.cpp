@@ -44,7 +44,7 @@ void M2MDevice::delete_instance()
 M2MDevice::M2MDevice()
 : M2MObject(M2M_DEVICE_ID)
 {
-    M2MBase::set_register_uri(true);
+    M2MBase::set_register_uri(false);
     M2MBase::set_operation(M2MBase::GET_ALLOWED);
 
     _device_instance = M2MObject::create_object_instance();
@@ -58,7 +58,7 @@ M2MDevice::M2MDevice()
                                                                      false);
         if(res) {
             res->set_operation(M2MBase::POST_ALLOWED);
-            res->set_register_uri(true);
+            res->set_register_uri(false);
         }
 
         M2MResourceInstance* instance = _device_instance->create_dynamic_resource_instance(DEVICE_ERROR_CODE,
@@ -67,14 +67,14 @@ M2MDevice::M2MDevice()
                                                                  true,0);
         if(instance) {
             M2MResource * dev_res = _device_instance->resource(DEVICE_ERROR_CODE);
-            dev_res->set_register_uri(true);
+            dev_res->set_register_uri(false);
             instance->set_operation(M2MBase::GET_PUT_ALLOWED); // GET_ALLOWED
             uint32_t size = 0;
             uint8_t* buffer = String::convert_integer_to_array(0, size);
             instance->set_value(buffer, size);
             free(buffer);
 
-            instance->set_register_uri(true);
+            instance->set_register_uri(false);
         }
         res = _device_instance->create_dynamic_resource(DEVICE_SUPPORTED_BINDING_MODE,
                                                         OMA_RESOURCE_TYPE,
@@ -84,7 +84,7 @@ M2MDevice::M2MDevice()
             res->set_operation(M2MBase::GET_ALLOWED);
             res->set_value((const uint8_t*)BINDING_MODE_UDP.c_str(),
                            (uint32_t)BINDING_MODE_UDP.length());
-            res->set_register_uri(true);
+            res->set_register_uri(false);
         }
     }
 }
@@ -148,7 +148,7 @@ M2MResource* M2MDevice::create_resource(DeviceResource resource, const String &v
                     res->set_value((const uint8_t*)value.c_str(),
                                    (uint32_t)value.length());
                 }
-                res->set_register_uri(true);
+                res->set_register_uri(false);
             }
         }
     }
@@ -203,7 +203,7 @@ M2MResource* M2MDevice::create_resource(DeviceResource resource, int64_t value)
                     }
                     memory_free(buffer);
                 }
-                res->set_register_uri(true);
+                res->set_register_uri(false);
             }
         }
     }
@@ -236,8 +236,10 @@ M2MResourceInstance* M2MDevice::create_resource_instance(DeviceResource resource
                                                                      M2MResourceInstance::INTEGER,
                                                                      true, instance_id);
 
-            M2MResource *resource = _device_instance->resource(DEVICE_POWER_SOURCE_VOLTAGE);
-            //resource->set_register_uri(true);
+            M2MResource *resource = _device_instance->resource(device_id);
+            if(resource) {
+                resource->set_register_uri(false);
+            }
             if(res) {
                 char *buffer = (char*)memory_alloc(BUFFER_SIZE);
                 if(buffer) {
@@ -249,7 +251,7 @@ M2MResourceInstance* M2MDevice::create_resource_instance(DeviceResource resource
                     }
                     memory_free(buffer);
                 }
-                res->set_register_uri(true);
+                res->set_register_uri(false);
             }
         }
     }
@@ -270,9 +272,13 @@ M2MResource* M2MDevice::create_resource(DeviceResource resource)
                                                             OMA_RESOURCE_TYPE,
                                                             M2MResourceInstance::OPAQUE,
                                                             true); //false
+            M2MResource *resource = _device_instance->resource(device_Id);
+            if(resource) {
+                resource->set_register_uri(false);
+            }
             if(res) {
                 res->set_operation(M2MBase::POST_ALLOWED);
-                res->set_register_uri(true);
+                res->set_register_uri(false);
             }
         }
     }

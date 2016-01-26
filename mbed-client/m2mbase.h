@@ -152,10 +152,11 @@ public:
     virtual void set_coap_content_type(const uint8_t content_type);
 
     /**
-     * @brief Sets the observable mode for the object.
+     * @brief Function is deprecated. Sets the observable mode for the object.
      * @param observable, Value for the observation.
      */
-    virtual void set_observable(bool observable);
+    virtual void set_observable(bool observable)
+     __attribute__ ((deprecated));
 
     /**
      * @brief Adds the observation level for the object.

@@ -43,8 +43,8 @@ void M2MFirmware::delete_instance()
 M2MFirmware::M2MFirmware()
 : M2MObject(M2M_FIRMWARE_ID)
 {
-    M2MBase::set_register_uri(true);
-    M2MBase::set_operation(M2MBase::GET_ALLOWED);
+    M2MBase::set_register_uri(false);
+    M2MBase::set_operation(M2MBase::GET_PUT_ALLOWED);
     _firmware_instance = M2MObject::create_object_instance();
     if(_firmware_instance) {
         _firmware_instance->set_operation(M2MBase::GET_PUT_ALLOWED);
@@ -65,6 +65,7 @@ void M2MFirmware::create_mandatory_resources()
                                                                  false);
     if(res) {
         res->set_operation(M2MBase::PUT_ALLOWED);
+        res->set_register_uri(false);
     }
 
     res = _firmware_instance->create_dynamic_resource(FIRMWARE_PACKAGE_URI,
@@ -73,6 +74,7 @@ void M2MFirmware::create_mandatory_resources()
                                                     false);
     if(res) {
         res->set_operation(M2MBase::PUT_ALLOWED);
+        res->set_register_uri(false);
     }
 
     res = _firmware_instance->create_dynamic_resource(FIRMWARE_UPDATE,
@@ -81,6 +83,7 @@ void M2MFirmware::create_mandatory_resources()
                                                     false);
     if(res) {
         res->set_operation(M2MBase::NOT_ALLOWED);
+        res->set_register_uri(false);
     }
 
     res = _firmware_instance->create_dynamic_resource(FIRMWARE_STATE,
@@ -90,6 +93,7 @@ void M2MFirmware::create_mandatory_resources()
     set_zero_value(res);
     if(res) {        
         res->set_operation(M2MBase::GET_PUT_ALLOWED);// GET_ALLOWED
+        res->set_register_uri(false);
     }
     res = _firmware_instance->create_dynamic_resource(FIRMWARE_UPDATE_RESULT,
                                                     OMA_RESOURCE_TYPE,
@@ -98,6 +102,7 @@ void M2MFirmware::create_mandatory_resources()
     set_zero_value(res);
     if(res) {
         res->set_operation(M2MBase::GET_PUT_ALLOWED);// GET_ALLOWED
+        res->set_register_uri(false);
     }
 }
 
@@ -126,7 +131,7 @@ M2MResource* M2MFirmware::create_resource(FirmwareResource resource, const Strin
                                                             false);
 
             if(res) {
-                res->set_observable(true);
+                res->set_register_uri(false);
                 res->set_operation(operation);
                 if(value.empty()) {
                     res->clear_value();
@@ -165,7 +170,7 @@ M2MResource* M2MFirmware::create_resource(FirmwareResource resource, int64_t val
                                                             false);
 
             if(res) {
-                res->set_observable(true);
+                res->set_register_uri(false);
                 char *buffer = (char*)memory_alloc(BUFFER_SIZE);
                 if(buffer) {
                     uint32_t size = m2m::itoa_c(value, buffer);

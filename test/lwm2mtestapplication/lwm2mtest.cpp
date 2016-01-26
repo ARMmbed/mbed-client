@@ -317,12 +317,10 @@ bool M2MLWClient::create_object(const char *name,
         _object = M2MInterfaceFactory::create_object(name);
         if(_object) {
             _object->set_operation(int_to_operation(object_operation));
-            _object->set_observable(object_observable);
             inst = _object->create_object_instance(object_instance_id);
             if(inst) {
                 success = true;
                 inst->set_operation(int_to_operation(object_instance_operation));
-                inst->set_observable(object_instance_observable);
             }
         }
     } else {
@@ -331,7 +329,6 @@ bool M2MLWClient::create_object(const char *name,
             if(inst) {
                 success = true;
                 inst->set_operation(int_to_operation(object_instance_operation));
-                inst->set_observable(object_instance_observable);
             }
         }
     }

@@ -196,7 +196,7 @@ M2MTLVDeserializer::Error M2MTLVDeserializer::deserialize_resources(uint8_t *tlv
                     String id(buffer);
                     M2MResource *resource = object_instance.create_dynamic_resource(id,"",M2MResourceInstance::INTEGER,true,false);
                     if(resource) {
-                        resource->set_operation(M2MBase::GET_PUT_ALLOWED);
+                        resource->set_operation(M2MBase::GET_PUT_POST_DELETE_ALLOWED);
                     }
                     free(buffer);
                 }
@@ -266,7 +266,7 @@ M2MTLVDeserializer::Error M2MTLVDeserializer::deserialize_resource_instances(uin
                                                                                                  true,
                                                                                                  til->_id);
                 if(res_instance) {
-                    res_instance->set_operation(M2MBase::GET_PUT_ALLOWED);
+                    res_instance->set_operation(M2MBase::GET_PUT_POST_DELETE_ALLOWED);
                 }
             } else if(M2MTLVDeserializer::Put == operation) {
                 error = M2MTLVDeserializer::NotFound;
