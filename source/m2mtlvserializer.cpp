@@ -111,17 +111,7 @@ bool M2MTLVSerializer::serialize_resource(M2MResource *resource, uint8_t *&data,
     bool success = false;
     if(resource->name_id() != -1 && (resource->operation() & SN_GRS_GET_ALLOWED) != 0 ) {
         success = true;
-        if(resource->resource_instance_type() == M2MResourceInstance::INTEGER) {
-            int64_t value = atoi((const char*)resource->value());
-            uint32_t val_size = 0;
-            uint8_t* buffer = String::convert_integer_to_array(value, val_size);
-            serialize_TILV(TYPE_RESOURCE, resource->name_id(), buffer, val_size, data, size);
-            if(buffer) {
-                free(buffer);
-            }
-        } else {
-            serialize_TILV(TYPE_RESOURCE, resource->name_id(), resource->value(), resource->value_length(), data, size);
-        }
+        serialize_TILV(TYPE_RESOURCE, resource->name_id(), resource->value(), resource->value_length(), data, size);
     }
     return success;
 }
@@ -154,17 +144,7 @@ bool M2MTLVSerializer::serialize_multiple_resource(M2MResource *resource, uint8_
 void M2MTLVSerializer::serialize_resource_instance(uint16_t id, M2MResourceInstance *resource, uint8_t *&data, uint32_t &size)
 {
     if((resource->operation() & SN_GRS_GET_ALLOWED) != 0) {
-        if(resource->resource_instance_type() == M2MResourceInstance::INTEGER) {
-            int64_t value = atoi((const char*)resource->value());
-            uint32_t val_size = 0;
-            uint8_t* buffer = String::convert_integer_to_array(value, val_size);
-            serialize_TILV(TYPE_RESOURCE_INSTANCE, id, buffer, val_size, data, size);
-            if(buffer) {
-                free(buffer);
-            }
-        } else {
-            serialize_TILV(TYPE_RESOURCE_INSTANCE, id, resource->value(), resource->value_length(), data, size);
-        }
+        serialize_TILV(TYPE_RESOURCE_INSTANCE, id, resource->value(), resource->value_length(), data, size);
     }
 }
 
