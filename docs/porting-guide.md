@@ -8,7 +8,7 @@ mbed Client is structured as a set of modules. Each module declares which other 
 
 This is also the process to build applications for the mbed Client (including the example application in the release). The application declares dependencies on the mbed Client and when it is built, `yotta` ensures that the modules (and anything that they depend on, recursively) are present before building. 
 
-In this release, all the necessary modules for the examples (the ones that the examples depend on) have been pre-installed in the `yotta_modules` directory of each example program, so you do not need to download them separately. In general, `yotta` downloads and installs the necessary modules over the internet from the public yotta Registry (which saves published versions of modules) or from a specified source control URL.
+In general, `yotta` downloads and installs the necessary modules over the internet from the public yotta Registry (which saves published versions of modules) or from a specified source control URL.
 
 # Components of mbed Client
 
@@ -33,7 +33,7 @@ To list the dependency trees, use the [`yotta list --all` command](http://docs.y
 
 **Note**: In this case, we have listed the dependencies for the `x86-linux-native` compilation target. Different modules are needed for different compilation targets.
 
-If you list the modules included in the [mbed Client Linux example](https://github.com/ARMmbed/mbed-client-linux-example), you can see that it depends directly only on the `mbed-client` and `mbed-client-linux` modules. These modules depend internally on various other modules.
+We are using the [mbed Client Linux example](https://github.com/ARMmbed/mbed-client-linux-example) in this document. You can see that it depends directly only on the `mbed-client` and `mbed-client-linux` modules. These modules depend internally on various other modules.
 
 ```
 mbed-client-linux-example x.x.x
@@ -46,7 +46,7 @@ mbed-client-linux-example x.x.x
    |_mbed-client-linux 0.0.2
 ```
 
-## Compilation targets
+## Compilation targets (Remove this section and move some of the contents to a more appropriate place in the doc.)
 
 This release supports only one compilation target:
 
@@ -59,7 +59,7 @@ To compile for a target board, you need a [target description](http://docs.yotta
 
 The `mbed-client` module uses the platform name that each target defines to choose which `mbed-client-<platform-name>` module to depend on to provide the platform-specific implementation.
 
-# Porting mbed Client to a different board
+# Porting mbed Client to a different platform
 
 To port mbed Client to a new platform:
 
@@ -83,51 +83,19 @@ When you contact `support@mbed.org`, a repository will be created for your modul
 
 # Step 2: Creating a yotta compilation target
 
-The target description contains:
-* `target.json` - the target description file
-* a [CMake toolchain file](http://www.cmake.org/cmake/help/v3.0/manual/cmake-toolchains.7.html) (and any dependencies it needs) that describes how to run the compiler
-* a linker script file
-
-To select the target description, run `yotta target <targetname>`. yotta needs this to set up the build.
-
-The documentation for target descriptions is available on the [yotta documentation site](http://docs.yottabuild.org/tutorial/targets.html).
-
 An example on compiling for linux target can be found in the `yotta_targets` directory of [the example application] (https://github.com/ARMmbed/mbed-client-linux-example).
 
-The directory structure of a typical target description is:
+Please, refer to the [yotta documentation](http://yottadocs.mbed.com/tutorial/targets.html) for setting up your compilation target.
 
-```
-|readme.md
-|target.json
-|_CMake
-|   |_toolchain.cmake
-|   |
-|   |_Compiler
-|   |   |_GNU-ASM.cmake
-|   |   |_GNU-C.cmake
-|   |   |_GNU-CXX.cmake
-|   |
-|   |_Platform
-|       |_xxx-GNU-C.cmake
-|       |_xxx-GNU-CXX.cmake
-|       |_xxx.cmake
-|
-|_ld
-    |_newtarget.ld
-```
-
-Where the `target.json` file specifies the path to the CMake toolchain (`toolchain.cmake`) that uses the standard CMake mechanisms for including compiler, platform and language-specific configuration.
-
-**Note**: Improvements are planned to the yotta target description to allow more reuse of the descriptions between targets.
-
-To make your target available locally (without publishing it), you use the `yotta link-target` command to link it into the global install targets directory:
+1.To make your target available locally (without publishing it), you use the `yotta link-target` command to link it into the global install targets directory:
 
 ```
 # in the directory of your target:
 yotta link-target
 ```
 
-You can then use `yotta link-target <targetname>` command to make the globally linked target available when compiling another module. Then, use the `yotta target <targetname>` command to select your target for the compilation.
+2.Use `yotta link-target <targetname>` command to make the globally linked target available when compiling another module. 
+3.Use the `yotta target <targetname>` command to select your target for the compilation.
 
 # Step 3: Implementing mbed-client-xxx
 
@@ -137,7 +105,7 @@ The `mbed-client-<your-platform-name>` module needs to provide a socket and time
 
 **Note**: Private implementation classes **must** be named as `M2MConnectionHandlerPimpl` and `M2MTimerPimpl`, because of forward declarations.
 
-An example of mbed-client-platform core:
+An example of mbed-client-platform:
 
 ```
 |_module.json
@@ -171,7 +139,7 @@ There are two header files that require porting for your platform:
 - `m2mconnectionhandler.h`
 - `m2mtimer.h` 
 
-To see how this is done in Linux, check the `mbed-client-linux` module available in this package.
+To see how this is done in Linux, check the `mbed-client-linux` module from the mbed [Client Linux Example](https://github.com/ARMmbed/mbed-client-linux-example).
 
 ## Implementing the M2MConnectionHandler class for your platform
 
@@ -198,7 +166,7 @@ public:
     /**
      * @enum ConnectionError
      * This enum defines the error that can come from
-     * the socket read and write operation.
+     * the socket read or write operation.
      */
     typedef enum {
         CONNECTION_ERROR_WANTS_READ = -1000,
@@ -242,7 +210,7 @@ public:
                                 const M2MSecurity* security);
 
     /**
-    * @brief Sends data, to the connected sent to server.
+    * @brief Sends data, to the connected server.
     * @param data_ptr, Data to be sent.
     * @param data_len, Length of data to be sent.
     * @param address_ptr, Address structure where data has to be sent.
@@ -380,6 +348,8 @@ public :
 ```
 
 ## Implementing M2MTimer class for your platform
+
+This class provides periodic timer functionality for your platform.
 
 ```
 /*
@@ -535,7 +505,7 @@ Two platforms, mbed OS and Linux, are already supported. You just need to add yo
 
 # Step 5: Testing and verification
 
-You can build your mbed-client port immediately. After that, run:
+You can build your mbed-client port immediately:
 
 ```
 # use the target we previously made locally available (not necessary if your target has been published):
