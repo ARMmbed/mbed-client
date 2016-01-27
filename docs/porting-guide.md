@@ -46,7 +46,7 @@ mbed-client-linux-example x.x.x
    |_mbed-client-linux 0.0.2
 ```
 
-## Compilation targets (Remove this section and move some of the contents to a more appropriate place in the doc.)
+## Compilation targets
 
 This release supports only one compilation target:
 
