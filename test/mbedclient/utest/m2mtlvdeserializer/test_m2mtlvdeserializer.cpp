@@ -123,6 +123,21 @@ void Test_M2MTLVDeserializer::test_deserialise_object_instances()
         data = 0;
     }
 
+    m2mbase_stub::operation = M2MBase::GET_ALLOWED;
+
+    data = serializer->serialize( m2mobject_stub::instance_list,size);
+
+    CHECK(M2MTLVDeserializer::NotAllowed == deserializer->deserialise_object_instances(data,size,*object,M2MTLVDeserializer::Post));
+
+    size = 0;
+
+    if(data) {
+        free(data);
+        data = 0;
+    }
+
+    m2mbase_stub::operation = M2MBase::GET_PUT_POST_ALLOWED;
+
     u_int8_t value[] = {"value"};
     m2mresourceinstance_stub::value = value;
     m2mresourceinstance_stub::int_value = sizeof(value);
@@ -513,6 +528,7 @@ void Test_M2MTLVDeserializer::test_deserialize_resource_instance()
                                                                 *name,
                                                                 M2MResourceInstance::INTEGER,
                                                                 *instance);
+
 
     m2mbase_stub::operation = M2MBase::GET_ALLOWED;
 

@@ -385,6 +385,24 @@ sn_coap_hdr_s* M2MResource::handle_put_request(nsdl_s *nsdl,
                                                msg_code);
         // process the PUT if we have registered a callback for it
         if(received_coap_header) {
+            uint16_t coap_content_type = 0;
+            bool content_type_present = false;
+            if(received_coap_header->content_type_ptr) {
+                if(coap_response) {
+                    content_type_present = true;
+                    coap_response->content_type_ptr = (uint8_t*)malloc(received_coap_header->content_type_len);
+                    if(coap_response->content_type_ptr) {
+                        memset(coap_response->content_type_ptr, 0, received_coap_header->content_type_len);
+                        memcpy(coap_response->content_type_ptr,
+                               received_coap_header->content_type_ptr,
+                               received_coap_header->content_type_len);
+                        coap_response->content_type_len = received_coap_header->content_type_len;
+                        for(uint8_t i = 0; i < coap_response->content_type_len; i++) {
+                            coap_content_type = (coap_content_type << 8) + (coap_response->content_type_ptr[i] & 0xFF);
+                        }
+                    }
+                }
+            }
             if(received_coap_header->options_list_ptr &&
                received_coap_header->options_list_ptr->uri_query_ptr) {
                 char *query = (char*)malloc(received_coap_header->options_list_ptr->uri_query_len+1);
@@ -404,24 +422,6 @@ sn_coap_hdr_s* M2MResource::handle_put_request(nsdl_s *nsdl,
                     free(query);
                 }
             } else if ((operation() & SN_GRS_PUT_ALLOWED) != 0) {
-                uint16_t coap_content_type = 0;
-                bool content_type_present = false;
-                if(received_coap_header->content_type_ptr) {
-                    if(coap_response) {
-                        content_type_present = true;
-                        coap_response->content_type_ptr = (uint8_t*)malloc(received_coap_header->content_type_len);
-                        if(coap_response->content_type_ptr) {
-                            memset(coap_response->content_type_ptr, 0, received_coap_header->content_type_len);
-                            memcpy(coap_response->content_type_ptr,
-                                   received_coap_header->content_type_ptr,
-                                   received_coap_header->content_type_len);
-                            coap_response->content_type_len = received_coap_header->content_type_len;
-                            for(uint8_t i = 0; i < coap_response->content_type_len; i++) {
-                                coap_content_type = (coap_content_type << 8) + (coap_response->content_type_ptr[i] & 0xFF);
-                            }
-                        }
-                    }
-                }
                 if(!content_type_present &&
                    M2MBase::coap_content_type() == COAP_CONTENT_OMA_TLV_TYPE) {
                     coap_content_type = COAP_CONTENT_OMA_TLV_TYPE;

@@ -70,6 +70,8 @@ void Test_M2MDevice::test_create_resource_instance()
 {
     m2mobjectinstance_stub::create_resource_instance = new M2MResourceInstance("name","type",M2MResourceInstance::INTEGER,*m2mobject_stub::inst);
 
+    m2mobjectinstance_stub::resource = new M2MResource(*m2mobject_stub::inst,"name","type",M2MResourceInstance::STRING,M2MBase::Dynamic);
+
     CHECK(device->create_resource_instance(M2MDevice::ErrorCode,5,1) != NULL);
     CHECK(device->create_resource_instance(M2MDevice::ErrorCode,-1,1) == NULL);
     CHECK(device->create_resource_instance(M2MDevice::ErrorCode,9,1) == NULL);
@@ -90,6 +92,9 @@ void Test_M2MDevice::test_create_resource_instance()
     free(m2mbase_stub::void_value);
     delete m2mobjectinstance_stub::create_resource_instance;
     m2mobjectinstance_stub::create_resource_instance = NULL;
+
+    delete m2mobjectinstance_stub::resource;
+    m2mobjectinstance_stub::resource  = NULL;
 }
 
 void Test_M2MDevice::test_create_resource_string()
@@ -220,6 +225,7 @@ void Test_M2MDevice::test_create_resource_no_param()
 {
     m2mobjectinstance_stub::create_resource = new M2MResource(*m2mobject_stub::inst,"name","type",M2MResourceInstance::STRING,M2MBase::Dynamic);
 
+
     CHECK(device->create_resource(M2MDevice::Reboot) == NULL);
     CHECK(device->create_resource(M2MDevice::ErrorCode) == NULL);
     CHECK(device->create_resource(M2MDevice::SupportedBindingMode) == NULL);
@@ -243,13 +249,21 @@ void Test_M2MDevice::test_create_resource_no_param()
     CHECK(device->create_resource(M2MDevice::PowerSourceVoltage) == NULL);
     CHECK(device->create_resource(M2MDevice::PowerSourceCurrent) == NULL);
 
+    m2mobjectinstance_stub::resource = new M2MResource(*m2mobject_stub::inst,"name","type",M2MResourceInstance::STRING,M2MBase::Dynamic);
+
     CHECK(device->create_resource(M2MDevice::ResetErrorCode) != NULL);
 
     CHECK(device->create_resource(M2MDevice::FactoryReset) != NULL);
+
+    delete m2mobjectinstance_stub::resource;
+    m2mobjectinstance_stub::resource = NULL;
+
     CHECK(M2MBase::POST_ALLOWED == m2mbase_stub::operation);
 
     delete m2mobjectinstance_stub::create_resource;
     m2mobjectinstance_stub::create_resource = NULL;
+
+
 }
 
 void Test_M2MDevice::test_delete_resource()
