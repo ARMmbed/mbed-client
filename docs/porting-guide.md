@@ -142,7 +142,7 @@ There are two header files that require porting for your platform:
 
 To see how this is done in Linux, check the `mbed-client-linux` module from the mbed [Client Linux Example](https://github.com/ARMmbed/mbed-client-linux-example).
 
-## Implementing the M2MConnectionHandler class for your platform
+### Implementing the M2MConnectionHandler class for your platform
 
 ```
 /*
@@ -348,7 +348,7 @@ public :
 
 ```
 
-## Implementing M2MTimer class for your platform
+### Implementing M2MTimer class for your platform
 
 This class provides the periodic timer functionality for your platform.
 
