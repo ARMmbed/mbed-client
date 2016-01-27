@@ -36,7 +36,7 @@ M2MReportHandler::M2MReportHandler(M2MReportObserver &observer)
   _low_step(0.0f),
   _current_value(0.0f),
   _last_value(0.0f),
-  _attribute_state(2),
+  _attribute_state(0),
   _notify(false),
   _obj_instance_id(0)
 {
@@ -394,7 +394,7 @@ void M2MReportHandler::set_default_values()
     _pmin_exceeded = false;
     _pmax_exceeded = false;
     _last_value = 0.0f;
-    _attribute_state = 2;
+    _attribute_state = 0;
 }
 
 bool M2MReportHandler::check_threshold_values()
