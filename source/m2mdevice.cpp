@@ -193,14 +193,14 @@ M2MResource* M2MDevice::create_resource(DeviceResource resource, int64_t value)
                                                             false);
 
             if(res) {
-                char *buffer = (char*)memory_alloc(BUFFER_SIZE);
+                char *buffer = (char*)malloc(BUFFER_SIZE);
                 if(buffer) {
                     uint32_t size = m2m::itoa_c(value, buffer);
                     if (size <= BUFFER_SIZE) {
                         res->set_operation(operation);
                         res->set_value((const uint8_t*)buffer, size);
                     }
-                    memory_free(buffer);
+                    free(buffer);
                 }
                 res->set_register_uri(false);
             }
@@ -236,7 +236,7 @@ M2MResourceInstance* M2MDevice::create_resource_instance(DeviceResource resource
                                                                      false, instance_id);
 
             if(res) {
-                char *buffer = (char*)memory_alloc(BUFFER_SIZE);
+                char *buffer = (char*)malloc(BUFFER_SIZE);
                 if(buffer) {
                     uint32_t size = m2m::itoa_c(value, buffer);
                     if (size <= BUFFER_SIZE) {
@@ -244,7 +244,7 @@ M2MResourceInstance* M2MDevice::create_resource_instance(DeviceResource resource
                         // Only read operation is allowed for above resources
                         res->set_operation(M2MBase::GET_ALLOWED);
                     }
-                    memory_free(buffer);
+                    free(buffer);
                 }
                 res->set_register_uri(false);
             }
@@ -349,13 +349,13 @@ bool M2MDevice::set_resource_value(DeviceResource resource,
             // If it is any of the above resource
             // set the value of the resource.
             if (check_value_range(resource, value)) {
-                char *buffer = (char*)memory_alloc(BUFFER_SIZE);
+                char *buffer = (char*)malloc(BUFFER_SIZE);
                 if(buffer) {
                     uint32_t size = m2m::itoa_c(value, buffer);
                     if (size <= BUFFER_SIZE)
                         success = res->set_value((const uint8_t*)buffer, size);
 
-                    memory_free(buffer);
+                    free(buffer);
                 }
             }
         }

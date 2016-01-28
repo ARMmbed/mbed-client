@@ -37,10 +37,12 @@ class M2MObservationHandler
      * @param object, Observed object whose information needs to be sent
      * @param obs_number, Observation number
      * @param obj_instance_id, Object instance id to be sent
+     * @param send_object, Indicates whether whole object will be sent or not
      */
     virtual void observation_to_be_sent(M2MBase *object,
                                         uint16_t obs_number,
-                                        uint16_t obj_instance_id) = 0;
+                                        uint16_t obj_instance_id,
+                                        bool send_object = false) = 0;
 
     /**
      * @brief Callback for deleting an NSDL resource.

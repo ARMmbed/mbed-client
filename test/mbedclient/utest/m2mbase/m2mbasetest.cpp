@@ -62,6 +62,16 @@ TEST(M2MBase, set_interface_description)
     m2m_base->test_set_interface_description();
 }
 
+TEST(M2MBase, set_uri_path)
+{
+    m2m_base->test_set_uri_path();
+}
+
+TEST(M2MBase, uri_path)
+{
+    m2m_base->test_uri_path();
+}
+
 TEST(M2MBase, set_resource_type)
 {
     m2m_base->test_set_resource_type();

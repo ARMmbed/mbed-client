@@ -27,7 +27,7 @@ public:
 
     Handler(){}
     ~Handler(){}
-    void observation_to_be_sent(M2MBase *, uint16_t, uint16_t){
+    void observation_to_be_sent(M2MBase *, uint16_t, uint16_t, bool){
         visited = true;
     }
     void resource_to_be_deleted(const String &){visited=true;}
@@ -43,7 +43,7 @@ public:
     Observer(){}
     ~Observer(){}
 
-    void observation_to_be_sent(uint16_t){}
+    void observation_to_be_sent(uint16_t,bool){}
 };
 
 Test_M2MBase::Test_M2MBase()
@@ -152,6 +152,21 @@ void Test_M2MBase::test_set_interface_description()
     set_interface_description(test);
 
     CHECK(test == this->_interface_description);
+}
+
+void Test_M2MBase::test_set_uri_path()
+{
+    String test = "10/0/1";
+    set_uri_path(test);
+    CHECK(test == this->_uri_path);
+}
+
+void Test_M2MBase::test_uri_path()
+{
+    String test = "interface_description";
+    this->_uri_path = test;
+
+    CHECK(test == uri_path());
 }
 
 void Test_M2MBase::test_set_resource_type()

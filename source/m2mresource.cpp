@@ -309,6 +309,7 @@ sn_coap_hdr_s* M2MResource::handle_get_request(nsdl_s *nsdl,
                                         for (; it!=_resource_instance_list.end(); it++ ) {
                                             tr_debug("M2MResource::handle_get_request - set_resource_observer");
                                             (*it)->set_resource_observer(this);
+                                            (*it)->add_observation_level(M2MBase::R_Attribute);
                                         }
 
                                         set_under_observation(true,observation_handler);

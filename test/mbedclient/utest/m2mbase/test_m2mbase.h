@@ -35,6 +35,10 @@ public:
 
     void test_set_interface_description();
 
+    void test_set_uri_path();
+
+    void test_uri_path();
+
     void test_set_resource_type();
 
     void test_set_coap_content_type();

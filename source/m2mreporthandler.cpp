@@ -304,7 +304,7 @@ void M2MReportHandler::report()
     else {
         if (_pmax_exceeded) {
             tr_debug("M2MReportHandler::report()- send with PMAX");
-            _observer.observation_to_be_sent(_obj_instance_id);
+            _observer.observation_to_be_sent(_obj_instance_id, true);
         }
         else {
             tr_debug("M2MReportHandler::report()- no need to send");

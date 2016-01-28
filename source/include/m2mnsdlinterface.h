@@ -21,6 +21,7 @@
 #include "mbed-client/m2minterface.h"
 #include "mbed-client/m2mtimerobserver.h"
 #include "mbed-client/m2mobservationhandler.h"
+#include "mbed-client/m2mbase.h"
 #include "include/nsdllinker.h"
 
 //FORWARD DECLARARTION
@@ -30,7 +31,6 @@ class M2MObjectInstance;
 class M2MResource;
 class M2MResourceInstance;
 class M2MNsdlObserver;
-class M2MBase;
 class M2MServer;
 class M2MTimer;
 
@@ -210,7 +210,10 @@ protected: // from M2MTimerObserver
 
 protected: // from M2MObservationHandler
 
-    virtual void observation_to_be_sent(M2MBase *object, uint16_t obs_number, uint16_t obj_instance_id);
+    virtual void observation_to_be_sent(M2MBase *object,
+                                        uint16_t obs_number,
+                                        uint16_t obj_instance_id,
+                                        bool send_object = false);
 
     virtual void resource_to_be_deleted(const String &resource_name);
 
@@ -263,11 +266,19 @@ private:
 
     M2MInterface::Error interface_error(sn_coap_hdr_s *coap_header);
 
-    void send_object_observation(M2MObject *object, uint16_t obs_number, uint16_t obj_instance_id);
+    void send_object_observation(M2MObject *object,
+                                 uint16_t obs_number,
+                                 uint16_t obj_instance_id,
+                                 bool send_object);
 
-    void send_object_instance_observation(M2MObjectInstance *object_instance, uint16_t obs_number);
+    void send_object_instance_observation(M2MObjectInstance *object_instance,
+                                          uint16_t obs_number);
 
     void send_resource_observation(M2MResource *resource, uint16_t obs_number);
+
+    void build_observation_number(uint8_t *obs_number,
+                                  uint8_t *obs_len,
+                                  uint16_t number);
 
 private:
 

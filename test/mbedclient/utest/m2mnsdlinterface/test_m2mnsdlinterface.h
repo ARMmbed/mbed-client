@@ -62,6 +62,8 @@ public:
 
     void test_resource_callback_delete();
 
+    void test_resource_callback_reset();
+
     void test_bootstrap_done_callback();
 
     void test_process_received_data();
