@@ -83,7 +83,7 @@ M2MDevice::M2MDevice()
         res = _device_instance->create_dynamic_resource(DEVICE_SUPPORTED_BINDING_MODE,
                                                         OMA_RESOURCE_TYPE,
                                                         M2MResourceInstance::STRING,
-                                                        true); //
+                                                        true);
         if(res) {
             res->set_operation(M2MBase::GET_ALLOWED);
             res->set_value((const uint8_t*)BINDING_MODE_UDP.c_str(),
@@ -142,7 +142,7 @@ M2MResource* M2MDevice::create_resource(DeviceResource resource, const String &v
             res = _device_instance->create_dynamic_resource(device_id,
                                                             OMA_RESOURCE_TYPE,
                                                             M2MResourceInstance::STRING,
-                                                            true); //false
+                                                            true);
 
             if(res ) {
                 res->set_operation(operation);
@@ -195,7 +195,7 @@ M2MResource* M2MDevice::create_resource(DeviceResource resource, int64_t value)
             res = _device_instance->create_dynamic_resource(device_id,
                                                             OMA_RESOURCE_TYPE,
                                                             M2MResourceInstance::INTEGER,
-                                                            true); //false
+                                                            true);
 
             if(res) {
                 char *buffer = (char*)memory_alloc(BUFFER_SIZE);
@@ -275,7 +275,7 @@ M2MResource* M2MDevice::create_resource(DeviceResource resource)
             res = _device_instance->create_dynamic_resource(device_Id,
                                                             OMA_RESOURCE_TYPE,
                                                             M2MResourceInstance::OPAQUE,
-                                                            true); //false
+                                                            true);
             M2MResource *resource = _device_instance->resource(device_Id);
             if(resource) {
                 resource->set_register_uri(false);

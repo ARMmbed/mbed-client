@@ -58,13 +58,14 @@ M2MResource::M2MResource(M2MObjectInstanceCallback &object_instance_callback,
 {
     M2MBase::set_base_type(M2MBase::Resource);
     M2MBase::set_operation(M2MBase::GET_ALLOWED);    
+    M2MBase::set_observable(false);
 }
 
 M2MResource::M2MResource(M2MObjectInstanceCallback &object_instance_callback,
                          const String &resource_name,
                          const String &resource_type,
                          M2MResourceInstance::ResourceType type,
-                         bool /*observable*/,
+                         bool observable,
                          bool multiple_instance)
 : M2MResourceInstance(resource_name, resource_type, type,
                       object_instance_callback),
@@ -72,6 +73,7 @@ M2MResource::M2MResource(M2MObjectInstanceCallback &object_instance_callback,
 {
     M2MBase::set_base_type(M2MBase::Resource);
     M2MBase::set_operation(M2MBase::GET_PUT_ALLOWED);
+    M2MBase::set_observable(observable);
 }
 
 M2MResource::~M2MResource()
@@ -429,7 +431,7 @@ sn_coap_hdr_s* M2MResource::handle_put_request(nsdl_s *nsdl,
 
                 tr_debug("M2MResource::handle_put_request() - Request Content-Type %d", coap_content_type);
 
-                if(1/*COAP_CONTENT_OMA_TLV_TYPE == coap_content_type*/) {
+                if(COAP_CONTENT_OMA_TLV_TYPE == coap_content_type) {
                     M2MTLVDeserializer *deserializer = new M2MTLVDeserializer();
                     if(deserializer) {
                         M2MTLVDeserializer::Error error = M2MTLVDeserializer::None;

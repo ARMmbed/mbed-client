@@ -155,7 +155,7 @@ M2MResource* M2MFirmware::create_resource(FirmwareResource resource, int64_t val
         case UpdateSupportedObjects:
             if(check_value_range(resource, value)) {
                 firmware_id = FIRMWARE_UPDATE_SUPPORTED_OBJECTS;
-                operation = M2MBase::GET_PUT_ALLOWED;                
+                operation = M2MBase::GET_PUT_ALLOWED;
             }
             break;
         default:

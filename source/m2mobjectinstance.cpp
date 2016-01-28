@@ -138,7 +138,8 @@ M2MResourceInstance* M2MObjectInstance::create_static_resource_instance(const St
         res = new M2MResource(*this,resource_name, resource_type, type,
                               value, value_length, true);
         _resource_list.push_back(res);
-        res->set_operation(M2MBase::GET_PUT_ALLOWED); //GET_ALLOWED
+        res->set_operation(M2MBase::GET_ALLOWED);
+        res->set_observable(false);
         res->set_register_uri(false);
         if(M2MBase::coap_content_type() == COAP_CONTENT_OMA_TLV_TYPE) {
             res->set_coap_content_type(COAP_CONTENT_OMA_TLV_TYPE);
@@ -148,7 +149,7 @@ M2MResourceInstance* M2MObjectInstance::create_static_resource_instance(const St
         instance = new M2MResourceInstance(resource_name, resource_type, type,
                                            value, value_length,*this);
         if(instance) {
-            instance->set_operation(M2MBase::GET_PUT_ALLOWED); //GET_ALLOWED
+            instance->set_operation(M2MBase::GET_ALLOWED);
             instance->set_instance_id(instance_id);
             if(M2MBase::coap_content_type() == COAP_CONTENT_OMA_TLV_TYPE) {
                 instance->set_coap_content_type(COAP_CONTENT_OMA_TLV_TYPE);
@@ -173,10 +174,10 @@ M2MResourceInstance* M2MObjectInstance::create_dynamic_resource_instance(const S
     M2MResource *res = resource(resource_name);
     if(!res) {
         res = new M2MResource(*this,resource_name, resource_type, type,
-                          observable, true);
+                              false, true);
         _resource_list.push_back(res);
         res->set_register_uri(false);
-        res->set_operation(M2MBase::GET_PUT_ALLOWED);
+        res->set_operation(M2MBase::GET_ALLOWED);
         if(M2MBase::coap_content_type() == COAP_CONTENT_OMA_TLV_TYPE) {
             res->set_coap_content_type(COAP_CONTENT_OMA_TLV_TYPE);
         }
@@ -184,7 +185,8 @@ M2MResourceInstance* M2MObjectInstance::create_dynamic_resource_instance(const S
     if(res->supports_multiple_instances() && (res->resource_instance(instance_id) == NULL)) {
         instance = new M2MResourceInstance(resource_name, resource_type, type,*this);
         if(instance) {
-            instance->set_operation(M2MBase::GET_PUT_ALLOWED);
+            instance->set_operation(M2MBase::GET_ALLOWED);
+            instance->set_observable(observable);
             instance->set_instance_id(instance_id);
             if(M2MBase::coap_content_type() == COAP_CONTENT_OMA_TLV_TYPE) {
                 instance->set_coap_content_type(COAP_CONTENT_OMA_TLV_TYPE);

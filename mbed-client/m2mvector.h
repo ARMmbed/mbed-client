@@ -104,6 +104,9 @@ class Vector
             reserve(2 * _capacity + 1);
         }
         _object_template[_index++] = x;
+        if(_index >=_capacity) {
+            _index--;
+        }
         _size++;
     }
 
