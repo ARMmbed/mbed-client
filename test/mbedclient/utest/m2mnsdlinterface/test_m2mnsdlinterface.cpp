@@ -864,6 +864,115 @@ void Test_M2MNsdlInterface::test_resource_callback_delete()
     free(common_stub::coap_header);
     free(address);
     free(coap_header);
+    m2mobject_stub::instance_list.clear();
+}
+
+void Test_M2MNsdlInterface::test_resource_callback_reset()
+{
+    uint8_t value[] = {"name"};
+    sn_coap_hdr_s *coap_header = (sn_coap_hdr_s *)malloc(sizeof(sn_coap_hdr_s));
+    memset(coap_header,0,sizeof(sn_coap_hdr_s));
+    sn_nsdl_addr_s *address = (sn_nsdl_addr_s *)malloc(sizeof(sn_nsdl_addr_s));
+    memset(address,0,sizeof(sn_nsdl_addr_s));
+
+    coap_header->uri_path_ptr = value;
+    coap_header->uri_path_len = sizeof(value);
+
+    coap_header->msg_type = COAP_MSG_TYPE_RESET;
+    m2mobjectinstance_stub::base_type = M2MBase::Object;
+    String *name = new String("name");
+    common_stub::int_value = 0;
+    m2mbase_stub::string_value = name;
+    M2MObject *object = new M2MObject(*name);
+    M2MObjectInstance* instance = new M2MObjectInstance(*name,*object);
+    M2MResource* create_resource = new M2MResource(*instance,
+                                                   *name,
+                                                   *name,
+                                                   M2MResourceInstance::INTEGER,
+                                                   M2MResource::Dynamic,false);
+    m2mobject_stub::int_value = 2;
+    m2mobject_stub::instance_list.push_back(instance);
+
+    m2mobjectinstance_stub::resource_list.push_back(create_resource);
+    m2mobjectinstance_stub::int_value = 1;
+
+    nsdl->_object_list.push_back(object);
+    // No response for RESET message
+    CHECK(nsdl->resource_callback(NULL,coap_header,address,SN_NSDL_PROTOCOL_HTTP) == 1);
+
+
+    m2mobject_stub::base_type = M2MBase::ObjectInstance;
+    // No response for RESET message
+    CHECK(nsdl->resource_callback(NULL,coap_header,address,SN_NSDL_PROTOCOL_HTTP) == 1);
+
+    m2mobject_stub::base_type = M2MBase::Resource;
+    // No response for RESET message
+    CHECK(nsdl->resource_callback(NULL,coap_header,address,SN_NSDL_PROTOCOL_HTTP) == 1);
+
+    delete instance;
+    delete object;
+    delete name;
+    delete create_resource;
+    free(address);
+    free(coap_header);
+    m2mobject_stub::instance_list.clear();
+    m2mobjectinstance_stub::resource_list.clear();
+    //nsdl->_object_list.clear();
+    /*uint8_t value[] = {"name"};
+    sn_coap_hdr_s *coap_header = (sn_coap_hdr_s *)malloc(sizeof(sn_coap_hdr_s));
+    memset(coap_header,0,sizeof(sn_coap_hdr_s));
+    sn_nsdl_addr_s *address = (sn_nsdl_addr_s *)malloc(sizeof(sn_nsdl_addr_s));
+    memset(address,0,sizeof(sn_nsdl_addr_s));
+    common_stub::coap_header = (sn_coap_hdr_ *)malloc(sizeof(sn_coap_hdr_));
+    memset(common_stub::coap_header,0,sizeof(sn_coap_hdr_));
+    coap_header->uri_path_ptr = value;
+    coap_header->uri_path_len = sizeof(value);
+    coap_header->msg_type = COAP_MSG_TYPE_RESET;
+
+    String *name = new String("name");
+    common_stub::int_value = 0;
+    m2mbase_stub::string_value = new String("name");
+    M2MObject *object = new M2MObject(*name);    
+    nsdl->_object_list.push_back(object);
+    CHECK(nsdl->resource_callback(NULL,coap_header,address,SN_NSDL_PROTOCOL_HTTP) == 0);
+
+    uint8_t value2[] = {"name/0"};
+    coap_header->uri_path_ptr = value2;
+    coap_header->uri_path_len = sizeof(value2);
+    M2MObjectInstance* instance = new M2MObjectInstance(*name,*object);
+    m2mbase_stub::int_value = 0;
+    m2mobject_stub::int_value = 1;
+    m2mobject_stub::bool_value = true;
+    m2mobject_stub::instance_list.push_back(instance);
+    m2mobjectinstance_stub::base_type = M2MBase::ObjectInstance;
+    CHECK(nsdl->resource_callback(NULL,coap_header,address,SN_NSDL_PROTOCOL_HTTP) == 0);
+
+    uint8_t value3[] = {"name/0/1"};
+    coap_header->uri_path_ptr = value3;
+    coap_header->uri_path_len = sizeof(value3);
+    M2MResource *res = new M2MResource(*instance,
+                                       "1","1",
+                                       M2MResourceInstance::INTEGER,
+                                       false);
+    nsdl->_object_list.clear();
+    nsdl->_object_list.push_back(object);
+    m2mbase_stub::int_value = 0;
+    m2mobject_stub::int_value = 1;
+    m2mobject_stub::bool_value = true;
+    m2mobjectinstance_stub::resource_list.push_back(res);
+    m2mobjectinstance_stub::int_value = 0;
+    CHECK(nsdl->resource_callback(NULL,coap_header,address,SN_NSDL_PROTOCOL_HTTP) == 0);
+
+    delete instance;
+    delete object;
+    delete name;
+    delete res;
+    delete m2mbase_stub::string_value;
+    m2mbase_stub::string_value = NULL;
+
+    free(common_stub::coap_header);
+    free(address);
+    free(coap_header);*/
 }
 
 void Test_M2MNsdlInterface::test_bootstrap_done_callback()
@@ -1398,3 +1507,4 @@ void Test_M2MNsdlInterface::test_add_object_to_list()
     nsdl->_object_list.clear();
     delete obj;
 }
+

@@ -123,6 +123,11 @@ TEST(M2MNsdlInterface, resource_callback_delete)
     m2m_nsdl_interface->test_resource_callback_delete();
 }
 
+TEST(M2MNsdlInterface, resource_callback_reset)
+{
+    m2m_nsdl_interface->test_resource_callback_reset();
+}
+
 TEST(M2MNsdlInterface, bootstrap_done_callback)
 {
     m2m_nsdl_interface->test_bootstrap_done_callback();

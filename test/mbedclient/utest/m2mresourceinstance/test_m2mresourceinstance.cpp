@@ -36,7 +36,7 @@ class TestReportObserver :  public M2MReportObserver{
 public :
     TestReportObserver() {}
     ~TestReportObserver() {}
-    void observation_to_be_sent(uint16_t){ }
+    void observation_to_be_sent(uint16_t,bool){ }
 };
 
 class ResourceCallback : public M2MResourceCallback {
@@ -59,7 +59,7 @@ public:
 
     Handler(){}
     ~Handler(){}
-    void observation_to_be_sent(M2MBase *, uint16_t, uint16_t){
+    void observation_to_be_sent(M2MBase *, uint16_t, uint16_t, bool){
         visited = true;
     }
     void resource_to_be_deleted(const String &){visited=true;}
@@ -234,6 +234,7 @@ void Test_M2MResourceInstance::test_set_value()
 
     CHECK(resource_instance->set_value(NULL,0) == false);
 
+    m2mbase_stub::observation_level_value = M2MBase::R_Attribute;
     resource_instance->_value = (u_int8_t*)malloc(sizeof(value)+1);
     memset(resource_instance->_value,0,sizeof(value)+1);
     memcpy(resource_instance->_value,value,sizeof(value));
@@ -254,8 +255,18 @@ void Test_M2MResourceInstance::test_set_value()
     CHECK(resource_instance->set_value(value2,(u_int32_t)sizeof(value2)) == true);
     CHECK(resource_cb->visited == true);
 
+    resource_cb->visited = false;
+    m2mbase_stub::observation_level_value = M2MBase::R_Attribute;
+    CHECK(resource_instance->set_value(value3,(u_int32_t)sizeof(value3)) == true);
+    CHECK(resource_cb->visited == true);
 
     resource_instance->set_resource_observer(NULL);
+    resource_cb->visited = false;
+    m2mbase_stub::observation_level_value = M2MBase::R_Attribute;
+    CHECK(resource_instance->set_value(value2,(u_int32_t)sizeof(value2)) == true);
+    CHECK(resource_cb->visited == false);
+
+
     CHECK(resource_instance->set_value(value3,(u_int32_t)sizeof(value3)) == true);
 
     m2mbase_stub::observation_level_value = M2MBase::OI_Attribute;
@@ -298,6 +309,7 @@ void Test_M2MResourceInstance::test_clear_value()
 
     m2mbase_stub::bool_value = true;
     m2mbase_stub::mode_value = M2MBase::Dynamic;
+    m2mbase_stub::observation_level_value = M2MBase::R_Attribute;
     resource_instance->_resource_type = M2MResourceInstance::INTEGER;
     resource_instance->clear_value();
 

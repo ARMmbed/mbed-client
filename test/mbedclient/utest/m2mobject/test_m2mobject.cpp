@@ -27,7 +27,7 @@ class TestReportObserver :  public M2MReportObserver{
 public :
     TestReportObserver() {}
     ~TestReportObserver() {}
-    void observation_to_be_sent(uint16_t){ }
+    void observation_to_be_sent(uint16_t,bool){ }
 };
 
 class Handler : public M2MObservationHandler {
@@ -36,7 +36,7 @@ public:
 
     Handler(){}
     ~Handler(){}
-    void observation_to_be_sent(M2MBase *, uint16_t, uint16_t){
+    void observation_to_be_sent(M2MBase *, uint16_t, uint16_t,bool){
         visited = true;
     }
     void resource_to_be_deleted(const String &){visited=true;}

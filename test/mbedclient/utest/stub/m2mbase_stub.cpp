@@ -201,7 +201,7 @@ bool M2MBase::handle_observation_attribute(char *&query)
     return m2mbase_stub::bool_value;
 }
 
-void M2MBase::observation_to_be_sent(uint16_t obj_instance_id)
+void M2MBase::observation_to_be_sent(uint16_t, bool)
 {
 }
 
@@ -255,4 +255,13 @@ void M2MBase::set_register_uri( bool register_uri)
 bool M2MBase::register_uri()
 {
     return m2mbase_stub::bool_value;
+}
+
+void M2MBase::set_uri_path(const String &uri_path)
+{
+}
+
+const String& M2MBase::uri_path() const
+{
+    return *m2mbase_stub::string_value;
 }

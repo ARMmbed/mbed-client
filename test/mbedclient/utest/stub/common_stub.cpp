@@ -112,6 +112,14 @@ uint16_t sn_nsdl_update_registration(struct nsdl_s *,uint8_t *, uint8_t)
     return common_stub::uint_value;
 }
 
+uint16_t sn_nsdl_send_observation_notification_with_uri_path(struct nsdl_s *, uint8_t *, uint8_t,
+                                                    uint8_t *, uint16_t,
+                                                    uint8_t *, uint8_t,
+                                                    sn_coap_msg_type_e , uint8_t,
+                                                    uint8_t *, uint16_t)
+{
+    return common_stub::uint_value;
+}
 uint16_t sn_nsdl_send_observation_notification(struct nsdl_s *, uint8_t *, uint8_t,
                                                     uint8_t *, uint16_t,
                                                     uint8_t *, uint8_t,

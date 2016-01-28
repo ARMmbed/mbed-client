@@ -334,9 +334,22 @@ public:
      */
     virtual bool register_uri();
 
+    /**
+     * @brief Sets object uri path.
+     * @param path, Object path
+     */
+    virtual void set_uri_path(const String &path);
+
+    /**
+     * @brief Returns uri path of the object.
+     * @return Uri path of the object.
+     */
+    virtual const String &uri_path() const;
+
 protected : // from M2MReportObserver
 
-    virtual void observation_to_be_sent(uint16_t obj_instance_id);
+    virtual void observation_to_be_sent(uint16_t obj_instance_id,
+                                        bool send_object = false);
 
 protected:
 
@@ -405,6 +418,7 @@ private:
     uint8_t                     *_token;
     uint8_t                     _token_length;
     bool                        _register_uri;
+    String                      _uri_path;
 
 friend class Test_M2MBase;
 

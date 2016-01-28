@@ -35,8 +35,10 @@ class M2MReportObserver
      * @brief Observation callback to be sent to the
      * server due to a change in the observed parameter.
      * @param obj_instance_id, Object instance id that has changed
+     * @param send_object, Indicates whether whole object will be sent or not
      */
-    virtual void observation_to_be_sent(uint16_t obj_instance_id) = 0;
+    virtual void observation_to_be_sent(uint16_t obj_instance_id,
+                                        bool send_object = false) = 0;
 };
 
 #endif // M2MREPORTOBSERVER_H

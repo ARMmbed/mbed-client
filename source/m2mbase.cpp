@@ -38,7 +38,7 @@ M2MBase& M2MBase::operator=(const M2MBase& other)
         _observation_level = other._observation_level;
         _observation_handler = other._observation_handler;
         _register_uri = other._register_uri;
-
+        _uri_path = other._uri_path;
         if(_token) {
             free(_token);
             _token = NULL;
@@ -81,7 +81,7 @@ M2MBase::M2MBase(const M2MBase& other) :
     _observation_number = other._observation_number;
     _observation_level = other._observation_level;
     _register_uri = other._register_uri;
-
+    _uri_path = other._uri_path;
     _token_length = other._token_length;
     if(other._token) {
         _token = (uint8_t *)malloc(other._token_length+1);
@@ -110,7 +110,8 @@ M2MBase::M2MBase(const String & resource_name,
   _observation_number(0),
   _token(NULL),
   _token_length(0),
-  _register_uri(true)
+  _register_uri(true),
+  _uri_path("")
 {
     if(is_integer(_name) && _name.size() <= MAX_ALLOWED_STRING_LENGTH) {
         _name_id = strtoul(_name.c_str(), NULL, 10);
@@ -181,7 +182,7 @@ void M2MBase::set_under_observation(bool observed,
 {
 
     tr_debug("M2MBase::set_under_observation - observed: %d", observed);
-    tr_debug("M2MBase::set_under_observation - _base_type: %d", _base_type);
+    tr_debug("M2MBase::set_under_observation - base_type: %d", _base_type);
     _observation_handler = handler;
     if(handler) {
         if (_base_type != M2MBase::ResourceInstance) {
@@ -318,14 +319,15 @@ bool M2MBase::handle_observation_attribute(char *&query)
     return success;
 }
 
-void M2MBase::observation_to_be_sent(uint16_t obj_instance_id)
+void M2MBase::observation_to_be_sent(uint16_t obj_instance_id, bool send_object)
 {
     //TODO: Move this to M2MResourceInstance
-    if(_observation_handler) {
+    if(_observation_handler) {        
        _observation_number++;
        _observation_handler->observation_to_be_sent(this,
                                                     _observation_number,
-                                                    obj_instance_id);
+                                                    obj_instance_id,
+                                                    send_object);
     }
 }
 
@@ -415,4 +417,15 @@ bool M2MBase::is_integer(const String &value)
     char * p ;
     strtol(value.c_str(), &p, 10);
     return (*p == 0);
+}
+
+void M2MBase::set_uri_path(const String &path)
+{
+    _uri_path = path;
+}
+
+
+const String& M2MBase::uri_path() const
+{
+    return _uri_path;
 }
