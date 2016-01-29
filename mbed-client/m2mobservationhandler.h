@@ -35,7 +35,7 @@ class M2MObservationHandler
      * server due to a change in a parameter under observation.
      * @param object, Observed object whose information needs to be sent
      * @param obs_number, Observation number
-     * @param changed_instance_ids, List of changed object instances
+     * @param changed_instance_ids, List of changed object instance id's
      * @param send_object, Indicates whether whole object will be sent or not
      */
     virtual void observation_to_be_sent(M2MBase *object,

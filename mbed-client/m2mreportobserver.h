@@ -32,7 +32,7 @@ class M2MReportObserver
     /**
      * @brief Observation callback to be sent to the
      * server due to a change in the observed parameter.
-     * @param changed_instance_ids, List of changed object instances
+     * @param changed_instance_ids, List of changed object instance id's
      * @param send_object, Indicates whether whole object will be sent or not
      */
     virtual void observation_to_be_sent(m2m::Vector<uint16_t> changed_instance_ids,
