@@ -46,19 +46,15 @@ TEST(M2MFirmware, create_resource_int)
     m2m_firmware->test_create_resource_int();
 }
 
-
-
 TEST(M2MFirmware, delete_resource)
 {
     m2m_firmware->test_delete_resource();
 }
 
-
 TEST(M2MFirmware, set_resource_value_int)
 {
     m2m_firmware->test_set_resource_value_int();
 }
-
 
 TEST(M2MFirmware, set_resource_value_string)
 {

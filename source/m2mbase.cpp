@@ -164,7 +164,7 @@ void M2MBase::set_coap_content_type(const uint8_t con_type)
 
 void M2MBase::set_observable(bool observable)
 {
-   _observable = observable;
+    _observable = observable;
 }
 
 void M2MBase::add_observation_level(M2MBase::Observation observation_level)

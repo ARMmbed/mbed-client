@@ -582,6 +582,18 @@ void Test_M2MResource::test_handle_put_request()
             coap_response->content_type_ptr = NULL;
         }
     }
+    free(coap_header->options_list_ptr);
+    coap_header->options_list_ptr = NULL;
+
+    coap_response = resource->handle_put_request(NULL,coap_header,handler);
+    CHECK( coap_response != NULL);
+    if(coap_response) {
+        if(coap_response->content_type_ptr) {
+            free(coap_response->content_type_ptr);
+            coap_response->content_type_ptr = NULL;
+        }
+    }
+
 
     m2mtlvdeserializer_stub::bool_value = false;
 
@@ -675,7 +687,7 @@ void Test_M2MResource::test_handle_put_request()
     }
 
     free(coap_header->content_type_ptr);
-    free(coap_header->options_list_ptr);
+    //free(coap_header->options_list_ptr);
     free(coap_header->payload_ptr);
     free(common_stub::coap_header);
     delete name;

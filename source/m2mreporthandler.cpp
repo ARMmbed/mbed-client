@@ -283,7 +283,7 @@ void M2MReportHandler::schedule_report()
     tr_debug("M2MReportHandler::schedule_report()");
     _notify = true;
     if ((_attribute_state & M2MReportHandler::Pmin) != M2MReportHandler::Pmin ||
-            _pmin_exceeded) {
+         _pmin_exceeded) {
         report();
     }
 }

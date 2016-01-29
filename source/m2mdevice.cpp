@@ -45,10 +45,11 @@ M2MDevice::M2MDevice()
 : M2MObject(M2M_DEVICE_ID)
 {
     M2MBase::set_register_uri(false);
+    M2MBase::set_operation(M2MBase::GET_ALLOWED);
 
     _device_instance = M2MObject::create_object_instance();
     _device_instance->set_operation(M2MBase::GET_ALLOWED);
-
+    _device_instance->set_register_uri(true);
     if(_device_instance) {
         _device_instance->set_coap_content_type(COAP_CONTENT_OMA_TLV_TYPE);        
         M2MResource* res = _device_instance->create_dynamic_resource(DEVICE_REBOOT,
@@ -63,22 +64,26 @@ M2MDevice::M2MDevice()
         M2MResourceInstance* instance = _device_instance->create_dynamic_resource_instance(DEVICE_ERROR_CODE,
                                                                  OMA_RESOURCE_TYPE,
                                                                  M2MResourceInstance::INTEGER,
-                                                                 false,0);       
+                                                                 true,0);
         if(instance) {
             M2MResource * dev_res = _device_instance->resource(DEVICE_ERROR_CODE);
             dev_res->set_register_uri(false);
             instance->set_operation(M2MBase::GET_ALLOWED);
             uint32_t size = 0;
-            uint8_t* buffer = String::convert_integer_to_array(0, size);
-            instance->set_value(buffer, size);
-            free(buffer);
+            char *buffer = (char*)malloc(BUFFER_SIZE);
+            if(buffer) {
+                size = m2m::itoa_c(0, buffer);
+                if (size <= BUFFER_SIZE)
+                    instance->set_value((const uint8_t*)buffer, size);
 
+                free(buffer);
+            }
             instance->set_register_uri(false);
         }
         res = _device_instance->create_dynamic_resource(DEVICE_SUPPORTED_BINDING_MODE,
                                                         OMA_RESOURCE_TYPE,
                                                         M2MResourceInstance::STRING,
-                                                        false);
+                                                        true);
         if(res) {
             res->set_operation(M2MBase::GET_ALLOWED);
             res->set_value((const uint8_t*)BINDING_MODE_UDP.c_str(),
@@ -137,7 +142,7 @@ M2MResource* M2MDevice::create_resource(DeviceResource resource, const String &v
             res = _device_instance->create_dynamic_resource(device_id,
                                                             OMA_RESOURCE_TYPE,
                                                             M2MResourceInstance::STRING,
-                                                            false);
+                                                            true);
 
             if(res ) {
                 res->set_operation(operation);
@@ -190,7 +195,7 @@ M2MResource* M2MDevice::create_resource(DeviceResource resource, int64_t value)
             res = _device_instance->create_dynamic_resource(device_id,
                                                             OMA_RESOURCE_TYPE,
                                                             M2MResourceInstance::INTEGER,
-                                                            false);
+                                                            true);
 
             if(res) {
                 char *buffer = (char*)malloc(BUFFER_SIZE);
@@ -233,8 +238,12 @@ M2MResourceInstance* M2MDevice::create_resource_instance(DeviceResource resource
         if(_device_instance) {
             res = _device_instance->create_dynamic_resource_instance(device_id,OMA_RESOURCE_TYPE,
                                                                      M2MResourceInstance::INTEGER,
-                                                                     false, instance_id);
+                                                                     true, instance_id);
 
+            M2MResource *resource = _device_instance->resource(device_id);
+            if(resource) {
+                resource->set_register_uri(false);
+            }
             if(res) {
                 char *buffer = (char*)malloc(BUFFER_SIZE);
                 if(buffer) {
@@ -266,7 +275,11 @@ M2MResource* M2MDevice::create_resource(DeviceResource resource)
             res = _device_instance->create_dynamic_resource(device_Id,
                                                             OMA_RESOURCE_TYPE,
                                                             M2MResourceInstance::OPAQUE,
-                                                            false);
+                                                            true);
+            M2MResource *resource = _device_instance->resource(device_Id);
+            if(resource) {
+                resource->set_register_uri(false);
+            }
             if(res) {
                 res->set_operation(M2MBase::POST_ALLOWED);
                 res->set_register_uri(false);

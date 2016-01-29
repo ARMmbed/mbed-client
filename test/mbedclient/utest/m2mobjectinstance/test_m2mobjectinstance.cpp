@@ -683,6 +683,31 @@ void Test_M2MObjectInstance::test_handle_put_request()
         }
     }
 
+    m2mbase_stub::bool_value = true;
+
+    coap_response = object->handle_put_request(NULL,coap_header,handler);
+    CHECK( coap_response != NULL);
+    if(coap_response) {
+        if(coap_response->content_type_ptr) {
+            free(coap_response->content_type_ptr);
+            coap_response->content_type_ptr = NULL;
+        }
+    }
+
+    free(coap_header->options_list_ptr);
+    coap_header->options_list_ptr = NULL;
+
+    m2mbase_stub::bool_value = false;
+
+    coap_response = object->handle_put_request(NULL,coap_header,handler);
+    CHECK( coap_response != NULL);
+    if(coap_response) {
+        if(coap_response->content_type_ptr) {
+            free(coap_response->content_type_ptr);
+            coap_response->content_type_ptr = NULL;
+        }
+    }
+
     m2mtlvdeserializer_stub::error = M2MTLVDeserializer::NotFound;
 
     m2mbase_stub::bool_value = false;
@@ -795,7 +820,7 @@ void Test_M2MObjectInstance::test_handle_put_request()
 
 
     free(coap_header->content_type_ptr);
-    free(coap_header->options_list_ptr);
+    //free(coap_header->options_list_ptr);
     free(common_stub::coap_header);
     delete name;
     free(coap_header);

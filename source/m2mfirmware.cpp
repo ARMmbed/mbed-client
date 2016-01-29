@@ -43,9 +43,11 @@ void M2MFirmware::delete_instance()
 M2MFirmware::M2MFirmware()
 : M2MObject(M2M_FIRMWARE_ID)
 {
+    M2MBase::set_register_uri(false);
+    M2MBase::set_operation(M2MBase::GET_PUT_ALLOWED);
     _firmware_instance = M2MObject::create_object_instance();
     if(_firmware_instance) {
-        _firmware_instance->set_operation(M2MBase::GET_ALLOWED);
+        _firmware_instance->set_operation(M2MBase::GET_PUT_ALLOWED);
         create_mandatory_resources();
     }
 }
@@ -63,6 +65,7 @@ void M2MFirmware::create_mandatory_resources()
                                                                  false);
     if(res) {
         res->set_operation(M2MBase::PUT_ALLOWED);
+        res->set_register_uri(false);
     }
 
     res = _firmware_instance->create_dynamic_resource(FIRMWARE_PACKAGE_URI,
@@ -71,6 +74,7 @@ void M2MFirmware::create_mandatory_resources()
                                                     false);
     if(res) {
         res->set_operation(M2MBase::PUT_ALLOWED);
+        res->set_register_uri(false);
     }
 
     res = _firmware_instance->create_dynamic_resource(FIRMWARE_UPDATE,
@@ -79,22 +83,26 @@ void M2MFirmware::create_mandatory_resources()
                                                     false);
     if(res) {
         res->set_operation(M2MBase::NOT_ALLOWED);
+        res->set_register_uri(false);
     }
 
     res = _firmware_instance->create_dynamic_resource(FIRMWARE_STATE,
                                                     OMA_RESOURCE_TYPE,
                                                     M2MResourceInstance::INTEGER,
-                                                    false);
-    if(res) {
+                                                    true);
+    set_zero_value(res);
+    if(res) {        
         res->set_operation(M2MBase::GET_ALLOWED);
+        res->set_register_uri(false);
     }
-
     res = _firmware_instance->create_dynamic_resource(FIRMWARE_UPDATE_RESULT,
                                                     OMA_RESOURCE_TYPE,
                                                     M2MResourceInstance::INTEGER,
-                                                    false);
+                                                    true);
+    set_zero_value(res);
     if(res) {
         res->set_operation(M2MBase::GET_ALLOWED);
+        res->set_register_uri(false);
     }
 }
 
@@ -123,6 +131,7 @@ M2MResource* M2MFirmware::create_resource(FirmwareResource resource, const Strin
                                                             false);
 
             if(res) {
+                res->set_register_uri(false);
                 res->set_operation(operation);
                 if(value.empty()) {
                     res->clear_value();
@@ -161,14 +170,15 @@ M2MResource* M2MFirmware::create_resource(FirmwareResource resource, int64_t val
                                                             false);
 
             if(res) {
-                char *buffer = (char*)memory_alloc(BUFFER_SIZE);
+                res->set_register_uri(false);
+                char *buffer = (char*)malloc(BUFFER_SIZE);
                 if(buffer) {
                     uint32_t size = m2m::itoa_c(value, buffer);
                     if (size <= BUFFER_SIZE) {
                         res->set_operation(operation);
                         res->set_value((const uint8_t*)buffer, size);
                     }
-                    memory_free(buffer);
+                    free(buffer);
                 }
             }
         }
@@ -210,13 +220,13 @@ bool M2MFirmware::set_resource_value(FirmwareResource resource,
             // If it is any of the above resource
             // set the value of the resource.
             if (check_value_range(resource, value)) {
-                char *buffer = (char*)memory_alloc(BUFFER_SIZE);
+                char *buffer = (char*)malloc(BUFFER_SIZE);
                 if(buffer) {
                     uint32_t size = m2m::itoa_c(value, buffer);
                     if (size <= BUFFER_SIZE) {
                         success = res->set_value((const uint8_t*)buffer, size);
                     }
-                    memory_free(buffer);
+                    free(buffer);
                 }
             }
         }
@@ -446,3 +456,15 @@ bool M2MFirmware::check_value_range(FirmwareResource resource, int64_t value) co
     return success;
 }
 
+void M2MFirmware::set_zero_value(M2MResource *resource)
+{
+    char *buffer = (char*)malloc(BUFFER_SIZE);
+    int64_t value = 0;
+    if(buffer) {
+        uint32_t size = m2m::itoa_c(value, buffer);
+        if (size <= BUFFER_SIZE) {
+            resource->set_value((const uint8_t*)buffer, size);
+        }
+        free(buffer);
+    }
+}
