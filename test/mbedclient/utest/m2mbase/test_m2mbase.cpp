@@ -27,7 +27,7 @@ public:
 
     Handler(){}
     ~Handler(){}
-    void observation_to_be_sent(M2MBase *, uint16_t, uint16_t, bool){
+    void observation_to_be_sent(M2MBase *, uint16_t, m2m::Vector<uint16_t>, bool){
         visited = true;
     }
     void resource_to_be_deleted(const String &){visited=true;}
@@ -43,7 +43,7 @@ public:
     Observer(){}
     ~Observer(){}
 
-    void observation_to_be_sent(uint16_t,bool){}
+    void observation_to_be_sent(m2m::Vector<uint16_t>,bool){}
 };
 
 Test_M2MBase::Test_M2MBase()
@@ -420,14 +420,14 @@ void Test_M2MBase::test_handle_observation_attribute()
 void Test_M2MBase::test_observation_to_be_sent()
 {
     Handler handler;
-
-    observation_to_be_sent(0);
+    Vector<uint16_t> list;
+    observation_to_be_sent(list);
     CHECK(handler.visited == false);
 
     bool test = true;
     set_under_observation(test,&handler);
 
-    observation_to_be_sent(0);
+    observation_to_be_sent(list);
 
     CHECK(handler.visited == true);
 }

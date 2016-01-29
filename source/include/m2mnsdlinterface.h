@@ -212,7 +212,7 @@ protected: // from M2MObservationHandler
 
     virtual void observation_to_be_sent(M2MBase *object,
                                         uint16_t obs_number,
-                                        uint16_t obj_instance_id,
+                                        m2m::Vector<uint16_t> changed_instance_ids,
                                         bool send_object = false);
 
     virtual void resource_to_be_deleted(const String &resource_name);
@@ -268,7 +268,7 @@ private:
 
     void send_object_observation(M2MObject *object,
                                  uint16_t obs_number,
-                                 uint16_t obj_instance_id,
+                                 m2m::Vector<uint16_t> changed_instance_ids,
                                  bool send_object);
 
     void send_object_instance_observation(M2MObjectInstance *object_instance,

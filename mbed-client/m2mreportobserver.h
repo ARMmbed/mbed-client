@@ -17,9 +17,7 @@
 #define M2MREPORTOBSERVER_H
 
 #include <inttypes.h>
-
-//FORWARD DECLARATION
-class M2MResourceInstance;
+#include <mbed-client/m2mvector.h>
 
 /**
  * @brief M2MReportObserver
@@ -34,10 +32,10 @@ class M2MReportObserver
     /**
      * @brief Observation callback to be sent to the
      * server due to a change in the observed parameter.
-     * @param obj_instance_id, Object instance id that has changed
+     * @param changed_instance_ids, List of changed object instances
      * @param send_object, Indicates whether whole object will be sent or not
      */
-    virtual void observation_to_be_sent(uint16_t obj_instance_id,
+    virtual void observation_to_be_sent(m2m::Vector<uint16_t> changed_instance_ids,
                                         bool send_object = false) = 0;
 };
 

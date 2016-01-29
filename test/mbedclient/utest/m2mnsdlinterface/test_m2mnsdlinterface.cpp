@@ -1236,6 +1236,7 @@ void Test_M2MNsdlInterface::test_timer_expired()
 
 void Test_M2MNsdlInterface::test_observation_to_be_sent()
 {
+    Vector<uint16_t> instance_list_ids;
     M2MObject *object = new M2MObject("name");
     M2MObjectInstance* instance = new M2MObjectInstance("name",*object);
     M2MResource *res = new M2MResource(*instance,
@@ -1258,6 +1259,7 @@ void Test_M2MNsdlInterface::test_observation_to_be_sent()
     m2mresource_stub::list.push_back(res_instance);
     m2mresource_stub::list.push_back(res_instance_1);
     m2mresource_stub::int_value = 2;
+    instance_list_ids.push_back(0);
 
     uint8_t value[] = {"value"};
     m2mresourceinstance_stub::value = (uint8_t *)malloc(sizeof(value));
@@ -1272,13 +1274,13 @@ void Test_M2MNsdlInterface::test_observation_to_be_sent()
     m2mresourceinstance_stub::base_type = M2MBase::Resource;
 
     //CHECK if nothing crashes
-    nsdl->observation_to_be_sent(res2, 1, 0);
+    nsdl->observation_to_be_sent(res2, 1, instance_list_ids);
 
     m2mresource_stub::list.clear();
     m2mresource_stub::int_value = 0;
 
     //CHECK if nothing crashes
-    nsdl->observation_to_be_sent(res, 500, 0);
+    nsdl->observation_to_be_sent(res, 500, instance_list_ids);
 
     M2MObjectInstance *object_instance = new M2MObjectInstance("name",*object);
     m2mobject_stub::int_value = 1;    
@@ -1286,14 +1288,14 @@ void Test_M2MNsdlInterface::test_observation_to_be_sent()
     m2mobject_stub::inst = object_instance;
     m2mobjectinstance_stub::resource_list.push_back(res);
     nsdl->_object_list.push_back(object);
+    instance_list_ids.push_back(1);
+    //CHECK if nothing crashes
+    nsdl->observation_to_be_sent(object, 1, instance_list_ids);
+    nsdl->observation_to_be_sent(object, 500, instance_list_ids, true);
 
     //CHECK if nothing crashes
-    nsdl->observation_to_be_sent(object, 1, 0);
-    nsdl->observation_to_be_sent(object, 500, 0);
-
-    //CHECK if nothing crashes
-    nsdl->observation_to_be_sent(object_instance, 1, 0);
-    nsdl->observation_to_be_sent(object_instance, 500, 0);
+    nsdl->observation_to_be_sent(object_instance, 1, instance_list_ids);
+    nsdl->observation_to_be_sent(object_instance, 500, instance_list_ids);
 
     delete owned;
     owned = NULL;

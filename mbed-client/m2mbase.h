@@ -348,7 +348,7 @@ public:
 
 protected : // from M2MReportObserver
 
-    virtual void observation_to_be_sent(uint16_t obj_instance_id,
+    virtual void observation_to_be_sent(m2m::Vector<uint16_t> changed_instance_ids,
                                         bool send_object = false);
 
 protected:

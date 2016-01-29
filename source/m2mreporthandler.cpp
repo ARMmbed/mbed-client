@@ -37,8 +37,7 @@ M2MReportHandler::M2MReportHandler(M2MReportObserver &observer)
   _current_value(0.0f),
   _last_value(0.0f),
   _attribute_state(0),
-  _notify(false),
-  _obj_instance_id(0)
+  _notify(false)
 {
     tr_debug("M2MReportHandler::M2MReportHandler()");
 }
@@ -97,7 +96,7 @@ void M2MReportHandler::set_value(float value)
 void M2MReportHandler::set_notification_trigger(uint16_t obj_instance_id)
 {
     tr_debug("M2MReportHandler::set_notification_trigger()");
-    _obj_instance_id = obj_instance_id;
+    _changed_instance_ids.push_back(obj_instance_id);
     _current_value = 0.0f;
     _last_value = 1.0f;    
     schedule_report();
@@ -258,11 +257,6 @@ bool M2MReportHandler::set_notification_attribute(char* option,
         _low_step = _current_value - _st;
         _attribute_state |= M2MReportHandler::St;        
         tr_debug("M2MReportHandler::set_notification_attribute %s to %f", attribute, _st);
-    }
-    else if(strcmp(attribute, CANCEL.c_str()) == 0) {
-        success = true;
-        _attribute_state |= M2MReportHandler::Cancel;
-        tr_debug("M2MReportHandler::set_notification_attribute cancel");
     }   
 
     // Return false if try to set gt,lt or st when the resource type is something else than numerical
@@ -296,7 +290,8 @@ void M2MReportHandler::report()
         _pmin_exceeded = false;
         _pmax_exceeded = false;
         _notify = false;
-        _observer.observation_to_be_sent(_obj_instance_id);
+        _observer.observation_to_be_sent(_changed_instance_ids);
+        _changed_instance_ids.clear();
         if (_pmax_timer) {
             _pmax_timer->stop_timer();
         }
@@ -304,7 +299,8 @@ void M2MReportHandler::report()
     else {
         if (_pmax_exceeded) {
             tr_debug("M2MReportHandler::report()- send with PMAX");
-            _observer.observation_to_be_sent(_obj_instance_id, true);
+            _observer.observation_to_be_sent(_changed_instance_ids, true);
+            _changed_instance_ids.clear();
         }
         else {
             tr_debug("M2MReportHandler::report()- no need to send");
@@ -395,6 +391,7 @@ void M2MReportHandler::set_default_values()
     _pmax_exceeded = false;
     _last_value = 0.0f;
     _attribute_state = 0;
+    _changed_instance_ids.clear();
 }
 
 bool M2MReportHandler::check_threshold_values()

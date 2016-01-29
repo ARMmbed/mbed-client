@@ -16,7 +16,6 @@
 #ifndef M2M_OBSERVATION_HANDLER_H
 #define M2M_OBSERVATION_HANDLER_H
 
-
 //FORWARD DECLARATION
 class M2MBase;
 class M2MResourceInstance;
@@ -36,12 +35,12 @@ class M2MObservationHandler
      * server due to a change in a parameter under observation.
      * @param object, Observed object whose information needs to be sent
      * @param obs_number, Observation number
-     * @param obj_instance_id, Object instance id to be sent
+     * @param changed_instance_ids, List of changed object instances
      * @param send_object, Indicates whether whole object will be sent or not
      */
     virtual void observation_to_be_sent(M2MBase *object,
                                         uint16_t obs_number,
-                                        uint16_t obj_instance_id,
+                                        m2m::Vector<uint16_t> changed_instance_ids,
                                         bool send_object = false) = 0;
 
     /**
