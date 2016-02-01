@@ -35,7 +35,7 @@ Because there can be only one instance of M2MDevice, it is a static class and yo
 
 `M2MDevice::delete_instance();`
 
-Check the [M2MDevice class documentation](https://docs.mbed.com/docs/mbed-client-guide/en/latest/api/classM2MDevice.html) to see how to configure the Device Object, as well as how to create appropriate Resources and assign values to them. 
+Check the [M2MDevice class documentation](https://docs.mbed.com/docs/mbed-client-guide/en/latest/api/classM2MDevice.html) to see how to configure the Device Object. 
 
 #### Security Object
 
@@ -57,7 +57,7 @@ To create an M2MObject:
 
 #### Configuring the Object
 
-Once you have created an Object (whether OMA-specific or custom), you can configure various parameters in that Object so that they can be controlled or modified to affect communication with mbed Device Server.
+Once you have created an Object (whether OMA-specific or custom), you can configure various parameters in that Object so that they can be controlled or modified to affect communication with mbed Device Server. (Action to Yogesh: include a full code sample for creating a custom object and setting parameters for it.)
 
 Here, we discuss a few of the most important parameters, which you must configure properly to work with the Objects.
 
@@ -71,11 +71,11 @@ To set the operation mode of the Objects so that they can handle `GET`, `PUT`, `
 
 To set the Object to be an observing resource:
 
-`virtual void set_observable(bool observable);`
+`virtual void set_observable(bool observable);` (Yogesh: How do I set it to be not observable? Or is that the default? If it is, we should explain it.)
 
 ##### Setting CoAP content type
 
-Currently, the only available content type is the OMA TLV type. The OMA TLV type works only for Objects with a numeric value. For example, if you are creating a custom Object it must be of a numeric type like `100`.
+Currently, the only available content type is the OMA TLV type. The OMA TLV type works only for Objects with a numeric value. For example, if you are creating a custom Object it must be of a numeric type like `100`. (Yogesh: give an example)
 
 If you want your Object to support the TLV type, set the object's CoAP content type as `99`:
 
@@ -193,7 +193,7 @@ There are other APIs in the M2MDevice class that you can use to set, remove and 
 
 _Mandatory Resources_
 
-Most of the mandatory Resources are created automatically when you create an M2MSecurity Object. You can set their values based on their data types:
+Most of the mandatory Resources (Yogesh: which ones are, which are not) are created automatically when you create an M2MSecurity Object. You can set their values based on their data types:
 
 - For Resources that take integer values:
 
@@ -203,7 +203,7 @@ Most of the mandatory Resources are created automatically when you create an M2M
 
   `bool set_resource_value(SecurityResource resource,const String &value);`
 
-- For Resources that take binary values, like setting public keys and certificates:
+- For Resources that take binary values, like setting public keys and certificates: (Yogesh: explaine the purpose of all three data types, not just binary.)
 
   `bool set_resource_value(SecurityResource resource,onst uint8_t *value,const uint16_t length);`
   
@@ -232,7 +232,7 @@ For each of these types, the Resource and Resource Instances can be either stati
 
 **Creating dynamic and static single-instance Resources**
 
-- To create a single-instance Resource with a static value:
+- To create a single-instance Resource with a static value: (Pekka: add link)
 
 ```	
 M2MResource* create_static_resource(const String &resource_name,
@@ -241,7 +241,7 @@ const uint8_t *value, const uint8_t value_length,
 bool multiple_instance = false);
 ```
 
-- To create a single-instance Resource with a dynamic value that can be set later on:
+- To create a single-instance Resource with a dynamic value that can be set later on: (Pekka: add link)
 
 ```
 M2MResource* create_dynamic_resource(const String &resource_name,
@@ -253,7 +253,7 @@ These APIs take different parameters that you can see in the documentation.
 
 **Creating dynamic and static Resource Instances**
 
-- To create a Resource Instance with a static value:
+- To create a Resource Instance with a static value: (Pekka: add link)
 
 ```
 M2MResourceInstance* create_static_resource_instance(const String &resource_name,
@@ -261,7 +261,7 @@ const String &resource_type, M2MResourceInstance::ResourceType type,
 const uint8_t *value, const uint8_t value_length, uint16_t instance_id);
 ```
 
-- To create a Resource Instance with a dynamic value that can be set later on:
+- To create a Resource Instance with a dynamic value that can be set later on: (Pekka: add link)
 
 ```
 M2MResourceInstance* create_dynamic_resource_instance(const String &resource_name,
