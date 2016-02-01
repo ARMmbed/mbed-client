@@ -232,7 +232,7 @@ For each of these types, the Resource and Resource Instances can be either stati
 
 **Creating dynamic and static single-instance Resources**
 
-- To create a single-instance Resource with a static value: (Pekka: add link)
+- To create a single-instance Resource with a static value: (Pekka: add link, Yogesh: add a code snippet)
 
 ```	
 M2MResource* create_static_resource(const String &resource_name,
@@ -241,7 +241,7 @@ const uint8_t *value, const uint8_t value_length,
 bool multiple_instance = false);
 ```
 
-- To create a single-instance Resource with a dynamic value that can be set later on: (Pekka: add link)
+- To create a single-instance Resource with a dynamic value that can be set later on: (Pekka: add link, Yogesh: add a code snippet)
 
 ```
 M2MResource* create_dynamic_resource(const String &resource_name,
@@ -253,7 +253,7 @@ These APIs take different parameters that you can see in the documentation.
 
 **Creating dynamic and static Resource Instances**
 
-- To create a Resource Instance with a static value: (Pekka: add link)
+- To create a Resource Instance with a static value: (Pekka: add link, Yogesh: add a code snippet)
 
 ```
 M2MResourceInstance* create_static_resource_instance(const String &resource_name,
@@ -261,7 +261,7 @@ const String &resource_type, M2MResourceInstance::ResourceType type,
 const uint8_t *value, const uint8_t value_length, uint16_t instance_id);
 ```
 
-- To create a Resource Instance with a dynamic value that can be set later on: (Pekka: add link)
+- To create a Resource Instance with a dynamic value that can be set later on: (Pekka: add link, Yogesh: add a code snippet)
 
 ```
 M2MResourceInstance* create_dynamic_resource_instance(const String &resource_name,
