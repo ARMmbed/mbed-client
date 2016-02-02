@@ -232,7 +232,7 @@ For each of these types, the Resource and Resource Instances can be either stati
 
 **Creating dynamic and static single-instance Resources**
 
-- To create a single-instance Resource with a static value: (Pekka: add link, Yogesh: add a code snippet)
+- To create a single-instance Resource with a static value: [see parameters here](https://docs.mbed.com/docs/mbed-client-guide/en/latest/api/classM2MObjectInstance.html#aaa596f731688730d7a883b7f1251a662) (Yogesh: add a code snippet)
 
 ```	
 M2MResource* create_static_resource(const String &resource_name,
@@ -241,7 +241,7 @@ const uint8_t *value, const uint8_t value_length,
 bool multiple_instance = false);
 ```
 
-- To create a single-instance Resource with a dynamic value that can be set later on: (Pekka: add link, Yogesh: add a code snippet)
+- To create a single-instance Resource with a dynamic value that can be set later on: [see parameters here](https://docs.mbed.com/docs/mbed-client-guide/en/latest/api/classM2MObjectInstance.html#a9b3f88dc2d28512ea6c3db6f74168c3f)  (Yogesh: add a code snippet)
 
 ```
 M2MResource* create_dynamic_resource(const String &resource_name,
@@ -249,11 +249,10 @@ const String &resource_type, M2MResourceInstance::ResourceType type,
 bool observable, bool multiple_instance = false);
 ```
 
-These APIs take different parameters that you can see in the documentation.
 
 **Creating dynamic and static Resource Instances**
 
-- To create a Resource Instance with a static value: (Pekka: add link, Yogesh: add a code snippet)
+- To create a Resource Instance with a static value: [see parameters here](https://docs.mbed.com/docs/mbed-client-guide/en/latest/api/classM2MObjectInstance.html#a6acac6e65bfbc8b731ab4afcc805c41b) (Yogesh: add a code snippet)
 
 ```
 M2MResourceInstance* create_static_resource_instance(const String &resource_name,
@@ -261,7 +260,7 @@ const String &resource_type, M2MResourceInstance::ResourceType type,
 const uint8_t *value, const uint8_t value_length, uint16_t instance_id);
 ```
 
-- To create a Resource Instance with a dynamic value that can be set later on: (Pekka: add link, Yogesh: add a code snippet)
+- To create a Resource Instance with a dynamic value that can be set later on: [see parameters here](https://docs.mbed.com/docs/mbed-client-guide/en/latest/api/classM2MObjectInstance.html#adcaba046a484282983380edf8a370cfa)  (Yogesh: add code snippet)
 
 ```
 M2MResourceInstance* create_dynamic_resource_instance(const String &resource_name,
@@ -269,7 +268,6 @@ const String &resource_type, M2MResourceInstance::ResourceType type,
 bool observable, uint16_t instance_id);
 ```
 
-These APIs take different parameters that you can see in the documentation.
 
 #### Configuring the Resource and Resource Instance
 

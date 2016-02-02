@@ -2,10 +2,13 @@ site_name: ARM mbed Client Guide
 theme: readthedocs
 use directory_urls: false
 pages:
-- ['index.md', 'About this document']
-- ['Introduction.md','Introduction to mbed Client','mbed Client overview']
+- ['index.md','About this document']
+- ['introduction.md','Introduction to mbed Client','mbed Client overview']
+- ['client_reg_dereg.md','Client Registration']
+- ['dev_man_serv_enable.md','Device Management and Service Enablement']
+- ['info_reporting.md','Information Reporting']
+- ['howto.md','Using mbed Client API','Quick start guide for using mbed Client API']
 - ['porting-guide.md','Porting mbed Client', 'mbed Client structure and build process']
-- ['Howto.md','Using mbed Client API','Quick start guide for using mbed Client API']
 
 
 
