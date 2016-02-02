@@ -22,6 +22,7 @@
 #include "mbed-client/m2mbase.h"
 #include "mbed-client/m2mtimerobserver.h"
 #include "mbed-client/m2mresourceinstance.h"
+#include "mbed-client/m2mvector.h"
 
 //FORWARD DECLARATION
 class M2MReportObserver;
@@ -32,7 +33,6 @@ class M2MResourceInstance;
  *  @brief M2MReportHandler.
  *  This class is handles all the observation related operations.
  */
-
 class M2MReportHandler: public M2MTimerObserver
 {
 private:
@@ -157,7 +157,6 @@ private:
     bool check_gt_lt_params();
 
 private:
-
     M2MReportObserver           &_observer;
     float                       _pmax;
     float                       _pmin;
@@ -174,7 +173,7 @@ private:
     float                       _last_value;    
     uint8_t                     _attribute_state;
     bool                        _notify;
-    uint16_t                    _obj_instance_id;
+    m2m::Vector<uint16_t>       _changed_instance_ids;
 
 friend class Test_M2MReportHandler;
 

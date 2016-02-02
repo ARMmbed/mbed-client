@@ -32,7 +32,7 @@ public:
 
     Handler(){}
     ~Handler(){}
-    void observation_to_be_sent(M2MBase *, uint16_t, uint16_t,bool){
+    void observation_to_be_sent(M2MBase *, uint16_t, m2m::Vector<uint16_t>,bool){
         visited = true;
     }
     void resource_to_be_deleted(const String &){visited=true;}
@@ -47,7 +47,7 @@ class TestReportObserver :  public M2MReportObserver{
 public :
     TestReportObserver() {}
     ~TestReportObserver() {}
-    void observation_to_be_sent(uint16_t,bool){ }
+    void observation_to_be_sent(m2m::Vector<uint16_t>,bool){ }
 };
 
 class Callback : public M2MObjectCallback {

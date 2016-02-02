@@ -26,7 +26,7 @@ public:
 
     Observer(){}
     virtual ~Observer(){}
-    void observation_to_be_sent(uint16_t,bool){
+    void observation_to_be_sent(m2m::Vector<uint16_t>,bool){
         visited = true;
     }
     bool visited;
@@ -86,15 +86,15 @@ void Test_M2MReportHandler::test_parse_notification_attribute()
     CHECK(true == _handler->parse_notification_attribute(val_real, M2MBase::Resource,
                                                          M2MResourceInstance::INTEGER ));
 
-    char* val_real1 = {"a=1&pmin=2&pmax=3&gt=4&lt=5&st=6&cancel"};
+    char* val_real1 = {"a=1&pmin=2&pmax=3&gt=4&lt=5&st=6"};
     CHECK(false == _handler->parse_notification_attribute(val_real1, M2MBase::Resource,
                                                           M2MResourceInstance::INTEGER ));
 
-    char* val2_real = {"cancel=&cancel=&st=6&lt=50&gt=1"};
+    char* val2_real = {"st=6&lt=50&gt=1"};
     CHECK(false == _handler->parse_notification_attribute(val2_real, M2MBase::Resource,
                                                           M2MResourceInstance::INTEGER ));
 
-    char* val3_real = {"cancel&gt=40&lt=5&st=6&cancel"};
+    char* val3_real = {"gt=40&lt=5&st=6"};
     CHECK(true == _handler->parse_notification_attribute(val3_real, M2MBase::Resource,
                                                          M2MResourceInstance::INTEGER ));
 
@@ -131,7 +131,7 @@ void Test_M2MReportHandler::test_parse_notification_attribute()
                                                          M2MResourceInstance::INTEGER ));
 
     char* val4_real = {"cancel"};
-    CHECK(true == _handler->parse_notification_attribute(val4_real, M2MBase::Resource,
+    CHECK(false == _handler->parse_notification_attribute(val4_real, M2MBase::Resource,
                                                          M2MResourceInstance::INTEGER ));
 
     _handler->set_default_values();
@@ -140,15 +140,15 @@ void Test_M2MReportHandler::test_parse_notification_attribute()
     CHECK(true == _handler->parse_notification_attribute(inst_real, M2MBase::Resource,
                                                          M2MResourceInstance::INTEGER ));
 
-    char* inst1_real1 = {"a=1&pmin=2&pmax=3&gt=4&lt=5&st=6&cancel"};
+    char* inst1_real1 = {"a=1&pmin=2&pmax=3&gt=4&lt=5&st=6"};
     CHECK(false == _handler->parse_notification_attribute(inst1_real1, M2MBase::Resource,
                                                           M2MResourceInstance::INTEGER ));
 
-    char* inst2_real = {"cancel=&cancel=&st=6&lt=50&gt=1"};
+    char* inst2_real = {"st=6&lt=50&gt=1"};
     CHECK(false == _handler->parse_notification_attribute(inst2_real, M2MBase::Resource,
                                                           M2MResourceInstance::INTEGER ));
 
-    char* inst3_real = {"cancel&gt=40&lt=5&st=6&cancel"};
+    char* inst3_real = {"gt=40&lt=5&st=6"};
     CHECK(true == _handler->parse_notification_attribute(inst3_real, M2MBase::Resource,
                                                          M2MResourceInstance::INTEGER ));
 
@@ -184,7 +184,7 @@ void Test_M2MReportHandler::test_parse_notification_attribute()
                                                          M2MResourceInstance::INTEGER ));
 
     char* inst4_real = {"cancel"};
-    CHECK(true == _handler->parse_notification_attribute(inst4_real, M2MBase::Resource,
+    CHECK(false == _handler->parse_notification_attribute(inst4_real, M2MBase::Resource,
                                                          M2MResourceInstance::INTEGER ));
 
     _handler->set_default_values();

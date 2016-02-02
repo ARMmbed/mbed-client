@@ -201,7 +201,7 @@ bool M2MBase::handle_observation_attribute(char *&query)
     return m2mbase_stub::bool_value;
 }
 
-void M2MBase::observation_to_be_sent(uint16_t, bool)
+void M2MBase::observation_to_be_sent(m2m::Vector<uint16_t>, bool)
 {
 }
 
