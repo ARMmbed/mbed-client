@@ -523,3 +523,8 @@ void Test_M2MBase::test_register_uri()
     this->_register_uri = false;
     CHECK(this->register_uri() == false);
 }
+void Test_M2MBase::test_set_observation_number()
+ {
+     set_observation_number(0);
+     CHECK(0 == this->_observation_number);
+ }
