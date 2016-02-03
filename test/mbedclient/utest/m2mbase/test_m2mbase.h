@@ -108,6 +108,8 @@ public:
     void test_set_register_uri();
 
     void test_register_uri();
+
+    void test_set_observation_number();
 };
 
 

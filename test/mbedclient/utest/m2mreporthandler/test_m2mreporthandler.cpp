@@ -353,6 +353,15 @@ void Test_M2MReportHandler::test_trigger_object_notification()
     _handler->set_notification_trigger();
     CHECK(_handler->_pmin_exceeded == false);
     CHECK(_observer->visited == true);
+
+    _handler->_changed_instance_ids.push_back(0);
+    _handler->_changed_instance_ids.push_back(1);
+    _handler->_changed_instance_ids.push_back(2);
+
+    _handler->set_notification_trigger();
+    CHECK(_handler->_pmin_exceeded == false);
+    CHECK(_observer->visited == true);
+
 }
 
 void Test_M2MReportHandler::test_set_string_notification_trigger()

@@ -95,8 +95,21 @@ void M2MReportHandler::set_value(float value)
 
 void M2MReportHandler::set_notification_trigger(uint16_t obj_instance_id)
 {
-    tr_debug("M2MReportHandler::set_notification_trigger()");
-    _changed_instance_ids.push_back(obj_instance_id);
+    tr_debug("M2MReportHandler::set_notification_trigger(): %d", obj_instance_id);
+    // Add to array if not there yet
+    m2m::Vector<uint16_t>::const_iterator it;
+    it = _changed_instance_ids.begin();
+    bool found = false;
+    for ( ; it != _changed_instance_ids.end(); it++) {
+        if ((*it) == obj_instance_id) {
+            found = true;
+            break;
+        }
+    }
+    if (!found) {
+        _changed_instance_ids.push_back(obj_instance_id);
+    }
+
     _current_value = 0.0f;
     _last_value = 1.0f;    
     schedule_report();
@@ -289,7 +302,7 @@ void M2MReportHandler::report()
         tr_debug("M2MReportHandler::report()- send with PMIN");
         _pmin_exceeded = false;
         _pmax_exceeded = false;
-        _notify = false;
+        _notify = false;        
         _observer.observation_to_be_sent(_changed_instance_ids);
         _changed_instance_ids.clear();
         if (_pmax_timer) {
@@ -298,7 +311,7 @@ void M2MReportHandler::report()
     }
     else {
         if (_pmax_exceeded) {
-            tr_debug("M2MReportHandler::report()- send with PMAX");
+            tr_debug("M2MReportHandler::report()- send with PMAX");            
             _observer.observation_to_be_sent(_changed_instance_ids, true);
             _changed_instance_ids.clear();
         }
