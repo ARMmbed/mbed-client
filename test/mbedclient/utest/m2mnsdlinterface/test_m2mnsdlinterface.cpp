@@ -84,6 +84,27 @@ public:
     bool value_update;
 };
 
+struct nsdl_s {
+    struct grs_s *grs;
+
+    uint8_t *oma_bs_address_ptr;                                                /* Bootstrap address pointer. If null, no bootstrap in use */
+    uint8_t oma_bs_address_len;                                                 /* Bootstrap address length */
+    uint16_t oma_bs_port;                                                       /* Bootstrap port */
+    void (*sn_nsdl_oma_bs_done_cb)(sn_nsdl_oma_server_info_t *server_info_ptr); /* Callback to inform application when bootstrap is done */
+
+    sn_nsdl_ep_parameters_s *ep_information_ptr;    // Endpoint parameters, Name, Domain etc..
+    sn_nsdl_oma_server_info_t *nsp_address_ptr;     // NSP server address information
+    uint8_t sn_nsdl_endpoint_registered;
+
+    uint16_t register_msg_id;
+    uint16_t unregister_msg_id;
+
+    void *(*sn_nsdl_alloc)(uint16_t);
+    void (*sn_nsdl_free)(void *);
+    uint8_t (*sn_nsdl_tx_callback)(struct nsdl_s *, sn_nsdl_capab_e , uint8_t *, uint16_t, sn_nsdl_addr_s *);
+    uint8_t (*sn_nsdl_rx_callback)(struct nsdl_s *, sn_coap_hdr_s *, sn_nsdl_addr_s *);
+};
+
 Test_M2MNsdlInterface::Test_M2MNsdlInterface()
 {
     observer = new TestObserver();
@@ -1510,3 +1531,54 @@ void Test_M2MNsdlInterface::test_add_object_to_list()
     delete obj;
 }
 
+void Test_M2MNsdlInterface::test_send_delayed_response()
+{
+    String *name = new String("name");
+    common_stub::int_value = 0;
+    m2mbase_stub::int_value = 0;
+
+    M2MObject *object = new M2MObject(*name);
+    M2MObjectInstance* instance = new M2MObjectInstance(*name,*object);
+    nsdl->_nsdl_handle = (nsdl_s*)malloc(sizeof(nsdl_s));
+    memset(nsdl->_nsdl_handle,0,sizeof(nsdl_s));
+
+    sn_nsdl_oma_server_info_t * nsp_address = (sn_nsdl_oma_server_info_t *)malloc(sizeof(sn_nsdl_oma_server_info_t));
+    memset(nsp_address,0,sizeof(sn_nsdl_oma_server_info_t));
+    sn_nsdl_addr_s* address = (sn_nsdl_addr_s*)malloc(sizeof(sn_nsdl_addr_s));
+    memset(address,0,sizeof(sn_nsdl_addr_s));
+
+    M2MResource* resource = new M2MResource(*instance,
+                                            *name,
+                                            *name,
+                                            M2MResourceInstance::INTEGER,
+                                            M2MResource::Dynamic,
+                                            false);
+
+    uint8_t val[] = {"name"};
+    m2mresource_stub::delayed_token = (uint8_t*)malloc(sizeof(val));
+    memcpy(m2mresource_stub::delayed_token,val,sizeof(val));
+    m2mresource_stub::delayed_token_len = sizeof(val);
+
+    m2mresourceinstance_stub::base_type = M2MBase::Resource;
+
+    nsdl->_nsdl_handle->nsp_address_ptr = nsp_address;
+    memset(nsdl->_nsdl_handle->nsp_address_ptr,0,sizeof(sn_nsdl_oma_server_info_t));
+    nsdl->_nsdl_handle->nsp_address_ptr->omalw_address_ptr = address;
+
+    nsdl->send_delayed_response(resource);
+
+    free(nsp_address);
+    free(address);
+    free(nsdl->_nsdl_handle);
+
+    delete object;
+    delete name;
+    name = NULL;
+    delete instance;
+    instance = NULL;
+    delete resource;
+    resource = NULL;
+    free(m2mresource_stub::delayed_token);
+    m2mresource_stub::delayed_token = NULL;
+    m2mresource_stub::delayed_token_len = 0;
+}

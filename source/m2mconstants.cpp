@@ -15,6 +15,7 @@
  */
 #include "mbed-client/m2mconstants.h"
 const String COAP = "coap://";
+const String COAPS = "coaps://";
 
 // PUT attributes to be checked from server
 const String EQUAL = "=";

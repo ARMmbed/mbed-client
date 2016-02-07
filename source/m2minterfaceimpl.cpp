@@ -416,26 +416,45 @@ void M2MInterfaceImpl::state_bootstrap( EventData *data)
                 tr_debug("M2MInterfaceImpl::state_bootstrap - server_address %s", server_address.c_str());
                 String ip_address;
                 uint16_t port;
+                String  coap;
                 if(server_address.compare(0,COAP.size(),COAP) == 0) {
-                    server_address = server_address.substr(COAP.size(),
-                                                           server_address.size()-COAP.size());
-                    int colonFound = server_address.find_last_of(':');
+                     coap = COAP;
+                }
+                else if(server_address.compare(0,COAPS.size(),COAPS) == 0) {
+                    security->resource_value_int(M2MSecurity::SecurityMode) != M2MSecurity::NoSecurity ? coap = COAPS: coap = "";
+                }
+                if(!coap.empty()) {
+                    server_address = server_address.substr(coap.size(),
+                                                       server_address.size()-coap.size());
+                    int colonFound = server_address.find_last_of(':'); //10
                     if(colonFound != -1) {
-                       ip_address = server_address.substr(0,colonFound);
-                       port = atoi(server_address.substr(colonFound+1,
+                        ip_address = server_address.substr(0,colonFound);
+                        port = atoi(server_address.substr(colonFound+1,
                                                          server_address.size()-ip_address.size()).c_str());
-
-                        tr_debug("M2MInterfaceImpl::state_bootstrap - IP address %s , Port %d", ip_address.c_str(), port);
-                       // If bind and resolving server address succeed then proceed else
-                       // return error to the application and go to Idle state.
-                       if(_connection_handler->resolve_server_address(ip_address,
-                                                                      port,
-                                                                      M2MConnectionObserver::Bootstrap,
-                                                                      security)) {
-                           tr_debug("M2MInterfaceImpl::state_bootstrap - resolve_server_address - success");
-                           success = true;
-                       }
+                        colonFound = ip_address.find_last_of(']');
+                        if(ip_address.compare(0,1,"[") == 0) {
+                            if(colonFound == -1) {
+                                ip_address.clear();
+                            } else {
+                                ip_address = ip_address.substr(1,colonFound-1);
+                            }
+                        } else if(colonFound != -1) {
+                            ip_address.clear();
+                        }
                     }
+                    tr_debug("M2MInterfaceImpl::state_bootstrap - IP address %s , Port %d", ip_address.c_str(), port);
+                    // If bind and resolving server address succeed then proceed else
+                    // return error to the application and go to Idle state.
+                    if(ip_address.empty()) {
+                        tr_error("M2MInterfaceImpl::state_bootstrap - set error as M2MInterface::InvalidParameters");
+                        success = false;
+                    } else if(_connection_handler->resolve_server_address(ip_address,
+                                                                  port,
+                                                                  M2MConnectionObserver::Bootstrap,
+                                                                  security)) {
+                       tr_debug("M2MInterfaceImpl::state_bootstrap - resolve_server_address - success");
+                       success = true;
+                   }
                 }
             }
         }
@@ -508,28 +527,47 @@ void M2MInterfaceImpl::state_register( EventData *data)
                     tr_debug("M2MInterfaceImpl::state_register - server_address %s", server_address.c_str());
                     String ip_address;
                     uint16_t port;
+                    String  coap;
                     if(server_address.compare(0,COAP.size(),COAP) == 0) {
-                        server_address = server_address.substr(COAP.size(),
-                                                               server_address.size()-COAP.size());
+                         coap = COAP;
+                    }
+                    else if(server_address.compare(0,COAPS.size(),COAPS) == 0) {
+                        security->resource_value_int(M2MSecurity::SecurityMode) != M2MSecurity::NoSecurity ? coap = COAPS: coap = "";
+                    }
+                    if(!coap.empty()) {
+                        server_address = server_address.substr(coap.size(),
+                                                           server_address.size()-coap.size());
                         int colonFound = server_address.find_last_of(':'); //10
                         if(colonFound != -1) {
-                           ip_address = server_address.substr(0,colonFound);
-                           port = atoi(server_address.substr(colonFound+1,
+                            ip_address = server_address.substr(0,colonFound);
+                            port = atoi(server_address.substr(colonFound+1,
                                                              server_address.size()-ip_address.size()).c_str());
-
-                            tr_debug("M2MInterfaceImpl::state_register - IP address %s , Port %d", ip_address.c_str(), port);
-                           // If bind and resolving server address succeed then proceed else
-                           // return error to the application and go to Idle state.
-                           if(_connection_handler->resolve_server_address(ip_address,
-                                                                          port,
-                                                                          M2MConnectionObserver::LWM2MServer,
-                                                                          security)) {
-                                tr_debug("M2MInterfaceImpl::state_register - resolve_server_address - success");
-                                success = true;
-                            } else {
-                                tr_error("M2MInterfaceImpl::state_register - set error as M2MInterface::NetworkError");
-                                error = M2MInterface::NetworkError;
+                            colonFound = ip_address.find_last_of(']');
+                            if(ip_address.compare(0,1,"[") == 0) {
+                                if(colonFound == -1) {
+                                    ip_address.clear();
+                                } else {
+                                    ip_address = ip_address.substr(1,colonFound-1);
+                                }
+                            } else if(colonFound != -1) {
+                                ip_address.clear();
                             }
+                        }
+                        tr_debug("M2MInterfaceImpl::state_register - IP address %s , Port %d", ip_address.c_str(), port);
+                        // If bind and resolving server address succeed then proceed else
+                        // return error to the application and go to Idle state.
+                        if(ip_address.empty()) {
+                            tr_error("M2MInterfaceImpl::state_register - set error as M2MInterface::InvalidParameters");
+                            error = M2MInterface::InvalidParameters;
+                        }else if(_connection_handler->resolve_server_address(ip_address,
+                                                                      port,
+                                                                      M2MConnectionObserver::LWM2MServer,
+                                                                      security)) {
+                            tr_debug("M2MInterfaceImpl::state_register - resolve_server_address - success");
+                            success = true;
+                        } else {
+                            tr_error("M2MInterfaceImpl::state_register - set error as M2MInterface::NetworkError");
+                            error = M2MInterface::NetworkError;
                         }
                     }
                 }

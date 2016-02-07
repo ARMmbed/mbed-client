@@ -30,6 +30,7 @@ public:
     void observation_to_be_sent(M2MBase *, uint16_t, m2m::Vector<uint16_t>, bool){
         visited = true;
     }
+    void send_delayed_response(M2MBase *){}
     void resource_to_be_deleted(const String &){visited=true;}
     void remove_object(M2MBase *){visited = true;}
     void value_updated(M2MBase *,const String&){visited = true;}
@@ -523,8 +524,21 @@ void Test_M2MBase::test_register_uri()
     this->_register_uri = false;
     CHECK(this->register_uri() == false);
 }
+
 void Test_M2MBase::test_set_observation_number()
- {
-     set_observation_number(0);
-     CHECK(0 == this->_observation_number);
- }
+{
+    set_observation_number(0);
+    CHECK(0 == this->_observation_number);
+}
+
+void Test_M2MBase::test_set_max_age()
+{
+    this->set_max_age(10000);
+    CHECK(this->_max_age == 10000);
+}
+
+void Test_M2MBase::test_max_age()
+{
+    this->_max_age = 10000;
+    CHECK(this->max_age() == 10000);
+}

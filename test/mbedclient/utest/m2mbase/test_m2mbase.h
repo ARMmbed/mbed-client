@@ -110,6 +110,10 @@ public:
     void test_register_uri();
 
     void test_set_observation_number();
+
+    void test_set_max_age();
+
+    void test_max_age();
 };
 
 

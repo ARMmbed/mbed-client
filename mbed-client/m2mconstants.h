@@ -22,6 +22,7 @@
 const int MAX_VALUE_LENGTH = 256;
 const int BUFFER_LENGTH = 1152;
 extern const String COAP;
+extern const String COAPS;
 const int32_t MINIMUM_REGISTRATION_TIME = 60; //in seconds
 const uint64_t ONE_SECOND_TIMER = 1;
 const uint16_t MAX_ALLOWED_STRING_LENGTH = 64;

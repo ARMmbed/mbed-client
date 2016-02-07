@@ -63,6 +63,13 @@ class M2MObservationHandler
      */
     virtual void remove_object(M2MBase *object) = 0;
 
+    /**
+     * @brief Delayed response callback to be sent to the
+     * server due to a changed response.
+     * @param base, Resource which sends the response.
+     */
+    virtual void send_delayed_response(M2MBase *base) = 0;
+
 };
 
 

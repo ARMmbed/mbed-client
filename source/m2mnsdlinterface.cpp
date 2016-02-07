@@ -24,6 +24,7 @@
 #include "include/m2mtlvserializer.h"
 #include "ip6string.h"
 #include "ns_trace.h"
+#include "source/libNsdl/src/include/sn_grs.h"
 #include "mbed-client/m2mtimer.h"
 
 #define BUFFER_SIZE 21
@@ -768,6 +769,45 @@ void M2MNsdlInterface::observation_to_be_sent(M2MBase *object,
             send_object_instance_observation((M2MObjectInstance*)object, obs_number);
         } else if(type == M2MBase::Resource) {
             send_resource_observation((M2MResource*)object, obs_number);
+        }
+    }
+}
+
+void M2MNsdlInterface::send_delayed_response(M2MBase *base)
+{
+    tr_debug("M2MNsdlInterface::send_delayed_response()");
+    M2MResource *resource = NULL;
+    if(base) {
+        if(M2MBase::Resource == base->base_type()) {
+            resource = (M2MResource *)base;
+        }
+        if(resource) {
+            sn_coap_hdr_s * coap_response = (sn_coap_hdr_s *)malloc(sizeof(sn_coap_hdr_s));
+            if(coap_response) {
+                memset(coap_response,0,sizeof(sn_coap_hdr_s));
+
+                coap_response->msg_type = COAP_MSG_TYPE_CONFIRMABLE;
+                coap_response->msg_code = COAP_MSG_CODE_RESPONSE_CONTENT;
+                resource->get_delayed_token(coap_response->token_ptr,coap_response->token_len);
+
+                uint32_t length = 0;
+                resource->get_value(coap_response->payload_ptr, length);
+                coap_response->payload_len = length;
+
+                sn_nsdl_send_coap_message(_nsdl_handle, _nsdl_handle->nsp_address_ptr->omalw_address_ptr, coap_response);
+
+                if(coap_response->payload_ptr) {
+                   free(coap_response->payload_ptr);
+                   coap_response->payload_ptr = NULL;
+                }
+                if(coap_response->token_ptr) {
+                    free(coap_response->token_ptr);
+                    coap_response->token_ptr = NULL;
+                }
+                free(coap_response);
+                coap_response = NULL;
+
+            }
         }
     }
 }

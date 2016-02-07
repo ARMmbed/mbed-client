@@ -142,6 +142,10 @@ void M2MNsdlInterface::observation_to_be_sent(M2MBase *, uint16_t, Vector<uint16
 {
 }
 
+void M2MNsdlInterface::send_delayed_response(M2MBase *)
+{
+}
+
 void M2MNsdlInterface::resource_to_be_deleted(const String &)
 {
 }
