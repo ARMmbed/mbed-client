@@ -50,6 +50,7 @@ public:
     void test_operator_lt();
     void test_reverse();
     void test_itoa_c();
+    void test_convert_integer_to_array();
 
     String* str;
 };
