@@ -577,7 +577,7 @@ sn_coap_hdr_s* M2MObjectInstance::handle_put_request(nsdl_s *nsdl,
 
             tr_debug("M2MObjectInstance::handle_put_request() - Request Content-Type %d", coap_content_type);
 
-            if(1/*COAP_CONTENT_OMA_TLV_TYPE == coap_content_type*/) {
+            if(COAP_CONTENT_OMA_TLV_TYPE == coap_content_type) {
                 M2MTLVDeserializer::Error error = M2MTLVDeserializer::None;
                 M2MTLVDeserializer *deserializer = new M2MTLVDeserializer();
                 if(deserializer && received_coap_header->payload_ptr) {
