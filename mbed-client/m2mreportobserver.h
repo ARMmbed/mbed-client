@@ -37,6 +37,7 @@ class M2MReportObserver
      */
     virtual void observation_to_be_sent(m2m::Vector<uint16_t> changed_instance_ids,
                                         bool send_object = false) = 0;
+
 };
 
 #endif // M2MREPORTOBSERVER_H

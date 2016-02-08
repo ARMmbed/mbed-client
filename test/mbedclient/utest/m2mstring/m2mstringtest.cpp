@@ -155,3 +155,8 @@ TEST(M2MString, test_itoa_c)
 {
     m2m_string->test_itoa_c();
 }
+
+TEST(M2MString, test_convert_integer_to_array)
+{
+    m2m_string->test_convert_integer_to_array();
+}

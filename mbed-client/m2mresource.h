@@ -102,6 +102,27 @@ public:
     bool supports_multiple_instances() const;
 
     /**
+     * @brief Sets whether the resource should send a delayed response for POST request.
+     * @param delayed_response, Boolean value to set the delayed responde.
+     */
+    void set_delayed_response(bool delayed_response);
+
+    /**
+     * @brief Trigger to send the delayed response for POST request.
+     * The delayed_response flag must be set before receiving POST request
+     * and the value of resource must be updated before calling this function.
+     * @return boolean, true if response is sent else false.
+     */
+    bool send_delayed_post_response();
+
+    /**
+     * @brief Provides the value of the given token.
+     * @param value[OUT], Pointer to the token value.
+     * @param value_length[OUT], Length of the token pointer.
+     */
+    void get_delayed_token(uint8_t *&token, uint8_t &token_length);
+
+    /**
      * @brief Removes the resource with the given name.
      * @param name, Name of the resource to be removed.
      * @param instance_id, Instance ID of resource to be removed, default is 0.
@@ -127,6 +148,12 @@ public:
      * @return Total number of resources.
      */
     virtual uint16_t resource_instance_count() const;
+
+    /**
+     * @brief Returns the value set for delayed response.
+     * @return Value for delayed response.
+     */
+    bool delayed_response() const;
 
     /**
      * @brief Parses the received query for a notification
@@ -188,6 +215,10 @@ private:
 
     M2MResourceInstanceList     _resource_instance_list; // owned
     bool                        _has_multiple_instances;
+    bool                        _delayed_response;
+    uint8_t                     *_delayed_token;
+    uint8_t                     _delayed_token_len;
+
 
 friend class Test_M2MResource;
 friend class Test_M2MObjectInstance;

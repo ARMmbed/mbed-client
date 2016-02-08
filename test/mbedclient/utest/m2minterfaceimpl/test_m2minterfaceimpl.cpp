@@ -112,7 +112,64 @@ void Test_M2MInterfaceImpl::test_constructor()
 void Test_M2MInterfaceImpl::test_bootstrap()
 {
     M2MSecurity *sec = new M2MSecurity(M2MSecurity::Bootstrap);
-    String *val = new String("coap://10.45.3.83:5685");
+    m2msecurity_stub::int_value = 2;
+    String *val = new String("coaps://[2001:12:12:23::23:FF]:5685");
+
+    m2msecurity_stub::string_value = val;
+    m2mnsdlinterface_stub::bool_value = true;
+    m2mconnectionhandler_stub::bool_value = true;
+
+    impl->bootstrap(sec);
+
+    CHECK(impl->_current_state == M2MInterfaceImpl::STATE_BOOTSTRAP);
+
+    delete val;
+
+    val = new String("coaps://[10.45.3.83:5685");
+
+    impl->_register_ongoing = false;
+    impl->_current_state = M2MInterfaceImpl::STATE_IDLE;
+
+    m2msecurity_stub::string_value = val;
+    m2mnsdlinterface_stub::bool_value = true;
+    m2mconnectionhandler_stub::bool_value = true;
+
+    impl->bootstrap(sec);
+    CHECK(impl->_current_state == M2MInterfaceImpl::STATE_IDLE);
+
+    delete val;
+
+    val = new String("coaps://10.45.3.83]:5685");
+
+    impl->_register_ongoing = false;
+    impl->_current_state = M2MInterfaceImpl::STATE_IDLE;
+
+    m2msecurity_stub::string_value = val;
+    m2mnsdlinterface_stub::bool_value = true;
+    m2mconnectionhandler_stub::bool_value = true;
+
+    impl->bootstrap(sec);
+
+    CHECK(impl->_current_state == M2MInterfaceImpl::STATE_IDLE);
+
+    delete val;
+
+    val = new String("coaps://10.45.3.83:5685");
+
+    impl->_register_ongoing = false;
+    impl->_current_state = M2MInterfaceImpl::STATE_IDLE;
+
+    m2msecurity_stub::string_value = val;
+    m2mnsdlinterface_stub::bool_value = true;
+    m2mconnectionhandler_stub::bool_value = true;
+
+    impl->bootstrap(sec);
+
+    CHECK(impl->_current_state == M2MInterfaceImpl::STATE_BOOTSTRAP);
+
+    delete val;
+
+    val = new String("coap://10.45.3.83:5685");
     m2msecurity_stub::string_value = val;
     m2mconnectionhandler_stub::bool_value = true;
 
@@ -154,6 +211,7 @@ void Test_M2MInterfaceImpl::test_cancel_bootstrap()
 void Test_M2MInterfaceImpl::test_register_object()
 {
     M2MSecurity *sec = new M2MSecurity(M2MSecurity::M2MServer);
+    m2msecurity_stub::int_value = 2;
 
     M2MObject *object = new M2MObject("test");
     M2MObjectInstance *ins = object->create_object_instance();
@@ -162,7 +220,8 @@ void Test_M2MInterfaceImpl::test_register_object()
     M2MObjectList list;
     list.push_back(object);
 
-    String *val = new String("coap://10.45.3.83:5685");
+    String *val = new String("coaps://[2001:12:12:23::23:FF]:5685");
+
     m2msecurity_stub::string_value = val;
     m2mnsdlinterface_stub::bool_value = true;
     m2mconnectionhandler_stub::bool_value = true;
@@ -170,6 +229,59 @@ void Test_M2MInterfaceImpl::test_register_object()
     impl->register_object(sec,list);
 
     CHECK(impl->_current_state == M2MInterfaceImpl::STATE_REGISTER);
+
+    delete val;
+
+    val = new String("coaps://[10.45.3.83:5685");
+
+    impl->_register_ongoing = false;
+    impl->_current_state = M2MInterfaceImpl::STATE_IDLE;
+
+    m2msecurity_stub::string_value = val;
+    m2mnsdlinterface_stub::bool_value = true;
+    m2mconnectionhandler_stub::bool_value = true;
+
+    impl->register_object(sec,list);
+
+    CHECK(impl->_current_state == M2MInterfaceImpl::STATE_IDLE);
+
+    delete val;
+
+    val = new String("coaps://10.45.3.83]:5685");
+
+    impl->_register_ongoing = false;
+    impl->_current_state = M2MInterfaceImpl::STATE_IDLE;
+
+    m2msecurity_stub::string_value = val;
+    m2mnsdlinterface_stub::bool_value = true;
+    m2mconnectionhandler_stub::bool_value = true;
+
+    impl->register_object(sec,list);
+
+    CHECK(impl->_current_state == M2MInterfaceImpl::STATE_IDLE);
+
+    delete val;
+
+    val = new String("coaps://10.45.3.83:5685");
+
+    impl->_register_ongoing = false;
+    impl->_current_state = M2MInterfaceImpl::STATE_IDLE;
+
+    m2msecurity_stub::string_value = val;
+    m2mnsdlinterface_stub::bool_value = true;
+    m2mconnectionhandler_stub::bool_value = true;
+
+    impl->register_object(sec,list);
+
+    CHECK(impl->_current_state == M2MInterfaceImpl::STATE_REGISTER);
+
+    delete val;
+
+    val = new String("coap://10.45.3.83:5685");
+
+    impl->register_object(sec,list);
+
+    CHECK(impl->_current_state == M2MInterfaceImpl::STATE_REGISTER);       
 
     m2mnsdlinterface_stub::bool_value = true;
     m2mconnectionhandler_stub::bool_value = false;

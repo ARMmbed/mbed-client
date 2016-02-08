@@ -177,3 +177,8 @@ TEST(M2MNsdlInterface, add_object_to_list)
 {
     m2m_nsdl_interface->test_add_object_to_list();
 }
+
+TEST(M2MNsdlInterface, test_send_delayed_response)
+{
+    m2m_nsdl_interface->test_send_delayed_response();
+}

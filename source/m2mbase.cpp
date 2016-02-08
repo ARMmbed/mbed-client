@@ -39,6 +39,7 @@ M2MBase& M2MBase::operator=(const M2MBase& other)
         _observation_handler = other._observation_handler;
         _register_uri = other._register_uri;
         _uri_path = other._uri_path;
+        _max_age = other._max_age;
         if(_token) {
             free(_token);
             _token = NULL;
@@ -82,6 +83,7 @@ M2MBase::M2MBase(const M2MBase& other) :
     _observation_level = other._observation_level;
     _register_uri = other._register_uri;
     _uri_path = other._uri_path;
+    _max_age = other._max_age;
     _token_length = other._token_length;
     if(other._token) {
         _token = (uint8_t *)malloc(other._token_length+1);
@@ -111,7 +113,8 @@ M2MBase::M2MBase(const String & resource_name,
   _token(NULL),
   _token_length(0),
   _register_uri(true),
-  _uri_path("")
+  _uri_path(""),
+  _max_age(0)
 {
     if(is_integer(_name) && _name.size() <= MAX_ALLOWED_STRING_LENGTH) {
         _name_id = strtoul(_name.c_str(), NULL, 10);
@@ -167,14 +170,14 @@ void M2MBase::set_observable(bool observable)
     _observable = observable;
 }
 
-void M2MBase::add_observation_level(M2MBase::Observation observation_level)
+void M2MBase::add_observation_level(M2MBase::Observation obs_level)
 {
-    _observation_level = (M2MBase::Observation)(_observation_level | observation_level);
+    _observation_level = (M2MBase::Observation)(_observation_level | obs_level);
 }
 
-void M2MBase::remove_observation_level(M2MBase::Observation observation_level)
+void M2MBase::remove_observation_level(M2MBase::Observation obs_level)
 {
-    _observation_level = (M2MBase::Observation)(_observation_level ^ observation_level);
+    _observation_level = (M2MBase::Observation)(_observation_level ^ obs_level);
 }
 
 void M2MBase::set_under_observation(bool observed,
@@ -225,6 +228,11 @@ void M2MBase::set_instance_id(const uint16_t inst_id)
 
 void M2MBase::set_observation_number(const uint16_t /*observation_number*/)
 {
+}
+
+void M2MBase::set_max_age(const uint32_t max_age)
+{
+    _max_age = max_age;
 }
 
 M2MBase::BaseType M2MBase::base_type() const
@@ -300,6 +308,11 @@ M2MBase::Mode M2MBase::mode() const
 uint16_t M2MBase::observation_number() const
 {
     return _observation_number;
+}
+
+uint32_t M2MBase::max_age() const
+{
+    return _max_age;
 }
 
 bool M2MBase::handle_observation_attribute(char *&query)

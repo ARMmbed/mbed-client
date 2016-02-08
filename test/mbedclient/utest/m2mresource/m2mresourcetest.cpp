@@ -115,3 +115,23 @@ TEST(M2MResource, test_notification_update)
 {
     m2m_resource->test_notification_update();
 }
+
+TEST(M2MResource, test_set_delayed_response)
+{
+    m2m_resource->test_set_delayed_response();
+}
+
+TEST(M2MResource, test_send_delayed_post_response)
+{
+    m2m_resource->test_send_delayed_post_response();
+}
+
+TEST(M2MResource, test_get_delayed_token)
+{
+    m2m_resource->test_get_delayed_token();
+}
+
+TEST(M2MResource, test_delayed_response)
+{
+    m2m_resource->test_delayed_response();
+}

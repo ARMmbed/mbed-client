@@ -262,9 +262,8 @@ sn_coap_hdr_s* M2MObject::handle_get_request(nsdl_s *nsdl,
                 coap_response->options_list_ptr = (sn_coap_options_list_s*)malloc(sizeof(sn_coap_options_list_s));
                 memset(coap_response->options_list_ptr, 0, sizeof(sn_coap_options_list_s));
 
-                coap_response->options_list_ptr->max_age_ptr = (uint8_t*)malloc(1);
-                memset(coap_response->options_list_ptr->max_age_ptr,0,1);
-                coap_response->options_list_ptr->max_age_len = 1;
+                coap_response->options_list_ptr->max_age_ptr = m2m::String::convert_integer_to_array(max_age(),
+                                                                                                     coap_response->options_list_ptr->max_age_len);
 
                 if(data){
                     if(received_coap_header->token_ptr) {

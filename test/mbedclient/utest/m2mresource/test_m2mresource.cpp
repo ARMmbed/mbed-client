@@ -64,6 +64,7 @@ public:
     void observation_to_be_sent(M2MBase *, uint16_t,m2m::Vector<uint16_t>,bool){
         visited = true;
     }
+    void send_delayed_response(M2MBase *){}
     void resource_to_be_deleted(const String &){visited=true;}
     void remove_object(M2MBase *){visited = true;}
     void value_updated(M2MBase *,const String&){visited = true;}
@@ -87,6 +88,8 @@ void Test_M2MResource::test_copy_constructor()
 {
     u_int8_t value[] = {"value"};
     resource->set_value(value,(u_int32_t)sizeof(value));
+    resource->_delayed_token = (u_int8_t*)malloc(sizeof(value));
+    resource->_delayed_token_len = sizeof(value);
 
     M2MResourceInstance *res = new M2MResourceInstance("name","type",M2MResourceInstance::STRING,*callback);
     resource->add_resource_instance(res);
@@ -730,15 +733,32 @@ void Test_M2MResource::test_handle_post_request()
     coap_header->content_type_len = 1;
     *coap_header->content_type_ptr = 99;
 
+    resource->_delayed_response = true;
+    resource->_delayed_token = (uint8_t*)malloc(1);
+    *resource->_delayed_token  = 2;
+    coap_header->token_ptr = (uint8_t*)malloc(1);
+    *coap_header->token_ptr = 1;
+    coap_header->token_len = 1;
+
     m2mbase_stub::bool_value = false;
 
     CHECK(resource->handle_post_request(NULL,coap_header,handler) != NULL);
+
+    m2mresourceinstance_stub::int_value = sizeof(value);
+    m2mresourceinstance_stub::value = value;
+
+    resource->_delayed_response = false;
+    sn_coap_hdr_s *coap_response = resource->handle_post_request(NULL,coap_header,handler);
+
+    CHECK(coap_response != NULL);
+    free(coap_response->payload_ptr);
 
     m2mbase_stub::operation = M2MBase::NOT_ALLOWED;
     CHECK(resource->handle_post_request(NULL,coap_header,handler) != NULL);
 
     CHECK(resource->handle_post_request(NULL,NULL,handler) != NULL);
 
+    free(coap_header->token_ptr);
     free(coap_header->content_type_ptr);
     free(coap_header->options_list_ptr);
     free(coap_header->payload_ptr);
@@ -761,4 +781,35 @@ void Test_M2MResource::test_notification_update()
 
     delete m2mbase_stub::report;
     m2mbase_stub::report = NULL;
+}
+
+void Test_M2MResource::test_set_delayed_response()
+{
+    resource->set_delayed_response(true);
+    CHECK(resource->_delayed_response == true);
+}
+
+void Test_M2MResource::test_send_delayed_post_response()
+{
+    resource->_delayed_response = true;
+    m2mbase_stub::observe = handler;
+    CHECK(resource->send_delayed_post_response() == true);
+}
+
+void Test_M2MResource::test_get_delayed_token()
+{
+    uint8_t value[] = {"1"};
+    uint8_t *token = NULL;
+    uint8_t token_len = 0;
+    resource->_delayed_token_len = 1;
+    resource->_delayed_token = (uint8_t*)malloc(sizeof(1));
+    memcpy(resource->_delayed_token,value,1);
+    resource->get_delayed_token(token,token_len);
+    CHECK(token != NULL);
+}
+
+void Test_M2MResource::test_delayed_response()
+{
+    resource->_delayed_response = false;
+    CHECK(resource->delayed_response() == false);
 }

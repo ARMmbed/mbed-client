@@ -60,6 +60,14 @@ public:
 
     void test_notification_update();
 
+    void test_set_delayed_response();
+
+    void test_send_delayed_post_response();
+
+    void test_get_delayed_token();
+
+    void test_delayed_response();
+
     M2MResource* resource;
     Callback *callback;
 

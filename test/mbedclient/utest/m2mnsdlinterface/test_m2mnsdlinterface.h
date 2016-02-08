@@ -84,6 +84,8 @@ public:
 
     void test_add_object_to_list(); //Special: Would be too difficult to test in normal ways
 
+    void test_send_delayed_response();
+
     M2MNsdlInterface* nsdl;
 
     TestObserver *observer;

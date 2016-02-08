@@ -221,6 +221,8 @@ protected: // from M2MObservationHandler
 
     virtual void remove_object(M2MBase *object);
 
+    void send_delayed_response(M2MBase *base);
+
 private:
 
     /**

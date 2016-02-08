@@ -35,12 +35,22 @@ M2MResource& M2MResource::operator=(const M2MResource& other)
                 _resource_instance_list.push_back(new M2MResourceInstance(*ins));
             }
         }
+        if(other._delayed_token) {
+            _delayed_token = (uint8_t*)malloc(other._delayed_token_len);
+            if(_delayed_token) {
+                memcpy(_delayed_token,other._delayed_token,other._delayed_token_len);
+                _delayed_token_len = other._delayed_token_len;
+            }
+        }
     }
     return *this;
 }
 
 M2MResource::M2MResource(const M2MResource& other)
-: M2MResourceInstance(other)
+: M2MResourceInstance(other),
+  _delayed_response(false),
+  _delayed_token(NULL),
+  _delayed_token_len(0)
 {
     this->operator=(other);
 }
@@ -54,7 +64,10 @@ M2MResource::M2MResource(M2MObjectInstanceCallback &object_instance_callback,
                          bool multiple_instance)
 : M2MResourceInstance(resource_name, resource_type, type, value, value_length,
                       object_instance_callback),
-  _has_multiple_instances(multiple_instance)
+  _has_multiple_instances(multiple_instance),
+  _delayed_response(false),
+  _delayed_token(NULL),
+  _delayed_token_len(0)
 {
     M2MBase::set_base_type(M2MBase::Resource);
     M2MBase::set_operation(M2MBase::GET_ALLOWED);    
@@ -69,7 +82,10 @@ M2MResource::M2MResource(M2MObjectInstanceCallback &object_instance_callback,
                          bool multiple_instance)
 : M2MResourceInstance(resource_name, resource_type, type,
                       object_instance_callback),
-  _has_multiple_instances(multiple_instance)
+  _has_multiple_instances(multiple_instance),
+  _delayed_response(false),
+  _delayed_token(NULL),
+  _delayed_token_len(0)
 {
     M2MBase::set_base_type(M2MBase::Resource);
     M2MBase::set_operation(M2MBase::GET_PUT_ALLOWED);
@@ -90,11 +106,36 @@ M2MResource::~M2MResource()
         }
         _resource_instance_list.clear();
     }
+    if(_delayed_token) {
+        free(_delayed_token);
+        _delayed_token = NULL;
+    }
 }
 
 bool M2MResource::supports_multiple_instances() const
 {
     return _has_multiple_instances;
+}
+
+void M2MResource::set_delayed_response(bool delayed_response)
+{
+    _delayed_response = delayed_response;
+}
+
+bool M2MResource::send_delayed_post_response()
+{
+    bool success = false;
+    if(_delayed_response) {
+        success = true;
+        observation_handler()->send_delayed_response(this);
+    }
+    return success;
+}
+
+void M2MResource::get_delayed_token(uint8_t *&token, uint8_t &token_length)
+{
+    token = _delayed_token;
+    token_length = _delayed_token_len;
 }
 
 bool M2MResource::remove_resource_instance(uint16_t inst_id)
@@ -147,6 +188,11 @@ const M2MResourceInstanceList& M2MResource::resource_instances() const
 uint16_t M2MResource::resource_instance_count() const
 {
     return (uint16_t)_resource_instance_list.size();
+}
+
+bool M2MResource::delayed_response() const
+{
+    return _delayed_response;
 }
 
 bool M2MResource::handle_observation_attribute(char *&query)
@@ -281,9 +327,8 @@ sn_coap_hdr_s* M2MResource::handle_get_request(nsdl_s *nsdl,
                     coap_response->options_list_ptr = (sn_coap_options_list_s*)malloc(sizeof(sn_coap_options_list_s));
                     memset(coap_response->options_list_ptr, 0, sizeof(sn_coap_options_list_s));
 
-                    coap_response->options_list_ptr->max_age_ptr = (uint8_t*)malloc(1);
-                    memset(coap_response->options_list_ptr->max_age_ptr,0,1);
-                    coap_response->options_list_ptr->max_age_len = 1;
+                    coap_response->options_list_ptr->max_age_ptr = m2m::String::convert_integer_to_array(max_age(),
+                                                                                                         coap_response->options_list_ptr->max_age_len);
 
                     if(received_coap_header->token_ptr) {
                         tr_debug("M2MResource::handle_get_request - Sets Observation Token to resource");
@@ -519,6 +564,28 @@ sn_coap_hdr_s* M2MResource::handle_post_request(nsdl_s *nsdl,
             tr_debug("M2MResource::handle_post_request - Execute resource function");
             execute(arguments);
             free(arguments);
+            if(_delayed_response) {
+                coap_response->msg_type = COAP_MSG_TYPE_ACKNOWLEDGEMENT;
+                coap_response->msg_code = COAP_MSG_CODE_EMPTY;
+                coap_response->msg_id = received_coap_header->msg_id;
+                if(received_coap_header->token_len) {
+                    if(_delayed_token) {
+                     free(_delayed_token);
+                     _delayed_token = NULL;
+                     _delayed_token_len = 0;
+                    }
+                    _delayed_token = (uint8_t*)malloc(received_coap_header->token_len);
+                    if(_delayed_token) {
+                        memset(_delayed_token,0,received_coap_header->token_len);
+                        _delayed_token_len = received_coap_header->token_len;
+                        memcpy(_delayed_token, received_coap_header->token_ptr, _delayed_token_len);
+                    }
+                }
+            } else {
+                uint32_t length = 0;
+                get_value(coap_response->payload_ptr, length);
+                coap_response->payload_len = length;
+            }
         } else { // if ((object->operation() & SN_GRS_POST_ALLOWED) != 0)
             tr_error("M2MResource::handle_post_request - COAP_MSG_CODE_RESPONSE_METHOD_NOT_ALLOWED");
             msg_code = COAP_MSG_CODE_RESPONSE_METHOD_NOT_ALLOWED; // 4.05

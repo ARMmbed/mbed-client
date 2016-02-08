@@ -201,6 +201,12 @@ public:
         __attribute__ ((deprecated));
 
     /**
+     * Sets the max age for the resource value to be cached.
+     * @param max_age, Max age in seconds.
+     */
+    virtual void set_max_age(const uint32_t max_age);
+
+    /**
      * @brief Returns object type.
      * @return BaseType of the object.
      */
@@ -278,6 +284,13 @@ public:
      * @return Observation number for the object.
      */
     virtual uint16_t observation_number() const;
+
+    /**
+     * @brief Returns max age for the resource value to be cached.
+     * @return Max age in seconds.
+     */
+    virtual uint32_t max_age() const;
+
 
     /**
      * @brief Parses the received query for the notification
@@ -419,6 +432,7 @@ private:
     uint8_t                     _token_length;
     bool                        _register_uri;
     String                      _uri_path;
+    uint32_t                    _max_age;
 
 friend class Test_M2MBase;
 

@@ -23,6 +23,7 @@ namespace m2mbase_stub
 {
     extern uint8_t uint8_value;
     extern uint16_t uint16_value;
+    extern uint32_t uint32_value;
     extern uint16_t int_value;
     extern int32_t name_id_value;
     extern String *string_value;    

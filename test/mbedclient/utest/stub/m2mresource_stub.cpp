@@ -16,6 +16,8 @@
 #include "m2mresource_stub.h"
 
 uint32_t m2mresource_stub::int_value;
+uint8_t* m2mresource_stub::delayed_token;
+uint8_t m2mresource_stub::delayed_token_len;
 bool m2mresource_stub::bool_value;
 M2MResourceInstanceList m2mresource_stub::list;
 M2MResourceInstance *m2mresource_stub::instance;
@@ -23,6 +25,8 @@ sn_coap_hdr_s *m2mresource_stub::header;
 void m2mresource_stub::clear()
 {
     int_value = 0;
+    delayed_token = NULL;
+    delayed_token_len = 0;
     bool_value = false;
     list.clear();
     instance = NULL;
@@ -69,6 +73,20 @@ M2MResource::~M2MResource()
 bool M2MResource::supports_multiple_instances() const
 {
     return m2mresource_stub::bool_value;
+}
+
+void M2MResource::get_delayed_token(unsigned char *&token, unsigned char &token_len)
+{
+    token_len = 0;
+    if(token) {
+        free(token);
+        token = NULL;
+    }
+    token = (uint8_t *)malloc(m2mresource_stub::delayed_token_len);
+    if(token) {
+        token_len = m2mresource_stub::delayed_token_len;
+        memcpy((uint8_t *)token, (uint8_t *)m2mresource_stub::delayed_token, token_len);
+    }
 }
 
 bool M2MResource::remove_resource_instance(uint16_t inst_id)
