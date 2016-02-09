@@ -28,7 +28,6 @@ namespace m2mbase_stub
     extern int32_t name_id_value;
     extern String *string_value;    
     extern bool bool_value;
-    extern bool bool_value_execute;
     extern M2MBase::BaseType base_type;
     extern M2MBase::Mode mode_value;
     extern M2MBase::Operation operation;

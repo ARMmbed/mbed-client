@@ -515,7 +515,7 @@ void Test_M2MNsdlInterface::test_received_from_server_callback()
     coap_header->uri_path_len = sizeof(object_instance);
 
     coap_header->payload_ptr = (uint8_t*)malloc(1);
-
+    m2mobjectinstance_stub::bool_value = true;
     CHECK(0== nsdl->received_from_server_callback(NULL,coap_header,NULL));
 
     M2MObject *obj = new M2MObject("name");
@@ -652,8 +652,7 @@ void Test_M2MNsdlInterface::test_resource_callback_get()
 
 void Test_M2MNsdlInterface::test_resource_callback_put()
 {
-    uint8_t value[] = {"name"};
-    m2mbase_stub::bool_value_execute = false;
+    uint8_t value[] = {"name"};    
     sn_coap_hdr_s *coap_header = (sn_coap_hdr_s *)malloc(sizeof(sn_coap_hdr_s));
     memset(coap_header,0,sizeof(sn_coap_hdr_s));
     sn_nsdl_addr_s *address = (sn_nsdl_addr_s *)malloc(sizeof(sn_nsdl_addr_s));
@@ -697,12 +696,13 @@ void Test_M2MNsdlInterface::test_resource_callback_put()
 
     CHECK(nsdl->resource_callback(NULL,coap_header,address,SN_NSDL_PROTOCOL_HTTP) ==0);
 
-    m2mbase_stub::bool_value_execute = true;
+
     m2mobject_stub::base_type = M2MBase::Resource;
     m2mbase_stub::base_type = M2MBase::Resource;
+    m2mobject_stub::bool_value = true;
     CHECK(nsdl->resource_callback(NULL,coap_header,address,SN_NSDL_PROTOCOL_HTTP) ==0);
+    m2mobject_stub::bool_value = false;
 
-    m2mbase_stub::bool_value_execute = false;
     m2mobject_stub::base_type = M2MBase::ObjectInstance;
     m2mbase_stub::base_type = M2MBase::ObjectInstance;
     CHECK(nsdl->resource_callback(NULL,coap_header,address,SN_NSDL_PROTOCOL_HTTP) ==0);

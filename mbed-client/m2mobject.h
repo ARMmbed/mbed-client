@@ -122,29 +122,34 @@ public:
     virtual sn_coap_hdr_s* handle_get_request(nsdl_s *nsdl,
                                               sn_coap_hdr_s *received_coap_header,
                                               M2MObservationHandler *observation_handler = NULL);
+
     /**
      * @brief Handles PUT request for the registered objects.
      * @param nsdl, NSDL handler for the CoAP library.
-     * @param received_coap_header, CoAP message received from the server.
+     * @param received_coap_header, Received CoAP message from the server.
      * @param observation_handler, Handler object for sending
      * observation callbacks.
+     * @param executeCallback, True will execute "value_updated" callback.
      * @return sn_coap_hdr_s,  Message that needs to be sent to server.
      */
     virtual sn_coap_hdr_s* handle_put_request(nsdl_s *nsdl,
                                               sn_coap_hdr_s *received_coap_header,
-                                              M2MObservationHandler *observation_handler = NULL);
+                                              M2MObservationHandler *observation_handler,
+                                              bool &executeCallback);
 
     /**
      * @brief Handles GET request for the registered objects.
      * @param nsdl, NSDL handler for the CoAP library.
-     * @param received_coap_header, CoAP message received from the server.
+     * @param received_coap_header, Received CoAP message from the server.
      * @param observation_handler, Handler object for sending
      * observation callbacks.
+     * @param executeCallback, True will execute "value_updated" callback.
      * @return sn_coap_hdr_s,  Message that needs to be sent to server.
      */
     virtual sn_coap_hdr_s* handle_post_request(nsdl_s *nsdl,
                                                sn_coap_hdr_s *received_coap_header,
-                                               M2MObservationHandler *observation_handler = NULL);
+                                               M2MObservationHandler *observation_handler,
+                                               bool &executeCallback);
 
 protected :
 
