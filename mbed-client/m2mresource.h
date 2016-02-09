@@ -191,22 +191,26 @@ public:
      * @param received_coap_header, CoAP message received from the server.
      * @param observation_handler, Handler object for sending
      * observation callbacks.
+     * @param executeCallback, True will execute "value_updated" callback.
      * @return sn_coap_hdr_s,  Message that needs to be sent to the server.
      */
     virtual sn_coap_hdr_s* handle_put_request(nsdl_s *nsdl,
                                               sn_coap_hdr_s *received_coap_header,
-                                              M2MObservationHandler *observation_handler = NULL);
+                                              M2MObservationHandler *observation_handler,
+                                              bool &executeCallback);
     /**
      * @brief Handles POST request for the registered objects.
      * @param nsdl, NSDL handler for the CoAP library.
      * @param received_coap_header, CoAP message received from the server.
      * @param observation_handler, Handler object for sending
      * observation callbacks.
+     * @param executeCallback, True will execute "value_updated" callback.
      * @return sn_coap_hdr_s,  Message that needs to be sent to the server.
      */
     virtual sn_coap_hdr_s* handle_post_request(nsdl_s *nsdl,
                                                sn_coap_hdr_s *received_coap_header,
-                                               M2MObservationHandler *observation_handler = NULL);
+                                               M2MObservationHandler *observation_handler,
+                                               bool &executeCallback);
 
 protected:
     virtual void notification_update();

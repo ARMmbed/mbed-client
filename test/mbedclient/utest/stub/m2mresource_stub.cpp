@@ -139,14 +139,16 @@ sn_coap_hdr_s* M2MResource::handle_get_request(nsdl_s *,
 
 sn_coap_hdr_s* M2MResource::handle_put_request(nsdl_s *,
                                                sn_coap_hdr_s *,
-                                               M2MObservationHandler *)
+                                               M2MObservationHandler *,
+                                               bool &)
 {
     return m2mresource_stub::header;
 }
 
 sn_coap_hdr_s* M2MResource::handle_post_request(nsdl_s *,
                                                sn_coap_hdr_s *,
-                                               M2MObservationHandler *)
+                                               M2MObservationHandler *,
+                                               bool &)
 {
     return m2mresource_stub::header;
 }

@@ -22,6 +22,7 @@ uint16_t m2mbase_stub::int_value;
 int32_t m2mbase_stub::name_id_value;
 
 bool m2mbase_stub::bool_value;
+bool m2mbase_stub::bool_value_execute;
 String *m2mbase_stub::string_value;
 
 M2MBase::BaseType m2mbase_stub::base_type;
@@ -46,6 +47,7 @@ void m2mbase_stub::clear()
     base_type = M2MBase::Object;
     observation_level_value = M2MBase::None;
     bool_value = false;
+    bool_value_execute = false;
     m2mbase_stub::operation = M2MBase::NOT_ALLOWED;
     void_value = NULL;
     observe = NULL;
@@ -245,15 +247,18 @@ sn_coap_hdr_s* M2MBase::handle_get_request(nsdl_s */*nsdl*/,
 
 sn_coap_hdr_s* M2MBase::handle_put_request(nsdl_s */*nsdl*/,
                                            sn_coap_hdr_s */*received_coap_header*/,
-                                           M2MObservationHandler */*observation_handler*/)
+                                           M2MObservationHandler */*observation_handler*/,
+                                           bool &executeCallback)
 {
     //Handled in M2MResource, M2MObjectInstance and M2MObject classes
+    executeCallback = m2mbase_stub::bool_value_execute;
     return NULL;
 }
 
 sn_coap_hdr_s* M2MBase::handle_post_request(nsdl_s */*nsdl*/,
                                             sn_coap_hdr_s */*received_coap_header*/,
-                                            M2MObservationHandler */*observation_handler*/)
+                                            M2MObservationHandler */*observation_handler*/,
+                                            bool &)
 {
     //Handled in M2MResource, M2MObjectInstance and M2MObject classes
     return NULL;

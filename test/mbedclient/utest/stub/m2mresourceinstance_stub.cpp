@@ -138,7 +138,8 @@ sn_coap_hdr_s* M2MResourceInstance::handle_get_request(nsdl_s *,
 
 sn_coap_hdr_s* M2MResourceInstance::handle_put_request(nsdl_s *,
                                                sn_coap_hdr_s *,
-                                               M2MObservationHandler *)
+                                               M2MObservationHandler *,
+                                               bool &)
 {
     return m2mresourceinstance_stub::header;
 }

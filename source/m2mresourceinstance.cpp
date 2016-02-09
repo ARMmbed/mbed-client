@@ -391,8 +391,9 @@ sn_coap_hdr_s* M2MResourceInstance::handle_get_request(nsdl_s *nsdl,
 }
 
 sn_coap_hdr_s* M2MResourceInstance::handle_put_request(nsdl_s *nsdl,
-                                               sn_coap_hdr_s *received_coap_header,
-                                               M2MObservationHandler *observation_handler)
+                                               sn_coap_hdr_s *received_coap_header,                                                                                              
+                                               M2MObservationHandler *observation_handler,
+                                               bool &executeCallBack)
 {
     tr_debug("M2MResourceInstance::handle_put_request()");
     sn_coap_msg_code_e msg_code = COAP_MSG_CODE_RESPONSE_CHANGED; // 2.04
@@ -456,7 +457,7 @@ sn_coap_hdr_s* M2MResourceInstance::handle_put_request(nsdl_s *nsdl,
                                 free(buf);
                             }
                         }
-                        observation_handler->value_updated(this,value);
+                        executeCallBack = true;
                     }
                 }
             }

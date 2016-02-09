@@ -415,7 +415,7 @@ void M2MInterfaceImpl::state_bootstrap( EventData *data)
                 String server_address = security->resource_value_string(M2MSecurity::M2MServerUri);
                 tr_debug("M2MInterfaceImpl::state_bootstrap - server_address %s", server_address.c_str());
                 String ip_address;
-                uint16_t port;
+                uint16_t port = 0;
                 String  coap;
                 if(server_address.compare(0,COAP.size(),COAP) == 0) {
                      coap = COAP;
@@ -526,7 +526,7 @@ void M2MInterfaceImpl::state_register( EventData *data)
                     String server_address = security->resource_value_string(M2MSecurity::M2MServerUri);
                     tr_debug("M2MInterfaceImpl::state_register - server_address %s", server_address.c_str());
                     String ip_address;
-                    uint16_t port;
+                    uint16_t port = 0;
                     String  coap;
                     if(server_address.compare(0,COAP.size(),COAP) == 0) {
                          coap = COAP;
