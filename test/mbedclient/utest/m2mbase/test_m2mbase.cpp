@@ -469,12 +469,14 @@ void Test_M2MBase::test_handle_get_request()
 
 void Test_M2MBase::test_handle_put_request()
 {
-    CHECK(this->handle_put_request(NULL,NULL,NULL) == NULL);
+    bool execute = false;
+    CHECK(this->handle_put_request(NULL,NULL,NULL, execute) == NULL);
 }
 
 void Test_M2MBase::test_handle_post_request()
 {
-    CHECK(this->handle_post_request(NULL,NULL,NULL) == NULL);
+    bool execute = false;
+    CHECK(this->handle_post_request(NULL,NULL,NULL, execute) == NULL);
 }
 
 void Test_M2MBase::test_memory_alloc()

@@ -373,7 +373,8 @@ sn_coap_hdr_s* M2MBase::handle_get_request(nsdl_s */*nsdl*/,
 
 sn_coap_hdr_s* M2MBase::handle_put_request(nsdl_s */*nsdl*/,
                                            sn_coap_hdr_s */*received_coap_header*/,
-                                           M2MObservationHandler */*observation_handler*/)
+                                           M2MObservationHandler */*observation_handler*/,
+                                           bool &)
 {
     //Handled in M2MResource, M2MObjectInstance and M2MObject classes
     return NULL;
@@ -381,7 +382,8 @@ sn_coap_hdr_s* M2MBase::handle_put_request(nsdl_s */*nsdl*/,
 
 sn_coap_hdr_s* M2MBase::handle_post_request(nsdl_s */*nsdl*/,
                                             sn_coap_hdr_s */*received_coap_header*/,
-                                            M2MObservationHandler */*observation_handler*/)
+                                            M2MObservationHandler */*observation_handler*/,
+                                            bool &)
 {
     //Handled in M2MResource, M2MObjectInstance and M2MObject classes
     return NULL;
