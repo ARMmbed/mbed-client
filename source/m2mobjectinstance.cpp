@@ -525,7 +525,7 @@ sn_coap_hdr_s* M2MObjectInstance::handle_get_request(nsdl_s *nsdl,
 sn_coap_hdr_s* M2MObjectInstance::handle_put_request(nsdl_s *nsdl,
                                                      sn_coap_hdr_s *received_coap_header,
                                                      M2MObservationHandler *observation_handler,
-                                                     bool &executeCallback)
+                                                     bool &execute_value_updated)
 {
     tr_debug("M2MObjectInstance::handle_put_request()");
     sn_coap_msg_code_e msg_code = COAP_MSG_CODE_RESPONSE_CHANGED; // 2.04
@@ -625,7 +625,7 @@ sn_coap_hdr_s* M2MObjectInstance::handle_put_request(nsdl_s *nsdl,
 sn_coap_hdr_s* M2MObjectInstance::handle_post_request(nsdl_s *nsdl,
                                                       sn_coap_hdr_s *received_coap_header,
                                                       M2MObservationHandler *observation_handler,
-                                                      bool &executeCallback)
+                                                      bool &execute_value_updated)
 {
     tr_debug("M2MObjectInstance::handle_post_request()");
     sn_coap_msg_code_e msg_code = COAP_MSG_CODE_RESPONSE_CHANGED; // 2.04
@@ -675,7 +675,7 @@ sn_coap_hdr_s* M2MObjectInstance::handle_post_request(nsdl_s *nsdl,
                     switch(error) {
                         case M2MTLVDeserializer::None:
                             if(observation_handler) {
-                                executeCallback = true;
+                                execute_value_updated = true;
                             }                            
                             coap_response->options_list_ptr = (sn_coap_options_list_s*)malloc(sizeof(sn_coap_options_list_s));
                             if (coap_response->options_list_ptr) {

@@ -462,7 +462,7 @@ uint8_t M2MNsdlInterface::received_from_server_callback(struct nsdl_s * /*nsdl_h
         } else {
             if(COAP_MSG_CODE_REQUEST_POST == coap_header->msg_code) {
                 if(coap_header->uri_path_ptr) {
-                    bool executeCallback = false;
+                    bool execute_value_updated = false;
                     M2MObjectInstance *obj_instance = NULL;
                     String resource_name = coap_to_string(coap_header->uri_path_ptr,
                                                           coap_header->uri_path_len);
@@ -490,7 +490,7 @@ uint8_t M2MNsdlInterface::received_from_server_callback(struct nsdl_s * /*nsdl_h
                                         coap_response = obj_instance->handle_post_request(_nsdl_handle,
                                                                                           coap_header,
                                                                                           this,
-                                                                                          executeCallback);
+                                                                                          execute_value_updated);
                                     }
                                     if(coap_response && coap_response->msg_code != COAP_MSG_CODE_RESPONSE_CREATED) {
                                         //Invalid request so remove created ObjectInstance
@@ -523,7 +523,7 @@ uint8_t M2MNsdlInterface::received_from_server_callback(struct nsdl_s * /*nsdl_h
                         (sn_nsdl_send_coap_message(_nsdl_handle, address, coap_response) == 0) ? value = 0 : value = 1;
                         sn_nsdl_release_allocated_coap_msg_mem(_nsdl_handle, coap_response);
                     }
-                    if (executeCallback) {
+                    if (execute_value_updated) {
                         value_updated(obj_instance, obj_instance->name());
                     }
                 }
@@ -546,19 +546,19 @@ uint8_t M2MNsdlInterface::resource_callback(struct nsdl_s */*nsdl_handle*/,
     String resource_name = coap_to_string(received_coap_header->uri_path_ptr,
                                           received_coap_header->uri_path_len);
     tr_debug("M2MNsdlInterface::resource_callback() - resource_name %s", resource_name.c_str());
-    bool executeCallback = false;
+    bool execute_value_updated = false;
     M2MBase* base = find_resource(resource_name);
     if(base) {
         base->set_uri_path(resource_name);
         if(COAP_MSG_CODE_REQUEST_GET == received_coap_header->msg_code) {
             coap_response = base->handle_get_request(_nsdl_handle, received_coap_header,this);
         } else if(COAP_MSG_CODE_REQUEST_PUT == received_coap_header->msg_code) {            
-            coap_response = base->handle_put_request(_nsdl_handle, received_coap_header, this, executeCallback);
+            coap_response = base->handle_put_request(_nsdl_handle, received_coap_header, this, execute_value_updated);
         } else if(COAP_MSG_CODE_REQUEST_POST == received_coap_header->msg_code) {
             if(base->base_type() == M2MBase::ResourceInstance) {
                 msg_code = COAP_MSG_CODE_RESPONSE_BAD_REQUEST;
             } else {
-                coap_response = base->handle_post_request(_nsdl_handle, received_coap_header,this, executeCallback);
+                coap_response = base->handle_post_request(_nsdl_handle, received_coap_header,this, execute_value_updated);
             }
         } else if(COAP_MSG_CODE_REQUEST_DELETE == received_coap_header->msg_code) {
             // Delete the object instance
@@ -622,7 +622,7 @@ uint8_t M2MNsdlInterface::resource_callback(struct nsdl_s */*nsdl_handle*/,
         }
         sn_nsdl_release_allocated_coap_msg_mem(_nsdl_handle, coap_response);
     }
-    if (executeCallback) {
+    if (execute_value_updated) {
         value_updated(base,base->uri_path());
     }
     return result;

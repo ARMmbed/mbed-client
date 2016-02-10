@@ -180,13 +180,13 @@ public:
      * @param received_coap_header, CoAP message received from the server.
      * @param observation_handler, Handler object for sending
      * observation callbacks.
-     * @param executeCallback, True will execute "value_updated" callback.
+     * @param execute_value_updated, True will execute "value_updated" callback.
      * @return sn_coap_hdr_s,  Message that needs to be sent to the server.
      */
     virtual sn_coap_hdr_s* handle_put_request(nsdl_s *nsdl,
                                               sn_coap_hdr_s *received_coap_header,                                                                                            
                                               M2MObservationHandler *observation_handler,
-                                              bool &executeCallback);
+                                              bool &execute_value_updated);
 
 protected:
 

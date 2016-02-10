@@ -635,7 +635,7 @@ void Test_M2MObjectInstance::test_handle_get_request()
 void Test_M2MObjectInstance::test_handle_put_request()
 {
     uint8_t value[] = {"name"};
-    bool executeCallback = false;
+    bool execute_value_updated = false;
     sn_coap_hdr_s *coap_header = (sn_coap_hdr_s *)malloc(sizeof(sn_coap_hdr_s));
     memset(coap_header, 0, sizeof(sn_coap_hdr_s));
 
@@ -658,7 +658,7 @@ void Test_M2MObjectInstance::test_handle_put_request()
 
     sn_coap_hdr_s *coap_response = NULL;
     m2mbase_stub::uint8_value = 99;
-    coap_response = object->handle_put_request(NULL,coap_header,handler,executeCallback);
+    coap_response = object->handle_put_request(NULL,coap_header,handler,execute_value_updated);
     CHECK( coap_response != NULL);
 
     m2mbase_stub::uint8_value = 0;
@@ -676,7 +676,7 @@ void Test_M2MObjectInstance::test_handle_put_request()
     m2mbase_stub::bool_value = false;
 
 
-    coap_response = object->handle_put_request(NULL,coap_header,handler,executeCallback);
+    coap_response = object->handle_put_request(NULL,coap_header,handler,execute_value_updated);
     CHECK( coap_response != NULL);
     if(coap_response) {
         if(coap_response->content_type_ptr) {
@@ -687,7 +687,7 @@ void Test_M2MObjectInstance::test_handle_put_request()
 
     m2mbase_stub::bool_value = true;
 
-    coap_response = object->handle_put_request(NULL,coap_header,handler,executeCallback);
+    coap_response = object->handle_put_request(NULL,coap_header,handler,execute_value_updated);
     CHECK( coap_response != NULL);
     if(coap_response) {
         if(coap_response->content_type_ptr) {
@@ -701,7 +701,7 @@ void Test_M2MObjectInstance::test_handle_put_request()
 
     m2mbase_stub::bool_value = false;
 
-    coap_response = object->handle_put_request(NULL,coap_header,handler,executeCallback);
+    coap_response = object->handle_put_request(NULL,coap_header,handler,execute_value_updated);
     CHECK( coap_response != NULL);
     if(coap_response) {
         if(coap_response->content_type_ptr) {
@@ -715,7 +715,7 @@ void Test_M2MObjectInstance::test_handle_put_request()
     m2mbase_stub::bool_value = false;
 
 
-    coap_response = object->handle_put_request(NULL,coap_header,handler,executeCallback);
+    coap_response = object->handle_put_request(NULL,coap_header,handler,execute_value_updated);
     CHECK( coap_response != NULL);
     if(coap_response) {
         if(coap_response->content_type_ptr) {
@@ -729,7 +729,7 @@ void Test_M2MObjectInstance::test_handle_put_request()
     m2mbase_stub::bool_value = false;
 
 
-    coap_response = object->handle_put_request(NULL,coap_header,handler,executeCallback);
+    coap_response = object->handle_put_request(NULL,coap_header,handler,execute_value_updated);
     CHECK( coap_response != NULL);
     if(coap_response) {
         if(coap_response->content_type_ptr) {
@@ -743,7 +743,7 @@ void Test_M2MObjectInstance::test_handle_put_request()
     m2mbase_stub::bool_value = false;
 
 
-    coap_response = object->handle_put_request(NULL,coap_header,handler,executeCallback);
+    coap_response = object->handle_put_request(NULL,coap_header,handler,execute_value_updated);
     CHECK( coap_response != NULL);
     if(coap_response) {
         if(coap_response->content_type_ptr) {
@@ -754,7 +754,7 @@ void Test_M2MObjectInstance::test_handle_put_request()
 
     m2mtlvdeserializer_stub::bool_value = false;
 
-    coap_response = object->handle_put_request(NULL,coap_header,handler,executeCallback);
+    coap_response = object->handle_put_request(NULL,coap_header,handler,execute_value_updated);
     CHECK( coap_response != NULL);
     if(coap_response) {
         if(coap_response->content_type_ptr) {
@@ -765,7 +765,7 @@ void Test_M2MObjectInstance::test_handle_put_request()
 
     *coap_header->content_type_ptr = 100;
 
-    coap_response = object->handle_put_request(NULL,coap_header,handler,executeCallback);
+    coap_response = object->handle_put_request(NULL,coap_header,handler,execute_value_updated);
     CHECK( coap_response != NULL);
     if(coap_response) {
         if(coap_response->content_type_ptr) {
@@ -779,7 +779,7 @@ void Test_M2MObjectInstance::test_handle_put_request()
 
     m2mbase_stub::bool_value = true;
 
-    coap_response = object->handle_put_request(NULL,coap_header,handler,executeCallback);
+    coap_response = object->handle_put_request(NULL,coap_header,handler,execute_value_updated);
     CHECK( coap_response != NULL);
     if(coap_response) {
         if(coap_response->content_type_ptr) {
@@ -790,7 +790,7 @@ void Test_M2MObjectInstance::test_handle_put_request()
 
     m2mbase_stub::bool_value = false;
 
-    coap_response = object->handle_put_request(NULL,coap_header,handler,executeCallback);
+    coap_response = object->handle_put_request(NULL,coap_header,handler,execute_value_updated);
     CHECK( coap_response != NULL);
     if(coap_response) {
         if(coap_response->content_type_ptr) {
@@ -801,7 +801,7 @@ void Test_M2MObjectInstance::test_handle_put_request()
 
     m2mbase_stub::operation = M2MBase::NOT_ALLOWED;
 
-    coap_response = object->handle_put_request(NULL,coap_header,handler,executeCallback);
+    coap_response = object->handle_put_request(NULL,coap_header,handler,execute_value_updated);
     CHECK( coap_response != NULL);
     if(coap_response) {
         if(coap_response->content_type_ptr) {
@@ -810,7 +810,7 @@ void Test_M2MObjectInstance::test_handle_put_request()
         }
     }
 
-    coap_response = object->handle_put_request(NULL,NULL,handler,executeCallback);
+    coap_response = object->handle_put_request(NULL,NULL,handler,execute_value_updated);
 
     CHECK( coap_response != NULL);
     if(coap_response) {
@@ -835,7 +835,7 @@ void Test_M2MObjectInstance::test_handle_put_request()
 void Test_M2MObjectInstance::test_handle_post_request()
 {
     uint8_t value[] = {"name"};
-    bool executeCallback = false;
+    bool execute_value_updated = false;
     sn_coap_hdr_s *coap_header = (sn_coap_hdr_s *)malloc(sizeof(sn_coap_hdr_s));
     memset(coap_header, 0, sizeof(sn_coap_hdr_s));
 
@@ -859,7 +859,7 @@ void Test_M2MObjectInstance::test_handle_post_request()
     sn_coap_hdr_s * coap_response = NULL;
     m2mbase_stub::uint8_value = 99;
 
-    coap_response = object->handle_post_request(NULL,coap_header,handler,executeCallback);
+    coap_response = object->handle_post_request(NULL,coap_header,handler,execute_value_updated);
     CHECK( coap_response != NULL);
     if(coap_response) {
         if(coap_response->content_type_ptr) {
@@ -878,7 +878,7 @@ void Test_M2MObjectInstance::test_handle_post_request()
 
     m2mbase_stub::uint8_value = 100;
 
-    coap_response = object->handle_post_request(NULL,coap_header,handler,executeCallback);
+    coap_response = object->handle_post_request(NULL,coap_header,handler,execute_value_updated);
     CHECK( coap_response != NULL);
     if(coap_response) {
         if(coap_response->content_type_ptr) {
@@ -896,7 +896,7 @@ void Test_M2MObjectInstance::test_handle_post_request()
     }
     coap_header->payload_ptr = (uint8_t*)malloc(1);
 
-    coap_response = object->handle_post_request(NULL,coap_header,handler,executeCallback);
+    coap_response = object->handle_post_request(NULL,coap_header,handler,execute_value_updated);
     CHECK( coap_response != NULL);
     if(coap_response) {
         if(coap_response->content_type_ptr) {
@@ -914,7 +914,7 @@ void Test_M2MObjectInstance::test_handle_post_request()
     }
     m2mbase_stub::uint8_value = 99;
 
-    coap_response = object->handle_post_request(NULL,coap_header,handler,executeCallback);
+    coap_response = object->handle_post_request(NULL,coap_header,handler,execute_value_updated);
     CHECK( coap_response != NULL);
     if(coap_response) {
         if(coap_response->content_type_ptr) {
@@ -945,7 +945,7 @@ void Test_M2MObjectInstance::test_handle_post_request()
     m2mbase_stub::bool_value = false;
 
     m2mtlvdeserializer_stub::error = M2MTLVDeserializer::None;
-    coap_response = object->handle_post_request(NULL,coap_header,handler,executeCallback);
+    coap_response = object->handle_post_request(NULL,coap_header,handler,execute_value_updated);
 
     CHECK( coap_response != NULL);
     if(coap_response) {
@@ -970,7 +970,7 @@ void Test_M2MObjectInstance::test_handle_post_request()
 
     m2mtlvdeserializer_stub::error = M2MTLVDeserializer::NotAllowed;
 
-    coap_response = object->handle_post_request(NULL,coap_header,handler,executeCallback);
+    coap_response = object->handle_post_request(NULL,coap_header,handler,execute_value_updated);
 
     CHECK( coap_response != NULL);
     if(coap_response) {
@@ -990,7 +990,7 @@ void Test_M2MObjectInstance::test_handle_post_request()
 
     m2mtlvdeserializer_stub::error = M2MTLVDeserializer::NotValid;
 
-    coap_response = object->handle_post_request(NULL,coap_header,handler,executeCallback);
+    coap_response = object->handle_post_request(NULL,coap_header,handler,execute_value_updated);
 
     CHECK( coap_response != NULL);
     if(coap_response) {
@@ -1015,7 +1015,7 @@ void Test_M2MObjectInstance::test_handle_post_request()
     m2mbase_stub::bool_value = false;
     m2mtlvdeserializer_stub::error = M2MTLVDeserializer::None;
 
-    coap_response = object->handle_post_request(NULL,coap_header,handler,executeCallback);
+    coap_response = object->handle_post_request(NULL,coap_header,handler,execute_value_updated);
 
     CHECK( coap_response != NULL);
     if(coap_response) {
@@ -1039,7 +1039,7 @@ void Test_M2MObjectInstance::test_handle_post_request()
     m2mbase_stub::bool_value = false;
     m2mtlvdeserializer_stub::error = M2MTLVDeserializer::NotFound;
 
-    coap_response = object->handle_post_request(NULL,coap_header,handler,executeCallback);
+    coap_response = object->handle_post_request(NULL,coap_header,handler,execute_value_updated);
 
     CHECK( coap_response != NULL);
     if(coap_response) {
@@ -1060,7 +1060,7 @@ void Test_M2MObjectInstance::test_handle_post_request()
     m2mbase_stub::operation = M2MBase::POST_ALLOWED;
     m2mtlvdeserializer_stub::bool_value = false;
 
-    coap_response = object->handle_post_request(NULL,coap_header,handler,executeCallback);
+    coap_response = object->handle_post_request(NULL,coap_header,handler,execute_value_updated);
 
     CHECK( coap_response != NULL);
     if(coap_response) {
@@ -1081,7 +1081,7 @@ void Test_M2MObjectInstance::test_handle_post_request()
 
     *coap_header->content_type_ptr = 100;
 
-    coap_response = object->handle_post_request(NULL,coap_header,handler,executeCallback);
+    coap_response = object->handle_post_request(NULL,coap_header,handler,execute_value_updated);
 
     CHECK( coap_response != NULL);
     if(coap_response) {
@@ -1102,7 +1102,7 @@ void Test_M2MObjectInstance::test_handle_post_request()
 
     m2mbase_stub::bool_value = true;
 
-    coap_response = object->handle_post_request(NULL,coap_header,handler,executeCallback);
+    coap_response = object->handle_post_request(NULL,coap_header,handler,execute_value_updated);
 
     CHECK( coap_response != NULL);
     if(coap_response) {
@@ -1123,7 +1123,7 @@ void Test_M2MObjectInstance::test_handle_post_request()
 
     m2mbase_stub::operation = M2MBase::NOT_ALLOWED;
 
-    coap_response = object->handle_post_request(NULL,coap_header,handler,executeCallback);
+    coap_response = object->handle_post_request(NULL,coap_header,handler,execute_value_updated);
 
     CHECK( coap_response != NULL);
     if(coap_response) {
@@ -1141,7 +1141,7 @@ void Test_M2MObjectInstance::test_handle_post_request()
         }
     }
 
-    coap_response = object->handle_post_request(NULL,NULL,handler,executeCallback);
+    coap_response = object->handle_post_request(NULL,NULL,handler,execute_value_updated);
 
     CHECK( coap_response != NULL);
     if(coap_response) {
