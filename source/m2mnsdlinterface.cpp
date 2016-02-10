@@ -219,6 +219,7 @@ bool M2MNsdlInterface::delete_nsdl_resource(const String &resource_name)
                                     (uint8_t *)resource_name.c_str()) == 0) ? true : false;
 }
 
+#ifndef YOTTA_CFG_DISABLE_BOOTSTRAP_FEATURE
 bool M2MNsdlInterface::create_bootstrap_resource(sn_nsdl_addr_s *address)
 {
     tr_debug("M2MNsdlInterface::create_bootstrap_resource()");
@@ -240,6 +241,7 @@ bool M2MNsdlInterface::create_bootstrap_resource(sn_nsdl_addr_s *address)
     }
     return success;
 }
+#endif //YOTTA_CFG_DISABLE_BOOTSTRAP_FEATURE
 
 bool M2MNsdlInterface::send_register_message(uint8_t* address,
                                              const uint16_t port,
@@ -628,6 +630,7 @@ uint8_t M2MNsdlInterface::resource_callback(struct nsdl_s */*nsdl_handle*/,
     return result;
 }
 
+#ifndef YOTTA_CFG_DISABLE_BOOTSTRAP_FEATURE
 void M2MNsdlInterface::bootstrap_done_callback(sn_nsdl_oma_server_info_t *server_info)
 {
     tr_debug("M2MNsdlInterface::bootstrap_done_callback()");
@@ -734,6 +737,7 @@ void M2MNsdlInterface::bootstrap_done_callback(sn_nsdl_oma_server_info_t *server
         _observer.bootstrap_error();
     }
 }
+#endif //YOTTA_CFG_DISABLE_BOOTSTRAP_FEATURE
 
 bool M2MNsdlInterface::process_received_data(uint8_t *data,
                                              uint16_t data_size,

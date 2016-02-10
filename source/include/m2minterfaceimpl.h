@@ -183,6 +183,7 @@ private: // state machine state functions
     */
     void state_idle(EventData* data);
 
+#ifndef YOTTA_CFG_DISABLE_BOOTSTRAP_FEATURE
     /**
     * When the client starts bootstrap.
     */
@@ -202,6 +203,7 @@ private: // state machine state functions
     * When the server has sent response and bootstrapping is done.
     */
     void state_bootstrapped( EventData *data);
+#endif //YOTTA_CFG_DISABLE_BOOTSTRAP_FEATURE
 
     /**
     * When the client starts register.
