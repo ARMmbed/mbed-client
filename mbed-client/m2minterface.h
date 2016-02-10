@@ -91,6 +91,7 @@ public:
 
     virtual ~M2MInterface(){}
 
+#ifndef YOTTA_CFG_DISABLE_BOOTSTRAP_FEATURE
     /**
      * @brief Initiates bootstrapping of the client with the provided Bootstrap
      * server information.
@@ -107,6 +108,7 @@ public:
      * NOTE: This API is not supported for developers!!
      */
     virtual void cancel_bootstrap() = 0;
+#endif //YOTTA_CFG_DISABLE_BOOTSTRAP_FEATURE
 
     /**
      * @brief Initiates the registration of the provided Security object to the

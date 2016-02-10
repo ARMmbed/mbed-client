@@ -67,6 +67,7 @@ public :
     */
     virtual void client_unregistered() = 0;
 
+#ifndef YOTTA_CFG_DISABLE_BOOTSTRAP_FEATURE
     /**
     * @brief Informs that client bootstrapping is done.
     * @param security_object, M2MSecurity Object which contains information about
@@ -79,6 +80,7 @@ public :
     * bootstrapping.
     */
     virtual void bootstrap_error() = 0;
+#endif //YOTTA_CFG_DISABLE_BOOTSTRAP_FEATURE
 
     /**
     * @brief Informs that received data has been processed.

@@ -455,13 +455,17 @@ uint8_t M2MNsdlInterface::received_from_server_callback(struct nsdl_s * /*nsdl_h
                 }
                 _observer.registration_error(error);
             }
-        }else if(coap_header->msg_id == _bootstrap_id) {
+        }
+#ifndef YOTTA_CFG_DISABLE_BOOTSTRAP_FEATURE
+        else if(coap_header->msg_id == _bootstrap_id) {
             _bootstrap_id = 0;
             M2MInterface::Error error = interface_error(coap_header);
             if(error != M2MInterface::ErrorNone) {
                 _observer.bootstrap_error();
             }
-        } else {
+        }
+#endif //YOTTA_CFG_DISABLE_BOOTSTRAP_FEATURE
+        else {
             if(COAP_MSG_CODE_REQUEST_POST == coap_header->msg_code) {
                 if(coap_header->uri_path_ptr) {
                     bool execute_value_updated = false;
