@@ -219,9 +219,10 @@ bool M2MNsdlInterface::delete_nsdl_resource(const String &resource_name)
                                     (uint8_t *)resource_name.c_str()) == 0) ? true : false;
 }
 
-#ifndef YOTTA_CFG_DISABLE_BOOTSTRAP_FEATURE
+
 bool M2MNsdlInterface::create_bootstrap_resource(sn_nsdl_addr_s *address)
 {
+#ifndef YOTTA_CFG_DISABLE_BOOTSTRAP_FEATURE
     tr_debug("M2MNsdlInterface::create_bootstrap_resource()");
     bool success = false;
     _bootstrap_device_setup.error_code = NO_ERROR;
@@ -240,8 +241,9 @@ bool M2MNsdlInterface::create_bootstrap_resource(sn_nsdl_addr_s *address)
 
     }
     return success;
-}
 #endif //YOTTA_CFG_DISABLE_BOOTSTRAP_FEATURE
+    return false;
+}
 
 bool M2MNsdlInterface::send_register_message(uint8_t* address,
                                              const uint16_t port,
@@ -634,9 +636,10 @@ uint8_t M2MNsdlInterface::resource_callback(struct nsdl_s */*nsdl_handle*/,
     return result;
 }
 
-#ifndef YOTTA_CFG_DISABLE_BOOTSTRAP_FEATURE
+
 void M2MNsdlInterface::bootstrap_done_callback(sn_nsdl_oma_server_info_t *server_info)
 {
+#ifndef YOTTA_CFG_DISABLE_BOOTSTRAP_FEATURE
     tr_debug("M2MNsdlInterface::bootstrap_done_callback()");
     _bootstrap_id = 0;
     M2MSecurity* security = NULL;
@@ -740,8 +743,8 @@ void M2MNsdlInterface::bootstrap_done_callback(sn_nsdl_oma_server_info_t *server
         // Bootstrap error inform to the application.
         _observer.bootstrap_error();
     }
-}
 #endif //YOTTA_CFG_DISABLE_BOOTSTRAP_FEATURE
+}
 
 bool M2MNsdlInterface::process_received_data(uint8_t *data,
                                              uint16_t data_size,

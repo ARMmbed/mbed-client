@@ -82,7 +82,6 @@ public:
      */
     virtual ~M2MInterfaceImpl();
 
-#ifndef YOTTA_CFG_DISABLE_BOOTSTRAP_FEATURE
     /**
      * @brief Initiates bootstrapping of the client with the provided Bootstrap
      * server information.
@@ -97,7 +96,6 @@ public:
      * bootstrap information from the client.
      */
     virtual void cancel_bootstrap();
-#endif //YOTTA_CFG_DISABLE_BOOTSTRAP_FEATURE
 
     /**
      * @brief Initiates registration of the provided Security object to the
@@ -150,11 +148,10 @@ protected: // From M2MNsdlObserver
     virtual void registration_error(uint8_t error_code);
 
     virtual void client_unregistered();
-#ifndef YOTTA_CFG_DISABLE_BOOTSTRAP_FEATURE
+
     virtual void bootstrap_done(M2MSecurity *security_object);
 
     virtual void bootstrap_error();
-#endif //YOTTA_CFG_DISABLE_BOOTSTRAP_FEATURE
 
     virtual void coap_data_processed();
 
@@ -186,7 +183,6 @@ private: // state machine state functions
     */
     void state_idle(EventData* data);
 
-#ifndef YOTTA_CFG_DISABLE_BOOTSTRAP_FEATURE
     /**
     * When the client starts bootstrap.
     */
@@ -206,7 +202,6 @@ private: // state machine state functions
     * When the server has sent response and bootstrapping is done.
     */
     void state_bootstrapped( EventData *data);
-#endif //YOTTA_CFG_DISABLE_BOOTSTRAP_FEATURE
 
     /**
     * When the client starts register.
