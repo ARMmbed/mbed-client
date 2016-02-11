@@ -241,8 +241,9 @@ bool M2MNsdlInterface::create_bootstrap_resource(sn_nsdl_addr_s *address)
 
     }
     return success;
-#endif //YOTTA_CFG_DISABLE_BOOTSTRAP_FEATURE
+#else
     return false;
+#endif //YOTTA_CFG_DISABLE_BOOTSTRAP_FEATURE
 }
 
 bool M2MNsdlInterface::send_register_message(uint8_t* address,

@@ -392,7 +392,7 @@ TypeIdLength* TypeIdLength::createTypeIdLength(uint8_t *tlv, uint32_t offset)
     til->_tlv = tlv;
     til->_offset = offset;
     til->_type = tlv[offset] & 0xC0;
-    til->_id = -1;
+    til->_id = 0;
     til->_length = 0;
     return til;
 }
