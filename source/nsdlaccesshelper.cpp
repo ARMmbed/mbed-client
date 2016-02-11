@@ -78,9 +78,11 @@ uint8_t __nsdl_c_received_from_server(struct nsdl_s * nsdl_handle,
 
 void __nsdl_c_bootstrap_done(sn_nsdl_oma_server_info_t *server_info_ptr)
 {
+#ifndef YOTTA_CFG_DISABLE_BOOTSTRAP_FEATURE
     if(__nsdl_interface) {
         __nsdl_interface->bootstrap_done_callback(server_info_ptr);
     }
+#endif //YOTTA_CFG_DISABLE_BOOTSTRAP_FEATURE
 }
 
 void* __socket_malloc( void * context, size_t size)

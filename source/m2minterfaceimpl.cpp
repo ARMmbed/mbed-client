@@ -89,8 +89,10 @@ M2MInterfaceImpl::~M2MInterfaceImpl()
     tr_debug("M2MInterfaceImpl::~M2MInterfaceImpl() - OUT");
 }
 
+
 void M2MInterfaceImpl::bootstrap(M2MSecurity *security)
 {
+#ifndef YOTTA_CFG_DISABLE_BOOTSTRAP_FEATURE
     tr_debug("M2MInterfaceImpl::bootstrap(M2MSecurity *security) - IN");
     // Transition to a new state based upon
     // the current state of the state machine
@@ -121,11 +123,14 @@ void M2MInterfaceImpl::bootstrap(M2MSecurity *security)
         _observer.error(M2MInterface::NotAllowed);
     }
     tr_debug("M2MInterfaceImpl::bootstrap(M2MSecurity *security) - OUT");
+#endif //YOTTA_CFG_DISABLE_BOOTSTRAP_FEATURE
 }
 
 void M2MInterfaceImpl::cancel_bootstrap()
 {
+#ifndef YOTTA_CFG_DISABLE_BOOTSTRAP_FEATURE
 //TODO: Do we need this ?
+#endif //YOTTA_CFG_DISABLE_BOOTSTRAP_FEATURE
 }
 
 void M2MInterfaceImpl::register_object(M2MSecurity *security, const M2MObjectList &object_list)
@@ -297,18 +302,23 @@ void M2MInterfaceImpl::client_unregistered()
     _observer.object_unregistered(_register_server);
 }
 
+
 void M2MInterfaceImpl::bootstrap_done(M2MSecurity *security_object)
 {
+#ifndef YOTTA_CFG_DISABLE_BOOTSTRAP_FEATURE
     tr_debug("M2MInterfaceImpl::bootstrap_done(M2MSecurity *security_object)");
     internal_event(STATE_BOOTSTRAPPED);
     _observer.bootstrap_done(security_object);
+#endif //YOTTA_CFG_DISABLE_BOOTSTRAP_FEATURE
 }
 
 void M2MInterfaceImpl::bootstrap_error()
 {
+#ifndef YOTTA_CFG_DISABLE_BOOTSTRAP_FEATURE
     tr_debug("M2MInterfaceImpl::bootstrap_error()");
     internal_event(STATE_IDLE);
     _observer.error(M2MInterface::BootstrapFailed);
+#endif //YOTTA_CFG_DISABLE_BOOTSTRAP_FEATURE
 }
 
 void M2MInterfaceImpl::coap_data_processed()
@@ -401,8 +411,10 @@ void M2MInterfaceImpl::state_idle(EventData* /*data*/)
     tr_debug("M2MInterfaceImpl::state_idle");
 }
 
+
 void M2MInterfaceImpl::state_bootstrap( EventData *data)
 {
+#ifndef YOTTA_CFG_DISABLE_BOOTSTRAP_FEATURE
     tr_debug("M2MInterfaceImpl::state_bootstrap");
     // Start with bootstrapping preparation
     bool success = false;
@@ -464,10 +476,12 @@ void M2MInterfaceImpl::state_bootstrap( EventData *data)
         _observer.error(M2MInterface::InvalidParameters);
         internal_event(STATE_IDLE);
     }
+#endif //YOTTA_CFG_DISABLE_BOOTSTRAP_FEATURE
 }
 
 void M2MInterfaceImpl::state_bootstrap_address_resolved( EventData *data)
 {
+#ifndef YOTTA_CFG_DISABLE_BOOTSTRAP_FEATURE
     tr_debug("M2MInterfaceImpl::state_bootstrap_address_resolved");
     ResolvedAddressData *event = (ResolvedAddressData *)data;
     sn_nsdl_addr_s address;
@@ -496,16 +510,21 @@ void M2MInterfaceImpl::state_bootstrap_address_resolved( EventData *data)
         internal_event(STATE_IDLE);
         _observer.error(M2MInterface::InvalidParameters);
     }
+#endif //YOTTA_CFG_DISABLE_BOOTSTRAP_FEATURE
 }
 
 void M2MInterfaceImpl::state_bootstrap_resource_created( EventData */*data*/)
 {
+#ifndef YOTTA_CFG_DISABLE_BOOTSTRAP_FEATURE
     tr_debug("M2MInterfaceImpl::state_bootstrap_resource_created");
+#endif //YOTTA_CFG_DISABLE_BOOTSTRAP_FEATURE
 }
 
 void M2MInterfaceImpl::state_bootstrapped( EventData */*data*/)
 {
+#ifndef YOTTA_CFG_DISABLE_BOOTSTRAP_FEATURE
     tr_debug("M2MInterfaceImpl::state_bootstrapped");
+#endif //YOTTA_CFG_DISABLE_BOOTSTRAP_FEATURE
 }
 
 void M2MInterfaceImpl::state_register( EventData *data)
@@ -784,16 +803,24 @@ void M2MInterfaceImpl::state_function( uint8_t current_state, EventData* data )
             M2MInterfaceImpl::state_idle(data);
             break;
         case STATE_BOOTSTRAP:
+        #ifndef YOTTA_CFG_DISABLE_BOOTSTRAP_FEATURE
             M2MInterfaceImpl::state_bootstrap(data);
+        #endif //YOTTA_CFG_DISABLE_BOOTSTRAP_FEATURE
             break;
         case STATE_BOOTSTRAP_ADDRESS_RESOLVED:
+        #ifndef YOTTA_CFG_DISABLE_BOOTSTRAP_FEATURE
             M2MInterfaceImpl::state_bootstrap_address_resolved(data);
+        #endif //YOTTA_CFG_DISABLE_BOOTSTRAP_FEATURE
             break;
         case STATE_BOOTSTRAP_RESOURCE_CREATED:
+        #ifndef YOTTA_CFG_DISABLE_BOOTSTRAP_FEATURE
             M2MInterfaceImpl::state_bootstrap_resource_created(data);
+        #endif //YOTTA_CFG_DISABLE_BOOTSTRAP_FEATURE
             break;
         case STATE_BOOTSTRAPPED:
+        #ifndef YOTTA_CFG_DISABLE_BOOTSTRAP_FEATURE
             M2MInterfaceImpl::state_bootstrapped(data);
+        #endif //YOTTA_CFG_DISABLE_BOOTSTRAP_FEATURE
             break;
         case STATE_REGISTER:
             M2MInterfaceImpl::state_register(data);

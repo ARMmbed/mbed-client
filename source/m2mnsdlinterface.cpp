@@ -219,8 +219,10 @@ bool M2MNsdlInterface::delete_nsdl_resource(const String &resource_name)
                                     (uint8_t *)resource_name.c_str()) == 0) ? true : false;
 }
 
+
 bool M2MNsdlInterface::create_bootstrap_resource(sn_nsdl_addr_s *address)
 {
+#ifndef YOTTA_CFG_DISABLE_BOOTSTRAP_FEATURE
     tr_debug("M2MNsdlInterface::create_bootstrap_resource()");
     bool success = false;
     _bootstrap_device_setup.error_code = NO_ERROR;
@@ -239,6 +241,9 @@ bool M2MNsdlInterface::create_bootstrap_resource(sn_nsdl_addr_s *address)
 
     }
     return success;
+#else
+    return false;
+#endif //YOTTA_CFG_DISABLE_BOOTSTRAP_FEATURE
 }
 
 bool M2MNsdlInterface::send_register_message(uint8_t* address,
@@ -453,13 +458,17 @@ uint8_t M2MNsdlInterface::received_from_server_callback(struct nsdl_s * /*nsdl_h
                 }
                 _observer.registration_error(error);
             }
-        }else if(coap_header->msg_id == _bootstrap_id) {
+        }
+#ifndef YOTTA_CFG_DISABLE_BOOTSTRAP_FEATURE
+        else if(coap_header->msg_id == _bootstrap_id) {
             _bootstrap_id = 0;
             M2MInterface::Error error = interface_error(coap_header);
             if(error != M2MInterface::ErrorNone) {
                 _observer.bootstrap_error();
             }
-        } else {
+        }
+#endif //YOTTA_CFG_DISABLE_BOOTSTRAP_FEATURE
+        else {
             if(COAP_MSG_CODE_REQUEST_POST == coap_header->msg_code) {
                 if(coap_header->uri_path_ptr) {
                     bool execute_value_updated = false;
@@ -628,8 +637,10 @@ uint8_t M2MNsdlInterface::resource_callback(struct nsdl_s */*nsdl_handle*/,
     return result;
 }
 
+
 void M2MNsdlInterface::bootstrap_done_callback(sn_nsdl_oma_server_info_t *server_info)
 {
+#ifndef YOTTA_CFG_DISABLE_BOOTSTRAP_FEATURE
     tr_debug("M2MNsdlInterface::bootstrap_done_callback()");
     _bootstrap_id = 0;
     M2MSecurity* security = NULL;
@@ -733,6 +744,7 @@ void M2MNsdlInterface::bootstrap_done_callback(sn_nsdl_oma_server_info_t *server
         // Bootstrap error inform to the application.
         _observer.bootstrap_error();
     }
+#endif //YOTTA_CFG_DISABLE_BOOTSTRAP_FEATURE
 }
 
 bool M2MNsdlInterface::process_received_data(uint8_t *data,
