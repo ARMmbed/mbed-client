@@ -57,7 +57,12 @@ To create an M2MObject:
 
 #### Configuring the Object
 
-Once you have created an Object (whether OMA-specific or custom), you can configure various parameters in that Object so that they can be controlled or modified to affect communication with mbed Device Server. (Action to Yogesh: include a full code sample for creating a custom object and setting parameters for it.)
+Once you have created an Object (whether OMA-specific or custom), you can configure various parameters in that Object so that they can be controlled or modified to affect communication with mbed Device Server. (Action to Yogesh: include a full code sample for creating a custom object and setting parameters for it.  -- DONE, Pekka to verify)
+
+`M2MObject * _object = M2MInterfaceFactory::create_object("Test");
+ if(_object) { 
+     _object->set_register_uri(true);   // This defines the registration message will explicitly sends this object path as registered resource like /Test.
+ }`
 
 Here, we discuss a few of the most important parameters, which you must configure properly to work with the Objects.
 
@@ -66,20 +71,27 @@ Here, we discuss a few of the most important parameters, which you must configur
 To set the operation mode of the Objects so that they can handle `GET`, `PUT`, `POST`, `DELETE` or a combination of these requests coming from mbed Device Server:
 
 `virtual void set_operation(M2MBase::Operation operation);`
+`_object->set_operation(M2MBase::GET_PUT_POST_ALLOWED); // This defines the REST operations that can be performed on this object`
 
 ##### Setting Observable Mode
 
 To set the Object to be an observing resource:
 
-`virtual void set_observable(bool observable);` (Yogesh: How do I set it to be not observable? Or is that the default? If it is, we should explain it.)
+`virtual void set_observable(bool observable);` (Yogesh: How do I set it to be not observable? Or is that the default? If it is, we should explain it. -- DONE, Pekka to verify)
+By default, all the created objects are non-observable. You can set them to be observable or not observable using this API.
+`_object->set_observable(true); // This defines the object can be observed from server.`
+`_object->set_observable(false); // This defines the object cannot be observed from server.`
 
 ##### Setting CoAP content type
 
-Currently, the only available content type is the OMA TLV type. The OMA TLV type works only for Objects with a numeric value. For example, if you are creating a custom Object it must be of a numeric type like `100`. (Yogesh: give an example)
+Currently, the only available content type is the OMA TLV type. The OMA TLV type works only for Objects with a numeric value. For example, if you are creating a custom Object it must be of a numeric type like `100`. (Yogesh: give an example -- DONE, Pekka to verify)
+For example, if you are creating object as defined below 
+`M2MObject * _object = M2MInterfaceFactory::create_object("100");`
 
-If you want your Object to support the TLV type, set the object's CoAP content type as `99`:
+By default. all the numeric objects are assigned the CoAP content type of `99` by mbed Client but if you want your Object to assign any other CoAP content type, for eg. 120, you can do that by setting the object's CoAP content type as shown below:
 
 `virtual void set_coap_content_type(const uint8_t content_type);`
+`_object->set_coap_content_type(120);`
 
 **Tip:** In future releases, we will introduce support for the JSON content types.
 
@@ -120,35 +132,44 @@ You can pass an Object Instance ID to create appropriate Object Instances. Norma
 
 `Object/Object Instance ID`
 
+`M2MObjectInstance * object_instance = _object->create_object_instance(0);
+ if(object_instance) { 
+     object_instance->set_register_uri(true);   // This defines the registration message will explicitly sends this object instance path as registered resource like /Test/0.
+ }`
+
 ### Configuring the Object Instance
 
 When you have created an Object Instance (whether OMA-specific or custom), you can configure various parameters in that object so that they can be controlled or modified to affect communication with mbed Device Server.
 
 Here, we present a few of the most important parameters that you must configure properly to work with the object instances.
 
-#### Setting operation mode
+##### Setting Operation Mode
 
-You can set the operation mode of the Object Instances so that they can handle `GET`, `PUT`, `POST`, `DELETE` or a combination of these requests coming from mbed Device Server.
-
-The API that you can use to set the operation mode (present in the M2MBase class) is:
+To set the operation mode of the Objects so that they can handle `GET`, `PUT`, `POST`, `DELETE` or a combination of these requests coming from mbed Device Server:
 
 `virtual void set_operation(M2MBase::Operation operation);`
+`object_instance->set_operation(M2MBase::GET_PUT_POST_ALLOWED); // This defines the REST operations that can be performed on this object instance`
 
-#### Setting observable mode
+##### Setting Observable Mode
 
-To set the object to be an observing resource:
-
-You can set the observable mode using the following API:
+To set the ObjectInstance to be an observing resource:
 
 `virtual void set_observable(bool observable);`
+By default, all the created ObjectInstances are non-observable. You can set them to be observable or not observable using this API.
+`_object_instance->set_observable(true); // This defines the ObjectInstance can be observed from server.`
+`_object_instance->set_observable(false); // This defines the ObjectInstance cannot be observed from server.`
 
-#### Setting CoAP content type
+##### Setting CoAP content type
 
-Currently, the only available content type is the OMA TLV type. The OMA TLV type works only for Objects with a numeric value. For example, if are creating a custom object it must be of a numeric type like `100`.
+Currently, the only available content type is the OMA TLV type. The OMA TLV type works only for Objects and ObjectInstances with a numeric value. For example, if you are creating a custom Object and ObjectInstances it must be of a numeric type like `100`. (Yogesh: give an example -- DONE, Pekka to verify)
+For example, if you are creating ObjectInstance as defined below 
+`M2MObject * _object = M2MInterfaceFactory::create_object("100");`
+`M2MObjectInstance * object_instance = _object->create_object_instance(0);`
 
-If you want your Object to support the TLV type, set the CoAP content type of the object to `99`:
+By default. all the numeric objects are assigned the CoAP content type of `99` by mbed Client but if you want your ObjectInstance to assign any other CoAP content type, for eg. 120, you can do that by setting the object's CoAP content type as shown below:
 
 `virtual void set_coap_content_type(const uint8_t content_type);`
+`object_instance->set_coap_content_type(120);`
 
 **Tip:** In future version, we will introduce support for the JSON content types.
 
@@ -193,25 +214,57 @@ There are other APIs in the M2MDevice class that you can use to set, remove and 
 
 _Mandatory Resources_
 
-Most of the mandatory Resources (Yogesh: which ones are, which are not) are created automatically when you create an M2MSecurity Object. You can set their values based on their data types:
+Most of the mandatory Resources (Yogesh: which ones are, which are not -- DONE, Pekka to verify ) are created automatically when you create an M2MSecurity Object. You can set their values based on their data types:
+Below is the provided list of resources which are automatically created and their accepted data types
 
-- For Resources that take integer values:
+`SecurityMode,
+ ShortServerID,
+ M2MServerUri,
+ BootstrapServer,
+ PublicKey,
+ ServerPublicKey,
+ Secretkey`
+
+- For Resources (`SecurityMode`, `ShortServerID`) that take integer values, you can set the values as described below:
 
   `bool set_resource_value(SecurityResource resource,uint32_t value);`
+  
+   You can set the values to these resources like this
 
-- For Resources that take string values:
+   `security_object->set_resource_value(M2MSecurity::SecurityMode, 1);
+    security_object->set_resource_value(M2MSecurity::ShortServerID, 1);`
+
+- For Resources (`M2MServerUri`) that take string values, you can set the values as described below:
 
   `bool set_resource_value(SecurityResource resource,const String &value);`
+ 
+   You can set the values to these resources like this
 
-- For Resources that take binary values, like setting public keys and certificates: (Yogesh: explaine the purpose of all three data types, not just binary.)
+   `security_object->set_resource_value(M2MSecurity::M2MServerUri, "coap://api.connector.mbed.com:5684");`
+
+- For Resources (`PublicKey`, `ServerPublicKey`, `Secretkey`) that take binary values, you can set the values as described below:
 
   `bool set_resource_value(SecurityResource resource,onst uint8_t *value,const uint16_t length);`
+
+   You can set the values to these resources like this
+
+   `uint8_t key[] = {"key"};
+   security_object->set_resource_value(M2MSecurity::PublicKey, key, sizeof(key));`
   
 _Optional Resources_
 
-To create and set values for Resources that are not mandatory, and which take an integer value:
+   To create and set values for Resources that are not mandatory, and which take an integer value:
+  Here is the list of optional Resources as defined in Security object:
+  `SMSSecurityMode
+   M2MServerSMSNumber
+   ClientHoldOffTime`
 
   `M2MResource* create_resource(SecurityResource resource, uint32_t value);`
+
+   You can create and set the values to these resources like this
+
+   `security_object->create_resource(M2MSecurity::M2MServerSMSNumber, 123542323);`
+
 
 Check the [M2MSecurity API documentation](https://docs.mbed.com/docs/mbed-client-guide/en/latest/api/classM2MSecurity.html) to find which enums are supported for `integer`, `string` or `uint8_t*` value types.
 
@@ -227,47 +280,60 @@ For Custom Objects, you can create Resources of two types:
 
 For each of these types, the Resource and Resource Instances can be either static or dynamic:
 
-- Static: Resource and Resource Instances whose value does not change over time.
+- Static: Resource and Resource Instances whose value does not change over time, these are not observable.
 - Dynamic: Resource and Resource Instances whose value can change. These can be made observable.
 
 **Creating dynamic and static single-instance Resources**
 
-- To create a single-instance Resource with a static value: [see parameters here](https://docs.mbed.com/docs/mbed-client-guide/en/latest/api/classM2MObjectInstance.html#aaa596f731688730d7a883b7f1251a662) (Yogesh: add a code snippet)
-
-```	
-M2MResource* create_static_resource(const String &resource_name,
-const String &resource_type, M2MResourceInstance::ResourceType type,
-const uint8_t *value, const uint8_t value_length,
-bool multiple_instance = false);
-```
-
-- To create a single-instance Resource with a dynamic value that can be set later on: [see parameters here](https://docs.mbed.com/docs/mbed-client-guide/en/latest/api/classM2MObjectInstance.html#a9b3f88dc2d28512ea6c3db6f74168c3f)  (Yogesh: add a code snippet)
+- To create a single-instance Resource with a static value: [see parameters here](https://docs.mbed.com/docs/mbed-client-guide/en/latest/api/classM2MObjectInstance.html#aaa596f731688730d7a883b7f1251a662) 
+Here is how you can create a Static Resource of `/Test/0/Resource` (Yogesh: add a code snippet -- DONE, Pekka to verify)
 
 ```
-M2MResource* create_dynamic_resource(const String &resource_name,
-const String &resource_type, M2MResourceInstance::ResourceType type,
-bool observable, bool multiple_instance = false);
+M2MObject * object = M2MInterfaceFactory::create_object("Test");
+M2MObjectInstance * object_instance = object->create_object_instance(0);
+
+uint8_t value[] ={"value"};
+M2MResource* resource = object_instance->create_static_resource("Resource", "sensor",M2MResourceInstance::INTEGER,value,sizeof(value),false);
 ```
 
+- To create a single-instance Resource with a dynamic value that can be set later on: [see parameters here](https://docs.mbed.com/docs/mbed-client-guide/en/latest/api/classM2MObjectInstance.html#a9b3f88dc2d28512ea6c3db6f74168c3f)  (Yogesh: add a code snippet -- DONE, Pekka to verify)
+
+Here is how you can create a Dynamic Resource of `/Test/0/Resource` which is also an observable resource
+
+```
+M2MObject * object = M2MInterfaceFactory::create_object("Test");
+M2MObjectInstance * object_instance = object->create_object_instance(0);
+
+uint8_t value[] ={"value"};
+M2MResource* resource = object_instance->create_dynamic_resource("Resource", "sensor",M2MResourceInstance::INTEGER,value,sizeof(value), true, false);
+```
 
 **Creating dynamic and static Resource Instances**
 
-- To create a Resource Instance with a static value: [see parameters here](https://docs.mbed.com/docs/mbed-client-guide/en/latest/api/classM2MObjectInstance.html#a6acac6e65bfbc8b731ab4afcc805c41b) (Yogesh: add a code snippet)
+- To create a Resource Instance with a static value: [see parameters here](https://docs.mbed.com/docs/mbed-client-guide/en/latest/api/classM2MObjectInstance.html#a6acac6e65bfbc8b731ab4afcc805c41b)
+
+Here is how you can create a Static Resource Instance of `/Test/0/Resource/0`(Yogesh: add a code snippet -- DONE, Pekka to verify)
 
 ```
-M2MResourceInstance* create_static_resource_instance(const String &resource_name,
-const String &resource_type, M2MResourceInstance::ResourceType type,
-const uint8_t *value, const uint8_t value_length, uint16_t instance_id);
+M2MObject * object = M2MInterfaceFactory::create_object("Test");
+M2MObjectInstance * object_instance = object->create_object_instance(0);
+
+uint8_t value[] ={"value"};
+M2MResourceInstance* resource_instance = object_instance->create_static_resource_instance("Resource", "sensor",M2MResourceInstance::INTEGER,value,sizeof(value),0);
 ```
 
-- To create a Resource Instance with a dynamic value that can be set later on: [see parameters here](https://docs.mbed.com/docs/mbed-client-guide/en/latest/api/classM2MObjectInstance.html#adcaba046a484282983380edf8a370cfa)  (Yogesh: add code snippet)
+
+- To create a Resource Instance with a dynamic value that can be set later on: [see parameters here](https://docs.mbed.com/docs/mbed-client-guide/en/latest/api/classM2MObjectInstance.html#adcaba046a484282983380edf8a370cfa)  (Yogesh: add code snippet -- DONE, Pekka to verify)
+
+Here is how you can create a Dynamic Resource Instance of `/Test/0/Resource/0` which is also an observable resource instance
 
 ```
-M2MResourceInstance* create_dynamic_resource_instance(const String &resource_name,
-const String &resource_type, M2MResourceInstance::ResourceType type,
-bool observable, uint16_t instance_id);
-```
+M2MObject * object = M2MInterfaceFactory::create_object("Test");
+M2MObjectInstance * object_instance = object->create_object_instance(0);
 
+uint8_t value[] ={"value"};
+M2MResource* resource = object_instance->create_dynamic_resource_instance("Resource", "sensor",M2MResourceInstance::INTEGER,value,sizeof(value), true, 0);
+```
 
 #### Configuring the Resource and Resource Instance
 
@@ -282,6 +348,8 @@ You can set the Resource or Resource Instance operation mode so that they can ha
 To set the operation mode:
 
   `virtual void set_operation(M2MBase::Operation operation);`
+  `resource->set_operation(M2MBase::GET_PUT_POST_ALLOWED); // This defines the REST operations that can be performed on this Resource`
+  `resource_instance->set_operation(M2MBase::GET_PUT_POST_ALLOWED); // This defines the REST operations that can be performed on this ResourceInstance`
 
 ##### Setting the value of a dynamic Resource or Resource Instance
 
@@ -290,6 +358,8 @@ You can set the value of a dynamic Resource or Resource Instance so that they ca
 To set the values :
 
   `virtual bool set_value(const uint8_t *value, const uint32_t value_length);`
+  ` uint8_t value[] = {"value"};
+   resource->set_value(value,sizeof(value));`
 
 ##### Setting an executable function
 
@@ -298,5 +368,10 @@ For Dynamic Resources, you can pass a function pointer to the Resource or Resour
 To pass the function pointer:
 
 `virtual void set_execute_function(execute_callback callback);`
+ ` void execute_function_example(void *) {
+   // Code
+   };
+   resource->set_execute_function(execute_callback(this,&execute_function_example));
+ `
 
 There are additional APIs that provide getter and remove functions for Resource and Resource Instances in the M2MResource and M2MResourceInstance classes. Check [the API documentation](https://docs.mbed.com/docs/mbed-client-guide/en/latest/api/annotated.html) for their usage. 
