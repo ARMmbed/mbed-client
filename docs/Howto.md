@@ -140,7 +140,7 @@ To create an M2M Object Instance:
 
 You can pass an Object Instance ID to create appropriate Object Instances. Normally, Object Instances will start from `0` and increment. So the Object Instance structure on the mbed Device Server side would look like this:
 
- Object/Object Instance ID
+`Object/Object Instance ID`
 
 ```
 M2MObjectInstance * object_instance = _object->create_object_instance(0);
