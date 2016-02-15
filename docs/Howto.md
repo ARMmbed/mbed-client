@@ -64,7 +64,7 @@ M2MObject * _object = M2MInterfaceFactory::create_object("Test");
  if(_object) { 
  _object->set_register_uri(true); // The registration message explicitly sends this object path as registered resource such as /Test.
  }
- ```
+```
 
 Here, we discuss a few of the most important parameters, which you must configure properly to work with the Objects.
 
