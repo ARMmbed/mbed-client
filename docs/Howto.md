@@ -62,7 +62,7 @@ Once you have created an Object (whether OMA-specific or custom), you can config
 ```
 M2MObject * _object = M2MInterfaceFactory::create_object("Test");
  if(_object) { 
-     _object->set_register_uri(true);  // The registration message explicitly sends this object path as registered resource such as /Test.
+     _object->set_register_uri(true); // The registration message explicitly sends this object path as registered resource such as /Test.
  }
  ```
 
@@ -173,8 +173,8 @@ To set the Object Instance to be an observing resource:
 By default, all the created Object Instances are non-observable. You can set them to be observable or not observable using this API.
 
 ```
-_object_instance->set_observable(true); // This defines the Object Instance can be observed from server.
-_object_instance->set_observable(false); // This defines the Object Instance cannot be observed from server.
+_object_instance->set_observable(true); // This defines that the Object Instance can be observed from server.
+_object_instance->set_observable(false); // This defines that the Object Instance cannot be observed from server.
 ```
 
 ##### Setting CoAP content type
@@ -230,7 +230,7 @@ Where `instance_id` is the Resource Instance ID, for example `/3/0/11/0`.
 
 Check the [M2MDevice API documentation](https://docs.mbed.com/docs/mbed-client-guide/en/latest/api/classM2MDevice.html) to find which enums are supported for `integer` or `string` value types.
 
-There are other APIs in the M2MDevice class that you can use to set, remove and modify new values for the resources.
+There are other APIs in the `M2MDevice` class that you can use to set, remove and modify new values for the resources.
 
 #### Security Object Resources
 
@@ -291,7 +291,7 @@ To create and set values for the optional Resources that take an integer value:
 
 Check the [M2MSecurity API documentation](https://docs.mbed.com/docs/mbed-client-guide/en/latest/api/classM2MSecurity.html) to find which enums are supported for `integer`, `string` or `uint8_t*` value types.
 
-There are more APIs in the M2MSecurity class that you can use to set, remove and modify Resource values.
+There are more APIs in the `M2MSecurity` class that you can use to set, remove and modify Resource values.
 
 #### Custom Resources
 
@@ -366,19 +366,19 @@ To set the operation mode:
 ```
 virtual void set_operation(M2MBase::Operation operation);
 resource->set_operation(M2MBase::GET_PUT_POST_ALLOWED); // This defines the REST operations that can be performed on this Resource.
-resource_instance->set_operation(M2MBase::GET_PUT_POST_ALLOWED); // This defines the REST operations that can be performed on this ResourceInstance.
+resource_instance->set_operation(M2MBase::GET_PUT_POST_ALLOWED); // This defines the REST operations that can be performed on this Resource Instance.
 ```
 ##### Setting Observable Mode
 
-To set the Resource or ResourceInstance to be an observing resource:
+To set the Resource or Resource Instance to be an observable resource:
 
 `virtual void set_observable(bool observable);`
 
-By default, all the created Static Resources or ResourceInstances are non-observable. While creating Dynamic Resource or ResourceInstance you can specify through API if those are observable or not. But, you can change that later as well, by using API as described below.
+By default, all created static Resources or Resource Instances are non-observable. While creating a dynamic Resource or Resource Instance you can specify through API whether they are observable or not. You can change that later as well as follows:
 
 ```
-resource->set_observable(true); // This defines the Resource or ResourceInstance can be observed from server.
-resource->set_observable(false); // This defines the Resource or ResourceInstance cannot be observed from server.
+resource->set_observable(true); // This defines that the Resource or Resource Instance can be observed from server.
+resource->set_observable(false); // This defines that the Resource or Resource Instance cannot be observed from server.
 ```
 
 ##### Setting the value of a dynamic Resource or Resource Instance
@@ -395,7 +395,7 @@ resource->set_value(value,sizeof(value));
 
 ##### Setting an executable function
 
-For Dynamic Resources, you can pass a function pointer to the Resource or Resource Instance. It will be executed when mbed Device Server calls a `POST` method on that resource. The Resource or Resource Instance must support the `POST` operation mode for this feature to work.
+For dynamic Resources, you can pass a function pointer to the Resource or Resource Instance. It will be executed when mbed Device Server calls a `POST` method on that resource. The Resource or Resource Instance must support the `POST` operation mode for this feature to work.
 
 To pass the function pointer:
 
