@@ -130,10 +130,6 @@ void Test_M2MReportHandler::test_parse_notification_attribute()
     CHECK(true == _handler->parse_notification_attribute(val11_real, M2MBase::Resource,
                                                          M2MResourceInstance::INTEGER ));
 
-    char* val4_real = {"cancel"};
-    CHECK(false == _handler->parse_notification_attribute(val4_real, M2MBase::Resource,
-                                                         M2MResourceInstance::INTEGER ));
-
     _handler->set_default_values();
 
     char* inst_real = {"st=6&pmax=3&lt=1&gt=100"};
@@ -183,8 +179,11 @@ void Test_M2MReportHandler::test_parse_notification_attribute()
     CHECK(true == _handler->parse_notification_attribute(inst11_real, M2MBase::Resource,
                                                          M2MResourceInstance::INTEGER ));
 
-    char* inst4_real = {"cancel"};
-    CHECK(false == _handler->parse_notification_attribute(inst4_real, M2MBase::Resource,
+    char* inst12_real = {"pmax=&pmin=30"};
+    CHECK(false == _handler->parse_notification_attribute(inst12_real, M2MBase::Resource,
+                                                         M2MResourceInstance::INTEGER ));
+    char* inst13_real = {"st="};
+    CHECK(false == _handler->parse_notification_attribute(inst13_real, M2MBase::Resource,
                                                          M2MResourceInstance::INTEGER ));
 
     _handler->set_default_values();

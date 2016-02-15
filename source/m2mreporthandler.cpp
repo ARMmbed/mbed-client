@@ -236,52 +236,53 @@ bool M2MReportHandler::set_notification_attribute(char* option,
         memcpy(attribute, option, (size_t)strlen(option) + 1);
     }
 
-    if (strcmp(attribute, PMIN.c_str()) == 0) {
-        sscanf(value, "%f", &_pmin);
-        success = true;
-        _attribute_state |= M2MReportHandler::Pmin;
-        tr_debug("M2MReportHandler::set_notification_attribute %s to %f", attribute, _pmin);
-    }
-    else if(strcmp(attribute, PMAX.c_str()) == 0) {
-        sscanf(value, "%f", &_pmax);
-        success = true;        
-        _attribute_state |= M2MReportHandler::Pmax;
-        tr_debug("M2MReportHandler::set_notification_attribute %s to %f", attribute, _pmax);
-    }
-    else if(strcmp(attribute, GT.c_str()) == 0 &&
-            (M2MBase::Resource == type)){
-        sscanf(value, "%f", &_gt);
-        success = true;        
-        _attribute_state |= M2MReportHandler::Gt;
-        tr_debug("M2MReportHandler::set_notification_attribute %s to %f", attribute, _gt);
-    }
-    else if(strcmp(attribute, LT.c_str()) == 0 &&
-            (M2MBase::Resource == type)){
-        sscanf(value, "%f", &_lt);
-        success = true;
-        _attribute_state |= M2MReportHandler::Lt;
-        tr_debug("M2MReportHandler::set_notification_attribute %s to %f", attribute, _lt);
-    }
-    else if(strcmp(attribute, ST.c_str()) == 0 &&
-            (M2MBase::Resource == type)){
-        sscanf(value, "%f", &_st);
-        success = true;
-        _high_step = _current_value + _st;
-        _low_step = _current_value - _st;
-        _attribute_state |= M2MReportHandler::St;        
-        tr_debug("M2MReportHandler::set_notification_attribute %s to %f", attribute, _st);
-    }   
+    if (strlen(value)) {
+        if (strcmp(attribute, PMIN.c_str()) == 0) {
+            sscanf(value, "%f", &_pmin);
+            success = true;
+            _attribute_state |= M2MReportHandler::Pmin;
+            tr_debug("M2MReportHandler::set_notification_attribute %s to %f", attribute, _pmin);
+        }
+        else if(strcmp(attribute, PMAX.c_str()) == 0) {
+            sscanf(value, "%f", &_pmax);
+            success = true;
+            _attribute_state |= M2MReportHandler::Pmax;
+            tr_debug("M2MReportHandler::set_notification_attribute %s to %f", attribute, _pmax);
+        }
+        else if(strcmp(attribute, GT.c_str()) == 0 &&
+                (M2MBase::Resource == type)){
+            sscanf(value, "%f", &_gt);
+            success = true;
+            _attribute_state |= M2MReportHandler::Gt;
+            tr_debug("M2MReportHandler::set_notification_attribute %s to %f", attribute, _gt);
+        }
+        else if(strcmp(attribute, LT.c_str()) == 0 &&
+                (M2MBase::Resource == type)){
+            sscanf(value, "%f", &_lt);
+            success = true;
+            _attribute_state |= M2MReportHandler::Lt;
+            tr_debug("M2MReportHandler::set_notification_attribute %s to %f", attribute, _lt);
+        }
+        else if(strcmp(attribute, ST.c_str()) == 0 &&
+                (M2MBase::Resource == type)){
+            sscanf(value, "%f", &_st);
+            success = true;
+            _high_step = _current_value + _st;
+            _low_step = _current_value - _st;
+            _attribute_state |= M2MReportHandler::St;
+            tr_debug("M2MReportHandler::set_notification_attribute %s to %f", attribute, _st);
+        }
 
-    // Return false if try to set gt,lt or st when the resource type is something else than numerical
-    if ((resource_type != M2MResourceInstance::INTEGER &&
-            resource_type != M2MResourceInstance::FLOAT) &&
-            ((_attribute_state & M2MReportHandler::Gt) == M2MReportHandler::Gt ||
-            (_attribute_state & M2MReportHandler::Lt) == M2MReportHandler::Lt ||
-            (_attribute_state & M2MReportHandler::St) == M2MReportHandler::St)) {
-        tr_debug("M2MReportHandler::set_notification_attribute - not numerical resource");
-        success = false;
+        // Return false if try to set gt,lt or st when the resource type is something else than numerical
+        if ((resource_type != M2MResourceInstance::INTEGER &&
+                resource_type != M2MResourceInstance::FLOAT) &&
+                ((_attribute_state & M2MReportHandler::Gt) == M2MReportHandler::Gt ||
+                (_attribute_state & M2MReportHandler::Lt) == M2MReportHandler::Lt ||
+                (_attribute_state & M2MReportHandler::St) == M2MReportHandler::St)) {
+            tr_debug("M2MReportHandler::set_notification_attribute - not numerical resource");
+            success = false;
+        }
     }
-
     return success;
 }
 
