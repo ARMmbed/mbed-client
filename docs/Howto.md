@@ -248,7 +248,7 @@ Resources that are automatically created and their accepted data types:
 - `ServerPublicKey`
 - `Secretkey`
 
-- For Resources (`SecurityMode`, `ShortServerID`) that take integer values, you can set the values as follows:
+For Resources (`SecurityMode`, `ShortServerID`) that take integer values, you can set the values as follows:
 
 `bool set_resource_value(SecurityResource resource,uint32_t value);`
 
@@ -257,7 +257,7 @@ security_object->set_resource_value(M2MSecurity::SecurityMode, 1);
 security_object->set_resource_value(M2MSecurity::ShortServerID, 1);
 ```
 
-- For Resources (`M2MServerUri`) that take string values, you can set the values as follows:
+For Resources (`M2MServerUri`) that take string values, you can set the values as follows:
 
 `bool set_resource_value(SecurityResource resource,const String &value);`
  
@@ -265,7 +265,7 @@ security_object->set_resource_value(M2MSecurity::ShortServerID, 1);
 security_object->set_resource_value(M2MSecurity::M2MServerUri, "coap://api.connector.mbed.com:5684");
 ```
 
-- For Resources (`PublicKey`, `ServerPublicKey`, `Secretkey`) that take binary values, you can set the values as follows:
+For Resources (`PublicKey`, `ServerPublicKey`, `Secretkey`) that take binary values, you can set the values as follows:
 
 `bool set_resource_value(SecurityResource resource,onst uint8_t *value,const uint16_t length);`
 
@@ -303,8 +303,8 @@ For Custom Objects, you can create Resources of two types:
 
 For each of these types, the Resource and Resource Instances can be either static or dynamic:
 
-- Static: Resource and Resource Instances whose value does not change over time, these are not observable.
-- Dynamic: Resource and Resource Instances whose value can change. These can be made observable.
+- **Static**: Resource and Resource Instances whose value does not change over time, these are not observable.
+- **Dynamic**: Resource and Resource Instances whose value can change. These can be made observable.
 
 **Creating dynamic and static single-instance Resources**
 
@@ -341,7 +341,7 @@ M2MResourceInstance* resource_instance = object_instance->create_static_resource
 ```
 
 
-- To create an observable Resource Instance (`/Test/0/Resource/0`) with a dynamic value that can be set later on: [see parameters here](https://docs.mbed.com/docs/mbed-client-guide/en/latest/api/classM2MObjectInstance.html#adcaba046a484282983380edf8a370cfa)  (Yogesh: add code snippet -- DONE, Pekka to verify)
+- To create an observable Resource Instance (`/Test/0/Resource/0`) with a dynamic value that can be set later on: [see parameters here](https://docs.mbed.com/docs/mbed-client-guide/en/latest/api/classM2MObjectInstance.html#adcaba046a484282983380edf8a370cfa)  
 
 ```
 M2MObject * object = M2MInterfaceFactory::create_object("Test");
