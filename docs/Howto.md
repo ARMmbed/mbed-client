@@ -368,6 +368,18 @@ virtual void set_operation(M2MBase::Operation operation);
 resource->set_operation(M2MBase::GET_PUT_POST_ALLOWED); // This defines the REST operations that can be performed on this Resource.
 resource_instance->set_operation(M2MBase::GET_PUT_POST_ALLOWED); // This defines the REST operations that can be performed on this ResourceInstance.
 ```
+##### Setting Observable Mode
+
+To set the Resource or ResourceInstance to be an observing resource:
+
+`virtual void set_observable(bool observable);`
+
+By default, all the created Static Resources or ResourceInstances are non-observable. While creating Dynamic Resource or ResourceInstance you can specify through API if those are observable or not. But, you can change that later as well, by using API as described below.
+
+```
+resource->set_observable(true); // This defines the Resource or ResourceInstance can be observed from server.
+resource->set_observable(false); // This defines the Resource or ResourceInstance cannot be observed from server.
+```
 
 ##### Setting the value of a dynamic Resource or Resource Instance
 
