@@ -59,8 +59,8 @@ To port mbed Client to a new platform:
  1. [Request for a development repository](#requesting-for-a-development-repository).
  2. [Create a yotta compilation target for your board](#creating-a-yotta-compilation-target).
  3. [Implement the `mbed-client-xxx` module for your target platform](#implementing-mbed-client-xxx).
- 4. [Modify the `module.json` of the `mbed-client` module](#modifying-`module.json`-in-the-`mbed-client`-module).
- 5. [Verify that your implementation is correct](#Testing and verification).
+ 4. [Modify the `module.json` of the `mbed-client` module](#modifying-module.json-in-the-mbed-client-module).
+ 5. [Verify that your implementation is correct](#testing-and-verification).
 
 The `yotta` build system is designed for easy reuse of generic modules. If you intend to support multiple platforms that share common features, we recommend moving the common functionality into a separate module and use it for each platform.
 
