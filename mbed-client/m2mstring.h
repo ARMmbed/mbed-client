@@ -30,44 +30,40 @@ namespace m2m
    */
   class String
   {
-    char*     p;           ///< The data
-    size_t    allocated_;  ///< The allocated memory size (including trailing NULL)
-    size_t    size_;       ///< The currently used memory size (excluding trailing NULL)
+    char* p;           ///< The data
+    size_t allocated_;  ///< The allocated memory size (including trailing NULL)
+    size_t size_;       ///< The currently used memory size (excluding trailing NULL)
 
   public:
     typedef size_t size_type;
-    static const   size_type npos;
+    static const size_type npos;
 
     String();
     virtual ~String();
     String(const String&);
     String(const char*);
 
-    String&  operator=(const char*);
-    String&  operator=(const String&);
+    String& operator=(const char*);
+    String& operator=(const String&);
 
-    String&  operator+=(const String&);
-    String&  operator+=(const char*);
-    String&  operator+=(char);
-    void     push_back(char);
+    String& operator+=(const String&);
+    String& operator+=(const char*);
+    String& operator+=(char);
+    void push_back(char);
 
-    //No need for this += is
-    //friend String operator+(const String& lhs, const String& rhs);
+    bool operator==(const char*) const;
+    bool operator==(const String&) const;
 
-    bool     operator==(const char*) const;
-    bool     operator==(const String&) const;
-
-    void     clear();       // set string to empty string (memory remains reserved)
+    void clear();       // set string to empty string (memory remains reserved)
 
     size_type size()   const   { return size_; }   ///< size without terminating NULL
     size_type length() const   { return size_; }   ///< as size()
 
-    /// size if fully used
     size_type capacity() const { return allocated_-1; }
 
-    bool      empty() const    { return size_ == 0; }
+    bool empty() const    { return size_ == 0; }
 
-    const char*  c_str() const { return p; } ///< raw data
+    const char* c_str() const { return p; } ///< raw data
 
     /** Reserve internal string memory so that n characters can be put into the
         string (plus 1 for the NULL char). If there is already enough memory,
@@ -91,31 +87,31 @@ namespace m2m
     /// swap contents
     void swap( String& );
 
-    String   substr(const size_type pos, size_type length) const;
+    String substr(const size_type pos, size_type length) const;
 
     // unchecked access:
-    char&    operator[](const size_type i)       { return p[i]; }
-    char     operator[](const size_type i) const { return p[i]; }
+    char& operator[](const size_type i)       { return p[i]; }
+    char operator[](const size_type i) const { return p[i]; }
     // checked access:
-    char&    at(const size_type i);
-    char     at(const size_type i) const;
+    char& at(const size_type i);
+    char at(const size_type i) const;
 
     /// erase len characters at position pos
     String& erase(size_type pos, size_type len);
     /// Append n characters of a string
     String& append(const char* str, size_type n);
 
-    int     compare( size_type pos, size_type len, const String& str ) const;
-    int     compare( size_type pos, size_type len, const char*   str ) const;
+    int compare( size_type pos, size_type len, const String& str ) const;
+    int compare( size_type pos, size_type len, const char*   str ) const;
 
-    int     find_last_of(char c) const;
+    int find_last_of(char c) const;
 
     static uint8_t* convert_integer_to_array(int64_t value, uint8_t &size);
 
   private:
     // reallocate the internal memory
-    void  new_realloc( size_type n);
-    char* strdup_never_null(const char* other);
+    void new_realloc( size_type n);
+    char* strdup(const char* other);
 
     char _return_value;
 
@@ -124,8 +120,7 @@ namespace m2m
   };
   // class
 
-  bool
-  operator<(const String&, const String&);
+  bool operator<(const String&, const String&);
 
   void reverse(char s[], uint32_t length);
 
