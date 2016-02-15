@@ -62,7 +62,7 @@ Once you have created an Object (whether OMA-specific or custom), you can config
 ```
 M2MObject * _object = M2MInterfaceFactory::create_object("Test");
  if(_object) { 
-     _object->set_register_uri(true); // The registration message explicitly sends this object path as registered resource such as /Test.
+ _object->set_register_uri(true); // The registration message explicitly sends this object path as registered resource such as /Test.
  }
  ```
 
