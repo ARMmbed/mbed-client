@@ -48,13 +48,6 @@ mbed-client-linux-example x.x.x
 
 ## Compilation targets
 
-This release supports only one compilation target:
-
- * `x86-linux-native`: to compile for linux OS, using the gcc toolchain.
-
-To select the compilation target used for compiling a library or an example program, give the command `yotta target x86-linux-native` before building. More documentation on target descriptions can be found on the [yotta
-documentation site](http://docs.yottabuild.org/tutorial/targets.html).
-
 To compile for a target board, you need a [target description](http://docs.yottabuild.org/tutorial/targets.html) that describes how to compile for the target. 
 
 The `mbed-client` module uses the platform name that each target defines to choose which `mbed-client-<platform-name>` module to depend on to provide the platform-specific implementation.
