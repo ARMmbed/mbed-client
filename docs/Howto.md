@@ -147,7 +147,7 @@ M2MObjectInstance * object_instance = _object->create_object_instance(0);
  if(object_instance) { 
      object_instance->set_register_uri(true);  // The registration message explicitly sends this object instance path as registered resource such as /Test/0.
  }
- ```
+```
 
 ### Configuring the Object Instance
 
