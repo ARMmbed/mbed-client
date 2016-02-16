@@ -86,6 +86,40 @@ private: // Constructor and destructor are private
     virtual ~M2MResource();
 
 public:
+    class M2MExecuteParameter {
+
+    private:
+        M2MExecuteParameter() {
+            value = NULL;
+            value_length = 0;
+        }
+
+       ~M2MExecuteParameter() {
+            if(value) {
+                free(value);
+            }
+        }
+
+    public:
+
+        uint8_t * get_argument_value() const {
+            return value;
+        }
+
+        uint16_t get_argument_value_length () const {
+            return value_length;
+        }
+
+    private:
+
+        uint8_t *value;
+        uint16_t value_length;
+
+    friend class M2MResource;
+    };
+
+
+public:
 
     /**
      * @brief Adds resource instances to the M2MResource.

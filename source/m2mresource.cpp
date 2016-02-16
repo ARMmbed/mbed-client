@@ -552,21 +552,26 @@ sn_coap_hdr_s* M2MResource::handle_post_request(nsdl_s *nsdl,
     // process the POST if we have registered a callback for it
     if(received_coap_header) {
         if ((operation() & SN_GRS_POST_ALLOWED) != 0) {
-            void *arguments = NULL;
+            M2MResource::M2MExecuteParameter *param = NULL;
             if(received_coap_header->payload_ptr) {
                 if(received_coap_header->payload_ptr) {
-                    arguments = (void*)malloc(received_coap_header->payload_len+1);
-                    if (arguments){
-                        memset(arguments, 0, received_coap_header->payload_len+1);
-                        memcpy(arguments,
+                    param = new M2MExecuteParameter();
+                    if (param){
+                        param->value = (uint8_t*)malloc(received_coap_header->payload_len);
+                        if(param->value) {
+                            memset(param->value, 0, received_coap_header->payload_len);
+                            memcpy(param->value,
                             received_coap_header->payload_ptr,
                             received_coap_header->payload_len);
+                            param->value_length = received_coap_header->payload_len;
+                        }
                     }
                 }
             }
             tr_debug("M2MResource::handle_post_request - Execute resource function");
-            execute(arguments);
-            free(arguments);
+
+            execute(param);
+            delete param;
             if(_delayed_response) {
                 coap_response->msg_type = COAP_MSG_TYPE_ACKNOWLEDGEMENT;
                 coap_response->msg_code = COAP_MSG_CODE_EMPTY;

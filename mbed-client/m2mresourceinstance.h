@@ -30,6 +30,7 @@ public:
  *  LWM2M resource models can be created based on it.
  */
 typedef FP1<void,void*> execute_callback;
+
 class M2MResourceCallback;
 
 class M2MResourceInstance : public M2MBase {
@@ -52,7 +53,6 @@ public:
         TIME,
         OBJLINK
     }ResourceType;
-
 
 private: // Constructor and destructor are private
          // which means that these objects can be created or

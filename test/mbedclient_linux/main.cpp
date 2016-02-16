@@ -29,7 +29,7 @@
 #include "ns_trace.h"
 
 const String &BOOTSTRAP_SERVER_ADDRESS = "coap://10.45.3.10:5693";
-const String &M2M_SERVER_ADDRESS = "coap://10.45.3.10:5683";
+const String &M2M_SERVER_ADDRESS = "coap://10.45.3.10:5683"; //
 const String &MANUFACTURER = "manufacturer";
 const String &TYPE = "type";
 const String &MODEL_NUMBER = "2015";
@@ -55,6 +55,7 @@ public:
         _registered = false;
         _unregistered = false;
         _registration_updated = false;
+        _executed = false;
         _value = 0;
     }
 
@@ -165,10 +166,24 @@ public:
         _device = M2MInterfaceFactory::create_device();
         if(_device) {
             _device->object_instance()->set_operation(M2MBase::GET_PUT_POST_ALLOWED);
-            if(_device->create_resource(M2MDevice::Manufacturer,MANUFACTURER)     &&
-               _device->create_resource(M2MDevice::DeviceType,TYPE)        &&
-               _device->create_resource(M2MDevice::ModelNumber,MODEL_NUMBER)      &&
-               _device->create_resource(M2MDevice::SerialNumber,SERIAL_NUMBER)) {
+         if(_device->create_resource(M2MDevice::Manufacturer,MANUFACTURER)   &&
+               _device->create_resource(M2MDevice::ModelNumber,"ModelNumber")   &&
+               _device->create_resource(M2MDevice::FirmwareVersion,"Firmware")  &&
+               _device->create_resource(M2MDevice::CurrentTime,121212121)       &&
+               _device->create_resource(M2MDevice::SoftwareVersion,"Software")  &&
+               _device->create_resource(M2MDevice::UTCOffset,"UTC+02:00")       &&
+               _device->create_resource(M2MDevice::Timezone,"+2:00")            &&
+               _device->create_resource(M2MDevice::SerialNumber,SERIAL_NUMBER)  &&
+               _device->create_resource(M2MDevice::BatteryLevel,8)              &&
+               _device->create_resource_instance(M2MDevice::ErrorCode,1,1)      &&
+               _device->create_resource_instance(M2MDevice::ErrorCode,6,2)      &&
+               _device->create_resource_instance(M2MDevice::ErrorCode,4,3)      &&
+               _device->create_resource_instance(M2MDevice::AvailablePowerSources,1,0)  &&
+               _device->create_resource_instance(M2MDevice::AvailablePowerSources,5,1)  &&
+               _device->create_resource_instance(M2MDevice::PowerSourceVoltage,1,0)     &&
+               _device->create_resource_instance(M2MDevice::PowerSourceVoltage,2,1)     &&
+               _device->create_resource_instance(M2MDevice::PowerSourceCurrent,3,0)     &&
+               _device->create_resource_instance(M2MDevice::PowerSourceCurrent,4,1)) {
                 success = true;
             }
         }
@@ -177,9 +192,11 @@ public:
 
     void execute_function(void *argument) {
         if(argument) {
-            char* arguments = (char*)argument;
-            printf("Received %s!!\n", arguments);
+            M2MResource::M2MExecuteParameter* arguments = (M2MResource::M2MExecuteParameter*)argument;
+            printf("Received LENGTH : %d!!\n", arguments->get_argument_value_length());
+            printf("Received STRING : %s!!\n", (char*)arguments->get_argument_value());
         }
+        _executed = true;
         printf("I am executed !!\n");
     }
 
@@ -188,29 +205,30 @@ public:
         _object = M2MInterfaceFactory::create_object("10");
         if(_object) {
             _object->set_operation(M2MBase::GET_PUT_POST_ALLOWED);
-            M2MObjectInstance* inst = _object->create_object_instance();
-            if(inst) {
-                inst->set_operation(M2MBase::GET_PUT_POST_ALLOWED);
-                inst->set_observable(false);
+            M2MObjectInstance* objinst = _object->create_object_instance();
+            if(objinst) {
+                objinst->set_operation(M2MBase::GET_PUT_POST_ALLOWED);
                 char buffer[20];
                 int size = sprintf(buffer,"%d",_value);
 
-                inst->create_static_resource("0",
+                objinst->create_static_resource("0",
                                              "ResourceTest",
-                                             M2MResourceInstance::INTEGER,
+                                             M2MResourceInstance::STRING,
                                              STATIC_VALUE,
                                              sizeof(STATIC_VALUE)-1);
 
-                M2MResourceInstance* instance = inst->create_dynamic_resource_instance("1",
-                                                                         "ResourceTest",
-                                                                         M2MResourceInstance::INTEGER,
-                                                                         true,0);
+                M2MResource* instance = objinst->create_dynamic_resource("1",
+                                                                              "ResourceTest",
+                                                                              M2MResourceInstance::INTEGER,
+                                                                              true);
 
                 if(instance) {
                     instance->set_operation(M2MBase::GET_PUT_POST_ALLOWED);
+                    instance->set_max_age(0);
                     instance->set_value((const uint8_t*)buffer,
-                                 (const uint32_t)size);
+                                        size);
                     instance->set_execute_function(execute_callback(this,&MbedClient::execute_function));
+                    instance->set_delayed_response(false);
                     _value++;
                 }
             }
@@ -219,18 +237,18 @@ public:
     }
 
     void update_resource() {
-        if(_object) {
-            M2MObjectInstance* inst = _object->object_instance();
-            if(inst) {
-                M2MResource* res = inst->resource("1");
-                res = inst->resource("1");
-                if(res) {
-                    M2MResourceInstance *res_inst = res->resource_instance(0);
-                    if(res_inst) {
+        if(_executed) {
+            if(_object) {
+                M2MObjectInstance* inst = _object->object_instance();
+                if(inst) {
+                    M2MResource* res = inst->resource("1");
+                    if(res) {
                         char buffer1[20];
                         int size1 = sprintf(buffer1,"%d",_value);
-                        res_inst->set_value((const uint8_t*)buffer1,
+                        res->set_value((const uint8_t*)buffer1,
                                        (const uint32_t)size1);
+                        _executed = false;
+                        //res->send_delayed_post_response();
                         _value++;
                     }
                 }
@@ -295,6 +313,15 @@ public:
     void value_updated(M2MBase *base, M2MBase::BaseType type) {
         printf("\nValue updated of Object name %s and Type %d\n",
                base->name().c_str(), type);
+        printf("\nPath name of object %s\n",
+               base->uri_path().c_str());
+
+       if(type == M2MBase::ObjectInstance) {
+            M2MObjectInstance * instance = (M2MObjectInstance*)base;
+            uint16_t id = instance->instance_id();
+            printf("\nObject Instance ID %d \n",id);
+       }
+
     }
 
 private:
@@ -310,6 +337,8 @@ private:
     bool                _unregistered;
     bool                _registration_updated;
     int                 _value;
+    int16_t             _value_time;
+    bool                _executed;
 };
 
 void* wait_for_bootstrap(void* arg) {
@@ -342,11 +371,11 @@ void* send_observation(void* arg) {
         sleep(1);
         if(counter >= 5 &&
            client->register_successful()) {
-            printf("Sending observation\n");
+            //printf("Sending observation\n");
             client->update_resource();
             counter = 0;
-            printf("\n============== After Sending Observation ==============\n");
-            display_mallinfo();
+//            printf("\n============== After Sending Observation ==============\n");
+//            display_mallinfo();
         }
         else
             counter++;
@@ -399,8 +428,8 @@ static void display_mallinfo(void)
 
 int main() {
 
-    printf("============== Before allocating blocks ==============\n");
-    display_mallinfo();
+//    printf("============== Before allocating blocks ==============\n");
+//    display_mallinfo();
 
     MbedClient mbed_client;
 
@@ -452,8 +481,8 @@ int main() {
     pthread_join(unregister_thread, NULL);
     pthread_join(observation_thread, NULL);
 
-    printf("\n============== After freeing blocks ==============\n");
-    display_mallinfo();
+//    printf("\n============== After freeing blocks ==============\n");
+//    display_mallinfo();
 
     exit(EXIT_SUCCESS);
 }
