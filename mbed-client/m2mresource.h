@@ -37,7 +37,10 @@ public:
 
 class M2MResource : public M2MResourceInstance, M2MResourceCallback {
 
-friend class M2MObjectInstance;
+    friend class M2MObjectInstance;
+
+public:
+    class M2MExecuteParameter;
 
 private: // Constructor and destructor are private
          // which means that these objects can be created or
@@ -223,7 +226,6 @@ private:
     uint8_t                     *_delayed_token;
     uint8_t                     _delayed_token_len;
 
-
 friend class Test_M2MResource;
 friend class Test_M2MObjectInstance;
 friend class Test_M2MObject;
@@ -235,6 +237,47 @@ friend class Test_M2MFirmware;
 friend class Test_M2MTLVSerializer;
 friend class Test_M2MTLVDeserializer;
 
+};
+
+/**
+ *  @brief M2MResource::M2MExecuteParameter.
+ *  This class handles "Execute" operation arguments.
+ */
+class M2MResource::M2MExecuteParameter {
+
+private:
+
+    /**
+     * @brief Constructor
+     */
+    M2MExecuteParameter();
+
+    /**
+     * Destructor
+     */
+   ~M2MExecuteParameter();
+
+public:
+
+    /**
+     * @brief Returns value of the argument.
+     * @return uint8_t *,  argument value
+     */
+    uint8_t *get_argument_value() const;
+
+    /**
+     * @brief Returns length of the value argumetn.
+     * @return uint8_t,  argument value length
+     */
+    uint16_t get_argument_value_length () const;
+
+private:
+
+    uint8_t *_value;
+    uint16_t _value_length;
+
+friend class Test_M2MResource;
+friend class M2MResource;
 };
 
 #endif // M2M_RESOURCE_H
