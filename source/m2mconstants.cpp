@@ -25,6 +25,7 @@ const String PMAX = "pmax";
 const String GT = "gt";
 const String LT = "lt";
 const String ST = "st";
+const String STP = "stp";
 const String CANCEL = "cancel";
 
 

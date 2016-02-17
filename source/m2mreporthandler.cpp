@@ -263,8 +263,8 @@ bool M2MReportHandler::set_notification_attribute(char* option,
             _attribute_state |= M2MReportHandler::Lt;
             tr_debug("M2MReportHandler::set_notification_attribute %s to %f", attribute, _lt);
         }
-        else if(strcmp(attribute, ST.c_str()) == 0 &&
-                (M2MBase::Resource == type)){
+        else if((strcmp(attribute, ST.c_str()) == 0 || (strcmp(attribute, STP.c_str()) == 0))
+                && (M2MBase::Resource == type)){
             sscanf(value, "%f", &_st);
             success = true;
             _high_step = _current_value + _st;
@@ -272,7 +272,6 @@ bool M2MReportHandler::set_notification_attribute(char* option,
             _attribute_state |= M2MReportHandler::St;
             tr_debug("M2MReportHandler::set_notification_attribute %s to %f", attribute, _st);
         }
-
         // Return false if try to set gt,lt or st when the resource type is something else than numerical
         if ((resource_type != M2MResourceInstance::INTEGER &&
                 resource_type != M2MResourceInstance::FLOAT) &&

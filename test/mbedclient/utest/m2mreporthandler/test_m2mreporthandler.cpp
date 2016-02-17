@@ -188,6 +188,15 @@ void Test_M2MReportHandler::test_parse_notification_attribute()
 
     _handler->set_default_values();
 
+    char* inst14_real = {"stp=10"};
+    CHECK(true == _handler->parse_notification_attribute(inst14_real, M2MBase::Resource,
+                                                         M2MResourceInstance::INTEGER ));
+    char* inst15_real = {"stp=10&st=15"};
+    CHECK(true == _handler->parse_notification_attribute(inst15_real, M2MBase::Resource,
+                                                         M2MResourceInstance::INTEGER ));
+
+    _handler->set_default_values();
+
     DOUBLES_EQUAL(0,_handler->_lt,0);
     DOUBLES_EQUAL(0,_handler->_gt,0);
     DOUBLES_EQUAL(-1,_handler->_pmax,0);

@@ -46,6 +46,7 @@ extern const String PMAX;
 extern const String GT;
 extern const String LT;
 extern const String ST;
+extern const String STP;
 extern const String CANCEL;
 
 //LWM2MOBJECT NAME/ID
