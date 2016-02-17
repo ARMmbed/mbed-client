@@ -2,7 +2,7 @@
 
 # mbed Client structure and build process
 
-**Tip:** Before embarking on your own port, you should build the core mbed Client for an existing compilation target to get an understanding of how the mbed Client builds.
+<span style="background-color:#E6E6E6;border:1px solid #000;display:block; height:100%; padding:10px">**Tip:** Before embarking on your own port, you should build the core mbed Client for an existing compilation target to get an understanding of how the mbed Client builds.</span>
 
 mbed Client is structured as a set of modules. Each module declares which other modules it depends on. When you build a module, our build system `yotta` looks at these dependencies and installs the necessary modules before completing the build.
 
