@@ -103,7 +103,7 @@ virtual void set_coap_content_type(const uint8_t content_type);
 _object->set_coap_content_type(120);
 ```
 
-**Tip:** In future releases, we will introduce support for the JSON content types.
+<span style="background-color:#E6E6E6;border:1px solid #000;display:block; height:100%; padding:10px">**Tip:** In future releases, we will introduce support for the JSON content types.</span>
 
 ## How to create and configure Object Instances
 
@@ -193,7 +193,7 @@ virtual void set_coap_content_type(const uint8_t content_type);
 object_instance->set_coap_content_type(120);
 ```
 
-**Tip:** In future version, we will introduce support for the JSON content types.
+<span style="background-color:#E6E6E6;border:1px solid #000;display:block; height:100%; padding:10px">**Tip:** In future version, we will introduce support for the JSON content types.</span>
 
 There are additional APIs that provide getter and remove functions for Object Instances in the `M2MObjectInstance` class; [check the API documentation](https://docs.mbed.com/docs/mbed-client-guide/en/latest/api/classM2MObjectInstance.html) for their usage. 
 
