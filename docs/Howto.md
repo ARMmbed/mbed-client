@@ -2,7 +2,7 @@
 
 This section explains how to use our C++ API to create and configure different types of Objects, Object Instances and Resources for mbed Client to comply with the OMA LWM2M specifications. These resources can then be communicated to mbed Device Server.
 
-**Note:** The API complies with the OMA LWM2M specifications.
+<span style="background-color:#E6E6E6;  border:1px solid #000;display:block; height:100%; padding:10px">**Note:** The API complies with the OMA LWM2M specifications.</span>
 
 As per the OMA LWM2M specification:
 
