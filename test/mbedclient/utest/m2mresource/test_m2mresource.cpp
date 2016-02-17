@@ -32,14 +32,7 @@ public :
 };
 
 
-class MyTest{
-public:
-    void execute_function(void */*argument*/) {
-        visited = true;
-    }
 
-    bool visited;
-};
 
 class Callback : public M2MObjectInstanceCallback {
 
@@ -704,7 +697,7 @@ void Test_M2MResource::test_handle_put_request()
 }
 
 void Test_M2MResource::test_handle_post_request()
-{
+{    
     uint8_t value[] = {"name"};
     bool execute_value_updated = false;
     sn_coap_hdr_s *coap_header = (sn_coap_hdr_s *)malloc(sizeof(sn_coap_hdr_s));
@@ -734,6 +727,7 @@ void Test_M2MResource::test_handle_post_request()
     coap_header->content_type_ptr = (uint8_t*)malloc(1);
     coap_header->content_type_len = 1;
     *coap_header->content_type_ptr = 99;
+
 
     resource->_delayed_response = true;
     resource->_delayed_token = (uint8_t*)malloc(1);
@@ -814,4 +808,22 @@ void Test_M2MResource::test_delayed_response()
 {
     resource->_delayed_response = false;
     CHECK(resource->delayed_response() == false);
+}
+
+void Test_M2MResource::test_execute_params()
+{
+    M2MResource::M2MExecuteParameter *params = new M2MResource::M2MExecuteParameter();
+    CHECK(params->get_argument_value() == NULL);
+    CHECK( params->get_argument_value_length() == 0);
+
+    uint8_t value[] = {"test"};
+    int length = sizeof(value);
+    params->_value = (uint8_t*)malloc(length);
+    memcpy(params->_value,value,length);
+    params->_value_length = length;
+
+    CHECK(params->_value == params->get_argument_value());
+    CHECK(params->_value_length == params->get_argument_value_length());
+
+    delete params;
 }

@@ -551,22 +551,25 @@ sn_coap_hdr_s* M2MResource::handle_post_request(nsdl_s *nsdl,
                                                            msg_code);
     // process the POST if we have registered a callback for it
     if(received_coap_header) {
-        if ((operation() & SN_GRS_POST_ALLOWED) != 0) {
-            void *arguments = NULL;
+        if ((operation() & SN_GRS_POST_ALLOWED) != 0) {            
+            M2MResource::M2MExecuteParameter *exec_params = NULL;
             if(received_coap_header->payload_ptr) {
-                if(received_coap_header->payload_ptr) {
-                    arguments = (void*)malloc(received_coap_header->payload_len+1);
-                    if (arguments){
-                        memset(arguments, 0, received_coap_header->payload_len+1);
-                        memcpy(arguments,
+                exec_params = new M2MResource::M2MExecuteParameter();
+                if (exec_params){
+                    exec_params->_value = (uint8_t*)malloc(received_coap_header->payload_len);
+                    if (exec_params->_value) {
+                        memset(exec_params->_value, 0, received_coap_header->payload_len);
+                        memcpy(exec_params->_value,
                             received_coap_header->payload_ptr,
                             received_coap_header->payload_len);
+                        exec_params->_value_length = received_coap_header->payload_len;
                     }
                 }
             }
             tr_debug("M2MResource::handle_post_request - Execute resource function");
-            execute(arguments);
-            free(arguments);
+            execute(exec_params);
+            delete exec_params;
+
             if(_delayed_response) {
                 coap_response->msg_type = COAP_MSG_TYPE_ACKNOWLEDGEMENT;
                 coap_response->msg_code = COAP_MSG_CODE_EMPTY;
@@ -611,3 +614,27 @@ void M2MResource::notification_update()
         report_handler->set_notification_trigger();
     }
 }
+
+M2MResource::M2MExecuteParameter::M2MExecuteParameter()
+{
+    _value = NULL;
+    _value_length = 0;
+}
+
+M2MResource::M2MExecuteParameter::~M2MExecuteParameter()
+{
+    if(_value) {
+        free(_value);
+    }
+}
+
+uint8_t *M2MResource::M2MExecuteParameter::get_argument_value() const
+{
+    return _value;
+}
+
+uint16_t M2MResource::M2MExecuteParameter::get_argument_value_length() const
+{
+    return _value_length;
+}
+

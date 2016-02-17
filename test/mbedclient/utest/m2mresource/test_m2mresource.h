@@ -24,6 +24,7 @@ class Handler;
 class Test_M2MResource
 {
 public:
+
     Test_M2MResource();
 
     void test_copy_constructor();
@@ -67,6 +68,8 @@ public:
     void test_get_delayed_token();
 
     void test_delayed_response();
+
+    void test_execute_params();
 
     M2MResource* resource;
     Callback *callback;

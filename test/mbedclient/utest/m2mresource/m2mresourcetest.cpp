@@ -135,3 +135,8 @@ TEST(M2MResource, test_delayed_response)
 {
     m2m_resource->test_delayed_response();
 }
+
+TEST(M2MResource, test_execute_params)
+{
+    m2m_resource->test_execute_params();
+}
