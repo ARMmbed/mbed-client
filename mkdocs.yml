@@ -4,9 +4,9 @@ use directory_urls: false
 pages:
 - ['index.md','About this document']
 - ['Introduction.md','Introduction to mbed Client','mbed Client overview']
-- ['client_reg_dereg.md','Client Registration']
-- ['dev_man_serv_enable.md','Device Management and Service Enablement']
-- ['info_reporting.md','Information Reporting']
+- ['client_reg_dereg.md','Features','Client Registration']
+- ['dev_man_serv_enable.md','Features','Device Management and Service Enablement']
+- ['info_reporting.md','Features','Information Reporting']
 - ['Howto.md','Using mbed Client API','Quick start guide for using mbed Client API']
 - ['porting-guide.md','Porting mbed Client', 'mbed Client structure and build process']
 
