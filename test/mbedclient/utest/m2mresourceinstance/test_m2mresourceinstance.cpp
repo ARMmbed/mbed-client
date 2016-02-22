@@ -396,6 +396,24 @@ void Test_M2MResourceInstance::test_handle_get_request()
         common_stub::coap_header->options_list_ptr = NULL;
     }
 
+    // OMA OPAQUE
+    resource_instance->_resource_type = M2MResourceInstance::OPAQUE;
+
+    CHECK(resource_instance->handle_get_request(NULL,coap_header,handler) != NULL);
+
+    if(common_stub::coap_header->content_type_ptr) {
+        free(common_stub::coap_header->content_type_ptr);
+        common_stub::coap_header->content_type_ptr = NULL;
+    }
+    if(common_stub::coap_header->options_list_ptr->max_age_ptr) {
+        free(common_stub::coap_header->options_list_ptr->max_age_ptr);
+        common_stub::coap_header->options_list_ptr->max_age_ptr = NULL;
+    }
+    if(common_stub::coap_header->options_list_ptr) {
+        free(common_stub::coap_header->options_list_ptr);
+        common_stub::coap_header->options_list_ptr = NULL;
+    }
+
     // Not OMA TLV or JSON
     m2mbase_stub::uint8_value = 110;
     CHECK(resource_instance->handle_get_request(NULL,coap_header,handler) != NULL);
