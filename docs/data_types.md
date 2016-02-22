@@ -104,7 +104,7 @@ instance->set_value((const uint8_t*)buffer, 10);
 - Base64 decoded value of the payload -> `Test Data`
 
 
-### Transferring an opaque value from mbed cCient to mbed Device Server
+### Transferring an opaque value from mbed Client to mbed Device Server
 
 **Opaque(from the application)**:
 
@@ -118,7 +118,7 @@ instance->set_value(buffer, 12);
 
 ```
 {"async-response-id":... { "id" : "1134045351#f4b93d6e-4652-4874-82e4-41a3ced0cd56@b02ac40a-a501-44d9-be29-e6e0e5303f85/Test/0/D", "status" : 200, "payload" : "T3BhcXVlIERhdGEA", 
-"ct" : "text/plain", "max-age" : 0 }
+"ct" : "application/octet-stream", "max-age" : 0 }
 ```
 
 - Base64 encoded value of the payload -> `T3BhcXVlIERhdGEA`
