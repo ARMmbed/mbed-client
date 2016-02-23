@@ -29,7 +29,7 @@ public:
 };
 
 /**
- *  @brief M2MResource.
+ *  \brief M2MResource.
  *  This class is the base class for mbed Client Resources. All defined
  *  LWM2M object models can be created using it. This class will also hold all resources
  *  instances associated with the given object.
@@ -47,13 +47,13 @@ private: // Constructor and destructor are private
          // deleted only through a function provided by the M2MObjectInstance.
 
     /**
-     * @brief Constructor
-     * @param resource_name, Resource name of the object.
-     * @param resource_type, Resource type of the object.
-     * @param type, Resource Data Type of the object.
-     * @param value, Value pointer of the object.
-     * @param value_length, Length of the value pointer
-     * @param multiple_instance, True if resource supports instances.
+     * \brief Constructor
+     * \param resource_name The resource name of the object.
+     * \param resource_type The resource type of the object.
+     * \param type The resource data type of the object.
+     * \param value The value pointer of the object.
+     * \param value_length The length of the value pointer.
+     * \param multiple_instance True if the resource supports instances.
      */
     M2MResource(M2MObjectInstanceCallback &object_instance_callback,
                 const String &resource_name,
@@ -64,8 +64,8 @@ private: // Constructor and destructor are private
                 bool multiple_instance = false);
 
     /**
-     * @brief Constructor
-     * @param name, Name of the object
+     * \brief Constructor
+     * \param name The name of the object.
      */
     M2MResource(M2MObjectInstanceCallback &object_instance_callback,
                 const String &resource_name,
@@ -91,124 +91,124 @@ private: // Constructor and destructor are private
 public:
 
     /**
-     * @brief Adds resource instances to the M2MResource.
-     * @param resource_instance, Resource Instance to be added.
+     * \brief Adds resource instances to the M2MResource.
+     * \param resource_instance The resource instance to be added.
      */
     void add_resource_instance(M2MResourceInstance *resource_instance);
 
     /**
-     * @brief Returns whether the resource has multiple
+     * \brief Returns whether the resource has multiple
      * resource instances or not.
-     * @return True if resource base has multiple instances,
+     * \return True if the resource base has multiple instances,
      * else false.
      */
     bool supports_multiple_instances() const;
 
     /**
-     * @brief Sets whether the resource should send a delayed response for POST request.
-     * @param delayed_response, Boolean value to set the delayed responde.
+     * \brief Sets whether the resource should send a delayed response for POST request.
+     * \param delayed_response A boolean value to set the delayed response.
      */
     void set_delayed_response(bool delayed_response);
 
     /**
-     * @brief Trigger to send the delayed response for POST request.
-     * The delayed_response flag must be set before receiving POST request
-     * and the value of resource must be updated before calling this function.
-     * @return boolean, true if response is sent else false.
+     * \brief A trigger to send the delayed response for the POST request.
+     * The delayed_response flag must be set before receiving the POST request
+     * and the value of the resource must be updated before calling this function.
+     * \return True if response is sent, else false.
      */
     bool send_delayed_post_response();
 
     /**
-     * @brief Provides the value of the given token.
-     * @param value[OUT], Pointer to the token value.
-     * @param value_length[OUT], Length of the token pointer.
+     * \brief Provides the value of the given token.
+     * \param value[OUT] A pointer to the token value.
+     * \param value_length[OUT] The length of the token pointer.
      */
     void get_delayed_token(uint8_t *&token, uint8_t &token_length);
 
     /**
-     * @brief Removes the resource with the given name.
-     * @param name, Name of the resource to be removed.
-     * @param instance_id, Instance ID of resource to be removed, default is 0.
-     * @return True if removed, else false.
+     * \brief Removes the resource with the given name.
+     * \param name The name of the resource to be removed.
+     * \param instance_id The instance ID of the resource to be removed, default is 0.
+     * \return True if removed, else false.
      */
     virtual bool remove_resource_instance(uint16_t instance_id = 0);
 
     /**
-     * @brief Returns resource instance with the given name.
-     * @param instance_id, Instance ID of the requested resource, default is 0
-     * @return M2MResourceInstance object if found, else NULL.
+     * \brief Returns the resource instance with the given name.
+     * \param instance_id The instance ID of the requested resource, default is 0
+     * \return M2MResourceInstance object if found, else NULL.
      */
     virtual M2MResourceInstance* resource_instance(uint16_t instance_id = 0) const;
 
     /**
-     * @brief Returns a list of resources.
-     * @return List of resources with the object.
+     * \brief Returns a list of resources.
+     * \return A list of resources.
      */
     virtual const M2MResourceInstanceList& resource_instances() const;
 
     /**
-     * @brief Returns the total number of resources with the object.
-     * @return Total number of resources.
+     * \brief Returns the total number of resources.
+     * \return The total number of resources.
      */
     virtual uint16_t resource_instance_count() const;
 
     /**
-     * @brief Returns the value set for delayed response.
-     * @return Value for delayed response.
+     * \brief Returns the value set for delayed response.
+     * \return The value for delayed response.
      */
     bool delayed_response() const;
 
     /**
-     * @brief Parses the received query for a notification
+     * \brief Parses the received query for a notification
      * attribute.
-     * @return True if required attributes are present, else false.
+     * \return True if required attributes are present, else false.
      */
     virtual bool handle_observation_attribute(char *&query);
 
     /**
-     * @brief Adds the observation level for the object.
-     * @param observation_level, Level of observation.
+     * \brief Adds the observation level for the object.
+     * \param observation_level The öevel of observation.
      */
     virtual void add_observation_level(M2MBase::Observation observation_level);
 
     /**
-     * @brief Removes the observation level from the object.
-     * @param observation_level, Level of observation.
+     * \brief Removes the observation level from the object.
+     * \param observation_level The level of observation.
      */
     virtual void remove_observation_level(M2MBase::Observation observation_level);
 
     /**
-     * @brief Handles GET request for the registered objects.
-     * @param nsdl, NSDL handler for the CoAP library.
-     * @param received_coap_header, CoAP message received from the server.
-     * @param observation_handler, Handler object for sending
+     * \brief Handles the GET request for the registered objects.
+     * \param nsdl The NSDL handler for the CoAP library.
+     * \param received_coap_header The CoAP message received from the server.
+     * \param observation_handler The handler object for sending
      * observation callbacks.
-     * @return sn_coap_hdr_s,  Message that needs to be sent to the server.
+     * \return sn_coap_hdr_s The message that needs to be sent to the server.
      */
     virtual sn_coap_hdr_s* handle_get_request(nsdl_s *nsdl,
                                               sn_coap_hdr_s *received_coap_header,
                                               M2MObservationHandler *observation_handler = NULL);
     /**
-     * @brief Handles PUT request for the registered objects.
-     * @param nsdl, NSDL handler for the CoAP library.
-     * @param received_coap_header, CoAP message received from the server.
-     * @param observation_handler, Handler object for sending
+     * \brief Handles the PUT request for the registered objects.
+     * \param nsdl The NSDL handler for the CoAP library.
+     * \param received_coap_header The CoAP message received from the server.
+     * \param observation_handler The handler object for sending
      * observation callbacks.
-     * @param execute_value_updated, True will execute "value_updated" callback.
-     * @return sn_coap_hdr_s,  Message that needs to be sent to the server.
+     * \param execute_value_updated True will execute the "value_updated" callback.
+     * \return sn_coap_hdr_s The message that needs to be sent to the server.
      */
     virtual sn_coap_hdr_s* handle_put_request(nsdl_s *nsdl,
                                               sn_coap_hdr_s *received_coap_header,
                                               M2MObservationHandler *observation_handler,
                                               bool &execute_value_updated);
     /**
-     * @brief Handles POST request for the registered objects.
-     * @param nsdl, NSDL handler for the CoAP library.
-     * @param received_coap_header, CoAP message received from the server.
-     * @param observation_handler, Handler object for sending
+     * \brief Handles the POST request for the registered objects.
+     * \param nsdl The NSDL handler for the CoAP library.
+     * \param received_coap_header The CoAP message received from the server.
+     * \param observation_handler The handler object for sending
      * observation callbacks.
-     * @param execute_value_updated, True will execute "value_updated" callback.
-     * @return sn_coap_hdr_s,  Message that needs to be sent to the server.
+     * \param execute_value_updated True will execute the "value_updated" callback.
+     * \return sn_coap_hdr_s The message that needs to be sent to the server.
      */
     virtual sn_coap_hdr_s* handle_post_request(nsdl_s *nsdl,
                                                sn_coap_hdr_s *received_coap_header,
@@ -240,15 +240,15 @@ friend class Test_M2MTLVDeserializer;
 };
 
 /**
- *  @brief M2MResource::M2MExecuteParameter.
- *  This class handles "Execute" operation arguments.
+ *  \brief M2MResource::M2MExecuteParameter.
+ *  This class handles the "Execute" operation arguments.
  */
 class M2MResource::M2MExecuteParameter {
 
 private:
 
     /**
-     * @brief Constructor
+     * \brief Constructor
      */
     M2MExecuteParameter();
 
@@ -260,14 +260,14 @@ private:
 public:
 
     /**
-     * @brief Returns value of the argument.
-     * @return uint8_t *,  argument value
+     * \brief Returns the value of the argument.
+     * \return uint8_t * The argument value.
      */
     uint8_t *get_argument_value() const;
 
     /**
-     * @brief Returns length of the value argumetn.
-     * @return uint8_t,  argument value length
+     * \brief Returns the length of the value argument.
+     * \return uint8_t The argument value length.
      */
     uint16_t get_argument_value_length () const;
 
