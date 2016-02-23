@@ -97,7 +97,7 @@ public:
      * 'Manufacturer', 'DeviceType','ModelNumber','SerialNumber',
      * 'HardwareVersion', 'FirmwareVersion', 'SoftwareVersion',
      *  'UTCOffset', 'Timezone', 'SupportedBindingMode'.
-     * \param value Value to be set on the resource, in String format.
+     * \param value The value to be set on the resource, in String format.
      * \return M2MResource if created successfully, else NULL.
      */
     M2MResource* create_resource(DeviceResource resource, const String &value);
@@ -109,7 +109,7 @@ public:
      * 'BatteryLevel', 'BatteryStatus', 'MemoryFree', 'MemoryTotal',
      * 'ErrorCode', 'CurrentTime'. For 'CurrentTime', pass the time value in EPOCH format, for example
      * 1438944683.
-     * \param value Value to be set on the resource, in Integer format.
+     * \param value The value to be set on the resource, in Integer format.
      * \return M2MResource if created successfully, else NULL.
      */
     M2MResource* create_resource(DeviceResource resource, int64_t value);
@@ -119,7 +119,7 @@ public:
      * \param resource With this function, the following resources can be created:
      * 'AvailablePowerSources','PowerSourceVoltage','PowerSourceCurrent',
      * 'ErrorCode'.
-     * \param value Value to be set on the resource, in Integer format.
+     * \param value The value to be set on the resource, in Integer format.
      * \return M2MResourceInstance if created successfully, else NULL.
      */
     M2MResourceInstance* create_resource_instance(DeviceResource resource, int64_t value,
@@ -172,7 +172,7 @@ public:
      * 'BatteryLevel', 'BatteryStatus', 'MemoryFree', 'MemoryTotal',
      * 'ErrorCode', 'CurrentTime'.
      * \param value The value to be set on the resource, in Integer format.
-     * \param instance_id, The instance ID of the resource, default is 0.
+     * \param instance_id The instance ID of the resource, default is 0.
      * \return True if successfully set, else false.
      */
     bool set_resource_value(DeviceResource resource,
@@ -219,7 +219,7 @@ public:
     /**
      * \brief Returns the number of resources for a given resource enum.
      * \param resource Resource enum.
-     * \return Number of resources for a given resource enum. Returns 1 for the
+     * \return The number of resources for a given resource enum. Returns 1 for the
      * mandatory resources. Can be 0 as well if no instances exist for an
      * optional resource.
      */
