@@ -73,7 +73,7 @@ Whenever there is a valid `PUT` operation for any of the resources, the applicat
 void value_updated(M2MBase *base, M2MBase::BaseType type) 
 ```
 
-Where `M2MBase` is the object whose value has been updated and `M2MBase::BaseType` is the object type.
+Where `M2MBase` is the Object whose value has been updated and `M2MBase::BaseType` is the object type.
 
 ## The Write Attributes operation
 
@@ -95,9 +95,9 @@ mbed Device Server uses the **Execute** operation to perform an action. This ope
 
 <span style="background-color:#E6E6E6;  border:1px solid #000;display:block; height:100%; padding:10px">**Note:** mbed Client returns an error when the **Execute** operation is received for Object Instances or Resource Instances.</span>
 
-Here is an implementation example for the **Execute** operation. If you want to execute a piece of code in your application, you can do it by passing it the `POST` request from mbed Device Server:
-When your Resource receives `POST` request from mbed Device Server, mbed Client will parse the payload from the request and wrap it under class `M2MResource::M2MExecuteParameter`. The class object is passed through the execute callback function that you passed.
-You can then typecast the `void*` argument into corresponding `M2MResource::M2MExecuteParameter` and access the passed payload and its length through the given API. Check the code snippet below for usage
+If you want to execute a piece of code in your application, you can pass a `POST` request from mbed Device Server.
+When your Resource receives the `POST` request, mbed Client parses the payload from the request and wraps it in the `M2MResource::M2MExecuteParameter` class. The class object is passed through the execute callback function.
+You can then typecast the `void*` argument into the corresponding `M2MResource::M2MExecuteParameter` and access the passed payload and its length through the given API. Check the code snippet below for usage.
 
 ```
 #include "mbed-client/m2mobject.h"
@@ -124,6 +124,6 @@ if(_object) {
         res->set_execute_function(execute_callback(this,&M2MLWClient::execute_function));
 ```
 
-The POST method allows for your client to respond back to the response immediately with updated payload value as piggyback response or then if you want to send the payload response to server later (because the Execute operation may take longer time on device to complete), you can handle this through API.
+The POST method allows the client to respond immediately with the updated payload value as a piggyback response. If you want to send the payload response to the server later (because the Execute operation may take longer time on device to complete), you can handle this through the API.
 
-You can set resource API `void set_delayed_response(bool)` to be `true`. In this case, the POST request's response to the server will be an empty acknowledgment. When your resource is ready with the response, you can simply call `send_delayed_post_response()` on that resource and client will send the latest resource value to the server as part of separate response of POST request. By default, the option of `void set_delayed_response(bool)` is false, which means the POST response will immediately return with resource value as piggyback payload. 
+You can set the resource API `void set_delayed_response(bool)` to `true`. In this case, the POST request response to the server is an empty acknowledgment. When your resource is ready with the response, you can simply call `send_delayed_post_response()` on that resource and the client sends the latest resource value to the server as part of a separate response to the POST request. By default, `void set_delayed_response(bool)` is `false`, which means that the POST response returns the resource value as a piggyback payload immediately. 
