@@ -17,14 +17,14 @@
 #define M2M_TIMER_OBSERVER_H
 
 /**
- *  @brief M2MTimerObserver
+ *  \brief M2MTimerObserver
  *  Observer class for indicating the timer expiry to the parent class.
  */
 class M2MTimerObserver
 {
 public:
     /**
-      * @enum Defines the types of timer
+      * \enum Defines the types of timer
       * that can be created for mbed Client.
       */
     typedef enum {
@@ -38,8 +38,8 @@ public:
     }Type;
 
     /**
-    * Indicates that the time has expired.
-    * @param type, Type of timer that has expired.
+    * \brief Indicates that the timer has expired.
+    * \param type The type of the timer that has expired.
     */
     virtual void timer_expired(M2MTimerObserver::Type type =
                                M2MTimerObserver::Notdefined) = 0;
