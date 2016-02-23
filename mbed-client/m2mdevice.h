@@ -23,7 +23,7 @@ class M2MResource;
 class M2MResourceInstance;
 
 /**
- *  @brief M2MDevice.
+ *  \brief M2MDevice.
  *  This class represents the Device Object model of the LWM2M framework.
  *  It provides an interface for handling the device object
  *  and all its corresponding resources. There can be only one instance
@@ -36,7 +36,7 @@ friend class M2MInterfaceFactory;
 public:
 
      /**
-      * @brief Enum defining all the resources associated with the
+      * \brief Enum defining all the resources associated with the
       * Device Object in the LWM2M framework.
       */
     typedef enum {
@@ -87,139 +87,139 @@ private:
 public:
 
     /**
-     * @brief Deletes the M2MDevice instance.
+     * \brief Deletes the M2MDevice instance.
      */
     static void delete_instance();
 
     /**
-     * @brief Creates a new resource for the given resource enum.
-     * @param resource, With this function, the following resources can be created:
+     * \brief Creates a new resource for the given resource enum.
+     * \param resource With this function, the following resources can be created:
      * 'Manufacturer', 'DeviceType','ModelNumber','SerialNumber',
      * 'HardwareVersion', 'FirmwareVersion', 'SoftwareVersion',
      *  'UTCOffset', 'Timezone', 'SupportedBindingMode'.
-     * @param value, Value to be set on the resource, in String format.
-     * @return M2MResource if created successfully, else NULL.
+     * \param value Value to be set on the resource, in String format.
+     * \return M2MResource if created successfully, else NULL.
      */
     M2MResource* create_resource(DeviceResource resource, const String &value);
 
     /**
-     * @brief Creates a new resource for given resource enum.
-     * @param resource, With this function, the following resources can be created:
+     * \brief Creates a new resource for given resource enum.
+     * \param resource With this function, the following resources can be created:
      * 'AvailablePowerSources','PowerSourceVoltage','PowerSourceCurrent',
      * 'BatteryLevel', 'BatteryStatus', 'MemoryFree', 'MemoryTotal',
      * 'ErrorCode', 'CurrentTime'. For 'CurrentTime', pass the time value in EPOCH format, for example
      * 1438944683.
-     * @param value, Value to be set on the resource, in Integer format.
-     * @return M2MResource if created successfully, else NULL.
+     * \param value Value to be set on the resource, in Integer format.
+     * \return M2MResource if created successfully, else NULL.
      */
     M2MResource* create_resource(DeviceResource resource, int64_t value);
 
     /**
-     * @brief Creates a new resource instance for given resource enum.
-     * @param resource, With this function, the following resources can be created:
+     * \brief Creates a new resource instance for given resource enum.
+     * \param resource With this function, the following resources can be created:
      * 'AvailablePowerSources','PowerSourceVoltage','PowerSourceCurrent',
      * 'ErrorCode'.
-     * @param value, Value to be set on the resource, in Integer format.
-     * @return M2MResourceInstance if created successfully, else NULL.
+     * \param value Value to be set on the resource, in Integer format.
+     * \return M2MResourceInstance if created successfully, else NULL.
      */
     M2MResourceInstance* create_resource_instance(DeviceResource resource, int64_t value,
                                                   uint16_t instance_id);
 
     /**
-     * @brief Creates a new resource for given resource name.
-     * @param resource, With this function, the following resources can be created:
+     * \brief Creates a new resource for given resource name.
+     * \param resource With this function, the following resources can be created:
      * 'ResetErrorCode','FactoryReset'.
-     * @return M2MResource if created successfully, else NULL.
+     * \return M2MResource if created successfully, else NULL.
      */
     M2MResource* create_resource(DeviceResource resource);
 
     /**
-     * @brief Deletes the resource with the given resource enum.
+     * \brief Deletes the resource with the given resource enum.
      * Mandatory resources cannot be deleted.
-     * @param resource, Name of the resource to be deleted.
-     * @return True if deleted, else false.
+     * \param resource The name of the resource to be deleted.
+     * \return True if deleted, else false.
      */
     bool delete_resource(DeviceResource resource);
 
     /**
-     * @brief Deletes the resource with the given resource enum.
+     * \brief Deletes the resource with the given resource enum.
      * Mandatory resources cannot be deleted.
-     * @param resource, Name of the resource to be deleted.
-     * @param instance_id, Instance Id of the resource.
-     * @return True if deleted, else false.
+     * \param resource The name of the resource to be deleted.
+     * \param instance_id The instance ID of the resource.
+     * \return True if deleted, else false.
      */
     bool delete_resource_instance(DeviceResource resource,
                                   uint16_t instance_id);
 
     /**
-     * @brief Sets the value of the given resource enum.
-     * @param resource, With this function, a value can be set for the following resources:
+     * \brief Sets the value of the given resource enum.
+     * \param resource With this function, a value can be set for the following resources:
      * 'Manufacturer', 'DeviceType','ModelNumber','SerialNumber',
      * 'HardwareVersion', 'FirmwareVersion', 'SoftwareVersion',
      *  'UTCOffset', 'Timezone', 'SupportedBindingMode'.
-     * @param value, Value to be set on the resource, in String format.
-     * @param instance_id, Instance Id of the resource, default is 0.
-     * @return True if successfully set, else false.
+     * \param value The value to be set on the resource, in String format.
+     * \param instance_id The instance ID of the resource, default is 0.
+     * \return True if successfully set, else false.
      */
     bool set_resource_value(DeviceResource resource,
                             const String &value,
                             uint16_t instance_id = 0);
 
     /**
-     * @brief Sets the value of the given resource enum.
-     * @param resource, With this function, a value can be set for the following resources:
+     * \brief Sets the value of the given resource enum.
+     * \param resource With this function, a value can be set for the following resources:
      * 'AvailablePowerSources','PowerSourceVoltage','PowerSourceCurrent',
      * 'BatteryLevel', 'BatteryStatus', 'MemoryFree', 'MemoryTotal',
      * 'ErrorCode', 'CurrentTime'.
-     * @param value, Value to be set on the resource, in Integer format.
-     * @param instance_id, Instance Id of the resource, default is 0.
-     * @return True if successfully set, else false.
+     * \param value The value to be set on the resource, in Integer format.
+     * \param instance_id, The instance ID of the resource, default is 0.
+     * \return True if successfully set, else false.
      */
     bool set_resource_value(DeviceResource resource,
                             int64_t value,
                             uint16_t instance_id = 0);
 
     /**
-     * @brief Returns the value of the given resource enum, in String.
-     * @param resource, With this function, the following resources can return a value:
+     * \brief Returns the value of the given resource enum, in String.
+     * \param resource With this function, the following resources can return a value:
      * 'Manufacturer', 'DeviceType','ModelNumber','SerialNumber',
      * 'HardwareVersion', 'FirmwareVersion', 'SoftwareVersion',
      *  'UTCOffset', 'Timezone', 'SupportedBindingMode'.
-     * @param instance_id, Instance Id of the resource, default is 0.
-     * @return Value associated with that resource. If the resource is not valid NULL is returned.
+     * \param instance_id The instance ID of the resource, default is 0.
+     * \return The value associated with that resource. If the resource is not valid NULL is returned.
      */
     String resource_value_string(DeviceResource resource,
                                  uint16_t instance_id = 0) const;
 
     /**
-     * @brief Returns the value of the given resource key name, in Integer.
-     * @param resource, With this function, the following resources can return a value:
+     * \brief Returns the value of the given resource key name, in Integer.
+     * \param resource With this function, the following resources can return a value:
      * 'AvailablePowerSources','PowerSourceVoltage','PowerSourceCurrent',
      * 'BatteryLevel', 'BatteryStatus', 'MemoryFree', 'MemoryTotal',
      * 'ErrorCode', 'CurrentTime'.
-     * @param instance_id, Instance Id of the resource, default is 0
-     * @return Value associated with that resource. If the resource is not valid -1 is returned.
+     * \param instance_id The instance ID of the resource, default is 0
+     * \return The value associated with that resource. If the resource is not valid -1 is returned.
      */
     int64_t resource_value_int(DeviceResource resource,
                                uint16_t instance_id = 0) const;
 
     /**
-     * @brief Indicates whether the resource instance with given resource enum exists or not.
-     * @param resource, Resource enum.
-     * @return True if at least one instance exists, else false.
+     * \brief Indicates whether the resource instance with given resource enum exists or not.
+     * \param resource Resource enum.
+     * \return True if at least one instance exists, else false.
      */
     bool is_resource_present(DeviceResource resource)const;
 
     /**
-     * @brief Returns the number of resources for the whole device object.
-     * @return Total number of resources belonging to the device object.
+     * \brief Returns the number of resources for the whole device object.
+     * \return Total number of resources belonging to the device object.
      */
     uint16_t total_resource_count()const;
 
     /**
-     * @brief Returns the number of resources for a given resource enum.
-     * @param resource, Resource enum.
-     * @return Number of resources for a given resource enum. Returns 1 for the
+     * \brief Returns the number of resources for a given resource enum.
+     * \param resource Resource enum.
+     * \return Number of resources for a given resource enum. Returns 1 for the
      * mandatory resources. Can be 0 as well if no instances exist for an
      * optional resource.
      */
