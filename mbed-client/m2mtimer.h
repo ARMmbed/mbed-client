@@ -22,7 +22,7 @@
 class M2MTimerPimpl;
 
 /**
-* @brief M2MTimer.
+* \brief M2MTimer.
 * Timer class for mbed client.
 */
 class M2MTimer
@@ -47,35 +47,35 @@ public:
     virtual ~M2MTimer();
 
     /**
-    * @brief Starts timer.
-    * @param interval Timer interval in milliseconds.
-    * @param single_shot Defines whether the timer is ticked once or restarted every time at expiry.
+    * \brief Starts the timer.
+    * \param interval The timer interval in milliseconds.
+    * \param single_shot Defines whether the timer is ticked once or restarted every time at expiry.
     */
     void start_timer(uint64_t interval, M2MTimerObserver::Type type, bool single_shot = true);
 
     /**
-     * @brief Starts timer in DTLS manner.
-     * @param intermediate_interval Intermediate interval to use, must be smaller than total (usually 1/4 of total).
-     * @param total_interval Total interval to use; This is the timeout value of a DTLS packet.
-     * @param type Type of the timer.
+     * \brief Starts the timer in DTLS manner.
+     * \param intermediate_interval The intermediate interval to use, must be smaller than total (usually 1/4 of total).
+     * \param total_interval The total interval to use; This is the timeout value of a DTLS packet.
+     * \param type The type of the timer.
      */
     void start_dtls_timer(uint64_t intermediate_interval, uint64_t total_interval, M2MTimerObserver::Type type = M2MTimerObserver::Dtls);
 
     /**
-    * Stops timer.
+    * \brief Stops the timer.
     * This cancels the ongoing timer.
     */
     void stop_timer();
 
     /**
-     * @brief Checks if the intermediate interval has passed.
-     * @return True if interval has passed, else false.
+     * \brief Checks if the intermediate interval has passed.
+     * \return True if the interval has passed, else false.
      */
     bool is_intermediate_interval_passed();
 
     /**
-     * @brief Checks if the total interval has passed.
-     * @return True if interval has passed, else false.
+     * \brief Checks if the total interval has passed.
+     * \return True if the interval has passed, else false.
      */
     bool is_total_interval_passed();
 
