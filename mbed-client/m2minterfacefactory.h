@@ -28,7 +28,7 @@ class M2MInterfaceImpl;
 class M2MFirmware;
 
 /**
- *  @brief M2MInterfaceFactory.
+ *  \brief M2MInterfaceFactory.
  *  This is a factory class that provides an interface for creating an mbed Client Interface
  *  object for an application to utilize the LWM2M features provided by the client.
  */
@@ -44,20 +44,20 @@ private:
 public:
 
     /**
-     * @brief Creates an interface object for the mbed Client Inteface. With this, the
+     * \brief Creates an interface object for the mbed Client Inteface. With this, the
      * client can handle client operations like Bootstrapping, Client
      * Registration, Device Management and Information Reporting.
-     * @param endpoint_name, Endpoint name of the mbed client.
-     * @param endpoint_type, Endpoint type of the mbed client, default is empty.
-     * @param life_time, Lifetime of the endpoint in seconds,
+     * \param endpoint_name The endpoint name of the mbed client.
+     * \param endpoint_type The endpoint type of the mbed client, default is empty.
+     * \param life_time The lifetime of the endpoint in seconds,
      *        if -1 it is optional.
-     * @param listen_port, Listening port for the endpoint, default is 5683.
-     * @param domain, Domain of the endpoint, default is empty.
-     * @param mode, Binding Mode of the endpoint, default is NOT_SET.
-     * @param stack, Select the underlying network stack to be used for the connection,
+     * \param listen_port The listening port for the endpoint, default is 5683.
+     * \param domain The domain of the endpoint, default is empty.
+     * \param mode The binding mode of the endpoint, default is NOT_SET.
+     * \param stack The underlying network stack to be used for the connection,
      * default is LwIP_IPv4.
-     * @param context_address, Context address for M2M-HTTP, not used currently.
-     * @return M2MInterfaceImpl , Object to manage other client operations.
+     * \param context_address The context address for M2M-HTTP, not used currently.
+     * \return M2MInterfaceImpl An object for managing other client operations.
      */
     static M2MInterface *create_interface(M2MInterfaceObserver &observer,
                                               const String &endpoint_name,
@@ -70,46 +70,46 @@ public:
                                               const String &context_address = "");
 
     /**
-     * @brief Creates a security object for the mbed Client Inteface. With this, the
+     * \brief Creates a security object for the mbed Client Inteface. With this, the
      * client can manage Bootstrapping and Client Registration.
-     * @param ServerType, Type of the Security Object, bootstrap or LWM2M server.
-     * @return M2MSecurity, Object to manage other client operations.
+     * \param ServerType The type of the Security Object, bootstrap or LWM2M server.
+     * \return M2MSecurity An object for managing other client operations.
      */
     static M2MSecurity *create_security(M2MSecurity::ServerType server_type);
 
     /**
-     * @brief Creates a server object for the mbed Client Inteface. With this, the 
+     * \brief Creates a server object for the mbed Client Inteface. With this, the 
      * client can manage the server resources used for client operations
      * such as Client Registration, server lifetime etc.
-     * @return M2MServer, Object to manage server client operations.
+     * \return M2MServer An object for managing server client operations.
      */
     static M2MServer *create_server();
 
     /**
-     * @brief Creates a device object for the mbed Client Inteface. With this, the
+     * \brief Creates a device object for the mbed Client Inteface. With this, the
      * client can manage the device resources used for client operations
      * such as Client Registration, Device Management and Information Reporting.
-     * @param name, Name of the device object.
-     * @return M2MDevice, Object to manage other client operations.
+     * \param name The name of the device object.
+     * \return M2MDevice An object for managing other client operations.
      */
     static M2MDevice *create_device();
 
     /**
-     * @brief Creates a firmware object for the mbed Client Inteface. With this, the
+     * \brief Creates a firmware object for the mbed Client Inteface. With this, the
      * client can manage the firmware resources used for the client operations
      * such as Client Registration, Device Management and Information Reporting.
-     * @return M2MFirmware, Object to manage other client operations.
+     * \return M2MFirmware An object for managing other client operations.
      */
     static M2MFirmware *create_firmware();
 
     /**
-     * @brief Creates a generic object for the mbed Client Inteface. With this, the
+     * \brief Creates a generic object for the mbed Client Inteface. With this, the
      * client can manage its own customized resources used for registering
      * Device Management and Information Reporting for those resources.
-     * @param name, Name of the object.
-     * @param id, Unique ID for the object. It should be other than the reserved
+     * \param name The name of the object.
+     * \param id A unique ID for the object. It should be other than the reserved
      * LWM2M object IDs.
-     * @return M2MObject, Object to manage other mbed Client operations.
+     * \return M2MObject An object for managing other mbed Client operations.
      */
     static M2MObject *create_object(const String &name);
 
