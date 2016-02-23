@@ -30,7 +30,7 @@ typedef Vector<M2MObject *> M2MObjectList;
 typedef FP callback_handler;
 
 /**
- *  @brief M2MInterface.
+ *  \brief M2MInterface.
  *  This class provides an interface for handling all the mbed Client Interface operations
  *  defined in the OMA LWM2M specifications.
  *  This includes Bootstrapping, Client Registration, Device Management &
@@ -42,7 +42,7 @@ class M2MInterface {
 public:
 
     /**
-     * @brief Enum defining different kinds of errors
+     * \brief Enum defining different kinds of errors
      * that can occur during various client operations.
      */
     typedef enum {
@@ -60,7 +60,7 @@ public:
     }Error;
 
     /**
-     * @brief Enum defining different kinds of binding
+     * \brief Enum defining different kinds of binding
      * modes handled for client operations.
      */
     typedef enum {
@@ -75,7 +75,7 @@ public:
     }BindingMode;
 
     /**
-     * @brief Enum defining different kinds of network
+     * \brief Enum defining different kinds of network
      * stacks that can be used by the mbed Client.
      */
     typedef enum {
@@ -92,16 +92,16 @@ public:
     virtual ~M2MInterface(){}
 
     /**
-     * @brief Initiates bootstrapping of the client with the provided Bootstrap
-     * server information.
+     * \brief Initiates bootstrapping of the client with the provided Bootstrap
+     * Server information.
      * NOTE: This API is not supported for developers!!
-     * @param security_object, Security object that contains information
+     * \param security_object The security object that contains information
      * required for successful bootstrapping of the client.
      */
     virtual void bootstrap(M2MSecurity *security_object) = 0;
 
     /**
-     * @brief Cancels the ongoing bootstrapping operation of the client. If the client has
+     * \brief Cancels the ongoing bootstrapping operation of the client. If the client has
      * already successfully bootstrapped this function deletes the existing
      * bootstrap information from the client.
      * NOTE: This API is not supported for developers!!
@@ -109,40 +109,40 @@ public:
     virtual void cancel_bootstrap() = 0;
 
     /**
-     * @brief Initiates the registration of the provided Security object to the
+     * \brief Initiates the registration of the provided Security object to the
      * corresponding LWM2M server.
-     * @param security_object, Security object that contains information
+     * \param security_object The security object that contains information
      * required for registering to the LWM2M server.
      * If the client wants to register to multiple LWM2M servers it must call
      * this function once for each of the LWM2M server objects separately.
-     * @param object_list, Objects that contain information about the
+     * \param object_list Objects that contain information about the
      * client attempting to register to the LWM2M server.
      */
     virtual void register_object(M2MSecurity *security_object, const M2MObjectList &object_list) = 0;
 
     /**
-     * @brief Updates or refreshes the client's registration on the LWM2M
+     * \brief Updates or refreshes the client's registration on the LWM2M
      * server.
-     * @param security_object, Security object from which the device object
+     * \param security_object The security object from which the device object
      * needs to update registration. If there is only one LWM2M server registered
      * this parameter can be NULL.
-     * @param lifetime, Lifetime for the endpoint client in seconds. If the same value
+     * \param lifetime The lifetime of the endpoint client in seconds. If the same value
      * has to be passed then put the default value as 0.
      */
     virtual void update_registration(M2MSecurity *security_object, const uint32_t lifetime = 0) = 0;
 
     /**
-     * @brief Unregisters the registered object from the LWM2M server.
-     * @param security_object, Security object from which the device object
+     * \brief Unregisters the registered object from the LWM2M server.
+     * \param security_object The security object from which the device object
      * needs to be unregistered. If there is only one LWM2M server registered
      * this parameter can be NULL.
      */
     virtual void unregister_object(M2MSecurity* security_object = NULL) = 0;
 
     /**
-     * @brief Sets the function that will be called for indicating that the client
+     * \brief Sets the function that will be called for indicating that the client
      * is going to sleep when the Binding mode is selected with Queue mode.
-     * @param callback, Function pointer that will be called when the client
+     * \param callback A function pointer that will be called when the client
      * goes to sleep.
      */
     virtual void set_queue_sleep_handler(callback_handler handler) = 0;
