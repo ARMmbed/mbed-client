@@ -19,7 +19,7 @@
 #include "mbed-client/m2minterface.h"
 
 /**
- * @brief M2MConnectionObserver
+ * \brief M2MConnectionObserver
  * Observer class for informing socket activity to the state machine.
  */
 
@@ -29,7 +29,7 @@ class M2MConnectionObserver
 public :
 
     /**
-      * @enum ServerType, Defines the type of the
+      * \enum ServerType, Defines the type of the
       * server that the client wants to use.
       */
     typedef enum {
@@ -38,7 +38,7 @@ public :
     }ServerType;
 
     /**
-     * @brief The M2MSocketAddress struct.
+     * \brief The M2MSocketAddress struct.
      * Unified container for holding socket address data
      * across different platforms.
      */
@@ -50,34 +50,34 @@ public :
     };
 
     /**
-    * @brief Indicates that data is available from socket.
-    * @param data, The data read from the socket.
-    * @param data_size, The length of the data read from the socket.
-    * @param address, Address of the server where the data is coming from.
+    * \brief Indicates that data is available from socket.
+    * \param data The data read from the socket.
+    * \param data_size The length of the data read from the socket.
+    * \param address The address of the server where the data is coming from.
     */
     virtual void data_available(uint8_t* data,
                                 uint16_t data_size,
                                 const M2MConnectionObserver::SocketAddress &address) = 0;
 
     /**
-    * @brief Indicates an error occured in socket.
-    * @param error_code, Error code from socket,
+    * \brief Indicates an error occured in socket.
+    * \param error_code The error code from socket,
     * it cannot be used any further.
     */
     virtual void socket_error(uint8_t error_code) = 0;
 
     /**
-    * @brief Indicates that the server address resolving is ready.
-    * @param address, Resolved socket address.
-    * @param server_type, Type of server.
-    * @param server_port, Port of the resolved server address.
+    * \brief Indicates that the server address resolving is ready.
+    * \param address The resolved socket address.
+    * \param server_type The type of the server.
+    * \param server_port The port of the resolved server address.
     */
     virtual void address_ready(const M2MConnectionObserver::SocketAddress &address,
                                M2MConnectionObserver::ServerType server_type,
                                const uint16_t server_port) = 0;
 
     /**
-    * @brief Indicates that data has been sent successfully.
+    * \brief Indicates that data has been sent successfully.
     */
     virtual void data_sent() = 0;
 };
