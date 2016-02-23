@@ -21,7 +21,7 @@ class M2MBase;
 class M2MResourceInstance;
 
 /**
- * @brief M2MObservationHandler
+ * \brief M2MObservationHandler
  * An interface for handling observation
  * callbacks from different objects.
  *
@@ -31,12 +31,12 @@ class M2MObservationHandler
   public:
 
     /**
-     * @brief Observation callback to be sent to the
+     * \brief The observation callback to be sent to the
      * server due to a change in a parameter under observation.
-     * @param object, Observed object whose information needs to be sent
-     * @param obs_number, Observation number
-     * @param changed_instance_ids, List of changed object instance id's
-     * @param send_object, Indicates whether whole object will be sent or not
+     * \param object The observed object whose information needs to be sent.
+     * \param obs_number The observation number.
+     * \param changed_instance_ids A list of changed object instance IDs.
+     * \param send_object Indicates whether the whole object will be sent or not.
      */
     virtual void observation_to_be_sent(M2MBase *object,
                                         uint16_t obs_number,
@@ -44,29 +44,29 @@ class M2MObservationHandler
                                         bool send_object = false) = 0;
 
     /**
-     * @brief Callback for deleting an NSDL resource.
-     * @param resource_name, Name of the observed object whose information
+     * \brief A callback for deleting an NSDL resource.
+     * \param resource_name The name of the observed object whose information
      * needs to be deleted.
      */
     virtual void resource_to_be_deleted(const String &resource_name) = 0;
 
     /**
-     * @brief Callback indicating that the value of the resource object is updated by server.
-     * @param base, Object whose value is updated.
-     * @param object_name, Name of the resource which is updated, default is empty.
+     * \brief A callback indicating that the value of the resource object is updated by server.
+     * \param base The object whose value is updated.
+     * \param object_name The name of the updated resource, default is empty.
      */
     virtual void value_updated(M2MBase *base, const String &object_name = "") = 0;
 
     /**
-     * @brief Callback for removing an object from the list.
-     * @param object, M2MObject to be removed.
+     * \brief A callback for removing an object from the list.
+     * \param object The M2MObject to be removed.
      */
     virtual void remove_object(M2MBase *object) = 0;
 
     /**
-     * @brief Delayed response callback to be sent to the
+     * \brief A delayed response callback to be sent to the
      * server due to a changed response.
-     * @param base, Resource which sends the response.
+     * \param base The resource sending the response.
      */
     virtual void send_delayed_response(M2MBase *base) = 0;
 
