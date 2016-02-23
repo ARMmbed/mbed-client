@@ -25,9 +25,9 @@
 template <typename R>
 class FP0{
 public:
-    /** Create a FunctionPointer, attaching a static function
+    /** Create a Function Pointer, attaching a static function
      *
-     *  @param function The void static function to attach (default is none)
+     *  \param function The void static function to attach (default is none)
      */
     FP0(R (*function)(void) = 0) {
         attach(function);
@@ -35,8 +35,8 @@ public:
 
     /** Create a FP, attaching a member function
      *
-     *  @param object The object pointer to invoke the member function on (i.e. the this pointer)
-     *  @param function The address of the void member function to attach
+     *  \param object The object pointer to invoke the member function on (i.e. the this pointer)
+     *  \param function The address of the void member function to attach
      */
     template<typename T>
     FP0(T *object, R (T::*member)(void)) {
@@ -45,7 +45,7 @@ public:
 
     /** Attach a static function
      *
-     *  @param function The void static function to attach (default is none)
+     *  \param function The void static function to attach (default is none)
      */
     void attach(R (*function)(void)) {
         _p.function = function;
@@ -54,8 +54,8 @@ public:
 
     /** Attach a member function
      *
-     *  @param object The object pointer to invoke the member function on (i.e. the this pointer)
-     *  @param function The address of the void member function to attach
+     *  \param object The object pointer to invoke the member function on (i.e. the this pointer)
+     *  \param function The address of the void member function to attach
      */
     template<typename T>
     void attach(T *object, R (T::*member)(void)) {
@@ -113,7 +113,7 @@ class FP1{
 public:
     /** Create a FP, attaching a static function
      *
-     *  @param function The void static function to attach (default is none)
+     *  \param function The void static function to attach (default is none)
      */
     FP1(R (*function)(A1) = 0) {
         attach(function);
@@ -121,8 +121,8 @@ public:
 
     /** Create a FP, attaching a member function
      *
-     *  @param object The object pointer to invoke the member function on (i.e. the this pointer)
-     *  @param function The address of the void member function to attach
+     *  \param object The object pointer to invoke the member function on (i.e. the this pointer)
+     *  \param function The address of the void member function to attach
      */
     template<typename T>
     FP1(T *object, R (T::*member)(A1)) {
@@ -131,7 +131,7 @@ public:
 
     /** Attach a static function
      *
-     *  @param function The void static function to attach (default is none)
+     *  \param function The void static function to attach (default is none)
      */
     void attach(R (*function)(A1)) {
         _p.function = function;
@@ -140,8 +140,8 @@ public:
 
     /** Attach a member function
      *
-     *  @param object The object pointer to invoke the member function on (i.e. the this pointer)
-     *  @param function The address of the void member function to attach
+     *  \param object The object pointer to invoke the member function on (i.e. the this pointer)
+     *  \param function The address of the void member function to attach
      */
     template<typename T>
     void attach(T *object, R (T::*member)(A1)) {
