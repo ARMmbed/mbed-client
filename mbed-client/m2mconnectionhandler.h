@@ -25,7 +25,7 @@ class M2MConnectionSecurity;
 class M2MConnectionHandlerPimpl;
 
 /**
- * @brief M2MConnectionHandler.
+ * \brief M2MConnectionHandler.
  * This class handles the socket connection for the LWM2M Client.
  */
 
@@ -45,7 +45,7 @@ public:
 public:
 
     /**
-    * @brief Constructor
+    * \brief Constructor
     */
     M2MConnectionHandler(M2MConnectionObserver &observer,
                          M2MConnectionSecurity* sec,
@@ -53,26 +53,26 @@ public:
                          M2MInterface::NetworkStack stack);
 
     /**
-    * @brief Destructor
+    * \brief Destructor
     */
     ~M2MConnectionHandler();
 
     /**
-    * @brief This binds the socket connection.
-    * @param listen_port Port to be listened to for an incoming connection.
-    * @return True if successful, else false.
+    * \brief This binds the socket connection.
+    * \param listen_port Port to be listened to for an incoming connection.
+    * \return True if successful, else false.
     */
     bool bind_connection(const uint16_t listen_port);
 
     /**
-    * @brief This resolves the server address. Output is
+    * \brief This resolves the server address. Output is
     * returned through a callback.
-    * @param String Server address.
-    * @param uint16_t Server port.
-    * @param ServerType, Server Type to be resolved.
-    * @param security, M2MSecurity object that determines what
+    * \param String The server address.
+    * \param uint16_t The server port.
+    * \param ServerType The server type to be resolved.
+    * \param security The M2MSecurity object that determines which
     * type of secure connection will be used by the socket.
-    * @return True if address is valid, else false.
+    * \return True if address is valid, else false.
     */
     bool resolve_server_address(const String& server_address,
                                 const uint16_t server_port,
@@ -80,53 +80,53 @@ public:
                                 const M2MSecurity* security);
 
     /**
-    * @brief Sends data to the connected server.
-    * @param data_ptr, Data to be sent.
-    * @param data_len, Length of data to be sent.
-    * @param address_ptr, Address structure where data has to be sent.
-    * @return True if data is sent successfully, else false.
+    * \brief Sends data to the connected server.
+    * \param data_ptr The data to be sent.
+    * \param data_len The length of data to be sent.
+    * \param address_ptr The address structure to which the data needs to be sent.
+    * \return True if data is sent successfully, else false.
     */
     bool send_data(uint8_t *data_ptr,
                            uint16_t data_len,
                            sn_nsdl_addr_s *address_ptr);
 
     /**
-    * @brief Listens to the incoming data from a remote server.
-    * @return True if successful, else false.
+    * \brief Listens to the incoming data from a remote server.
+    * \return True if successful, else false.
     */
     bool start_listening_for_data();
 
     /**
-    * @brief Stops listening to the incoming data.
+    * \brief Stops listening to the incoming data.
     */
     void stop_listening();
 
     /**
-     * @brief sendToSocket Sends directly to socket. This is used by
+     * \brief Sends directly to the socket. This is used by
      * security classes to send the data after it has been encrypted.
-     * @param buf Buffer to send.
-     * @param len Length of a buffer.
-     * @return Number of bytes sent or -1 if failed.
+     * \param buf Buffer to send.
+     * \param len The length of the buffer.
+     * \return Number of bytes sent or -1 if failed.
      */
     int send_to_socket(const unsigned char *buf, size_t len);
 
     /**
-     * @brief receiveFromSocket Receives directly from a socket. This
+     * \brief Receives directly from the socket. This
      * is used by the security classes to receive raw data to be decrypted.
-     * @param buf Buffer to send.
-     * @param len Length of a buffer.
-     * @return Number of bytes read or -1 if failed.
+     * \param buf Buffer to send.
+     * \param len The length of the buffer.
+     * \return Number of bytes read or -1 if failed.
      */
     int receive_from_socket(unsigned char *buf, size_t len);
 
     /**
-    * @brief Closes the open connection.
+    * \brief Closes the open connection.
     */
     void close_connection();
 
     /**
-    * @brief Error handling for DTLS connectivity.
-    * @param error, Error code from TLS library
+    * \brief Error handling for DTLS connectivity.
+    * \param error Error code from the TLS library.
     */
     void handle_connection_error(int error);
 
