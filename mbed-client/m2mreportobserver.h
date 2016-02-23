@@ -20,7 +20,7 @@
 #include <mbed-client/m2mvector.h>
 
 /**
- * @brief M2MReportObserver
+ * \brief M2MReportObserver
  * An interface for inviting the base class
  * to send a report to the server.
  *
@@ -30,10 +30,10 @@ class M2MReportObserver
   public:
 
     /**
-     * @brief Observation callback to be sent to the
+     * \brief An observation callback to be sent to the
      * server due to a change in the observed parameter.
-     * @param changed_instance_ids, List of changed object instance id's
-     * @param send_object, Indicates whether whole object will be sent or not
+     * \param changed_instance_ids A list of changed object instance id's.
+     * \param send_object Indicates whether the whole object will be sent or not.
      */
     virtual void observation_to_be_sent(m2m::Vector<uint16_t> changed_instance_ids,
                                         bool send_object = false) = 0;
