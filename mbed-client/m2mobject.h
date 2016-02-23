@@ -24,7 +24,7 @@
 typedef Vector<M2MObjectInstance *> M2MObjectInstanceList;
 
 /**
- *  @brief M2MObject.
+ *  \brief M2MObject.
  *  This class is the base class for the mbed Client Objects. All defined
  *  LWM2M object models can be created based on it. This class also holds all object
  *  instances associated with the given object.
@@ -39,8 +39,8 @@ friend class M2MInterfaceFactory;
 protected :
 
     /**
-     * @brief Constructor
-     * @param name, Name of the object
+     * \brief Constructor
+     * \param name The name of the object.
      */
     M2MObject(const String &object_name);
 
@@ -56,81 +56,81 @@ protected :
 public:
 
     /**
-     * @brief Destructor
+     * \brief Destructor
      */
     virtual ~M2MObject();
 
     /**
-     * @brief Creates a new object instance for a given mbed Client Interface object. With this,
+     * \brief Creates a new object instance for a given mbed Client Interface object. With this,
      * the client can respond to server's GET methods with the provided value.
-     * @return M2MObjectInstance, Object instance for managing other client operations.
+     * \return M2MObjectInstance. An object instance for managing other client operations.
      */
     M2MObjectInstance* create_object_instance(uint16_t instance_id = 0);
 
     /**
-     * @brief Removes the object instance resource with the given instance id.
-     * @param instance_id, Instance ID of the object instance to be removed, default is 0.
-     * @return True if removed, else false.
+     * \brief Removes the object instance resource with the given instance id.
+     * \param instance_id The instance ID of the object instance to be removed, default is 0.
+     * \return True if removed, else false.
      */
     virtual bool remove_object_instance(uint16_t instance_id = 0);
 
     /**
-     * @brief Returns object instance with the the given instance id.
-     * @param instance_id, Instance ID of the requested object instance id, default is 0.
-     * @return Object instance reference if found, else NULL.
+     * \brief Returns the object instance with the the given instance ID.
+     * \param instance_id The instance ID of the requested object instance ID, default is 0.
+     * \return Object instance reference if found, else NULL.
      */
     virtual M2MObjectInstance* object_instance(uint16_t instance_id = 0) const;
 
     /**
-     * @brief Returns a list of object instances.
-     * @return List of instances with the object.
+     * \brief Returns a list of object instances.
+     * \return A list of object instances.
      */
     virtual const M2MObjectInstanceList& instances() const;
 
     /**
-     * @brief Returns the total number of instances with the object.
-     * @return Total number of the object instances.
+     * \brief Returns the total number of object instances-
+     * \return The total number of the object instances.
      */
     virtual uint16_t instance_count() const;
 
     /**
-     * @brief Returns object type.
-     * @return BaseType.
+     * \brief Returns the object type.
+     * \return BaseType.
      */
     virtual M2MBase::BaseType base_type() const;
 
     /**
-     * @brief Adds the observation level for the object.
-     * @param observation_level, Level of observation.
+     * \brief Adds the observation level for the object.
+     * \param observation_level The level of observation.
      */
     virtual void add_observation_level(M2MBase::Observation observation_level);
 
     /**
-     * @brief Removes the observation level from the object.
-     * @param observation_level, Level of observation.
+     * \brief Removes the observation level from the object.
+     * \param observation_level The level of observation.
      */
     virtual void remove_observation_level(M2MBase::Observation observation_level);
 
     /**
-     * @brief Handles GET request for the registered objects.
-     * @param nsdl, NSDL handler for the CoAP library.
-     * @param received_coap_header, CoAP message received from the server.
-     * @param observation_handler, Handler object for sending
+     * \brief Handles GET request for the registered objects.
+     * \param nsdl The NSDL handler for the CoAP library.
+     * \param received_coap_header The CoAP message received from the server.
+     * \param observation_handler The handler object for sending
      * observation callbacks.
-     * @return sn_coap_hdr_s,  Message that needs to be sent to server.
+     * \return sn_coap_hdr_s  The message that needs to be sent to server.
      */
     virtual sn_coap_hdr_s* handle_get_request(nsdl_s *nsdl,
                                               sn_coap_hdr_s *received_coap_header,
                                               M2MObservationHandler *observation_handler = NULL);
 
     /**
-     * @brief Handles PUT request for the registered objects.
-     * @param nsdl, NSDL handler for the CoAP library.
-     * @param received_coap_header, Received CoAP message from the server.
-     * @param observation_handler, Handler object for sending
+     * \brief Handles PUT request for the registered objects.
+     * \param nsdl The NSDL handler for the CoAP library.
+     * \param received_coap_header The received CoAP message from the server.
+     * \param observation_handler The handler object for sending
      * observation callbacks.
-     * @param execute_value_updated, True will execute "value_updated" callback.
-     * @return sn_coap_hdr_s,  Message that needs to be sent to server.
+     * \param execute_value_updated True will execute the "value_updated" callback.
+     * \return sn_coap_hdr_s The message that needs to be sent to server.
      */
     virtual sn_coap_hdr_s* handle_put_request(nsdl_s *nsdl,
                                               sn_coap_hdr_s *received_coap_header,
@@ -138,13 +138,13 @@ public:
                                               bool &execute_value_updated);
 
     /**
-     * @brief Handles GET request for the registered objects.
-     * @param nsdl, NSDL handler for the CoAP library.
-     * @param received_coap_header, Received CoAP message from the server.
-     * @param observation_handler, Handler object for sending
+     * \brief Handles GET request for the registered objects.
+     * \param nsdl The NSDL handler for the CoAP library.
+     * \param received_coap_header The received CoAP message from the server.
+     * \param observation_handler The handler object for sending
      * observation callbacks.
-     * @param execute_value_updated, True will execute "value_updated" callback.
-     * @return sn_coap_hdr_s,  Message that needs to be sent to server.
+     * \param execute_value_updated True will execute the "value_updated" callback.
+     * \return sn_coap_hdr_s The message that needs to be sent to server.
      */
     virtual sn_coap_hdr_s* handle_post_request(nsdl_s *nsdl,
                                                sn_coap_hdr_s *received_coap_header,
