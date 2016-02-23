@@ -44,7 +44,7 @@ instance->set_max_age(15) ; // This is the resource lifetime in the server cache
 - Base64 encoded value of the payload -> `LTk5`
 - Base64 decoded value of the payload -> `1`
 
-If the resource value is stored in the server cache and is still valid, the response comes straight from the server cache in plain text and not encoded in B64.
+<span style="background-color:#E6E6E6;border:1px solid #000;display:block; height:100%; padding:10px">**Note**: If the resource value is stored in the server cache and is still valid, the response comes straight from the cache in **plain text**, neither inside any json object nor encoded in B64.</span>
 
 ### Transferring a float value from mbed Client to mbed Device Server
 
@@ -74,7 +74,7 @@ instance->set_max_age(15) ; // This is the resource lifetime in the server cache
 - Base64 encoded value of the payload -> `MS4wMjMyMDA=`
 - Base64 decoded value of the payload -> `1.023200`
 
-If the resource value is stored in the server cache and is still valid, the response comes straight from the server cache in plain text and not encoded in B64.
+<span style="background-color:#E6E6E6;border:1px solid #000;display:block; height:100%; padding:10px">**Note**: If the resource value is stored in the server cache and is still valid, the response comes straight from the cache in **plain text**, neither inside any json object nor encoded in B64.</span>
 
 ### Transferring a boolean value from mbed Client to mbed Device Server
 
@@ -104,7 +104,7 @@ instance->set_max_age(15) ; // This is the resource lifetime in the server cache
 - Base64 encoded value of the payload -> `LTk5`
 - Base64 decoded value of the payload -> `1`
 
-If the resource value is stored in the server cache and is still valid, the response comes straight from the server cache in plain text and not encoded in B64.
+<span style="background-color:#E6E6E6;border:1px solid #000;display:block; height:100%; padding:10px">**Note**: If the resource value is stored in the server cache and is still valid, the response comes straight from the cache in **plain text**, neither inside any json object nor encoded in B64.</span>
 
 ### Transferring a string value from mbed Client to mbed Device Server
 
@@ -132,7 +132,7 @@ instance->set_max_age(15) ; // This is the resource lifetime in the server cache
 - Base64 encoded value of the payload -> `VGVzdCBEYXRhAA==`
 - Base64 decoded value of the payload -> `Test Data`
 
-If the resource value is stored in the server cache and is still valid, the response comes straight from the server cache in plain text and not encoded in B64.
+<span style="background-color:#E6E6E6;border:1px solid #000;display:block; height:100%; padding:10px">**Note**: If the resource value is stored in the server cache and is still valid, the response comes straight from the cache in **plain text**, neither inside any json object nor encoded in B64.</span>
 
 ### Transferring an opaque value from mbed Client to mbed Device Server
 
@@ -160,4 +160,4 @@ instance->set_max_age(15) ; // This is the resource lifetime in the server cache
 - Base64 encoded value of the payload -> `T3BhcXVlIERhdGEA`
 - Base64 decoded value of the payload -> `Opaque Data`
 
-If the resource value is stored in the server cache and is still valid, the response comes straight from the server cache in plain text and not encoded in B64.
+<span style="background-color:#E6E6E6;border:1px solid #000;display:block; height:100%; padding:10px">**Note**: If the resource value is stored in the server cache and is still valid, the response comes straight from the cache in **plain text**, neither inside any json object nor encoded in B64.</span>
