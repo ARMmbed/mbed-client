@@ -96,13 +96,19 @@ mbed Device Server uses the **Execute** operation to perform an action. This ope
 <span style="background-color:#E6E6E6;  border:1px solid #000;display:block; height:100%; padding:10px">**Note:** mbed Client returns an error when the **Execute** operation is received for Object Instances or Resource Instances.</span>
 
 Here is an implementation example for the **Execute** operation. If you want to execute a piece of code in your application, you can do it by passing it the `POST` request from mbed Device Server:
+When your Resource receives `POST` request from mbed Device Server, mbed Client will parse the payload from the request and wrap it under class `M2MResource::M2MExecuteParameter`. The class object is passed through the execute callback function that you passed.
+You can then typecast the `void*` argument into corresponding `M2MResource::M2MExecuteParameter` and access the passed payload and its length through the given API. Check the code snippet below for usage
 
 ```
 #include "mbed-client/m2mobject.h"
 #include "mbed-client/m2mobjectinstance.h"
 #include "mbed-client/m2mresource.h"
 
-    void M2MLWClient::execute_function(void */*argument*/) {
+    void M2MLWClient::execute_function(void *argument) {
+        if(argument) {
+        M2MResource::M2MExecuteParameter* param = (M2MResource::M2MExecuteParameter*)argument;
+            int payload_length = param->get_argument_value_length();
+            uint8_t* payload = param->get_argument_value();
     }
 
 _object = M2MInterfaceFactory::create_object("Test");
@@ -118,3 +124,6 @@ if(_object) {
         res->set_execute_function(execute_callback(this,&M2MLWClient::execute_function));
 ```
 
+The POST method allows for your client to respond back to the response immediately with updated payload value as piggyback response or then if you want to send the payload response to server later (because the Execute operation may take longer time on device to complete), you can handle this through API.
+
+You can set resource API `void set_delayed_response(bool)` to be `true`. In this case, the POST request's response to the server will be an empty acknowledgment. When your resource is ready with the response, you can simply call `send_delayed_post_response()` on that resource and client will send the latest resource value to the server as part of separate response of POST request. By default, the option of `void set_delayed_response(bool)` is false, which means the POST response will immediately return with resource value as piggyback payload. 
