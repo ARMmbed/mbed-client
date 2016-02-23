@@ -25,7 +25,7 @@ public:
 };
 
 /**
- *  @brief M2MResourceInstance.
+ *  \brief M2MResourceInstance.
  *  This class is the base class for mbed Client Resources. All defined
  *  LWM2M resource models can be created based on it.
  */
@@ -58,10 +58,10 @@ private: // Constructor and destructor are private
          // which means that these objects can be created or
          // deleted only through a function provided by the M2MObjectInstance.
     /**
-     * @brief Constructor for creating resource.
-     * @param resource_name, Name of the resource.
-     * @param resource_type, Resource Type.
-     * @param type, Resource Data Type of the object.
+     * \brief A constructor for creating a resource.
+     * \param resource_name The name of the resource.
+     * \param resource_type The type of the resource.
+     * \param type, The resource data type of the object.
      */
     M2MResourceInstance(const String &resource_name,
                         const String &resource_type,
@@ -69,12 +69,12 @@ private: // Constructor and destructor are private
                         M2MObjectInstanceCallback &object_instance_callback);
 
     /**
-     * @brief Constructor for creating a resource.
-     * @param resource_name, Name of the resource.
-     * @param resource_type, Resource Type.
-     * @param type, Resource Data Type of the object.
-     * @param value, Value pointer of the object.
-     * @param value_length, Length of the value pointer.
+     * \brief A Constructor for creating a resource.
+     * \param resource_name The name of the resource.
+     * \param resource_type The type of the resource.
+     * \param type The resource data type of the object.
+     * \param value The value pointer of the object.
+     * \param value_length The length of the value pointer.
      */
     M2MResourceInstance(const String &resource_name,
                         const String &resource_type,
@@ -100,88 +100,88 @@ private: // Constructor and destructor are private
 public:
 
     /**
-     * @brief Returns object type.
-     * @return BaseType.
+     * \brief Returns the object type.
+     * \return BaseType.
      */
     virtual M2MBase::BaseType base_type() const;
 
     /**
-     * @brief Returns resource data type.
-     * @return ResourceType.
+     * \brief Returns the resource data type.
+     * \return ResourceType.
      */
     virtual M2MResourceInstance::ResourceType resource_instance_type() const;
 
     /**
-     * @brief Parses the received query for a notification
+     * \brief Parses the received query for a notification
      * attribute.
-     * @return True if required attributes are present, else false.
+     * \return True if required attributes are present, else false.
      */
     virtual bool handle_observation_attribute(char *&query);
 
     /**
-     * @brief Sets the function that should be executed when this
+     * \brief Sets the function that should be executed when this
      * resource receives a POST command.
-     * @param callback, Function pointer that needs to be executed.
+     * \param callback The function pointer that needs to be executed.
      */
     virtual void set_execute_function(execute_callback callback);
 
     /**
-     * @brief Sets the value of the given resource.
-     * @param value, Pointer to the value to be set on the resource.
-     * @param value_length , Length of the value pointer.
-     * @return True if successfully set, else false.
+     * \brief Sets the value of the given resource.
+     * \param value, A pointer to the value to be set on the resource.
+     * \param value_length The length of the value pointer.
+     * \return True if successfully set, else false.
      */
     virtual bool set_value(const uint8_t *value, const uint32_t value_length);
 
     /**
-     * @brief Clears the value of the given resource.
+     * \brief Clears the value of the given resource.
      */
     virtual void clear_value();
 
     /**
-     * @brief Executes the function that is set in "set_execute_function".
-     * @param arguments, Arguments that will be passed to be executed.
+     * \brief Executes the function that is set in "set_execute_function".
+     * \param arguments The arguments that will be passed to be executed.
      */
     void execute(void *arguments);
 
     /**
-     * @brief Provides the value of the given resource.
-     * @param value[OUT], Pointer to the resource value.
-     * @param value_length[OUT], Length of the value pointer.
+     * \brief Provides the value of the given resource.
+     * \param value[OUT] A pointer to the resource value.
+     * \param value_length[OUT] The length of the value pointer.
      */
     virtual void get_value(uint8_t *&value, uint32_t &value_length);
 
     /**
-     * @brief Returns value pointer of the object.
-     * @return Value pointer of the object.
+     * \brief Returns the value pointer of the object.
+     * \return The value pointer of the object.
     */
     uint8_t* value() const;
 
     /**
-     * @brief Returns length of the value pointer.
-     * @return Length of the value pointer.
+     * \brief Returns the length of the value pointer.
+     * \return The length of the value pointer.
     */
     uint32_t value_length() const;
 
     /**
-     * @brief Handles GET request for the registered objects.
-     * @param nsdl, NSDL handler for the CoAP library.
-     * @param received_coap_header, CoAP message received from the server.
-     * @param observation_handler, Handler object for sending
+     * \brief Handles the GET request for the registered objects.
+     * \param nsdl The NSDL handler for the CoAP library.
+     * \param received_coap_header The CoAP message received from the server.
+     * \param observation_handler The handler object for sending
      * observation callbacks.
-     * @return sn_coap_hdr_s,  Message that needs to be sent to the server.
+     * \return sn_coap_hdr_s The message that needs to be sent to the server.
      */
     virtual sn_coap_hdr_s* handle_get_request(nsdl_s *nsdl,
                                               sn_coap_hdr_s *received_coap_header,
                                               M2MObservationHandler *observation_handler = NULL);
     /**
-     * @brief Handles PUT request for the registered objects.
-     * @param nsdl, NSDL handler for the CoAP library.
-     * @param received_coap_header, CoAP message received from the server.
-     * @param observation_handler, Handler object for sending
+     * \brief Handles the PUT request for the registered objects.
+     * \param nsdl The NSDL handler for the CoAP library.
+     * \param received_coap_header The CoAP message received from the server.
+     * \param observation_handler The handler object for sending
      * observation callbacks.
-     * @param execute_value_updated, True will execute "value_updated" callback.
-     * @return sn_coap_hdr_s,  Message that needs to be sent to the server.
+     * \param execute_value_updated True will execute the "value_updated" callback.
+     * \return sn_coap_hdr_s The message that needs to be sent to the server.
      */
     virtual sn_coap_hdr_s* handle_put_request(nsdl_s *nsdl,
                                               sn_coap_hdr_s *received_coap_header,                                                                                            
@@ -191,8 +191,8 @@ public:
 protected:
 
     /**
-     * @brief Set observer for sending notification update.
-     * @param resource, callback handle.
+     * \brief Set observer for sending the notification update.
+     * \param resource The callback handle.
      */
     void set_resource_observer(M2MResourceCallback *resource);
 
