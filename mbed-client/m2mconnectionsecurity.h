@@ -21,7 +21,7 @@ class M2MSecurity;
 class M2MConnectionSecurityPimpl;
 
 /**
- * @brief M2MConnectionSecurity.
+ * \brief M2MConnectionSecurity.
  * This class provides a method to create a secure socket connection
  * to handle connectivity for the mbed Client. It will handle sending, receiving
  * and establishing a secure connection for the mbed Client on top of the
@@ -44,58 +44,58 @@ private:
 
 public:
     /**
-     * @brief Default Constructor.
+     * \brief Default Constructor.
      */
     M2MConnectionSecurity(SecurityMode mode);
 
     /**
-     * @brief Default Destructor.
+     * \brief Default Destructor.
      */
     ~M2MConnectionSecurity();
 
     /**
-     * @brief Resets the socket connection states.
+     * \brief Resets the socket connection states.
      */
     void reset();
 
     /**
-     * @brief Initiatlizes the socket connection states.
+     * \brief Initiatlizes the socket connection states.
      */
     int init(const M2MSecurity *security);
 
     /**
-     * @brief Starts the connection in non-blocking mode.
-     * @param connHandler, ConnectionHandler object that maintains the socket.
-     * @return Returns the state of the connection. Successful or not.
+     * \brief Starts the connection in non-blocking mode.
+     * \param connHandler The ConnectionHandler object that maintains the socket.
+     * \return Returns the state of the connection. Successful or not.
      */
     int start_connecting_non_blocking(M2MConnectionHandler* connHandler);
 
     /**
-     * @brief Continues connectivity logic for secure connection.
-     * @return Returns error code if any while continuing connection sequence.
+     * \brief Continues connectivity logic for secure connection.
+     * \return Returns an error code if any while continuing the connection sequence.
      */
     int continue_connecting();
 
     /**
-     * @brief Connects the client to the server.
-     * @param connHandler, ConnectionHandler object that maintains the socket.
-     * @return Returns the state of the connection. Successful or not.
+     * \brief Connects the client to the server.
+     * \param connHandler The ConnectionHandler object that maintains the socket.
+     * \return Returns the state of the connection. Successful or not.
      */
     int connect(M2MConnectionHandler* connHandler);
 
     /**
-     * @brief Sends data to the server.
-     * @param message, Data to be sent.
-     * @param len, Length of the data.
+     * \brief Sends data to the server.
+     * \param message The data to be sent.
+     * \param len The length of the data.
      * @return Indicates whether the data is sent successfully or not.
      */
     int send_message(unsigned char *message, int len);
 
     /**
-     * @brief Reads the data received from the server.
-     * @param message, Data to be read.
-     * @param len, Length of the data.
-     * @return Indicates whether the data is read successfully or not.
+     * \brief Reads the data received from the server.
+     * \param message The data to be read.
+     * \param len The length of the data.
+     * \return Indicates whether the data is read successfully or not.
      */
     int read(unsigned char* buffer, uint16_t len);
 
