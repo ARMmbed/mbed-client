@@ -22,7 +22,7 @@
 class M2MResource;
 
 /**
- *  @brief M2MSecurity.
+ *  \brief M2MSecurity.
  *  This class represents an interface for the Security Object model of the LWM2M framework.
  *  It handles the security object instances and all corresponding
  *  resources.
@@ -36,7 +36,7 @@ friend class M2MNsdlInterface;
 public:
 
     /**
-     * @brief Enum defining all resources associated with a
+     * \brief Enum defining all resources associated with a
      * Security Object in the LWM2M framework.
      */
     typedef enum {
@@ -55,7 +55,7 @@ public:
     }SecurityResource;
 
     /**
-     * @brief Enum defining the type of a security attribute
+     * \brief Enum defining the type of a security attribute
      * used by the Security Object.
      */
     typedef enum {
@@ -66,7 +66,7 @@ public:
     } SecurityModeType;
 
     /**
-     * @brief Enum defining an interface operation that can be
+     * \brief Enum defining an interface operation that can be
      * handled by the Security Object.
      */
     typedef enum {
@@ -77,8 +77,8 @@ public:
 private:
 
     /**
-     * @brief Constructor
-     * @param server_type, Type of the security object created. Either bootstrap or LWM2M server.
+     * \brief Constructor
+     * \param server_type The type of the security object created. Either bootstrap or LWM2M server.
      */
     M2MSecurity(ServerType server_type);
 
@@ -94,106 +94,106 @@ private:
 public:
 
     /**
-     * @brief Destructor
+     * \brief Destructor
      */
     virtual ~M2MSecurity();
 
     /**
-     * @brief Creates a new resource for given resource enum.
-     * @param rescource, With this function, the following resources can be created:
+     * \brief Creates a new resource for the given resource enum.
+     * \param rescource With this function, the following resources can be created:
      * ' BootstrapServer', 'SecurityMode', 'SMSSecurityMode',
      * 'M2MServerSMSNumber', 'ShortServerID', 'ClientHoldOffTime'.
-     * @param value, Value to be set on the resource, in Integer format.
-     * @return M2MResource if created successfully, else NULL.
+     * \param value The value to be set on the resource, in Integer format.
+     * \return M2MResource if created successfully, else NULL.
      */
     M2MResource* create_resource(SecurityResource rescource, uint32_t value);
 
     /**
-     * @brief Deletes the resource with the given resource enum.
+     * \brief Deletes the resource with the given resource enum.
      * Mandatory resources cannot be deleted.
-     * @param resource, Resource to be deleted.
-     * @return True if deleted, else false.
+     * \param resource The resource to be deleted.
+     * \return True if deleted, else false.
      */
     bool delete_resource(SecurityResource rescource);
 
     /**
-     * @brief Sets the value of the given resource enum.
-     * @param resource, With this function, a value can be set for the following resources:
+     * \brief Sets the value of the given resource enum.
+     * \param resource With this function, a value can be set for the following resources:
      * 'M2MServerUri', 'SMSBindingKey', 'SMSBindingSecretKey'.
-     * @param value, Value to be set on the resource, in String format.
-     * @return True if successfully set, else false.
+     * \param value The value to be set on the resource, in String format.
+     * \return True if successfully set, else false.
      */
     bool set_resource_value(SecurityResource resource,
                             const String &value);
 
     /**
-     * @brief Sets the value of the given resource enum.
-     * @param resource, With this function, a value can be set for the following resourecs:
+     * \brief Sets the value of the given resource enum.
+     * \param resource With this function, a value can be set for the following resourecs:
      * 'BootstrapServer', 'SecurityMode', 'SMSSecurityMode',
      * 'M2MServerSMSNumber', 'ShortServerID', 'ClientHoldOffTime'.
-     * @param value, Value to be set on the resource, in Integer format.
-     * @return True if successfully set, else false.
+     * \param value The value to be set on the resource, in Integer format.
+     * \return True if successfully set, else false.
      */
     bool set_resource_value(SecurityResource resource,
                             uint32_t value);
 
     /**
-     * @brief Sets the value of the given resource enum.
-     * @param resource, With this function, a value can be set for the follwing resources:
+     * \brief Sets the value of the given resource enum.
+     * \param resource With this function, a value can be set for the follwing resources:
      * 'PublicKey', 'ServerPublicKey', 'Secretkey'.
-     * @param value, Value to be set on the resource, in uint8_t format.
-     * @param size, Size of the buffer value to be set on the resource.
-     * @return True if successfully set, else false.
+     * \param value The value to be set on the resource, in uint8_t format.
+     * \param size The size of the buffer value to be set on the resource.
+     * \return True if successfully set, else false.
      */
     bool set_resource_value(SecurityResource resource,
                             const uint8_t *value,
                             const uint16_t length);
 
     /**
-     * @brief Returns the value of the given resource enum, in String.
-     * @param resource, With this function, the following resources can return a value:
+     * \brief Returns the value of the given resource enum, in String.
+     * \param resource With this function, the following resources can return a value:
      * 'M2MServerUri','SMSBindingKey', 'SMSBindingSecretKey'.
-     * @return Value associated with that resource. If the resource is not valid an empty string is returned.
+     * \return The value associated with the resource. If the resource is not valid an empty string is returned.
      */
     String resource_value_string(SecurityResource resource) const;
 
     /**
-     * @brief Populates the data buffer and returns the size of the buffer.
-     * @param resource, With this fucntion, the following resources can return a value:
+     * \brief Populates the data buffer and returns the size of the buffer.
+     * \param resource With this fucntion, the following resources can return a value:
      * 'PublicKey', 'ServerPublicKey', 'Secretkey'.
-     * @param [OUT] data, Data buffer that contains the value.
-     * @return Size of the populated buffer.
+     * \param [OUT]data The data buffer that contains the value.
+     * \return The size of the populated buffer.
      */
     uint32_t resource_value_buffer(SecurityResource resource,
                                    uint8_t *&data) const;
 
     /**
-     * @brief Returns the value of the given resource name, in Integer.
-     * @param resource, With this function, the following resources can return a value:
+     * \brief Returns the value of the given resource name, in Integer.
+     * \param resource With this function, the following resources can return a value:
      * 'BootstrapServer', 'SecurityMode', 'SMSSecurityMode',
      * 'M2MServerSMSNumber', 'ShortServerID', 'ClientHoldOffTime'.
-     * @return Value associated with the resource. If the resource is not valid 0 is returned.
+     * \return The value associated with the resource. If the resource is not valid 0 is returned.
      */
     uint32_t resource_value_int(SecurityResource resource) const;
 
 
     /**
-     * @brief Returns whether the resource instance with given resource enum exists or not
-     * @param resource, Resource enum.
-     * @return True if at least one instance exists, else false.
+     * \brief Returns whether the resource instance with the given resource enum exists or not
+     * \param resource Resource enum.
+     * \return True if at least one instance exists, else false.
      */
     bool is_resource_present(SecurityResource resource)const;
 
     /**
-     * @brief Returns the total number of resources for a security object.
-     * @return Total number of resources.
+     * \brief Returns the total number of resources for a security object.
+     * \return The total number of resources.
      */
     uint16_t total_resource_count()const;
 
     /**
-     * @brief Returns the type of the Security Object. It can be either
+     * \brief Returns the type of the Security Object. It can be either
      * Bootstrap or M2MServer.
-     * @return ServerType, Type of the Security Object.
+     * \return ServerType The type of the Security Object.
      */
     ServerType server_type() const;
 
