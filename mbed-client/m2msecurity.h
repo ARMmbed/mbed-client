@@ -159,7 +159,7 @@ public:
 
     /**
      * \brief Populates the data buffer and returns the size of the buffer.
-     * \param resource With this fucntion, the following resources can return a value:
+     * \param resource With this function, the following resources can return a value:
      * 'PublicKey', 'ServerPublicKey', 'Secretkey'.
      * \param [OUT]data The data buffer that contains the value.
      * \return The size of the populated buffer.
