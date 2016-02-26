@@ -158,8 +158,8 @@ private:
 
 private:
     M2MReportObserver           &_observer;
-    float                       _pmax;
-    float                       _pmin;
+    int                         _pmax;
+    int                         _pmin;
     float                       _gt;
     float                       _lt;
     float                       _st;
