@@ -238,34 +238,34 @@ bool M2MReportHandler::set_notification_attribute(char* option,
 
     if (strlen(value)) {
         if (strcmp(attribute, PMIN.c_str()) == 0) {
-            sscanf(value, "%f", &_pmin);
+           _pmin = atoi(value);
             success = true;
             _attribute_state |= M2MReportHandler::Pmin;
-            tr_debug("M2MReportHandler::set_notification_attribute %s to %f", attribute, _pmin);
+            tr_debug("M2MReportHandler::set_notification_attribute %s to %d", attribute, _pmin);
         }
         else if(strcmp(attribute, PMAX.c_str()) == 0) {
-            sscanf(value, "%f", &_pmax);
+            _pmax = atoi(value);
             success = true;
             _attribute_state |= M2MReportHandler::Pmax;
-            tr_debug("M2MReportHandler::set_notification_attribute %s to %f", attribute, _pmax);
+            tr_debug("M2MReportHandler::set_notification_attribute %s to %d", attribute, _pmax);
         }
         else if(strcmp(attribute, GT.c_str()) == 0 &&
                 (M2MBase::Resource == type)){
-            sscanf(value, "%f", &_gt);
+            _gt = atof(value);
             success = true;
             _attribute_state |= M2MReportHandler::Gt;
             tr_debug("M2MReportHandler::set_notification_attribute %s to %f", attribute, _gt);
         }
         else if(strcmp(attribute, LT.c_str()) == 0 &&
                 (M2MBase::Resource == type)){
-            sscanf(value, "%f", &_lt);
+            _lt = atof(value);
             success = true;
             _attribute_state |= M2MReportHandler::Lt;
             tr_debug("M2MReportHandler::set_notification_attribute %s to %f", attribute, _lt);
         }
         else if((strcmp(attribute, ST.c_str()) == 0 || (strcmp(attribute, STP.c_str()) == 0))
                 && (M2MBase::Resource == type)){
-            sscanf(value, "%f", &_st);
+            _st = atof(value);
             success = true;
             _high_step = _current_value + _st;
             _low_step = _current_value - _st;
