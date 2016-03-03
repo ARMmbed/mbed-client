@@ -740,6 +740,10 @@ void Test_M2MResource::test_handle_post_request()
 
     CHECK(resource->handle_post_request(NULL,coap_header,handler,execute_value_updated) != NULL);
 
+    *coap_header->content_type_ptr = 0;
+
+    CHECK(resource->handle_post_request(NULL,coap_header,handler,execute_value_updated) != NULL);
+
     m2mresourceinstance_stub::int_value = sizeof(value);
     m2mresourceinstance_stub::value = value;
 
