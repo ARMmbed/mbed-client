@@ -85,7 +85,7 @@ public:
         Reserved,
         Nanostack_IPv6,
 		WINC1500_IPv4,
-        WINC1500_IPvP,
+        WINC1500_IPv6,
         Unknown
     }NetworkStack;
 
