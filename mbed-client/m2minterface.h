@@ -84,6 +84,8 @@ public:
         LwIP_IPv6,
         Reserved,
         Nanostack_IPv6,
+		WINC1500_IPv4,
+        WINC1500_IPvP,
         Unknown
     }NetworkStack;
 
