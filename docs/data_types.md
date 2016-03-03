@@ -97,11 +97,10 @@ instance->set_max_age(15) ; // This is the resource lifetime in the server cache
 **Response on the REST API**:
 
 ```
-{"async-response-id":...{ "id" : "1131895768#f4b93d6e-4652-4874-82e4-41a3ced0cd56@b02ac40a-a501-44d9-be29-e6e0e5303f85/Test/0/D", "status" : 200, "payload" : "LTk5", 
-"ct" : "text/plain", "max-age" : 0 }
+{"async-response-id":….{ "id" : "1131895768#f4b93d6e-4652-4874-82e4-41a3ced0cd56@b02ac40a-a501-44d9-be29-e6e0e5303f85/Test/0/D", "status" : 200, "payload" : "MQ==", "ct" : "text/plain", "max-age" : 0 }
 ```
 
-- Base64 encoded value of the payload -> `LTk5`
+- Base64 encoded value of the payload -> `MQ==`
 - Base64 decoded value of the payload -> `1`
 
 <span style="background-color:#E6E6E6;border:1px solid #000;display:block; height:100%; padding:10px">**Note**: If the resource value is stored in the server cache and is still valid, the response comes straight from the cache in **plain text**, neither inside any json object nor encoded in B64.</span>
