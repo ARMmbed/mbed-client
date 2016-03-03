@@ -88,12 +88,14 @@ M2MResource* M2MObjectInstance::create_static_resource(const String &resource_na
     if( resource_name.empty() || resource_name.size() > MAX_ALLOWED_STRING_LENGTH){
         return res;
     }
-    res = new M2MResource(*this,resource_name, resource_type, type,
-                               value, value_length, multiple_instance);
-    if(res) {
-        _resource_list.push_back(res);
-        if(M2MBase::coap_content_type() == COAP_CONTENT_OMA_TLV_TYPE) {
-            res->set_coap_content_type(COAP_CONTENT_OMA_TLV_TYPE);
+    if(!resource(resource_name)) {
+        res = new M2MResource(*this,resource_name, resource_type, type,
+                                   value, value_length, multiple_instance);
+        if(res) {
+            _resource_list.push_back(res);
+            if(M2MBase::coap_content_type() == COAP_CONTENT_OMA_TLV_TYPE) {
+                res->set_coap_content_type(COAP_CONTENT_OMA_TLV_TYPE);
+            }
         }
     }
     return res;
@@ -110,12 +112,14 @@ M2MResource* M2MObjectInstance::create_dynamic_resource(const String &resource_n
     if( resource_name.empty() || resource_name.size() > MAX_ALLOWED_STRING_LENGTH){
         return res;
     }
-    res = new M2MResource(*this,resource_name, resource_type, type,
-                          observable, multiple_instance);
-    if(res) {
-        _resource_list.push_back(res);
-        if(M2MBase::coap_content_type() == COAP_CONTENT_OMA_TLV_TYPE) {
-            res->set_coap_content_type(COAP_CONTENT_OMA_TLV_TYPE);
+    if(!resource(resource_name)) {
+        res = new M2MResource(*this,resource_name, resource_type, type,
+                              observable, multiple_instance);
+        if(res) {
+            _resource_list.push_back(res);
+            if(M2MBase::coap_content_type() == COAP_CONTENT_OMA_TLV_TYPE) {
+                res->set_coap_content_type(COAP_CONTENT_OMA_TLV_TYPE);
+            }
         }
     }
     return res;

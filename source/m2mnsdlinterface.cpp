@@ -215,7 +215,7 @@ bool M2MNsdlInterface::delete_nsdl_resource(const String &resource_name)
 {
     tr_debug("M2MNsdlInterface::delete_nsdl_resource( %s)", resource_name.c_str());
     return (sn_nsdl_delete_resource(_nsdl_handle,
-                                    resource_name.length(),
+                                    resource_name.length()+1,
                                     (uint8_t *)resource_name.c_str()) == 0) ? true : false;
 }
 
