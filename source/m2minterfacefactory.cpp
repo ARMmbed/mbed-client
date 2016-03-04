@@ -21,7 +21,7 @@
 #include "mbed-client/m2mconstants.h"
 #include "mbed-client/m2mconfig.h"
 #include "include/m2minterfaceimpl.h"
-#include "ns_trace.h"
+#include "mbed-trace/mbed_trace.h"
 
 M2MInterface* M2MInterfaceFactory::create_interface(M2MInterfaceObserver &observer,
                                                     const String &endpoint_name,

@@ -23,7 +23,7 @@
 #include "mbed-client/m2mconstants.h"
 #include "include/m2mtlvserializer.h"
 #include "ip6string.h"
-#include "ns_trace.h"
+#include "mbed-trace/mbed_trace.h"
 #include "source/libNsdl/src/include/sn_grs.h"
 #include "mbed-client/m2mtimer.h"
 

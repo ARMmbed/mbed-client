@@ -24,7 +24,7 @@
 //mbed-client-libservice
 #include "randLIB.h"
 #include "nsdynmemLIB.h"
-#include "ns_trace.h"
+#include "mbed-trace/mbed_trace.h"
 #include "ns_cmdline.h"
 
 
@@ -108,13 +108,15 @@ int main(void)
 {
     ns_dyn_mem_init(app_defined_stack_heap, APP_DEV_HEAP_SIZE, app_heap_error_handler, &memory_heap_stat);
     eventOS_scheduler_init();
-    trace_init();
-    set_trace_print_function( trace_printer );
-    set_trace_cmdprint_function( cmd_printer );
-    set_trace_prefix_function( time_now );
-    set_trace_config(TRACE_MODE_COLOR|TRACE_ACTIVE_LEVEL_DEBUG|TRACE_CARRIAGE_RETURN);
+    mbed_trace_init();
+    mbed_trace_print_function_set( trace_printer );
+    mbed_trace_cmdprint_function_set( cmd_printer );
+    mbed_trace_prefix_function_set( time_now );
+    mbed_trace_config_set(TRACE_MODE_COLOR|TRACE_ACTIVE_LEVEL_DEBUG|TRACE_CARRIAGE_RETURN);
     cmd_init( &custom_cmd_response_out );
+
     initialize_app_commands(0);
+
     eventOS_scheduler_run();
     return 0;
 }

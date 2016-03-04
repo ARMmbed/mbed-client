@@ -23,7 +23,7 @@
 #include "mbed-client/m2msecurity.h"
 #include "mbed-client/m2mconstants.h"
 #include "mbed-client/m2mtimer.h"
-#include "ns_trace.h"
+#include "mbed-trace/mbed_trace.h"
 
 M2MInterfaceImpl::M2MInterfaceImpl(M2MInterfaceObserver& observer,
                                    const String &ep_name,

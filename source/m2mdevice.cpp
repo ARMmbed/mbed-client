@@ -19,7 +19,7 @@
 #include "mbed-client/m2mobject.h"
 #include "mbed-client/m2mobjectinstance.h"
 #include "mbed-client/m2mresource.h"
-#include "ns_trace.h"
+#include "mbed-trace/mbed_trace.h"
 
 #define BUFFER_SIZE 21
 
