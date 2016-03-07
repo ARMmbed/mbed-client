@@ -92,10 +92,11 @@ M2MResource* M2MObjectInstance::create_static_resource(const String &resource_na
         res = new M2MResource(*this,resource_name, resource_type, type,
                                    value, value_length, multiple_instance);
         if(res) {
-            _resource_list.push_back(res);
-            if(M2MBase::coap_content_type() == COAP_CONTENT_OMA_TLV_TYPE) {
+            res->add_observation_level(observation_level());
+            if (multiple_instance) {
                 res->set_coap_content_type(COAP_CONTENT_OMA_TLV_TYPE);
             }
+            _resource_list.push_back(res);
         }
     }
     return res;
@@ -116,10 +117,10 @@ M2MResource* M2MObjectInstance::create_dynamic_resource(const String &resource_n
         res = new M2MResource(*this,resource_name, resource_type, type,
                               observable, multiple_instance);        
         if(res) {
-            res->add_observation_level(observation_level());
-            if(M2MBase::coap_content_type() == COAP_CONTENT_OMA_TLV_TYPE) {
+            if (multiple_instance) {
                 res->set_coap_content_type(COAP_CONTENT_OMA_TLV_TYPE);
             }
+            res->add_observation_level(observation_level());
             _resource_list.push_back(res);
         }
     }
@@ -145,10 +146,7 @@ M2MResourceInstance* M2MObjectInstance::create_static_resource_instance(const St
         _resource_list.push_back(res);
         res->set_operation(M2MBase::GET_ALLOWED);
         res->set_observable(false);
-        res->set_register_uri(false);
-        if(M2MBase::coap_content_type() == COAP_CONTENT_OMA_TLV_TYPE) {
-            res->set_coap_content_type(COAP_CONTENT_OMA_TLV_TYPE);
-        }
+        res->set_register_uri(false);        
     }
     if(res->supports_multiple_instances()&& (res->resource_instance(instance_id) == NULL)) {
         instance = new M2MResourceInstance(resource_name, resource_type, type,
@@ -156,9 +154,6 @@ M2MResourceInstance* M2MObjectInstance::create_static_resource_instance(const St
         if(instance) {
             instance->set_operation(M2MBase::GET_ALLOWED);
             instance->set_instance_id(instance_id);
-            if(M2MBase::coap_content_type() == COAP_CONTENT_OMA_TLV_TYPE) {
-                instance->set_coap_content_type(COAP_CONTENT_OMA_TLV_TYPE);
-            }
             res->add_resource_instance(instance);
         }
     }
@@ -182,10 +177,7 @@ M2MResourceInstance* M2MObjectInstance::create_dynamic_resource_instance(const S
                               false, true);
         _resource_list.push_back(res);
         res->set_register_uri(false);
-        res->set_operation(M2MBase::GET_ALLOWED);
-        if(M2MBase::coap_content_type() == COAP_CONTENT_OMA_TLV_TYPE) {
-            res->set_coap_content_type(COAP_CONTENT_OMA_TLV_TYPE);
-        }
+        res->set_operation(M2MBase::GET_ALLOWED);        
     }
     if(res->supports_multiple_instances() && (res->resource_instance(instance_id) == NULL)) {
         instance = new M2MResourceInstance(resource_name, resource_type, type,*this);
@@ -193,9 +185,6 @@ M2MResourceInstance* M2MObjectInstance::create_dynamic_resource_instance(const S
             instance->set_operation(M2MBase::GET_ALLOWED);
             instance->set_observable(observable);
             instance->set_instance_id(instance_id);
-            if(M2MBase::coap_content_type() == COAP_CONTENT_OMA_TLV_TYPE) {
-                instance->set_coap_content_type(COAP_CONTENT_OMA_TLV_TYPE);
-            }
             res->add_resource_instance(instance);
         }
     }
