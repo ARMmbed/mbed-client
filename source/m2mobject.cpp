@@ -96,7 +96,7 @@ M2MObjectInstance* M2MObject::create_object_instance(uint16_t instance_id)
         instance = new M2MObjectInstance(this->name(),*this);
         if(instance) {
             instance->add_observation_level(observation_level());
-            instance->set_instance_id(instance_id);            
+            instance->set_instance_id(instance_id);
             if(M2MBase::name_id() != -1) {
                 instance->set_coap_content_type(COAP_CONTENT_OMA_TLV_TYPE);
             }
