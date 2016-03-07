@@ -114,12 +114,13 @@ M2MResource* M2MObjectInstance::create_dynamic_resource(const String &resource_n
     }
     if(!resource(resource_name)) {
         res = new M2MResource(*this,resource_name, resource_type, type,
-                              observable, multiple_instance);
-        if(res) {
-            _resource_list.push_back(res);
+                              observable, multiple_instance);        
+        if(res) {                        
+            res->add_observation_level(observation_level());
             if(M2MBase::coap_content_type() == COAP_CONTENT_OMA_TLV_TYPE) {
                 res->set_coap_content_type(COAP_CONTENT_OMA_TLV_TYPE);
             }
+            _resource_list.push_back(res);
         }
     }
     return res;
