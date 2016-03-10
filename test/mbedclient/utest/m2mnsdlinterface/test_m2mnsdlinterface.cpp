@@ -1301,6 +1301,11 @@ void Test_M2MNsdlInterface::test_observation_to_be_sent()
     //CHECK if nothing crashes
     nsdl->observation_to_be_sent(res2, 1, instance_list_ids);
 
+    m2mresourceinstance_stub::resource_type = M2MResource::OPAQUE;
+
+    //CHECK if nothing crashes
+    nsdl->observation_to_be_sent(res2, 1, instance_list_ids);
+
     m2mresource_stub::list.clear();
     m2mresource_stub::int_value = 0;
 

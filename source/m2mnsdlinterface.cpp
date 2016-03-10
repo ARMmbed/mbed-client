@@ -429,13 +429,13 @@ uint8_t M2MNsdlInterface::received_from_server_callback(struct nsdl_s * /*nsdl_h
             }
         } else if(coap_header->msg_id == _unregister_id) {
             _unregister_id = 0;
+            tr_debug("M2MNsdlInterface::received_from_server_callback - unregistration callback");
             if(coap_header->msg_code == COAP_MSG_CODE_RESPONSE_DELETED) {
                 _registration_timer->stop_timer();
                 if(_server) {
                    delete _server;
                    _server = NULL;
                 }
-                tr_debug("M2MNsdlInterface::received_from_server_callback - unregistration callback");
                 _observer.client_unregistered();
             } else {
                 tr_error("M2MNsdlInterface::received_from_server_callback - unregistration error %d", coap_header->msg_code);
@@ -1060,7 +1060,6 @@ bool M2MNsdlInterface::create_nsdl_resource(M2MBase *base, const String &name, b
                     _resource->pathlen = name.length();
                 }
             }
-
             if(!base->resource_type().empty() && _resource->resource_parameters_ptr) {
                 _resource->resource_parameters_ptr->resource_type_ptr =
                        ((uint8_t*)memory_alloc(base->resource_type().length()+1));
@@ -1479,6 +1478,9 @@ void M2MNsdlInterface::send_resource_observation(M2MResource *resource,
 
         resource->get_observation_token(token,token_length);
         uint8_t content_type = 0;
+        if(M2MResourceInstance::OPAQUE == resource->resource_instance_type()) {
+            content_type = COAP_CONTENT_OMA_OPAQUE_TYPE;
+        }
         if (resource->resource_instance_count() > 0) {
             M2MTLVSerializer *serializer = new M2MTLVSerializer();
             content_type = COAP_CONTENT_OMA_TLV_TYPE;

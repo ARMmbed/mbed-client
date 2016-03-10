@@ -551,27 +551,37 @@ sn_coap_hdr_s* M2MResource::handle_post_request(nsdl_s *nsdl,
                                                            msg_code);
     // process the POST if we have registered a callback for it
     if(received_coap_header) {
-        if ((operation() & SN_GRS_POST_ALLOWED) != 0) {            
-            if(received_coap_header->content_type_ptr && *received_coap_header->content_type_ptr != 0) {
-                msg_code = COAP_MSG_CODE_RESPONSE_UNSUPPORTED_CONTENT_FORMAT;
-            } else {
-                M2MResource::M2MExecuteParameter *exec_params = NULL;
-                if(received_coap_header->payload_ptr) {
+        if ((operation() & SN_GRS_POST_ALLOWED) != 0) {
+            M2MResource::M2MExecuteParameter *exec_params = NULL;
+            uint16_t coap_content_type = 0;
+            if(received_coap_header->payload_ptr) {
+                if(received_coap_header->content_type_ptr) {
+                    for(uint8_t i = 0; i < received_coap_header->content_type_len; i++) {
+                        coap_content_type = (coap_content_type << 8) + (received_coap_header->content_type_ptr[i] & 0xFF);
+                    }
+                }
+                if(coap_content_type == 0) {
                     exec_params = new M2MResource::M2MExecuteParameter();
                     if (exec_params){
-                        exec_params->_value = (uint8_t*)malloc(received_coap_header->payload_len);
+                        exec_params->_value = (uint8_t*)malloc(received_coap_header->payload_len+1);
                         if (exec_params->_value) {
-                            memset(exec_params->_value, 0, received_coap_header->payload_len);
+                            memset(exec_params->_value, 0, received_coap_header->payload_len+1);
                             memcpy(exec_params->_value,
                                 received_coap_header->payload_ptr,
                                 received_coap_header->payload_len);
                             exec_params->_value_length = received_coap_header->payload_len;
                         }
                     }
+                } else {
+                    msg_code = COAP_MSG_CODE_RESPONSE_UNSUPPORTED_CONTENT_FORMAT;
                 }
+            }
+            if(COAP_MSG_CODE_RESPONSE_CHANGED == msg_code) {
                 tr_debug("M2MResource::handle_post_request - Execute resource function");
                 execute(exec_params);
-                delete exec_params;
+                if(exec_params) {
+                    delete exec_params;
+                }
 
                 if(_delayed_response) {
                     coap_response->msg_type = COAP_MSG_TYPE_ACKNOWLEDGEMENT;

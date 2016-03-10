@@ -57,7 +57,7 @@ M2MObjectInstance::M2MObjectInstance(const String &object_name,
   _object_callback(object_callback)
 {
     M2MBase::set_base_type(M2MBase::ObjectInstance);
-
+    M2MBase::set_coap_content_type(COAP_CONTENT_OMA_TLV_TYPE);
 }
 
 M2MObjectInstance::~M2MObjectInstance()
