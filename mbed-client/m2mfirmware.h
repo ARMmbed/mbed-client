@@ -56,7 +56,8 @@ public:
     typedef enum {
        Idle = 0,
        Downloading,
-       Downloaded
+       Downloaded,
+       Updating
     } UpdateState;
 
     /**

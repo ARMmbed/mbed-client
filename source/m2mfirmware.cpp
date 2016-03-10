@@ -432,7 +432,7 @@ bool M2MFirmware::check_value_range(FirmwareResource resource, int64_t value) co
             }
             break;
         case State:
-            if (value >= 0 && value <= 2) {
+            if (value >= 0 && value <= 3) {
                 success = true;
                 M2MResource* updateRes = get_resource(M2MFirmware::Update);
                 if (updateRes){
