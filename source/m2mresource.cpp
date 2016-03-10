@@ -553,8 +553,14 @@ sn_coap_hdr_s* M2MResource::handle_post_request(nsdl_s *nsdl,
     if(received_coap_header) {
         if ((operation() & SN_GRS_POST_ALLOWED) != 0) {
             M2MResource::M2MExecuteParameter *exec_params = NULL;
+            uint16_t coap_content_type = 0;
             if(received_coap_header->payload_ptr) {
-                if(received_coap_header->content_type_ptr && *received_coap_header->content_type_ptr == 0) {
+                if(received_coap_header->content_type_ptr) {
+                    for(uint8_t i = 0; i < received_coap_header->content_type_len; i++) {
+                        coap_content_type = (coap_content_type << 8) + (received_coap_header->content_type_ptr[i] & 0xFF);
+                    }
+                }
+                if(coap_content_type == 0) {
                     exec_params = new M2MResource::M2MExecuteParameter();
                     if (exec_params){
                         exec_params->_value = (uint8_t*)malloc(received_coap_header->payload_len+1);
