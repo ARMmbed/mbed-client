@@ -492,17 +492,6 @@ void Test_M2MNsdlInterface::test_received_from_server_callback()
     CHECK(nsdl->_update_id == 0);
     CHECK(observer->register_error == true);
 
-    observer->register_error = false;
-    common_stub::uint_value = 10;
-    nsdl->_update_id = 10;
-    coap_header->msg_id = 10;
-    coap_header->msg_code = COAP_MSG_CODE_RESPONSE_NOT_FOUND;
-    coap_header->coap_status = COAP_STATUS_OK;
-    nsdl->received_from_server_callback(NULL,coap_header,NULL);
-    CHECK(nsdl->_register_id == 10);
-    CHECK(observer->register_error == false);
-
-
     coap_header->msg_id = 11;
     CHECK( 0== nsdl->received_from_server_callback(NULL,coap_header,NULL) );
 

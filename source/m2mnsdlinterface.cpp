@@ -449,20 +449,8 @@ uint8_t M2MNsdlInterface::received_from_server_callback(struct nsdl_s * /*nsdl_h
                 tr_debug("M2MNsdlInterface::received_from_server_callback - registration_updated successfully");
                 _observer.registration_updated(*_server);
             } else {
-                tr_error("M2MNsdlInterface::received_from_server_callback - registration_updated failed %d", coap_header->msg_code);
-                M2MInterface::Error error = interface_error(coap_header);
-                // Send full registration in case server has lost the endpoint information
-                if (coap_header->msg_code == COAP_MSG_CODE_RESPONSE_NOT_FOUND) {
-                    _register_id = sn_nsdl_register_endpoint(_nsdl_handle,_endpoint);
-                }
-                // In case, the error for update registration is not allowed implies the client is no longer registered in
-                // server hence the error returns should be NotRegistered.
-                else {
-                    if(M2MInterface::NotAllowed == error) {
-                        error = M2MInterface::NotRegistered;
-                    }
-                    _observer.registration_error(error);
-                }
+                tr_error("M2MNsdlInterface::received_from_server_callback - registration_updated failed %d", coap_header->msg_code);                
+                _register_id = sn_nsdl_register_endpoint(_nsdl_handle,_endpoint);
             }
         }
 #ifndef YOTTA_CFG_DISABLE_BOOTSTRAP_FEATURE
