@@ -579,7 +579,9 @@ sn_coap_hdr_s* M2MResource::handle_post_request(nsdl_s *nsdl,
             if(COAP_MSG_CODE_RESPONSE_CHANGED == msg_code) {
                 tr_debug("M2MResource::handle_post_request - Execute resource function");
                 execute(exec_params);
-                delete exec_params;
+                if(exec_params) {
+                    delete exec_params;
+                }
 
                 if(_delayed_response) {
                     coap_response->msg_type = COAP_MSG_TYPE_ACKNOWLEDGEMENT;
