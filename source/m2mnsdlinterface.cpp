@@ -1491,19 +1491,66 @@ void M2MNsdlInterface::send_resource_observation(M2MResource *resource,
         } else {
             resource->get_value(value,length);
         }
-        sn_nsdl_send_observation_notification_with_uri_path(_nsdl_handle,
-                                              token,
-                                              token_length,
-                                              value,length,
-                                              observation_number,
-                                              observation_number_length,
-                                              COAP_MSG_TYPE_CONFIRMABLE,
-                                              content_type,
-                                              (uint8_t *)resource->uri_path().c_str(),
-                                              resource->uri_path().size());
 
+        sn_coap_hdr_s *notification_message_ptr;
+
+        /* Allocate and initialize memory for header struct */
+        notification_message_ptr = (sn_coap_hdr_s *)memory_alloc(sizeof(sn_coap_hdr_s));
+        if (notification_message_ptr) {
+            memset(notification_message_ptr, 0, sizeof(sn_coap_hdr_s));
+
+            notification_message_ptr->options_list_ptr = (sn_coap_options_list_s *)memory_alloc(sizeof(sn_coap_options_list_s));
+            if (notification_message_ptr->options_list_ptr) {
+
+                memset(notification_message_ptr->options_list_ptr , 0, sizeof(sn_coap_options_list_s));
+
+                /* Fill header */
+                notification_message_ptr->msg_type = COAP_MSG_TYPE_CONFIRMABLE;
+                notification_message_ptr->msg_code = COAP_MSG_CODE_RESPONSE_CONTENT;
+
+                /* Fill token */
+                notification_message_ptr->token_len = token_length;
+                notification_message_ptr->token_ptr = token;
+
+                /* Fill payload */
+                notification_message_ptr->payload_len = length;
+                notification_message_ptr->payload_ptr = value;
+
+                /* Fill uri path */
+                notification_message_ptr->uri_path_len = resource->uri_path().size();
+                notification_message_ptr->uri_path_ptr = (uint8_t *)resource->uri_path().c_str();
+
+                /* Fill observe */
+                notification_message_ptr->options_list_ptr->observe_len = observation_number_length;
+                notification_message_ptr->options_list_ptr->observe_ptr = observation_number;
+
+                notification_message_ptr->options_list_ptr->max_age_ptr =
+                        m2m::String::convert_integer_to_array(resource->max_age(),
+                                                              notification_message_ptr->options_list_ptr->max_age_len);
+
+                notification_message_ptr->content_type_ptr =
+                        m2m::String::convert_integer_to_array(content_type,
+                                                              notification_message_ptr->content_type_len);
+
+                /* Send message */
+                sn_nsdl_send_coap_message(_nsdl_handle,
+                                          _nsdl_handle->nsp_address_ptr->omalw_address_ptr,
+                                          notification_message_ptr);
+
+                /* Free memory */
+                notification_message_ptr->uri_path_ptr = NULL;
+                notification_message_ptr->payload_ptr = NULL;
+                notification_message_ptr->options_list_ptr->observe_ptr = NULL;
+                notification_message_ptr->token_ptr = NULL;
+                free(notification_message_ptr->content_type_ptr);
+                notification_message_ptr->content_type_ptr = NULL;
+                free(notification_message_ptr->options_list_ptr->max_age_ptr);
+                notification_message_ptr->options_list_ptr->max_age_ptr = NULL;
+            }
+            sn_nsdl_release_allocated_coap_msg_mem(_nsdl_handle, notification_message_ptr);
+        }
         memory_free(value);
-        memory_free(token);        
+        memory_free(token);
     }
 }
 
