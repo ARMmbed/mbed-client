@@ -39,7 +39,6 @@ const uint8_t STATIC_VALUE[] = "Open Mobile Alliance";
 
 static void ctrl_c_handle_function(void);
 void close_function();
-static void display_mallinfo(void);
 typedef void (*signalhandler_t)(int); /* Function pointer type for ctrl-c */
 
 class MbedClient: public M2MInterfaceObserver {
@@ -270,8 +269,6 @@ public:
     void object_registered(M2MSecurity */*security_object*/, const M2MServer &/*server_object*/){
         _registered = true;
         printf("\nRegistered\n");
-        printf("\n============== After Registering ==============\n");
-        display_mallinfo();
     }
 
     void object_unregistered(M2MSecurity */*server_object*/){
@@ -316,8 +313,6 @@ void* wait_for_bootstrap(void* arg) {
     MbedClient *client;
     client = (MbedClient*) arg;
     if(client->bootstrap_successful()) {
-        printf("\n============== After Bootstrapping ==============\n");
-        display_mallinfo();
         printf("Registering endpoint\n");
         client->test_register();
     }
@@ -345,8 +340,6 @@ void* send_observation(void* arg) {
             printf("Sending observation\n");
             client->update_resource();
             counter = 0;
-            printf("\n============== After Sending Observation ==============\n");
-            display_mallinfo();
         }
         else
             counter++;
@@ -379,28 +372,7 @@ void close_function() {
     pthread_cancel(observation_thread);
 }
 
-static void display_mallinfo(void)
-{
-    struct mallinfo mi;
-
-   mi = mallinfo();
-
-    printf("Total non-mmapped bytes (arena):       %d\n", mi.arena);
-    printf("# of free chunks (ordblks):            %d\n", mi.ordblks);
-    printf("# of free fastbin blocks (smblks):     %d\n", mi.smblks);
-    printf("# of mapped regions (hblks):           %d\n", mi.hblks);
-    printf("Bytes in mapped regions (hblkhd):      %d\n", mi.hblkhd);
-    printf("Max. total allocated space (usmblks):  %d\n", mi.usmblks);
-    printf("Free bytes held in fastbins (fsmblks): %d\n", mi.fsmblks);
-    printf("Total allocated space (uordblks):      %d\n", mi.uordblks);
-    printf("Total free space (fordblks):           %d\n", mi.fordblks);
-    printf("Topmost releasable block (keepcost):   %d\n", mi.keepcost);
-}
-
 int main() {
-
-    printf("============== Before allocating blocks ==============\n");
-    display_mallinfo();
 
     MbedClient mbed_client;
 
@@ -451,9 +423,6 @@ int main() {
     pthread_join(bootstrap_thread, NULL);
     pthread_join(unregister_thread, NULL);
     pthread_join(observation_thread, NULL);
-
-    printf("\n============== After freeing blocks ==============\n");
-    display_mallinfo();
 
     exit(EXIT_SUCCESS);
 }
