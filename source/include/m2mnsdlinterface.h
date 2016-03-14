@@ -282,6 +282,15 @@ private:
                                   uint8_t *obs_len,
                                   uint16_t number);
 
+    void send_notification(uint8_t *token,
+                           uint8_t  token_length,
+                           uint8_t *value,
+                           uint32_t value_length,
+                           uint16_t observation,
+                           uint32_t max_age,
+                           uint8_t  coap_content_type,
+                           const String  &uri_path);
+
 private:
 
     M2MNsdlObserver                   &_observer;
