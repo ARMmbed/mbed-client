@@ -53,6 +53,8 @@ private: // Constructor and destructor are private
      * \param type The resource data type of the object.
      * \param value The value pointer of the object.
      * \param value_length The length of the value pointer.
+     * \param object_instance_id Object instance id where resource exists.
+     * \param object_name Object name where resource exists.
      * \param multiple_instance True if the resource supports instances.
      */
     M2MResource(M2MObjectInstanceCallback &object_instance_callback,
@@ -61,17 +63,27 @@ private: // Constructor and destructor are private
                 M2MResourceInstance::ResourceType type,
                 const uint8_t *value,
                 const uint8_t value_length,
+                const uint16_t object_instance_id,
+                const String &object_name,
                 bool multiple_instance = false);
 
     /**
      * \brief Constructor
-     * \param name The name of the object.
+     * \param resource_name The resource name of the object.
+     * \param resource_type The resource type of the object.
+     * \param type The resource data type of the object.
+     * \param observable Indicates whether the resource is observable or not.
+     * \param object_instance_id Object instance id where resource exists.
+     * \param object_name Object name where resource exists.
+     * \param multiple_instance True if the resource supports instances.
      */
     M2MResource(M2MObjectInstanceCallback &object_instance_callback,
                 const String &resource_name,
                 const String &resource_type,
                 M2MResourceInstance::ResourceType type,
                 bool observable,
+                const uint16_t object_instance_id,
+                const String &object_name,
                 bool multiple_instance = false);
 
     // Prevents the use of default constructor.
