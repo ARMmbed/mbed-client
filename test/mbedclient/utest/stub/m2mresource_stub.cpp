@@ -43,26 +43,30 @@ M2MResource::M2MResource(const M2MResource& other)
     *this = other;
 }
 
-M2MResource::M2MResource(M2MObjectInstanceCallback & object_instance_callback,
+M2MResource::M2MResource(M2MObjectInstanceCallback &object_instance_callback,
                          const String &resource_name,
                          const String &resource_type,
                          M2MResourceInstance::ResourceType type,
                          const uint8_t *value,
                          const uint8_t value_length,
+                         const uint16_t object_instance_id,
+                         const String &object_name,
                          bool)
 : M2MResourceInstance(resource_name, resource_type, type, value, value_length,
-                      object_instance_callback)
+                      object_instance_callback, object_instance_id, object_name)
 {
 }
 
-M2MResource::M2MResource(M2MObjectInstanceCallback & object_instance_callback,
+M2MResource::M2MResource(M2MObjectInstanceCallback &object_instance_callback,
                          const String &resource_name,
                          const String &resource_type,
                          M2MResourceInstance::ResourceType type,
                          bool,
-                         bool )
+                         const uint16_t object_instance_id,
+                         const String &object_name,
+                         bool)
 : M2MResourceInstance(resource_name, resource_type, type,
-                      object_instance_callback)
+                      object_instance_callback, object_instance_id, object_name)
 {
 }
 

@@ -652,7 +652,7 @@ void Test_M2MNsdlInterface::test_resource_callback_get()
 
 void Test_M2MNsdlInterface::test_resource_callback_put()
 {
-    uint8_t value[] = {"name"};    
+    uint8_t value[] = {"name/0/resource"};
     sn_coap_hdr_s *coap_header = (sn_coap_hdr_s *)malloc(sizeof(sn_coap_hdr_s));
     memset(coap_header,0,sizeof(sn_coap_hdr_s));
     sn_nsdl_addr_s *address = (sn_nsdl_addr_s *)malloc(sizeof(sn_nsdl_addr_s));
@@ -664,15 +664,17 @@ void Test_M2MNsdlInterface::test_resource_callback_put()
     coap_header->msg_code = COAP_MSG_CODE_REQUEST_PUT;
 
     String *name = new String("name");
+    String *res_name = new String("res");
     common_stub::int_value = 0;
     m2mbase_stub::string_value = name;
+
     M2MObject *object = new M2MObject(*name);
     M2MObjectInstance* instance = new M2MObjectInstance(*name,*object);
     M2MResource* create_resource = new M2MResource(*instance,
-                                                   *name,
-                                                   *name,
+                                                   *res_name,
+                                                   *res_name,
                                                    M2MResourceInstance::INTEGER,
-                                                   M2MResource::Dynamic,false);
+                                                   false);
     m2mobject_stub::int_value = 2;
     m2mobject_stub::instance_list.push_back(instance);
 
@@ -695,7 +697,6 @@ void Test_M2MNsdlInterface::test_resource_callback_put()
     memset(common_stub::coap_header,0,sizeof(sn_coap_hdr_));
 
     CHECK(nsdl->resource_callback(NULL,coap_header,address,SN_NSDL_PROTOCOL_HTTP) ==0);
-
 
     m2mobject_stub::base_type = M2MBase::Resource;
     m2mbase_stub::base_type = M2MBase::Resource;
@@ -736,6 +737,7 @@ void Test_M2MNsdlInterface::test_resource_callback_put()
     free(address);
 
     delete name;
+    delete res_name;
     name = NULL;
 
     m2mbase_stub::clear();
@@ -746,7 +748,7 @@ void Test_M2MNsdlInterface::test_resource_callback_put()
 
 void Test_M2MNsdlInterface::test_resource_callback_post()
 {
-    uint8_t value[] = {"name"};    
+    uint8_t value[] = {"name/0/name"};
     sn_coap_hdr_s *coap_header = (sn_coap_hdr_s *)malloc(sizeof(sn_coap_hdr_s));
     memset(coap_header,0,sizeof(sn_coap_hdr_s));
     sn_nsdl_addr_s *address = (sn_nsdl_addr_s *)malloc(sizeof(sn_nsdl_addr_s));

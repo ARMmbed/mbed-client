@@ -61,6 +61,10 @@ public:
 
     void test_set_resource_observer();
 
+    void test_get_object_name();
+
+    void test_get_object_instance_id();
+
     M2MResourceInstance* resource_instance;
 
     Callback *callback;

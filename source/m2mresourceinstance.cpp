@@ -25,21 +25,18 @@
 M2MResourceInstance& M2MResourceInstance::operator=(const M2MResourceInstance& other)
 {
     if (this != &other) { // protect against invalid self-assignment
-
         if(_value) {
             free(_value);
             _value = NULL;
             _value_length = 0;
         }
-        _value_length = other._value_length;
+        _value_length = other._value_length;        
         if(other._value) {
             _value = (uint8_t *)malloc(other._value_length+1);
             if(_value) {
                 memset(_value, 0, other._value_length+1);
                 memcpy((uint8_t *)_value, (uint8_t *)other._value, other._value_length);
-            }
-            _object_instance_id = other._object_instance_id;
-            _object_name = other._object_name;
+            }            
         }
     }
     return *this;
@@ -53,8 +50,9 @@ M2MResourceInstance::M2MResourceInstance(const M2MResourceInstance& other)
   _value_length(0),
   _resource_type(M2MResourceInstance::STRING),
   _resource_callback(NULL),
-  _object_instance_id(0),
-  _object_name("")
+  _object_instance_id(other._object_instance_id),
+  _object_name(other._object_name),
+  _function_pointer(NULL)
 {
     this->operator=(other);
 }
@@ -74,7 +72,8 @@ M2MResourceInstance::M2MResourceInstance(const String &res_name,
  _resource_type(type),
  _resource_callback(NULL),
  _object_instance_id(object_instance_id),
- _object_name(object_name)
+ _object_name(object_name),
+ _function_pointer(NULL)
 {
     M2MBase::set_resource_type(resource_type);
     M2MBase::set_base_type(M2MBase::ResourceInstance);
@@ -97,7 +96,8 @@ M2MResourceInstance::M2MResourceInstance(const String &res_name,
  _resource_type(type),
  _resource_callback(NULL),
  _object_instance_id(object_instance_id),
- _object_name(object_name)
+ _object_name(object_name),
+ _function_pointer(NULL)
 {
     M2MBase::set_resource_type(resource_type);
     M2MBase::set_base_type(M2MBase::Resource);
@@ -117,6 +117,10 @@ M2MResourceInstance::~M2MResourceInstance()
         free(_value);
         _value = NULL;
         _value_length = 0;
+    }
+    if (_function_pointer) {
+        delete _function_pointer;
+        _function_pointer = NULL;
     }
     _resource_callback = NULL;
 }
@@ -156,6 +160,15 @@ bool M2MResourceInstance::handle_observation_attribute(char *&query)
 void M2MResourceInstance::set_execute_function(execute_callback callback)
 {
     _execute_callback = callback;
+}
+
+void M2MResourceInstance::set_execute_function(execute_callback_2 callback)
+{
+    if (_function_pointer) {
+        delete _function_pointer;
+    }
+    _function_pointer = new FP1<void, void*>(callback);
+    set_execute_function(execute_callback(_function_pointer, &FP1<void, void*>::call));
 }
 
 void M2MResourceInstance::clear_value()

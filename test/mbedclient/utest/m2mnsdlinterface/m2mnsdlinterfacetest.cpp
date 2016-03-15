@@ -108,10 +108,6 @@ TEST(M2MNsdlInterface, resource_callback_get)
     m2m_nsdl_interface->test_resource_callback_get();
 }
 
-TEST(M2MNsdlInterface, resource_callback_put)
-{
-    m2m_nsdl_interface->test_resource_callback_put();
-}
 
 TEST(M2MNsdlInterface, resource_callback_post)
 {
@@ -181,4 +177,9 @@ TEST(M2MNsdlInterface, add_object_to_list)
 TEST(M2MNsdlInterface, test_send_delayed_response)
 {
     m2m_nsdl_interface->test_send_delayed_response();
+}
+
+TEST(M2MNsdlInterface, resource_callback_put)
+{
+    m2m_nsdl_interface->test_resource_callback_put();
 }

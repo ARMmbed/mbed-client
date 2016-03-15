@@ -30,6 +30,8 @@ public:
  *  LWM2M resource models can be created based on it.
  */
 typedef FP1<void,void*> execute_callback;
+typedef void(*execute_callback_2) (void *arguments);
+
 class M2MResourceCallback;
 
 class M2MResourceInstance : public M2MBase {
@@ -69,8 +71,8 @@ private: // Constructor and destructor are private
                         const String &resource_type,
                         M2MResourceInstance::ResourceType type,
                         M2MObjectInstanceCallback &object_instance_callback,
-                        const uint16_t object_instance_id,
-                        const String &object_name);
+                        const uint16_t object_instance_id = 0,
+                        const String &object_name = "");
 
     /**
      * \brief A Constructor for creating a resource.
@@ -89,8 +91,8 @@ private: // Constructor and destructor are private
                         const uint8_t *value,
                         const uint8_t value_length,
                         M2MObjectInstanceCallback &object_instance_callback,
-                        const uint16_t object_instance_id,
-                        const String &object_name);
+                        const uint16_t object_instance_id = 0,
+                        const String &object_name = "");
 
     // Prevents the use of default constructor.
     M2MResourceInstance();
@@ -133,6 +135,13 @@ public:
      * \param callback The function pointer that needs to be executed.
      */
     virtual void set_execute_function(execute_callback callback);
+
+    /**
+     * \brief Sets the function that should be executed when this
+     * resource receives a POST command.
+     * \param callback The function pointer that needs to be executed.
+     */
+    virtual void set_execute_function(execute_callback_2 callback);
 
     /**
      * \brief Sets the value of the given resource.
@@ -207,7 +216,7 @@ public:
      * \brief Returns the object name where resource exists.
      * \return Object name.
     */
-    const String &object_name() const;
+    const String& object_name() const;
 
 protected:
 
@@ -233,6 +242,7 @@ private:
     M2MResourceCallback                     *_resource_callback; // Not owned
     uint16_t                                _object_instance_id;
     String                                  _object_name;
+    FP1<void, void*>                        *_function_pointer;
 
     friend class Test_M2MResourceInstance;
     friend class Test_M2MResource;
