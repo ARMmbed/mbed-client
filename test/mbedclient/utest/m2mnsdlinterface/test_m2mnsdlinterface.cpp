@@ -1300,6 +1300,17 @@ void Test_M2MNsdlInterface::test_observation_to_be_sent()
 
     m2mresourceinstance_stub::base_type = M2MBase::Resource;
 
+    nsdl->_nsdl_handle = (nsdl_s*)malloc(sizeof(nsdl_s));
+    memset(nsdl->_nsdl_handle,0,sizeof(nsdl_s));
+    sn_nsdl_oma_server_info_t * nsp_address = (sn_nsdl_oma_server_info_t *)malloc(sizeof(sn_nsdl_oma_server_info_t));
+    memset(nsp_address,0,sizeof(sn_nsdl_oma_server_info_t));
+    sn_nsdl_addr_s* address = (sn_nsdl_addr_s*)malloc(sizeof(sn_nsdl_addr_s));
+    memset(address,0,sizeof(sn_nsdl_addr_s));
+
+    nsdl->_nsdl_handle->nsp_address_ptr = nsp_address;
+    memset(nsdl->_nsdl_handle->nsp_address_ptr,0,sizeof(sn_nsdl_oma_server_info_t));
+    nsdl->_nsdl_handle->nsp_address_ptr->omalw_address_ptr = address;
+
     //CHECK if nothing crashes
     nsdl->observation_to_be_sent(res2, 1, instance_list_ids);
 
@@ -1361,6 +1372,10 @@ void Test_M2MNsdlInterface::test_observation_to_be_sent()
 
     delete instance;
     instance = NULL;
+
+    free(nsp_address);
+    free(address);
+    free(nsdl->_nsdl_handle);
 }
 
 void Test_M2MNsdlInterface::test_resource_to_be_deleted()

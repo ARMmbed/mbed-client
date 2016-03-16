@@ -1370,13 +1370,6 @@ void M2MNsdlInterface::send_object_observation(M2MObject *object,
         uint32_t length = 0;
         uint8_t *token = 0;
         uint32_t token_length = 0;
-        uint8_t observation_number[2];
-        uint8_t observation_number_length = 1;
-
-        build_observation_number(observation_number,
-                                 &observation_number_length,
-                                 obs_number);
-
 
         M2MTLVSerializer *serializer = new M2MTLVSerializer();
         if (serializer) {
@@ -1405,16 +1398,14 @@ void M2MNsdlInterface::send_object_observation(M2MObject *object,
 
         object->get_observation_token(token,token_length);
 
-        sn_nsdl_send_observation_notification_with_uri_path(_nsdl_handle,
-                                              token,
-                                              token_length,
-                                              value,length,
-                                              observation_number,
-                                              observation_number_length,
-                                              COAP_MSG_TYPE_CONFIRMABLE,
-                                              object->coap_content_type(),
-                                              (uint8_t *)object->uri_path().c_str(),
-                                              object->uri_path().size());
+        send_notification(token,
+                          token_length,
+                          value,
+                          length,
+                          obs_number,
+                          object->max_age(),
+                          object->coap_content_type(),
+                          object->uri_path());
 
         memory_free(value);
         memory_free(token);
@@ -1430,12 +1421,6 @@ void M2MNsdlInterface::send_object_instance_observation(M2MObjectInstance *objec
         uint32_t length = 0;
         uint8_t *token = 0;
         uint32_t token_length = 0;
-        uint8_t observation_number[2];
-        uint8_t observation_number_length = 1;
-
-        build_observation_number(observation_number,
-                                 &observation_number_length,
-                                 obs_number);
 
         M2MTLVSerializer *serializer = new M2MTLVSerializer();
         if(serializer) {
@@ -1445,16 +1430,15 @@ void M2MNsdlInterface::send_object_instance_observation(M2MObjectInstance *objec
 
         object_instance->get_observation_token(token,token_length);
 
-        sn_nsdl_send_observation_notification_with_uri_path(_nsdl_handle,
-                                              token,
-                                              token_length,
-                                              value,length,
-                                              observation_number,
-                                              observation_number_length,
-                                              COAP_MSG_TYPE_CONFIRMABLE,
-                                              object_instance->coap_content_type(),
-                                              (uint8_t *)object_instance->uri_path().c_str(),
-                                              object_instance->uri_path().size());
+        send_notification(token,
+                          token_length,
+                          value,
+                          length,
+                          obs_number,
+                          object_instance->max_age(),
+                          object_instance->coap_content_type(),
+                          object_instance->uri_path());
+
         memory_free(value);
         memory_free(token);
     }
@@ -1469,12 +1453,6 @@ void M2MNsdlInterface::send_resource_observation(M2MResource *resource,
         uint32_t length = 0;
         uint8_t *token = 0;
         uint32_t token_length = 0;
-        uint8_t observation_number[2];
-        uint8_t observation_number_length = 0;
-
-        build_observation_number(observation_number,
-                                 &observation_number_length,
-                                 obs_number);
 
         resource->get_observation_token(token,token_length);
         uint8_t content_type = 0;
@@ -1491,19 +1469,17 @@ void M2MNsdlInterface::send_resource_observation(M2MResource *resource,
         } else {
             resource->get_value(value,length);
         }
-        sn_nsdl_send_observation_notification_with_uri_path(_nsdl_handle,
-                                              token,
-                                              token_length,
-                                              value,length,
-                                              observation_number,
-                                              observation_number_length,
-                                              COAP_MSG_TYPE_CONFIRMABLE,
-                                              content_type,
-                                              (uint8_t *)resource->uri_path().c_str(),
-                                              resource->uri_path().size());
+        send_notification(token,
+                          token_length,
+                          value,
+                          length,
+                          obs_number,
+                          resource->max_age(),
+                          resource->coap_content_type(),
+                          resource->uri_path());
 
         memory_free(value);
-        memory_free(token);        
+        memory_free(token);
     }
 }
 
@@ -1518,5 +1494,81 @@ void M2MNsdlInterface::build_observation_number(uint8_t *obs_number,
     } else {
         *obs_len = 1;
         *(obs_number) = number & 0x00FF;
+    }
+}
+
+void M2MNsdlInterface::send_notification(uint8_t *token,
+                                         uint8_t  token_length,
+                                         uint8_t *value,
+                                         uint32_t value_length,
+                                         uint16_t observation,
+                                         uint32_t max_age,
+                                         uint8_t  coap_content_type,
+                                         const String  &uri_path)
+
+{
+    tr_debug("M2MNsdlInterface::send_notification");
+    sn_coap_hdr_s *notification_message_ptr;
+
+    /* Allocate and initialize memory for header struct */
+    notification_message_ptr = (sn_coap_hdr_s *)memory_alloc(sizeof(sn_coap_hdr_s));
+    if (notification_message_ptr) {
+        memset(notification_message_ptr, 0, sizeof(sn_coap_hdr_s));
+
+        notification_message_ptr->options_list_ptr = (sn_coap_options_list_s *)memory_alloc(sizeof(sn_coap_options_list_s));
+        if (notification_message_ptr->options_list_ptr) {
+
+            memset(notification_message_ptr->options_list_ptr , 0, sizeof(sn_coap_options_list_s));
+
+            /* Fill header */
+            notification_message_ptr->msg_type = COAP_MSG_TYPE_CONFIRMABLE;
+            notification_message_ptr->msg_code = COAP_MSG_CODE_RESPONSE_CONTENT;
+
+            /* Fill token */
+            notification_message_ptr->token_len = token_length;
+            notification_message_ptr->token_ptr = token;
+
+            /* Fill payload */
+            notification_message_ptr->payload_len = value_length;
+            notification_message_ptr->payload_ptr = value;
+
+            /* Fill uri path */
+            notification_message_ptr->uri_path_len = uri_path.size();
+            notification_message_ptr->uri_path_ptr = (uint8_t *)uri_path.c_str();
+
+            /* Fill observe */
+            uint8_t observation_number[2];
+            uint8_t observation_number_length = 0;
+
+            build_observation_number(observation_number,
+                                     &observation_number_length,
+                                     observation);
+            notification_message_ptr->options_list_ptr->observe_len = observation_number_length;
+            notification_message_ptr->options_list_ptr->observe_ptr = observation_number;
+
+            notification_message_ptr->options_list_ptr->max_age_ptr =
+                    m2m::String::convert_integer_to_array(max_age,
+                                                          notification_message_ptr->options_list_ptr->max_age_len);
+
+            notification_message_ptr->content_type_ptr =
+                    m2m::String::convert_integer_to_array(coap_content_type,
+                                                          notification_message_ptr->content_type_len);
+
+            /* Send message */
+            sn_nsdl_send_coap_message(_nsdl_handle,
+                                      _nsdl_handle->nsp_address_ptr->omalw_address_ptr,
+                                      notification_message_ptr);
+
+            /* Free memory */
+            notification_message_ptr->uri_path_ptr = NULL;
+            notification_message_ptr->payload_ptr = NULL;
+            notification_message_ptr->options_list_ptr->observe_ptr = NULL;
+            notification_message_ptr->token_ptr = NULL;
+            free(notification_message_ptr->content_type_ptr);
+            notification_message_ptr->content_type_ptr = NULL;
+            free(notification_message_ptr->options_list_ptr->max_age_ptr);
+            notification_message_ptr->options_list_ptr->max_age_ptr = NULL;
+        }
+        sn_nsdl_release_allocated_coap_msg_mem(_nsdl_handle, notification_message_ptr);
     }
 }
