@@ -72,8 +72,53 @@ Whenever there is a valid `PUT` operation for any of the resources, the applicat
 ```
 void value_updated(M2MBase *base, M2MBase::BaseType type) 
 ```
-
 Where `M2MBase` is the Object whose value has been updated and `M2MBase::BaseType` is the object type.
+
+Check the code snippet below for usage.
+```
+void value_updated(M2MBase *base, M2MBase::BaseType type) {
+        M2MResource* resource = NULL;
+        M2MResourceInstance* res_instance = NULL;
+        M2MObjectInstance* obj_instance = NULL;
+        M2MObject* obj = NULL;
+        String object_name = "";
+        String resource_name = "";
+        uint16_t object_instance_id = 0;
+        uint16_t resource_instance_id = 0;
+        if(base) {
+            switch(base->base_type()) {
+                case M2MBase::Object:
+                    obj = (M2MObject *)base;
+                    object_name = obj->name();
+                break;
+                case M2MBase::ObjectInstance:
+                    obj_instance = (M2MObjectInstance *)base;
+                    object_name = obj_instance->name();
+                    object_instance_id = obj_instance->instance_id();
+                break;
+                case M2MBase::Resource: {
+                    resource = (M2MResource*)base;
+                    object_name = resource->object_name();
+                    object_instance_id = resource->object_instance_id();
+                    resource_name = resource->name();
+                    printf("Value updated, object name %s, object instance id %d, resource name %s\r\n",
+                           resource->object_name().c_str(), resource->object_instance_id(), resource->name().c_str());
+                }
+                break;
+                case M2MBase::ResourceInstance: {
+                    res_instance = (M2MResourceInstance*)base;
+                    object_name = res_instance->object_name();
+                    object_instance_id = res_instance->object_instance_id();
+                    resource_name = res_instance->name();
+                    resource_instance_id = res_instance->instance_id();
+                }
+                break;
+            default:
+                break;
+            }
+        }
+    }
+```
 
 ## The Write Attributes operation
 
