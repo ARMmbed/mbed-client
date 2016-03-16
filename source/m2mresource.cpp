@@ -61,9 +61,11 @@ M2MResource::M2MResource(M2MObjectInstanceCallback &object_instance_callback,
                          M2MResourceInstance::ResourceType type,
                          const uint8_t *value,
                          const uint8_t value_length,
+                         const uint16_t object_instance_id,
+                         const String &object_name,
                          bool multiple_instance)
 : M2MResourceInstance(resource_name, resource_type, type, value, value_length,
-                      object_instance_callback),
+                      object_instance_callback, object_instance_id, object_name),
   _has_multiple_instances(multiple_instance),
   _delayed_response(false),
   _delayed_token(NULL),
@@ -79,9 +81,11 @@ M2MResource::M2MResource(M2MObjectInstanceCallback &object_instance_callback,
                          const String &resource_type,
                          M2MResourceInstance::ResourceType type,
                          bool observable,
+                         const uint16_t object_instance_id,
+                         const String &object_name,
                          bool multiple_instance)
 : M2MResourceInstance(resource_name, resource_type, type,
-                      object_instance_callback),
+                      object_instance_callback, object_instance_id, object_name),
   _has_multiple_instances(multiple_instance),
   _delayed_response(false),
   _delayed_token(NULL),
@@ -571,6 +575,9 @@ sn_coap_hdr_s* M2MResource::handle_post_request(nsdl_s *nsdl,
                                 received_coap_header->payload_len);
                             exec_params->_value_length = received_coap_header->payload_len;
                         }
+                        exec_params->_object_name = object_name();
+                        exec_params->_resource_name = name();
+                        exec_params->_object_instance_id = object_instance_id();
                     }
                 } else {
                     msg_code = COAP_MSG_CODE_RESPONSE_UNSUPPORTED_CONTENT_FORMAT;
@@ -633,6 +640,9 @@ M2MResource::M2MExecuteParameter::M2MExecuteParameter()
 {
     _value = NULL;
     _value_length = 0;
+    _object_name = "";
+    _resource_name = "";
+    _object_instance_id = 0;
 }
 
 M2MResource::M2MExecuteParameter::~M2MExecuteParameter()
@@ -652,3 +662,17 @@ uint16_t M2MResource::M2MExecuteParameter::get_argument_value_length() const
     return _value_length;
 }
 
+const String& M2MResource::M2MExecuteParameter::get_argument_object_name() const
+{
+    return _object_name;
+}
+
+const String& M2MResource::M2MExecuteParameter::get_argument_resource_name() const
+{
+    return _resource_name;
+}
+
+uint16_t M2MResource::M2MExecuteParameter::get_argument_object_instance_id() const
+{
+    return _object_instance_id;
+}
