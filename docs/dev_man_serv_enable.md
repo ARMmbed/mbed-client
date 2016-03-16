@@ -97,7 +97,7 @@ mbed Device Server uses the **Execute** operation to perform an action. This ope
 
 If you want to execute a piece of code in your application, you can pass a `POST` request from mbed Device Server.
 When your Resource receives the `POST` request, mbed Client parses the payload from the request and wraps it in the `M2MResource::M2MExecuteParameter` class. The class object is passed through the execute callback function.
-You can then typecast the `void*` argument into the corresponding `M2MResource::M2MExecuteParameter` and access the passed payload and its length through the given API. Make sure that the payload sent through POST request is in `plain/text` format and that the content-type is set as “plain/text” on the POST request call.
+You can then typecast the `void*` argument into the corresponding `M2MResource::M2MExecuteParameter` and access the passed payload and its length through the given API. M2MResource::M2MExecuteParameter contains also information which object and object instance resource belongs to. Make sure that the payload sent through POST request is in `plain/text` format and that the content-type is set as “plain/text” on the POST request call.
 
 Check the code snippet below for usage.
 
@@ -111,6 +111,9 @@ Check the code snippet below for usage.
         M2MResource::M2MExecuteParameter* param = (M2MResource::M2MExecuteParameter*)argument;
             int payload_length = param->get_argument_value_length();
             uint8_t* payload = param->get_argument_value();
+            String object_name = param->get_argument_object_name();
+            uint16_t object_instance_id = param->get_argument_object_instance_id();
+            String resource_name = param->get_argument_resource_name();
     }
 
 _object = M2MInterfaceFactory::create_object("Test");
