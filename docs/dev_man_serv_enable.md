@@ -150,10 +150,19 @@ Check the code snippet below for usage.
 #include "mbed-client/m2mobject.h"
 #include "mbed-client/m2mobjectinstance.h"
 #include "mbed-client/m2mresource.h"
-
+    static void execute_function_2(void *argument) {
+        if(argument) {
+            M2MResource::M2MExecuteParameter* param = (M2MResource::M2MExecuteParameter*)argument;
+            int payload_length = param->get_argument_value_length();
+            uint8_t* payload = param->get_argument_value();
+            String object_name = param->get_argument_object_name();
+            uint16_t object_instance_id = param->get_argument_object_instance_id();
+            String resource_name = param->get_argument_resource_name();
+    }
+    
     void M2MLWClient::execute_function(void *argument) {
         if(argument) {
-        M2MResource::M2MExecuteParameter* param = (M2MResource::M2MExecuteParameter*)argument;
+            M2MResource::M2MExecuteParameter* param = (M2MResource::M2MExecuteParameter*)argument;
             int payload_length = param->get_argument_value_length();
             uint8_t* payload = param->get_argument_value();
             String object_name = param->get_argument_object_name();
@@ -172,6 +181,9 @@ if(_object) {
         res->set_value((const uint8_t*)buffer,
                        (const uint32_t)size);
         res->set_execute_function(execute_callback(this,&M2MLWClient::execute_function));
+        /* Overloaded function can be used If callback function is not in class scope. 
+        res->set_execute_function(&execute_function_2);
+        */
 ```
 
 The POST method allows the client to respond immediately with the updated payload value as a piggyback response. If you want to send the payload response to the server later (because the Execute operation may take longer time on device to complete), you can handle this through the API.
