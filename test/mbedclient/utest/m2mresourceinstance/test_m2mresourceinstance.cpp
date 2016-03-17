@@ -22,6 +22,11 @@
 #include "m2mreporthandler_stub.h"
 #include "common_stub.h"
 #include "m2mtlvdeserializer_stub.h"
+static bool cb_visited = false;
+static void callback_function(void *args)
+{
+    cb_visited = true;
+}
 
 class MyTest{
 public:
@@ -199,15 +204,27 @@ void Test_M2MResourceInstance::test_set_execute_function()
 {
     MyTest test;
     resource_instance->set_execute_function(execute_callback(&test,&MyTest::execute_function));
+    resource_instance->set_execute_function(callback_function);
 }
 
 void Test_M2MResourceInstance::test_execute()
 {
     MyTest test;
     void *args = NULL;
-    resource_instance->set_execute_function(execute_callback(&test,&MyTest::execute_function));
 
+    resource_instance->set_execute_function(execute_callback(&test,&MyTest::execute_function));    
     resource_instance->execute(args);
+
+    cb_visited = false;
+    resource_instance->set_execute_function(callback_function);
+    resource_instance->execute(args);
+    CHECK(true == cb_visited);
+
+    // Check delete
+    cb_visited = false;
+    resource_instance->set_execute_function(callback_function);
+    resource_instance->execute(args);
+    CHECK(true == cb_visited);
 }
 
 void Test_M2MResourceInstance::test_set_value()
@@ -738,4 +755,17 @@ void Test_M2MResourceInstance::test_set_resource_observer()
     resource_instance->set_resource_observer(resource_cb);
     CHECK(resource_instance->_resource_callback == resource_cb)
     delete resource_cb;
+}
+
+
+void Test_M2MResourceInstance::test_get_object_name()
+{
+    resource_instance->_object_name = "object";
+    CHECK(resource_instance->object_name() == "object");
+}
+
+void Test_M2MResourceInstance::test_get_object_instance_id()
+{
+    resource_instance->_object_instance_id = 100;
+    CHECK(resource_instance->object_instance_id() == 100);
 }

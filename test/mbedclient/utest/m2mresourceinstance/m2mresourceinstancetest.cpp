@@ -115,3 +115,13 @@ TEST(M2MResourceInstance, test_set_resource_observer)
 {
     m2m_resourceinstance->test_set_resource_observer();
 }
+
+TEST(M2MResourceInstance, test_get_object_instance_id)
+{
+    m2m_resourceinstance->test_get_object_instance_id();
+}
+
+TEST(M2MResourceInstance, test_get_object_name)
+{
+    m2m_resourceinstance->test_get_object_name();
+}

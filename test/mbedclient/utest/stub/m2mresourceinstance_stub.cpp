@@ -17,6 +17,7 @@
 
 uint32_t m2mresourceinstance_stub::int_value;
 bool m2mresourceinstance_stub::bool_value;
+String *m2mresourceinstance_stub::string_value;
 M2MResourceInstance::ResourceType m2mresourceinstance_stub::resource_type;
 sn_coap_hdr_s *m2mresourceinstance_stub::header;
 uint8_t* m2mresourceinstance_stub::value;
@@ -31,6 +32,7 @@ void m2mresourceinstance_stub::clear()
     header = NULL;
     value = NULL;
     base_type = M2MBase::ResourceInstance;
+    string_value = NULL;
 }
 
 M2MResourceInstance& M2MResourceInstance::operator=(const M2MResourceInstance&)
@@ -40,7 +42,9 @@ M2MResourceInstance& M2MResourceInstance::operator=(const M2MResourceInstance&)
 
 M2MResourceInstance::M2MResourceInstance(const M2MResourceInstance& other)
 : M2MBase(other),
-  _object_instance_callback(other._object_instance_callback)
+  _object_instance_callback(other._object_instance_callback)/*,
+  _object_instance_id(other._object_instance_id),
+  _object_name(other._object_name)*/
 {
     this->operator=(other);
 }
@@ -48,10 +52,14 @@ M2MResourceInstance::M2MResourceInstance(const M2MResourceInstance& other)
 M2MResourceInstance::M2MResourceInstance(const String &res_name,
                                          const String &,
                                          M2MResourceInstance::ResourceType,
-                                         M2MObjectInstanceCallback &object_instance_callback)
+                                         M2MObjectInstanceCallback &object_instance_callback,
+                                         const uint16_t /*object_instance_id*/,
+                                         const String &/*object_name*/)
 : M2MBase(res_name,
           M2MBase::Dynamic),
-  _object_instance_callback(object_instance_callback)
+  _object_instance_callback(object_instance_callback)/*,
+_object_instance_id(object_instance_id),
+_object_name(object_name)*/
 {
     m2mresourceinstance_stub::base_type = M2MBase::ResourceInstance;
 }
@@ -61,10 +69,14 @@ M2MResourceInstance::M2MResourceInstance(const String &res_name,
                                          M2MResourceInstance::ResourceType,
                                          const uint8_t *,
                                          const uint8_t,
-                                         M2MObjectInstanceCallback &object_instance_callback)
+                                         M2MObjectInstanceCallback &object_instance_callback,
+                                         const uint16_t/* object_instance_id*/,
+                                         const String &/*object_name*/)
 : M2MBase(res_name,
           M2MBase::Static),
-_object_instance_callback(object_instance_callback)
+_object_instance_callback(object_instance_callback)/*,
+  _object_instance_id(object_instance_id),
+  _object_name(object_name)*/
 {
 }
 
@@ -147,4 +159,17 @@ sn_coap_hdr_s* M2MResourceInstance::handle_put_request(nsdl_s *,
 void M2MResourceInstance::set_resource_observer(M2MResourceCallback *callback)
 {
 
+}
+const String& M2MResourceInstance::object_name() const
+{
+    return *m2mresourceinstance_stub::string_value;
+}
+
+uint16_t M2MResourceInstance::object_instance_id() const
+{
+    return m2mresourceinstance_stub::int_value;
+}
+
+void M2MResourceInstance::set_execute_function(execute_callback_2 callback)
+{
 }
