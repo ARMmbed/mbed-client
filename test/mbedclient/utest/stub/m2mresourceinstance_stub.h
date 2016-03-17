@@ -24,6 +24,7 @@ namespace m2mresourceinstance_stub
     extern uint32_t int_value;
     extern uint8_t* value;
     extern bool bool_value;
+    extern String *string_value;
     extern M2MResourceInstance::ResourceType resource_type;
     extern M2MBase::BaseType base_type;
     extern sn_coap_hdr_s *header;

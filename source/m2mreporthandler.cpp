@@ -17,7 +17,7 @@
 #include "mbed-client/m2mconstants.h"
 #include "mbed-client/m2mtimer.h"
 #include "include/m2mreporthandler.h"
-#include "ns_trace.h"
+#include "mbed-trace/mbed_trace.h"
 #include <stdio.h>
 #include <string.h>
 

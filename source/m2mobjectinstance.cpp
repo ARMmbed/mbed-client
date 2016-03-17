@@ -24,7 +24,7 @@
 #include "include/m2mtlvdeserializer.h"
 #include "include/nsdllinker.h"
 #include "include/m2mreporthandler.h"
-#include "ns_trace.h"
+#include "mbed-trace/mbed_trace.h"
 
 #define BUFFER_SIZE 10
 
@@ -90,7 +90,8 @@ M2MResource* M2MObjectInstance::create_static_resource(const String &resource_na
     }
     if(!resource(resource_name)) {
         res = new M2MResource(*this,resource_name, resource_type, type,
-                                   value, value_length, multiple_instance);
+                              value, value_length, M2MBase::instance_id(),
+                              M2MBase::name(), multiple_instance);
         if(res) {
             res->add_observation_level(observation_level());
             if (multiple_instance) {
@@ -115,7 +116,8 @@ M2MResource* M2MObjectInstance::create_dynamic_resource(const String &resource_n
     }
     if(!resource(resource_name)) {
         res = new M2MResource(*this,resource_name, resource_type, type,
-                              observable, multiple_instance);        
+                              observable, M2MBase::instance_id(),
+                              M2MBase::name(), multiple_instance);
         if(res) {
             if (multiple_instance) {
                 res->set_coap_content_type(COAP_CONTENT_OMA_TLV_TYPE);
@@ -140,9 +142,10 @@ M2MResourceInstance* M2MObjectInstance::create_static_resource_instance(const St
         return instance;
     }
     M2MResource *res = resource(resource_name);
-    if(!res) {
+    if(!res) {        
         res = new M2MResource(*this,resource_name, resource_type, type,
-                              value, value_length, true);
+                              value, value_length, M2MBase::instance_id(),
+                              M2MBase::name(), true);
         _resource_list.push_back(res);
         res->set_operation(M2MBase::GET_ALLOWED);
         res->set_observable(false);
@@ -150,7 +153,8 @@ M2MResourceInstance* M2MObjectInstance::create_static_resource_instance(const St
     }
     if(res->supports_multiple_instances()&& (res->resource_instance(instance_id) == NULL)) {
         instance = new M2MResourceInstance(resource_name, resource_type, type,
-                                           value, value_length,*this);
+                                           value, value_length, *this,
+                                           M2MBase::instance_id(), M2MBase::name());
         if(instance) {
             instance->set_operation(M2MBase::GET_ALLOWED);
             instance->set_instance_id(instance_id);
@@ -174,13 +178,14 @@ M2MResourceInstance* M2MObjectInstance::create_dynamic_resource_instance(const S
     M2MResource *res = resource(resource_name);
     if(!res) {
         res = new M2MResource(*this,resource_name, resource_type, type,
-                              false, true);
+                              false, M2MBase::instance_id(), M2MBase::name(), true);
         _resource_list.push_back(res);
         res->set_register_uri(false);
         res->set_operation(M2MBase::GET_ALLOWED);        
     }
     if(res->supports_multiple_instances() && (res->resource_instance(instance_id) == NULL)) {
-        instance = new M2MResourceInstance(resource_name, resource_type, type,*this);
+        instance = new M2MResourceInstance(resource_name, resource_type, type, *this,
+                                           M2MBase::instance_id(), M2MBase::name());
         if(instance) {
             instance->set_operation(M2MBase::GET_ALLOWED);
             instance->set_observable(observable);
