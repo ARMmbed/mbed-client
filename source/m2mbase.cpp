@@ -19,7 +19,7 @@
 #include "mbed-client/m2mtimer.h"
 #include "include/m2mreporthandler.h"
 #include "include/nsdllinker.h"
-#include "ns_trace.h"
+#include "mbed-trace/mbed_trace.h"
 #include <ctype.h>
 #include <string.h>
 

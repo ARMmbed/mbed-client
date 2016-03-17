@@ -20,7 +20,7 @@
 #include "mbed-client/m2mobjectinstance.h"
 #include "include/m2mreporthandler.h"
 #include "include/nsdllinker.h"
-#include "ns_trace.h"
+#include "mbed-trace/mbed_trace.h"
 
 M2MResourceInstance& M2MResourceInstance::operator=(const M2MResourceInstance& other)
 {

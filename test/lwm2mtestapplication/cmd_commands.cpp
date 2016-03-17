@@ -23,7 +23,7 @@
 #include "net_interface.h"
 #include "socket_api.h"
 #include "socket_security.h"
-#include "ns_trace.h"
+#include "mbed-trace/mbed_trace.h"
 #include "common_functions.h"
 
 #include "ns_cmdline.h"

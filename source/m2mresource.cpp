@@ -20,7 +20,7 @@
 #include "include/m2mtlvserializer.h"
 #include "include/m2mtlvdeserializer.h"
 #include "include/nsdllinker.h"
-#include "ns_trace.h"
+#include "mbed-trace/mbed_trace.h"
 
 M2MResource& M2MResource::operator=(const M2MResource& other)
 {

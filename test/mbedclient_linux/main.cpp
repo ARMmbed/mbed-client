@@ -26,7 +26,7 @@
 #include "mbed-client/m2mobjectinstance.h"
 #include "mbed-client/m2mresource.h"
 
-#include "ns_trace.h"
+#include "mbed-trace/mbed_trace.h"
 
 const String &BOOTSTRAP_SERVER_ADDRESS = "coap://10.45.3.10:5693";
 const String &M2M_SERVER_ADDRESS = "coap://10.45.3.10:5683";
@@ -378,9 +378,9 @@ int main() {
 
     m2mclient = &mbed_client;
 
-    trace_init();
-    set_trace_print_function( trace_printer );
-    set_trace_config(TRACE_MODE_COLOR|TRACE_ACTIVE_LEVEL_DEBUG|TRACE_CARRIAGE_RETURN);
+    mbed_trace_init();
+    mbed_trace_print_function_set( trace_printer );
+    mbed_trace_config_set(TRACE_MODE_COLOR|TRACE_ACTIVE_LEVEL_DEBUG|TRACE_CARRIAGE_RETURN);
 
     signal(SIGINT, (signalhandler_t)ctrl_c_handle_function);
 
