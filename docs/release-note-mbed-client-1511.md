@@ -23,7 +23,7 @@ To get started with mbed Client, please visit our [getting started guide](https:
 This section documents the changes between this release and the earlier mbed Client Beta (15.09) release.
 
 This release contains the following new features:
-Securely connect to mbed Device Server (mbed DS) over TCP connection through TLS. The supported secure connection includes Certificate mode. We still support non-secure connection mode for fast development and debugging.
+Securely connect to mbed Device Server over TCP connection through TLS. The supported secure connection includes Certificate mode. We still support non-secure connection mode for fast development and debugging.
 
 New LWM2M Firmware Object class preview for application development.
 
