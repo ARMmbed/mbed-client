@@ -406,5 +406,12 @@ void execute_function_example(void *) {
 };
 resource->set_execute_function(execute_callback(this,&execute_function_example));
 ```
-
+In case execute callback function is defined as a global function and it's outside of your class scope you can use overloaded set_execute_function:
+```
+virtual void set_execute_function(execute_callback_2 callback);
+static void c_style_function(void *) {
+// Code
+}
+resource->set_execute_function(&c_style_function);
+```
 There are additional APIs that provide getter and remove functions for Resource and Resource Instances in the `M2MResource` and `M2MResourceInstance` classes. Check [the API documentation](https://docs.mbed.com/docs/mbed-client-guide/en/latest/api/annotated.html) for their usage. 
