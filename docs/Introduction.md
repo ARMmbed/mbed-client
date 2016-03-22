@@ -48,7 +48,7 @@ To enable the Blockwise feature, you need to create a `config.json` file in the 
 An example:
 ```
 {
-"coap_max_blockwise_payload_size": 1024,
+"coap_max_blockwise_payload_size": 1024
 }
 ```
 
