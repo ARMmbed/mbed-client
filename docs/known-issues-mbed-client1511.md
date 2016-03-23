@@ -14,12 +14,7 @@ We’re still very actively building mbed Client and the 15.11 release is a tech
 
 #### Important Note for Windows Users
 
-If you are using this release on Microsoft Windows, please be advised that
-because of the way Windows handles filename and paths, you may have problems
-if you attempt to use this in a deep directory hierarchy with a long
-path name (e.g. `c:\some\very\long\path`). If you experience problems
-unpacking or building this release, please try it in a location with a
-shorter path before filing a bug. Thanks.
+If you are using this release on Microsoft Windows, please be advised that because of the way Windows handles filename and paths, you may have problems if you attempt to use this in a deep directory hierarchy with a long path name (e.g. `c:\some\very\long\path`). If you experience problems unpacking or building this release, please try it in a location with a shorter path before filing a bug. Thanks.
 
 ***
 ### mbed Client API may not be fully interoperable with other LWM2M servers.
