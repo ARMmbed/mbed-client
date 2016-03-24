@@ -1564,9 +1564,13 @@ void M2MNsdlInterface::send_notification(uint8_t *token,
             notification_message_ptr->payload_ptr = NULL;
             notification_message_ptr->options_list_ptr->observe_ptr = NULL;
             notification_message_ptr->token_ptr = NULL;
-            free(notification_message_ptr->content_type_ptr);
+            if (notification_message_ptr->content_type_ptr) {
+                free(notification_message_ptr->content_type_ptr);
+            }
             notification_message_ptr->content_type_ptr = NULL;
-            free(notification_message_ptr->options_list_ptr->max_age_ptr);
+            if (notification_message_ptr->options_list_ptr->max_age_ptr) {
+                free(notification_message_ptr->options_list_ptr->max_age_ptr);
+            }
             notification_message_ptr->options_list_ptr->max_age_ptr = NULL;
         }
         sn_nsdl_release_allocated_coap_msg_mem(_nsdl_handle, notification_message_ptr);

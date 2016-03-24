@@ -107,7 +107,10 @@ void Test_M2MObjectInstance::test_create_static_resource()
     M2MResource * res = object->create_static_resource("name","type",M2MResourceInstance::STRING,value,(u_int32_t)sizeof(value),false);
 
     CHECK(res != NULL);
-    CHECK(1 == object->_resource_list.size());
+    res = object->create_static_resource("name2","type",M2MResourceInstance::STRING,value,(u_int32_t)sizeof(value),true);
+
+    CHECK(res != NULL);
+    CHECK(2 == object->_resource_list.size());
 
     res = object->create_static_resource("","type",M2MResourceInstance::STRING,value,(u_int32_t)sizeof(value));
     CHECK(res == NULL);
@@ -214,9 +217,13 @@ void Test_M2MObjectInstance::test_create_dynamic_resource()
     CHECK(res != NULL);
     CHECK(1 == object->_resource_list.size());
 
+    res = object->create_dynamic_resource("multiple","type",M2MResourceInstance::STRING,false,true);
+    CHECK(res != NULL);
+    CHECK(2 == object->_resource_list.size());
+
     M2MResource * res1 = object->create_dynamic_resource("name1","type",M2MResourceInstance::STRING,false,false);
     CHECK(res1 != NULL);
-    CHECK(2 == object->_resource_list.size());
+    CHECK(3 == object->_resource_list.size());
 
     M2MResource * res2 = object->create_dynamic_resource("","type",M2MResourceInstance::STRING,false,false);
     CHECK(res2 == NULL);

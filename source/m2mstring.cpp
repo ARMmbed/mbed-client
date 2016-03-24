@@ -363,99 +363,50 @@ uint32_t itoa_c (int64_t n, char s[])
     return i;
 }
 
-uint8_t* String::convert_integer_to_array(int64_t value, uint8_t &size)
+uint8_t* String::convert_integer_to_array(int64_t value, uint8_t &size, uint8_t *array, uint32_t array_size)
 {
-    uint8_t* buffer;
-    if(value < 255) { // 0xFF
-        buffer = (uint8_t*)malloc(1);
-        *buffer = value;
+    uint8_t* buffer = NULL;
+    size = 0;
+    if (array) {
+        value = String::convert_array_to_integer(array, array_size);
+    }
+
+    if(value < 0xFF) {
         size = 1;
-    } else if(value < 0xFFFF) { // 0xFFFF
-        buffer = (uint8_t*)malloc(2);
-        *buffer++ = value >> 8;
-        *buffer = value;
-        buffer--;
+    } else if(value < 0xFFFF) {
         size = 2;
-    } else if(value < 0xFFFFFF) { // 0xFFFFFF 16777215
-        buffer = (uint8_t*)malloc(3);
-        *buffer++ = value >> 16;
-        *buffer++ = value >> 8;
-        *buffer = value;
-        buffer--;
-        buffer--;
+    } else if(value < 0xFFFFFF) {
         size = 3;
-    } else if(value < 0xFFFFFFFF) { // 4294967295
-        buffer = (uint8_t*)malloc(4);
-        *buffer++ = value >> 24;
-        *buffer++ = value >> 16;
-        *buffer++ = value >> 8;
-        *buffer = value;
-        buffer--;
-        buffer--;
-        buffer--;
+    } else if(value < 0xFFFFFFFF) {
         size = 4;
-    } else if(value < 0xFFFFFFFFFF) { // 1099511627775
-        buffer = (uint8_t*)malloc(5);
-        *buffer++ = value >> 32;
-        *buffer++ = value >> 24;
-        *buffer++ = value >> 16;
-        *buffer++ = value >> 8;
-        *buffer = value;
-        buffer--;
-        buffer--;
-        buffer--;
-        buffer--;
+    } else if(value < 0xFFFFFFFFFF) {
         size = 5;
-    } else if(value < 0xFFFFFFFFFFFF) { // 281474976710655
-        buffer = (uint8_t*)malloc(6);
-        *buffer++ = value >> 40;
-        *buffer++ = value >> 32;
-        *buffer++ = value >> 24;
-        *buffer++ = value >> 16;
-        *buffer++ = value >> 8;
-        *buffer = value;
-        buffer--;
-        buffer--;
-        buffer--;
-        buffer--;
-        buffer--;
+    } else if(value < 0xFFFFFFFFFFFF) {
         size = 6;
-    } else if(value < 0xFFFFFFFFFFFFFF) { // 72057594037927935
-        buffer = (uint8_t*)malloc(7);
-        *buffer++ = value >> 48;
-        *buffer++ = value >> 40;
-        *buffer++ = value >> 32;
-        *buffer++ = value >> 24;
-        *buffer++ = value >> 16;
-        *buffer++ = value >> 8;
-        *buffer = value;
-        buffer--;
-        buffer--;
-        buffer--;
-        buffer--;
-        buffer--;
-        buffer--;
+    } else if(value < 0xFFFFFFFFFFFFFF) {
         size = 7;
     } else {
-        buffer = (uint8_t*)malloc(8);
-        *buffer++ = value >> 56;
-        *buffer++ = value >> 48;
-        *buffer++ = value >> 40;
-        *buffer++ = value >> 32;
-        *buffer++ = value >> 24;
-        *buffer++ = value >> 16;
-        *buffer++ = value >> 8;
-        *buffer = value;
-        buffer--;
-        buffer--;
-        buffer--;
-        buffer--;
-        buffer--;
-        buffer--;
-        buffer--;
         size = 8;
     }
+
+    buffer = (uint8_t*)malloc(size);
+    if (buffer) {
+        for (int i = 0; i < size; i++) {
+            buffer[i] = (value >> ((size - i - 1) * 8));
+        }
+    } else {
+        size = 0;
+    }
     return buffer;
+}
+
+int64_t String::convert_array_to_integer(uint8_t *value, uint32_t size)
+{
+    int64_t temp_64 = 0;
+    for (int i = size - 1; i >= 0; i--) {
+        temp_64 += (uint64_t)(*value++) << i * 8;
+    }
+    return temp_64;
 }
 
 } // namespace
