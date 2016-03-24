@@ -242,7 +242,7 @@ sn_coap_hdr_s* M2MObject::handle_get_request(nsdl_s *nsdl,
                 if (!coap_response->content_type_ptr) {
                     coap_response->content_type_ptr =
                             m2m::String::convert_integer_to_array(coap_content_type,
-                                                                  coap_response->content_type_len);
+                                coap_response->content_type_len);
                     if (coap_response->content_type_ptr) {
                         set_coap_content_type(coap_content_type);
                     }
@@ -296,7 +296,7 @@ sn_coap_hdr_s* M2MObject::handle_get_request(nsdl_s *nsdl,
                                         tr_debug("M2MObject::handle_get_request - Put Resource under Observation");
                                         set_under_observation(true,observation_handler);
                                         add_observation_level(M2MBase::O_Attribute);
-                                        tr_debug("M2MObject::handle_get_request - Observation Number %d", number);
+                                        tr_debug("M2MObject::handle_get_request - Observation Number %d", observation_number());
                                         coap_response->options_list_ptr->observe_ptr =
                                                 m2m::String::convert_integer_to_array(observation_number(),
                                                       coap_response->options_list_ptr->observe_len);
