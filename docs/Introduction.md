@@ -55,6 +55,18 @@ An example:
 Acceptable values for the `coap_max_blockwise_payload_size` flag are:
 0, 16, 32, 64, 128, 256, 512 and 1024. Value 0 means that the feature is not used.
 
+### CoAP Message Deduplication
+Message duplication is disabled by default. More information about deduplication can be found from [CoAP specification.](https://tools.ietf.org/html/rfc7252#page-24)
+To enable message deduplication, you need to create a `config.json` file in the application level.
+
+An example:
+```
+{
+"coap_duplication_max_msgs_count": 1
+}
+```
+Recommended values for the `coap_duplication_max_msgs_count` flag are: 0 to 6, where value 0 means the feature is not used. Using higher value than 6 is not recommend since the memory consumption will also increase.
+
 ## How to use the API
 More information on how to use the API effectively to create and configure Objects, Object Instances and Resources, can be found [here](howto.md).
 
