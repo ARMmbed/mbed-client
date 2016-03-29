@@ -428,7 +428,6 @@ uint8_t M2MNsdlInterface::received_from_server_callback(struct nsdl_s * /*nsdl_h
                 _observer.registration_error(error);
             }
         } else if(coap_header->msg_id == _unregister_id) {
-            _unregister_id = 0;
             tr_debug("M2MNsdlInterface::received_from_server_callback - unregistration callback");
             if(coap_header->msg_code == COAP_MSG_CODE_RESPONSE_DELETED) {
                 _registration_timer->stop_timer();
@@ -442,6 +441,7 @@ uint8_t M2MNsdlInterface::received_from_server_callback(struct nsdl_s * /*nsdl_h
                 M2MInterface::Error error = interface_error(coap_header);
                 _observer.registration_error(error);
             }
+            _unregister_id = 0;
         } else if(coap_header->msg_id == _update_id) {
             _update_id = 0;
 
