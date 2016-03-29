@@ -37,6 +37,23 @@ M2MInterface* interface = M2MInterfaceFactory::create_interface(*this,
                                                   "");
 ```
 
+### Maximum UDP message size
+
+The maximum single UDP message size that mbed Client can receive is 1152 bytes. The actual payload size is 1137 bytes, the header information using the remaining 15 bytes. 
+
+For transferring larger amounts of data, the Blockwise feature must be deployed. When using this feature, mbed Client can handle messages up to 64KB. This feature is disabled by default.
+
+To enable the Blockwise feature, you need to create a `config.json` file in the application level. 
+
+An example:
+```
+{
+"coap_max_blockwise_payload_size": 1024
+}
+```
+
+Acceptable values for the `coap_max_blockwise_payload_size` flag are:
+0, 16, 32, 64, 128, 256, 512 and 1024. Value 0 means that the feature is not used.
 
 ## How to use the API
 More information on how to use the API effectively to create and configure Objects, Object Instances and Resources, can be found [here](howto.md).

@@ -208,7 +208,8 @@ void Test_M2MFirmware::test_set_resource_value_int()
     CHECK(firmware->set_resource_value(M2MFirmware::Package,10) == false);
     CHECK(firmware->set_resource_value(M2MFirmware::State,2) == true);
     CHECK(firmware->set_resource_value(M2MFirmware::State,1) == true);
-    CHECK(firmware->set_resource_value(M2MFirmware::State,3) == false);
+    CHECK(firmware->set_resource_value(M2MFirmware::State,3) == true);
+    CHECK(firmware->set_resource_value(M2MFirmware::State,4) == false);
     CHECK(firmware->set_resource_value(M2MFirmware::State,0) == true);
     CHECK(firmware->set_resource_value(M2MFirmware::UpdateResult,2) == true);
     CHECK(firmware->set_resource_value(M2MFirmware::UpdateResult,20) == false);

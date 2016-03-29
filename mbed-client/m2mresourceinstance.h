@@ -1,4 +1,4 @@
-/*
+    /*
  * Copyright (c) 2015 ARM Limited. All rights reserved.
  * SPDX-License-Identifier: Apache-2.0
  * Licensed under the Apache License, Version 2.0 (the License); you may
@@ -30,6 +30,8 @@ public:
  *  LWM2M resource models can be created based on it.
  */
 typedef FP1<void,void*> execute_callback;
+typedef void(*execute_callback_2) (void *arguments);
+
 class M2MResourceCallback;
 
 class M2MResourceInstance : public M2MBase {
@@ -62,11 +64,15 @@ private: // Constructor and destructor are private
      * \param resource_name The name of the resource.
      * \param resource_type The type of the resource.
      * \param type, The resource data type of the object.
+     * \param object_instance_id Object instance id where resource exists.
+     * \param object_name Object name where resource exists.
      */
     M2MResourceInstance(const String &resource_name,
                         const String &resource_type,
                         M2MResourceInstance::ResourceType type,
-                        M2MObjectInstanceCallback &object_instance_callback);
+                        M2MObjectInstanceCallback &object_instance_callback,
+                        const uint16_t object_instance_id = 0,
+                        const String &object_name = "");
 
     /**
      * \brief A Constructor for creating a resource.
@@ -75,13 +81,18 @@ private: // Constructor and destructor are private
      * \param type The resource data type of the object.
      * \param value The value pointer of the object.
      * \param value_length The length of the value pointer.
+     * \param value_length The length of the value pointer.
+     * \param object_instance_id Object instance id where resource exists.
+     * \param object_name Object name where resource exists.
      */
     M2MResourceInstance(const String &resource_name,
                         const String &resource_type,
                         M2MResourceInstance::ResourceType type,
                         const uint8_t *value,
                         const uint8_t value_length,
-                        M2MObjectInstanceCallback &object_instance_callback);
+                        M2MObjectInstanceCallback &object_instance_callback,
+                        const uint16_t object_instance_id = 0,
+                        const String &object_name = "");
 
     // Prevents the use of default constructor.
     M2MResourceInstance();
@@ -124,6 +135,13 @@ public:
      * \param callback The function pointer that needs to be executed.
      */
     virtual void set_execute_function(execute_callback callback);
+
+    /**
+     * \brief Sets the function that should be executed when this
+     * resource receives a POST command.
+     * \param callback The function pointer that needs to be executed.
+     */
+    virtual void set_execute_function(execute_callback_2 callback);
 
     /**
      * \brief Sets the value of the given resource.
@@ -188,6 +206,18 @@ public:
                                               M2MObservationHandler *observation_handler,
                                               bool &execute_value_updated);
 
+    /**
+     * \brief Returns the object instance id where resource exists.
+     * \return Object instance id.
+    */
+    uint16_t object_instance_id() const;
+
+    /**
+     * \brief Returns the object name where resource exists.
+     * \return Object name.
+    */
+    const String& object_name() const;
+
 protected:
 
     /**
@@ -210,6 +240,9 @@ private:
     uint32_t                                _value_length;
     ResourceType                            _resource_type;
     M2MResourceCallback                     *_resource_callback; // Not owned
+    uint16_t                                _object_instance_id;
+    String                                  _object_name;
+    FP1<void, void*>                        *_function_pointer;
 
     friend class Test_M2MResourceInstance;
     friend class Test_M2MResource;

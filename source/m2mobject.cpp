@@ -20,7 +20,7 @@
 #include "include/m2mtlvdeserializer.h"
 #include "include/nsdllinker.h"
 #include "include/m2mreporthandler.h"
-#include "ns_trace.h"
+#include "mbed-trace/mbed_trace.h"
 
 #define BUFFER_SIZE 10
 
@@ -95,11 +95,12 @@ M2MObjectInstance* M2MObject::create_object_instance(uint16_t instance_id)
     if(!object_instance(instance_id)) {
         instance = new M2MObjectInstance(this->name(),*this);
         if(instance) {
+            instance->add_observation_level(observation_level());
             instance->set_instance_id(instance_id);
-            _instance_list.push_back(instance);
             if(M2MBase::name_id() != -1) {
                 instance->set_coap_content_type(COAP_CONTENT_OMA_TLV_TYPE);
             }
+            _instance_list.push_back(instance);
         }
     }
     return instance;

@@ -736,7 +736,12 @@ void Test_M2MResource::test_handle_post_request()
     *coap_header->token_ptr = 1;
     coap_header->token_len = 1;
 
-    m2mbase_stub::bool_value = false;
+    m2mbase_stub::bool_value = false;    
+    m2mresourceinstance_stub::string_value = name;
+
+    CHECK(resource->handle_post_request(NULL,coap_header,handler,execute_value_updated) != NULL);
+
+    *coap_header->content_type_ptr = 0;
 
     CHECK(resource->handle_post_request(NULL,coap_header,handler,execute_value_updated) != NULL);
 
@@ -814,16 +819,24 @@ void Test_M2MResource::test_execute_params()
 {
     M2MResource::M2MExecuteParameter *params = new M2MResource::M2MExecuteParameter();
     CHECK(params->get_argument_value() == NULL);
-    CHECK( params->get_argument_value_length() == 0);
+    CHECK(params->get_argument_value_length() == 0);
+    CHECK(params->get_argument_object_name() == "");
+    CHECK(params->get_argument_resource_name() == "");
+    CHECK(params->get_argument_object_instance_id() == 0);
 
     uint8_t value[] = {"test"};
     int length = sizeof(value);
     params->_value = (uint8_t*)malloc(length);
     memcpy(params->_value,value,length);
     params->_value_length = length;
-
+    params->_object_name = "object";
+    params->_resource_name = "resource";
+    params->_object_instance_id = 0;
     CHECK(params->_value == params->get_argument_value());
     CHECK(params->_value_length == params->get_argument_value_length());
+    CHECK(params->_resource_name == params->get_argument_resource_name());
+    CHECK(params->_object_name == params->get_argument_object_name());
+    CHECK(params->_object_instance_id == params->get_argument_object_instance_id());
 
     delete params;
 }

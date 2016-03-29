@@ -214,7 +214,7 @@ void Test_M2MObjectInstance::test_create_dynamic_resource()
     CHECK(res != NULL);
     CHECK(1 == object->_resource_list.size());
 
-    M2MResource * res1 = object->create_dynamic_resource("name","type",M2MResourceInstance::STRING,false,false);
+    M2MResource * res1 = object->create_dynamic_resource("name1","type",M2MResourceInstance::STRING,false,false);
     CHECK(res1 != NULL);
     CHECK(2 == object->_resource_list.size());
 

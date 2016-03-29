@@ -53,6 +53,8 @@ private: // Constructor and destructor are private
      * \param type The resource data type of the object.
      * \param value The value pointer of the object.
      * \param value_length The length of the value pointer.
+     * \param object_instance_id Object instance id where resource exists.
+     * \param object_name Object name where resource exists.
      * \param multiple_instance True if the resource supports instances.
      */
     M2MResource(M2MObjectInstanceCallback &object_instance_callback,
@@ -61,17 +63,27 @@ private: // Constructor and destructor are private
                 M2MResourceInstance::ResourceType type,
                 const uint8_t *value,
                 const uint8_t value_length,
+                const uint16_t object_instance_id = 0,
+                const String &object_name = "",
                 bool multiple_instance = false);
 
     /**
      * \brief Constructor
-     * \param name The name of the object.
+     * \param resource_name The resource name of the object.
+     * \param resource_type The resource type of the object.
+     * \param type The resource data type of the object.
+     * \param observable Indicates whether the resource is observable or not.
+     * \param object_instance_id Object instance id where resource exists.
+     * \param object_name Object name where resource exists.
+     * \param multiple_instance True if the resource supports instances.
      */
     M2MResource(M2MObjectInstanceCallback &object_instance_callback,
                 const String &resource_name,
                 const String &resource_type,
                 M2MResourceInstance::ResourceType type,
                 bool observable,
+                const uint16_t object_instance_id = 0,
+                const String &object_name = "",
                 bool multiple_instance = false);
 
     // Prevents the use of default constructor.
@@ -269,12 +281,34 @@ public:
      * \brief Returns the length of the value argument.
      * \return uint8_t The argument value length.
      */
-    uint16_t get_argument_value_length () const;
+    uint16_t get_argument_value_length() const;
+
+    /**
+     * \brief Returns the object name where resource exists.
+     * \return Object name.
+    */
+    const String& get_argument_object_name() const;
+
+    /**
+     * \brief Returns the resource name.
+     * \return Resource name.
+    */
+    const String& get_argument_resource_name() const;
+
+    /**
+     * \brief Returns the object instance id where resource exists.
+     * \return Object instance id.
+    */
+    uint16_t get_argument_object_instance_id() const;
 
 private:
 
-    uint8_t *_value;
-    uint16_t _value_length;
+    uint8_t *   _value;
+    uint16_t    _value_length;
+    String      _object_name;
+    String      _resource_name;
+    uint16_t    _object_instance_id;
+
 
 friend class Test_M2MResource;
 friend class M2MResource;

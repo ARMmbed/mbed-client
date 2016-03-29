@@ -20,7 +20,7 @@
 #include "include/m2mtlvserializer.h"
 #include "include/m2mtlvdeserializer.h"
 #include "include/nsdllinker.h"
-#include "ns_trace.h"
+#include "mbed-trace/mbed_trace.h"
 
 M2MResource& M2MResource::operator=(const M2MResource& other)
 {
@@ -61,9 +61,11 @@ M2MResource::M2MResource(M2MObjectInstanceCallback &object_instance_callback,
                          M2MResourceInstance::ResourceType type,
                          const uint8_t *value,
                          const uint8_t value_length,
+                         const uint16_t object_instance_id,
+                         const String &object_name,
                          bool multiple_instance)
 : M2MResourceInstance(resource_name, resource_type, type, value, value_length,
-                      object_instance_callback),
+                      object_instance_callback, object_instance_id, object_name),
   _has_multiple_instances(multiple_instance),
   _delayed_response(false),
   _delayed_token(NULL),
@@ -79,9 +81,11 @@ M2MResource::M2MResource(M2MObjectInstanceCallback &object_instance_callback,
                          const String &resource_type,
                          M2MResourceInstance::ResourceType type,
                          bool observable,
+                         const uint16_t object_instance_id,
+                         const String &object_name,
                          bool multiple_instance)
 : M2MResourceInstance(resource_name, resource_type, type,
-                      object_instance_callback),
+                      object_instance_callback, object_instance_id, object_name),
   _has_multiple_instances(multiple_instance),
   _delayed_response(false),
   _delayed_token(NULL),
@@ -551,46 +555,63 @@ sn_coap_hdr_s* M2MResource::handle_post_request(nsdl_s *nsdl,
                                                            msg_code);
     // process the POST if we have registered a callback for it
     if(received_coap_header) {
-        if ((operation() & SN_GRS_POST_ALLOWED) != 0) {            
+        if ((operation() & SN_GRS_POST_ALLOWED) != 0) {
             M2MResource::M2MExecuteParameter *exec_params = NULL;
+            uint16_t coap_content_type = 0;
             if(received_coap_header->payload_ptr) {
-                exec_params = new M2MResource::M2MExecuteParameter();
-                if (exec_params){
-                    exec_params->_value = (uint8_t*)malloc(received_coap_header->payload_len);
-                    if (exec_params->_value) {
-                        memset(exec_params->_value, 0, received_coap_header->payload_len);
-                        memcpy(exec_params->_value,
-                            received_coap_header->payload_ptr,
-                            received_coap_header->payload_len);
-                        exec_params->_value_length = received_coap_header->payload_len;
+                if(received_coap_header->content_type_ptr) {
+                    for(uint8_t i = 0; i < received_coap_header->content_type_len; i++) {
+                        coap_content_type = (coap_content_type << 8) + (received_coap_header->content_type_ptr[i] & 0xFF);
                     }
+                }
+                if(coap_content_type == 0) {
+                    exec_params = new M2MResource::M2MExecuteParameter();
+                    if (exec_params){
+                        exec_params->_value = (uint8_t*)malloc(received_coap_header->payload_len+1);
+                        if (exec_params->_value) {
+                            memset(exec_params->_value, 0, received_coap_header->payload_len+1);
+                            memcpy(exec_params->_value,
+                                received_coap_header->payload_ptr,
+                                received_coap_header->payload_len);
+                            exec_params->_value_length = received_coap_header->payload_len;
+                        }
+                        exec_params->_object_name = object_name();
+                        exec_params->_resource_name = name();
+                        exec_params->_object_instance_id = object_instance_id();
+                    }
+                } else {
+                    msg_code = COAP_MSG_CODE_RESPONSE_UNSUPPORTED_CONTENT_FORMAT;
                 }
             }
-            tr_debug("M2MResource::handle_post_request - Execute resource function");
-            execute(exec_params);
-            delete exec_params;
-
-            if(_delayed_response) {
-                coap_response->msg_type = COAP_MSG_TYPE_ACKNOWLEDGEMENT;
-                coap_response->msg_code = COAP_MSG_CODE_EMPTY;
-                coap_response->msg_id = received_coap_header->msg_id;
-                if(received_coap_header->token_len) {
-                    if(_delayed_token) {
-                     free(_delayed_token);
-                     _delayed_token = NULL;
-                     _delayed_token_len = 0;
-                    }
-                    _delayed_token = (uint8_t*)malloc(received_coap_header->token_len);
-                    if(_delayed_token) {
-                        memset(_delayed_token,0,received_coap_header->token_len);
-                        _delayed_token_len = received_coap_header->token_len;
-                        memcpy(_delayed_token, received_coap_header->token_ptr, _delayed_token_len);
-                    }
+            if(COAP_MSG_CODE_RESPONSE_CHANGED == msg_code) {
+                tr_debug("M2MResource::handle_post_request - Execute resource function");
+                execute(exec_params);
+                if(exec_params) {
+                    delete exec_params;
                 }
-            } else {
-                uint32_t length = 0;
-                get_value(coap_response->payload_ptr, length);
-                coap_response->payload_len = length;
+
+                if(_delayed_response) {
+                    coap_response->msg_type = COAP_MSG_TYPE_ACKNOWLEDGEMENT;
+                    coap_response->msg_code = COAP_MSG_CODE_EMPTY;
+                    coap_response->msg_id = received_coap_header->msg_id;
+                    if(received_coap_header->token_len) {
+                        if(_delayed_token) {
+                         free(_delayed_token);
+                         _delayed_token = NULL;
+                         _delayed_token_len = 0;
+                        }
+                        _delayed_token = (uint8_t*)malloc(received_coap_header->token_len);
+                        if(_delayed_token) {
+                            memset(_delayed_token,0,received_coap_header->token_len);
+                            _delayed_token_len = received_coap_header->token_len;
+                            memcpy(_delayed_token, received_coap_header->token_ptr, _delayed_token_len);
+                        }
+                    }
+                } else {
+                    uint32_t length = 0;
+                    get_value(coap_response->payload_ptr, length);
+                    coap_response->payload_len = length;
+                }
             }
         } else { // if ((object->operation() & SN_GRS_POST_ALLOWED) != 0)
             tr_error("M2MResource::handle_post_request - COAP_MSG_CODE_RESPONSE_METHOD_NOT_ALLOWED");
@@ -619,6 +640,9 @@ M2MResource::M2MExecuteParameter::M2MExecuteParameter()
 {
     _value = NULL;
     _value_length = 0;
+    _object_name = "";
+    _resource_name = "";
+    _object_instance_id = 0;
 }
 
 M2MResource::M2MExecuteParameter::~M2MExecuteParameter()
@@ -638,3 +662,17 @@ uint16_t M2MResource::M2MExecuteParameter::get_argument_value_length() const
     return _value_length;
 }
 
+const String& M2MResource::M2MExecuteParameter::get_argument_object_name() const
+{
+    return _object_name;
+}
+
+const String& M2MResource::M2MExecuteParameter::get_argument_resource_name() const
+{
+    return _resource_name;
+}
+
+uint16_t M2MResource::M2MExecuteParameter::get_argument_object_instance_id() const
+{
+    return _object_instance_id;
+}
