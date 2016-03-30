@@ -236,6 +236,26 @@ String& String::append( const char* str, size_type n) {
     return *this;
 }
 
+String& String::append_raw( const char* str, size_type n) {
+    if (str && n > 0) {
+        size_t newlen = size_ + n;
+        this->reserve( newlen );
+        memmove(p+size_, str, n); // p and s.p MAY overlap
+        p[newlen] = 0; // add NUL termination
+        size_ = newlen;
+    }
+    return *this;
+}
+
+void String::append_int(int param) {
+
+    // max len of "-9223372036854775808" plus zero termination
+    char conv_buff[20+1];
+
+    int len = itoa_c(param, conv_buff);
+    append_raw(conv_buff, len);
+}
+
 int String::compare( size_type pos, size_type len, const String& str ) const {
     int r = -1;
     if (pos <= size_) {

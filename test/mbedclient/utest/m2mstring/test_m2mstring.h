@@ -45,6 +45,8 @@ public:
     void test_at();
     void test_erase();
     void test_append();
+    void test_append_raw();
+    void test_append_int();
     void test_compare();
     void test_find_last_of();
     void test_operator_lt();
