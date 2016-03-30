@@ -1,0 +1,3 @@
+   text	   data	    bss	    dec	    hex	filename
+   3125	     24	      0	   3149	    c4d	minar.cpp.o (ex ./build/frdm-k64f-armcc/ym/minar/source/minar.ar)
+   3125	     24	      0	   3149	    c4d	(TOTALS)

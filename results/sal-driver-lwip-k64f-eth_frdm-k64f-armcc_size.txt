@@ -1,0 +1,5 @@
+   text	   data	    bss	    dec	    hex	filename
+   1094	      4	      0	   1098	    44a	fsl_enet_driver.c.o (ex ./build/frdm-k64f-armcc/ym/sal-driver-lwip-k64f-eth/source/sal-driver-lwip-k64f-eth.ar)
+    290	      0	      0	    290	    122	hardware_init_MK64F12.c.o (ex ./build/frdm-k64f-armcc/ym/sal-driver-lwip-k64f-eth/source/sal-driver-lwip-k64f-eth.ar)
+   1799	     64	    196	   2059	    80b	k64f_emac.c.o (ex ./build/frdm-k64f-armcc/ym/sal-driver-lwip-k64f-eth/source/sal-driver-lwip-k64f-eth.ar)
+   3183	     68	    196	   3447	    d77	(TOTALS)

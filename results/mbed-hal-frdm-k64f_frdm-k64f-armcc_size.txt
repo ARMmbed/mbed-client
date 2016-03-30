@@ -1,0 +1,5 @@
+   text	   data	    bss	    dec	    hex	filename
+    104	      0	      0	    104	     68	mbed_overrides.c.o (ex ./build/frdm-k64f-armcc/ym/mbed-hal-frdm-k64f/source/mbed-hal-frdm-k64f.ar)
+      2	      0	      0	      2	      2	init_api.c.o (ex ./build/frdm-k64f-armcc/ym/mbed-hal-frdm-k64f/source/mbed-hal-frdm-k64f.ar)
+   1628	      0	      0	   1628	    65c	PeripheralPins.c.o (ex ./build/frdm-k64f-armcc/ym/mbed-hal-frdm-k64f/source/mbed-hal-frdm-k64f.ar)
+   1734	      0	      0	   1734	    6c6	(TOTALS)
