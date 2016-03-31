@@ -5,7 +5,7 @@ mbed Client is an OS-agnostic embedded software library that provides the means 
  
 ## Release summary
  
-This is an iterative release of mbed Client, which is available for mbed OS as well as for Ubuntu-like Linux distributions. We’re continuously maturing mbed Client and adding new features to mbed Client.. This release builds on the Technology Preview 15.11 release through the introduction of new APIs, enhanced functionalities and bug fixes.
+This is an iterative release of mbed Client, which is available for mbed OS as well as for Ubuntu-like Linux distributions. We’re continuously maturing mbed Client and adding new features to mbed Client. This release builds on the Technology Preview 15.11 release through the introduction of new APIs, enhanced functionalities and bug fixes.
 ## Collaboration
 We’re building mbed Client as a collaborative project, bringing together industry and open source community contributions. If you’d like to work on mbed Client with us, we’d encourage you [to pitch in](https://github.com/ARMmbed/mbed-os/blob/master/CONTRIBUTING.md). With this technology preview we’re ready to start receiving contributions back from the community.
 ## Documentation
@@ -69,7 +69,7 @@ mbed Client as a standalone distribution for Ubuntu-like Linux distributions:
  
 ### Known issues
  
-The known issues list for this release is available as [a separate document](Known_Issues.md)
+The known issues list for this release is available as [a separate document](https://github.com/ARMmbed/mbed-client/blob/master/docs/mbed_Client_Known_Issues_16_03.md)
 
 ### Other ways of accessing this release
 
