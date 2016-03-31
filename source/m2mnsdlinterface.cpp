@@ -428,7 +428,6 @@ uint8_t M2MNsdlInterface::received_from_server_callback(struct nsdl_s * /*nsdl_h
                 _observer.registration_error(error);
             }
         } else if(coap_header->msg_id == _unregister_id) {
-            _unregister_id = 0;
             tr_debug("M2MNsdlInterface::received_from_server_callback - unregistration callback");
             if(coap_header->msg_code == COAP_MSG_CODE_RESPONSE_DELETED) {
                 _registration_timer->stop_timer();
@@ -442,6 +441,7 @@ uint8_t M2MNsdlInterface::received_from_server_callback(struct nsdl_s * /*nsdl_h
                 M2MInterface::Error error = interface_error(coap_header);
                 _observer.registration_error(error);
             }
+            _unregister_id = 0;
         } else if(coap_header->msg_id == _update_id) {
             _update_id = 0;
 
@@ -1564,9 +1564,13 @@ void M2MNsdlInterface::send_notification(uint8_t *token,
             notification_message_ptr->payload_ptr = NULL;
             notification_message_ptr->options_list_ptr->observe_ptr = NULL;
             notification_message_ptr->token_ptr = NULL;
-            free(notification_message_ptr->content_type_ptr);
+            if (notification_message_ptr->content_type_ptr) {
+                free(notification_message_ptr->content_type_ptr);
+            }
             notification_message_ptr->content_type_ptr = NULL;
-            free(notification_message_ptr->options_list_ptr->max_age_ptr);
+            if (notification_message_ptr->options_list_ptr->max_age_ptr) {
+                free(notification_message_ptr->options_list_ptr->max_age_ptr);
+            }
             notification_message_ptr->options_list_ptr->max_age_ptr = NULL;
         }
         sn_nsdl_release_allocated_coap_msg_mem(_nsdl_handle, notification_message_ptr);

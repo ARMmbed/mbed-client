@@ -228,10 +228,10 @@ bool M2MReportHandler::set_notification_attribute(char* option,
     memset(&value, 0, 20);
 
     char* pos = strstr(option, EQUAL.c_str());
-    if( pos != NULL ){
+    if( pos != NULL ){        
         memcpy(attribute, option, (size_t)(pos-option));
         pos++;
-        memcpy(value, pos, 20);
+        memcpy(value, pos, strlen(pos));
     }else{
         memcpy(attribute, option, (size_t)strlen(option) + 1);
     }
