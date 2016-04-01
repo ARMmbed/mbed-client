@@ -400,6 +400,14 @@ protected:
     virtual void memory_free(void *ptr);
 
     /**
+     * \brief Allocate (size + 1) amount of memory, copy size bytes into
+     * it and add zero termination.
+     * \param source Source string to copy, may not be NULL.
+     * \param size The size of memory to be reserved.
+    */
+    virtual uint8_t* alloc_string_copy(const uint8_t* source, uint16_t size);
+
+    /**
      * \brief Returns the Report Handler object.
      * \return M2MReportHandler object.
     */

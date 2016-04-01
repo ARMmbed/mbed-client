@@ -28,6 +28,8 @@
 #include "source/libNsdl/src/include/sn_grs.h"
 #include "mbed-client/m2mtimer.h"
 
+#include <assert.h>
+
 #define BUFFER_SIZE 21
 
 M2MNsdlInterface::M2MNsdlInterface(M2MNsdlObserver &observer)
@@ -163,24 +165,28 @@ void M2MNsdlInterface::create_endpoint(const String &name,
 
         // If lifetime is less than zero then leave the field empty
         if( life_time > 0) {
-            char *buffer = (char*)memory_alloc(BUFFER_SIZE);
-            if(buffer) {
-                uint32_t size = m2m::itoa_c(life_time, buffer);
-                if (size <= BUFFER_SIZE) {
-                    if( _endpoint->lifetime_ptr == NULL ){
-                        _endpoint->lifetime_ptr = (uint8_t*)memory_alloc(size+1);
-                    }
-                    if(_endpoint->lifetime_ptr) {
-                        memset(_endpoint->lifetime_ptr, 0, size+1);
-                        memcpy(_endpoint->lifetime_ptr,buffer,size);
-                        _endpoint->lifetime_len =  size;
-                    }
-                }
-                memory_free(buffer);
-            }
+            set_endpoint_lifetime_buffer(life_time);
         }
     }
 }
+
+void M2MNsdlInterface::set_endpoint_lifetime_buffer(int lifetime)
+{
+    // max len of "-9223372036854775808" plus zero termination
+    char buffer[20+1];
+    
+    uint32_t size = m2m::itoa_c(lifetime, buffer);
+
+    if (size <= sizeof(buffer)) {
+        _endpoint->lifetime_ptr = alloc_string_copy((uint8_t*)buffer, size);
+        if(_endpoint->lifetime_ptr) {
+            _endpoint->lifetime_len =  size;
+        } else {
+            _endpoint->lifetime_len = 0;
+        }
+    }
+}
+
 
 void M2MNsdlInterface::delete_endpoint()
 {
@@ -271,39 +277,24 @@ bool M2MNsdlInterface::send_update_registration(const uint32_t lifetime)
     create_nsdl_list_structure(_object_list);
     //If Lifetime value is 0, then don't change the existing lifetime value
     if(lifetime != 0) {
-        char *buffer = (char*)memory_alloc(BUFFER_SIZE);
-        if (buffer) {
-            uint32_t size = m2m::itoa_c(lifetime, buffer);
-            if (size <= BUFFER_SIZE) {
-                if(_endpoint->lifetime_ptr) {
-                    memory_free(_endpoint->lifetime_ptr);
-                    _endpoint->lifetime_ptr = NULL;
-                    _endpoint->lifetime_len = 0;
-                }
-
-                if(_endpoint->lifetime_ptr == NULL){
-                    _endpoint->lifetime_ptr = (uint8_t*)memory_alloc(size+1);
-                }
-                if(_endpoint->lifetime_ptr) {
-                    memset(_endpoint->lifetime_ptr, 0, size+1);
-                    memcpy(_endpoint->lifetime_ptr,buffer,size);
-                    _endpoint->lifetime_len =  size;
-                }
-
-                _registration_timer->stop_timer();
-                _registration_timer->start_timer(registration_time() * 1000,
-                                                 M2MTimerObserver::Registration,
-                                                 false);
-                if(_nsdl_handle &&
-                   _endpoint && _endpoint->lifetime_ptr) {
-                    _update_id = sn_nsdl_update_registration(_nsdl_handle,
-                                                             _endpoint->lifetime_ptr,
-                                                             _endpoint->lifetime_len);
-                    tr_debug("M2MNsdlInterface::send_update_registration - New lifetime value _update_id %d", _update_id);
-                    success = _update_id != 0;
-                }
-            }
-            memory_free(buffer);
+        if(_endpoint->lifetime_ptr) {
+            memory_free(_endpoint->lifetime_ptr);
+            _endpoint->lifetime_ptr = NULL;
+            _endpoint->lifetime_len = 0;
+        }
+        set_endpoint_lifetime_buffer(lifetime);
+        
+        _registration_timer->stop_timer();
+        _registration_timer->start_timer(registration_time() * 1000,
+                                         M2MTimerObserver::Registration,
+                                         false);
+        if(_nsdl_handle &&
+           _endpoint && _endpoint->lifetime_ptr) {
+            _update_id = sn_nsdl_update_registration(_nsdl_handle,
+                                                     _endpoint->lifetime_ptr,
+                                                     _endpoint->lifetime_len);
+            tr_debug("M2MNsdlInterface::send_update_registration - New lifetime value _update_id %d", _update_id);
+            success = _update_id != 0;
         }
     } else {
         if(_nsdl_handle) {
@@ -328,6 +319,7 @@ bool M2MNsdlInterface::send_unregister_message()
     return success;
 }
 
+// XXX: move these to common place, no need to copy these wrappers to multiple places:
 void *M2MNsdlInterface::memory_alloc(uint16_t size)
 {
     if(size)
@@ -340,6 +332,18 @@ void M2MNsdlInterface::memory_free(void *ptr)
 {
     if(ptr)
         free(ptr);
+}
+
+uint8_t* M2MNsdlInterface::alloc_string_copy(const uint8_t* source, uint16_t size)
+{
+    assert(source != NULL);
+
+    uint8_t* result = (uint8_t*)memory_alloc(size + 1);
+    if (result) {
+        memcpy(result, source, size);
+        result[size] = '\0';
+    }
+    return result;
 }
 
 uint8_t M2MNsdlInterface::send_to_server_callback(struct nsdl_s * /*nsdl_handle*/,
@@ -388,28 +392,14 @@ uint8_t M2MNsdlInterface::received_from_server_callback(struct nsdl_s * /*nsdl_h
                             }
                         // If lifetime is less than zero then leave the field empty
                         if( max_time > 0) {
-                            char *buffer = (char*)memory_alloc(BUFFER_SIZE);
-                            if(buffer) {
-                                uint32_t size = m2m::itoa_c(max_time, buffer);
-                                if (size <= BUFFER_SIZE) {
-                                    _endpoint->lifetime_ptr = (uint8_t*)memory_alloc(size+1);
-                                    if(_endpoint->lifetime_ptr) {
-                                        memset(_endpoint->lifetime_ptr, 0, size+1);
-                                        memcpy(_endpoint->lifetime_ptr,buffer,size);
-                                        _endpoint->lifetime_len =  size;
-                                    }
-                                }
-                                memory_free(buffer);
-                            }
+                            set_endpoint_lifetime_buffer(max_time);
                         }
                     }
                     if(coap_header->options_list_ptr->location_path_ptr) {
-                        _endpoint->location_ptr = (uint8_t*)memory_alloc(coap_header->options_list_ptr->location_path_len+1);
-                        memset(_endpoint->location_ptr,0,coap_header->options_list_ptr->location_path_len+1);
-                        memcpy(_endpoint->location_ptr,
-                               coap_header->options_list_ptr->location_path_ptr,
-                               coap_header->options_list_ptr->location_path_len);
-                        _endpoint->location_len = coap_header->options_list_ptr->location_path_len ;
+                        _endpoint->location_ptr = alloc_string_copy(coap_header->options_list_ptr->location_path_ptr, coap_header->options_list_ptr->location_path_len);
+                        if (_endpoint->location_ptr != NULL) {
+                            _endpoint->location_len = coap_header->options_list_ptr->location_path_len;
+                        }
                         sn_nsdl_set_endpoint_location(_nsdl_handle,_endpoint->location_ptr,_endpoint->location_len);
                     }
                 }
@@ -1036,35 +1026,25 @@ bool M2MNsdlInterface::create_nsdl_resource(M2MBase *base, const String &name, b
                 _resource->path = NULL;
             }
             if(name.length() > 0 ){
-                _resource->path = ((uint8_t*)memory_alloc(name.length()+1));
+                _resource->path = alloc_string_copy((uint8_t*)name.c_str(), name.length());
                 if(_resource->path) {
-                    memset(_resource->path, 0, name.length()+1);
-                    memcpy(_resource->path, (uint8_t*)name.c_str(), name.length());
                     _resource->pathlen = name.length();
                 }
             }
             if(!base->resource_type().empty() && _resource->resource_parameters_ptr) {
                 _resource->resource_parameters_ptr->resource_type_ptr =
-                       ((uint8_t*)memory_alloc(base->resource_type().length()+1));
-                if(_resource->resource_parameters_ptr->resource_type_ptr) {
-                    memset(_resource->resource_parameters_ptr->resource_type_ptr,
-                          0, base->resource_type().length()+1);
-                    memcpy(_resource->resource_parameters_ptr->resource_type_ptr,
-                          (uint8_t*)base->resource_type().c_str(),
+                    alloc_string_copy((uint8_t*)base->resource_type().c_str(),
                           base->resource_type().length());
+                if(_resource->resource_parameters_ptr->resource_type_ptr) {
                     _resource->resource_parameters_ptr->resource_type_len =
                            base->resource_type().length();
                 }
             }
             if(!base->interface_description().empty() && _resource->resource_parameters_ptr) {
                 _resource->resource_parameters_ptr->interface_description_ptr =
-                       ((uint8_t*)memory_alloc(base->interface_description().length()+1));
-                if(_resource->resource_parameters_ptr->interface_description_ptr) {
-                    memset(_resource->resource_parameters_ptr->interface_description_ptr,
-                          0, base->interface_description().length()+1);
-                    memcpy(_resource->resource_parameters_ptr->interface_description_ptr,
-                          (uint8_t*)base->interface_description().c_str(),
+                    alloc_string_copy((uint8_t*)base->interface_description().c_str(),
                           base->interface_description().length());
+                if(_resource->resource_parameters_ptr->interface_description_ptr) {
                     _resource->resource_parameters_ptr->interface_description_len =
                            base->interface_description().length();
                  }

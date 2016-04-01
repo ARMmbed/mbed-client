@@ -225,6 +225,11 @@ void M2MBase::memory_free(void *)
 {
 }
 
+uint8_t* M2MBase::alloc_string_copy(const uint8_t* source, uint16_t size)
+{
+    return (uint8_t*)m2mbase_stub::void_value;
+}
+
 M2MReportHandler* M2MBase::report_handler()
 {
     return m2mbase_stub::report;
