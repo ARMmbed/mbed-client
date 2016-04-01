@@ -25,7 +25,7 @@ class Handler : public M2MObservationHandler {
 
 public:
 
-    Handler(){}
+    Handler() : visited(false) {}
     ~Handler(){}
     void observation_to_be_sent(M2MBase *, uint16_t, m2m::Vector<uint16_t>, bool){
         visited = true;
@@ -226,6 +226,8 @@ void Test_M2MBase::test_set_under_observation()
 {
     Handler handler;
 
+    this->_base_type = M2MBase::ObjectInstance;
+
     bool test = true;
     set_under_observation(test,NULL);
     set_under_observation(test,&handler);
@@ -425,6 +427,8 @@ void Test_M2MBase::test_observation_to_be_sent()
     observation_to_be_sent(list);
     CHECK(handler.visited == false);
 
+    this->_base_type = M2MBase::ObjectInstance;
+
     bool test = true;
     set_under_observation(test,&handler);
 
@@ -436,6 +440,8 @@ void Test_M2MBase::test_observation_to_be_sent()
 void Test_M2MBase::test_remove_resource_from_coap()
 {
     Handler handler;
+
+    this->_base_type = M2MBase::ObjectInstance;
 
     const String s = "test";
     remove_resource_from_coap(s);
@@ -451,6 +457,8 @@ void Test_M2MBase::test_remove_resource_from_coap()
 void Test_M2MBase::test_remove_object_from_coap()
 {
     Handler handler;
+
+    this->_base_type = M2MBase::ObjectInstance;
 
     remove_object_from_coap();
     CHECK(handler.visited == false);
