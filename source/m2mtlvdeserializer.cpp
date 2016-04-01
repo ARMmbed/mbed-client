@@ -190,15 +190,11 @@ M2MTLVDeserializer::Error M2MTLVDeserializer::deserialize_resources(uint8_t *tlv
         if(!found) {
             if(M2MTLVDeserializer::Post == operation) {
                 //Create a new Resource
-                char *buffer = (char*)malloc(BUFFER_SIZE);
-                if(buffer) {
-                    snprintf(buffer, BUFFER_SIZE, "%d",til->_id);
-                    String id(buffer);
-                    M2MResource *resource = object_instance.create_dynamic_resource(id,"",M2MResourceInstance::INTEGER,true,false);
-                    if(resource) {
-                        resource->set_operation(M2MBase::GET_PUT_POST_DELETE_ALLOWED);
-                    }
-                    free(buffer);
+                String id;
+                id.append_int(til->_id);
+                M2MResource *resource = object_instance.create_dynamic_resource(id,"",M2MResourceInstance::INTEGER,true,false);
+                if(resource) {
+                    resource->set_operation(M2MBase::GET_PUT_POST_DELETE_ALLOWED);
                 }
             } else if(M2MTLVDeserializer::Put == operation) {
                 error = M2MTLVDeserializer::NotFound;

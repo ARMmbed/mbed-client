@@ -216,9 +216,9 @@ bool M2MObjectInstance::remove_resource(const String &resource_name)
                     uint32_t size = m2m::itoa_c(instance_id(), obj_inst_id);
                     if (size <= BUFFER_SIZE) {
                         String obj_name = name();
-                        obj_name += String("/");
+                        obj_name.push_back('/');
                         obj_name += String(obj_inst_id);
-                        obj_name += String("/");
+                        obj_name.push_back('/');
                         obj_name += (*it)->name();
                         remove_resource_from_coap(obj_name);
                         delete res;
@@ -248,40 +248,28 @@ bool M2MObjectInstance::remove_resource_instance(const String &resource_name,
         it = list.begin();
         for ( ; it != list.end(); it++) {
             if((*it)->instance_id() == inst_id) {
-                char *obj_inst_id = (char*)malloc(BUFFER_SIZE);
-                if(obj_inst_id) {
-                    snprintf(obj_inst_id, BUFFER_SIZE,"%d",instance_id());
 
-                    String obj_name = name();
-                    obj_name += String("/");
-                    obj_name += String(obj_inst_id);
-                    obj_name += String("/");
-                    obj_name += resource_name;
+                String obj_name = name();
+                obj_name.push_back('/');
+                obj_name.append_int(instance_id());
+                obj_name.push_back('/');
+                obj_name += resource_name;
 
-                    free(obj_inst_id);
+                obj_name.push_back('/');
+                obj_name.append_int(inst_id);
 
-                    char *res_inst_id = (char*)malloc(BUFFER_SIZE);
-                    if(res_inst_id) {
-                        snprintf(res_inst_id, BUFFER_SIZE,"%d",inst_id);
-                        obj_name += String("/");
-                        obj_name += String(res_inst_id);
-
-                        free(res_inst_id);
-
-                        remove_resource_from_coap(obj_name);
-                        success = res->remove_resource_instance(inst_id);
-                        if(res->resource_instance_count() == 0) {
-                            M2MResourceList::const_iterator itr;
-                            itr = _resource_list.begin();
-                            int pos = 0;
-                            for ( ; itr != _resource_list.end(); itr++, pos++ ) {
-                                if(((*itr)->name() == resource_name)) {
-                                    delete res;
-                                    res = NULL;
-                                    _resource_list.erase(pos);
-                                    break;
-                                }
-                            }
+                remove_resource_from_coap(obj_name);
+                success = res->remove_resource_instance(inst_id);
+                if(res->resource_instance_count() == 0) {
+                    M2MResourceList::const_iterator itr;
+                    itr = _resource_list.begin();
+                    int pos = 0;
+                    for ( ; itr != _resource_list.end(); itr++, pos++ ) {
+                        if(((*itr)->name() == resource_name)) {
+                            delete res;
+                            res = NULL;
+                            _resource_list.erase(pos);
+                            break;
                         }
                     }
                 }
@@ -680,16 +668,11 @@ sn_coap_hdr_s* M2MObjectInstance::handle_post_request(nsdl_s *nsdl,
                             if (coap_response->options_list_ptr) {
                                 memset(coap_response->options_list_ptr, 0, sizeof(sn_coap_options_list_s));
 
-                                resource_id = (char*)malloc(BUFFER_SIZE);
-                                obj_inst_id = (char*)malloc(BUFFER_SIZE);
-                                snprintf(resource_id, BUFFER_SIZE, "%d",instance_id);
-                                snprintf(obj_inst_id, BUFFER_SIZE, "%d",M2MBase::instance_id());
-
                                 obj_name += M2MBase::name();
                                 obj_name += "/";
-                                obj_name += obj_inst_id;
+                                obj_name.append_int(M2MBase::instance_id());
                                 obj_name += "/";
-                                obj_name += resource_id;
+                                obj_name.append_int(instance_id);
 
                                 coap_response->options_list_ptr->location_path_len = obj_name.length();
                                 if (coap_response->options_list_ptr->location_path_len != 0) {
@@ -701,9 +684,6 @@ sn_coap_hdr_s* M2MObjectInstance::handle_post_request(nsdl_s *nsdl,
                                                coap_response->options_list_ptr->location_path_len);
                                     }
                                 }
-
-                                free(obj_inst_id);
-                                free(resource_id);
                             }
                             msg_code = COAP_MSG_CODE_RESPONSE_CREATED;
                             break;

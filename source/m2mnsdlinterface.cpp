@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+#include "mbed-client/m2mstring.h"
 #include "include/nsdlaccesshelper.h"
 #include "include/m2mnsdlobserver.h"
 #include "mbed-client/m2msecurity.h"
@@ -641,39 +642,31 @@ void M2MNsdlInterface::bootstrap_done_callback(sn_nsdl_oma_server_info_t *server
     if(server_info && server_info->omalw_address_ptr->addr_ptr) {
         security = new M2MSecurity(M2MSecurity::M2MServer);
         uint16_t port = server_info->omalw_address_ptr->port;
-        char *buffer = (char*)memory_alloc(BUFFER_SIZE);
-        snprintf(buffer, BUFFER_SIZE,"%d",port);
+
+        String server_port;
+        server_port.append_int(port);
+
         String server_uri(COAP);
         String server_address;
         //TODO: currently only supports IPV4 Mapping, fix to support IPV6 as well
         if(SN_NSDL_ADDRESS_TYPE_IPV4 == server_info->omalw_address_ptr->type) {
             int val = 0;
             for(int index = 0; index < server_info->omalw_address_ptr->addr_len; index++) {
-                char *server_buffer = (char*)memory_alloc(BUFFER_SIZE);
                 val = (int)server_info->omalw_address_ptr->addr_ptr[index];
-                snprintf(server_buffer, BUFFER_SIZE,"%d",val);
-                server_address +=String(server_buffer);
 
-                memory_free(server_buffer);
+                server_address.append_int(val);
 
                 if(index < server_info->omalw_address_ptr->addr_len-1) {
-                    server_address += String(".");
+                    server_address.push_back('.');
                 }
             }
 
             tr_debug("M2MNsdlInterface::bootstrap_done_callback - IPv4 Server address received %s", server_address.c_str());
         } else if(SN_NSDL_ADDRESS_TYPE_HOSTNAME == server_info->omalw_address_ptr->type) {
-            char *hostname = (char*)memory_alloc(server_info->omalw_address_ptr->addr_len);
-            if(hostname) {
-                memset(hostname, 0, server_info->omalw_address_ptr->addr_len);
-                memcpy(hostname,
-                       server_info->omalw_address_ptr->addr_ptr,
-                       server_info->omalw_address_ptr->addr_len);
-                server_address += String(hostname);
-                memory_free(hostname);
-                hostname = NULL;
-                tr_debug("M2MNsdlInterface::bootstrap_done_callback - Hostname Server address received %s", server_address.c_str());
-            }
+
+            server_address.append_raw((char*)server_info->omalw_address_ptr->addr_ptr, server_info->omalw_address_ptr->addr_len);
+            tr_debug("M2MNsdlInterface::bootstrap_done_callback - Hostname Server address received %s", server_address.c_str());
+
         } else if(SN_NSDL_ADDRESS_TYPE_IPV6 == server_info->omalw_address_ptr->type) {
             char ipv6_address[40];
             ip6tos(server_info->omalw_address_ptr->addr_ptr, ipv6_address);
@@ -682,10 +675,9 @@ void M2MNsdlInterface::bootstrap_done_callback(sn_nsdl_oma_server_info_t *server
         }
 
         server_uri += server_address;
-        server_uri +=String(":");
-        server_uri += String(buffer);
+        server_uri.push_back(':');
+        server_uri += server_port;
 
-        memory_free(buffer);
         security->set_resource_value(M2MSecurity::M2MServerUri, server_uri);
         security->set_resource_value(M2MSecurity::BootstrapServer, 0);
 
@@ -913,15 +905,10 @@ bool M2MNsdlInterface::create_nsdl_object_instance_structure(M2MObjectInstance *
     bool success = false;
     if( object_instance) {
 
-        char *inst_id = (char*)malloc(BUFFER_SIZE);
-        snprintf(inst_id, BUFFER_SIZE,"%d",object_instance->instance_id());
-
         // Append object instance id to the object name.
         String object_name = object_instance->name();
-        object_name += String("/");
-        object_name += String(inst_id);
-        free(inst_id);
-
+        object_name.push_back('/');
+        object_name.append_int(object_instance->instance_id());
 
         //object_instance->set_under_observation(false,this);
 
@@ -955,7 +942,7 @@ bool M2MNsdlInterface::create_nsdl_resource_structure(M2MResource *res,
         // resource name like "object/0/+ resource + / + 0"
         String res_name = object_name;
         if (strcmp(res_name.c_str(), res->uri_path().c_str()) != 0) {
-            res_name+= String("/");
+            res_name.push_back('/');
             res_name.append(res->name().c_str(),res->name().length());
         }
 
@@ -971,12 +958,8 @@ bool M2MNsdlInterface::create_nsdl_resource_structure(M2MResource *res,
                 for ( ; it != res_list.end(); it++ ) {
                     String inst_name = res_name;
                     // Create NSDL structure for all resources inside
-                    char *inst_id = (char*)memory_alloc(BUFFER_SIZE);
-                    snprintf(inst_id, BUFFER_SIZE,"%d",(*it)->instance_id());
-                    inst_name+= String("/") ;
-                    inst_name+= String(inst_id);
-
-                    memory_free(inst_id);
+                    inst_name.push_back('/');
+                    inst_name.append_int((*it)->instance_id());
 
                     success = create_nsdl_resource((*it),inst_name,(*it)->register_uri());
                 }
@@ -1186,15 +1169,10 @@ M2MBase* M2MNsdlInterface::find_resource(const M2MObject *object,
             M2MObjectInstanceList::const_iterator it;
             it = list.begin();
             for ( ; it != list.end(); it++ ) {
-                char *inst_id = (char*)memory_alloc(BUFFER_SIZE);
-                snprintf(inst_id, BUFFER_SIZE,"%d",(*it)->instance_id());
-
                 // Append object instance id to the object name.
                 String name = (*it)->name();
-                name+= String("/");
-                name+= String(inst_id);
-
-                memory_free(inst_id);
+                name.push_back('/');
+                name.append_int((*it)->instance_id());
 
                 if(name == object_instance){
                     instance = (*it);
@@ -1221,16 +1199,11 @@ M2MBase* M2MNsdlInterface::find_resource(const M2MObjectInstance *object_instanc
             it = list.begin();
             for ( ; it != list.end(); it++ ) {
                 String name = object_instance->name();
-                char *obj_inst_id = (char*)memory_alloc(BUFFER_SIZE);
-                snprintf(obj_inst_id, BUFFER_SIZE,"%d",object_instance->instance_id());
-
                 // Append object instance id to the object name.
-                name+= String("/");
-                name+= String(obj_inst_id);
+                name.push_back('/');
+                name.append_int(object_instance->instance_id());
 
-                memory_free(obj_inst_id);
-
-                name+= String("/");
+                name.push_back('/');
                 name+= (*it)->name();
 
                 if(name == resource_instance) {
@@ -1265,13 +1238,8 @@ M2MBase* M2MNsdlInterface::find_resource(const M2MResource *resource,
                     // then add instance Id into creating resource path
                     // else normal /object_id/object_instance/resource_id format.
 
-                    char *inst_id = (char*)memory_alloc(BUFFER_SIZE);
-                    snprintf(inst_id, BUFFER_SIZE,"%d",(*it)->instance_id());
-
-                    name+= String("/") ;
-                    name+= String(inst_id);
-
-                    memory_free(inst_id);
+                    name.push_back('/');
+                    name.append_int((*it)->instance_id());
 
                     if(name == resource_instance){
                         res = (*it);
