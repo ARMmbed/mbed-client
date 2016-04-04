@@ -96,6 +96,8 @@ void Test_M2MObject::test_create_object_instance()
 
 void Test_M2MObject::test_remove_object_instance()
 {
+    m2mbase_stub::string_value = new String("name");
+    
     M2MObjectInstance *ins = new M2MObjectInstance("name",*object);
     object->set_instance_id(0);
     object->_instance_list.push_back(ins);
@@ -103,6 +105,8 @@ void Test_M2MObject::test_remove_object_instance()
     CHECK(true == object->remove_object_instance(0));
 
     CHECK(false == object->remove_object_instance(0));
+
+    delete m2mbase_stub::string_value;
 }
 
 void Test_M2MObject::test_object_instance()
