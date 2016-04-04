@@ -28,6 +28,7 @@
 #include "mbed-client/m2mtimer.h"
 
 #define BUFFER_SIZE 21
+#define TRACE_GROUP "mClt"
 
 M2MNsdlInterface::M2MNsdlInterface(M2MNsdlObserver &observer)
 : _observer(observer),

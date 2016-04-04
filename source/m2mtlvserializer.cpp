@@ -18,6 +18,8 @@
 #include "include/nsdllinker.h"
 #include "mbed-client/m2mconstants.h"
 
+#define TRACE_GROUP "mClt"
+
 M2MTLVSerializer::M2MTLVSerializer()
 {
 }

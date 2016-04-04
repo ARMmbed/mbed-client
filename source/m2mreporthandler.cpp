@@ -21,6 +21,8 @@
 #include <stdio.h>
 #include <string.h>
 
+#define TRACE_GROUP "mClt"
+
 M2MReportHandler::M2MReportHandler(M2MReportObserver &observer)
 : _observer(observer),
   _pmax(-1.0f),
