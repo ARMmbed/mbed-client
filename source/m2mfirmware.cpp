@@ -171,14 +171,13 @@ M2MResource* M2MFirmware::create_resource(FirmwareResource resource, int64_t val
 
             if(res) {
                 res->set_register_uri(false);
-                char *buffer = (char*)malloc(BUFFER_SIZE);
-                if(buffer) {
-                    uint32_t size = m2m::itoa_c(value, buffer);
-                    if (size <= BUFFER_SIZE) {
-                        res->set_operation(operation);
-                        res->set_value((const uint8_t*)buffer, size);
-                    }
-                    free(buffer);
+
+                // max len of "-9223372036854775808" plus zero termination
+                char buffer[20+1];
+                uint32_t size = m2m::itoa_c(value, buffer);
+                if (size <= BUFFER_SIZE) {
+                    res->set_operation(operation);
+                    res->set_value((const uint8_t*)buffer, size);
                 }
             }
         }
@@ -220,13 +219,12 @@ bool M2MFirmware::set_resource_value(FirmwareResource resource,
             // If it is any of the above resource
             // set the value of the resource.
             if (check_value_range(resource, value)) {
-                char *buffer = (char*)malloc(BUFFER_SIZE);
-                if(buffer) {
-                    uint32_t size = m2m::itoa_c(value, buffer);
-                    if (size <= BUFFER_SIZE) {
-                        success = res->set_value((const uint8_t*)buffer, size);
-                    }
-                    free(buffer);
+                
+                // max len of "-9223372036854775808" plus zero termination
+                char buffer[20+1];
+                uint32_t size = m2m::itoa_c(value, buffer);
+                if (size <= BUFFER_SIZE) {
+                    success = res->set_value((const uint8_t*)buffer, size);
                 }
             }
         }
@@ -403,18 +401,8 @@ String M2MFirmware::resource_value_string(FirmwareResource resource) const
             uint32_t length = 0;
             res->get_value(buffer,length);
 
-            char *char_buffer = (char*)malloc(length+1);
-            if(char_buffer) {
-                memset(char_buffer,0,length+1);
-                memcpy(char_buffer,(char*)buffer,length);
-
-                String s_name(char_buffer);
-                value = s_name;
-                if(char_buffer) {
-                    free(char_buffer);
-                }
-            }
             if(buffer) {
+                value.append_raw((char*)buffer, length);
                 free(buffer);
             }
         }
@@ -458,13 +446,5 @@ bool M2MFirmware::check_value_range(FirmwareResource resource, int64_t value) co
 
 void M2MFirmware::set_zero_value(M2MResource *resource)
 {
-    char *buffer = (char*)malloc(BUFFER_SIZE);
-    int64_t value = 0;
-    if(buffer) {
-        uint32_t size = m2m::itoa_c(value, buffer);
-        if (size <= BUFFER_SIZE) {
-            resource->set_value((const uint8_t*)buffer, size);
-        }
-        free(buffer);
-    }
+    resource->set_value((const uint8_t*)"0", 1);
 }

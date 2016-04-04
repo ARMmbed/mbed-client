@@ -385,12 +385,9 @@ sn_coap_hdr_s* M2MObjectInstance::handle_get_request(nsdl_s *nsdl,
                 bool content_type_present = false;
                 if(received_coap_header->content_type_ptr) {
                     content_type_present = true;
-                    coap_response->content_type_ptr = (uint8_t*)malloc(received_coap_header->content_type_len);
-                    if(coap_response->content_type_ptr) {
-                        memset(coap_response->content_type_ptr, 0, received_coap_header->content_type_len);
-                        memcpy(coap_response->content_type_ptr,
-                               received_coap_header->content_type_ptr,
+                    coap_response->content_type_ptr = alloc_copy(received_coap_header->content_type_ptr,
                                received_coap_header->content_type_len);
+                    if(coap_response->content_type_ptr) {
                         coap_response->content_type_len = received_coap_header->content_type_len;
                         for(uint8_t i = 0; i < coap_response->content_type_len; i++) {
                             coap_content_type = (coap_content_type << 8) + (coap_response->content_type_ptr[i] & 0xFF);
@@ -404,7 +401,7 @@ sn_coap_hdr_s* M2MObjectInstance::handle_get_request(nsdl_s *nsdl,
 
                 tr_debug("M2MObjectInstance::handle_get_request() - Request Content-Type %d", coap_content_type);
                 if (!coap_response->content_type_ptr) {
-                    coap_response->content_type_ptr = (uint8_t*)malloc(2);
+                    coap_response->content_type_ptr = (uint8_t*)malloc(1);
                     coap_response->content_type_len = 1;
                     if(coap_response->content_type_ptr) {
                         *coap_response->content_type_ptr = coap_content_type;
@@ -413,11 +410,8 @@ sn_coap_hdr_s* M2MObjectInstance::handle_get_request(nsdl_s *nsdl,
                 }
                 // fill in the CoAP response payload
                 if(COAP_CONTENT_OMA_TLV_TYPE == coap_content_type) {
-                    M2MTLVSerializer *serializer = new M2MTLVSerializer();
-                    if(serializer) {
-                        data = serializer->serialize(_resource_list, data_length);
-                        delete serializer;
-                    }
+                    M2MTLVSerializer serializer;
+                    data = serializer.serialize(_resource_list, data_length);
                 } else {
                     msg_code = COAP_MSG_CODE_RESPONSE_UNSUPPORTED_CONTENT_FORMAT; // Content format not supported
                 }
@@ -525,12 +519,9 @@ sn_coap_hdr_s* M2MObjectInstance::handle_put_request(nsdl_s *nsdl,
         if(received_coap_header->content_type_ptr) {
             content_type_present = true;
             if(coap_response) {
-                coap_response->content_type_ptr = (uint8_t*)malloc(received_coap_header->content_type_len);
+                coap_response->content_type_ptr = alloc_copy(received_coap_header->content_type_ptr,
+                                                                        received_coap_header->content_type_len);
                 if(coap_response->content_type_ptr) {
-                    memset(coap_response->content_type_ptr, 0, received_coap_header->content_type_len);
-                    memcpy(coap_response->content_type_ptr,
-                           received_coap_header->content_type_ptr,
-                           received_coap_header->content_type_len);
                     coap_response->content_type_len = received_coap_header->content_type_len;
                     for(uint8_t i = 0; i < coap_response->content_type_len; i++) {
                         coap_content_type = (coap_content_type << 8) + (coap_response->content_type_ptr[i] & 0xFF);
@@ -540,14 +531,10 @@ sn_coap_hdr_s* M2MObjectInstance::handle_put_request(nsdl_s *nsdl,
         }
         if(received_coap_header->options_list_ptr &&
            received_coap_header->options_list_ptr->uri_query_ptr) {
-            char *query = (char*)malloc(received_coap_header->options_list_ptr->uri_query_len+1);
+            char *query = (char*)alloc_string_copy(received_coap_header->options_list_ptr->uri_query_ptr,
+                                                    received_coap_header->options_list_ptr->uri_query_len);
             if (query){
-                memset(query, 0, received_coap_header->options_list_ptr->uri_query_len+1);
-                memcpy(query,
-                    received_coap_header->options_list_ptr->uri_query_ptr,
-                    received_coap_header->options_list_ptr->uri_query_len);
-                memset(query + received_coap_header->options_list_ptr->uri_query_len,'\0',1);//String terminator
-               tr_debug("M2MObjectInstance::handle_put_request() - Query %s", query);
+                tr_debug("M2MObjectInstance::handle_put_request() - Query %s", query);
                 // if anything was updated, re-initialize the stored notification attributes
                 if (!handle_observation_attribute(query)){
                     tr_debug("M2MObjectInstance::handle_put_request() - Invalid query");
@@ -626,12 +613,9 @@ sn_coap_hdr_s* M2MObjectInstance::handle_post_request(nsdl_s *nsdl,
             if(received_coap_header->content_type_ptr) {
                 content_type_present = true;
                 if(coap_response) {
-                    coap_response->content_type_ptr = (uint8_t*)malloc(received_coap_header->content_type_len);
+                    coap_response->content_type_ptr = alloc_copy(received_coap_header->content_type_ptr,
+                                                                            received_coap_header->content_type_len);
                     if(coap_response->content_type_ptr) {
-                        memset(coap_response->content_type_ptr, 0, received_coap_header->content_type_len);
-                        memcpy(coap_response->content_type_ptr,
-                               received_coap_header->content_type_ptr,
-                               received_coap_header->content_type_len);
                         coap_response->content_type_len = received_coap_header->content_type_len;
                         for(uint8_t i = 0; i < coap_response->content_type_len; i++) {
                             coap_content_type = (coap_content_type << 8) + (coap_response->content_type_ptr[i] & 0xFF);

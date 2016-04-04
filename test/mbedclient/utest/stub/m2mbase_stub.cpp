@@ -15,6 +15,8 @@
  */
 #include "m2mbase_stub.h"
 
+#include <assert.h>
+
 uint8_t m2mbase_stub::uint8_value;
 uint16_t m2mbase_stub::uint16_value;
 uint32_t m2mbase_stub::uint32_value;
@@ -216,18 +218,41 @@ void M2MBase::observation_to_be_sent(m2m::Vector<uint16_t>, bool)
 {
 }
 
-void* M2MBase::memory_alloc(uint16_t)
+void *M2MBase::memory_alloc(uint16_t size)
 {
-    return m2mbase_stub::void_value;
+    if(size)
+        return malloc(size);
+    else
+        return 0;
 }
 
-void M2MBase::memory_free(void *)
+void M2MBase::memory_free(void *ptr)
 {
+    if(ptr)
+        free(ptr);
 }
 
 uint8_t* M2MBase::alloc_string_copy(const uint8_t* source, uint16_t size)
 {
-    return (uint8_t*)m2mbase_stub::void_value;
+    assert(source != NULL);
+
+    uint8_t* result = (uint8_t*)memory_alloc(size + 1);
+    if (result) {
+        memcpy(result, source, size);
+        result[size] = '\0';
+    }
+    return result;
+}
+
+uint8_t* M2MBase::alloc_copy(const uint8_t* source, uint16_t size)
+{
+    assert(source != NULL);
+
+    uint8_t* result = (uint8_t*)memory_alloc(size);
+    if (result) {
+        memcpy(result, source, size);
+    }
+    return result;
 }
 
 M2MReportHandler* M2MBase::report_handler()

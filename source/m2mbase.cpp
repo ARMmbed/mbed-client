@@ -404,6 +404,17 @@ uint8_t* M2MBase::alloc_string_copy(const uint8_t* source, uint16_t size)
     return result;
 }
 
+uint8_t* M2MBase::alloc_copy(const uint8_t* source, uint16_t size)
+{
+    assert(source != NULL);
+
+    uint8_t* result = (uint8_t*)memory_alloc(size);
+    if (result) {
+        memcpy(result, source, size);
+    }
+    return result;
+}
+
 M2MReportHandler* M2MBase::report_handler()
 {
     return _report_handler;

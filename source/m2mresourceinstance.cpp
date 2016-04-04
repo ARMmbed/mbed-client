@@ -30,13 +30,9 @@ M2MResourceInstance& M2MResourceInstance::operator=(const M2MResourceInstance& o
             _value = NULL;
             _value_length = 0;
         }
-        _value_length = other._value_length;        
+        _value_length = other._value_length;
         if(other._value) {
-            _value = (uint8_t *)malloc(other._value_length+1);
-            if(_value) {
-                memset(_value, 0, other._value_length+1);
-                memcpy((uint8_t *)_value, (uint8_t *)other._value, other._value_length);
-            }            
+            _value = (uint8_t *)alloc_string_copy(other._value, other._value_length);
         }
     }
     return *this;
@@ -102,10 +98,8 @@ M2MResourceInstance::M2MResourceInstance(const String &res_name,
     M2MBase::set_resource_type(resource_type);
     M2MBase::set_base_type(M2MBase::Resource);
     if( value != NULL && value_length > 0 ) {
-        _value = (uint8_t *)malloc(value_length+1);
+        _value = alloc_string_copy(value, value_length);
         if(_value) {
-            memset(_value, 0, value_length+1);
-            memcpy((uint8_t *)_value, (uint8_t *)value, value_length);
             _value_length = value_length;
         }
     }
@@ -198,10 +192,8 @@ bool M2MResourceInstance::set_value(const uint8_t *value,
              _value = NULL;
              _value_length = 0;
         }
-        _value = (uint8_t *)malloc(value_length+1);
+        _value = alloc_string_copy(value, value_length);
         if(_value) {
-            memset(_value, 0, value_length+1);
-            memcpy((uint8_t *)_value, (uint8_t *)value, value_length);
             _value_length = value_length;
             if( value_changed ) { //
                 if (_resource_type == M2MResourceInstance::STRING) {
@@ -269,9 +261,7 @@ bool M2MResourceInstance::is_value_changed(const uint8_t* value, const uint32_t 
         changed = true;
     } else {        
         if (_value) {
-            String val((const char*)value);
-            String tmp_val((const char*)_value);
-            if(!(val == tmp_val)){
+            if (strcmp((char*)value, (char*)_value) != 0) {
                 changed = true;
             }
         }
@@ -295,11 +285,9 @@ void M2MResourceInstance::get_value(uint8_t *&value, uint32_t &value_length)
         value = NULL;
     }
     if(_value && _value_length > 0) {
-        value = (uint8_t *)malloc(_value_length+1);
+        value = alloc_string_copy(_value, _value_length);
         if(value) {
             value_length = _value_length;
-            memset(value, 0, _value_length+1);
-            memcpy((uint8_t *)value, (uint8_t *)_value, value_length);
         }
     }
 }
@@ -435,12 +423,9 @@ sn_coap_hdr_s* M2MResourceInstance::handle_put_request(nsdl_s *nsdl,
         uint16_t coap_content_type = 0;
         if(received_coap_header->content_type_ptr) {
             if(coap_response) {
-                coap_response->content_type_ptr = (uint8_t*)malloc(received_coap_header->content_type_len);
+                coap_response->content_type_ptr = alloc_copy(received_coap_header->content_type_ptr,
+                                                                received_coap_header->content_type_len);
                 if(coap_response->content_type_ptr) {
-                    memset(coap_response->content_type_ptr, 0, received_coap_header->content_type_len);
-                    memcpy(coap_response->content_type_ptr,
-                           received_coap_header->content_type_ptr,
-                           received_coap_header->content_type_len);
                     coap_response->content_type_len = received_coap_header->content_type_len;
                     for(uint8_t i = 0; i < coap_response->content_type_len; i++) {
                         coap_content_type = (coap_content_type << 8) + (coap_response->content_type_ptr[i] & 0xFF);
@@ -450,13 +435,9 @@ sn_coap_hdr_s* M2MResourceInstance::handle_put_request(nsdl_s *nsdl,
         }
         if(received_coap_header->options_list_ptr &&
            received_coap_header->options_list_ptr->uri_query_ptr) {
-            char *query = (char*)malloc(received_coap_header->options_list_ptr->uri_query_len+1);
+            char *query = (char*)alloc_string_copy(received_coap_header->options_list_ptr->uri_query_ptr,
+                                                    received_coap_header->options_list_ptr->uri_query_len);
             if (query){
-                memset(query, 0, received_coap_header->options_list_ptr->uri_query_len+1);
-                memcpy(query,
-                    received_coap_header->options_list_ptr->uri_query_ptr,
-                    received_coap_header->options_list_ptr->uri_query_len);
-                memset(query + received_coap_header->options_list_ptr->uri_query_len,'\0',1);//String terminator
                 tr_debug("M2MResourceInstance::handle_put_request() - Query %s", query);
                 // if anything was updated, re-initialize the stored notification attributes
                 if (!handle_observation_attribute(query)){
@@ -479,13 +460,8 @@ sn_coap_hdr_s* M2MResourceInstance::handle_put_request(nsdl_s *nsdl,
                         String value = "";
                         if (received_coap_header->uri_path_ptr != NULL &&
                             received_coap_header->uri_path_len > 0) {
-                            char* buf = (char*)malloc(received_coap_header->uri_path_len+1);
-                            if(buf) {
-                                memset(buf,0,received_coap_header->uri_path_len+1);
-                                memcpy(buf,received_coap_header->uri_path_ptr,received_coap_header->uri_path_len);
-                                value = String(buf);
-                                free(buf);
-                            }
+
+                            value.append_raw((char*)received_coap_header->uri_path_ptr, received_coap_header->uri_path_len);
                         }
                         execute_value_updated = true;
                     }

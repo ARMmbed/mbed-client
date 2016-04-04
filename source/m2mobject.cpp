@@ -204,12 +204,9 @@ sn_coap_hdr_s* M2MObject::handle_get_request(nsdl_s *nsdl,
                 bool content_type_present = false;
                 if(received_coap_header->content_type_ptr) {
                     content_type_present = true;
-                    coap_response->content_type_ptr = (uint8_t*)malloc(received_coap_header->content_type_len);
+                    coap_response->content_type_ptr = alloc_copy(received_coap_header->content_type_ptr,
+                                                                    received_coap_header->content_type_len);
                     if(coap_response->content_type_ptr) {
-                        memset(coap_response->content_type_ptr, 0, received_coap_header->content_type_len);
-                        memcpy(coap_response->content_type_ptr,
-                               received_coap_header->content_type_ptr,
-                               received_coap_header->content_type_len);
                         coap_response->content_type_len = received_coap_header->content_type_len;
                         for(uint8_t i = 0; i < coap_response->content_type_len; i++) {
                             coap_content_type = (coap_content_type << 8) + (coap_response->content_type_ptr[i] & 0xFF);
@@ -341,14 +338,10 @@ sn_coap_hdr_s* M2MObject::handle_put_request(nsdl_s *nsdl,
     if(received_coap_header) {
         if(received_coap_header->options_list_ptr &&
            received_coap_header->options_list_ptr->uri_query_ptr) {
-            char *query = (char*)malloc(received_coap_header->options_list_ptr->uri_query_len+1);
+            char *query = (char*)alloc_string_copy(received_coap_header->options_list_ptr->uri_query_ptr,
+                                                    received_coap_header->options_list_ptr->uri_query_len);
             if (query){
-                memset(query, 0, received_coap_header->options_list_ptr->uri_query_len+1);
-                memcpy(query,
-                    received_coap_header->options_list_ptr->uri_query_ptr,
-                    received_coap_header->options_list_ptr->uri_query_len);
-                memset(query + received_coap_header->options_list_ptr->uri_query_len,'\0',1);//String terminator
-               tr_debug("M2MObject::handle_put_request() - Query %s", query);
+                tr_debug("M2MObject::handle_put_request() - Query %s", query);
                 // if anything was updated, re-initialize the stored notification attributes
                 if (!handle_observation_attribute(query)){
                     tr_debug("M2MObject::handle_put_request() - Invalid query");
@@ -391,12 +384,9 @@ sn_coap_hdr_s* M2MObject::handle_post_request(nsdl_s *nsdl,
                 if(received_coap_header->content_type_ptr) {
                     content_type_present = true;
                     if(coap_response) {
-                        coap_response->content_type_ptr = (uint8_t*)malloc(received_coap_header->content_type_len);
+                        coap_response->content_type_ptr = (uint8_t*)alloc_copy(received_coap_header->content_type_ptr,
+                                                                                received_coap_header->content_type_len);
                         if(coap_response->content_type_ptr) {
-                            memset(coap_response->content_type_ptr, 0, received_coap_header->content_type_len);
-                            memcpy(coap_response->content_type_ptr,
-                                   received_coap_header->content_type_ptr,
-                                   received_coap_header->content_type_len);
                             coap_response->content_type_len = received_coap_header->content_type_len;
                             for(uint8_t i = 0; i < coap_response->content_type_len; i++) {
                                 coap_content_type = (coap_content_type << 8) + (coap_response->content_type_ptr[i] & 0xFF);

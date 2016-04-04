@@ -1093,10 +1093,7 @@ String M2MNsdlInterface::coap_to_string(uint8_t *coap_data,int coap_data_length)
 {
     String value = "";
     if (coap_data != NULL && coap_data_length > 0) {
-        char buf[256+1];
-        memset(buf,0,256+1);
-        memcpy(buf,(char *)coap_data,coap_data_length);
-        value = String(buf);
+        value.append_raw((char *)coap_data,coap_data_length);
     }
     return value;
 }
@@ -1370,11 +1367,8 @@ void M2MNsdlInterface::send_object_instance_observation(M2MObjectInstance *objec
         uint8_t *token = 0;
         uint32_t token_length = 0;
 
-        M2MTLVSerializer *serializer = new M2MTLVSerializer();
-        if(serializer) {
-            value = serializer->serialize(object_instance->resources(), length);
-            delete serializer;
-        }
+        M2MTLVSerializer serializer;
+        value = serializer.serialize(object_instance->resources(), length);
 
         object_instance->get_observation_token(token,token_length);
 
@@ -1408,12 +1402,9 @@ void M2MNsdlInterface::send_resource_observation(M2MResource *resource,
             content_type = COAP_CONTENT_OMA_OPAQUE_TYPE;
         }
         if (resource->resource_instance_count() > 0) {
-            M2MTLVSerializer *serializer = new M2MTLVSerializer();
             content_type = COAP_CONTENT_OMA_TLV_TYPE;
-            if(serializer) {
-                value = serializer->serialize(resource, length);
-                delete serializer;
-            }
+            M2MTLVSerializer serializer;
+            value = serializer.serialize(resource, length);
         } else {
             resource->get_value(value,length);
         }

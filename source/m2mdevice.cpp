@@ -69,15 +69,9 @@ M2MDevice::M2MDevice()
             M2MResource * dev_res = _device_instance->resource(DEVICE_ERROR_CODE);
             dev_res->set_register_uri(false);
             instance->set_operation(M2MBase::GET_ALLOWED);
-            uint32_t size = 0;
-            char *buffer = (char*)malloc(BUFFER_SIZE);
-            if(buffer) {
-                size = m2m::itoa_c(0, buffer);
-                if (size <= BUFFER_SIZE)
-                    instance->set_value((const uint8_t*)buffer, size);
 
-                free(buffer);
-            }
+            instance->set_value((const uint8_t*)"0", 1);
+            
             instance->set_register_uri(false);
         }
         res = _device_instance->create_dynamic_resource(DEVICE_SUPPORTED_BINDING_MODE,
@@ -198,14 +192,13 @@ M2MResource* M2MDevice::create_resource(DeviceResource resource, int64_t value)
                                                             true);
 
             if(res) {
-                char *buffer = (char*)malloc(BUFFER_SIZE);
-                if(buffer) {
-                    uint32_t size = m2m::itoa_c(value, buffer);
-                    if (size <= BUFFER_SIZE) {
-                        res->set_operation(operation);
-                        res->set_value((const uint8_t*)buffer, size);
-                    }
-                    free(buffer);
+
+                // max len of "-9223372036854775808" plus zero termination
+                char buffer[20+1];
+                uint32_t size = m2m::itoa_c(value, buffer);
+                if (size <= BUFFER_SIZE) {
+                    res->set_operation(operation);
+                    res->set_value((const uint8_t*)buffer, size);
                 }
                 res->set_register_uri(false);
             }
@@ -245,15 +238,13 @@ M2MResourceInstance* M2MDevice::create_resource_instance(DeviceResource resource
                 resource->set_register_uri(false);
             }
             if(res) {
-                char *buffer = (char*)malloc(BUFFER_SIZE);
-                if(buffer) {
-                    uint32_t size = m2m::itoa_c(value, buffer);
-                    if (size <= BUFFER_SIZE) {
-                        res->set_value((const uint8_t*)buffer, size);
-                        // Only read operation is allowed for above resources
-                        res->set_operation(M2MBase::GET_ALLOWED);
-                    }
-                    free(buffer);
+                // max len of "-9223372036854775808" plus zero termination
+                char buffer[20+1];
+                uint32_t size = m2m::itoa_c(value, buffer);
+                if (size <= BUFFER_SIZE) {
+                    res->set_value((const uint8_t*)buffer, size);
+                    // Only read operation is allowed for above resources
+                    res->set_operation(M2MBase::GET_ALLOWED);
                 }
                 res->set_register_uri(false);
             }
@@ -362,13 +353,12 @@ bool M2MDevice::set_resource_value(DeviceResource resource,
             // If it is any of the above resource
             // set the value of the resource.
             if (check_value_range(resource, value)) {
-                char *buffer = (char*)malloc(BUFFER_SIZE);
-                if(buffer) {
-                    uint32_t size = m2m::itoa_c(value, buffer);
-                    if (size <= BUFFER_SIZE)
-                        success = res->set_value((const uint8_t*)buffer, size);
 
-                    free(buffer);
+                // max len of "-9223372036854775808" plus zero termination
+                char buffer[20+1];
+                uint32_t size = m2m::itoa_c(value, buffer);
+                if (size <= BUFFER_SIZE) {
+                    success = res->set_value((const uint8_t*)buffer, size);
                 }
             }
         }
@@ -396,18 +386,8 @@ String M2MDevice::resource_value_string(DeviceResource resource,
             uint32_t length = 0;
             res->get_value(buffer,length);
 
-            char *char_buffer = (char*)malloc(length+1);
-            if(char_buffer) {
-                memset(char_buffer,0,length+1);
-                memcpy(char_buffer,(char*)buffer,length);
-
-                String s_name(char_buffer);
-                value = s_name;
-                if(char_buffer) {
-                    free(char_buffer);
-                }
-            }
             if(buffer) {
+                value.append_raw((char*)buffer, length);
                 free(buffer);
             }
         }
