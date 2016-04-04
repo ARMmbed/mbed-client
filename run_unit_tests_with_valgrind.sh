@@ -1,4 +1,7 @@
 #!/bin/bash
+# Execute script with root path where to find binaries. 
+# For example ./run_unit_tests_with_valgrind.sh ./build/x86-linux-native-coverage/test/mbedclient/
+
 input="binaries.txt"
 valgrind_logs="valgrind_logs"
 rm -rf $valgrind_logs
