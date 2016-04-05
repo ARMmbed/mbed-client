@@ -428,7 +428,7 @@ protected:
 
 private:
 
-    bool is_integer(const String &value);
+    static bool is_integer(const String &value);
 
 private:
 

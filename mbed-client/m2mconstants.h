@@ -49,6 +49,9 @@ extern const String ST;
 extern const String STP;
 extern const String CANCEL;
 
+// just a helper for "String default_value = "";" pattern
+extern const String EMPTY;
+
 //LWM2MOBJECT NAME/ID
 extern const String M2M_SECURITY_ID;
 extern const String M2M_SERVER_ID;

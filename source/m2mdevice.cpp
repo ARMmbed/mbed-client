@@ -452,78 +452,78 @@ M2MResourceInstance* M2MDevice::get_resource_instance(DeviceResource dev_res,
     return inst;
 }
 
-String M2MDevice::resource_name(DeviceResource resource) const
+const String& M2MDevice::resource_name(DeviceResource resource)
 {
-    String res_name = "";
+    const String* res_name = &EMPTY;
     switch(resource) {
         case Manufacturer:
-            res_name = DEVICE_MANUFACTURER;
+            res_name = &DEVICE_MANUFACTURER;
             break;
         case DeviceType:
-            res_name = DEVICE_DEVICE_TYPE;
+            res_name = &DEVICE_DEVICE_TYPE;
             break;
         case ModelNumber:
-            res_name = DEVICE_MODEL_NUMBER;
+            res_name = &DEVICE_MODEL_NUMBER;
             break;
         case SerialNumber:
-            res_name = DEVICE_SERIAL_NUMBER;
+            res_name = &DEVICE_SERIAL_NUMBER;
             break;
         case HardwareVersion:
-            res_name = DEVICE_HARDWARE_VERSION;
+            res_name = &DEVICE_HARDWARE_VERSION;
             break;
         case FirmwareVersion:
-            res_name = DEVICE_FIRMWARE_VERSION;
+            res_name = &DEVICE_FIRMWARE_VERSION;
             break;
         case SoftwareVersion:
-            res_name = DEVICE_SOFTWARE_VERSION;
+            res_name = &DEVICE_SOFTWARE_VERSION;
             break;
         case Reboot:
-            res_name = DEVICE_REBOOT;
+            res_name = &DEVICE_REBOOT;
             break;
         case FactoryReset:
-            res_name = DEVICE_FACTORY_RESET;
+            res_name = &DEVICE_FACTORY_RESET;
             break;
         case AvailablePowerSources:
-            res_name = DEVICE_AVAILABLE_POWER_SOURCES;
+            res_name = &DEVICE_AVAILABLE_POWER_SOURCES;
             break;
         case PowerSourceVoltage:
-            res_name = DEVICE_POWER_SOURCE_VOLTAGE;
+            res_name = &DEVICE_POWER_SOURCE_VOLTAGE;
             break;
         case PowerSourceCurrent:
-            res_name = DEVICE_POWER_SOURCE_CURRENT;
+            res_name = &DEVICE_POWER_SOURCE_CURRENT;
             break;
         case BatteryLevel:
-            res_name = DEVICE_BATTERY_LEVEL;
+            res_name = &DEVICE_BATTERY_LEVEL;
             break;
         case BatteryStatus:
-            res_name = DEVICE_BATTERY_STATUS;
+            res_name = &DEVICE_BATTERY_STATUS;
             break;
         case MemoryFree:
-            res_name = DEVICE_MEMORY_FREE;
+            res_name = &DEVICE_MEMORY_FREE;
             break;
         case MemoryTotal:
-            res_name = DEVICE_MEMORY_TOTAL;
+            res_name = &DEVICE_MEMORY_TOTAL;
             break;
         case ErrorCode:
-            res_name = DEVICE_ERROR_CODE;
+            res_name = &DEVICE_ERROR_CODE;
             break;
         case ResetErrorCode:
-            res_name = DEVICE_RESET_ERROR_CODE;
+            res_name = &DEVICE_RESET_ERROR_CODE;
             break;
         case CurrentTime:
-            res_name = DEVICE_CURRENT_TIME;
+            res_name = &DEVICE_CURRENT_TIME;
             break;
         case UTCOffset:
-            res_name = DEVICE_UTC_OFFSET;
+            res_name = &DEVICE_UTC_OFFSET;
             break;
         case Timezone:
-            res_name = DEVICE_TIMEZONE;
+            res_name = &DEVICE_TIMEZONE;
             break;
         case SupportedBindingMode:
-            res_name = DEVICE_SUPPORTED_BINDING_MODE;
+            res_name = &DEVICE_SUPPORTED_BINDING_MODE;
             break;
     }
-    return res_name;
+    return *res_name;
 }
 
 bool M2MDevice::check_value_range(DeviceResource resource, int64_t value) const

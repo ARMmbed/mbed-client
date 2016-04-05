@@ -148,13 +148,13 @@ M2MResource* M2MFirmware::create_resource(FirmwareResource resource, const Strin
 M2MResource* M2MFirmware::create_resource(FirmwareResource resource, int64_t value)
 {
     M2MResource* res = NULL;
-    String firmware_id = "";
+    const String* firmware_id = &EMPTY;
     M2MBase::Operation operation = M2MBase::GET_ALLOWED;
     if(!is_resource_present(resource)) {
         switch(resource) {
         case UpdateSupportedObjects:
             if(check_value_range(resource, value)) {
-                firmware_id = FIRMWARE_UPDATE_SUPPORTED_OBJECTS;
+                firmware_id = &FIRMWARE_UPDATE_SUPPORTED_OBJECTS;
                 operation = M2MBase::GET_PUT_ALLOWED;
             }
             break;
@@ -162,9 +162,9 @@ M2MResource* M2MFirmware::create_resource(FirmwareResource resource, int64_t val
             break;
         }
     }
-    if(!firmware_id.empty()) {
+    if(!firmware_id->empty()) {
         if(_firmware_instance) {
-            res = _firmware_instance->create_dynamic_resource(firmware_id,
+            res = _firmware_instance->create_dynamic_resource(*firmware_id,
                                                             OMA_RESOURCE_TYPE,
                                                             M2MResourceInstance::INTEGER,
                                                             false);
@@ -246,36 +246,36 @@ bool M2MFirmware::is_resource_present(FirmwareResource resource) const
     return success;
 }
 
-String M2MFirmware::resource_name(FirmwareResource resource) const
+const String& M2MFirmware::resource_name(FirmwareResource resource)
 {
-    String res_name = "";
+    const String* res_name;
     switch(resource) {
         case Package:
-            res_name = FIRMWARE_PACKAGE;
+            res_name = &FIRMWARE_PACKAGE;
             break;
         case PackageUri:
-            res_name = FIRMWARE_PACKAGE_URI;
+            res_name = &FIRMWARE_PACKAGE_URI;
             break;
         case Update:
-            res_name = FIRMWARE_UPDATE;
+            res_name = &FIRMWARE_UPDATE;
             break;
         case State:
-            res_name = FIRMWARE_STATE;
+            res_name = &FIRMWARE_STATE;
             break;
         case UpdateSupportedObjects:
-            res_name = FIRMWARE_UPDATE_SUPPORTED_OBJECTS;
+            res_name = &FIRMWARE_UPDATE_SUPPORTED_OBJECTS;
             break;
         case UpdateResult:
-            res_name = FIRMWARE_UPDATE_RESULT;
+            res_name = &FIRMWARE_UPDATE_RESULT;
             break;
         case PackageName:
-            res_name = FIRMWARE_PACKAGE_NAME;
+            res_name = &FIRMWARE_PACKAGE_NAME;
             break;
         case PackageVersion:
-            res_name = FIRMWARE_PACKAGE_VERSION;
+            res_name = &FIRMWARE_PACKAGE_VERSION;
             break;
     }
-    return res_name;
+    return *res_name;
 }
 
 uint16_t M2MFirmware::per_resource_count(FirmwareResource res) const
@@ -313,34 +313,34 @@ M2MResource* M2MFirmware::get_resource(FirmwareResource res) const
 {
     M2MResource* res_object = NULL;
     if(_firmware_instance) {
-        String res_name = "";
+        const String* res_name = &EMPTY;
         switch(res) {
             case Package:
-                res_name = FIRMWARE_PACKAGE;
+                res_name = &FIRMWARE_PACKAGE;
                 break;
             case PackageUri:
-                res_name = FIRMWARE_PACKAGE_URI;
+                res_name = &FIRMWARE_PACKAGE_URI;
                 break;
             case Update:
-                res_name = FIRMWARE_UPDATE;
+                res_name = &FIRMWARE_UPDATE;
                 break;
             case State:
-                res_name = FIRMWARE_STATE;
+                res_name = &FIRMWARE_STATE;
                 break;
             case UpdateSupportedObjects:
-                res_name = FIRMWARE_UPDATE_SUPPORTED_OBJECTS;
+                res_name = &FIRMWARE_UPDATE_SUPPORTED_OBJECTS;
                 break;
             case UpdateResult:
-                res_name = FIRMWARE_UPDATE_RESULT;
+                res_name = &FIRMWARE_UPDATE_RESULT;
                 break;
             case PackageName:
-                res_name = FIRMWARE_PACKAGE_NAME;
+                res_name = &FIRMWARE_PACKAGE_NAME;
                 break;
             case PackageVersion:
-                res_name = FIRMWARE_PACKAGE_VERSION;
+                res_name = &FIRMWARE_PACKAGE_VERSION;
                 break;
         }
-        res_object = _firmware_instance->resource(res_name);
+        res_object = _firmware_instance->resource(*res_name);
     }
     return res_object;
 }

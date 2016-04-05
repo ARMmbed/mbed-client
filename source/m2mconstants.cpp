@@ -28,6 +28,7 @@ const String ST = "st";
 const String STP = "stp";
 const String CANCEL = "cancel";
 
+const String EMPTY = "";
 
 //LWM2MOBJECT NAME/ID
 const String M2M_SECURITY_ID = "0";

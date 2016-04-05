@@ -388,8 +388,7 @@ void *M2MBase::memory_alloc(uint16_t size)
 
 void M2MBase::memory_free(void *ptr)
 {
-    if(ptr)
-        free(ptr);
+    free(ptr);
 }
 
 uint8_t* M2MBase::alloc_string_copy(const uint8_t* source, uint16_t size)
