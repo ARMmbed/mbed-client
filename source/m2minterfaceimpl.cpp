@@ -438,22 +438,9 @@ void M2MInterfaceImpl::state_bootstrap( EventData *data)
                 if(!coap.empty()) {
                     server_address = server_address.substr(coap.size(),
                                                        server_address.size()-coap.size());
-                    int colonFound = server_address.find_last_of(':'); //10
-                    if(colonFound != -1) {
-                        ip_address = server_address.substr(0,colonFound);
-                        port = atoi(server_address.substr(colonFound+1,
-                                                         server_address.size()-ip_address.size()).c_str());
-                        colonFound = ip_address.find_last_of(']');
-                        if(ip_address.compare(0,1,"[") == 0) {
-                            if(colonFound == -1) {
-                                ip_address.clear();
-                            } else {
-                                ip_address = ip_address.substr(1,colonFound-1);
-                            }
-                        } else if(colonFound != -1) {
-                            ip_address.clear();
-                        }
-                    }
+
+                    process_address(server_address, ip_address, port);
+                    
                     tr_debug("M2MInterfaceImpl::state_bootstrap - IP address %s , Port %d", ip_address.c_str(), port);
                     // If bind and resolving server address succeed then proceed else
                     // return error to the application and go to Idle state.
@@ -556,22 +543,9 @@ void M2MInterfaceImpl::state_register( EventData *data)
                     if(!coap.empty()) {
                         server_address = server_address.substr(coap.size(),
                                                            server_address.size()-coap.size());
-                        int colonFound = server_address.find_last_of(':'); //10
-                        if(colonFound != -1) {
-                            ip_address = server_address.substr(0,colonFound);
-                            port = atoi(server_address.substr(colonFound+1,
-                                                             server_address.size()-ip_address.size()).c_str());
-                            colonFound = ip_address.find_last_of(']');
-                            if(ip_address.compare(0,1,"[") == 0) {
-                                if(colonFound == -1) {
-                                    ip_address.clear();
-                                } else {
-                                    ip_address = ip_address.substr(1,colonFound-1);
-                                }
-                            } else if(colonFound != -1) {
-                                ip_address.clear();
-                            }
-                        }
+
+                        process_address(server_address, ip_address, port);
+
                         tr_debug("M2MInterfaceImpl::state_register - IP address %s , Port %d", ip_address.c_str(), port);
                         // If bind and resolving server address succeed then proceed else
                         // return error to the application and go to Idle state.
@@ -597,6 +571,26 @@ void M2MInterfaceImpl::state_register( EventData *data)
         tr_error("M2MInterfaceImpl::state_register - Error Occured %d", (int)error);
         internal_event(STATE_IDLE);
         _observer.error(error);
+    }
+}
+
+void M2MInterfaceImpl::process_address(const String& server_address, String& ip_address, uint16_t& port) {
+    
+    int colonFound = server_address.find_last_of(':'); //10
+    if(colonFound != -1) {
+        ip_address = server_address.substr(0,colonFound);
+        port = atoi(server_address.substr(colonFound+1,
+                                         server_address.size()-ip_address.size()).c_str());
+        colonFound = ip_address.find_last_of(']');
+        if(ip_address.compare(0,1,"[") == 0) {
+            if(colonFound == -1) {
+                ip_address.clear();
+            } else {
+                ip_address = ip_address.substr(1,colonFound-1);
+            }
+        } else if(colonFound != -1) {
+            ip_address.clear();
+        }
     }
 }
 

@@ -64,24 +64,24 @@ M2MBase& M2MBase::operator=(const M2MBase& other)
 
 M2MBase::M2MBase(const M2MBase& other) :
     _report_handler(NULL),
+    _observation_handler(other._observation_handler),
+    _operation(other._operation),
+    _mode(other._mode),
+    _observation_level(other._observation_level),
+    _name(other._name),
+    _resource_type(other._resource_type),
+    _interface_description(other._interface_description),
+    _coap_content_type(other._coap_content_type),
+    _instance_id(other._instance_id),
+    _observable(other._observable),
+    _observation_number(other._observation_number),
     _token(NULL),
-    _token_length(0)
+    _token_length(other._token_length),
+    _register_uri(other._register_uri),
+    _uri_path(other._uri_path),
+    _max_age(other._max_age)
 {
-    _operation = other._operation;
-    _mode = other._mode;
-    _name = other._name;
-    _resource_type = other._resource_type;
-    _interface_description = other._interface_description;
-    _coap_content_type = other._coap_content_type;
-    _instance_id = other._instance_id;
-    _observable = other._observable;
-    _observation_handler = other._observation_handler;
-    _observation_number = other._observation_number;
-    _observation_level = other._observation_level;
-    _register_uri = other._register_uri;
-    _uri_path = other._uri_path;
-    _max_age = other._max_age;
-    _token_length = other._token_length;
+
     if(other._token) {
         _token = alloc_string_copy((uint8_t *)other._token, other._token_length);
     }

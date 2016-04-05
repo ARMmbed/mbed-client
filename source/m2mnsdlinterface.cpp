@@ -37,6 +37,8 @@ M2MNsdlInterface::M2MNsdlInterface(M2MNsdlObserver &observer)
   _server(NULL),
   _nsdl_exceution_timer(new M2MTimer(*this)),
   _registration_timer(new M2MTimer(*this)),
+  _endpoint(NULL),
+  _resource(NULL),
   _nsdl_handle(NULL),
   _counter_for_nsdl(0),
   _register_id(0),
@@ -45,8 +47,6 @@ M2MNsdlInterface::M2MNsdlInterface(M2MNsdlObserver &observer)
   _bootstrap_id(0)
 {
     tr_debug("M2MNsdlInterface::M2MNsdlInterface()");
-    _endpoint = NULL;
-    _resource = NULL;
     __nsdl_interface = this;
 
     _bootstrap_endpoint.device_object = NULL;
@@ -1316,30 +1316,27 @@ void M2MNsdlInterface::send_object_observation(M2MObject *object,
         uint8_t *token = 0;
         uint32_t token_length = 0;
 
-        M2MTLVSerializer *serializer = new M2MTLVSerializer();
-        if (serializer) {
-            // Send whole object structure
-            if (send_object) {
-                value = serializer->serialize(object->instances(), length);
+        M2MTLVSerializer serializer;
+        // Send whole object structure
+        if (send_object) {
+            value = serializer.serialize(object->instances(), length);
+        }
+        // Send only change object instances
+        else {
+            M2MObjectInstanceList list;
+            Vector<uint16_t>::const_iterator it;
+            it = changed_instance_ids.begin();
+            for (; it != changed_instance_ids.end(); it++){
+                M2MObjectInstance* obj_instance = object->object_instance(*it);
+                if (obj_instance){
+                    list.push_back(obj_instance);
+                }
             }
-            // Send only change object instances
-            else {
-                M2MObjectInstanceList list;
-                Vector<uint16_t>::const_iterator it;
-                it = changed_instance_ids.begin();
-                for (; it != changed_instance_ids.end(); it++){
-                    M2MObjectInstance* obj_instance = object->object_instance(*it);
-                    if (obj_instance){
-                        list.push_back(obj_instance);
-                    }
-                }
-                if (!list.empty()) {
-                    value = serializer->serialize(list, length);
-                    list.clear();
-                }
+            if (!list.empty()) {
+                value = serializer.serialize(list, length);
+                list.clear();
             }
         }
-        delete serializer;
 
         object->get_observation_token(token,token_length);
 

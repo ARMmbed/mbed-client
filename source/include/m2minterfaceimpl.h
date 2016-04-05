@@ -331,6 +331,15 @@ private: // state machine state functions
         CANNOT_HAPPEN
     };
 
+    /**
+     * Helper method for extracting the IP address part and port from the
+     * given server address.
+     * @param server_address source url (without "coap" or "coaps" prefix)
+     * @param ip_address extracted IP
+     * @param port extracted port
+     */
+    static void process_address(const String& server_address, String& ip_address, uint16_t& port);
+
 private:
 
     M2MInterfaceObserver        &_observer;
