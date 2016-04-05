@@ -178,7 +178,7 @@ void M2MInterfaceImpl::register_object(M2MSecurity *security, const M2MObjectLis
 
 void M2MInterfaceImpl::update_registration(M2MSecurity *security_object, const uint32_t lifetime)
 {
-    tr_debug("M2MInterfaceImpl::update_registration(M2MSecurity *security,const uint32_t lifetime) - IN");
+    tr_debug("M2MInterfaceImpl::update_registration - IN");
     // Transition to a new state based upon
     // the current state of the state machine
     if(lifetime != 0 && (lifetime < MINIMUM_REGISTRATION_TIME)) {
@@ -213,10 +213,10 @@ void M2MInterfaceImpl::update_registration(M2MSecurity *security_object, const u
             _observer.error(M2MInterface::NotAllowed);
         }
     } else {
-        tr_debug("M2MInterfaceImpl::update_registration(M2MSecurity *security,const M2MObjectList &object_list) - NOT ALLOWED");
+        tr_debug("M2MInterfaceImpl::update_registration - NOT ALLOWED");
         _observer.error(M2MInterface::NotAllowed);
     }
-    tr_debug("M2MInterfaceImpl::update_registration(M2MSecurity *security,const uint32_t lifetime) - OUT");
+    tr_debug("M2MInterfaceImpl::update_registration - OUT");
 }
 
 void M2MInterfaceImpl::unregister_object(M2MSecurity* /*security*/)
