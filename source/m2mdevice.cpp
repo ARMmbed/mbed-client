@@ -398,14 +398,9 @@ int64_t M2MDevice::resource_value_int(DeviceResource resource,
            M2MDevice::AvailablePowerSources == resource ||
            M2MDevice::PowerSourceVoltage == resource    ||
            M2MDevice::PowerSourceCurrent == resource) {
-            // Get the value and convert it into integer
-            uint8_t* buffer = NULL;
-            uint32_t length = 0;
-            res->get_value(buffer,length);
-            if(buffer) {
-                value = atoi((const char*)buffer);
-                free(buffer);
-            }
+
+            // note: the value may be 32bit int on 32b archs.
+            value = res->get_value_int();
         }
     }
     return value;

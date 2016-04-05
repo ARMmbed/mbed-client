@@ -225,14 +225,8 @@ uint32_t M2MServer::resource_value_int(ServerResource resource) const
            M2MServer::DefaultMaxPeriod == resource  ||
            M2MServer::DisableTimeout == resource    ||
            M2MServer::NotificationStorage == resource) {
-            // Get the value and convert it into integer
-            uint8_t* buffer = NULL;
-            uint32_t length = 0;
-            res->get_value(buffer,length);
-            if(buffer) {
-                value = atoi((const char*)buffer);
-                free(buffer);
-            }
+
+            value = res->get_value_int();
         }
     }
     return value;

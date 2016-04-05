@@ -366,14 +366,8 @@ int64_t M2MFirmware::resource_value_int(FirmwareResource resource) const
         if(M2MFirmware::State == resource          ||
            M2MFirmware::UpdateSupportedObjects == resource         ||
            M2MFirmware::UpdateResult == resource) {
-            // Get the value and convert it into integer
-            uint8_t* buffer = NULL;
-            uint32_t length = 0;
-            res->get_value(buffer,length);
-            if(buffer) {
-                value = atoi((const char*)buffer);
-                free(buffer);
-            }
+
+            value = res->get_value_int();
         }
     }
     return value;

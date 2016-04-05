@@ -248,6 +248,8 @@ void Test_M2MResourceInstance::test_set_value()
     CHECK(resource_instance->set_value(123456789) == true);
     CHECK(memcmp(resource_instance->_value, "123456789", 9) == 0);
 
+    CHECK(resource_instance->get_value_int() == 123456789);
+
     free(resource_instance->_value);
     resource_instance->_value_length = 0;
 

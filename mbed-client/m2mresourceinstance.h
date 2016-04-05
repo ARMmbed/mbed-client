@@ -178,6 +178,12 @@ public:
     virtual void get_value(uint8_t *&value, uint32_t &value_length);
 
     /**
+     * \brief Converts value to int and return it. Note: conversion
+     * errors are not detected.
+     */
+    virtual int get_value_int();
+
+    /**
      * \brief Returns the value pointer of the object.
      * \return The value pointer of the object.
     */
