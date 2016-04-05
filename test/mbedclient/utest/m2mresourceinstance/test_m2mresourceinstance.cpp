@@ -245,6 +245,9 @@ void Test_M2MResourceInstance::test_set_value()
     u_int8_t value3[] = {"13"};
     CHECK(resource_instance->set_value(value3,(u_int32_t)sizeof(value3)) == true);
 
+    CHECK(resource_instance->set_value(123456789) == true);
+    CHECK(memcmp(resource_instance->_value, "123456789", 9) == 0);
+
     free(resource_instance->_value);
     resource_instance->_value_length = 0;
 

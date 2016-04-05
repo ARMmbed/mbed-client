@@ -176,6 +176,18 @@ void M2MResourceInstance::clear_value()
     report();
 }
 
+bool M2MResourceInstance::set_value(int64_t value)
+{
+    bool success;
+    // max len of "-9223372036854775808" plus zero termination
+    char buffer[20+1];
+    uint32_t size = m2m::itoa_c(value, buffer);
+
+    success = set_value((const uint8_t*)buffer, size);
+
+    return success;
+}
+
 bool M2MResourceInstance::set_value(const uint8_t *value,
                                     const uint32_t value_length)
 {

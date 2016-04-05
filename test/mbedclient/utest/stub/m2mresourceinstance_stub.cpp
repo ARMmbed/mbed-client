@@ -109,6 +109,12 @@ bool M2MResourceInstance::set_value(const uint8_t *,
     return m2mresourceinstance_stub::bool_value;
 }
 
+bool M2MResourceInstance::set_value(int64_t value)
+{
+    return m2mresourceinstance_stub::bool_value;
+}
+
+
 void M2MResourceInstance::clear_value()
 {
 }

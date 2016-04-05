@@ -70,7 +70,7 @@ M2MDevice::M2MDevice()
             dev_res->set_register_uri(false);
             instance->set_operation(M2MBase::GET_ALLOWED);
 
-            instance->set_value((const uint8_t*)"0", 1);
+            instance->set_value(0);
             
             instance->set_register_uri(false);
         }
@@ -193,13 +193,10 @@ M2MResource* M2MDevice::create_resource(DeviceResource resource, int64_t value)
 
             if(res) {
 
-                // max len of "-9223372036854775808" plus zero termination
-                char buffer[20+1];
-                uint32_t size = m2m::itoa_c(value, buffer);
-                if (size <= BUFFER_SIZE) {
-                    res->set_operation(operation);
-                    res->set_value((const uint8_t*)buffer, size);
-                }
+
+                res->set_operation(operation);
+                res->set_value(value);
+
                 res->set_register_uri(false);
             }
         }
@@ -238,14 +235,10 @@ M2MResourceInstance* M2MDevice::create_resource_instance(DeviceResource resource
                 resource->set_register_uri(false);
             }
             if(res) {
-                // max len of "-9223372036854775808" plus zero termination
-                char buffer[20+1];
-                uint32_t size = m2m::itoa_c(value, buffer);
-                if (size <= BUFFER_SIZE) {
-                    res->set_value((const uint8_t*)buffer, size);
-                    // Only read operation is allowed for above resources
-                    res->set_operation(M2MBase::GET_ALLOWED);
-                }
+                res->set_value(value);
+                // Only read operation is allowed for above resources
+                res->set_operation(M2MBase::GET_ALLOWED);
+
                 res->set_register_uri(false);
             }
         }
@@ -354,12 +347,7 @@ bool M2MDevice::set_resource_value(DeviceResource resource,
             // set the value of the resource.
             if (check_value_range(resource, value)) {
 
-                // max len of "-9223372036854775808" plus zero termination
-                char buffer[20+1];
-                uint32_t size = m2m::itoa_c(value, buffer);
-                if (size <= BUFFER_SIZE) {
-                    success = res->set_value((const uint8_t*)buffer, size);
-                }
+                success = res->set_value(value);
             }
         }
     }

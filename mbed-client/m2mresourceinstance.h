@@ -152,6 +152,14 @@ public:
     virtual bool set_value(const uint8_t *value, const uint32_t value_length);
 
     /**
+     * \brief Sets the value of the given resource.
+     * \param value, new value which is to be formatted into a string
+     * and set on the resource.
+     * \return True if successfully set, else false.
+     */
+    virtual bool set_value(int64_t value);
+
+    /**
      * \brief Clears the value of the given resource.
      */
     virtual void clear_value();

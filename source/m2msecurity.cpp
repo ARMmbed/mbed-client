@@ -123,13 +123,7 @@ M2MResource* M2MSecurity::create_resource(SecurityResource resource, uint32_t va
             if(res) {
                 res->set_operation(M2MBase::NOT_ALLOWED);
 
-                // max len of "-9223372036854775808" plus zero termination
-                char buffer[20+1];
-                uint32_t size = m2m::itoa_c(value, buffer);
-                            
-                if (size <= BUFFER_SIZE) {
-                    res->set_value((const uint8_t*)buffer, size);
-                }
+                res->set_value(value);
             }
         }
     }
@@ -194,12 +188,7 @@ bool M2MSecurity::set_resource_value(SecurityResource resource,
             // If it is any of the above resource
             // set the value of the resource.
 
-            // max len of "-9223372036854775808" plus zero termination
-            char buffer[20+1];
-            uint32_t size = m2m::itoa_c(value, buffer);
-            if (size <= BUFFER_SIZE) {
-                success = res->set_value((const uint8_t*)buffer, size);
-            }
+            success = res->set_value(value);
         }
     }
     return success;

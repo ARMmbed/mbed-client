@@ -172,13 +172,8 @@ M2MResource* M2MFirmware::create_resource(FirmwareResource resource, int64_t val
             if(res) {
                 res->set_register_uri(false);
 
-                // max len of "-9223372036854775808" plus zero termination
-                char buffer[20+1];
-                uint32_t size = m2m::itoa_c(value, buffer);
-                if (size <= BUFFER_SIZE) {
-                    res->set_operation(operation);
-                    res->set_value((const uint8_t*)buffer, size);
-                }
+                res->set_operation(operation);
+                res->set_value(value);
             }
         }
     }
@@ -220,12 +215,7 @@ bool M2MFirmware::set_resource_value(FirmwareResource resource,
             // set the value of the resource.
             if (check_value_range(resource, value)) {
                 
-                // max len of "-9223372036854775808" plus zero termination
-                char buffer[20+1];
-                uint32_t size = m2m::itoa_c(value, buffer);
-                if (size <= BUFFER_SIZE) {
-                    success = res->set_value((const uint8_t*)buffer, size);
-                }
+                success = res->set_value(value);
             }
         }
     }
