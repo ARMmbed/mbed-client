@@ -25,6 +25,8 @@
 #include "mbed-client/m2mtimer.h"
 #include "mbed-trace/mbed_trace.h"
 
+#define TRACE_GROUP "mClt"
+
 M2MInterfaceImpl::M2MInterfaceImpl(M2MInterfaceObserver& observer,
                                    const String &ep_name,
                                    const String &ep_type,

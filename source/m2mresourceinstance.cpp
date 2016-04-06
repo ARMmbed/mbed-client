@@ -22,6 +22,8 @@
 #include "include/nsdllinker.h"
 #include "mbed-trace/mbed_trace.h"
 
+#define TRACE_GROUP "mClt"
+
 M2MResourceInstance& M2MResourceInstance::operator=(const M2MResourceInstance& other)
 {
     if (this != &other) { // protect against invalid self-assignment

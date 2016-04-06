@@ -60,18 +60,18 @@ void Test_M2MTLVDeserializer::test_is_resource()
 void Test_M2MTLVDeserializer::test_is_multiple_resource()
 {
     uint8_t data_resource[] = {0xC3,0x0};
-    uint8_t data_object[] = {0x08,0x0};
+    uint8_t data_object[] = {0x88,0x0};
 
     CHECK(deserializer->is_multiple_resource(data_resource) == false);
-    CHECK(deserializer->is_multiple_resource(data_object) == false);
+    CHECK(deserializer->is_multiple_resource(data_object) == true);
 }
 
 void Test_M2MTLVDeserializer::test_is_resource_instance()
 {
     uint8_t data_resource[] = {0xC3,0x0};
-    uint8_t data_object[] = {0x08,0x0};
+    uint8_t data_object[] = {0x44,0x0};
 
-    CHECK(deserializer->is_resource_instance(data_object) == false);
+    CHECK(deserializer->is_resource_instance(data_object) == true);
     CHECK(deserializer->is_resource_instance(data_resource) == false);
 }
 
