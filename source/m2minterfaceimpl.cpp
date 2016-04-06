@@ -259,6 +259,14 @@ void M2MInterfaceImpl::set_queue_sleep_handler(callback_handler handler)
     _callback_handler = handler;
 }
 
+void M2MInterfaceImpl::set_platform_network_handler(void *handler)
+{
+    tr_debug("M2MInterfaceImpl::set_platform_network_handler()");
+    if(_connection_handler) {
+        _connection_handler->set_platform_network_handler(handler);
+    }
+}
+
 void M2MInterfaceImpl::coap_message_ready(uint8_t *data_ptr,
                                           uint16_t data_len,
                                           sn_nsdl_addr_s *address_ptr)

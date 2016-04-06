@@ -135,6 +135,15 @@ public:
      */
     virtual void set_queue_sleep_handler(callback_handler handler);
 
+    /**
+     * @brief Sets the network interface handler that is used by client to connect
+     * to a network over IP..
+     * @param handler A network interface handler that is used by client to connect.
+     *  This API is optional but provides a mechanism for different platforms to
+     * manage usage of underlying network interface by client.
+     */
+    virtual void set_platform_network_handler(void *handler = NULL);
+
 protected: // From M2MNsdlObserver
 
     virtual void coap_message_ready(uint8_t *data_ptr,
