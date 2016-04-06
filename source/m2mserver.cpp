@@ -21,6 +21,8 @@
 #include "mbed-client/m2mresource.h"
 #include "mbed-client/m2mstring.h"
 
+#define TRACE_GROUP "mClt"
+
 #define BUFFER_SIZE 21
 
 M2MServer::M2MServer()

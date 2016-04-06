@@ -23,6 +23,8 @@
 #include "include/m2minterfaceimpl.h"
 #include "mbed-trace/mbed_trace.h"
 
+#define TRACE_GROUP "mClt"
+
 M2MInterface* M2MInterfaceFactory::create_interface(M2MInterfaceObserver &observer,
                                                     const String &endpoint_name,
                                                     const String &endpoint_type,

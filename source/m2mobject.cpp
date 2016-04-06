@@ -23,6 +23,7 @@
 #include "mbed-trace/mbed_trace.h"
 
 #define BUFFER_SIZE 10
+#define TRACE_GROUP "mClt"
 
 M2MObject::M2MObject(const String &object_name)
 : M2MBase(object_name,M2MBase::Dynamic),

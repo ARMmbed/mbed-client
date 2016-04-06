@@ -22,6 +22,7 @@
 #include "mbed-trace/mbed_trace.h"
 
 #define BUFFER_SIZE 21
+#define TRACE_GROUP "mClt"
 
 M2MDevice* M2MDevice::_instance = NULL;
 
