@@ -216,14 +216,8 @@ String M2MSecurity::resource_value_string(SecurityResource resource) const
     M2MResource* res = get_resource(resource);
     if(res) {
         if(M2MSecurity::M2MServerUri == resource) {
-            uint8_t* buffer = NULL;
-            uint32_t length = 0;
-            res->get_value(buffer,length);
 
-            if(buffer) {
-                value.append_raw((char*)buffer, length);
-                free(buffer);
-            }
+            value = res->get_value_string();
         }
     }
     return value;

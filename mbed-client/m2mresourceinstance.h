@@ -181,7 +181,13 @@ public:
      * \brief Converts value to int and return it. Note: conversion
      * errors are not detected.
      */
-    virtual int get_value_int();
+    int get_value_int();
+
+    /**
+     * Get the value as a String object. No encoding/charset conversions
+     * done for the value, just a raw copy.
+     */
+    String get_value_string() const;
 
     /**
      * \brief Returns the value pointer of the object.

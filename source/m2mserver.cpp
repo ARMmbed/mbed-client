@@ -194,14 +194,8 @@ String M2MServer::resource_value_string(ServerResource resource) const
     String value = "";
     M2MResource* res = get_resource(resource);
     if(res && (M2MServer::Binding == resource)) {
-        uint8_t* buffer = NULL;
-        uint32_t length = 0;
-        res->get_value(buffer,length);
 
-        if (buffer) {
-            value.append_raw((char*)buffer, length);
-            free(buffer);
-        }
+        value = res->get_value_string();
     }
     return value;
 }

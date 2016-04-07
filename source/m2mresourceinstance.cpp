@@ -319,6 +319,17 @@ int M2MResourceInstance::get_value_int()
     return value_int;
 }
 
+String M2MResourceInstance::get_value_string() const
+{
+    // XXX: do a better constructor to avoid pointless malloc
+    String value;
+    if (_value) {
+        value.append_raw((char*)_value, _value_length);
+    }
+    
+    return value;
+}
+
 uint8_t* M2MResourceInstance::value() const
 {
     return _value;

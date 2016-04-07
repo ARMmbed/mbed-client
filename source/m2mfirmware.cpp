@@ -381,14 +381,8 @@ String M2MFirmware::resource_value_string(FirmwareResource resource) const
         if(M2MFirmware::PackageUri == resource          ||
            M2MFirmware::PackageName == resource           ||
            M2MFirmware::PackageVersion == resource) {
-            uint8_t* buffer = NULL;
-            uint32_t length = 0;
-            res->get_value(buffer,length);
 
-            if(buffer) {
-                value.append_raw((char*)buffer, length);
-                free(buffer);
-            }
+            value = res->get_value_string();
         }
     }
     return value;
