@@ -307,7 +307,7 @@ private:
     uint32_t                           _counter_for_nsdl;
     int32_t                            _register_id;
     int32_t                            _unregister_id;
-    uint16_t                           _update_id;
+    int32_t                            _update_id;
     uint16_t                           _bootstrap_id;
 
 friend class Test_M2MNsdlInterface;
