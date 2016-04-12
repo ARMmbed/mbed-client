@@ -35,10 +35,8 @@ M2MDevice* M2MDevice::get_instance()
 
 void M2MDevice::delete_instance()
 {
-    if(_instance) {
-        delete _instance;
-        _instance = NULL;
-    }
+    delete _instance;
+    _instance = NULL;
 }
 
 M2MDevice::M2MDevice()

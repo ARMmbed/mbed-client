@@ -73,34 +73,20 @@ M2MNsdlInterface::~M2MNsdlInterface()
 {
     tr_debug("M2MNsdlInterface::~M2MNsdlInterface() - IN");
     if(_resource) {
-        if(_resource->resource_parameters_ptr) {
-            memory_free(_resource->resource_parameters_ptr);
-            _resource->resource_parameters_ptr = NULL;
-        }
+        memory_free(_resource->resource_parameters_ptr);
         memory_free(_resource);
-        _resource = NULL;
     }
     if(_endpoint) {
-        if(_endpoint->lifetime_ptr) {
-            memory_free(_endpoint->lifetime_ptr);
-            _endpoint->lifetime_ptr = NULL;
-        }
-        if(_endpoint->location_ptr) {
-            memory_free(_endpoint->location_ptr);
-            _endpoint->location_ptr = NULL;
-        }
+        memory_free(_endpoint->lifetime_ptr);
+        memory_free(_endpoint->location_ptr);
         memory_free(_endpoint);
-        _endpoint = NULL;
-
     }
     delete _nsdl_exceution_timer;
     delete _registration_timer;
     _object_list.clear();
 
-    if(_server){
-        delete _server;
-        _server = NULL;
-    }
+    delete _server;
+
     sn_nsdl_destroy(_nsdl_handle);
     _nsdl_handle = NULL;
     __nsdl_interface = NULL;
@@ -192,10 +178,8 @@ void M2MNsdlInterface::delete_endpoint()
 {
     tr_debug("M2MNsdlInterface::delete_endpoint()");
     if(_endpoint) {
-        if(_endpoint->lifetime_ptr) {
-            free(_endpoint->lifetime_ptr);
-            _endpoint->lifetime_ptr = NULL;
-        }
+        free(_endpoint->lifetime_ptr);
+
         memory_free(_endpoint);
         _endpoint = NULL;
     }

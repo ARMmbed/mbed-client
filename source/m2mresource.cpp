@@ -105,14 +105,10 @@ M2MResource::~M2MResource()
             //Free allocated memory for resources.
             res = *it;
             delete res;
-            res = NULL;
         }
         _resource_instance_list.clear();
     }
-    if(_delayed_token) {
-        free(_delayed_token);
-        _delayed_token = NULL;
-    }
+    free(_delayed_token);
 }
 
 bool M2MResource::supports_multiple_instances() const
@@ -155,7 +151,6 @@ bool M2MResource::remove_resource_instance(uint16_t inst_id)
                 // Resource found and deleted.
                 res = *it;
                 delete res;
-                res = NULL;
                 _resource_instance_list.erase(pos);
                 success = true;
                 break;
@@ -567,20 +562,18 @@ sn_coap_hdr_s* M2MResource::handle_post_request(nsdl_s *nsdl,
             if(COAP_MSG_CODE_RESPONSE_CHANGED == msg_code) {
                 tr_debug("M2MResource::handle_post_request - Execute resource function");
                 execute(exec_params);
-                if(exec_params) {
-                    delete exec_params;
-                }
+
+                delete exec_params;
 
                 if(_delayed_response) {
                     coap_response->msg_type = COAP_MSG_TYPE_ACKNOWLEDGEMENT;
                     coap_response->msg_code = COAP_MSG_CODE_EMPTY;
                     coap_response->msg_id = received_coap_header->msg_id;
                     if(received_coap_header->token_len) {
-                        if(_delayed_token) {
-                         free(_delayed_token);
-                         _delayed_token = NULL;
-                         _delayed_token_len = 0;
-                        }
+
+                        free(_delayed_token);
+                        _delayed_token_len = 0;
+
                         _delayed_token = alloc_copy(received_coap_header->token_ptr, _delayed_token_len);
                         if(_delayed_token) {
                             _delayed_token_len = received_coap_header->token_len;
@@ -626,9 +619,7 @@ M2MResource::M2MExecuteParameter::M2MExecuteParameter()
 
 M2MResource::M2MExecuteParameter::~M2MExecuteParameter()
 {
-    if(_value) {
-        free(_value);
-    }
+    free(_value);
 }
 
 uint8_t *M2MResource::M2MExecuteParameter::get_argument_value() const

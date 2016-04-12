@@ -25,11 +25,10 @@
 M2MResourceInstance& M2MResourceInstance::operator=(const M2MResourceInstance& other)
 {
     if (this != &other) { // protect against invalid self-assignment
-        if(_value) {
-            free(_value);
-            _value = NULL;
-            _value_length = 0;
-        }
+
+        free(_value);
+        _value = NULL;
+
         _value_length = other._value_length;
         if(other._value) {
             _value = (uint8_t *)alloc_string_copy(other._value, other._value_length);
@@ -107,16 +106,8 @@ M2MResourceInstance::M2MResourceInstance(const String &res_name,
 
 M2MResourceInstance::~M2MResourceInstance()
 {
-    if(_value) {
-        free(_value);
-        _value = NULL;
-        _value_length = 0;
-    }
-    if (_function_pointer) {
-        delete _function_pointer;
-        _function_pointer = NULL;
-    }
-    _resource_callback = NULL;
+    free(_value);
+    delete _function_pointer;
 }
 
 M2MBase::BaseType M2MResourceInstance::base_type() const
@@ -158,9 +149,8 @@ void M2MResourceInstance::set_execute_function(execute_callback callback)
 
 void M2MResourceInstance::set_execute_function(execute_callback_2 callback)
 {
-    if (_function_pointer) {
-        delete _function_pointer;
-    }
+    delete _function_pointer;
+
     _function_pointer = new FP1<void, void*>(callback);
     set_execute_function(execute_callback(_function_pointer, &FP1<void, void*>::call));
 }
@@ -168,11 +158,11 @@ void M2MResourceInstance::set_execute_function(execute_callback_2 callback)
 void M2MResourceInstance::clear_value()
 {
     tr_debug("M2MResourceInstance::clear_value");
-    if(_value) {
-         free(_value);
-         _value = NULL;
-         _value_length = 0;
-    }
+
+     free(_value);
+     _value = NULL;
+     _value_length = 0;
+
     report();
 }
 
@@ -199,11 +189,10 @@ bool M2MResourceInstance::set_value(const uint8_t *value,
     }
     if( value != NULL && value_length > 0 ) {
         success = true;
-        if(_value) {
-             free(_value);
-             _value = NULL;
-             _value_length = 0;
-        }
+
+        free(_value);
+        _value_length = 0;
+
         _value = alloc_string_copy(value, value_length);
         if(_value) {
             _value_length = value_length;

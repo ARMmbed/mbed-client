@@ -41,20 +41,18 @@ M2MBase& M2MBase::operator=(const M2MBase& other)
         _register_uri = other._register_uri;
         _uri_path = other._uri_path;
         _max_age = other._max_age;
-        if(_token) {
-            free(_token);
-            _token = NULL;
-            _token_length = 0;
-        }
+
+        free(_token);
+        _token = NULL;
+
         _token_length = other._token_length;
         if(other._token) {
             _token = alloc_string_copy(other._token, other._token_length);
         }
 
-        if(_report_handler) {
-            delete _report_handler;
-            _report_handler = NULL;
-        }
+        delete _report_handler;
+        _report_handler = NULL;
+
         if(other._report_handler) {
             _report_handler = new M2MReportHandler(*other._report_handler);
         }
@@ -121,15 +119,8 @@ M2MBase::M2MBase(const String & resource_name,
 
 M2MBase::~M2MBase()
 {
-    if(_report_handler) {
-        delete _report_handler;
-        _report_handler = NULL;
-    }
-    if(_token) {
-        free(_token);
-        _token = NULL;
-        _token_length = 0;
-    }
+    delete _report_handler;
+    free(_token);
 }
 
 void M2MBase::set_operation(M2MBase::Operation opr)
@@ -188,20 +179,16 @@ void M2MBase::set_under_observation(bool observed,
             _report_handler->set_under_observation(observed);
         }
     } else {
-        if(_report_handler) {
-            delete _report_handler;
-            _report_handler = NULL;
-        }
+        delete _report_handler;
+        _report_handler = NULL;
     }
 }
 
 void M2MBase::set_observation_token(const uint8_t *token, const uint8_t length)
 {
-    if(_token) {
-         free(_token);
-         _token = NULL;
-         _token_length = 0;
-    }
+     free(_token);
+     _token = NULL;
+     _token_length = 0;
 
     if( token != NULL && length > 0 ) {
         _token = alloc_string_copy((uint8_t *)token, length);
@@ -279,10 +266,8 @@ M2MBase::Observation M2MBase::observation_level() const
 void M2MBase::get_observation_token(uint8_t *&token, uint32_t &token_length)
 {
     token_length = 0;
-    if(token) {
-        free(token);
-        token = NULL;
-    }
+    free(token);
+
     token = alloc_string_copy((uint8_t *)_token, _token_length);
     if(token) {
         token_length = _token_length;

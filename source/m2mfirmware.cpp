@@ -34,10 +34,8 @@ M2MFirmware* M2MFirmware::get_instance()
 
 void M2MFirmware::delete_instance()
 {
-    if(_instance) {
-        delete _instance;
-        _instance = NULL;
-    }
+    delete _instance;
+    _instance = NULL;
 }
 
 M2MFirmware::M2MFirmware()

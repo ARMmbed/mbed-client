@@ -70,7 +70,6 @@ M2MObjectInstance::~M2MObjectInstance()
             //Free allocated memory for resources.
             res = *it;
             delete res;
-            res = NULL;
         }
         _resource_list.clear();
     }

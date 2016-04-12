@@ -45,12 +45,9 @@ M2MReportHandler::M2MReportHandler(M2MReportObserver &observer)
 M2MReportHandler::~M2MReportHandler()
 {
     tr_debug("M2MReportHandler::~M2MReportHandler()");
-    if(_pmax_timer) {
-        delete _pmax_timer;
-    }
-    if(_pmin_timer) {
-        delete _pmin_timer;
-    }
+
+    delete _pmax_timer;
+    delete _pmin_timer;
 }
 
 void M2MReportHandler::set_under_observation(bool observed)

@@ -88,7 +88,6 @@ M2MSecurity::M2MSecurity(ServerType ser_type)
 
 M2MSecurity::~M2MSecurity()
 {
-    _server_instance = NULL;
 }
 
 M2MResource* M2MSecurity::create_resource(SecurityResource resource, uint32_t value)
