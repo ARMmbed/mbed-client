@@ -26,7 +26,11 @@
 class TestObserver : public M2MInterfaceObserver {
 
 public:
-    TestObserver(){}
+    TestObserver() : val_updated(false), error_occured(false),
+            registered(false), unregistered(false), bootstrapped(false)
+    {
+    }
+
     virtual ~TestObserver(){}
     void bootstrap_done(M2MSecurity */*server_object*/){
         bootstrapped = true;
