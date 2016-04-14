@@ -157,7 +157,7 @@ class Vector
     }
 
     enum {
-        MORE_SIZE = 32
+        MORE_SIZE = 4
     };
 
   private:

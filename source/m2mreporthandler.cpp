@@ -229,7 +229,7 @@ bool M2MReportHandler::set_notification_attribute(char* option,
     memset(&attribute, 0, 20);
     memset(&value, 0, 20);
 
-    char* pos = strstr(option, EQUAL.c_str());
+    char* pos = strstr(option, EQUAL);
     if( pos != NULL ){        
         memcpy(attribute, option, (size_t)(pos-option));
         pos++;
@@ -239,33 +239,33 @@ bool M2MReportHandler::set_notification_attribute(char* option,
     }
 
     if (strlen(value)) {
-        if (strcmp(attribute, PMIN.c_str()) == 0) {
+        if (strcmp(attribute, PMIN) == 0) {
            _pmin = atoi(value);
             success = true;
             _attribute_state |= M2MReportHandler::Pmin;
             tr_debug("M2MReportHandler::set_notification_attribute %s to %d", attribute, _pmin);
         }
-        else if(strcmp(attribute, PMAX.c_str()) == 0) {
+        else if(strcmp(attribute, PMAX) == 0) {
             _pmax = atoi(value);
             success = true;
             _attribute_state |= M2MReportHandler::Pmax;
             tr_debug("M2MReportHandler::set_notification_attribute %s to %d", attribute, _pmax);
         }
-        else if(strcmp(attribute, GT.c_str()) == 0 &&
+        else if(strcmp(attribute, GT) == 0 &&
                 (M2MBase::Resource == type)){
             _gt = atof(value);
             success = true;
             _attribute_state |= M2MReportHandler::Gt;
             tr_debug("M2MReportHandler::set_notification_attribute %s to %f", attribute, _gt);
         }
-        else if(strcmp(attribute, LT.c_str()) == 0 &&
+        else if(strcmp(attribute, LT) == 0 &&
                 (M2MBase::Resource == type)){
             _lt = atof(value);
             success = true;
             _attribute_state |= M2MReportHandler::Lt;
             tr_debug("M2MReportHandler::set_notification_attribute %s to %f", attribute, _lt);
         }
-        else if((strcmp(attribute, ST.c_str()) == 0 || (strcmp(attribute, STP.c_str()) == 0))
+        else if((strcmp(attribute, ST) == 0 || (strcmp(attribute, STP) == 0))
                 && (M2MBase::Resource == type)){
             _st = atof(value);
             success = true;

@@ -21,8 +21,8 @@
 
 const int MAX_VALUE_LENGTH = 256;
 const int BUFFER_LENGTH = 1152;
-extern const String COAP;
-extern const String COAPS;
+extern const char* COAP;
+extern const char* COAPS;
 const int32_t MINIMUM_REGISTRATION_TIME = 60; //in seconds
 const uint64_t ONE_SECOND_TIMER = 1;
 const uint16_t MAX_ALLOWED_STRING_LENGTH = 64;
@@ -39,98 +39,98 @@ const int RETRY_INTERVAL = 5;
 #define STOP_OBSERVATION 1
 
 // PUT attributes to be checked from server
-extern const String EQUAL;
-extern const String AMP;
-extern const String PMIN;
-extern const String PMAX;
-extern const String GT;
-extern const String LT;
-extern const String ST;
-extern const String STP;
-extern const String CANCEL;
+extern const char* EQUAL;
+extern const char* AMP;
+extern const char* PMIN;
+extern const char* PMAX;
+extern const char* GT;
+extern const char* LT;
+extern const char* ST;
+extern const char* STP;
+extern const char* CANCEL;
 
 //LWM2MOBJECT NAME/ID
-extern const String M2M_SECURITY_ID;
-extern const String M2M_SERVER_ID;
-extern const String M2M_ACCESS_CONTROL_ID;
-extern const String M2M_DEVICE_ID;
+extern const char* M2M_SECURITY_ID;
+extern const char* M2M_SERVER_ID;
+extern const char* M2M_ACCESS_CONTROL_ID;
+extern const char* M2M_DEVICE_ID;
 
-extern const String M2M_CONNECTIVITY_MONITOR_ID;
-extern const String M2M_FIRMWARE_ID;
-extern const String M2M_LOCATION_ID;
-extern const String M2M_CONNECTIVITY_STATISTICS_ID;
-extern const String RESERVED_ID;
+extern const char* M2M_CONNECTIVITY_MONITOR_ID;
+extern const char* M2M_FIRMWARE_ID;
+extern const char* M2M_LOCATION_ID;
+extern const char* M2M_CONNECTIVITY_STATISTICS_ID;
+extern const char* RESERVED_ID;
 
 //OBJECT RESOURCE TYPE
-extern const String OMA_RESOURCE_TYPE;
+extern const char* OMA_RESOURCE_TYPE;
 
 //DEVICE RESOURCES
-extern const String DEVICE_MANUFACTURER;
-extern const String DEVICE_DEVICE_TYPE;
-extern const String DEVICE_MODEL_NUMBER;
-extern const String DEVICE_SERIAL_NUMBER;
-extern const String DEVICE_HARDWARE_VERSION;
-extern const String DEVICE_FIRMWARE_VERSION;
-extern const String DEVICE_SOFTWARE_VERSION;
-extern const String DEVICE_REBOOT;
-extern const String DEVICE_FACTORY_RESET;
-extern const String DEVICE_AVAILABLE_POWER_SOURCES;
-extern const String DEVICE_POWER_SOURCE_VOLTAGE;
-extern const String DEVICE_POWER_SOURCE_CURRENT;
-extern const String DEVICE_BATTERY_LEVEL;
-extern const String DEVICE_BATTERY_STATUS;
-extern const String DEVICE_MEMORY_FREE;
-extern const String DEVICE_MEMORY_TOTAL;
-extern const String DEVICE_ERROR_CODE;
-extern const String DEVICE_RESET_ERROR_CODE;
-extern const String DEVICE_CURRENT_TIME;
-extern const String DEVICE_UTC_OFFSET;
-extern const String DEVICE_TIMEZONE;
-extern const String DEVICE_SUPPORTED_BINDING_MODE;
+extern const char* DEVICE_MANUFACTURER;
+extern const char* DEVICE_DEVICE_TYPE;
+extern const char* DEVICE_MODEL_NUMBER;
+extern const char* DEVICE_SERIAL_NUMBER;
+extern const char* DEVICE_HARDWARE_VERSION;
+extern const char* DEVICE_FIRMWARE_VERSION;
+extern const char* DEVICE_SOFTWARE_VERSION;
+extern const char* DEVICE_REBOOT;
+extern const char* DEVICE_FACTORY_RESET;
+extern const char* DEVICE_AVAILABLE_POWER_SOURCES;
+extern const char* DEVICE_POWER_SOURCE_VOLTAGE;
+extern const char* DEVICE_POWER_SOURCE_CURRENT;
+extern const char* DEVICE_BATTERY_LEVEL;
+extern const char* DEVICE_BATTERY_STATUS;
+extern const char* DEVICE_MEMORY_FREE;
+extern const char* DEVICE_MEMORY_TOTAL;
+extern const char* DEVICE_ERROR_CODE;
+extern const char* DEVICE_RESET_ERROR_CODE;
+extern const char* DEVICE_CURRENT_TIME;
+extern const char* DEVICE_UTC_OFFSET;
+extern const char* DEVICE_TIMEZONE;
+extern const char* DEVICE_SUPPORTED_BINDING_MODE;
 
-extern const String BINDING_MODE_UDP;
-extern const String BINDING_MODE_UDP_QUEUE;
-extern const String BINDING_MODE_SMS;
-extern const String BINDING_MODE_SMS_QUEUE;
+extern const char* BINDING_MODE_UDP;
+extern const char* BINDING_MODE_UDP_QUEUE;
+extern const char* BINDING_MODE_SMS;
+extern const char* BINDING_MODE_SMS_QUEUE;
 
-extern const String ERROR_CODE_VALUE;
+extern const char* ERROR_CODE_VALUE;
 
 
 
 //SECURITY RESOURCES
-extern const String SECURITY_M2M_SERVER_URI;
-extern const String SECURITY_BOOTSTRAP_SERVER;
-extern const String SECURITY_SECURITY_MODE;
-extern const String SECURITY_PUBLIC_KEY;
-extern const String SECURITY_SERVER_PUBLIC_KEY;
-extern const String SECURITY_SECRET_KEY;
-extern const String SECURITY_SMS_SECURITY_MODE;
-extern const String SECURITY_SMS_BINDING_KEY;
-extern const String SECURITY_SMS_BINDING_SECRET_KEY;
-extern const String SECURITY_M2M_SERVER_SMS_NUMBER;
-extern const String SECURITY_SHORT_SERVER_ID;
-extern const String SECURITY_CLIENT_HOLD_OFF_TIME;
+extern const char* SECURITY_M2M_SERVER_URI;
+extern const char* SECURITY_BOOTSTRAP_SERVER;
+extern const char* SECURITY_SECURITY_MODE;
+extern const char* SECURITY_PUBLIC_KEY;
+extern const char* SECURITY_SERVER_PUBLIC_KEY;
+extern const char* SECURITY_SECRET_KEY;
+extern const char* SECURITY_SMS_SECURITY_MODE;
+extern const char* SECURITY_SMS_BINDING_KEY;
+extern const char* SECURITY_SMS_BINDING_SECRET_KEY;
+extern const char* SECURITY_M2M_SERVER_SMS_NUMBER;
+extern const char* SECURITY_SHORT_SERVER_ID;
+extern const char* SECURITY_CLIENT_HOLD_OFF_TIME;
 
 //SERVER RESOURCES
-extern const String SERVER_SHORT_SERVER_ID;
-extern const String SERVER_LIFETIME;
-extern const String SERVER_DEFAULT_MIN_PERIOD;
-extern const String SERVER_DEFAULT_MAX_PERIOD;
-extern const String SERVER_DISABLE;
-extern const String SERVER_DISABLE_TIMEOUT;
-extern const String SERVER_NOTIFICATION_STORAGE;
-extern const String SERVER_BINDING;
-extern const String SERVER_REGISTRATION_UPDATE;
+extern const char* SERVER_SHORT_SERVER_ID;
+extern const char* SERVER_LIFETIME;
+extern const char* SERVER_DEFAULT_MIN_PERIOD;
+extern const char* SERVER_DEFAULT_MAX_PERIOD;
+extern const char* SERVER_DISABLE;
+extern const char* SERVER_DISABLE_TIMEOUT;
+extern const char* SERVER_NOTIFICATION_STORAGE;
+extern const char* SERVER_BINDING;
+extern const char* SERVER_REGISTRATION_UPDATE;
 
 //FIRMWARE RESOURCES
-extern const String FIRMWARE_PACKAGE;
-extern const String FIRMWARE_PACKAGE_URI;
-extern const String FIRMWARE_UPDATE;
-extern const String FIRMWARE_STATE;
-extern const String FIRMWARE_UPDATE_SUPPORTED_OBJECTS;
-extern const String FIRMWARE_UPDATE_RESULT;
-extern const String FIRMWARE_PACKAGE_NAME;
-extern const String FIRMWARE_PACKAGE_VERSION;
+extern const char* FIRMWARE_PACKAGE;
+extern const char* FIRMWARE_PACKAGE_URI;
+extern const char* FIRMWARE_UPDATE;
+extern const char* FIRMWARE_STATE;
+extern const char* FIRMWARE_UPDATE_SUPPORTED_OBJECTS;
+extern const char* FIRMWARE_UPDATE_RESULT;
+extern const char* FIRMWARE_PACKAGE_NAME;
+extern const char* FIRMWARE_PACKAGE_VERSION;
 
 // TLV serializer / deserializer
 const uint8_t TYPE_RESOURCE = 0xC0;
