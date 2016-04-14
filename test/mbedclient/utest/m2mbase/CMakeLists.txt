@@ -2,7 +2,6 @@ if(TARGET_LIKE_LINUX)
 include("../includes.txt")
 add_executable(m2mbase 
 	"../../../../source/m2mbase.cpp"
-	"../../../../source/m2mconstants.cpp"
 	"main.cpp"
         "../stub/m2mreporthandler_stub.cpp"
         "../stub/m2mstring_stub.cpp"

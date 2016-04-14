@@ -11,7 +11,6 @@ add_executable(m2mserver
         "../stub/m2mresourceinstance_stub.cpp"
         "../stub/m2mbase_stub.cpp"
         "../../../../source/m2mserver.cpp"
-        "../../../../source/m2mconstants.cpp"
 )
 
 target_link_libraries(m2mserver

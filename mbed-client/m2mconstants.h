@@ -21,8 +21,7 @@
 
 const int MAX_VALUE_LENGTH = 256;
 const int BUFFER_LENGTH = 1152;
-extern const String COAP;
-extern const String COAPS;
+
 const int32_t MINIMUM_REGISTRATION_TIME = 60; //in seconds
 const uint64_t ONE_SECOND_TIMER = 1;
 const uint16_t MAX_ALLOWED_STRING_LENGTH = 64;
@@ -38,99 +37,96 @@ const int RETRY_INTERVAL = 5;
 #define START_OBSERVATION 0
 #define STOP_OBSERVATION 1
 
+#define COAP "coap://"
+#define COAPS  "coaps://"
 // PUT attributes to be checked from server
-extern const String EQUAL;
-extern const String AMP;
-extern const String PMIN;
-extern const String PMAX;
-extern const String GT;
-extern const String LT;
-extern const String ST;
-extern const String STP;
-extern const String CANCEL;
+#define EQUAL  "="
+#define AMP  "&"
+#define PMIN  "pmin"
+#define PMAX  "pmax"
+#define GT  "gt"
+#define LT  "lt"
+#define ST_SIZE  "st"
+#define STP  "stp"
+#define CANCEL  "cancel"
 
 //LWM2MOBJECT NAME/ID
-extern const String M2M_SECURITY_ID;
-extern const String M2M_SERVER_ID;
-extern const String M2M_ACCESS_CONTROL_ID;
-extern const String M2M_DEVICE_ID;
+#define M2M_SECURITY_ID  "0"
+#define M2M_SERVER_ID  "1"
+#define M2M_ACCESS_CONTROL_ID  "2"
+#define M2M_DEVICE_ID  "3"
+#define M2M_CONNECTIVITY_MONITOR_ID  "4"
+#define M2M_FIRMWARE_ID  "5"
+#define M2M_LOCATION_ID  "6"
+#define M2M_CONNECTIVITY_STATISTICS_ID  "7"
+#define RESERVED_ID  "8"
 
-extern const String M2M_CONNECTIVITY_MONITOR_ID;
-extern const String M2M_FIRMWARE_ID;
-extern const String M2M_LOCATION_ID;
-extern const String M2M_CONNECTIVITY_STATISTICS_ID;
-extern const String RESERVED_ID;
-
-//OBJECT RESOURCE TYPE
-extern const String OMA_RESOURCE_TYPE;
+//OMA RESOURCE TYPE
+#define OMA_RESOURCE_TYPE  "" //oma.lwm2m
 
 //DEVICE RESOURCES
-extern const String DEVICE_MANUFACTURER;
-extern const String DEVICE_DEVICE_TYPE;
-extern const String DEVICE_MODEL_NUMBER;
-extern const String DEVICE_SERIAL_NUMBER;
-extern const String DEVICE_HARDWARE_VERSION;
-extern const String DEVICE_FIRMWARE_VERSION;
-extern const String DEVICE_SOFTWARE_VERSION;
-extern const String DEVICE_REBOOT;
-extern const String DEVICE_FACTORY_RESET;
-extern const String DEVICE_AVAILABLE_POWER_SOURCES;
-extern const String DEVICE_POWER_SOURCE_VOLTAGE;
-extern const String DEVICE_POWER_SOURCE_CURRENT;
-extern const String DEVICE_BATTERY_LEVEL;
-extern const String DEVICE_BATTERY_STATUS;
-extern const String DEVICE_MEMORY_FREE;
-extern const String DEVICE_MEMORY_TOTAL;
-extern const String DEVICE_ERROR_CODE;
-extern const String DEVICE_RESET_ERROR_CODE;
-extern const String DEVICE_CURRENT_TIME;
-extern const String DEVICE_UTC_OFFSET;
-extern const String DEVICE_TIMEZONE;
-extern const String DEVICE_SUPPORTED_BINDING_MODE;
-
-extern const String BINDING_MODE_UDP;
-extern const String BINDING_MODE_UDP_QUEUE;
-extern const String BINDING_MODE_SMS;
-extern const String BINDING_MODE_SMS_QUEUE;
-
-extern const String ERROR_CODE_VALUE;
-
-
+#define DEVICE_MANUFACTURER  "0"
+#define DEVICE_DEVICE_TYPE  "17"
+#define DEVICE_MODEL_NUMBER  "1"
+#define DEVICE_SERIAL_NUMBER  "2"
+#define DEVICE_HARDWARE_VERSION  "18"
+#define DEVICE_FIRMWARE_VERSION  "3"
+#define DEVICE_SOFTWARE_VERSION  "19"
+#define DEVICE_REBOOT  "4"
+#define DEVICE_FACTORY_RESET  "5"
+#define DEVICE_AVAILABLE_POWER_SOURCES  "6"
+#define DEVICE_POWER_SOURCE_VOLTAGE  "7"
+#define DEVICE_POWER_SOURCE_CURRENT  "8"
+#define DEVICE_BATTERY_LEVEL  "9"
+#define DEVICE_BATTERY_STATUS  "20"
+#define DEVICE_MEMORY_FREE  "10"
+#define DEVICE_MEMORY_TOTAL  "21"
+#define DEVICE_ERROR_CODE  "11"
+#define DEVICE_RESET_ERROR_CODE  "12"
+#define DEVICE_CURRENT_TIME  "13"
+#define DEVICE_UTC_OFFSET  "14"
+#define DEVICE_TIMEZONE  "15"
+#define DEVICE_SUPPORTED_BINDING_MODE  "16"
+#define BINDING_MODE_UDP  "U"
+#define BINDING_MODE_UDP_QUEUE  "UQ"
+#define BINDING_MODE_SMS  "S"
+#define BINDING_MODE_SMS_QUEUE  "SQ"
+#define ERROR_CODE_VALUE  "0"
 
 //SECURITY RESOURCES
-extern const String SECURITY_M2M_SERVER_URI;
-extern const String SECURITY_BOOTSTRAP_SERVER;
-extern const String SECURITY_SECURITY_MODE;
-extern const String SECURITY_PUBLIC_KEY;
-extern const String SECURITY_SERVER_PUBLIC_KEY;
-extern const String SECURITY_SECRET_KEY;
-extern const String SECURITY_SMS_SECURITY_MODE;
-extern const String SECURITY_SMS_BINDING_KEY;
-extern const String SECURITY_SMS_BINDING_SECRET_KEY;
-extern const String SECURITY_M2M_SERVER_SMS_NUMBER;
-extern const String SECURITY_SHORT_SERVER_ID;
-extern const String SECURITY_CLIENT_HOLD_OFF_TIME;
+#define SECURITY_M2M_SERVER_URI  "0"
+#define SECURITY_BOOTSTRAP_SERVER  "1"
+#define SECURITY_SECURITY_MODE  "2"
+#define SECURITY_PUBLIC_KEY  "3"
+#define SECURITY_SERVER_PUBLIC_KEY  "4"
+#define SECURITY_SECRET_KEY  "5"
+#define SECURITY_SMS_SECURITY_MODE  "6"
+#define SECURITY_SMS_BINDING_KEY  "7"
+#define SECURITY_SMS_BINDING_SECRET_KEY  "8"
+#define SECURITY_M2M_SERVER_SMS_NUMBER  "9"
+#define SECURITY_SHORT_SERVER_ID  "10"
+#define SECURITY_CLIENT_HOLD_OFF_TIME  "11"
 
 //SERVER RESOURCES
-extern const String SERVER_SHORT_SERVER_ID;
-extern const String SERVER_LIFETIME;
-extern const String SERVER_DEFAULT_MIN_PERIOD;
-extern const String SERVER_DEFAULT_MAX_PERIOD;
-extern const String SERVER_DISABLE;
-extern const String SERVER_DISABLE_TIMEOUT;
-extern const String SERVER_NOTIFICATION_STORAGE;
-extern const String SERVER_BINDING;
-extern const String SERVER_REGISTRATION_UPDATE;
+#define SERVER_SHORT_SERVER_ID  "0"
+#define SERVER_LIFETIME  "1"
+#define SERVER_DEFAULT_MIN_PERIOD  "2"
+#define SERVER_DEFAULT_MAX_PERIOD  "3"
+#define SERVER_DISABLE  "4"
+#define SERVER_DISABLE_TIMEOUT  "5"
+#define SERVER_NOTIFICATION_STORAGE  "6"
+#define SERVER_BINDING  "7"
+#define SERVER_REGISTRATION_UPDATE  "8"
 
 //FIRMWARE RESOURCES
-extern const String FIRMWARE_PACKAGE;
-extern const String FIRMWARE_PACKAGE_URI;
-extern const String FIRMWARE_UPDATE;
-extern const String FIRMWARE_STATE;
-extern const String FIRMWARE_UPDATE_SUPPORTED_OBJECTS;
-extern const String FIRMWARE_UPDATE_RESULT;
-extern const String FIRMWARE_PACKAGE_NAME;
-extern const String FIRMWARE_PACKAGE_VERSION;
+#define FIRMWARE_PACKAGE  "0"
+#define FIRMWARE_PACKAGE_URI  "1"
+#define FIRMWARE_UPDATE  "2"
+#define FIRMWARE_STATE  "3"
+#define FIRMWARE_UPDATE_SUPPORTED_OBJECTS  "4"
+#define FIRMWARE_UPDATE_RESULT  "5"
+#define FIRMWARE_PACKAGE_NAME  "6"
+#define FIRMWARE_PACKAGE_VERSION  "7"
 
 // TLV serializer / deserializer
 const uint8_t TYPE_RESOURCE = 0xC0;

@@ -87,8 +87,7 @@ M2MDevice::M2MDevice()
                                                         true);
         if(res) {
             res->set_operation(M2MBase::GET_ALLOWED);
-            res->set_value((const uint8_t*)BINDING_MODE_UDP.c_str(),
-                           (uint32_t)BINDING_MODE_UDP.length());
+            res->set_value((const uint8_t*)BINDING_MODE_UDP,sizeof(BINDING_MODE_UDP)-1);
             res->set_register_uri(false);
         }
     }
