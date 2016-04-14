@@ -265,7 +265,7 @@ bool M2MReportHandler::set_notification_attribute(char* option,
             _attribute_state |= M2MReportHandler::Lt;
             tr_debug("M2MReportHandler::set_notification_attribute %s to %f", attribute, _lt);
         }
-        else if((strcmp(attribute, ST) == 0 || (strcmp(attribute, STP) == 0))
+        else if((strcmp(attribute, ST_SIZE) == 0 || (strcmp(attribute, STP) == 0))
                 && (M2MBase::Resource == type)){
             _st = atof(value);
             success = true;
