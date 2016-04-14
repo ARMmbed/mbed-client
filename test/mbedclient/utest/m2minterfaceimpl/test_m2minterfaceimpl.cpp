@@ -26,7 +26,11 @@
 class TestObserver : public M2MInterfaceObserver {
 
 public:
-    TestObserver(){}
+    TestObserver() : val_updated(false), error_occured(false),
+            registered(false), unregistered(false), bootstrapped(false)
+    {
+    }
+
     virtual ~TestObserver(){}
     void bootstrap_done(M2MSecurity */*server_object*/){
         bootstrapped = true;
@@ -283,6 +287,7 @@ void Test_M2MInterfaceImpl::test_register_object()
 
     CHECK(impl->_current_state == M2MInterfaceImpl::STATE_REGISTER);       
 
+    m2msecurity_stub::string_value = val;
     m2mnsdlinterface_stub::bool_value = true;
     m2mconnectionhandler_stub::bool_value = false;
 
