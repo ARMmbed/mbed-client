@@ -56,7 +56,12 @@ public:
         ResponseParseFailed,
         UnknownError,
         MemoryFail,
-        NotAllowed
+        NotAllowed, // 10
+        HandshakeFailed,
+        SslInitFailed,
+        DNSResolvingFailed,
+        SocketReadError,
+        SocketSendError
     }Error;
 
     /**

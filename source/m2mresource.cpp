@@ -100,6 +100,7 @@ M2MResource::M2MResource(M2MObjectInstanceCallback &object_instance_callback,
 
 M2MResource::~M2MResource()
 {
+    tr_debug("M2MResource::~M2MResource() - IN");
     if(!_resource_instance_list.empty()) {
         M2MResourceInstance* res = NULL;
         M2MResourceInstanceList::const_iterator it;
@@ -116,6 +117,7 @@ M2MResource::~M2MResource()
         free(_delayed_token);
         _delayed_token = NULL;
     }
+    tr_debug("M2MResource::~M2MResource() - OUT");
 }
 
 bool M2MResource::supports_multiple_instances() const

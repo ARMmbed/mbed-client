@@ -311,10 +311,10 @@ bool M2MNsdlInterface::send_update_registration(const uint32_t lifetime)
         if(_nsdl_handle) {
             _update_id = -1;
             _update_id = sn_nsdl_update_registration(_nsdl_handle, NULL, 0);
-            tr_debug("M2MNsdlInterface::send_update_registration - regular update- _update_id %d", _update_id);
             success = _update_id != 0;
         }
     }
+    tr_debug("M2MNsdlInterface::send_update_registration - OUT success %d", success);
     return success;
 }
 
@@ -894,7 +894,7 @@ bool M2MNsdlInterface::create_nsdl_object_structure(M2MObject *object)
     tr_debug("M2MNsdlInterface::create_nsdl_object_structure()");
     bool success = false;
     if(object) {
-        //object->set_under_observation(false,this);
+        object->set_observation_handler(this);
         M2MObjectInstanceList instance_list = object->instances();
         tr_debug("M2MNsdlInterface::create_nsdl_object_structure - Object Instance count %d", instance_list.size());
         if(!instance_list.empty()) {
@@ -927,8 +927,7 @@ bool M2MNsdlInterface::create_nsdl_object_instance_structure(M2MObjectInstance *
         object_name += String(inst_id);
         free(inst_id);
 
-
-        //object_instance->set_under_observation(false,this);
+        object_instance->set_observation_handler(this);
 
         M2MResourceList res_list = object_instance->resources();
         tr_debug("M2MNsdlInterface::create_nsdl_object_instance_structure - ResourceBase count %d", res_list.size());
@@ -1058,16 +1057,16 @@ bool M2MNsdlInterface::create_nsdl_resource(M2MBase *base, const String &name, b
                 _resource->path = NULL;
             }
             if(name.length() > 0 ){
-                _resource->path = ((uint8_t*)memory_alloc(name.length()+1));
+                _resource->path = ((uint8_t*)memory_alloc(name.length()));
                 if(_resource->path) {
-                    memset(_resource->path, 0, name.length()+1);
+                    memset(_resource->path, 0, name.length());
                     memcpy(_resource->path, (uint8_t*)name.c_str(), name.length());
                     _resource->pathlen = name.length();
                 }
             }
             if(!base->resource_type().empty() && _resource->resource_parameters_ptr) {
                 _resource->resource_parameters_ptr->resource_type_ptr =
-                       ((uint8_t*)memory_alloc(base->resource_type().length()+1));
+                       ((uint8_t*)memory_alloc(base->resource_type().length()));
                 if(_resource->resource_parameters_ptr->resource_type_ptr) {
                     memset(_resource->resource_parameters_ptr->resource_type_ptr,
                           0, base->resource_type().length()+1);

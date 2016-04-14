@@ -204,6 +204,11 @@ void M2MBase::set_under_observation(bool observed,
     }
 }
 
+void M2MBase::set_observation_handler(M2MObservationHandler *handler)
+{
+    _observation_handler = handler;
+}
+
 void M2MBase::set_observation_token(const uint8_t *token, const uint8_t length)
 {
     if(_token) {

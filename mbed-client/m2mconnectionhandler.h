@@ -72,9 +72,9 @@ public:
     * \param ServerType The server type to be resolved.
     * \param security The M2MSecurity object that determines which
     * type of secure connection will be used by the socket.
-    * \return True if address is valid, else false.
+    * \return Error code
     */
-    bool resolve_server_address(const String& server_address,
+    M2MInterface::Error resolve_server_address(const String& server_address,
                                 const uint16_t server_port,
                                 M2MConnectionObserver::ServerType server_type,
                                 const M2MSecurity* security);
