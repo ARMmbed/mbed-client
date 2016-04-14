@@ -39,8 +39,14 @@ public:
      */
     typedef enum {
         CONNECTION_ERROR_WANTS_READ = -1000,
-        CONNECTION_ERROR_WANTS_WRITE = -1001
+        CONNECTION_ERROR_WANTS_WRITE = -1001,
+        ERROR_NONE = 0,
+        SSL_CONNECTION_ERROR,
+        SOCKET_READ_ERROR,
+        SOCKET_SEND_ERROR,
+        DNS_RESOLVING_ERROR,
     }ConnectionError;
+
 
 public:
 
@@ -72,7 +78,7 @@ public:
     * \param ServerType The server type to be resolved.
     * \param security The M2MSecurity object that determines which
     * type of secure connection will be used by the socket.
-    * \return True if address is valid, else false.
+    * @return True if address is valid, else false.
     */
     bool resolve_server_address(const String& server_address,
                                 const uint16_t server_port,

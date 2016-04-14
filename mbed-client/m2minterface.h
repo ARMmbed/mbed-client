@@ -56,7 +56,9 @@ public:
         ResponseParseFailed,
         UnknownError,
         MemoryFail,
-        NotAllowed
+        NotAllowed,
+        SecureConnectionFailed,
+        DnsResolvingFailed
     }Error;
 
     /**

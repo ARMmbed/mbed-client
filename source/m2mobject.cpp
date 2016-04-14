@@ -37,6 +37,7 @@ M2MObject::M2MObject(const String &object_name)
 
 M2MObject::~M2MObject()
 {
+    tr_debug("M2MObject::~M2MObject() - IN");
     if(!_instance_list.empty()) {
         M2MObjectInstanceList::const_iterator it;
         it = _instance_list.begin();
@@ -45,25 +46,14 @@ M2MObject::~M2MObject()
         for (; it!=_instance_list.end(); it++, index++ ) {
             //Free allocated memory for object instances.
             obj = *it;
-
-            char *obj_inst_id = (char*)malloc(BUFFER_SIZE);
-            if(obj_inst_id) {
-                snprintf(obj_inst_id, BUFFER_SIZE,"%d",index);
-
-                String obj_name = M2MBase::name();
-                obj_name += String("/");
-                obj_name += String(obj_inst_id);
-
-                free(obj_inst_id);
-                remove_resource_from_coap(obj_name);
-            }
-
             delete obj;
             obj = NULL;
         }
+        remove_resource_from_coap(M2MBase::name());
         remove_object_from_coap();
         _instance_list.clear();
     }
+    tr_debug("M2MObject::~M2MObject() - OUT");
 }
 
 M2MObject& M2MObject::operator=(const M2MObject& other)
@@ -508,7 +498,7 @@ sn_coap_hdr_s* M2MObject::handle_post_request(nsdl_s *nsdl,
                                     case M2MTLVDeserializer::NotFound:
                                         msg_code = COAP_MSG_CODE_RESPONSE_NOT_FOUND;
                                         break;
-                                }                                
+                                }
                             }
                         } else {
                             tr_debug("M2MObject::handle_post_request() - COAP_MSG_CODE_RESPONSE_BAD_REQUEST");

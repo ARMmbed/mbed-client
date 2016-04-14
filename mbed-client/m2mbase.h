@@ -179,6 +179,12 @@ public:
                                        M2MObservationHandler *handler);
 
     /**
+     * \brief Sets the observation handler.
+     * \param handler Handler object for sending observation callbacks.
+     */
+    virtual void set_observation_handler(M2MObservationHandler *handler);
+
+    /**
      * \brief Sets the observation token value.
      * \param token Pointer to the token of the resource.
      * \param length Length of the token pointer.

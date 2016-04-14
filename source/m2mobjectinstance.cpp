@@ -63,6 +63,7 @@ M2MObjectInstance::M2MObjectInstance(const String &object_name,
 
 M2MObjectInstance::~M2MObjectInstance()
 {
+    tr_debug("M2MObjectInstance::~M2MObjectInstance() - IN");
     if(!_resource_list.empty()) {
         M2MResource* res = NULL;
         M2MResourceList::const_iterator it;
@@ -70,11 +71,20 @@ M2MObjectInstance::~M2MObjectInstance()
         for (; it!=_resource_list.end(); it++ ) {
             //Free allocated memory for resources.
             res = *it;
+            char obj_inst_id[BUFFER_SIZE];
+            snprintf(obj_inst_id, BUFFER_SIZE,"%d",M2MBase::instance_id());
+            String obj_name = M2MBase::name();
+            obj_name.push_back('/');
+            obj_name += obj_inst_id;
+            obj_name.push_back('/');
+            obj_name.append(res->name().c_str(), res->name().length());
+            remove_resource_from_coap(obj_name);
             delete res;
             res = NULL;
         }
         _resource_list.clear();
     }
+    tr_debug("M2MObjectInstance::~M2MObjectInstance() - OUT");
 }
 
 M2MResource* M2MObjectInstance::create_static_resource(const String &resource_name,

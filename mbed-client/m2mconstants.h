@@ -38,6 +38,11 @@ const int RETRY_INTERVAL = 5;
 #define START_OBSERVATION 0
 #define STOP_OBSERVATION 1
 
+// Default value for TCP keepalive is 10 min
+#ifndef YOTTA_CFG_TCP_KEEPALIVE_TIME
+#define YOTTA_CFG_TCP_KEEPALIVE_TIME 600
+#endif
+
 // PUT attributes to be checked from server
 extern const String EQUAL;
 extern const String AMP;
