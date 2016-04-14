@@ -351,8 +351,28 @@ void M2MInterfaceImpl::data_available(uint8_t* data,
 
 void M2MInterfaceImpl::socket_error(uint8_t error_code)
 {
-    _observer.error((M2MInterface::Error)error_code);
-    internal_event(STATE_IDLE);
+    M2MInterface::Error error = M2MInterface::ErrorNone;
+    switch (error_code) {
+    case M2MConnectionHandler::SSL_CONNECTION_ERROR:
+        error = M2MInterface::SecureConnectionFailed;
+        break;
+    case M2MConnectionHandler::SOCKET_READ_ERROR:
+        error = M2MInterface::NetworkError;
+        break;
+    case M2MConnectionHandler::SOCKET_SEND_ERROR:
+        error = M2MInterface::NetworkError;
+        break;
+    case M2MConnectionHandler::DNS_RESOLVING_ERROR:
+        error = M2MInterface::DnsResolvingFailed;
+        break;
+    default:
+        break;
+    }
+
+    if (M2MInterface::ErrorNone != error) {
+        _observer.error(error);
+        internal_event(STATE_IDLE);
+    }
 }
 
 void M2MInterfaceImpl::address_ready(const M2MConnectionObserver::SocketAddress &address,
@@ -574,12 +594,11 @@ void M2MInterfaceImpl::state_register( EventData *data)
                             tr_error("M2MInterfaceImpl::state_register - set error as M2MInterface::InvalidParameters");
                             error = M2MInterface::InvalidParameters;
                         } else {
-                            error = _connection_handler->resolve_server_address(ip_address,port,
+                            _connection_handler->resolve_server_address(ip_address,port,
                                                                         M2MConnectionObserver::LWM2MServer,
                                                                         security);
-                            if (M2MInterface::ErrorNone == error) {
-                                success = true;
-                            }
+                            // Errors are coming through callback
+                            success = true;
                         }
                     }
                 }
