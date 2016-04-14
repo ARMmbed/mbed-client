@@ -11,7 +11,6 @@ add_executable(m2mfirmware
         "../stub/m2mbase_stub.cpp"
         "../stub/m2mstring_stub.cpp"
         "../../../../source/m2mfirmware.cpp"
-        "../../../../source/m2mconstants.cpp"
 )
 target_link_libraries(m2mfirmware
     CppUTest
