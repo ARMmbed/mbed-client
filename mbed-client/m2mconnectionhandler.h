@@ -115,9 +115,11 @@ public:
      * is used by the security classes to receive raw data to be decrypted.
      * \param buf Buffer to send.
      * \param len The length of the buffer.
-     * \return Number of bytes read or -1 if failed.
+     * \param timeout Timeout defined from DTLS to wait for blocking receive calls
+     * before timing out, by default value is 0.
+     * \return Number of bytes read or negative number if failed.
      */
-    int receive_from_socket(unsigned char *buf, size_t len);
+    int receive_from_socket(unsigned char *buf, size_t len, uint32_t timeout = 0);
 
     /**
     * \brief Closes the open connection.
@@ -129,6 +131,15 @@ public:
     * \param error Error code from the TLS library.
     */
     void handle_connection_error(int error);
+
+    /**
+     * \brief Sets the network interface handler that is used by client to connect
+     * to a network over IP..
+     * \param handler A network interface handler that is used by client to connect.
+     *  This API is optional but provides a mechanism for different platforms to
+     * manage usage of underlying network interface by client.
+     */
+    void set_platform_network_handler(void *handler = NULL);
 
 private:
 
