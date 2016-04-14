@@ -22,6 +22,8 @@
 #include "include/nsdllinker.h"
 #include "mbed-trace/mbed_trace.h"
 
+#define TRACE_GROUP "mClt"
+
 M2MResourceInstance& M2MResourceInstance::operator=(const M2MResourceInstance& other)
 {
     if (this != &other) { // protect against invalid self-assignment
@@ -259,7 +261,6 @@ void M2MResourceInstance::report()
 
 bool M2MResourceInstance::is_value_changed(const uint8_t* value, const uint32_t value_len)
 {
-    tr_debug("M2MResourceInstance::is_value_changed()");
     bool changed = false;
     if(value_len != _value_length) {
         changed = true;
@@ -276,6 +277,7 @@ bool M2MResourceInstance::is_value_changed(const uint8_t* value, const uint32_t 
             }
         }
     }
+    tr_debug("M2MResourceInstance::is_value_changed() -- %s", changed ? "true" : "false");
     return changed;
 }
 

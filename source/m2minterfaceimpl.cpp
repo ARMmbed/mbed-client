@@ -25,6 +25,8 @@
 #include "mbed-client/m2mtimer.h"
 #include "mbed-trace/mbed_trace.h"
 
+#define TRACE_GROUP "mClt"
+
 M2MInterfaceImpl::M2MInterfaceImpl(M2MInterfaceObserver& observer,
                                    const String &ep_name,
                                    const String &ep_type,
@@ -75,7 +77,7 @@ M2MInterfaceImpl::M2MInterfaceImpl(M2MInterfaceObserver& observer,
     _connection_handler = new M2MConnectionHandler(*this, new M2MConnectionSecurity(sec_mode), mode, stack);
 
     _connection_handler->bind_connection(_listen_port);
-     tr_debug("M2MInterfaceImpl::M2MInterfaceImpl() -OUT");
+    tr_debug("M2MInterfaceImpl::M2MInterfaceImpl() -OUT");
 }
 
 
@@ -178,7 +180,7 @@ void M2MInterfaceImpl::register_object(M2MSecurity *security, const M2MObjectLis
 
 void M2MInterfaceImpl::update_registration(M2MSecurity *security_object, const uint32_t lifetime)
 {
-    tr_debug("M2MInterfaceImpl::update_registration(M2MSecurity *security,const uint32_t lifetime) - IN");
+    tr_debug("M2MInterfaceImpl::update_registration - IN");
     // Transition to a new state based upon
     // the current state of the state machine
     if(lifetime != 0 && (lifetime < MINIMUM_REGISTRATION_TIME)) {
@@ -213,10 +215,10 @@ void M2MInterfaceImpl::update_registration(M2MSecurity *security_object, const u
             _observer.error(M2MInterface::NotAllowed);
         }
     } else {
-        tr_debug("M2MInterfaceImpl::update_registration(M2MSecurity *security,const M2MObjectList &object_list) - NOT ALLOWED");
+        tr_debug("M2MInterfaceImpl::update_registration - NOT ALLOWED");
         _observer.error(M2MInterface::NotAllowed);
     }
-    tr_debug("M2MInterfaceImpl::update_registration(M2MSecurity *security,const uint32_t lifetime) - OUT");
+    tr_debug("M2MInterfaceImpl::update_registration - OUT");
 }
 
 void M2MInterfaceImpl::unregister_object(M2MSecurity* /*security*/)
@@ -429,10 +431,10 @@ void M2MInterfaceImpl::state_bootstrap( EventData *data)
                 String ip_address;
                 uint16_t port = 0;
                 String  coap;
-                if(server_address.compare(0,COAP.size(),COAP) == 0) {
+                if(server_address.compare(0,sizeof(COAP)-1,COAP) == 0) {
                      coap = COAP;
                 }
-                else if(server_address.compare(0,COAPS.size(),COAPS) == 0) {
+                else if(server_address.compare(0,sizeof(COAPS)-1,COAPS) == 0) {
                     security->resource_value_int(M2MSecurity::SecurityMode) != M2MSecurity::NoSecurity ? coap = COAPS: coap = "";
                 }
                 if(!coap.empty()) {
@@ -547,10 +549,10 @@ void M2MInterfaceImpl::state_register( EventData *data)
                     String ip_address;
                     uint16_t port = 0;
                     String  coap;
-                    if(server_address.compare(0,COAP.size(),COAP) == 0) {
+                    if(server_address.compare(0,sizeof(COAP)-1,COAP) == 0) {
                          coap = COAP;
                     }
-                    else if(server_address.compare(0,COAPS.size(),COAPS) == 0) {
+                    else if(server_address.compare(0,sizeof(COAPS)-1,COAPS) == 0) {
                         security->resource_value_int(M2MSecurity::SecurityMode) != M2MSecurity::NoSecurity ? coap = COAPS: coap = "";
                     }
                     if(!coap.empty()) {

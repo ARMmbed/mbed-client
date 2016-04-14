@@ -27,6 +27,7 @@
 #include "mbed-trace/mbed_trace.h"
 
 #define BUFFER_SIZE 10
+#define TRACE_GROUP "mClt"
 
 M2MObjectInstance& M2MObjectInstance::operator=(const M2MObjectInstance& other)
 {

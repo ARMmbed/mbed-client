@@ -1004,9 +1004,10 @@ void Test_M2MNsdlInterface::test_resource_callback_reset()
 
 void Test_M2MNsdlInterface::test_bootstrap_done_callback()
 {
-    uint8_t server_address[] = {"10.45.3.85"};
+    const uint8_t server_address[] = {10, 45, 3, 85};
     sn_nsdl_oma_server_info_t *server_info =(sn_nsdl_oma_server_info_t *)malloc(sizeof(sn_nsdl_oma_server_info_t));
     server_info->omalw_address_ptr = (sn_nsdl_addr_ *)malloc(sizeof(sn_nsdl_addr_));
+    server_info->omalw_address_ptr->type = SN_NSDL_ADDRESS_TYPE_IPV4;
     server_info->omalw_address_ptr->port = 5685;
     server_info->omalw_address_ptr->addr_ptr = (uint8_t *)malloc(sizeof(server_address));
     memcpy(server_info->omalw_address_ptr->addr_ptr,server_address,sizeof(server_address));
@@ -1078,9 +1079,10 @@ void Test_M2MNsdlInterface::test_bootstrap_done_callback()
     common_stub::clear();
 
     // Test for Hostname
-    uint8_t hostname_address[] = {"abc.xyz.sss.sdsd"};
+    const uint8_t hostname_address[] = {"abc.xyz.sss.sdsd"};
     server_info =(sn_nsdl_oma_server_info_t *)malloc(sizeof(sn_nsdl_oma_server_info_t));
     server_info->omalw_address_ptr = (sn_nsdl_addr_ *)malloc(sizeof(sn_nsdl_addr_));
+    server_info->omalw_address_ptr->type = SN_NSDL_ADDRESS_TYPE_HOSTNAME;
     server_info->omalw_address_ptr->port = 5685;
     server_info->omalw_address_ptr->addr_ptr = (uint8_t *)malloc(sizeof(hostname_address));
     memcpy(server_info->omalw_address_ptr->addr_ptr,hostname_address,sizeof(hostname_address));
@@ -1148,9 +1150,15 @@ void Test_M2MNsdlInterface::test_bootstrap_done_callback()
     common_stub::clear();
 
     //Test for IPv6 address
-    uint8_t ipv6_address[] = {"FD00:FF1:CE0B:A5E1:1068:AF13:9B61:D557"};
+    // FD00:FF1:CE0B:A5E1:1068:AF13:9B61:D557
+    const uint8_t ipv6_address[16] = {0xFD, 0x00, 0x0F, 0xF1,
+                                      0xCE, 0x0B, 0xA5, 0xE1,
+                                      0x10, 0x68, 0xAF, 0x13,
+                                      0x9B, 0x61, 0xD5, 0x57};
+
     server_info =(sn_nsdl_oma_server_info_t *)malloc(sizeof(sn_nsdl_oma_server_info_t));
     server_info->omalw_address_ptr = (sn_nsdl_addr_ *)malloc(sizeof(sn_nsdl_addr_));
+    server_info->omalw_address_ptr->type = SN_NSDL_ADDRESS_TYPE_IPV6;
     server_info->omalw_address_ptr->port = 5685;
     server_info->omalw_address_ptr->addr_ptr = (uint8_t *)malloc(sizeof(ipv6_address));
     memcpy(server_info->omalw_address_ptr->addr_ptr,ipv6_address,sizeof(ipv6_address));
