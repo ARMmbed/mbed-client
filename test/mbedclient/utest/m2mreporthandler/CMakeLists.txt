@@ -9,7 +9,6 @@ add_executable(m2mreporthandler
         "../stub/m2mtimer_stub.cpp"
         "../stub/m2mstring_stub.cpp"
         "../../../../source/m2mreporthandler.cpp"
-        "../../../../source/m2mconstants.cpp"
 
 )
 target_link_libraries(m2mreporthandler

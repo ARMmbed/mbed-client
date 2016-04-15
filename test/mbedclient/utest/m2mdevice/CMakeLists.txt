@@ -11,7 +11,6 @@ add_executable(m2mdevice
         "m2mdevicetest.cpp"
         "test_m2mdevice.cpp"
         "../../../../source/m2mdevice.cpp"
-        "../../../../source/m2mconstants.cpp"
 )
 target_link_libraries(m2mdevice
     CppUTest

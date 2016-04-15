@@ -80,25 +80,28 @@ M2MServer::~M2MServer()
 M2MResource* M2MServer::create_resource(ServerResource resource, uint32_t value)
 {
     M2MResource* res = NULL;
-    const String* server_id = &EMPTY;
+    const char* server_id_ptr;
     if(!is_resource_present(resource)) {
         switch(resource) {
         case DefaultMinPeriod:
-            server_id = &SERVER_DEFAULT_MIN_PERIOD;
+            server_id_ptr = SERVER_DEFAULT_MIN_PERIOD;
             break;
         case DefaultMaxPeriod:
-            server_id = &SERVER_DEFAULT_MAX_PERIOD;
+            server_id_ptr = SERVER_DEFAULT_MAX_PERIOD;
             break;
         case DisableTimeout:
-            server_id = &SERVER_DISABLE_TIMEOUT;
+            server_id_ptr = SERVER_DISABLE_TIMEOUT;
             break;
         default:
+            server_id_ptr = "";
             break;
         }
     }
-    if(!server_id->empty()) {
+    String server_id(server_id_ptr);
+    
+    if(!server_id.empty()) {
         if(_server_instance) {
-            res = _server_instance->create_dynamic_resource(*server_id,
+            res = _server_instance->create_dynamic_resource(server_id,
                                                             OMA_RESOURCE_TYPE,
                                                             M2MResourceInstance::INTEGER,
                                                             true);
@@ -134,26 +137,29 @@ M2MResource* M2MServer::create_resource(ServerResource resource)
 bool M2MServer::delete_resource(ServerResource resource)
 {
     bool success = false;
-    const String* server_id = &EMPTY;
+    const char* server_id_ptr;
     switch(resource) {
         case DefaultMinPeriod:
-           server_id = &SERVER_DEFAULT_MIN_PERIOD;
+           server_id_ptr = SERVER_DEFAULT_MIN_PERIOD;
            break;
         case DefaultMaxPeriod:
-            server_id = &SERVER_DEFAULT_MAX_PERIOD;
+            server_id_ptr = SERVER_DEFAULT_MAX_PERIOD;
             break;
         case Disable:
-            server_id = &SERVER_DISABLE;
+            server_id_ptr = SERVER_DISABLE;
             break;
         case DisableTimeout:
-            server_id = &SERVER_DISABLE_TIMEOUT;
+            server_id_ptr = SERVER_DISABLE_TIMEOUT;
             break;
         default:
+            server_id_ptr = "";
             break;
     }
-    if(!server_id->empty()) {
+    String server_id(server_id_ptr);
+    
+    if(!server_id.empty()) {
         if(_server_instance) {
-            success = _server_instance->remove_resource(*server_id);
+            success = _server_instance->remove_resource(server_id);
         }
     }
     return success;
@@ -243,39 +249,42 @@ uint16_t M2MServer::total_resource_count() const
 M2MResource* M2MServer::get_resource(ServerResource res) const
 {
     M2MResource* res_object = NULL;
-    const String* res_name = &EMPTY;
+    const char* res_name_ptr = "";
     switch(res) {
     case ShortServerID:
-        res_name = &SERVER_SHORT_SERVER_ID;
+        res_name_ptr = SERVER_SHORT_SERVER_ID;
         break;
     case Lifetime:
-        res_name = &SERVER_LIFETIME;
+        res_name_ptr = SERVER_LIFETIME;
         break;
     case DefaultMinPeriod:
-        res_name = &SERVER_DEFAULT_MIN_PERIOD;
+        res_name_ptr = SERVER_DEFAULT_MIN_PERIOD;
         break;
     case DefaultMaxPeriod:
-        res_name = &SERVER_DEFAULT_MAX_PERIOD;
+        res_name_ptr = SERVER_DEFAULT_MAX_PERIOD;
         break;
     case Disable:
-        res_name = &SERVER_DISABLE;
+        res_name_ptr = SERVER_DISABLE;
         break;
     case DisableTimeout:
-        res_name = &SERVER_DISABLE_TIMEOUT;
+        res_name_ptr = SERVER_DISABLE_TIMEOUT;
         break;
     case NotificationStorage:
-        res_name = &SERVER_NOTIFICATION_STORAGE;
+        res_name_ptr = SERVER_NOTIFICATION_STORAGE;
         break;
     case Binding:
-        res_name = &SERVER_BINDING;
+        res_name_ptr = SERVER_BINDING;
         break;
     case RegistrationUpdate:
-        res_name = &SERVER_REGISTRATION_UPDATE;
+        res_name_ptr = SERVER_REGISTRATION_UPDATE;
         break;
     }
-    if(!res_name->empty()) {
+
+    const String res_name(res_name_ptr);
+
+    if(!res_name.empty()) {
         if(_server_instance) {
-        res_object = _server_instance->resource(*res_name);
+        res_object = _server_instance->resource(res_name);
         }
     }
     return res_object;

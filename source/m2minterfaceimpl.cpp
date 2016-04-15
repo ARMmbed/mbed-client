@@ -77,7 +77,7 @@ M2MInterfaceImpl::M2MInterfaceImpl(M2MInterfaceObserver& observer,
     _connection_handler = new M2MConnectionHandler(*this, new M2MConnectionSecurity(sec_mode), mode, stack);
 
     _connection_handler->bind_connection(_listen_port);
-     tr_debug("M2MInterfaceImpl::M2MInterfaceImpl() -OUT");
+    tr_debug("M2MInterfaceImpl::M2MInterfaceImpl() -OUT");
 }
 
 
@@ -431,10 +431,10 @@ void M2MInterfaceImpl::state_bootstrap( EventData *data)
                 String ip_address;
                 uint16_t port = 0;
                 String  coap;
-                if(server_address.compare(0,COAP.size(),COAP) == 0) {
+                if(server_address.compare(0,sizeof(COAP)-1,COAP) == 0) {
                      coap = COAP;
                 }
-                else if(server_address.compare(0,COAPS.size(),COAPS) == 0) {
+                else if(server_address.compare(0,sizeof(COAPS)-1,COAPS) == 0) {
                     security->resource_value_int(M2MSecurity::SecurityMode) != M2MSecurity::NoSecurity ? coap = COAPS: coap = "";
                 }
                 if(!coap.empty()) {
@@ -536,10 +536,10 @@ void M2MInterfaceImpl::state_register( EventData *data)
                     String ip_address;
                     uint16_t port = 0;
                     String  coap;
-                    if(server_address.compare(0,COAP.size(),COAP) == 0) {
+                    if(server_address.compare(0,sizeof(COAP)-1,COAP) == 0) {
                          coap = COAP;
                     }
-                    else if(server_address.compare(0,COAPS.size(),COAPS) == 0) {
+                    else if(server_address.compare(0,sizeof(COAPS)-1,COAPS) == 0) {
                         security->resource_value_int(M2MSecurity::SecurityMode) != M2MSecurity::NoSecurity ? coap = COAPS: coap = "";
                     }
                     if(!coap.empty()) {
