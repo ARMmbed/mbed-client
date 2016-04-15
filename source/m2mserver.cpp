@@ -80,22 +80,25 @@ M2MServer::~M2MServer()
 M2MResource* M2MServer::create_resource(ServerResource resource, uint32_t value)
 {
     M2MResource* res = NULL;
-    String server_id = "";
+    const char* server_id_ptr;
     if(!is_resource_present(resource)) {
         switch(resource) {
         case DefaultMinPeriod:
-            server_id = SERVER_DEFAULT_MIN_PERIOD;
+            server_id_ptr = SERVER_DEFAULT_MIN_PERIOD;
             break;
         case DefaultMaxPeriod:
-            server_id = SERVER_DEFAULT_MAX_PERIOD;
+            server_id_ptr = SERVER_DEFAULT_MAX_PERIOD;
             break;
         case DisableTimeout:
-            server_id = SERVER_DISABLE_TIMEOUT;
+            server_id_ptr = SERVER_DISABLE_TIMEOUT;
             break;
         default:
+            server_id_ptr = "";
             break;
         }
     }
+    String server_id(server_id_ptr);
+    
     if(!server_id.empty()) {
         if(_server_instance) {
             res = _server_instance->create_dynamic_resource(server_id,
@@ -104,15 +107,8 @@ M2MResource* M2MServer::create_resource(ServerResource resource, uint32_t value)
                                                             true);
             if(res) {
                 res->set_operation(M2MBase::GET_PUT_POST_ALLOWED);
-                // If resource is created then set the value.                
-                char *buffer = (char*)malloc(BUFFER_SIZE);
-                if(buffer) {
-                    uint32_t size = m2m::itoa_c(value, buffer);
-                    if (size <= BUFFER_SIZE) {
-                        res->set_value((const uint8_t*)buffer, size);
-                    }
-                    free(buffer);
-                }
+                
+                res->set_value(value);
             }
         }
     }
@@ -141,23 +137,26 @@ M2MResource* M2MServer::create_resource(ServerResource resource)
 bool M2MServer::delete_resource(ServerResource resource)
 {
     bool success = false;
-    String server_id = "";
+    const char* server_id_ptr;
     switch(resource) {
         case DefaultMinPeriod:
-           server_id = SERVER_DEFAULT_MIN_PERIOD;
+           server_id_ptr = SERVER_DEFAULT_MIN_PERIOD;
            break;
         case DefaultMaxPeriod:
-            server_id = SERVER_DEFAULT_MAX_PERIOD;
+            server_id_ptr = SERVER_DEFAULT_MAX_PERIOD;
             break;
         case Disable:
-            server_id = SERVER_DISABLE;
+            server_id_ptr = SERVER_DISABLE;
             break;
         case DisableTimeout:
-            server_id = SERVER_DISABLE_TIMEOUT;
+            server_id_ptr = SERVER_DISABLE_TIMEOUT;
             break;
         default:
+            server_id_ptr = "";
             break;
     }
+    String server_id(server_id_ptr);
+    
     if(!server_id.empty()) {
         if(_server_instance) {
             success = _server_instance->remove_resource(server_id);
@@ -191,14 +190,8 @@ bool M2MServer::set_resource_value(ServerResource resource,
            M2MServer::NotificationStorage == resource) {
             // If it is any of the above resource
             // set the value of the resource.
-            char *buffer = (char*)malloc(BUFFER_SIZE);
-            if(buffer) {
-                uint32_t size = m2m::itoa_c(value, buffer);
-                if (size <= BUFFER_SIZE) {
-                    success = res->set_value((const uint8_t*)buffer, size);
-                }
-                free(buffer);
-            }
+
+            success = res->set_value(value);
         }
     }
     return success;
@@ -209,24 +202,8 @@ String M2MServer::resource_value_string(ServerResource resource) const
     String value = "";
     M2MResource* res = get_resource(resource);
     if(res && (M2MServer::Binding == resource)) {
-        uint8_t* buffer = NULL;
-        uint32_t length = 0;
-        res->get_value(buffer,length);
 
-        char *char_buffer = (char*)malloc(length+1);
-        if(char_buffer) {
-            memset(char_buffer,0,length+1);
-            memcpy(char_buffer,(char*)buffer,length);
-
-            String s_name(char_buffer);
-            value = s_name;
-            if(char_buffer) {
-                free(char_buffer);
-            }
-        }
-        if(buffer) {
-            free(buffer);
-        }
+        value = res->get_value_string();
     }
     return value;
 }
@@ -243,14 +220,8 @@ uint32_t M2MServer::resource_value_int(ServerResource resource) const
            M2MServer::DefaultMaxPeriod == resource  ||
            M2MServer::DisableTimeout == resource    ||
            M2MServer::NotificationStorage == resource) {
-            // Get the value and convert it into integer
-            uint8_t* buffer = NULL;
-            uint32_t length = 0;
-            res->get_value(buffer,length);
-            if(buffer) {
-                value = atoi((const char*)buffer);
-                free(buffer);
-            }
+
+            value = res->get_value_int();
         }
     }
     return value;
@@ -278,36 +249,39 @@ uint16_t M2MServer::total_resource_count() const
 M2MResource* M2MServer::get_resource(ServerResource res) const
 {
     M2MResource* res_object = NULL;
-    String res_name = "";
+    const char* res_name_ptr = "";
     switch(res) {
     case ShortServerID:
-        res_name = SERVER_SHORT_SERVER_ID;
+        res_name_ptr = SERVER_SHORT_SERVER_ID;
         break;
     case Lifetime:
-        res_name = SERVER_LIFETIME;
+        res_name_ptr = SERVER_LIFETIME;
         break;
     case DefaultMinPeriod:
-        res_name = SERVER_DEFAULT_MIN_PERIOD;
+        res_name_ptr = SERVER_DEFAULT_MIN_PERIOD;
         break;
     case DefaultMaxPeriod:
-        res_name = SERVER_DEFAULT_MAX_PERIOD;
+        res_name_ptr = SERVER_DEFAULT_MAX_PERIOD;
         break;
     case Disable:
-        res_name = SERVER_DISABLE;
+        res_name_ptr = SERVER_DISABLE;
         break;
     case DisableTimeout:
-        res_name = SERVER_DISABLE_TIMEOUT;
+        res_name_ptr = SERVER_DISABLE_TIMEOUT;
         break;
     case NotificationStorage:
-        res_name = SERVER_NOTIFICATION_STORAGE;
+        res_name_ptr = SERVER_NOTIFICATION_STORAGE;
         break;
     case Binding:
-        res_name = SERVER_BINDING;
+        res_name_ptr = SERVER_BINDING;
         break;
     case RegistrationUpdate:
-        res_name = SERVER_REGISTRATION_UPDATE;
+        res_name_ptr = SERVER_REGISTRATION_UPDATE;
         break;
     }
+
+    const String res_name(res_name_ptr);
+
     if(!res_name.empty()) {
         if(_server_instance) {
         res_object = _server_instance->resource(res_name);

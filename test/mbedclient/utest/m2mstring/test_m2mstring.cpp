@@ -218,6 +218,37 @@ void Test_M2MString::test_append()
     CHECK(s.size() == 8);
 }
 
+void Test_M2MString::test_append_raw()
+{
+    String s("name");
+    const char test_source[] = "something";
+    String expected("namesomething");
+
+    s.append_raw(test_source, 1);
+    CHECK(s.size() == 5);
+
+    s.append_raw(test_source + 1, 8);
+    CHECK(s.size() == 13);
+
+    CHECK(s == expected);
+}
+
+void Test_M2MString::test_append_int()
+{
+    String s("source");
+    String expected("source1234");
+    String expected2("source12342147483647");
+
+    s.append_int(1234);
+    CHECK(s.size() == 10);
+
+    CHECK(s == expected);
+
+    s.append_int(INT32_MAX);
+
+    CHECK(s == expected2);
+}
+
 void Test_M2MString::test_compare()
 {
     String s("name");

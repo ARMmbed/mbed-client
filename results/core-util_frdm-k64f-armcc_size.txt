@@ -1,0 +1,11 @@
+   text	   data	    bss	    dec	    hex	filename
+    200	      0	      0	    200	     c8	assert_mbed.c.o (ex ./build/frdm-k64f-armcc/ym/core-util/source/core-util.ar)
+      0	      0	      0	      0	      0	critical_nordic.c.o (ex ./build/frdm-k64f-armcc/ym/core-util/source/core-util.ar)
+    406	      0	      0	    406	    196	ExtendablePoolAllocator.cpp.o (ex ./build/frdm-k64f-armcc/ym/core-util/source/core-util.ar)
+      0	      0	      0	      0	      0	assert_posix.c.o (ex ./build/frdm-k64f-armcc/ym/core-util/source/core-util.ar)
+    310	      0	      0	    310	    136	atomic_ops.cpp.o (ex ./build/frdm-k64f-armcc/ym/core-util/source/core-util.ar)
+      0	      0	      0	      0	      0	critical_posix.c.o (ex ./build/frdm-k64f-armcc/ym/core-util/source/core-util.ar)
+    332	      0	      0	    332	    14c	PoolAllocator.cpp.o (ex ./build/frdm-k64f-armcc/ym/core-util/source/core-util.ar)
+    284	     12	      0	    296	    128	sbrk.cpp.o (ex ./build/frdm-k64f-armcc/ym/core-util/source/core-util.ar)
+     76	      8	      0	     84	     54	critical.c.o (ex ./build/frdm-k64f-armcc/ym/core-util/source/core-util.ar)
+   1608	     20	      0	   1628	    65c	(TOTALS)

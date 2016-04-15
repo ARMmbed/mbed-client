@@ -90,31 +90,33 @@ M2MSecurity::M2MSecurity(ServerType ser_type)
 
 M2MSecurity::~M2MSecurity()
 {
-    _server_instance = NULL;
 }
 
 M2MResource* M2MSecurity::create_resource(SecurityResource resource, uint32_t value)
 {
     M2MResource* res = NULL;
-    String security_id = "";
+    const char* security_id_ptr = "";
     if(!is_resource_present(resource)) {
         switch(resource) {
             case SMSSecurityMode:
-               security_id = SECURITY_SMS_SECURITY_MODE;
+               security_id_ptr = SECURITY_SMS_SECURITY_MODE;
                break;
             case M2MServerSMSNumber:
-                security_id = SECURITY_M2M_SERVER_SMS_NUMBER;
+                security_id_ptr = SECURITY_M2M_SERVER_SMS_NUMBER;
                 break;
             case ShortServerID:
-                security_id = SECURITY_SHORT_SERVER_ID;
+                security_id_ptr = SECURITY_SHORT_SERVER_ID;
                 break;
             case ClientHoldOffTime:
-                security_id = SECURITY_CLIENT_HOLD_OFF_TIME;
+                security_id_ptr = SECURITY_CLIENT_HOLD_OFF_TIME;
                 break;
             default:
                 break;
         }
     }
+
+    const String security_id(security_id_ptr);
+    
     if(!security_id.empty()) {
         if(_server_instance) {
 
@@ -124,14 +126,8 @@ M2MResource* M2MSecurity::create_resource(SecurityResource resource, uint32_t va
 
             if(res) {
                 res->set_operation(M2MBase::NOT_ALLOWED);
-                char *buffer = (char*)malloc(BUFFER_SIZE);
-                if(buffer) {
-                    uint32_t size = m2m::itoa_c(value, buffer);
-                    if (size <= BUFFER_SIZE) {
-                        res->set_value((const uint8_t*)buffer, size);
-                    }
-                    free(buffer);
-                }
+
+                res->set_value(value);
             }
         }
     }
@@ -141,26 +137,29 @@ M2MResource* M2MSecurity::create_resource(SecurityResource resource, uint32_t va
 bool M2MSecurity::delete_resource(SecurityResource resource)
 {
     bool success = false;
-    String security_id = "";
+    const char* security_id_ptr = "";
     switch(resource) {
         case SMSSecurityMode:
-           security_id = SECURITY_SMS_SECURITY_MODE;
+           security_id_ptr = SECURITY_SMS_SECURITY_MODE;
            break;
         case M2MServerSMSNumber:
-            security_id = SECURITY_M2M_SERVER_SMS_NUMBER;
+            security_id_ptr = SECURITY_M2M_SERVER_SMS_NUMBER;
             break;
         case ShortServerID:
             if(M2MSecurity::Bootstrap == _server_type) {
-                security_id = SECURITY_SHORT_SERVER_ID;
+                security_id_ptr = SECURITY_SHORT_SERVER_ID;
             }
             break;
         case ClientHoldOffTime:
-            security_id = SECURITY_CLIENT_HOLD_OFF_TIME;
+            security_id_ptr = SECURITY_CLIENT_HOLD_OFF_TIME;
             break;
         default:
             // Others are mandatory resources hence cannot be deleted.
             break;
     }
+
+    const String security_id(security_id_ptr);
+
     if(!security_id.empty()) {
         if(_server_instance) {
             success = _server_instance->remove_resource(security_id);
@@ -194,15 +193,9 @@ bool M2MSecurity::set_resource_value(SecurityResource resource,
            M2MSecurity::ShortServerID == resource       ||
            M2MSecurity::ClientHoldOffTime == resource) {
             // If it is any of the above resource
-            // set the value of the resource.            
-            char *buffer = (char*)malloc(BUFFER_SIZE);
-            if(buffer) {
-                uint32_t size = m2m::itoa_c(value, buffer);
-                if (size <= BUFFER_SIZE) {
-                    success = res->set_value((const uint8_t*)buffer, size);
-                }
-                free(buffer);
-            }
+            // set the value of the resource.
+
+            success = res->set_value(value);
         }
     }
     return success;
@@ -230,23 +223,8 @@ String M2MSecurity::resource_value_string(SecurityResource resource) const
     M2MResource* res = get_resource(resource);
     if(res) {
         if(M2MSecurity::M2MServerUri == resource) {
-            uint8_t* buffer = NULL;
-            uint32_t length = 0;
-            res->get_value(buffer,length);
 
-            char *char_buffer = (char*)malloc(length+1);
-            if(char_buffer) {
-                memset(char_buffer,0,length+1);
-                if(buffer) {
-                    memcpy(char_buffer,(char*)buffer,length);                    
-                }
-                String s_name(char_buffer);
-                value = s_name;
-                free(char_buffer);
-            }
-            if(buffer) {
-                free(buffer);
-            }
+            value = res->get_value_string();
         }
     }
     return value;
@@ -278,14 +256,8 @@ uint32_t M2MSecurity::resource_value_int(SecurityResource resource) const
            M2MSecurity::M2MServerSMSNumber == resource  ||
            M2MSecurity::ShortServerID == resource       ||
            M2MSecurity::ClientHoldOffTime == resource) {
-            // Get the value and convert it into integer
-            uint8_t* buffer = NULL;
-            uint32_t length = 0;
-            res->get_value(buffer,length);
-            if(buffer) {
-                value = atoi((const char*)buffer);
-                free(buffer);
-            }
+
+            value = res->get_value_int();
         }
     }
     return value;
@@ -319,45 +291,47 @@ M2MResource* M2MSecurity::get_resource(SecurityResource res) const
 {
     M2MResource* res_object = NULL;
     if(_server_instance) {
-        String res_name = "";
+        const char* res_name_ptr = "";
         switch(res) {
             case M2MServerUri:
-                res_name = SECURITY_M2M_SERVER_URI;
+                res_name_ptr = SECURITY_M2M_SERVER_URI;
                 break;
             case BootstrapServer:
-                res_name = SECURITY_BOOTSTRAP_SERVER;
+                res_name_ptr = SECURITY_BOOTSTRAP_SERVER;
                 break;
             case SecurityMode:
-                res_name = SECURITY_SECURITY_MODE;
+                res_name_ptr = SECURITY_SECURITY_MODE;
                 break;
             case PublicKey:
-                res_name = SECURITY_PUBLIC_KEY;
+                res_name_ptr = SECURITY_PUBLIC_KEY;
                 break;
             case ServerPublicKey:
-                res_name = SECURITY_SERVER_PUBLIC_KEY;
+                res_name_ptr = SECURITY_SERVER_PUBLIC_KEY;
                 break;
             case Secretkey:
-                res_name = SECURITY_SECRET_KEY;
+                res_name_ptr = SECURITY_SECRET_KEY;
                 break;
             case SMSSecurityMode:
-                res_name = SECURITY_SMS_SECURITY_MODE;
+                res_name_ptr = SECURITY_SMS_SECURITY_MODE;
                 break;
             case SMSBindingKey:
-                res_name = SECURITY_SMS_BINDING_KEY;
+                res_name_ptr = SECURITY_SMS_BINDING_KEY;
                 break;
             case SMSBindingSecretKey:
-                res_name = SECURITY_SMS_BINDING_SECRET_KEY;
+                res_name_ptr = SECURITY_SMS_BINDING_SECRET_KEY;
                 break;
             case M2MServerSMSNumber:
-                res_name = SECURITY_M2M_SERVER_SMS_NUMBER;
+                res_name_ptr = SECURITY_M2M_SERVER_SMS_NUMBER;
                 break;
             case ShortServerID:
-                res_name = SECURITY_SHORT_SERVER_ID;
+                res_name_ptr = SECURITY_SHORT_SERVER_ID;
                 break;
             case ClientHoldOffTime:
-                res_name = SECURITY_CLIENT_HOLD_OFF_TIME;
+                res_name_ptr = SECURITY_CLIENT_HOLD_OFF_TIME;
                 break;
         }
+        const String res_name(res_name_ptr);
+        
         res_object = _server_instance->resource(res_name);
     }
     return res_object;

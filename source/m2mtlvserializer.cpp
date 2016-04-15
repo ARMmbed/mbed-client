@@ -176,19 +176,11 @@ void M2MTLVSerializer::serialize_TILV(uint8_t type, uint16_t id, uint8_t *value,
     memcpy(tlv+size+type_length+id_size, length_ptr, length_size);
     memcpy(tlv+size+type_length+id_size+length_size, value, value_length);
 
-    if(tlv_type) {
-        free(tlv_type) ;
-    }
-    if(length_ptr) {
-        free(length_ptr);
-    }
-    if(id_ptr) {
-        free(id_ptr);
-    }
-    if(data) {
-        free(data);
-        data = NULL;
-    }
+    free(tlv_type) ;
+    free(length_ptr);
+    free(id_ptr);
+    free(data);
+
     data = tlv;
     size += type_length + id_size + length_size + value_length;
 }

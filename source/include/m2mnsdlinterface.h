@@ -291,6 +291,21 @@ private:
                            uint8_t  coap_content_type,
                            const String  &uri_path);
 
+    /**
+     * \brief Allocate (size + 1) amount of memory, copy size bytes into
+     * it and add zero termination.
+     * \param source Source string to copy, may not be NULL.
+     * \param size The size of memory to be reserved.
+    */
+    uint8_t* alloc_string_copy(const uint8_t* source, uint16_t size);
+
+    /**
+     * \brief Utility method to convert given lifetime int to ascii 
+     * and allocate a buffer for it and set it to _endpoint->lifetime_ptr.
+     * \param lifetime A new value for lifetime.
+    */
+    void set_endpoint_lifetime_buffer(int lifetime);
+
 private:
 
     M2MNsdlObserver                   &_observer;

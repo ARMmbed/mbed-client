@@ -1,0 +1,8 @@
+   text	   data	    bss	    dec	    hex	filename
+   1548	      2	      0	   1550	    60e	sn_coap_protocol.c.o (ex ./build/frdm-k64f-armcc/ym/mbed-client-c/source/mbed-client-c.ar)
+   2066	      0	      0	   2066	    812	sn_coap_builder.c.o (ex ./build/frdm-k64f-armcc/ym/mbed-client-c/source/mbed-client-c.ar)
+    136	      0	      0	    136	     88	sn_coap_header_check.c.o (ex ./build/frdm-k64f-armcc/ym/mbed-client-c/source/mbed-client-c.ar)
+   5996	     32	      0	   6028	   178c	sn_nsdl.c.o (ex ./build/frdm-k64f-armcc/ym/mbed-client-c/source/mbed-client-c.ar)
+   2196	      0	      0	   2196	    894	sn_grs.c.o (ex ./build/frdm-k64f-armcc/ym/mbed-client-c/source/mbed-client-c.ar)
+   1584	      0	      0	   1584	    630	sn_coap_parser.c.o (ex ./build/frdm-k64f-armcc/ym/mbed-client-c/source/mbed-client-c.ar)
+  13526	     34	      0	  13560	   34f8	(TOTALS)

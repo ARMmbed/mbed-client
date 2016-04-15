@@ -1,0 +1,8 @@
+   text	   data	    bss	    dec	    hex	filename
+    505	      0	      0	    505	    1f9	inet_pton.c.o (ex ./build/frdm-k64f-armcc/ym/sal/source/sal.ar)
+    234	      0	      0	    234	     ea	inet_aton.c.o (ex ./build/frdm-k64f-armcc/ym/sal/source/sal.ar)
+   7346	     60	     72	   7478	   1d36	socket_abstract_test.cpp.o (ex ./build/frdm-k64f-armcc/ym/sal/source/sal.ar)
+    916	      8	      0	    924	    39c	socket_abstract.c.o (ex ./build/frdm-k64f-armcc/ym/sal/source/sal.ar)
+    476	      0	      0	    476	    1dc	inet_ntop.c.o (ex ./build/frdm-k64f-armcc/ym/sal/source/sal.ar)
+    160	      0	     16	    176	     b0	inet_ntoa.c.o (ex ./build/frdm-k64f-armcc/ym/sal/source/sal.ar)
+   9637	     68	     88	   9793	   2641	(TOTALS)

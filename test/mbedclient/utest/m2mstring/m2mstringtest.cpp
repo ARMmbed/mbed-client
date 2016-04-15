@@ -131,6 +131,16 @@ TEST(M2MString, test_append)
     m2m_string->test_append();
 }
 
+TEST(M2MString, test_append_raw)
+{
+    m2m_string->test_append_raw();
+}
+
+TEST(M2MString, test_append_int)
+{
+    m2m_string->test_append_int();
+}
+
 TEST(M2MString, test_compare)
 {
     m2m_string->test_compare();

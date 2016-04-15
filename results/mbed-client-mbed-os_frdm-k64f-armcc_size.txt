@@ -1,0 +1,6 @@
+   text	   data	    bss	    dec	    hex	filename
+   2892	      0	      0	   2892	    b4c	m2mconnectionhandlerpimpl.cpp.o (ex ./build/frdm-k64f-armcc/ym/mbed-client-mbed-os/source/mbed-client-mbed-os.ar)
+    246	      0	      0	    246	     f6	m2mtimer.cpp.o (ex ./build/frdm-k64f-armcc/ym/mbed-client-mbed-os/source/mbed-client-mbed-os.ar)
+    212	      0	      0	    212	     d4	m2mconnectionhandler.cpp.o (ex ./build/frdm-k64f-armcc/ym/mbed-client-mbed-os/source/mbed-client-mbed-os.ar)
+   1039	      0	      0	   1039	    40f	m2mtimerpimpl.cpp.o (ex ./build/frdm-k64f-armcc/ym/mbed-client-mbed-os/source/mbed-client-mbed-os.ar)
+   4389	      0	      0	   4389	   1125	(TOTALS)

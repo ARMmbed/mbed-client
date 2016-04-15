@@ -101,6 +101,13 @@ namespace m2m
     /// Append n characters of a string
     String& append(const char* str, size_type n);
 
+    // Append n characters of a non-zero-terminated string
+    // (in contrast with other append(), which performs strlen() for the given string).
+    String& append_raw(const char*, size_type);
+
+    // convert int to ascii and append it to end of string
+    void append_int(int);
+
     int compare( size_type pos, size_type len, const String& str ) const;
     int compare( size_type pos, size_type len, const char*   str ) const;
 

@@ -50,6 +50,9 @@ const int RETRY_INTERVAL = 5;
 #define STP  "stp"
 #define CANCEL  "cancel"
 
+// just a helper for "String default_value = "";" pattern
+extern const String EMPTY;
+
 //LWM2MOBJECT NAME/ID
 #define M2M_SECURITY_ID  "0"
 #define M2M_SERVER_ID  "1"

@@ -152,6 +152,14 @@ public:
     virtual bool set_value(const uint8_t *value, const uint32_t value_length);
 
     /**
+     * \brief Sets the value of the given resource.
+     * \param value, new value which is to be formatted into a string
+     * and set on the resource.
+     * \return True if successfully set, else false.
+     */
+    virtual bool set_value(int64_t value);
+
+    /**
      * \brief Clears the value of the given resource.
      */
     virtual void clear_value();
@@ -168,6 +176,18 @@ public:
      * \param value_length[OUT] The length of the value pointer.
      */
     virtual void get_value(uint8_t *&value, uint32_t &value_length);
+
+    /**
+     * \brief Converts value to int and return it. Note: conversion
+     * errors are not detected.
+     */
+    int get_value_int();
+
+    /**
+     * Get the value as a String object. No encoding/charset conversions
+     * done for the value, just a raw copy.
+     */
+    String get_value_string() const;
 
     /**
      * \brief Returns the value pointer of the object.
