@@ -330,51 +330,82 @@ void Test_M2MString::test_convert_integer_to_array()
 {
     uint8_t *max_age_ptr = NULL;
     uint8_t max_age_len = 0;
+    uint8_t *temp = NULL;
+    uint8_t temp_len = 0;
 
-    max_age_ptr = m2m::String::convert_integer_to_array(0,max_age_len);
+    int64_t val = 0;
+    max_age_ptr = m2m::String::convert_integer_to_array(val,max_age_len);
     CHECK(max_age_ptr != NULL);
+    CHECK(val == m2m::String::convert_array_to_integer(max_age_ptr, max_age_len));
+    temp = m2m::String::convert_integer_to_array(0,temp_len, max_age_ptr, max_age_len);
+    CHECK(temp != NULL);
+    CHECK(val == m2m::String::convert_array_to_integer(temp, temp_len));
+    free(temp);
     free(max_age_ptr);
     max_age_ptr = NULL;
 
-    max_age_ptr = m2m::String::convert_integer_to_array(256,max_age_len);
+    val = 0xff;
+    max_age_ptr = m2m::String::convert_integer_to_array(val,max_age_len);
     CHECK(max_age_ptr != NULL);
+    CHECK(val == m2m::String::convert_array_to_integer(max_age_ptr, max_age_len));
+    temp = m2m::String::convert_integer_to_array(0,temp_len, max_age_ptr, max_age_len);
+    CHECK(temp != NULL);
+    CHECK(val == m2m::String::convert_array_to_integer(temp, temp_len));
+    free(temp);
     free(max_age_ptr);
     max_age_ptr = NULL;
 
-    max_age_ptr = m2m::String::convert_integer_to_array(16777214,max_age_len);
+    val = 0xffff;
+    max_age_ptr = m2m::String::convert_integer_to_array(val,max_age_len);
     CHECK(max_age_ptr != NULL);
+    CHECK(val == m2m::String::convert_array_to_integer(max_age_ptr, max_age_len));
     free(max_age_ptr);
     max_age_ptr = NULL;
 
-    max_age_ptr = m2m::String::convert_integer_to_array(16777216,max_age_len);
+    val = 0xffffff;
+    max_age_ptr = m2m::String::convert_integer_to_array(val,max_age_len);
     CHECK(max_age_ptr != NULL);
+    CHECK(val == m2m::String::convert_array_to_integer(max_age_ptr, max_age_len));
     free(max_age_ptr);
     max_age_ptr = NULL;
 
-    max_age_ptr = m2m::String::convert_integer_to_array(4294967296,max_age_len);
+    val = 0xffffffff;
+    max_age_ptr = m2m::String::convert_integer_to_array(val,max_age_len);
     CHECK(max_age_ptr != NULL);
+    CHECK(val == m2m::String::convert_array_to_integer(max_age_ptr, max_age_len));
     free(max_age_ptr);
     max_age_ptr = NULL;
 
-    max_age_ptr = m2m::String::convert_integer_to_array(1099511627776,max_age_len);
+    val = 0xffffffffff;
+    max_age_ptr = m2m::String::convert_integer_to_array(val,max_age_len);
     CHECK(max_age_ptr != NULL);
+    CHECK(val == m2m::String::convert_array_to_integer(max_age_ptr, max_age_len));
     free(max_age_ptr);
     max_age_ptr = NULL;
 
-    max_age_ptr = m2m::String::convert_integer_to_array(281474976710655,max_age_len);
+    val = 0xffffffffffff;
+    max_age_ptr = m2m::String::convert_integer_to_array(val,max_age_len);
     CHECK(max_age_ptr != NULL);
+    CHECK(val == m2m::String::convert_array_to_integer(max_age_ptr, max_age_len));
     free(max_age_ptr);
     max_age_ptr = NULL;
 
-    max_age_ptr = m2m::String::convert_integer_to_array(281474976710656,max_age_len);
+    val = 0xffffffffffffff;
+    max_age_ptr = m2m::String::convert_integer_to_array(val,max_age_len);
     CHECK(max_age_ptr != NULL);
+    CHECK(val == m2m::String::convert_array_to_integer(max_age_ptr, max_age_len));
     free(max_age_ptr);
     max_age_ptr = NULL;
 
-    max_age_ptr = m2m::String::convert_integer_to_array(72057594037927936,max_age_len);
+    val = 0xffff;
+    max_age_ptr = m2m::String::convert_integer_to_array(val,max_age_len);
     CHECK(max_age_ptr != NULL);
+    CHECK(val == m2m::String::convert_array_to_integer(max_age_ptr, max_age_len));
     free(max_age_ptr);
     max_age_ptr = NULL;
+
+
+
 }
 
 

@@ -19,6 +19,7 @@
 #include "include/nsdllinker.h"
 #include "mbed-trace/mbed_trace.h"
 
+#define TRACE_GROUP "mClt"
 #define BUFFER_SIZE 10
 
 M2MTLVDeserializer::M2MTLVDeserializer()

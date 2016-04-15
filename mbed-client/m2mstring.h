@@ -113,7 +113,8 @@ namespace m2m
 
     int find_last_of(char c) const;
 
-    static uint8_t* convert_integer_to_array(int64_t value, uint8_t &size);
+    static uint8_t* convert_integer_to_array(int64_t value, uint8_t &size, uint8_t *array = NULL, uint32_t array_size = 0);
+    static int64_t convert_array_to_integer(uint8_t *value, uint32_t size);
 
   private:
     // reallocate the internal memory

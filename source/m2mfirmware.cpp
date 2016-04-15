@@ -21,6 +21,7 @@
 #include "mbed-client/m2mresource.h"
 
 #define BUFFER_SIZE 21
+#define TRACE_GROUP "mClt"
 
 M2MFirmware* M2MFirmware::_instance = NULL;
 

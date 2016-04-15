@@ -24,6 +24,8 @@
 #include <ctype.h>
 #include <string.h>
 
+#define TRACE_GROUP "mClt"
+
 M2MBase& M2MBase::operator=(const M2MBase& other)
 {
     if (this != &other) { // protect against invalid self-assignment

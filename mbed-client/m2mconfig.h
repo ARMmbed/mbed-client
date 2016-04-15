@@ -22,8 +22,4 @@
 #include "mbed-client/m2mstring.h"
 using namespace m2m;
 
-#if defined(HAVE_DEBUG) || !defined(NDEBUG)
-#define TRACE_GROUP "mbed-client"
-#endif
-
 #endif // M2MCONFIG_H
