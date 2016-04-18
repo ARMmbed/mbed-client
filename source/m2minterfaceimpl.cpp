@@ -536,8 +536,6 @@ void M2MInterfaceImpl::state_register( EventData *data)
 {
     tr_debug("M2MInterfaceImpl::state_register");
     // Start with registration preparation
-    bool success = false;
-    M2MInterface::Error error = M2MInterface::InvalidParameters;
     if(data) {
         M2MRegisterData *event = (M2MRegisterData *)data;
         M2MSecurity *security = event->_object;
@@ -560,7 +558,7 @@ void M2MInterfaceImpl::state_register( EventData *data)
                     }
                     if(!coap.empty()) {
                         server_address = server_address.substr(coap.size(),
-                                                           server_address.size()-coap.size());
+                                                           server_address.size() - coap.size());
 
                         process_address(server_address, ip_address, port);
 
@@ -569,23 +567,18 @@ void M2MInterfaceImpl::state_register( EventData *data)
                         // return error to the application and go to Idle state.
                         if(ip_address.empty()) {
                             tr_error("M2MInterfaceImpl::state_register - set error as M2MInterface::InvalidParameters");
-                            error = M2MInterface::InvalidParameters;
+                            internal_event(STATE_IDLE);
+                            _observer.error(M2MInterface::InvalidParameters);
                         } else {
+                            // Errors are coming through callback
                             _connection_handler->resolve_server_address(ip_address,port,
                                                                         M2MConnectionObserver::LWM2MServer,
                                                                         security);
-                            // Errors are coming through callback
-                            success = true;
                         }
                     }
                 }
             }
         }
-    }
-    if(!success) {
-        tr_error("M2MInterfaceImpl::state_register - Error Occured %d", (int)error);
-        internal_event(STATE_IDLE);
-        _observer.error(error);
     }
 }
 
