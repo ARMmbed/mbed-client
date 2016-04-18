@@ -130,7 +130,7 @@ void M2MBase::set_operation(M2MBase::Operation opr)
     // If the mode is Static, there is only GET_ALLOWED
    // supported.
     if(M2MBase::Static == _mode) {
-            _operation = M2MBase::GET_ALLOWED;
+        _operation = M2MBase::GET_ALLOWED;
     } else {
         _operation = opr;
     }

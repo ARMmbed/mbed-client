@@ -860,7 +860,6 @@ bool M2MNsdlInterface::create_nsdl_object_structure(M2MObject *object)
     tr_debug("M2MNsdlInterface::create_nsdl_object_structure()");
     bool success = false;
     if(object) {
-        //object->set_under_observation(false,this);
         M2MObjectInstanceList instance_list = object->instances();
         tr_debug("M2MNsdlInterface::create_nsdl_object_structure - Object Instance count %d", instance_list.size());
         if(!instance_list.empty()) {
@@ -888,8 +887,6 @@ bool M2MNsdlInterface::create_nsdl_object_instance_structure(M2MObjectInstance *
         String object_name = object_instance->name();
         object_name.push_back('/');
         object_name.append_int(object_instance->instance_id());
-
-        //object_instance->set_under_observation(false,this);
 
         M2MResourceList res_list = object_instance->resources();
         tr_debug("M2MNsdlInterface::create_nsdl_object_instance_structure - ResourceBase count %d", res_list.size());
