@@ -39,8 +39,14 @@ public:
      */
     typedef enum {
         CONNECTION_ERROR_WANTS_READ = -1000,
-        CONNECTION_ERROR_WANTS_WRITE = -1001
+        CONNECTION_ERROR_WANTS_WRITE = -1001,
+        ERROR_NONE = 0,
+        SSL_CONNECTION_ERROR,
+        SOCKET_READ_ERROR,
+        SOCKET_SEND_ERROR,
+        DNS_RESOLVING_ERROR,
     }ConnectionError;
+
 
 public:
 

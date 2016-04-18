@@ -70,6 +70,19 @@ M2MObjectInstance::~M2MObjectInstance()
         for (; it!=_resource_list.end(); it++ ) {
             //Free allocated memory for resources.
             res = *it;
+            char *obj_inst_id = (char*)malloc(BUFFER_SIZE);
+            if(obj_inst_id) {
+                uint32_t size = m2m::itoa_c(instance_id(), obj_inst_id);
+                if (size <= BUFFER_SIZE) {
+                    String obj_name = name();
+                    obj_name.push_back('/');
+                    obj_name += String(obj_inst_id);
+                    obj_name.push_back('/');
+                    obj_name += (*it)->name();
+                    (*it)->remove_resource_from_coap(obj_name);
+                }
+                free(obj_inst_id);
+            }
             delete res;
         }
         _resource_list.clear();
@@ -149,7 +162,7 @@ M2MResourceInstance* M2MObjectInstance::create_static_resource_instance(const St
         _resource_list.push_back(res);
         res->set_operation(M2MBase::GET_ALLOWED);
         res->set_observable(false);
-        res->set_register_uri(false);        
+        res->set_register_uri(false);
     }
     if(res->supports_multiple_instances()&& (res->resource_instance(instance_id) == NULL)) {
         instance = new M2MResourceInstance(resource_name, resource_type, type,
@@ -210,7 +223,6 @@ bool M2MObjectInstance::remove_resource(const String &resource_name)
              if(((*it)->name() == resource_name)) {
                 // Resource found and deleted.
                 res = *it;
-
                 char *obj_inst_id = (char*)malloc(BUFFER_SIZE);
                 if(obj_inst_id) {
                     uint32_t size = m2m::itoa_c(instance_id(), obj_inst_id);
@@ -219,8 +231,8 @@ bool M2MObjectInstance::remove_resource(const String &resource_name)
                         obj_name.push_back('/');
                         obj_name += String(obj_inst_id);
                         obj_name.push_back('/');
-                        obj_name += (*it)->name();
-                        remove_resource_from_coap(obj_name);
+                        obj_name += res->name();
+                        res->remove_resource_from_coap(obj_name);
                         delete res;
                         res = NULL;
                         _resource_list.erase(pos);
@@ -228,7 +240,7 @@ bool M2MObjectInstance::remove_resource(const String &resource_name)
                     }
                     free(obj_inst_id);
                 }
-                 break;
+                break;
              }
          }
      }
@@ -248,16 +260,13 @@ bool M2MObjectInstance::remove_resource_instance(const String &resource_name,
         it = list.begin();
         for ( ; it != list.end(); it++) {
             if((*it)->instance_id() == inst_id) {
-
                 String obj_name = name();
                 obj_name.push_back('/');
                 obj_name.append_int(instance_id());
                 obj_name.push_back('/');
                 obj_name += resource_name;
-
                 obj_name.push_back('/');
                 obj_name.append_int(inst_id);
-
                 remove_resource_from_coap(obj_name);
                 success = res->remove_resource_instance(inst_id);
                 if(res->resource_instance_count() == 0) {

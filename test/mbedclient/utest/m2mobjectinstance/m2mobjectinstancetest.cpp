@@ -115,3 +115,4 @@ TEST(M2MObjectInstance, notification_update)
 {
     m2m_object_instance->test_notification_update();
 }
+
