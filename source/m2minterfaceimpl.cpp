@@ -535,6 +535,7 @@ void M2MInterfaceImpl::state_bootstrapped( EventData */*data*/)
 void M2MInterfaceImpl::state_register( EventData *data)
 {
     tr_debug("M2MInterfaceImpl::state_register");
+    M2MInterface::Error error = M2MInterface::InvalidParameters;
     // Start with registration preparation
     if(data) {
         M2MRegisterData *event = (M2MRegisterData *)data;
@@ -563,14 +564,9 @@ void M2MInterfaceImpl::state_register( EventData *data)
                         process_address(server_address, ip_address, port);
 
                         tr_debug("M2MInterfaceImpl::state_register - IP address %s , Port %d", ip_address.c_str(), port);
-                        // If bind and resolving server address succeed then proceed else
-                        // return error to the application and go to Idle state.
-                        if(ip_address.empty()) {
-                            tr_error("M2MInterfaceImpl::state_register - set error as M2MInterface::InvalidParameters");
-                            internal_event(STATE_IDLE);
-                            _observer.error(M2MInterface::InvalidParameters);
-                        } else {
-                            // Errors are coming through callback
+                        if(!ip_address.empty()) {
+                            // Connection related errors are coming through callback
+                            error = M2MInterface::ErrorNone;
                             _connection_handler->resolve_server_address(ip_address,port,
                                                                         M2MConnectionObserver::LWM2MServer,
                                                                         security);
@@ -579,6 +575,11 @@ void M2MInterfaceImpl::state_register( EventData *data)
                 }
             }
         }
+    }
+    if (error != M2MInterface::ErrorNone) {
+        tr_error("M2MInterfaceImpl::state_register - set error as M2MInterface::InvalidParameters");
+        internal_event(STATE_IDLE);
+        _observer.error(error);
     }
 }
 
