@@ -230,7 +230,7 @@ private:
     M2MResourceInstance* get_resource_instance(DeviceResource dev_res,
                                                uint16_t instance_id) const;
 
-    String resource_name(DeviceResource resource) const;
+    static const String resource_name(DeviceResource resource);
 
     bool check_value_range(DeviceResource resource, const int64_t value) const;
 

@@ -1,0 +1,9 @@
+   text	   data	    bss	    dec	    hex	filename
+    232	      0	      0	    232	     e8	stoip6.c.o (ex ./build/frdm-k64f-armcc/ym/nanostack-libservice/source/nanostack-libservice.ar)
+    658	      0	      0	    658	    292	common_functions.c.o (ex ./build/frdm-k64f-armcc/ym/nanostack-libservice/source/nanostack-libservice.ar)
+   1586	      0	     52	   1638	    666	ns_trace.c.o (ex ./build/frdm-k64f-armcc/ym/nanostack-libservice/source/nanostack-libservice.ar)
+    900	     20	      0	    920	    398	nsdynmemLIB.c.o (ex ./build/frdm-k64f-armcc/ym/nanostack-libservice/source/nanostack-libservice.ar)
+    240	      0	      0	    240	     f0	ns_list.c.o (ex ./build/frdm-k64f-armcc/ym/nanostack-libservice/source/nanostack-libservice.ar)
+    152	      0	      0	    152	     98	ip6tos.c.o (ex ./build/frdm-k64f-armcc/ym/nanostack-libservice/source/nanostack-libservice.ar)
+    184	      0	      0	    184	     b8	ip_fsc.c.o (ex ./build/frdm-k64f-armcc/ym/nanostack-libservice/source/nanostack-libservice.ar)
+   3952	     20	     52	   4024	    fb8	(TOTALS)

@@ -26,7 +26,11 @@
 class TestObserver : public M2MInterfaceObserver {
 
 public:
-    TestObserver(){}
+    TestObserver() : val_updated(false), error_occured(false),
+            registered(false), unregistered(false), bootstrapped(false)
+    {
+    }
+
     virtual ~TestObserver(){}
     void bootstrap_done(M2MSecurity */*server_object*/){
         bootstrapped = true;
@@ -281,8 +285,9 @@ void Test_M2MInterfaceImpl::test_register_object()
 
     impl->register_object(sec,list);
 
-    CHECK(impl->_current_state == M2MInterfaceImpl::STATE_REGISTER);       
+    CHECK(impl->_current_state == M2MInterfaceImpl::STATE_REGISTER);
 
+    /*m2msecurity_stub::string_value = val;
     m2mnsdlinterface_stub::bool_value = true;
     m2mconnectionhandler_stub::bool_value = false;
 
@@ -291,7 +296,7 @@ void Test_M2MInterfaceImpl::test_register_object()
 
     impl->register_object(sec,list);
 
-    CHECK(impl->_current_state == M2MInterfaceImpl::STATE_IDLE);
+    CHECK(impl->_current_state == M2MInterfaceImpl::STATE_IDLE);*/
 
     impl->_current_state =  M2MInterfaceImpl::STATE_IDLE;
     m2mconnectionhandler_stub::bool_value = true;
@@ -549,16 +554,36 @@ void Test_M2MInterfaceImpl::test_data_available()
 
 void Test_M2MInterfaceImpl::test_socket_error()
 {
-    impl->socket_error(2);
+    impl->socket_error(M2MConnectionHandler::SSL_CONNECTION_ERROR);
 
     CHECK(observer->error_occured == true);
     CHECK(impl->_current_state == M2MInterfaceImpl::STATE_IDLE);
 
     observer->error_occured = false;
 
-    impl->socket_error(1);
+    impl->socket_error(M2MConnectionHandler::SOCKET_READ_ERROR);
+
     CHECK(observer->error_occured == true);
     CHECK(impl->_current_state == M2MInterfaceImpl::STATE_IDLE);
+
+    observer->error_occured = false;
+
+    impl->socket_error(M2MConnectionHandler::SOCKET_SEND_ERROR);
+
+    CHECK(observer->error_occured == true);
+    CHECK(impl->_current_state == M2MInterfaceImpl::STATE_IDLE);
+
+    observer->error_occured = false;
+
+    impl->socket_error(M2MConnectionHandler::DNS_RESOLVING_ERROR);
+
+    CHECK(observer->error_occured == true);
+    CHECK(impl->_current_state == M2MInterfaceImpl::STATE_IDLE);
+
+    observer->error_occured = false;
+
+    impl->socket_error(M2MConnectionHandler::ERROR_NONE);
+    CHECK(observer->error_occured == false);
 }
 
 void Test_M2MInterfaceImpl::test_address_ready()

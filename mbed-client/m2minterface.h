@@ -56,7 +56,9 @@ public:
         ResponseParseFailed,
         UnknownError,
         MemoryFail,
-        NotAllowed
+        NotAllowed,
+        SecureConnectionFailed,
+        DnsResolvingFailed
     }Error;
 
     /**
@@ -84,6 +86,7 @@ public:
         LwIP_IPv6,
         Reserved,
         Nanostack_IPv6,
+        ATWINC_IPv4,
         Unknown
     }NetworkStack;
 

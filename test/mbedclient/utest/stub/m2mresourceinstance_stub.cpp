@@ -109,6 +109,12 @@ bool M2MResourceInstance::set_value(const uint8_t *,
     return m2mresourceinstance_stub::bool_value;
 }
 
+bool M2MResourceInstance::set_value(int64_t value)
+{
+    return m2mresourceinstance_stub::bool_value;
+}
+
+
 void M2MResourceInstance::clear_value()
 {
 }
@@ -129,6 +135,35 @@ void M2MResourceInstance::get_value(uint8_t *&value, uint32_t &value_length)
         value_length = m2mresourceinstance_stub::int_value;
         memcpy((uint8_t *)value, (uint8_t *)m2mresourceinstance_stub::value, value_length);
     }
+}
+
+int M2MResourceInstance::get_value_int()
+{
+    // Note: this is a copy-paste from the original version, as the tests
+    // set only m2mresourceinstance_stub::value.
+
+    int value_int = 0;
+    // Get the value and convert it into integer. This is not the most
+    // efficient way, as it takes pointless heap copy to get the zero termination.
+    uint8_t* buffer = NULL;
+    uint32_t length;
+    get_value(buffer,length);
+    if(buffer) {
+        value_int = atoi((const char*)buffer);
+        free(buffer);
+    }
+    return value_int;
+}
+
+String M2MResourceInstance::get_value_string() const
+{
+    // XXX: do a better constructor to avoid pointless malloc
+    String value;
+    if (m2mresourceinstance_stub::value) {
+        value.append_raw((char*)m2mresourceinstance_stub::value, m2mresourceinstance_stub::int_value);
+    }
+    
+    return value;
 }
 
 uint8_t* M2MResourceInstance::value() const

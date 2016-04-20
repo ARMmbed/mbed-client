@@ -24,7 +24,7 @@ class Observer : public M2MReportObserver{
 
 public:
 
-    Observer(){}
+    Observer() : visited(false) {}
     virtual ~Observer(){}
     void observation_to_be_sent(m2m::Vector<uint16_t>,bool){
         visited = true;
@@ -35,7 +35,7 @@ public:
 class TimerObserver : public M2MTimerObserver
 {
 public:
-    TimerObserver(){}
+    TimerObserver() : visited(false) {}
     virtual ~TimerObserver(){}
 
     virtual void timer_expired(M2MTimerObserver::Type ){

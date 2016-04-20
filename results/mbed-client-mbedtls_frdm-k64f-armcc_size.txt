@@ -1,0 +1,4 @@
+   text	   data	    bss	    dec	    hex	filename
+   1888	      1	      0	   1889	    761	m2mconnectionsecuritypimpl.cpp.o (ex ./build/frdm-k64f-armcc/ym/mbed-client-mbedtls/source/mbed-client-mbedtls.ar)
+    158	      0	      0	    158	     9e	m2mconnectionsecurity.cpp.o (ex ./build/frdm-k64f-armcc/ym/mbed-client-mbedtls/source/mbed-client-mbedtls.ar)
+   2046	      1	      0	   2047	    7ff	(TOTALS)

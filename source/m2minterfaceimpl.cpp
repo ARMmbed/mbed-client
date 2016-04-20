@@ -25,6 +25,8 @@
 #include "mbed-client/m2mtimer.h"
 #include "mbed-trace/mbed_trace.h"
 
+#define TRACE_GROUP "mClt"
+
 M2MInterfaceImpl::M2MInterfaceImpl(M2MInterfaceObserver& observer,
                                    const String &ep_name,
                                    const String &ep_type,
@@ -75,7 +77,7 @@ M2MInterfaceImpl::M2MInterfaceImpl(M2MInterfaceObserver& observer,
     _connection_handler = new M2MConnectionHandler(*this, new M2MConnectionSecurity(sec_mode), mode, stack);
 
     _connection_handler->bind_connection(_listen_port);
-     tr_debug("M2MInterfaceImpl::M2MInterfaceImpl() -OUT");
+    tr_debug("M2MInterfaceImpl::M2MInterfaceImpl() -OUT");
 }
 
 
@@ -178,7 +180,7 @@ void M2MInterfaceImpl::register_object(M2MSecurity *security, const M2MObjectLis
 
 void M2MInterfaceImpl::update_registration(M2MSecurity *security_object, const uint32_t lifetime)
 {
-    tr_debug("M2MInterfaceImpl::update_registration(M2MSecurity *security,const uint32_t lifetime) - IN");
+    tr_debug("M2MInterfaceImpl::update_registration - IN");
     // Transition to a new state based upon
     // the current state of the state machine
     if(lifetime != 0 && (lifetime < MINIMUM_REGISTRATION_TIME)) {
@@ -213,10 +215,10 @@ void M2MInterfaceImpl::update_registration(M2MSecurity *security_object, const u
             _observer.error(M2MInterface::NotAllowed);
         }
     } else {
-        tr_debug("M2MInterfaceImpl::update_registration(M2MSecurity *security,const M2MObjectList &object_list) - NOT ALLOWED");
+        tr_debug("M2MInterfaceImpl::update_registration - NOT ALLOWED");
         _observer.error(M2MInterface::NotAllowed);
     }
-    tr_debug("M2MInterfaceImpl::update_registration(M2MSecurity *security,const uint32_t lifetime) - OUT");
+    tr_debug("M2MInterfaceImpl::update_registration - OUT");
 }
 
 void M2MInterfaceImpl::unregister_object(M2MSecurity* /*security*/)
@@ -350,17 +352,35 @@ void M2MInterfaceImpl::data_available(uint8_t* data,
 
 void M2MInterfaceImpl::socket_error(uint8_t error_code)
 {
-    tr_debug("M2MInterfaceImpl::socket_error code [%d]", error_code);
-    internal_event(STATE_IDLE);
-    M2MInterface::Error error = M2MInterface::NetworkError;
-    _observer.error(error);
+    M2MInterface::Error error = M2MInterface::ErrorNone;
+    switch (error_code) {
+    case M2MConnectionHandler::SSL_CONNECTION_ERROR:
+        error = M2MInterface::SecureConnectionFailed;
+        break;
+    case M2MConnectionHandler::SOCKET_READ_ERROR:
+        error = M2MInterface::NetworkError;
+        break;
+    case M2MConnectionHandler::SOCKET_SEND_ERROR:
+        error = M2MInterface::NetworkError;
+        break;
+    case M2MConnectionHandler::DNS_RESOLVING_ERROR:
+        error = M2MInterface::DnsResolvingFailed;
+        break;
+    default:
+        break;
+    }
+
+    if (M2MInterface::ErrorNone != error) {
+        _observer.error(error);
+        internal_event(STATE_IDLE);
+    }
 }
 
 void M2MInterfaceImpl::address_ready(const M2MConnectionObserver::SocketAddress &address,
                                      M2MConnectionObserver::ServerType server_type,
                                      const uint16_t server_port)
 {
-    tr_debug("M2MInterfaceImpl::address_ready(const M2MConnectionObserver::SocketAddress ,M2MConnectionObserver::ServerType,const uint16_t)");
+    tr_debug("M2MInterfaceImpl::address_ready");
     ResolvedAddressData *data = new ResolvedAddressData();
     data->_address = &address;
     data->_port = server_port;
@@ -391,7 +411,7 @@ void M2MInterfaceImpl::data_sent()
 void M2MInterfaceImpl::timer_expired(M2MTimerObserver::Type type)
 {
     tr_debug("M2MInterfaceImpl::timer_expired()");
-    if(M2MTimerObserver::QueueSleep == type) {        
+    if(M2MTimerObserver::QueueSleep == type) {
         if(_callback_handler) {
             _callback_handler();
         }
@@ -404,13 +424,11 @@ void M2MInterfaceImpl::state_idle(EventData* /*data*/)
 {
     // Handle Idle state here
     // Cleanup all resources, if necessary
-    _connection_handler->stop_listening();
+    tr_debug("M2MInterfaceImpl::state_idle");
     _nsdl_interface->stop_timers();
     _register_ongoing = false;
     _update_register_ongoing = false;
-    tr_debug("M2MInterfaceImpl::state_idle");
 }
-
 
 void M2MInterfaceImpl::state_bootstrap( EventData *data)
 {
@@ -429,31 +447,18 @@ void M2MInterfaceImpl::state_bootstrap( EventData *data)
                 String ip_address;
                 uint16_t port = 0;
                 String  coap;
-                if(server_address.compare(0,COAP.size(),COAP) == 0) {
+                if(server_address.compare(0,sizeof(COAP)-1,COAP) == 0) {
                      coap = COAP;
                 }
-                else if(server_address.compare(0,COAPS.size(),COAPS) == 0) {
+                else if(server_address.compare(0,sizeof(COAPS)-1,COAPS) == 0) {
                     security->resource_value_int(M2MSecurity::SecurityMode) != M2MSecurity::NoSecurity ? coap = COAPS: coap = "";
                 }
                 if(!coap.empty()) {
                     server_address = server_address.substr(coap.size(),
                                                        server_address.size()-coap.size());
-                    int colonFound = server_address.find_last_of(':'); //10
-                    if(colonFound != -1) {
-                        ip_address = server_address.substr(0,colonFound);
-                        port = atoi(server_address.substr(colonFound+1,
-                                                         server_address.size()-ip_address.size()).c_str());
-                        colonFound = ip_address.find_last_of(']');
-                        if(ip_address.compare(0,1,"[") == 0) {
-                            if(colonFound == -1) {
-                                ip_address.clear();
-                            } else {
-                                ip_address = ip_address.substr(1,colonFound-1);
-                            }
-                        } else if(colonFound != -1) {
-                            ip_address.clear();
-                        }
-                    }
+
+                    process_address(server_address, ip_address, port);
+                    
                     tr_debug("M2MInterfaceImpl::state_bootstrap - IP address %s , Port %d", ip_address.c_str(), port);
                     // If bind and resolving server address succeed then proceed else
                     // return error to the application and go to Idle state.
@@ -531,8 +536,6 @@ void M2MInterfaceImpl::state_register( EventData *data)
 {
     tr_debug("M2MInterfaceImpl::state_register");
     // Start with registration preparation
-    bool success = false;
-    M2MInterface::Error error = M2MInterface::InvalidParameters;
     if(data) {
         M2MRegisterData *event = (M2MRegisterData *)data;
         M2MSecurity *security = event->_object;
@@ -547,56 +550,55 @@ void M2MInterfaceImpl::state_register( EventData *data)
                     String ip_address;
                     uint16_t port = 0;
                     String  coap;
-                    if(server_address.compare(0,COAP.size(),COAP) == 0) {
+                    if(server_address.compare(0,sizeof(COAP)-1,COAP) == 0) {
                          coap = COAP;
                     }
-                    else if(server_address.compare(0,COAPS.size(),COAPS) == 0) {
+                    else if(server_address.compare(0,sizeof(COAPS)-1,COAPS) == 0) {
                         security->resource_value_int(M2MSecurity::SecurityMode) != M2MSecurity::NoSecurity ? coap = COAPS: coap = "";
                     }
                     if(!coap.empty()) {
                         server_address = server_address.substr(coap.size(),
-                                                           server_address.size()-coap.size());
-                        int colonFound = server_address.find_last_of(':'); //10
-                        if(colonFound != -1) {
-                            ip_address = server_address.substr(0,colonFound);
-                            port = atoi(server_address.substr(colonFound+1,
-                                                             server_address.size()-ip_address.size()).c_str());
-                            colonFound = ip_address.find_last_of(']');
-                            if(ip_address.compare(0,1,"[") == 0) {
-                                if(colonFound == -1) {
-                                    ip_address.clear();
-                                } else {
-                                    ip_address = ip_address.substr(1,colonFound-1);
-                                }
-                            } else if(colonFound != -1) {
-                                ip_address.clear();
-                            }
-                        }
+                                                           server_address.size() - coap.size());
+
+                        process_address(server_address, ip_address, port);
+
                         tr_debug("M2MInterfaceImpl::state_register - IP address %s , Port %d", ip_address.c_str(), port);
                         // If bind and resolving server address succeed then proceed else
                         // return error to the application and go to Idle state.
                         if(ip_address.empty()) {
                             tr_error("M2MInterfaceImpl::state_register - set error as M2MInterface::InvalidParameters");
-                            error = M2MInterface::InvalidParameters;
-                        }else if(_connection_handler->resolve_server_address(ip_address,
-                                                                      port,
-                                                                      M2MConnectionObserver::LWM2MServer,
-                                                                      security)) {
-                            tr_debug("M2MInterfaceImpl::state_register - resolve_server_address - success");
-                            success = true;                            
+                            internal_event(STATE_IDLE);
+                            _observer.error(M2MInterface::InvalidParameters);
                         } else {
-                            tr_error("M2MInterfaceImpl::state_register - set error as M2MInterface::NetworkError");
-                            error = M2MInterface::NetworkError;
+                            // Errors are coming through callback
+                            _connection_handler->resolve_server_address(ip_address,port,
+                                                                        M2MConnectionObserver::LWM2MServer,
+                                                                        security);
                         }
                     }
                 }
             }
         }
     }
-    if(!success) {
-        tr_error("M2MInterfaceImpl::state_register - Error Occured %d", (int)error);
-        internal_event(STATE_IDLE);
-        _observer.error(error);
+}
+
+void M2MInterfaceImpl::process_address(const String& server_address, String& ip_address, uint16_t& port) {
+    
+    int colonFound = server_address.find_last_of(':'); //10
+    if(colonFound != -1) {
+        ip_address = server_address.substr(0,colonFound);
+        port = atoi(server_address.substr(colonFound+1,
+                                         server_address.size()-ip_address.size()).c_str());
+        colonFound = ip_address.find_last_of(']');
+        if(ip_address.compare(0,1,"[") == 0) {
+            if(colonFound == -1) {
+                ip_address.clear();
+            } else {
+                ip_address = ip_address.substr(1,colonFound-1);
+            }
+        } else if(colonFound != -1) {
+            ip_address.clear();
+        }
     }
 }
 
@@ -648,12 +650,11 @@ void M2MInterfaceImpl::state_update_registration( EventData *data)
     // Start with registration preparation
     bool success = false;
     if(data) {
-        M2MUpdateRegisterData *event = (M2MUpdateRegisterData *)data;
+        M2MUpdateRegisterData *event = static_cast<M2MUpdateRegisterData *> (data);
         success = _nsdl_interface->send_update_registration(event->_lifetime);
-
     }
     if(!success) {
-        tr_error("M2MInterfaceImpl::state_register_address_resolved : M2MInterface::InvalidParameters");
+        tr_error("M2MInterfaceImpl::state_update_registration : M2MInterface::InvalidParameters");
         internal_event(STATE_IDLE);
         _observer.error(M2MInterface::InvalidParameters);
     }
@@ -774,7 +775,7 @@ void M2MInterfaceImpl::internal_event(uint8_t new_state,
 }
 
 // the state engine executes the state machine states
-void M2MInterfaceImpl::state_engine (void )
+void M2MInterfaceImpl::state_engine (void)
 {
     tr_debug("M2MInterfaceImpl::state_engine");
     EventData* p_data_temp = NULL;
@@ -800,7 +801,7 @@ void M2MInterfaceImpl::state_engine (void )
 void M2MInterfaceImpl::state_function( uint8_t current_state, EventData* data )
 {
     switch( current_state ) {
-    case STATE_IDLE:
+        case STATE_IDLE:
             M2MInterfaceImpl::state_idle(data);
             break;
         case STATE_BOOTSTRAP:

@@ -1,0 +1,3 @@
+   text	   data	    bss	    dec	    hex	filename
+   7910	      0	    496	   8406	   20d6	dlmalloc.c.o (ex ./build/frdm-k64f-armcc/ym/dlmalloc/source/dlmalloc.ar)
+   7910	      0	    496	   8406	   20d6	(TOTALS)

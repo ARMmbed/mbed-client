@@ -1,0 +1,4 @@
+   text	   data	    bss	    dec	    hex	filename
+     36	      4	      0	     40	     28	malloc.c.o (ex ./build/frdm-k64f-armcc/ym/ualloc/source/ualloc.ar)
+    244	      4	      0	    248	     f8	ualloc.c.o (ex ./build/frdm-k64f-armcc/ym/ualloc/source/ualloc.ar)
+    280	      8	      0	    288	    120	(TOTALS)

@@ -243,8 +243,11 @@ int8_t sn_coap_protocol_set_retransmission_parameters(uint8_t, uint8_t)
 }
 
 // IP6String.h
-void ip6tos(const void *, char *)
+void ip6tos(const void *ip6addr, char *p)
 {
+    // Just set at least something there, or the valgrind will scream when
+    // client tries to use the result string.
+    p[0] = '\0';
 }
 
 //Socket

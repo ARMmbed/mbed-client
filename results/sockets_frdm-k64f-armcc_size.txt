@@ -1,0 +1,8 @@
+   text	   data	    bss	    dec	    hex	filename
+   1405	      0	      0	   1405	    57d	TCPListener.cpp.o (ex ./build/frdm-k64f-armcc/ym/sockets/source/sockets.ar)
+    220	      0	      0	    220	     dc	SocketAddr.cpp.o (ex ./build/frdm-k64f-armcc/ym/sockets/source/sockets.ar)
+   1259	      0	      0	   1259	    4eb	TCPStream.cpp.o (ex ./build/frdm-k64f-armcc/ym/sockets/source/sockets.ar)
+    691	      8	      0	    699	    2bb	TCPAsynch.cpp.o (ex ./build/frdm-k64f-armcc/ym/sockets/source/sockets.ar)
+   2613	      0	      0	   2613	    a35	Socket.cpp.o (ex ./build/frdm-k64f-armcc/ym/sockets/source/sockets.ar)
+    241	      0	      0	    241	     f1	UDPSocket.cpp.o (ex ./build/frdm-k64f-armcc/ym/sockets/source/sockets.ar)
+   6429	      8	      0	   6437	   1925	(TOTALS)

@@ -21,6 +21,7 @@
 #include "mbed-client/m2mresource.h"
 
 #define BUFFER_SIZE 21
+#define TRACE_GROUP "mClt"
 
 M2MFirmware* M2MFirmware::_instance = NULL;
 
@@ -34,10 +35,8 @@ M2MFirmware* M2MFirmware::get_instance()
 
 void M2MFirmware::delete_instance()
 {
-    if(_instance) {
-        delete _instance;
-        _instance = NULL;
-    }
+    delete _instance;
+    _instance = NULL;
 }
 
 M2MFirmware::M2MFirmware()
@@ -109,20 +108,22 @@ void M2MFirmware::create_mandatory_resources()
 M2MResource* M2MFirmware::create_resource(FirmwareResource resource, const String &value)
 {
     M2MResource* res = NULL;
-    String firmware_id = "";
+    const char* firmware_id_ptr = "";
     M2MBase::Operation operation = M2MBase::GET_ALLOWED;
     if(!is_resource_present(resource)) {
         switch(resource) {
             case PackageName:
-                firmware_id = FIRMWARE_PACKAGE_NAME;
+                firmware_id_ptr = FIRMWARE_PACKAGE_NAME;
                 break;
             case PackageVersion:
-                firmware_id = FIRMWARE_PACKAGE_VERSION;
+                firmware_id_ptr = FIRMWARE_PACKAGE_VERSION;
                 break;
             default:
                 break;
         }
     }
+    String firmware_id(firmware_id_ptr);
+
     if(!firmware_id.empty() && value.size() < 256) {
         if(_firmware_instance) {
             res = _firmware_instance->create_dynamic_resource(firmware_id,
@@ -148,13 +149,13 @@ M2MResource* M2MFirmware::create_resource(FirmwareResource resource, const Strin
 M2MResource* M2MFirmware::create_resource(FirmwareResource resource, int64_t value)
 {
     M2MResource* res = NULL;
-    String firmware_id = "";
+    const char* firmware_id_ptr = "";
     M2MBase::Operation operation = M2MBase::GET_ALLOWED;
     if(!is_resource_present(resource)) {
         switch(resource) {
         case UpdateSupportedObjects:
             if(check_value_range(resource, value)) {
-                firmware_id = FIRMWARE_UPDATE_SUPPORTED_OBJECTS;
+                firmware_id_ptr = FIRMWARE_UPDATE_SUPPORTED_OBJECTS;
                 operation = M2MBase::GET_PUT_ALLOWED;
             }
             break;
@@ -162,6 +163,9 @@ M2MResource* M2MFirmware::create_resource(FirmwareResource resource, int64_t val
             break;
         }
     }
+
+    const String firmware_id(firmware_id_ptr);
+    
     if(!firmware_id.empty()) {
         if(_firmware_instance) {
             res = _firmware_instance->create_dynamic_resource(firmware_id,
@@ -171,15 +175,9 @@ M2MResource* M2MFirmware::create_resource(FirmwareResource resource, int64_t val
 
             if(res) {
                 res->set_register_uri(false);
-                char *buffer = (char*)malloc(BUFFER_SIZE);
-                if(buffer) {
-                    uint32_t size = m2m::itoa_c(value, buffer);
-                    if (size <= BUFFER_SIZE) {
-                        res->set_operation(operation);
-                        res->set_value((const uint8_t*)buffer, size);
-                    }
-                    free(buffer);
-                }
+
+                res->set_operation(operation);
+                res->set_value(value);
             }
         }
     }
@@ -220,14 +218,8 @@ bool M2MFirmware::set_resource_value(FirmwareResource resource,
             // If it is any of the above resource
             // set the value of the resource.
             if (check_value_range(resource, value)) {
-                char *buffer = (char*)malloc(BUFFER_SIZE);
-                if(buffer) {
-                    uint32_t size = m2m::itoa_c(value, buffer);
-                    if (size <= BUFFER_SIZE) {
-                        success = res->set_value((const uint8_t*)buffer, size);
-                    }
-                    free(buffer);
-                }
+                
+                success = res->set_value(value);
             }
         }
     }
@@ -258,9 +250,9 @@ bool M2MFirmware::is_resource_present(FirmwareResource resource) const
     return success;
 }
 
-String M2MFirmware::resource_name(FirmwareResource resource) const
+const String M2MFirmware::resource_name(FirmwareResource resource)
 {
-    String res_name = "";
+    const char* res_name = "";
     switch(resource) {
         case Package:
             res_name = FIRMWARE_PACKAGE;
@@ -287,7 +279,7 @@ String M2MFirmware::resource_name(FirmwareResource resource) const
             res_name = FIRMWARE_PACKAGE_VERSION;
             break;
     }
-    return res_name;
+    return String(res_name);
 }
 
 uint16_t M2MFirmware::per_resource_count(FirmwareResource res) const
@@ -325,33 +317,35 @@ M2MResource* M2MFirmware::get_resource(FirmwareResource res) const
 {
     M2MResource* res_object = NULL;
     if(_firmware_instance) {
-        String res_name = "";
+        const char* res_name_ptr = "";
         switch(res) {
             case Package:
-                res_name = FIRMWARE_PACKAGE;
+                res_name_ptr = FIRMWARE_PACKAGE;
                 break;
             case PackageUri:
-                res_name = FIRMWARE_PACKAGE_URI;
+                res_name_ptr = FIRMWARE_PACKAGE_URI;
                 break;
             case Update:
-                res_name = FIRMWARE_UPDATE;
+                res_name_ptr = FIRMWARE_UPDATE;
                 break;
             case State:
-                res_name = FIRMWARE_STATE;
+                res_name_ptr = FIRMWARE_STATE;
                 break;
             case UpdateSupportedObjects:
-                res_name = FIRMWARE_UPDATE_SUPPORTED_OBJECTS;
+                res_name_ptr = FIRMWARE_UPDATE_SUPPORTED_OBJECTS;
                 break;
             case UpdateResult:
-                res_name = FIRMWARE_UPDATE_RESULT;
+                res_name_ptr = FIRMWARE_UPDATE_RESULT;
                 break;
             case PackageName:
-                res_name = FIRMWARE_PACKAGE_NAME;
+                res_name_ptr = FIRMWARE_PACKAGE_NAME;
                 break;
             case PackageVersion:
-                res_name = FIRMWARE_PACKAGE_VERSION;
+                res_name_ptr = FIRMWARE_PACKAGE_VERSION;
                 break;
         }
+        const String res_name(res_name_ptr);
+        
         res_object = _firmware_instance->resource(res_name);
     }
     return res_object;
@@ -378,14 +372,8 @@ int64_t M2MFirmware::resource_value_int(FirmwareResource resource) const
         if(M2MFirmware::State == resource          ||
            M2MFirmware::UpdateSupportedObjects == resource         ||
            M2MFirmware::UpdateResult == resource) {
-            // Get the value and convert it into integer
-            uint8_t* buffer = NULL;
-            uint32_t length = 0;
-            res->get_value(buffer,length);
-            if(buffer) {
-                value = atoi((const char*)buffer);
-                free(buffer);
-            }
+
+            value = res->get_value_int();
         }
     }
     return value;
@@ -399,24 +387,8 @@ String M2MFirmware::resource_value_string(FirmwareResource resource) const
         if(M2MFirmware::PackageUri == resource          ||
            M2MFirmware::PackageName == resource           ||
            M2MFirmware::PackageVersion == resource) {
-            uint8_t* buffer = NULL;
-            uint32_t length = 0;
-            res->get_value(buffer,length);
 
-            char *char_buffer = (char*)malloc(length+1);
-            if(char_buffer) {
-                memset(char_buffer,0,length+1);
-                memcpy(char_buffer,(char*)buffer,length);
-
-                String s_name(char_buffer);
-                value = s_name;
-                if(char_buffer) {
-                    free(char_buffer);
-                }
-            }
-            if(buffer) {
-                free(buffer);
-            }
+            value = res->get_value_string();
         }
     }
     return value;
@@ -458,13 +430,5 @@ bool M2MFirmware::check_value_range(FirmwareResource resource, int64_t value) co
 
 void M2MFirmware::set_zero_value(M2MResource *resource)
 {
-    char *buffer = (char*)malloc(BUFFER_SIZE);
-    int64_t value = 0;
-    if(buffer) {
-        uint32_t size = m2m::itoa_c(value, buffer);
-        if (size <= BUFFER_SIZE) {
-            resource->set_value((const uint8_t*)buffer, size);
-        }
-        free(buffer);
-    }
+    resource->set_value((const uint8_t*)"0", 1);
 }

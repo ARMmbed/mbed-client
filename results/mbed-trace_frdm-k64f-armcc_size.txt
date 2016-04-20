@@ -1,0 +1,4 @@
+   text	   data	    bss	    dec	    hex	filename
+   1278	      0	     52	   1330	    532	mbed_trace.c.o (ex ./build/frdm-k64f-armcc/ym/mbed-trace/source/mbed-trace.ar)
+    152	      0	      0	    152	     98	mbed_trace_ip6tos.c.o (ex ./build/frdm-k64f-armcc/ym/mbed-trace/source/mbed-trace.ar)
+   1430	      0	     52	   1482	    5ca	(TOTALS)

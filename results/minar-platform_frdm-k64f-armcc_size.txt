@@ -1,0 +1,3 @@
+   text	   data	    bss	    dec	    hex	filename
+      2	      0	      0	      2	      2	dummy.c.o (ex ./build/frdm-k64f-armcc/ym/minar-platform/yotta_dummy_lib_minar_platform/minar-platform.ar)
+      2	      0	      0	      2	      2	(TOTALS)

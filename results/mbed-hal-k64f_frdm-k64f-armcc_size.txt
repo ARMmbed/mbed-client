@@ -1,0 +1,6 @@
+   text	   data	    bss	    dec	    hex	filename
+   1076	      0	      0	   1076	    434	startup_MK64F12.s.o (ex ./build/frdm-k64f-armcc/ym/mbed-hal-k64f/source/mbed-hal-k64f.ar)
+    792	      0	      0	    792	    318	fsl_clock_K64F12.c.o (ex ./build/frdm-k64f-armcc/ym/mbed-hal-k64f/source/mbed-hal-k64f.ar)
+   2230	      0	      0	   2230	    8b6	fsl_sim_hal_K64F12.c.o (ex ./build/frdm-k64f-armcc/ym/mbed-hal-k64f/source/mbed-hal-k64f.ar)
+    252	      0	    512	    764	    2fc	crc.c.o (ex ./build/frdm-k64f-armcc/ym/mbed-hal-k64f/source/mbed-hal-k64f.ar)
+   4350	      0	    512	   4862	   12fe	(TOTALS)

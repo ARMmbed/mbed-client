@@ -19,7 +19,6 @@ add_executable(m2mnsdlinterface
         "../stub/nsdlaccesshelper_stub.cpp"
         "../stub/m2mtlvserializer_stub.cpp"
         "../../../../source/m2mnsdlinterface.cpp"
-        "../../../../source/m2mconstants.cpp"
 )
 target_link_libraries(m2mnsdlinterface
     CppUTest

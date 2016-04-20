@@ -1,0 +1,3 @@
+   text	   data	    bss	    dec	    hex	filename
+      2	      0	      0	      2	      2	dummy.c.o (ex ./build/frdm-k64f-armcc/ym/cmsis-core-freescale/yotta_dummy_lib_cmsis_core_freescale/cmsis-core-freescale.ar)
+      2	      0	      0	      2	      2	(TOTALS)

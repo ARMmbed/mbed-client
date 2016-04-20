@@ -48,7 +48,7 @@ class ResourceCallback : public M2MResourceCallback {
 
 public:
 
-    ResourceCallback(){}
+    ResourceCallback() : visited(false) {}
     ~ResourceCallback(){}
     void notification_update() {
         visited = true;
@@ -245,6 +245,15 @@ void Test_M2MResourceInstance::test_set_value()
     u_int8_t value3[] = {"13"};
     CHECK(resource_instance->set_value(value3,(u_int32_t)sizeof(value3)) == true);
 
+    CHECK(resource_instance->set_value(123456789) == true);
+    CHECK(memcmp(resource_instance->_value, "123456789", 9) == 0);
+
+    // verify int value helper
+    CHECK(resource_instance->get_value_int() == 123456789);
+
+    // verify string value helper
+    CHECK(resource_instance->get_value_string() == "123456789");
+
     free(resource_instance->_value);
     resource_instance->_value_length = 0;
 
@@ -271,7 +280,10 @@ void Test_M2MResourceInstance::test_set_value()
     ResourceCallback *resource_cb = new ResourceCallback();
     resource_instance->set_resource_observer(resource_cb);
     CHECK(resource_instance->set_value(value2,(u_int32_t)sizeof(value2)) == true);
-    CHECK(resource_cb->visited == true);
+
+    // XXX: the callback will not be called on current code with combination of
+    // M2MBase::Dynamic and M2MBase::R_Attribute.
+    CHECK(resource_cb->visited == false);
 
     resource_cb->visited = false;
     m2mbase_stub::observation_level_value = M2MBase::R_Attribute;

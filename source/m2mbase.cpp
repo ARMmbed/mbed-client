@@ -20,8 +20,11 @@
 #include "include/m2mreporthandler.h"
 #include "include/nsdllinker.h"
 #include "mbed-trace/mbed_trace.h"
+#include <assert.h>
 #include <ctype.h>
 #include <string.h>
+
+#define TRACE_GROUP "mClt"
 
 M2MBase& M2MBase::operator=(const M2MBase& other)
 {
@@ -40,24 +43,18 @@ M2MBase& M2MBase::operator=(const M2MBase& other)
         _register_uri = other._register_uri;
         _uri_path = other._uri_path;
         _max_age = other._max_age;
-        if(_token) {
-            free(_token);
-            _token = NULL;
-            _token_length = 0;
-        }
+
+        free(_token);
+        _token = NULL;
+
         _token_length = other._token_length;
         if(other._token) {
-            _token = (uint8_t *)malloc(other._token_length+1);
-            if(_token) {
-                memset(_token, 0, other._token_length+1);
-                memcpy((uint8_t *)_token, (uint8_t *)other._token, other._token_length);
-            }
+            _token = alloc_string_copy(other._token, other._token_length);
         }
 
-        if(_report_handler) {
-            delete _report_handler;
-            _report_handler = NULL;
-        }
+        delete _report_handler;
+        _report_handler = NULL;
+
         if(other._report_handler) {
             _report_handler = new M2MReportHandler(*other._report_handler);
         }
@@ -67,30 +64,26 @@ M2MBase& M2MBase::operator=(const M2MBase& other)
 
 M2MBase::M2MBase(const M2MBase& other) :
     _report_handler(NULL),
+    _observation_handler(other._observation_handler),
+    _operation(other._operation),
+    _mode(other._mode),
+    _observation_level(other._observation_level),
+    _name(other._name),
+    _resource_type(other._resource_type),
+    _interface_description(other._interface_description),
+    _coap_content_type(other._coap_content_type),
+    _instance_id(other._instance_id),
+    _observable(other._observable),
+    _observation_number(other._observation_number),
     _token(NULL),
-    _token_length(0)
+    _token_length(other._token_length),
+    _register_uri(other._register_uri),
+    _uri_path(other._uri_path),
+    _max_age(other._max_age)
 {
-    _operation = other._operation;
-    _mode = other._mode;
-    _name = other._name;
-    _resource_type = other._resource_type;
-    _interface_description = other._interface_description;
-    _coap_content_type = other._coap_content_type;
-    _instance_id = other._instance_id;
-    _observable = other._observable;
-    _observation_handler = other._observation_handler;
-    _observation_number = other._observation_number;
-    _observation_level = other._observation_level;
-    _register_uri = other._register_uri;
-    _uri_path = other._uri_path;
-    _max_age = other._max_age;
-    _token_length = other._token_length;
+
     if(other._token) {
-        _token = (uint8_t *)malloc(other._token_length+1);
-        if(_token) {
-            memset(_token, 0, other._token_length+1);
-            memcpy((uint8_t *)_token, (uint8_t *)other._token, other._token_length);
-        }
+        _token = alloc_string_copy((uint8_t *)other._token, other._token_length);
     }
 
     if(other._report_handler) {
@@ -128,15 +121,8 @@ M2MBase::M2MBase(const String & resource_name,
 
 M2MBase::~M2MBase()
 {
-    if(_report_handler) {
-        delete _report_handler;
-        _report_handler = NULL;
-    }
-    if(_token) {
-        free(_token);
-        _token = NULL;
-        _token_length = 0;
-    }
+    delete _report_handler;
+    free(_token);
 }
 
 void M2MBase::set_operation(M2MBase::Operation opr)
@@ -144,7 +130,7 @@ void M2MBase::set_operation(M2MBase::Operation opr)
     // If the mode is Static, there is only GET_ALLOWED
    // supported.
     if(M2MBase::Static == _mode) {
-            _operation = M2MBase::GET_ALLOWED;
+        _operation = M2MBase::GET_ALLOWED;
     } else {
         _operation = opr;
     }
@@ -195,26 +181,20 @@ void M2MBase::set_under_observation(bool observed,
             _report_handler->set_under_observation(observed);
         }
     } else {
-        if(_report_handler) {
-            delete _report_handler;
-            _report_handler = NULL;
-        }
+        delete _report_handler;
+        _report_handler = NULL;
     }
 }
 
 void M2MBase::set_observation_token(const uint8_t *token, const uint8_t length)
 {
-    if(_token) {
-         free(_token);
-         _token = NULL;
-         _token_length = 0;
-    }
+     free(_token);
+     _token = NULL;
+     _token_length = 0;
 
     if( token != NULL && length > 0 ) {
-        _token = (uint8_t *)malloc(length+1);
-       if(_token) {
-            memset(_token, 0, length+1);
-            memcpy((uint8_t *)_token, (uint8_t *)token, length);
+        _token = alloc_string_copy((uint8_t *)token, length);
+        if(_token) {
             _token_length = length;
         }
     }
@@ -288,15 +268,11 @@ M2MBase::Observation M2MBase::observation_level() const
 void M2MBase::get_observation_token(uint8_t *&token, uint32_t &token_length)
 {
     token_length = 0;
-    if(token) {
-        free(token);
-        token = NULL;
-    }
-    token = (uint8_t *)malloc(_token_length+1);
+    free(token);
+
+    token = alloc_string_copy((uint8_t *)_token, _token_length);
     if(token) {
         token_length = _token_length;
-        memset(token, 0, _token_length+1);
-        memcpy((uint8_t *)token, (uint8_t *)_token, token_length);
     }
 }
 
@@ -399,8 +375,30 @@ void *M2MBase::memory_alloc(uint16_t size)
 
 void M2MBase::memory_free(void *ptr)
 {
-    if(ptr)
-        free(ptr);
+    free(ptr);
+}
+
+uint8_t* M2MBase::alloc_string_copy(const uint8_t* source, uint16_t size)
+{
+    assert(source != NULL);
+
+    uint8_t* result = (uint8_t*)memory_alloc(size + 1);
+    if (result) {
+        memcpy(result, source, size);
+        result[size] = '\0';
+    }
+    return result;
+}
+
+uint8_t* M2MBase::alloc_copy(const uint8_t* source, uint16_t size)
+{
+    assert(source != NULL);
+
+    uint8_t* result = (uint8_t*)memory_alloc(size);
+    if (result) {
+        memcpy(result, source, size);
+    }
+    return result;
 }
 
 M2MReportHandler* M2MBase::report_handler()

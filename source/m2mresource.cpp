@@ -22,6 +22,8 @@
 #include "include/nsdllinker.h"
 #include "mbed-trace/mbed_trace.h"
 
+#define TRACE_GROUP "mClt"
+
 M2MResource& M2MResource::operator=(const M2MResource& other)
 {
     if (this != &other) { // protect against invalid self-assignment
@@ -36,9 +38,8 @@ M2MResource& M2MResource::operator=(const M2MResource& other)
             }
         }
         if(other._delayed_token) {
-            _delayed_token = (uint8_t*)malloc(other._delayed_token_len);
+            _delayed_token = (uint8_t*)alloc_copy(other._delayed_token,other._delayed_token_len);
             if(_delayed_token) {
-                memcpy(_delayed_token,other._delayed_token,other._delayed_token_len);
                 _delayed_token_len = other._delayed_token_len;
             }
         }
@@ -72,7 +73,7 @@ M2MResource::M2MResource(M2MObjectInstanceCallback &object_instance_callback,
   _delayed_token_len(0)
 {
     M2MBase::set_base_type(M2MBase::Resource);
-    M2MBase::set_operation(M2MBase::GET_ALLOWED);    
+    M2MBase::set_operation(M2MBase::GET_ALLOWED);
     M2MBase::set_observable(false);
 }
 
@@ -106,14 +107,10 @@ M2MResource::~M2MResource()
             //Free allocated memory for resources.
             res = *it;
             delete res;
-            res = NULL;
         }
         _resource_instance_list.clear();
     }
-    if(_delayed_token) {
-        free(_delayed_token);
-        _delayed_token = NULL;
-    }
+    free(_delayed_token);
 }
 
 bool M2MResource::supports_multiple_instances() const
@@ -156,7 +153,6 @@ bool M2MResource::remove_resource_instance(uint16_t inst_id)
                 // Resource found and deleted.
                 res = *it;
                 delete res;
-                res = NULL;
                 _resource_instance_list.erase(pos);
                 success = true;
                 break;
@@ -285,17 +281,15 @@ sn_coap_hdr_s* M2MResource::handle_get_request(nsdl_s *nsdl,
                     bool content_type_present = false;
                     if(received_coap_header->content_type_ptr){
                         content_type_present = true;
-                        coap_response->content_type_ptr = (uint8_t*)malloc(received_coap_header->content_type_len);
+                        coap_response->content_type_ptr = alloc_copy(received_coap_header->content_type_ptr,
+                                                                     received_coap_header->content_type_len);
                         if(coap_response->content_type_ptr) {
-                            memset(coap_response->content_type_ptr, 0, received_coap_header->content_type_len);
-                            memcpy(coap_response->content_type_ptr,
-                                   received_coap_header->content_type_ptr,
-                                   received_coap_header->content_type_len);
                             coap_response->content_type_len = received_coap_header->content_type_len;
                             for(uint8_t i = 0; i < coap_response->content_type_len; i++) {
-                                coap_content_type = (coap_content_type << 8) + (coap_response->content_type_ptr[i] & 0xFF);
+                                coap_content_type = (coap_content_type << 8) +
+                                        (coap_response->content_type_ptr[i] & 0xFF);
                             }
-                         }
+                        }
                     }
 
                     if(!content_type_present &&
@@ -305,10 +299,10 @@ sn_coap_hdr_s* M2MResource::handle_get_request(nsdl_s *nsdl,
 
                     tr_debug("M2MResource::handle_get_request() - Request Content-Type %d", coap_content_type);
                     if (!coap_response->content_type_ptr) {
-                        coap_response->content_type_ptr = (uint8_t*)malloc(2);
-                        coap_response->content_type_len = 1;
-                        if(coap_response->content_type_ptr) {
-                            *coap_response->content_type_ptr = coap_content_type;
+                        coap_response->content_type_ptr =
+                                m2m::String::convert_integer_to_array(coap_content_type,
+                                    coap_response->content_type_len);
+                        if (coap_response->content_type_ptr) {
                             set_coap_content_type(coap_content_type);
                         }
                     }
@@ -331,8 +325,9 @@ sn_coap_hdr_s* M2MResource::handle_get_request(nsdl_s *nsdl,
                     coap_response->options_list_ptr = (sn_coap_options_list_s*)malloc(sizeof(sn_coap_options_list_s));
                     memset(coap_response->options_list_ptr, 0, sizeof(sn_coap_options_list_s));
 
-                    coap_response->options_list_ptr->max_age_ptr = m2m::String::convert_integer_to_array(max_age(),
-                                                                                                         coap_response->options_list_ptr->max_age_len);
+                    coap_response->options_list_ptr->max_age_ptr =
+                            m2m::String::convert_integer_to_array(max_age(),
+                                coap_response->options_list_ptr->max_age_len);
 
                     if(received_coap_header->token_ptr) {
                         tr_debug("M2MResource::handle_get_request - Sets Observation Token to resource");
@@ -367,27 +362,11 @@ sn_coap_hdr_s* M2MResource::handle_get_request(nsdl_s *nsdl,
                                             (*it)->set_resource_observer(this);
                                             (*it)->add_observation_level(M2MBase::R_Attribute);
                                         }
-
                                         set_under_observation(true,observation_handler);
                                         M2MBase::add_observation_level(M2MBase::R_Attribute);
-
-                                        uint8_t *obs_number = (uint8_t*)malloc(3);
-                                        memset(obs_number,0,3);
-                                        uint8_t observation_number_length = 1;
-
-                                        uint16_t number = observation_number();
-
-                                        tr_debug("M2MResource::handle_get_request - Observation Number %d", number);
-                                        if(number > 0xFF) {
-                                            observation_number_length = 2;
-                                            *(obs_number) = (number >> 8) & 0x00FF;
-                                            obs_number[1] = number & 0x00FF;
-                                        } else {
-                                            observation_number_length = 1;
-                                            *(obs_number) = number & 0x00FF;
-                                        }
-                                        coap_response->options_list_ptr->observe_ptr = obs_number;
-                                        coap_response->options_list_ptr->observe_len = observation_number_length;
+                                        coap_response->options_list_ptr->observe_ptr =
+                                                m2m::String::convert_integer_to_array(observation_number(),
+                                                      coap_response->options_list_ptr->observe_len);
                                     }
                                 } else if (STOP_OBSERVATION == observe_option) {
                                     tr_debug("M2MResource::handle_get_request - Stops Observation");
@@ -418,14 +397,14 @@ sn_coap_hdr_s* M2MResource::handle_get_request(nsdl_s *nsdl,
         }
     } else {
         coap_response = M2MResourceInstance::handle_get_request(nsdl,
-                                                                received_coap_header,
-                                                                observation_handler);
+                            received_coap_header,
+                            observation_handler);
     }
     return coap_response;
 }
 
 sn_coap_hdr_s* M2MResource::handle_put_request(nsdl_s *nsdl,
-                                               sn_coap_hdr_s *received_coap_header,                                                                                              
+                                               sn_coap_hdr_s *received_coap_header,
                                                M2MObservationHandler *observation_handler,
                                                bool &execute_value_updated)
 {
@@ -443,29 +422,23 @@ sn_coap_hdr_s* M2MResource::handle_put_request(nsdl_s *nsdl,
             if(received_coap_header->content_type_ptr) {
                 if(coap_response) {
                     content_type_present = true;
-                    coap_response->content_type_ptr = (uint8_t*)malloc(received_coap_header->content_type_len);
+                    coap_response->content_type_ptr = alloc_copy(received_coap_header->content_type_ptr,
+                                                                    received_coap_header->content_type_len);
                     if(coap_response->content_type_ptr) {
-                        memset(coap_response->content_type_ptr, 0, received_coap_header->content_type_len);
-                        memcpy(coap_response->content_type_ptr,
-                               received_coap_header->content_type_ptr,
-                               received_coap_header->content_type_len);
                         coap_response->content_type_len = received_coap_header->content_type_len;
                         for(uint8_t i = 0; i < coap_response->content_type_len; i++) {
-                            coap_content_type = (coap_content_type << 8) + (coap_response->content_type_ptr[i] & 0xFF);
+                            coap_content_type = (coap_content_type << 8) +
+                                    (coap_response->content_type_ptr[i] & 0xFF);
                         }
                     }
                 }
             }
             if(received_coap_header->options_list_ptr &&
                received_coap_header->options_list_ptr->uri_query_ptr) {
-                char *query = (char*)malloc(received_coap_header->options_list_ptr->uri_query_len+1);
+                char *query = (char*)alloc_string_copy(received_coap_header->options_list_ptr->uri_query_ptr,
+                                                        received_coap_header->options_list_ptr->uri_query_len);
                 if (query){
                     msg_code = COAP_MSG_CODE_RESPONSE_CHANGED;
-                    memset(query, 0, received_coap_header->options_list_ptr->uri_query_len+1);
-                    memcpy(query,
-                        received_coap_header->options_list_ptr->uri_query_ptr,
-                        received_coap_header->options_list_ptr->uri_query_len);
-                    memset(query + received_coap_header->options_list_ptr->uri_query_len,'\0',1);//String terminator
                     tr_debug("M2MResource::handle_put_request() - Query %s", query);
                     // if anything was updated, re-initialize the stored notification attributes
                     if (!handle_observation_attribute(query)){
@@ -496,13 +469,8 @@ sn_coap_hdr_s* M2MResource::handle_put_request(nsdl_s *nsdl,
                                     String value = "";
                                     if (received_coap_header->uri_path_ptr != NULL &&
                                         received_coap_header->uri_path_len > 0) {
-                                        char* buf = (char*)malloc(received_coap_header->uri_path_len+1);
-                                        if(buf) {
-                                            memset(buf,0,received_coap_header->uri_path_len+1);
-                                            memcpy(buf,received_coap_header->uri_path_ptr,received_coap_header->uri_path_len);
-                                            value = String(buf);
-                                            free(buf);
-                                        }
+
+                                        value.append_raw((char*)received_coap_header->uri_path_ptr,received_coap_header->uri_path_len);
                                     }
                                     execute_value_updated = true;
                                 }
@@ -536,9 +504,9 @@ sn_coap_hdr_s* M2MResource::handle_put_request(nsdl_s *nsdl,
         }
     } else {        
         coap_response = M2MResourceInstance::handle_put_request(nsdl,
-                                                                received_coap_header,                                                                
-                                                                observation_handler,
-                                                                execute_value_updated);
+                            received_coap_header,
+                            observation_handler,
+                            execute_value_updated);
     }
     return coap_response;
 }
@@ -567,12 +535,9 @@ sn_coap_hdr_s* M2MResource::handle_post_request(nsdl_s *nsdl,
                 if(coap_content_type == 0) {
                     exec_params = new M2MResource::M2MExecuteParameter();
                     if (exec_params){
-                        exec_params->_value = (uint8_t*)malloc(received_coap_header->payload_len+1);
+                        exec_params->_value = alloc_string_copy(received_coap_header->payload_ptr,
+                                                                received_coap_header->payload_len);
                         if (exec_params->_value) {
-                            memset(exec_params->_value, 0, received_coap_header->payload_len+1);
-                            memcpy(exec_params->_value,
-                                received_coap_header->payload_ptr,
-                                received_coap_header->payload_len);
                             exec_params->_value_length = received_coap_header->payload_len;
                         }
                         exec_params->_object_name = object_name();
@@ -586,25 +551,21 @@ sn_coap_hdr_s* M2MResource::handle_post_request(nsdl_s *nsdl,
             if(COAP_MSG_CODE_RESPONSE_CHANGED == msg_code) {
                 tr_debug("M2MResource::handle_post_request - Execute resource function");
                 execute(exec_params);
-                if(exec_params) {
-                    delete exec_params;
-                }
+
+                delete exec_params;
 
                 if(_delayed_response) {
                     coap_response->msg_type = COAP_MSG_TYPE_ACKNOWLEDGEMENT;
                     coap_response->msg_code = COAP_MSG_CODE_EMPTY;
                     coap_response->msg_id = received_coap_header->msg_id;
                     if(received_coap_header->token_len) {
+
+                        free(_delayed_token);
+                        _delayed_token_len = 0;
+
+                        _delayed_token = alloc_copy(received_coap_header->token_ptr, _delayed_token_len);
                         if(_delayed_token) {
-                         free(_delayed_token);
-                         _delayed_token = NULL;
-                         _delayed_token_len = 0;
-                        }
-                        _delayed_token = (uint8_t*)malloc(received_coap_header->token_len);
-                        if(_delayed_token) {
-                            memset(_delayed_token,0,received_coap_header->token_len);
                             _delayed_token_len = received_coap_header->token_len;
-                            memcpy(_delayed_token, received_coap_header->token_ptr, _delayed_token_len);
                         }
                     }
                 } else {
@@ -647,9 +608,7 @@ M2MResource::M2MExecuteParameter::M2MExecuteParameter()
 
 M2MResource::M2MExecuteParameter::~M2MExecuteParameter()
 {
-    if(_value) {
-        free(_value);
-    }
+    free(_value);
 }
 
 uint8_t *M2MResource::M2MExecuteParameter::get_argument_value() const
