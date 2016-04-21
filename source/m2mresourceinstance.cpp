@@ -201,7 +201,7 @@ bool M2MResourceInstance::set_value(const uint8_t *value,
             if( value_changed ) { //
                 if (_resource_type == M2MResourceInstance::STRING) {
                     M2MReportHandler *report_handler = M2MBase::report_handler();
-                    if(report_handler && is_observable()) {
+                    if(report_handler && M2MBase::None != observation_level()) {
                         report_handler->set_notification_trigger();
                     }
                 }
