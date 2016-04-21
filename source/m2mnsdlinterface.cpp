@@ -963,6 +963,7 @@ bool M2MNsdlInterface::create_nsdl_resource(M2MBase *base, const String &name, b
                                                                  name.length(),
                                                                  (uint8_t*)name.c_str());
         if(resource) {
+            bool changed = false;
             success = true;
             if(resource->mode == SN_GRS_STATIC) {
                 if((M2MBase::Resource == base->base_type() ||
@@ -976,11 +977,23 @@ bool M2MNsdlInterface::create_nsdl_resource(M2MBase *base, const String &name, b
                     resource->resource = buffer;
                     resource->resourcelen = length;
                     resource->publish_uri = publish_uri;
-                    sn_nsdl_update_resource(_nsdl_handle,resource);
                 }
             }
-            // Update Resource access everytime for existing resource.
-            resource->access = (sn_grs_resource_acl_e)base->operation();
+            // Check if the access level for the resource has changed.
+            if(resource->access != (sn_grs_resource_acl_e)base->operation()) {
+                changed = true;
+                resource->access = (sn_grs_resource_acl_e)base->operation();
+            }
+            if(resource->resource_parameters_ptr) {
+                // Check if the observation parameter for the resource has changed.
+                if(resource->resource_parameters_ptr->observable != (uint8_t)base->is_observable())
+                changed = true;
+                resource->resource_parameters_ptr->observable = (uint8_t)base->is_observable();
+            }
+            if(changed && resource->resource_parameters_ptr) {
+                resource->resource_parameters_ptr->registered = SN_NDSL_RESOURCE_NOT_REGISTERED;
+            }
+            sn_nsdl_update_resource(_nsdl_handle,resource);
         } else if(_resource) {
             base->set_under_observation(false,this);
             //TODO: implement access control
