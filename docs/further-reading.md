@@ -1,6 +1,4 @@
-# mbed Device Connector service
-
-## Useful reading
+# Useful reading
 
 [Getting started with mbed Device Connector](https://docs.mbed.com/docs/getting-started-with-mbed-device-connector/en/latest/) provides you:
 
