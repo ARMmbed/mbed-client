@@ -1430,6 +1430,12 @@ void Test_M2MNsdlInterface::test_value_updated()
     common_stub::resource->mode = SN_GRS_STATIC;
     m2mbase_stub::mode_value = M2MBase::Static;
 
+    common_stub::resource->resource_parameters_ptr = (sn_nsdl_resource_parameters_s*)malloc(sizeof(sn_nsdl_resource_parameters_s));
+    memset(common_stub::resource->resource_parameters_ptr,0, sizeof(sn_nsdl_resource_parameters_s));
+
+    common_stub::resource->resource_parameters_ptr->observable = false;
+    m2mbase_stub::bool_value = true;
+
     m2mresourceinstance_stub::int_value = 2;
     uint8_t value[] = "1";
     m2mresourceinstance_stub::value = value;
@@ -1441,6 +1447,7 @@ void Test_M2MNsdlInterface::test_value_updated()
     observer->value_update = false;
 
     m2mresourceinstance_stub::clear();
+    free(common_stub::resource->resource_parameters_ptr);
     free(common_stub::resource);
     common_stub::resource = NULL;
     common_stub::clear();
