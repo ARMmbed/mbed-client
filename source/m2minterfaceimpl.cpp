@@ -415,7 +415,6 @@ void M2MInterfaceImpl::timer_expired(M2MTimerObserver::Type type)
         if(_callback_handler) {
             _callback_handler();
         }
-    _queue_sleep_timer->stop_timer();
     }
 }
 
