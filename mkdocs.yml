@@ -10,6 +10,7 @@ pages:
 - ['data_types.md','Data types']
 - ['Howto.md','Quick start guide for using mbed Client API']
 - ['porting-guide.md','Porting mbed Client']
+- ['further-reading.md','mbed Device Connector service']
 
 
 
