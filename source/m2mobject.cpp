@@ -504,7 +504,7 @@ void M2MObject::notification_update(uint16_t obj_instance_id)
 {
     tr_debug("M2MObject::notification_update - id: %d", obj_instance_id);
     M2MReportHandler *report_handler = M2MBase::report_handler();
-    if(report_handler && is_observable()) {
+    if(report_handler && M2MBase::None != observation_level()) {
         report_handler->set_notification_trigger(obj_instance_id);
     }
 }
