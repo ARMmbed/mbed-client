@@ -37,7 +37,7 @@ M2MReportHandler::M2MReportHandler(M2MReportObserver &observer)
   _high_step(0.0f),
   _low_step(0.0f),
   _current_value(0.0f),
-  _last_value(0.0f),
+  _last_value(-1.0f),
   _attribute_state(0),
   _notify(false)
 {
@@ -66,7 +66,7 @@ void M2MReportHandler::set_under_observation(bool observed)
 
 void M2MReportHandler::set_value(float value)
 {
-    tr_debug("M2MReportHandler::set_value()");
+    tr_debug("M2MReportHandler::set_value() - current %f, last %f", value, _last_value);
     _current_value = value;    
     if(_current_value != _last_value) {
         tr_debug("M2MReportHandler::set_value() - UNDER OBSERVATION");
@@ -110,7 +110,7 @@ void M2MReportHandler::set_notification_trigger(uint16_t obj_instance_id)
     }
 
     _current_value = 0.0f;
-    _last_value = 1.0f;    
+    _last_value = 1.0f;
     schedule_report();
 }
 
@@ -301,7 +301,7 @@ void M2MReportHandler::report()
         tr_debug("M2MReportHandler::report()- send with PMIN");
         _pmin_exceeded = false;
         _pmax_exceeded = false;
-        _notify = false;        
+        _notify = false;
         _observer.observation_to_be_sent(_changed_instance_ids);
         _changed_instance_ids.clear();
         if (_pmax_timer) {
@@ -310,7 +310,7 @@ void M2MReportHandler::report()
     }
     else {
         if (_pmax_exceeded) {
-            tr_debug("M2MReportHandler::report()- send with PMAX");            
+            tr_debug("M2MReportHandler::report()- send with PMAX");
             _observer.observation_to_be_sent(_changed_instance_ids, true);
             _changed_instance_ids.clear();
         }
@@ -401,7 +401,7 @@ void M2MReportHandler::set_default_values()
     _low_step = 0.0f;
     _pmin_exceeded = false;
     _pmax_exceeded = false;
-    _last_value = 0.0f;
+    _last_value = -1.0f;
     _attribute_state = 0;
     _changed_instance_ids.clear();
 }
