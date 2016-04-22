@@ -649,16 +649,10 @@ void M2MInterfaceImpl::state_update_registration( EventData *data)
 {
     tr_debug("M2MInterfaceImpl::state_update_registration");
     // Start with registration preparation
-    bool success = false;
     if(data) {
         M2MUpdateRegisterData *event = static_cast<M2MUpdateRegisterData *> (data);
-        success = _nsdl_interface->send_update_registration(event->_lifetime);
-    }
-    if(!success) {
-        tr_error("M2MInterfaceImpl::state_update_registration : M2MInterface::InvalidParameters");
-        internal_event(STATE_IDLE);
-        _observer.error(M2MInterface::InvalidParameters);
-    }
+        _nsdl_interface->send_update_registration(event->_lifetime);
+    }    
 }
 
 void M2MInterfaceImpl::state_unregister( EventData */*data*/)

@@ -204,7 +204,7 @@ void Test_M2MReportHandler::test_parse_notification_attribute()
     DOUBLES_EQUAL(0,_handler->_st,0);
     DOUBLES_EQUAL(0,_handler->_high_step,0);
     DOUBLES_EQUAL(0,_handler->_low_step,0);
-    DOUBLES_EQUAL(0,_handler->_last_value,0);
+    DOUBLES_EQUAL(-1,_handler->_last_value,0);
     DOUBLES_EQUAL(0,_handler->_attribute_state,0);
     CHECK_FALSE(_handler->_pmin_exceeded);
     CHECK_FALSE(_handler->_pmax_exceeded);
@@ -216,24 +216,24 @@ void Test_M2MReportHandler::test_timer_expired()
     CHECK(_observer->visited == false);
 
     _handler->_notify = true;
-    _handler->_pmin_exceeded = true;    
+    _handler->_pmin_exceeded = true;
     _handler->timer_expired(M2MTimerObserver::PMaxTimer);
-    CHECK(_handler->_pmax_exceeded == true);
     CHECK(_observer->visited == true);
 
     _handler->_pmin_exceeded = false;
     _handler->_notify = false;
     _handler->_attribute_state = M2MReportHandler::Pmax;
+    _handler->_current_value = 100;
     _handler->timer_expired(M2MTimerObserver::PMinTimer);
     CHECK(_handler->_pmin_exceeded == true);
 
     _observer->visited = false;
-    _handler->_notify = true;    
-    _handler->timer_expired(M2MTimerObserver::PMinTimer);    
+    _handler->_notify = true;
+    _handler->timer_expired(M2MTimerObserver::PMinTimer);
     CHECK(_observer->visited == true);
 
     _handler->_notify = true;
-    _handler->_pmin_exceeded = true;    
+    _handler->_pmin_exceeded = true;
     _handler->timer_expired(M2MTimerObserver::PMinTimer);
     CHECK(_handler->_pmin_exceeded == true);
 
