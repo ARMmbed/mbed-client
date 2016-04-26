@@ -102,9 +102,9 @@ bool M2MNsdlInterface::initialize()
     //Sets the packet retransmission attempts and time interval
     sn_nsdl_set_retransmission_parameters(_nsdl_handle,RETRY_COUNT,RETRY_INTERVAL);
 
-    _nsdl_exceution_timer->start_timer(ONE_SECOND_TIMER * 1000,
+    /*_nsdl_exceution_timer->start_timer(ONE_SECOND_TIMER * 1000,
                                        M2MTimerObserver::NsdlExecution,
-                                       false);
+                                       false);*/
 
     // Allocate the memory for resources
     _resource = (sn_nsdl_resource_info_s*)memory_alloc(sizeof(sn_nsdl_resource_info_s));
@@ -243,6 +243,10 @@ bool M2MNsdlInterface::send_register_message(uint8_t* address,
                                              sn_nsdl_addr_type_e address_type)
 {
     tr_debug("M2MNsdlInterface::send_register_message()");
+    _nsdl_exceution_timer->stop_timer();
+    _nsdl_exceution_timer->start_timer(ONE_SECOND_TIMER * 1000,
+                                       M2MTimerObserver::NsdlExecution,
+                                       false);
     bool success = false;
     if(set_NSP_address(_nsdl_handle,address, port, address_type) == 0) {
         if(_register_id == 0) {
@@ -356,6 +360,7 @@ uint8_t M2MNsdlInterface::received_from_server_callback(struct nsdl_s * /*nsdl_h
     if(coap_header) {
         if(coap_header->msg_id == _register_id || _register_id == -1) {
             _register_id = 0;
+            tr_error("M2MNsdlInterface::received_from_server_callback() code %d", coap_header->msg_code);
             if(coap_header->msg_code == COAP_MSG_CODE_RESPONSE_CREATED) {
                 if(_server) {
                     delete _server;
@@ -404,8 +409,8 @@ uint8_t M2MNsdlInterface::received_from_server_callback(struct nsdl_s * /*nsdl_h
                     _server = NULL;
                 }
                 tr_error("M2MNsdlInterface::received_from_server_callback - registration error %d", coap_header->msg_code);
-                M2MInterface::Error error = interface_error(coap_header);
-                _observer.registration_error(error);
+                // Try to do clean register again
+                _observer.registration_error(M2MInterface::LastItem + 1);
             }
         } else if(coap_header->msg_id == _unregister_id || _unregister_id == -1) {
             tr_debug("M2MNsdlInterface::received_from_server_callback - unregistration callback id:%d", _unregister_id);
@@ -429,6 +434,7 @@ uint8_t M2MNsdlInterface::received_from_server_callback(struct nsdl_s * /*nsdl_h
                 _observer.registration_updated(*_server);
             } else {
                 tr_error("M2MNsdlInterface::received_from_server_callback - registration_updated failed %d", coap_header->msg_code);
+                _registration_timer->stop_timer();
                 _register_id = -1;
                 _register_id = sn_nsdl_register_endpoint(_nsdl_handle,_endpoint);
             }
@@ -728,6 +734,9 @@ void M2MNsdlInterface::stop_timers()
     tr_debug("M2MNsdlInterface::stop_timers()");
     if(_registration_timer) {
         _registration_timer->stop_timer();
+    }
+    if (_nsdl_exceution_timer) {
+        _nsdl_exceution_timer->stop_timer();
     }
 }
 
@@ -1097,7 +1106,8 @@ uint64_t M2MNsdlInterface::registration_time()
         value = REDUCTION_FACTOR * value;
     }
     tr_debug("M2MNsdlInterface::registration_time - value (in seconds) %ld", value);
-    return value;
+    //return value;
+    return 15;
 }
 
 M2MBase* M2MNsdlInterface::find_resource(const String &object_name)

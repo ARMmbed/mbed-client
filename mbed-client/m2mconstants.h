@@ -29,7 +29,7 @@ const uint16_t OPTIMUM_LIFETIME = 3600;
 const uint16_t REDUCE_LIFETIME = 900;
 const float REDUCTION_FACTOR = 0.75f;
 
-const int RETRY_COUNT = 2;
+const int RETRY_COUNT = 3;
 const int RETRY_INTERVAL = 5;
 
 // values per: draft-ietf-core-observe-16
@@ -40,7 +40,7 @@ const int RETRY_INTERVAL = 5;
 
 // Default value for TCP keepalive is 10 min
 #ifndef YOTTA_CFG_TCP_KEEPALIVE_TIME
-#define YOTTA_CFG_TCP_KEEPALIVE_TIME 600
+#define YOTTA_CFG_TCP_KEEPALIVE_TIME 300
 #endif
 
 

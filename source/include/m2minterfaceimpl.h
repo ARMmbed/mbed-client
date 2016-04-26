@@ -357,12 +357,18 @@ private:
     BindingMode                 _binding_mode;
     String                      _context_address;
     uint16_t                    _listen_port;
+    uint16_t                    _server_port;
+    String                      _server_ip_address;
     M2MSecurity                 *_register_server; //TODO: to be the list not owned
     bool                        _event_ignored;
     bool                        _register_ongoing;
     bool                        _update_register_ongoing;
     M2MTimer                    *_queue_sleep_timer;
+    M2MTimer                    *_retry_timer;
     callback_handler            _callback_handler;
+    M2MSecurity                 *_security;
+    uint8_t                     _retry_count;
+    bool                        _reconnecting;
 
    friend class Test_M2MInterfaceImpl;
 

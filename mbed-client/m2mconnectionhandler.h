@@ -45,6 +45,7 @@ public:
         SOCKET_READ_ERROR,
         SOCKET_SEND_ERROR,
         DNS_RESOLVING_ERROR,
+        SSL_HANDSHAKE_ERROR
     }ConnectionError;
 
 
