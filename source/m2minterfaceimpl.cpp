@@ -18,7 +18,6 @@
 #include "include/eventdata.h"
 #include "mbed-client/m2minterfaceobserver.h"
 #include "mbed-client/m2mconnectionhandler.h"
-#include "mbed-client/m2mconnectionsecurity.h"
 #include "include/m2mnsdlinterface.h"
 #include "mbed-client/m2msecurity.h"
 #include "mbed-client/m2mconstants.h"
@@ -79,7 +78,10 @@ M2MInterfaceImpl::M2MInterfaceImpl(M2MInterfaceObserver& observer,
                                      _context_address);
 
     //Here we must use TCP still
-    _connection_handler = new M2MConnectionHandler(*this, new M2MConnectionSecurity(sec_mode), mode, stack);
+    _connection_handler = new M2MConnectionHandler(*this,
+                                                   new M2MConnectionSecurity(sec_mode),
+                                                   mode,
+                                                   stack);
 
     _connection_handler->bind_connection(_listen_port);
     tr_debug("M2MInterfaceImpl::M2MInterfaceImpl() -OUT");
@@ -94,7 +96,6 @@ M2MInterfaceImpl::~M2MInterfaceImpl()
     _connection_handler->stop_listening();
     delete _connection_handler;
     delete _retry_timer;
-    //delete _security;
     tr_debug("M2MInterfaceImpl::~M2MInterfaceImpl() - OUT");
 }
 
@@ -143,7 +144,7 @@ void M2MInterfaceImpl::cancel_bootstrap()
 
 void M2MInterfaceImpl::register_object(M2MSecurity *security, const M2MObjectList &object_list)
 {
-    tr_debug("M2MInterfaceImpl::register_object(M2MSecurity *security,const M2MObjectList &object_list) - IN");
+    tr_debug("M2MInterfaceImpl::register_object - IN");
     // Transition to a new state based upon
     // the current state of the state machine
     //TODO: manage register object in a list.
@@ -178,10 +179,10 @@ void M2MInterfaceImpl::register_object(M2MSecurity *security, const M2MObjectLis
             _observer.error(M2MInterface::NotAllowed);
         }
     } else {
-       tr_debug("M2MInterfaceImpl::register_object(M2MSecurity *security,const M2MObjectList &object_list) - NOT ALLOWED");
+        tr_debug("M2MInterfaceImpl::register_object - NOT ALLOWED");
         _observer.error(M2MInterface::NotAllowed);
     }
-    tr_debug("M2MInterfaceImpl::register_object(M2MSecurity *security,const M2MObjectList &object_list) - OUT");
+    tr_debug("M2MInterfaceImpl::register_object - OUT");
 }
 
 void M2MInterfaceImpl::update_registration(M2MSecurity *security_object, const uint32_t lifetime)
@@ -229,7 +230,7 @@ void M2MInterfaceImpl::update_registration(M2MSecurity *security_object, const u
 
 void M2MInterfaceImpl::unregister_object(M2MSecurity* /*security*/)
 {
-    tr_debug("M2MInterfaceImpl::unregister_object(M2MSecurity *security) - IN");
+    tr_debug("M2MInterfaceImpl::unregister_object - IN");
     // Transition to a new state based upon
     // the current state of the state machine
     BEGIN_TRANSITION_MAP                                // - Current State -
@@ -256,7 +257,7 @@ void M2MInterfaceImpl::unregister_object(M2MSecurity* /*security*/)
         _event_ignored = false;
         _observer.error(M2MInterface::NotAllowed);
     }
-    tr_debug("M2MInterfaceImpl::unregister_object(M2MSecurity *security) - OUT");
+    tr_debug("M2MInterfaceImpl::unregister_object - OUT");
 }
 
 void M2MInterfaceImpl::set_queue_sleep_handler(callback_handler handler)
@@ -269,9 +270,9 @@ void M2MInterfaceImpl::coap_message_ready(uint8_t *data_ptr,
                                           uint16_t data_len,
                                           sn_nsdl_addr_s *address_ptr)
 {
-    tr_debug("M2MInterfaceImpl::coap_message_ready(uint8_t *data_ptr,uint16_t data_len,sn_nsdl_addr_s *address_ptr)");
+    tr_debug("M2MInterfaceImpl::coap_message_ready");
     internal_event(STATE_SENDING_COAP_DATA);
-    if(!_connection_handler->send_data(data_ptr,data_len,address_ptr) && !_reconnecting) {
+    if(!_connection_handler->send_data(data_ptr,data_len,address_ptr)) {
         internal_event( STATE_IDLE);
         tr_error("M2MInterfaceImpl::coap_message_ready() - M2MInterface::NetworkError");
         _observer.error(M2MInterface::NetworkError);
@@ -280,7 +281,7 @@ void M2MInterfaceImpl::coap_message_ready(uint8_t *data_ptr,
 
 void M2MInterfaceImpl::client_registered(M2MServer *server_object)
 {
-    tr_debug("M2MInterfaceImpl::client_registered(M2MServer *server_object)");
+    tr_debug("M2MInterfaceImpl::client_registered");
     _retry_count = 0;
     internal_event(STATE_REGISTERED);
     //Inform client is registered.
@@ -290,7 +291,7 @@ void M2MInterfaceImpl::client_registered(M2MServer *server_object)
 
 void M2MInterfaceImpl::registration_updated(const M2MServer &server_object)
 {
-    tr_debug("M2MInterfaceImpl::registration_updated(const M2MServer &server_object)");
+    tr_debug("M2MInterfaceImpl::registration_updated");
     internal_event(STATE_REGISTERED);
     _observer.registration_updated(_register_server,server_object);
 }
@@ -363,16 +364,17 @@ void M2MInterfaceImpl::data_available(uint8_t* data,
 
 void M2MInterfaceImpl::socket_error(uint8_t error_code)
 {
+    tr_debug("M2MInterfaceImpl::socket_error, %d", error_code);
     if (_reconnecting) {
-        tr_debug("M2MInterfaceImpl::socket_error, retry ongoing");
+        tr_debug("M2MInterfaceImpl::socket_error, reconnection ongoing - return");
         return;
     }
-    tr_debug("M2MInterfaceImpl::socket_error, %d", error_code);
     M2MInterface::Error error = M2MInterface::ErrorNone;
     bool retry = false;
     switch (error_code) {
     case M2MConnectionHandler::SSL_CONNECTION_ERROR:
         error = M2MInterface::SecureConnectionFailed;
+        retry = true;
         break;
     case M2MConnectionHandler::DNS_RESOLVING_ERROR:
         retry = true;
@@ -396,25 +398,27 @@ void M2MInterfaceImpl::socket_error(uint8_t error_code)
 
     // Try to do reconnecting
     if (retry) {
-        if (_retry_count < RETRY_COUNT) {
+        if (_retry_count < YOTTA_CFG_RECONNECTION_COUNT) {
             internal_event(STATE_IDLE);
-            _connection_handler->stop_listening();
-            _retry_count++;
-            int retry_time = 1000 * RETRY_INTERVAL * RETRY_COUNT/* * _retry_count*/;
             _reconnecting = true;
+            _retry_count++;
+            _connection_handler->stop_listening();
+            int retry_time = YOTTA_CFG_RECONNECTION_INTERVAL *
+                    YOTTA_CFG_RECONNECTION_COUNT * _retry_count * 1000;
             _retry_timer->start_timer(retry_time,
                                       M2MTimerObserver::ConnectionRetry);
-            tr_debug("M2MInterfaceImpl::socket_error - reconnecting in %d s... count %d", retry_time / 1000, _retry_count);
+            tr_debug("M2MInterfaceImpl::socket_error - reconnecting in %d(s)... count %d", retry_time / 1000, _retry_count);
         } else {
             tr_debug("M2MInterfaceImpl::socket_error - no more retries");
             _connection_handler->stop_listening();
+            _retry_timer->stop_timer();
             retry = false;
         }
     }
-    // Inform error to application
+    // Inform application
     if (!retry && M2MInterface::ErrorNone != error) {
+        _connection_handler->stop_listening();
         _retry_timer->stop_timer();
-        _reconnecting = false;
         _retry_count = 0;
         _observer.error(error);
         internal_event(STATE_IDLE);
@@ -447,7 +451,8 @@ void M2MInterfaceImpl::data_sent()
        _binding_mode == M2MInterface::UDP_SMS_QUEUE) {
         if(_callback_handler) {
             _queue_sleep_timer->stop_timer();
-            _queue_sleep_timer->start_timer(RETRY_COUNT*RETRY_INTERVAL*1000, M2MTimerObserver::QueueSleep);
+            _queue_sleep_timer->start_timer(YOTTA_CFG_RECONNECTION_COUNT*YOTTA_CFG_RECONNECTION_INTERVAL*1000,
+                                            M2MTimerObserver::QueueSleep);
         }
     }
     internal_event(STATE_COAP_DATA_SENT);
@@ -463,9 +468,8 @@ void M2MInterfaceImpl::timer_expired(M2MTimerObserver::Type type)
     _queue_sleep_timer->stop_timer();
     }
     else if (M2MTimerObserver::ConnectionRetry == type) {
-        tr_debug("M2MInterfaceImpl::timer_expired() - ConnectionRetry");
         _reconnecting = false;
-        uint16_t _listen_port = rand() % 65535 + 12345;
+        _listen_port = rand() % 65535 + 12345;
         _connection_handler->bind_connection(_listen_port);
         internal_event(STATE_REGISTER);
     }
@@ -474,13 +478,8 @@ void M2MInterfaceImpl::timer_expired(M2MTimerObserver::Type type)
 // state machine sits here.
 void M2MInterfaceImpl::state_idle(EventData* /*data*/)
 {
-    // Handle Idle state here
-    // Cleanup all resources, if necessary
     tr_debug("M2MInterfaceImpl::state_idle");
     _nsdl_interface->stop_timers();
-    //_retry_timer->stop_timer();
-    //_reconnecting = false;
-    //_retry_count = 0;
     _register_ongoing = false;
     _update_register_ongoing = false;
 }
@@ -698,7 +697,7 @@ void M2MInterfaceImpl::state_register_resource_created( EventData */*data*/)
 void M2MInterfaceImpl::state_registered( EventData */*data*/)
 {
     tr_debug("M2MInterfaceImpl::state_registered");
-    _reconnecting = false;
+    _retry_count = 0;
     _register_ongoing = false;
     _update_register_ongoing = false;
 }
@@ -707,9 +706,16 @@ void M2MInterfaceImpl::state_update_registration( EventData *data)
 {
     tr_debug("M2MInterfaceImpl::state_update_registration");
     // Start with registration preparation
+    bool success = false;
     if(data) {
         M2MUpdateRegisterData *event = static_cast<M2MUpdateRegisterData *> (data);
-        _nsdl_interface->send_update_registration(event->_lifetime);
+        success = _nsdl_interface->send_update_registration(event->_lifetime);
+
+    }
+    if(!success) {
+        tr_error("M2MInterfaceImpl::state_register_address_resolved : M2MInterface::InvalidParameters");
+        internal_event(STATE_IDLE);
+        _observer.error(M2MInterface::InvalidParameters);
     }
 }
 

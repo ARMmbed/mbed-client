@@ -19,6 +19,7 @@
 #include "mbed-client/m2minterface.h"
 #include "mbed-client/m2mserver.h"
 #include "mbed-client/m2mconnectionobserver.h"
+#include "mbed-client/m2mconnectionsecurity.h"
 #include "include/m2mnsdlobserver.h"
 #include "mbed-client/m2mtimerobserver.h"
 

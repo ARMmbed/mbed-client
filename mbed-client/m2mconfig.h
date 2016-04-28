@@ -22,4 +22,16 @@
 #include "mbed-client/m2mstring.h"
 using namespace m2m;
 
+#ifndef YOTTA_CFG_RECONNECTION_COUNT
+#define YOTTA_CFG_RECONNECTION_COUNT 2
+#endif
+
+#ifndef YOTTA_CFG_RECONNECTION_INTERVAL
+#define YOTTA_CFG_RECONNECTION_INTERVAL 3
+#endif
+
+#ifndef YOTTA_CFG_TCP_KEEPALIVE_TIME
+#define YOTTA_CFG_TCP_KEEPALIVE_TIME 300
+#endif
+
 #endif // M2MCONFIG_H
