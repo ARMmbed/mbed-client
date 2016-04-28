@@ -16,6 +16,7 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <string.h>
+#include <time.h>
 
 void arm_random_module_init(void)
 {
@@ -24,4 +25,9 @@ void arm_random_module_init(void)
 uint32_t arm_random_seed_get(void)
 {
 	return 0;
+}
+
+uint32_t get_random_number(void)
+{
+    return time(NULL);
 }
