@@ -365,13 +365,13 @@ void Test_M2MInterfaceImpl::test_update_registration()
     m2mnsdlinterface_stub::bool_value = false;
     impl->update_registration(NULL,120);
 
-    CHECK(impl->_current_state == M2MInterfaceImpl::STATE_IDLE);
+    CHECK(impl->_current_state == M2MInterfaceImpl::STATE_UPDATE_REGISTRATION);
 
     impl->_current_state = M2MInterfaceImpl::STATE_REGISTERED;
     m2mnsdlinterface_stub::bool_value = false;
     impl->update_registration(NULL,120);
 
-    CHECK(impl->_current_state == M2MInterfaceImpl::STATE_IDLE);
+    CHECK(impl->_current_state == M2MInterfaceImpl::STATE_REGISTERED);
 
     impl->_current_state = M2MInterfaceImpl::STATE_IDLE;
     impl->update_registration(NULL,120);

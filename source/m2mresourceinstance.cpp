@@ -201,7 +201,7 @@ bool M2MResourceInstance::set_value(const uint8_t *value,
             if( value_changed ) { //
                 if (_resource_type == M2MResourceInstance::STRING) {
                     M2MReportHandler *report_handler = M2MBase::report_handler();
-                    if(report_handler && is_observable()) {
+                    if(report_handler && M2MBase::None != observation_level()) {
                         report_handler->set_notification_trigger();
                     }
                 }
@@ -218,13 +218,10 @@ void M2MResourceInstance::report()
 {
     tr_debug("M2MResourceInstance::report()");
     M2MBase::Observation  observation_level = M2MBase::observation_level();
-    if(M2MBase::O_Attribute == observation_level ||
-       M2MBase::OI_Attribute == observation_level||
-       M2MBase::OOI_Attribute == observation_level) {
+    if(M2MBase::R_Attribute != observation_level) {
         tr_debug("M2MResourceInstance::report() -- object level");
         _object_instance_callback.notification_update(observation_level);
     }
-
     if(M2MBase::Dynamic == mode() && M2MBase::R_Attribute == observation_level) {
         tr_debug("M2MResourceInstance::report() - resource level");
         if(!_resource_callback && _resource_type != M2MResourceInstance::STRING) {
