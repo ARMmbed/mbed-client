@@ -73,8 +73,10 @@ M2MInterfaceImpl::M2MInterfaceImpl(M2MInterfaceObserver& observer,
                                      (uint8_t)_binding_mode,
                                      _context_address);
 
+    //Doesn't own, ownership is passed to ConnectionHandler class
+    _security_connection = new M2MConnectionSecurity(sec_mode);
     //Here we must use TCP still
-    _connection_handler = new M2MConnectionHandler(*this, new M2MConnectionSecurity(sec_mode), mode, stack);
+    _connection_handler = new M2MConnectionHandler(*this, _security_connection, mode, stack);
 
     _connection_handler->bind_connection(_listen_port);
     tr_debug("M2MInterfaceImpl::M2MInterfaceImpl() -OUT");
@@ -88,6 +90,7 @@ M2MInterfaceImpl::~M2MInterfaceImpl()
     delete _nsdl_interface;
     _connection_handler->stop_listening();
     delete _connection_handler;
+    _security_connection = NULL;
     tr_debug("M2MInterfaceImpl::~M2MInterfaceImpl() - OUT");
 }
 
@@ -257,6 +260,20 @@ void M2MInterfaceImpl::set_queue_sleep_handler(callback_handler handler)
 {
     tr_debug("M2MInterfaceImpl::set_queue_sleep_handler()");
     _callback_handler = handler;
+}
+
+void M2MInterfaceImpl::set_random_number_callback(random_number_cb callback)
+{
+    if(_security_connection) {
+        _security_connection->set_random_number_callback(callback);
+    }
+}
+
+void M2MInterfaceImpl::set_entropy_callback(entropy_cb callback)
+{
+    if(_security_connection) {
+        _security_connection->set_entropy_callback(callback);
+    }
 }
 
 void M2MInterfaceImpl::coap_message_ready(uint8_t *data_ptr,
