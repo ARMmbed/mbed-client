@@ -53,10 +53,10 @@ M2MInterfaceImpl::M2MInterfaceImpl(M2MInterfaceObserver& observer,
   _event_ignored(false),
   _register_ongoing(false),
   _update_register_ongoing(false),
-  _queue_sleep_timer(new M2MTimer(*this)),
+  _queue_sleep_timer(new M2MTimer(*this)),  
+  _retry_timer(new M2MTimer(*this)),
   _callback_handler(NULL),
   _security(NULL),
-  _retry_timer(new M2MTimer(*this)),
   _retry_count(0),
   _reconnecting(false)
 {
@@ -392,6 +392,10 @@ void M2MInterfaceImpl::socket_error(uint8_t error_code)
         retry = true;
         error = M2MInterface::SecureConnectionFailed;
         break;
+    case M2MConnectionHandler::SOCKET_ABORT:
+        retry = false;
+        error = M2MInterface::NetworkError;
+        break;
     default:
         break;
     }
@@ -490,7 +494,7 @@ void M2MInterfaceImpl::state_bootstrap( EventData *data)
     // Start with bootstrapping preparation
     bool success = false;
     if(data) {
-        M2MSecurityData *event = static_cast<M2MSecurityData *> data;
+        M2MSecurityData *event = static_cast<M2MSecurityData *> (data);
         M2MSecurity *security = event->_object;
         if(security) {
             if(M2MSecurity::Bootstrap == security->server_type()) {
@@ -511,14 +515,14 @@ void M2MInterfaceImpl::state_bootstrap( EventData *data)
 
                     process_address(server_address, ip_address, _server_port);
                     
-                    tr_debug("M2MInterfaceImpl::state_bootstrap - IP address %s , Port %d", ip_address.c_str(), port);
+                    tr_debug("M2MInterfaceImpl::state_bootstrap - IP address %s , Port %d", ip_address.c_str(), _server_port);
                     // If bind and resolving server address succeed then proceed else
                     // return error to the application and go to Idle state.
                     if(ip_address.empty()) {
                         tr_error("M2MInterfaceImpl::state_bootstrap - set error as M2MInterface::InvalidParameters");
                         success = false;
                     } else if(_connection_handler->resolve_server_address(ip_address,
-                                                                  port,
+                                                                  _server_port,
                                                                   M2MConnectionObserver::Bootstrap,
                                                                   security)) {
                        tr_debug("M2MInterfaceImpl::state_bootstrap - resolve_server_address - success");
@@ -540,7 +544,7 @@ void M2MInterfaceImpl::state_bootstrap_address_resolved( EventData *data)
 {
 #ifndef YOTTA_CFG_DISABLE_BOOTSTRAP_FEATURE
     tr_debug("M2MInterfaceImpl::state_bootstrap_address_resolved");
-    ResolvedAddressData *event = static_cast<ResolvedAddressData *> data;
+    ResolvedAddressData *event = static_cast<ResolvedAddressData *> (data);
     sn_nsdl_addr_s address;
 
     M2MInterface::NetworkStack stack = event->_address->_stack;

@@ -1337,7 +1337,7 @@ void M2MNsdlInterface::send_object_observation(M2MObject *object,
         if (send_object) {
             value = serializer.serialize(object->instances(), length);
         }
-        // Send only change object instances
+        // Send only changed object instances
         else {
             M2MObjectInstanceList list;
             Vector<uint16_t>::const_iterator it;
@@ -1427,7 +1427,7 @@ void M2MNsdlInterface::send_resource_observation(M2MResource *resource,
                           length,
                           obs_number,
                           resource->max_age(),
-                          resource->coap_content_type(),
+                          content_type,
                           resource->uri_path());
 
         memory_free(value);
