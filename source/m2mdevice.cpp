@@ -66,7 +66,9 @@ M2MDevice::M2MDevice()
                                                                  true,0);
         if(instance) {
             M2MResource * dev_res = _device_instance->resource(DEVICE_ERROR_CODE);
-            dev_res->set_register_uri(false);
+            if(dev_res) {
+                dev_res->set_register_uri(false);
+            }
             instance->set_operation(M2MBase::GET_ALLOWED);
 
             instance->set_value(0);
