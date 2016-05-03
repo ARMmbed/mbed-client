@@ -986,14 +986,14 @@ bool M2MNsdlInterface::create_nsdl_resource(M2MBase *base, const String &name, b
             }
             if(resource->resource_parameters_ptr) {
                 // Check if the observation parameter for the resource has changed.
-                if(resource->resource_parameters_ptr->observable != (uint8_t)base->is_observable())
-                changed = true;
-                resource->resource_parameters_ptr->observable = (uint8_t)base->is_observable();
+                if(resource->resource_parameters_ptr->observable != (uint8_t)base->is_observable()) {
+                    changed = true;
+                    resource->resource_parameters_ptr->observable = (uint8_t)base->is_observable();
+                }
             }
             if(changed && resource->resource_parameters_ptr) {
                 resource->resource_parameters_ptr->registered = SN_NDSL_RESOURCE_NOT_REGISTERED;
             }
-            sn_nsdl_update_resource(_nsdl_handle,resource);
         } else if(_resource) {
             base->set_under_observation(false,this);
             //TODO: implement access control
@@ -1016,8 +1016,6 @@ bool M2MNsdlInterface::create_nsdl_resource(M2MBase *base, const String &name, b
               // Dynamic resource is updated
                _resource->mode = SN_GRS_DYNAMIC;
                _resource->sn_grs_dyn_res_callback = __nsdl_c_callback;
-            } else {
-               _resource->mode = SN_GRS_DIRECTORY;
             }
 
             if( _resource->path != NULL ){
@@ -1072,6 +1070,9 @@ bool M2MNsdlInterface::create_nsdl_resource(M2MBase *base, const String &name, b
             if(_resource->resource_parameters_ptr->interface_description_ptr){
                 memory_free(_resource->resource_parameters_ptr->interface_description_ptr);
             }
+            if (_resource->resource) {
+                memory_free(_resource->resource);
+            }
 
             //Clear up the filled resource to fill up new resource.
             clear_resource(_resource);
@@ -1080,9 +1081,6 @@ bool M2MNsdlInterface::create_nsdl_resource(M2MBase *base, const String &name, b
                base->set_under_observation(false,this);
             }
         }
-    }
-    if(buffer) {
-        free(buffer);
     }
     return success;
 }
