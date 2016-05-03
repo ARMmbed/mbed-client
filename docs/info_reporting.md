@@ -8,7 +8,7 @@ The interface supports the following sub-features:
 
 mbed Device Server initiates an observation request to observe the changing value of either an Object, Object Instance or Resource.
 
-**Tip:** Related parameters for the **Observe** operation are described in the [Write Attributes](dev_man_serv_enable.md#write-attributes) section.
+<span style="background-color:#E6E6E6;border:1px solid #000;display:block; height:100%; padding:10px">**Tip:** Related parameters for the **Observe** operation are described in the [Write Attributes](dev_man_serv_enable.md#write-attributes) section.</span>
 
 ## The Notify feature
 
