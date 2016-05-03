@@ -27,17 +27,17 @@ template <typename ObjectTemplate>
 class Vector
 {
   public:
-    explicit Vector( int init_size = 0)
-            : _size( init_size ),
+    explicit Vector( int init_size = MIN_CAPACITY)
+            : _size(0),
               _index(0),
-              _capacity( init_size + MORE_SIZE ){
+              _capacity((init_size >= MIN_CAPACITY) ? init_size : MIN_CAPACITY) {
         _object_template = new ObjectTemplate[ _capacity ];
     }
 
     Vector(const Vector & rhs ): _object_template(0) {
         operator=(rhs);
     }
-
+ 
     ~Vector() {
         delete [] _object_template;
       _object_template = NULL;
@@ -157,7 +157,7 @@ class Vector
     }
 
     enum {
-        MORE_SIZE = 12
+        MIN_CAPACITY = 1
     };
 
   private:
