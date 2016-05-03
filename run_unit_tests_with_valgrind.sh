@@ -11,3 +11,4 @@ while file= read -r binary
 do
     valgrind --track-origins=yes --xml=yes --xml-file="${valgrind_logs}/valgrind_$(basename $binary).xml" "$binary"
 done < "$input"
+
