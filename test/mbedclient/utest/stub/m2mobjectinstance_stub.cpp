@@ -19,7 +19,11 @@ u_int8_t m2mobjectinstance_stub::int_value;
 bool m2mobjectinstance_stub::bool_value;
 M2MResource* m2mobjectinstance_stub::resource;
 M2MResource* m2mobjectinstance_stub::create_resource;
-M2MResourceList m2mobjectinstance_stub::resource_list;
+
+// The statically initialized list must be bigh enough to cater 
+// for all the tests, or the utest framework will complain for memory leak.
+M2MResourceList m2mobjectinstance_stub::resource_list(12);
+
 M2MResourceInstance* m2mobjectinstance_stub::create_resource_instance;
 sn_coap_hdr_s* m2mobjectinstance_stub::header;
 M2MBase::BaseType m2mobjectinstance_stub::base_type;
