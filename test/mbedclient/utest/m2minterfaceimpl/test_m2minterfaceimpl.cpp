@@ -23,8 +23,6 @@
 #include "m2mobjectinstance_stub.h"
 #include "m2mbase.h"
 
-entropy_cb ent_cb;
-
 class TestObserver : public M2MInterfaceObserver {
 
 public:
@@ -432,18 +430,6 @@ void Test_M2MInterfaceImpl::test_set_queue_sleep_handler()
     CHECK(impl->_callback_handler == NULL);
 }
 
-
-void Test_M2MInterfaceImpl::test_set_random_number_callback()
-{
-    random_number_cb cb(&test_random_callback);
-    impl->set_random_number_callback(cb);
-}
-
-void Test_M2MInterfaceImpl::test_set_entropy_callback()
-{
-    impl->set_entropy_callback(ent_cb);
-}
-
 void Test_M2MInterfaceImpl::test_coap_message_ready()
 {
     m2mconnectionhandler_stub::bool_value = true;
@@ -706,9 +692,4 @@ void Test_M2MInterfaceImpl::test_timer_expired()
 void Test_M2MInterfaceImpl::test_callback_handler()
 {
     visited = true;
-}
-
-uint32_t test_random_callback(void)
-{
-    return 1;
 }

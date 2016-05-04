@@ -16,7 +16,6 @@
 #ifndef __M2M_CONNECTION_SECURITY_H__
 #define __M2M_CONNECTION_SECURITY_H__
 
-#include "mbed-client/m2mconfig.h"
 class M2MConnectionHandler;
 class M2MSecurity;
 class M2MConnectionSecurityPimpl;
@@ -99,26 +98,6 @@ public:
      * \return Indicates whether the data is read successfully or not.
      */
     int read(unsigned char* buffer, uint16_t len);
-
-    /**
-     * \brief Sets the function callback that will be called by mbed-client for
-     * fetching random number from application for ensuring strong entropy.
-     * \param random_callback A function pointer that will be called by mbed-client
-     * while performing secure handshake.
-     * Function signature should be uint32_t (*random_number_callback)(void);
-     */
-    void set_random_number_callback(random_number_cb callback);
-
-    /**
-     * \brief Sets the function callback that will be called by mbed-client for
-     * providing entropy source from application for ensuring strong entropy.
-     * \param entropy_callback A function pointer that will be called by mbed-client
-     * while performing secure handshake.
-     * Function signature , if using mbed-client-mbedtls should be
-     * int (*mbedtls_entropy_f_source_ptr)(void *data, unsigned char *output,
-     *                                     size_t len, size_t *olen);
-     */
-    void set_entropy_callback(entropy_cb callback);
 
 private:
 

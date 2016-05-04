@@ -150,25 +150,6 @@ public:
      */
     virtual void set_queue_sleep_handler(callback_handler handler) = 0;
 
-    /**
-     * \brief Sets the function callback that will be called by mbed-client for
-     * fetching random number from application for ensuring strong entropy.
-     * \param random_callback A function pointer that will be called by mbed-client
-     * while performing secure handshake.
-     * Function signature should be uint32_t (*random_number_callback)(void);
-     */
-    virtual void set_random_number_callback(random_number_cb callback) = 0;
-
-    /**
-     * \brief Sets the function callback that will be called by mbed-client for
-     * providing entropy source from application for ensuring strong entropy.
-     * \param entropy_callback A function pointer that will be called by mbed-client
-     * while performing secure handshake.
-     * Function signature , if using mbed-client-mbedtls should be
-     * int (*mbedtls_entropy_f_source_ptr)(void *data, unsigned char *output,
-     *                                     size_t len, size_t *olen);
-     */
-    virtual void set_entropy_callback(entropy_cb callback) = 0;
 };
 
 #endif // M2M_INTERFACE_H
