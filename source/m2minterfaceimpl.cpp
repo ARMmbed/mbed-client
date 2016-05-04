@@ -18,6 +18,7 @@
 #include "include/eventdata.h"
 #include "mbed-client/m2minterfaceobserver.h"
 #include "mbed-client/m2mconnectionhandler.h"
+#include "mbed-client/m2mconnectionsecurity.h"
 #include "include/m2mnsdlinterface.h"
 #include "mbed-client/m2msecurity.h"
 #include "mbed-client/m2mconstants.h"
@@ -275,7 +276,9 @@ void M2MInterfaceImpl::coap_message_ready(uint8_t *data_ptr,
     if(!_connection_handler->send_data(data_ptr,data_len,address_ptr)) {
         internal_event( STATE_IDLE);
         tr_error("M2MInterfaceImpl::coap_message_ready() - M2MInterface::NetworkError");
-        _observer.error(M2MInterface::NetworkError);
+        if (!_reconnecting) {
+            _observer.error(M2MInterface::NetworkError);
+        }
     }
 }
 
@@ -296,11 +299,11 @@ void M2MInterfaceImpl::registration_updated(const M2MServer &server_object)
     _observer.registration_updated(_register_server,server_object);
 }
 
-void M2MInterfaceImpl::registration_error(uint8_t error_code)
+void M2MInterfaceImpl::registration_error(uint8_t error_code, bool retry)
 {
     tr_debug("M2MInterfaceImpl::registration_error code [%d]", error_code);
     // Try to register again
-    if (M2MInterface::LastItem + 1 == error_code) {
+    if (retry) {
         socket_error(M2MConnectionHandler::SOCKET_SEND_ERROR);
     } else {
         internal_event(STATE_IDLE);
@@ -362,38 +365,32 @@ void M2MInterfaceImpl::data_available(uint8_t* data,
     internal_event(STATE_COAP_DATA_RECEIVED, event);
 }
 
-void M2MInterfaceImpl::socket_error(uint8_t error_code)
+void M2MInterfaceImpl::socket_error(uint8_t error_code, bool retry)
 {
-    tr_debug("M2MInterfaceImpl::socket_error, %d", error_code);
+    tr_debug("M2MInterfaceImpl::socket_error: %d, retry %d", error_code, retry);
     if (_reconnecting) {
         tr_debug("M2MInterfaceImpl::socket_error, reconnection ongoing - return");
         return;
     }
+
     M2MInterface::Error error = M2MInterface::ErrorNone;
-    bool retry = false;
     switch (error_code) {
     case M2MConnectionHandler::SSL_CONNECTION_ERROR:
         error = M2MInterface::SecureConnectionFailed;
-        retry = true;
         break;
     case M2MConnectionHandler::DNS_RESOLVING_ERROR:
-        retry = true;
         error = M2MInterface::DnsResolvingFailed;
         break;
     case M2MConnectionHandler::SOCKET_READ_ERROR:
-        retry = true;
         error = M2MInterface::NetworkError;
         break;
     case M2MConnectionHandler::SOCKET_SEND_ERROR:
-        retry = true;
         error = M2MInterface::NetworkError;
         break;
     case M2MConnectionHandler::SSL_HANDSHAKE_ERROR:
-        retry = true;
         error = M2MInterface::SecureConnectionFailed;
         break;
     case M2MConnectionHandler::SOCKET_ABORT:
-        retry = false;
         error = M2MInterface::NetworkError;
         break;
     default:
@@ -410,8 +407,9 @@ void M2MInterfaceImpl::socket_error(uint8_t error_code)
             int retry_time = YOTTA_CFG_RECONNECTION_INTERVAL *
                     YOTTA_CFG_RECONNECTION_COUNT * _retry_count * 1000;
             _retry_timer->start_timer(retry_time,
-                                      M2MTimerObserver::ConnectionRetry);
-            tr_debug("M2MInterfaceImpl::socket_error - reconnecting in %d(s)... count %d", retry_time / 1000, _retry_count);
+                                      M2MTimerObserver::RetryTimer);
+            tr_debug("M2MInterfaceImpl::socket_error - reconnecting in %d(s), count %d/%d", retry_time / 1000,
+                     _retry_count, YOTTA_CFG_RECONNECTION_COUNT);
         } else {
             tr_debug("M2MInterfaceImpl::socket_error - no more retries");
             _connection_handler->stop_listening();
@@ -470,7 +468,7 @@ void M2MInterfaceImpl::timer_expired(M2MTimerObserver::Type type)
             _callback_handler();
         }
     }
-    else if (M2MTimerObserver::ConnectionRetry == type) {
+    else if (M2MTimerObserver::RetryTimer == type) {
         _reconnecting = false;
         _listen_port = rand() % 65535 + 12345;
         _connection_handler->bind_connection(_listen_port);
@@ -561,10 +559,10 @@ void M2MInterfaceImpl::state_bootstrap_address_resolved( EventData *data)
     }
     address.port = event->_port;
     address.addr_ptr = (uint8_t*)event->_address->_address;
+    _connection_handler->start_listening_for_data();
     if(_nsdl_interface->create_bootstrap_resource(&address)) {
        tr_debug("M2MInterfaceImpl::state_bootstrap_address_resolved : create_bootstrap_resource - success");
        internal_event(STATE_BOOTSTRAP_RESOURCE_CREATED);
-       _connection_handler->start_listening_for_data();
     } else{
         // If resource creation fails then inform error to application
         tr_error("M2MInterfaceImpl::state_bootstrap_address_resolved : M2MInterface::InvalidParameters");
@@ -680,9 +678,10 @@ void M2MInterfaceImpl::state_register_address_resolved( EventData *data)
             tr_debug("M2MInterfaceImpl::state_register_address_resolved : IPv6 address");
             address_type = SN_NSDL_ADDRESS_TYPE_IPV6;
         }
+        _connection_handler->start_listening_for_data();
         if(_nsdl_interface->send_register_message((uint8_t*)event->_address->_address,event->_port, address_type)) {
             internal_event(STATE_REGISTER_RESOURCE_CREATED);
-            _connection_handler->start_listening_for_data();
+
         } else {
             // If resource creation fails then inform error to application
             tr_error("M2MInterfaceImpl::state_register_address_resolved : M2MInterface::InvalidParameters");

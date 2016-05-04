@@ -58,8 +58,7 @@ public:
         MemoryFail,
         NotAllowed,
         SecureConnectionFailed,
-        DnsResolvingFailed,
-        LastItem
+        DnsResolvingFailed
     }Error;
 
     /**

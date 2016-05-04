@@ -35,7 +35,7 @@ public:
         PMaxTimer,
         Dtls,
         QueueSleep,
-        ConnectionRetry
+        RetryTimer
     }Type;
 
     /**

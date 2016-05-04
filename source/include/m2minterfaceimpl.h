@@ -146,7 +146,7 @@ protected: // From M2MNsdlObserver
 
     virtual void registration_updated(const M2MServer &server_object);
 
-    virtual void registration_error(uint8_t error_code);
+    virtual void registration_error(uint8_t error_code, bool retry = false);
 
     virtual void client_unregistered();
 
@@ -164,7 +164,7 @@ protected: // From M2MConnectionObserver
                                 uint16_t data_size,
                                 const M2MConnectionObserver::SocketAddress &address);
 
-    virtual void socket_error(uint8_t error_code);
+    virtual void socket_error(uint8_t error_code, bool retry = true);
 
     virtual void address_ready(const M2MConnectionObserver::SocketAddress &address,
                                M2MConnectionObserver::ServerType server_type,

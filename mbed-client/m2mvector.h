@@ -100,7 +100,7 @@ class Vector
     }
 
     void push_back(const ObjectTemplate& x) {
-        if(_size == _capacity) {
+        if(_size == _capacity -1) {
             reserve(2 * _capacity + 1);
         }
         _object_template[_index++] = x;
