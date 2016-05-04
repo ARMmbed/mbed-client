@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 ARM Limited. All rights reserved.
+ * Copyright (c) 2015-2016 ARM Limited. All rights reserved.
  * SPDX-License-Identifier: Apache-2.0
  * Licensed under the Apache License, Version 2.0 (the License); you may
  * not use this file except in compliance with the License.
@@ -29,7 +29,6 @@ class Vector
   public:
     explicit Vector( int init_size = MIN_CAPACITY)
             : _size(0),
-              _index(0),
               _capacity((init_size >= MIN_CAPACITY) ? init_size : MIN_CAPACITY) {
         _object_template = new ObjectTemplate[ _capacity ];
     }
@@ -40,14 +39,12 @@ class Vector
  
     ~Vector() {
         delete [] _object_template;
-      _object_template = NULL;
     }
 
     const Vector & operator=(const Vector & rhs) {
         if(this != &rhs) {
             delete[] _object_template;
             _size = rhs.size();
-            _index = rhs._index;
             _capacity = rhs._capacity;
 
             _object_template = new ObjectTemplate[capacity()];
@@ -100,28 +97,23 @@ class Vector
     }
 
     void push_back(const ObjectTemplate& x) {
-        if(_size == _capacity -1) {
+        if(_size == _capacity) {
             reserve(2 * _capacity + 1);
         }
-        _object_template[_index++] = x;
-        if(_index >=_capacity) {
-            _index--;
-        }
+        _object_template[_size] = x;
         _size++;
     }
 
     void pop_back() {
         _size--;
-        _index--;
     }
 
     void clear() {
         _size = 0;
-        _index = 0;
     }
 
     const ObjectTemplate& back() const {
-        return _object_template[_index- 1];
+        return _object_template[_size - 1];
     }
 
     typedef ObjectTemplate* iterator;
@@ -136,23 +128,20 @@ class Vector
     }
 
     iterator end() {
-        return &_object_template[_index];
+        return &_object_template[_size];
     }
 
     const_iterator end() const {
-        return &_object_template[_index];
+        return &_object_template[_size];
     }
 
     void erase(int position) {
-        if(position <= _size) {
+        if(position < _size) {
             _object_template[position] = 0;
-            _size--;
-            if(position < _index) {
-                for(int k = position; k < _index; k++) {
-                    _object_template[k] = _object_template[k+1];
-                }
+            for(int k = position; k < _size; k++) {
+                _object_template[k] = _object_template[k+1];
             }
-            _index--;
+            _size--;
         }
     }
 
@@ -162,7 +151,6 @@ class Vector
 
   private:
     int                 _size;
-    int                 _index;
     int                 _capacity;
     ObjectTemplate*     _object_template;
 };
