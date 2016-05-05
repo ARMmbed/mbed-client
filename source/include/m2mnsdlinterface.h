@@ -130,18 +130,6 @@ public:
     bool send_unregister_message();
 
     /**
-     * @brief Memory Allocation required for libCoap.
-     * @param size, Size of memory to be reserved.
-    */
-    void* memory_alloc(uint16_t size);
-
-    /**
-     * @brief Memory free functions required for libCoap
-     * @param ptr, Object whose memory needs to be freed.
-    */
-    void memory_free(void *ptr);
-
-    /**
     * @brief Callback from nsdl library to inform the data is ready
     * to be sent to server.
     * @param nsdl_handle, Handler for the nsdl structure for this endpoint
@@ -203,6 +191,8 @@ public:
      * @brief Stops all the timers in case there is any errors.
      */
     void stop_timers();
+
+    nsdl_s* get_nsdl_handle();
 
 protected: // from M2MTimerObserver
 
@@ -305,6 +295,18 @@ private:
      * \param lifetime A new value for lifetime.
     */
     void set_endpoint_lifetime_buffer(int lifetime);
+
+    /**
+     * @brief Memory Allocation required for libCoap.
+     * @param size, Size of memory to be reserved.
+    */
+    void* memory_alloc(uint16_t size);
+
+    /**
+     * @brief Memory free functions required for libCoap
+     * @param ptr, Object whose memory needs to be freed.
+    */
+    void memory_free(void *ptr);
 
 private:
 

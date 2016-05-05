@@ -48,7 +48,7 @@ M2MNsdlInterface::M2MNsdlInterface(M2MNsdlObserver &observer)
   _bootstrap_id(0)
 {
     tr_debug("M2MNsdlInterface::M2MNsdlInterface()");
-    __nsdl_interface = this;
+    __nsdl_interface_list.push_back(this);
 
     _bootstrap_endpoint.device_object = NULL;
     _bootstrap_endpoint.oma_bs_status_cb = NULL;
@@ -85,12 +85,18 @@ M2MNsdlInterface::~M2MNsdlInterface()
     delete _nsdl_exceution_timer;
     delete _registration_timer;
     _object_list.clear();
-
     delete _server;
-
     sn_nsdl_destroy(_nsdl_handle);
     _nsdl_handle = NULL;
-    __nsdl_interface = NULL;
+
+    M2MNsdlInterfaceList::const_iterator it;
+    it = __nsdl_interface_list.begin();
+    int index = 0;
+    for (; it!=__nsdl_interface_list.end(); it++, index++) {
+        if ((*it) == this) {
+            __nsdl_interface_list.erase(index);
+        }
+    }
     tr_debug("M2MNsdlInterface::~M2MNsdlInterface() - OUT");
 }
 
@@ -1508,4 +1514,9 @@ void M2MNsdlInterface::send_notification(uint8_t *token,
         }
         sn_nsdl_release_allocated_coap_msg_mem(_nsdl_handle, notification_message_ptr);
     }
+}
+
+nsdl_s * M2MNsdlInterface::get_nsdl_handle()
+{
+    return _nsdl_handle;
 }
