@@ -72,6 +72,16 @@ void M2MInterfaceImpl::set_queue_sleep_handler(callback_handler)
 
 }
 
+void M2MInterfaceImpl::set_random_number_callback(random_number_cb)
+{
+
+}
+
+void M2MInterfaceImpl::set_entropy_callback(entropy_cb)
+{
+
+}
+
 void M2MInterfaceImpl::coap_message_ready(uint8_t *,
                                 uint16_t ,
                                 sn_nsdl_addr_s *)

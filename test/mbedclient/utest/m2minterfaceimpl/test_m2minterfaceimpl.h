@@ -20,6 +20,8 @@
 
 class TestObserver;
 
+uint32_t test_random_callback(void);
+
 class Test_M2MInterfaceImpl
 {
 public:
@@ -40,6 +42,10 @@ public:
     void test_unregister_object();
 
     void test_set_queue_sleep_handler();
+
+    void test_set_random_number_callback();
+
+    void test_set_entropy_callback();
 
     void test_coap_message_ready();
 

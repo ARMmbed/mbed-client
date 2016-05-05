@@ -25,6 +25,7 @@
 //FORWARD DECLARATION
 class M2MNsdlInterface;
 class M2MConnectionHandler;
+class M2MConnectionSecurity;
 class EventData;
 class M2MTimer;
 
@@ -134,6 +135,27 @@ public:
      * goes to seleep.
      */
     virtual void set_queue_sleep_handler(callback_handler handler);
+
+    /**
+     * \brief Sets the function callback that will be called by mbed-client for
+     * fetching random number from application for ensuring strong entropy.
+     * \param random_callback A function pointer that will be called by mbed-client
+     * while performing secure handshake.
+     * Function signature should be uint32_t (*random_number_callback)(void);
+     */
+    virtual void set_random_number_callback(random_number_cb callback);
+
+    /**
+     * \brief Sets the function callback that will be called by mbed-client for
+     * providing entropy source from application for ensuring strong entropy.
+     * \param entropy_callback A function pointer that will be called by mbed-client
+     * while performing secure handshake.
+     * Function signature , if using mbed-client-mbedtls should be
+     * int (*mbedtls_entropy_f_source_ptr)(void *data, unsigned char *output,
+     *                                     size_t len, size_t *olen);
+     */
+    virtual void set_entropy_callback(entropy_cb callback);
+
 
 protected: // From M2MNsdlObserver
 
@@ -344,6 +366,7 @@ private:
 
     M2MInterfaceObserver        &_observer;
     M2MConnectionHandler        *_connection_handler;
+    M2MConnectionSecurity       *_security_connection; // Doesn't own
     M2MNsdlInterface            *_nsdl_interface;
     uint8_t                     _current_state;
     const int                   _max_states;

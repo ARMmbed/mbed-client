@@ -86,3 +86,13 @@ int M2MConnectionSecurity::read(unsigned char* buffer, uint16_t len){
     }
     return m2mconnectionsecurityimpl_stub::int_value;
 }
+
+void M2MConnectionSecurity::set_random_number_callback(random_number_cb)
+{
+
+}
+
+void M2MConnectionSecurity::set_entropy_callback(mbedtls_entropy)
+{
+
+}
