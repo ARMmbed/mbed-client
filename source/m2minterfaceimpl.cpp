@@ -521,10 +521,10 @@ void M2MInterfaceImpl::state_bootstrap_address_resolved( EventData *data)
     }
     address.port = event->_port;
     address.addr_ptr = (uint8_t*)event->_address->_address;
+    _connection_handler->start_listening_for_data();
     if(_nsdl_interface->create_bootstrap_resource(&address)) {
        tr_debug("M2MInterfaceImpl::state_bootstrap_address_resolved : create_bootstrap_resource - success");
        internal_event(STATE_BOOTSTRAP_RESOURCE_CREATED);
-       _connection_handler->start_listening_for_data();
     } else{
         // If resource creation fails then inform error to application
         tr_error("M2MInterfaceImpl::state_bootstrap_address_resolved : M2MInterface::InvalidParameters");
@@ -637,9 +637,9 @@ void M2MInterfaceImpl::state_register_address_resolved( EventData *data)
             tr_debug("M2MInterfaceImpl::state_register_address_resolved : IPv6 address");
             address_type = SN_NSDL_ADDRESS_TYPE_IPV6;
         }
+        _connection_handler->start_listening_for_data();
         if(_nsdl_interface->send_register_message((uint8_t*)event->_address->_address,event->_port, address_type)) {
             internal_event(STATE_REGISTER_RESOURCE_CREATED);
-            _connection_handler->start_listening_for_data();
         } else {
             // If resource creation fails then inform error to application
             tr_error("M2MInterfaceImpl::state_register_address_resolved : M2MInterface::InvalidParameters");
