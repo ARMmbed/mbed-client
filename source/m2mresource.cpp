@@ -524,7 +524,12 @@ sn_coap_hdr_s* M2MResource::handle_post_request(nsdl_s *nsdl,
     // process the POST if we have registered a callback for it
     if(received_coap_header) {
         if ((operation() & SN_GRS_POST_ALLOWED) != 0) {
-            M2MResource::M2MExecuteParameter *exec_params = NULL;
+            M2MResource::M2MExecuteParameter *exec_params = new M2MResource::M2MExecuteParameter();
+            if (exec_params) {
+                exec_params->_object_name = object_name();
+                exec_params->_resource_name = name();
+                exec_params->_object_instance_id = object_instance_id();
+            }
             uint16_t coap_content_type = 0;
             if(received_coap_header->payload_ptr) {
                 if(received_coap_header->content_type_ptr) {
@@ -533,16 +538,12 @@ sn_coap_hdr_s* M2MResource::handle_post_request(nsdl_s *nsdl,
                     }
                 }
                 if(coap_content_type == 0) {
-                    exec_params = new M2MResource::M2MExecuteParameter();
                     if (exec_params){
                         exec_params->_value = alloc_string_copy(received_coap_header->payload_ptr,
                                                                 received_coap_header->payload_len);
                         if (exec_params->_value) {
                             exec_params->_value_length = received_coap_header->payload_len;
                         }
-                        exec_params->_object_name = object_name();
-                        exec_params->_resource_name = name();
-                        exec_params->_object_instance_id = object_instance_id();
                     }
                 } else {
                     msg_code = COAP_MSG_CODE_RESPONSE_UNSUPPORTED_CONTENT_FORMAT;
@@ -551,15 +552,11 @@ sn_coap_hdr_s* M2MResource::handle_post_request(nsdl_s *nsdl,
             if(COAP_MSG_CODE_RESPONSE_CHANGED == msg_code) {
                 tr_debug("M2MResource::handle_post_request - Execute resource function");
                 execute(exec_params);
-
-                delete exec_params;
-
                 if(_delayed_response) {
                     coap_response->msg_type = COAP_MSG_TYPE_ACKNOWLEDGEMENT;
                     coap_response->msg_code = COAP_MSG_CODE_EMPTY;
                     coap_response->msg_id = received_coap_header->msg_id;
                     if(received_coap_header->token_len) {
-
                         free(_delayed_token);
                         _delayed_token_len = 0;
 
@@ -574,6 +571,7 @@ sn_coap_hdr_s* M2MResource::handle_post_request(nsdl_s *nsdl,
                     coap_response->payload_len = length;
                 }
             }
+            delete exec_params;
         } else { // if ((object->operation() & SN_GRS_POST_ALLOWED) != 0)
             tr_error("M2MResource::handle_post_request - COAP_MSG_CODE_RESPONSE_METHOD_NOT_ALLOWED");
             msg_code = COAP_MSG_CODE_RESPONSE_METHOD_NOT_ALLOWED; // 4.05
