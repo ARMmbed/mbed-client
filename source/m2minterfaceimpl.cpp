@@ -194,6 +194,7 @@ void M2MInterfaceImpl::update_registration(M2MSecurity *security_object, const u
     if(lifetime != 0 && (lifetime < MINIMUM_REGISTRATION_TIME)) {
         _observer.error(M2MInterface::InvalidParameters);
     } else if(!_update_register_ongoing){
+        tr_debug("M2MInterfaceImpl::update_registration - already ongoing");
         _update_register_ongoing = true;
         M2MUpdateRegisterData *data = new M2MUpdateRegisterData();
         data->_object = security_object;
@@ -220,11 +221,14 @@ void M2MInterfaceImpl::update_registration(M2MSecurity *security_object, const u
         END_TRANSITION_MAP(data)
         if(_event_ignored) {
             _event_ignored = false;
-            _observer.error(M2MInterface::NotAllowed);
+            if (!_reconnecting)
+                _observer.error(M2MInterface::NotAllowed);
         }
-    } else {
+    } else if(!_reconnecting) {
         tr_debug("M2MInterfaceImpl::update_registration - NOT ALLOWED");
         _observer.error(M2MInterface::NotAllowed);
+    } else {
+        tr_debug("M2MInterfaceImpl::update_registration - reconnecting");
     }
     tr_debug("M2MInterfaceImpl::update_registration - OUT");
 }
@@ -319,7 +323,6 @@ void M2MInterfaceImpl::client_unregistered()
     _observer.object_unregistered(_register_server);
 }
 
-
 void M2MInterfaceImpl::bootstrap_done(M2MSecurity *security_object)
 {
 #ifndef YOTTA_CFG_DISABLE_BOOTSTRAP_FEATURE
@@ -368,10 +371,6 @@ void M2MInterfaceImpl::data_available(uint8_t* data,
 void M2MInterfaceImpl::socket_error(uint8_t error_code, bool retry)
 {
     tr_debug("M2MInterfaceImpl::socket_error: %d, retry %d", error_code, retry);
-    if (_reconnecting) {
-        tr_debug("M2MInterfaceImpl::socket_error, reconnection ongoing - return");
-        return;
-    }
 
     M2MInterface::Error error = M2MInterface::ErrorNone;
     switch (error_code) {
@@ -419,9 +418,11 @@ void M2MInterfaceImpl::socket_error(uint8_t error_code, bool retry)
     }
     // Inform application
     if (!retry && M2MInterface::ErrorNone != error) {
+        tr_debug("M2MInterfaceImpl::socket_error - send error to application");
         _connection_handler->stop_listening();
         _retry_timer->stop_timer();
         _retry_count = 0;
+        _reconnecting = false;
         _observer.error(error);
         internal_event(STATE_IDLE);
     }
@@ -469,7 +470,6 @@ void M2MInterfaceImpl::timer_expired(M2MTimerObserver::Type type)
         }
     }
     else if (M2MTimerObserver::RetryTimer == type) {
-        _reconnecting = false;
         _listen_port = rand() % 65535 + 12345;
         _connection_handler->bind_connection(_listen_port);
         internal_event(STATE_REGISTER);
@@ -702,6 +702,7 @@ void M2MInterfaceImpl::state_registered( EventData */*data*/)
     _retry_count = 0;
     _register_ongoing = false;
     _update_register_ongoing = false;
+    _reconnecting = false;
 }
 
 void M2MInterfaceImpl::state_update_registration( EventData *data)
