@@ -37,6 +37,62 @@ M2MInterface* interface = M2MInterfaceFactory::create_interface(*this,
                                                   "");
 ```
 
+### Setup own random number generator function
+
+In order to provide a stronger security mechanism , mbed Client requires random number generator to feed into underlying SSL library. There is a default PRNG seeded with RTC
+for security but some platform do not have RTC and for some , time value seeded PRNG is not secure enough. So, there is a possiblity for application to pass their own RNG implementation
+to mbed Client as function pointer callback through an API, set_random_number_callback(random_number_cb callback).
+Here is an example how you can use it from application
+
+```
+#include "mbed-client/m2minterfacefactory.h"
+#include "mbed-client/m2minterface.h"
+
+uint32_t get_random_number(void)
+{
+    uint32_t i = 0;
+    printf("\Your application's RNG logic\n");
+    return i;
+}
+
+_interface->set_random_number_callback(&get_random_number);
+
+```
+
+### Setup own entropy function for additional secure connectivity 
+
+mbed Client provides an API to add own entropy source to feed into underlying SSL library. There is a default entropy source provided by mbed Client which uses PRNG seeded with RTC
+for security but some platform do not have RTC and for some this level of security may not be adequately strong . So, there is a possiblity for application to pass their own entropy source
+to mbed Client as function pointer callback through an API, set_entropy_callback(entropy_cb callback).
+Here is an example how you can use it from application
+
+```
+#include "mbed-client/m2minterfacefactory.h"
+#include "mbed-client/m2minterface.h"
+
+entropy_cb ent_cb;
+
+int ent_poll( void *, unsigned char *output, size_t len,
+                           size_t *olen )
+{
+    for(uint16_t i=0; i < len; i++){
+        srand(time(NULL));
+        output[i] = rand() % 256;
+    }
+    *olen = len;
+
+    return( 0 );
+}
+
+    ent_cb.entropy_source_ptr = ent_poll;
+    ent_cb.p_source = NULL;
+    ent_cb.threshold = 128;
+    ent_cb.strong = 0;
+
+_interface->set_entropy_callback(ent_cb);
+
+```
+
 ### Maximum UDP message size
 
 The maximum single UDP message size that mbed Client can receive is 1152 bytes. The actual payload size is 1137 bytes, the header information using the remaining 15 bytes. 
