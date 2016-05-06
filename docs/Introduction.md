@@ -37,12 +37,13 @@ M2MInterface* interface = M2MInterfaceFactory::create_interface(*this,
                                                   "");
 ```
 
-### Setup own random number generator function
+### Setting up own random number generator function
 
-In order to provide a stronger security mechanism , mbed Client requires random number generator to feed into underlying SSL library. There is a default PRNG seeded with RTC
-for security but some platform do not have RTC and for some , time value seeded PRNG is not secure enough. So, there is a possiblity for application to pass their own RNG implementation
-to mbed Client as function pointer callback through an API, set_random_number_callback(random_number_cb callback).
-Here is an example how you can use it from application
+To provide a stronger security mechanism, mbed Client requires a random number generator to feed into the underlying SSL library. There is a default PRNG seeded with RTC for security but some platforms do not have RTC, and for some, time value seeded PRNG is not secure enough. 
+
+Now, an application can pass its own RNG implementation to mbed Client as function pointer callback through an API, `set_random_number_callback(random_number_cb callback)`.
+
+Here is an example on how you can use it from an application:
 
 ```
 #include "mbed-client/m2minterfacefactory.h"
@@ -59,12 +60,13 @@ _interface->set_random_number_callback(&get_random_number);
 
 ```
 
-### Setup own entropy function for additional secure connectivity 
+### Setting up own entropy function for additional secure connectivity 
 
-mbed Client provides an API to add own entropy source to feed into underlying SSL library. There is a default entropy source provided by mbed Client which uses PRNG seeded with RTC
-for security but some platform do not have RTC and for some this level of security may not be adequately strong . So, there is a possiblity for application to pass their own entropy source
-to mbed Client as function pointer callback through an API, set_entropy_callback(entropy_cb callback).
-Here is an example how you can use it from application
+mbed Client provides an API to add your own entropy source to feed into underlying SSL library. There is a default entropy source provided by mbed Client. It uses PRNG seeded with RTC for the security but some platforms do not have RTC, and for some, this level of security may not be strong enough. 
+
+Now, an application can pass its own entropy source to mbed Client as function pointer callback through an API, `set_entropy_callback(entropy_cb callback)`.
+
+Here is an example on how you can use it from an application:
 
 ```
 #include "mbed-client/m2minterfacefactory.h"
