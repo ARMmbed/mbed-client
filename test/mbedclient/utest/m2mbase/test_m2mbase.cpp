@@ -220,6 +220,16 @@ void Test_M2MBase::test_remove_observation_level()
     remove_observation_level(M2MBase::O_Attribute);
     CHECK(M2MBase::None == this->_observation_level);
 
+    this->_observation_level = M2MBase::OI_Attribute;
+    remove_observation_level(M2MBase::R_Attribute);
+    CHECK(M2MBase::OI_Attribute == this->_observation_level);
+
+    remove_observation_level(M2MBase::OI_Attribute);
+    CHECK(M2MBase::None == this->_observation_level);
+    remove_observation_level(M2MBase::OI_Attribute);
+    CHECK(M2MBase::None == this->_observation_level);
+}
+
     remove_observation_level(M2MBase::O_Attribute);
     CHECK(M2MBase::None == this->_observation_level);
 }

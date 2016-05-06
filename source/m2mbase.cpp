@@ -166,12 +166,7 @@ void M2MBase::add_observation_level(M2MBase::Observation obs_level)
 
 void M2MBase::remove_observation_level(M2MBase::Observation obs_level)
 {
-    if ((obs_level & _observation_level) == obs_level) {
-        tr_debug("M2MBase::remove_observation_level %d", obs_level);
-        _observation_level = (M2MBase::Observation)(_observation_level ^ obs_level);
-    } else {
-        tr_debug("M2MBase::remove_observation_level (%d) already removed", obs_level);
-    }
+    _observation_level = (M2MBase::Observation)(_observation_level & ~obs_level);
 }
 
 void M2MBase::set_under_observation(bool observed,
