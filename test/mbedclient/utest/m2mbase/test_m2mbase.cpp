@@ -230,10 +230,6 @@ void Test_M2MBase::test_remove_observation_level()
     CHECK(M2MBase::None == this->_observation_level);
 }
 
-    remove_observation_level(M2MBase::O_Attribute);
-    CHECK(M2MBase::None == this->_observation_level);
-}
-
 void Test_M2MBase::test_set_under_observation()
 {
     Handler handler;
