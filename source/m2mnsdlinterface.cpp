@@ -48,6 +48,7 @@ M2MNsdlInterface::M2MNsdlInterface(M2MNsdlObserver &observer)
   _bootstrap_id(0)
 {
     tr_debug("M2MNsdlInterface::M2MNsdlInterface()");
+
     __nsdl_interface_list.push_back(this);
 
     _bootstrap_endpoint.device_object = NULL;
@@ -88,15 +89,15 @@ M2MNsdlInterface::~M2MNsdlInterface()
     delete _server;
     sn_nsdl_destroy(_nsdl_handle);
     _nsdl_handle = NULL;
-
     M2MNsdlInterfaceList::const_iterator it;
     it = __nsdl_interface_list.begin();
     int index = 0;
     for (; it!=__nsdl_interface_list.end(); it++, index++) {
         if ((*it) == this) {
             __nsdl_interface_list.erase(index);
+            break;
         }
-    }
+    }    
     tr_debug("M2MNsdlInterface::~M2MNsdlInterface() - OUT");
 }
 
