@@ -133,7 +133,8 @@ bool M2MResourceInstance::handle_observation_attribute(char *&query)
         if(success) {
             if (is_under_observation()) {
                 handler->set_under_observation(true);
-            } else {
+            }
+            else {
                 handler->set_default_values();
             }
         }
