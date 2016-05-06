@@ -40,7 +40,7 @@ uint8_t __nsdl_c_send_to_server(struct nsdl_s * nsdl_handle,
 uint8_t __nsdl_c_received_from_server(struct nsdl_s * nsdl_handle,
                                       sn_coap_hdr_s *coap_header,
                                       sn_nsdl_addr_s *address_ptr);
-void __nsdl_c_bootstrap_done(sn_nsdl_oma_server_info_t *server_info_ptr);
+void __nsdl_c_bootstrap_done(sn_nsdl_oma_server_info_t *server_info_ptr, struct nsdl_s * nsdl_handle);
 void *__socket_malloc( void * context, size_t size);
 void __socket_free(void * context, void * ptr);
 M2MNsdlInterface* get_interface(struct nsdl_s* nsdl_handle);

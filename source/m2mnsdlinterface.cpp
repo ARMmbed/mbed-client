@@ -51,7 +51,7 @@ M2MNsdlInterface::M2MNsdlInterface(M2MNsdlObserver &observer)
     __nsdl_interface_list.push_back(this);
 
     _bootstrap_endpoint.device_object = NULL;
-    _bootstrap_endpoint.oma_bs_status_cb = NULL;
+    _bootstrap_endpoint.oma_bs_status_cb_handle = NULL;
 
     _bootstrap_device_setup.sn_oma_device_boot_callback = NULL;
     _bootstrap_device_setup.error_code = NO_ERROR;
@@ -227,7 +227,7 @@ bool M2MNsdlInterface::create_bootstrap_resource(sn_nsdl_addr_s *address)
     _bootstrap_device_setup.sn_oma_device_boot_callback = 0;
 
     _bootstrap_endpoint.device_object = &_bootstrap_device_setup;
-    _bootstrap_endpoint.oma_bs_status_cb = &__nsdl_c_bootstrap_done;
+    _bootstrap_endpoint.oma_bs_status_cb_handle = &__nsdl_c_bootstrap_done;
 
     if(_bootstrap_id == 0) {
         _bootstrap_id = sn_nsdl_oma_bootstrap(_nsdl_handle,
