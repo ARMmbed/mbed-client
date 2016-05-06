@@ -16,6 +16,7 @@
 #ifndef __M2M_CONNECTION_SECURITY_H__
 #define __M2M_CONNECTION_SECURITY_H__
 
+#include "mbed-client/m2mconfig.h"
 class M2MConnectionHandler;
 class M2MSecurity;
 class M2MConnectionSecurityPimpl;
@@ -24,7 +25,7 @@ class M2MConnectionSecurityPimpl;
  * \brief M2MConnectionSecurity.
  * This class provides a method to create a secure socket connection
  * to handle connectivity for the mbed Client. It will handle sending, receiving
- * and establishing a secure connection for the mbed Client on top of the
+ * and establishing a secure connection for mbed Client on top of the
  * normal socket connection.
  */
 
@@ -87,7 +88,7 @@ public:
      * \brief Sends data to the server.
      * \param message The data to be sent.
      * \param len The length of the data.
-     * @return Indicates whether the data is sent successfully or not.
+     * \return Indicates whether the data is sent successfully or not.
      */
     int send_message(unsigned char *message, int len);
 
@@ -98,6 +99,26 @@ public:
      * \return Indicates whether the data is read successfully or not.
      */
     int read(unsigned char* buffer, uint16_t len);
+
+    /**
+     * \brief Sets the function callback that is called by mbed-client to
+     * fetch a random number from an application to ensure strong entropy.
+     * \param random_callback A function pointer that is called by mbed-client
+     * while performing a secure handshake.
+     * The function signature should be uint32_t (*random_number_callback)(void);
+     */
+    void set_random_number_callback(random_number_cb callback);
+
+    /**
+     * \brief Sets the function callback that is called by mbed-client to
+     * provide an entropy source from an application to ensure strong entropy.
+     * \param entropy_callback A function pointer that is called by mbed-client
+     * while performing a secure handshake.
+     * Function signature, if using mbed-client-mbedtls, should be
+     * int (*mbedtls_entropy_f_source_ptr)(void *data, unsigned char *output,
+     *                                     size_t len, size_t *olen);
+     */
+    void set_entropy_callback(entropy_cb callback);
 
 private:
 

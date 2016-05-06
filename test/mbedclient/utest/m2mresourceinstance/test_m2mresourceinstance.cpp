@@ -192,8 +192,7 @@ void Test_M2MResourceInstance::test_handle_observation_attribute()
     m2mreporthandler_stub::bool_return = true;
     CHECK(true == resource_instance->handle_observation_attribute(d));
 
-    m2mreporthandler_stub::bool_return = true;
-    m2mreporthandler_stub::int_value = M2MReportHandler::Cancel;
+    m2mbase_stub::bool_value = false;
     CHECK(true == resource_instance->handle_observation_attribute(d));
 
     delete m2mbase_stub::report;

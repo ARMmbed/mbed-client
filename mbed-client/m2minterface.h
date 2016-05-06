@@ -78,7 +78,7 @@ public:
 
     /**
      * \brief Enum defining different kinds of network
-     * stacks that can be used by the mbed Client.
+     * stacks that can be used by mbed Client.
      */
     typedef enum {
         Uninitialized = 0,
@@ -105,7 +105,7 @@ public:
 
     /**
      * \brief Cancels the ongoing bootstrapping operation of the client. If the client has
-     * already successfully bootstrapped this function deletes the existing
+     * already successfully bootstrapped, this function deletes the existing
      * bootstrap information from the client.
      * NOTE: This API is not supported for developers!!
      */
@@ -116,7 +116,7 @@ public:
      * corresponding LWM2M server.
      * \param security_object The security object that contains information
      * required for registering to the LWM2M server.
-     * If the client wants to register to multiple LWM2M servers it must call
+     * If the client wants to register to multiple LWM2M servers, it must call
      * this function once for each of the LWM2M server objects separately.
      * \param object_list Objects that contain information about the
      * client attempting to register to the LWM2M server.
@@ -127,29 +127,48 @@ public:
      * \brief Updates or refreshes the client's registration on the LWM2M
      * server.
      * \param security_object The security object from which the device object
-     * needs to update registration. If there is only one LWM2M server registered
+     * needs to update the registration. If there is only one LWM2M server registered,
      * this parameter can be NULL.
      * \param lifetime The lifetime of the endpoint client in seconds. If the same value
-     * has to be passed then put the default value as 0.
+     * has to be passed, set the default value to 0.
      */
     virtual void update_registration(M2MSecurity *security_object, const uint32_t lifetime = 0) = 0;
 
     /**
      * \brief Unregisters the registered object from the LWM2M server.
      * \param security_object The security object from which the device object
-     * needs to be unregistered. If there is only one LWM2M server registered
+     * needs to be unregistered. If there is only one LWM2M server registered,
      * this parameter can be NULL.
      */
     virtual void unregister_object(M2MSecurity* security_object = NULL) = 0;
 
     /**
-     * \brief Sets the function that will be called for indicating that the client
+     * \brief Sets the function that is called for indicating that the client
      * is going to sleep when the Binding mode is selected with Queue mode.
-     * \param callback A function pointer that will be called when the client
+     * \param callback A function pointer that is called when the client
      * goes to sleep.
      */
     virtual void set_queue_sleep_handler(callback_handler handler) = 0;
 
+    /**
+     * \brief Sets the function callback that is called by mbed-client to
+     * fetch a random number from an application to ensure strong entropy.
+     * \param random_callback A function pointer that is called by mbed-client
+     * while performing a secure handshake.
+     * The function signature should be uint32_t (*random_number_callback)(void);
+     */
+    virtual void set_random_number_callback(random_number_cb callback) = 0;
+
+    /**
+     * \brief Sets the function callback that is called by mbed-client to
+     * provide an entropy source from an application to ensure strong entropy.
+     * \param entropy_callback A function pointer that is called by mbed-client
+     * while performing a secure handshake.
+     * Function signature, if using mbed-client-mbedtls, should be
+     * int (*mbedtls_entropy_f_source_ptr)(void *data, unsigned char *output,
+     *                                     size_t len, size_t *olen);
+     */
+    virtual void set_entropy_callback(entropy_cb callback) = 0;
 };
 
 #endif // M2M_INTERFACE_H

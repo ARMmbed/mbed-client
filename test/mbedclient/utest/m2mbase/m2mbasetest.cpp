@@ -260,3 +260,8 @@ TEST(M2MBase, test_max_age)
 {
     m2m_base->test_max_age();
 }
+
+TEST(M2MBase, test_is_under_observation)
+{
+    m2m_base->test_is_under_observation();
+}

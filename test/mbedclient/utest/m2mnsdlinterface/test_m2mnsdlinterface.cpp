@@ -1448,6 +1448,7 @@ void Test_M2MNsdlInterface::test_value_updated()
 
     m2mresourceinstance_stub::clear();
     free(common_stub::resource->resource_parameters_ptr);
+    free(common_stub::resource->resource);
     free(common_stub::resource);
     common_stub::resource = NULL;
     common_stub::clear();
@@ -1477,7 +1478,9 @@ void Test_M2MNsdlInterface::test_value_updated()
 
     m2mresourceinstance_stub::clear();
 
+    free(common_stub::resource->resource);
     free(common_stub::resource);
+
     common_stub::resource = NULL;
     common_stub::clear();
 

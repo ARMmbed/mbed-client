@@ -80,7 +80,7 @@ M2MServer::~M2MServer()
 M2MResource* M2MServer::create_resource(ServerResource resource, uint32_t value)
 {
     M2MResource* res = NULL;
-    const char* server_id_ptr;
+    const char* server_id_ptr = "";
     if(!is_resource_present(resource)) {
         switch(resource) {
         case DefaultMinPeriod:
@@ -93,7 +93,6 @@ M2MResource* M2MServer::create_resource(ServerResource resource, uint32_t value)
             server_id_ptr = SERVER_DISABLE_TIMEOUT;
             break;
         default:
-            server_id_ptr = "";
             break;
         }
     }

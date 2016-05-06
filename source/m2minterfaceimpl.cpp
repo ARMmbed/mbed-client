@@ -78,12 +78,10 @@ M2MInterfaceImpl::M2MInterfaceImpl(M2MInterfaceObserver& observer,
                                      (uint8_t)_binding_mode,
                                      _context_address);
 
+    //Doesn't own, ownership is passed to ConnectionHandler class
+    _security_connection = new M2MConnectionSecurity(sec_mode);
     //Here we must use TCP still
-    _connection_handler = new M2MConnectionHandler(*this,
-                                                   new M2MConnectionSecurity(sec_mode),
-                                                   mode,
-                                                   stack);
-
+    _connection_handler = new M2MConnectionHandler(*this, _security_connection, mode, stack);
     _connection_handler->bind_connection(_listen_port);
     tr_debug("M2MInterfaceImpl::M2MInterfaceImpl() -OUT");
 }
@@ -97,6 +95,7 @@ M2MInterfaceImpl::~M2MInterfaceImpl()
     _connection_handler->stop_listening();
     delete _connection_handler;
     delete _retry_timer;
+    _security_connection = NULL;
     tr_debug("M2MInterfaceImpl::~M2MInterfaceImpl() - OUT");
 }
 
@@ -269,6 +268,20 @@ void M2MInterfaceImpl::set_queue_sleep_handler(callback_handler handler)
 {
     tr_debug("M2MInterfaceImpl::set_queue_sleep_handler()");
     _callback_handler = handler;
+}
+
+void M2MInterfaceImpl::set_random_number_callback(random_number_cb callback)
+{
+    if(_security_connection) {
+        _security_connection->set_random_number_callback(callback);
+    }
+}
+
+void M2MInterfaceImpl::set_entropy_callback(entropy_cb callback)
+{
+    if(_security_connection) {
+        _security_connection->set_entropy_callback(callback);
+    }
 }
 
 void M2MInterfaceImpl::coap_message_ready(uint8_t *data_ptr,
@@ -681,7 +694,6 @@ void M2MInterfaceImpl::state_register_address_resolved( EventData *data)
         _connection_handler->start_listening_for_data();
         if(_nsdl_interface->send_register_message((uint8_t*)event->_address->_address,event->_port, address_type)) {
             internal_event(STATE_REGISTER_RESOURCE_CREATED);
-
         } else {
             // If resource creation fails then inform error to application
             tr_error("M2MInterfaceImpl::state_register_address_resolved : M2MInterface::InvalidParameters");
