@@ -354,11 +354,25 @@ M2MBase::BaseType M2MObjectInstance::base_type() const
 void M2MObjectInstance::add_observation_level(M2MBase::Observation observation_level)
 {
     M2MBase::add_observation_level(observation_level);
+    if(!_resource_list.empty()) {
+        M2MResourceList::const_iterator it;
+        it = _resource_list.begin();
+        for ( ; it != _resource_list.end(); it++ ) {
+            (*it)->add_observation_level(observation_level);
+        }
+    }
 }
 
 void M2MObjectInstance::remove_observation_level(M2MBase::Observation observation_level)
 {
     M2MBase::remove_observation_level(observation_level);
+    if(!_resource_list.empty()) {
+        M2MResourceList::const_iterator it;
+        it = _resource_list.begin();
+        for ( ; it != _resource_list.end(); it++ ) {
+           (*it)->remove_observation_level(observation_level);
+        }
+    }
 }
 
 sn_coap_hdr_s* M2MObjectInstance::handle_get_request(nsdl_s *nsdl,
