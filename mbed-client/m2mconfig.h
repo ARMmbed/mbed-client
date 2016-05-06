@@ -27,17 +27,17 @@ using namespace m2m;
 // can be other
 
 /*
-*\brief Callback function for Random number
-* required by mbed-client-mbedtls module
+*\brief A callback function for Random number
+* required by the mbed-client-mbedtls module.
 */
 typedef uint32_t (*random_number_cb)(void) ;
 
 /*
-*\brief Entropy structure for mbedtls entropy source
-* \param entropy_source_ptr  Entropy function
-* \param p_source  Function data
+*\brief An entropy structure for mbedtls entropy source.
+* \param entropy_source_ptr Entropy function.
+* \param p_source  Function data.
 * \param threshold Minimum required from source before entropy is released
-*                  ( with mbedtls_entropy_func() ) (in bytes)
+*                  (with mbedtls_entropy_func()) (in bytes).
 * \param strong    MBEDTLS_ENTROPY_SOURCE_STRONG = 1 or
 *                  MBEDTSL_ENTROPY_SOURCE_WEAK = 0.
 *                  At least one strong source needs to be added.
