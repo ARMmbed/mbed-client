@@ -157,25 +157,11 @@ M2MBase::BaseType M2MObject::base_type() const
 void M2MObject::add_observation_level(M2MBase::Observation observation_level)
 {
     M2MBase::add_observation_level(observation_level);
-    if(!_instance_list.empty()) {
-        M2MObjectInstanceList::const_iterator it;
-        it = _instance_list.begin();
-        for ( ; it != _instance_list.end(); it++ ) {
-            (*it)->add_observation_level(observation_level);
-        }
-    }
 }
 
 void M2MObject::remove_observation_level(M2MBase::Observation observation_level)
 {
     M2MBase::remove_observation_level(observation_level);
-    if(!_instance_list.empty()) {
-        M2MObjectInstanceList::const_iterator it;
-        it = _instance_list.begin();
-        for ( ; it != _instance_list.end(); it++ ) {
-            (*it)->remove_observation_level(observation_level);
-        }
-    }
 }
 
 sn_coap_hdr_s* M2MObject::handle_get_request(nsdl_s *nsdl,
@@ -504,7 +490,7 @@ void M2MObject::notification_update(uint16_t obj_instance_id)
 {
     tr_debug("M2MObject::notification_update - id: %d", obj_instance_id);
     M2MReportHandler *report_handler = M2MBase::report_handler();
-    if(report_handler && M2MBase::None != observation_level()) {
+    if(report_handler && is_under_observation()) {
         report_handler->set_notification_trigger(obj_instance_id);
     }
 }

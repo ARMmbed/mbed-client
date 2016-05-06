@@ -321,7 +321,7 @@ public:
      * \return sn_coap_hdr_s The message that needs to be sent to server.
      */
     virtual sn_coap_hdr_s* handle_put_request(nsdl_s *nsdl,
-                                              sn_coap_hdr_s *received_coap_header,                                                                                            
+                                              sn_coap_hdr_s *received_coap_header,
                                               M2MObservationHandler *observation_handler,
                                               bool &execute_value_updated);
 
@@ -335,7 +335,7 @@ public:
      * \return sn_coap_hdr_s  The message that needs to be sent to server.
      */
     virtual sn_coap_hdr_s* handle_post_request(nsdl_s *nsdl,
-                                               sn_coap_hdr_s *received_coap_header,                                               
+                                               sn_coap_hdr_s *received_coap_header,
                                                M2MObservationHandler *observation_handler,
                                                bool &execute_value_updated);
 
@@ -362,6 +362,12 @@ public:
      * \return URI path of the object.
      */
     virtual const String &uri_path() const;
+
+    /**
+     * @brief Returns whether this resource is under observation or not.
+     * @return True if the resource is under observation, else false,
+     */
+    virtual bool is_under_observation() const;
 
 protected : // from M2MReportObserver
 
@@ -452,6 +458,7 @@ private:
     bool                        _register_uri;
     String                      _uri_path;
     uint32_t                    _max_age;
+    bool                        _is_under_observation;
 
 friend class Test_M2MBase;
 

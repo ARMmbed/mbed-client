@@ -219,8 +219,10 @@ void Test_M2MBase::test_remove_observation_level()
 
     remove_observation_level(M2MBase::O_Attribute);
     CHECK(M2MBase::None == this->_observation_level);
-}
 
+    remove_observation_level(M2MBase::O_Attribute);
+    CHECK(M2MBase::None == this->_observation_level);
+}
 
 void Test_M2MBase::test_set_under_observation()
 {
@@ -415,9 +417,15 @@ void Test_M2MBase::test_handle_observation_attribute()
     ret = handle_observation_attribute(s);
     CHECK(ret == true);
 
-    m2mreporthandler_stub::int_value = M2MReportHandler::Cancel;
+    this->_is_under_observation = true;
     ret = handle_observation_attribute(s);
     CHECK(ret == true);
+
+    this->_is_under_observation = true;
+    m2mreporthandler_stub::bool_return = false;
+    ret = handle_observation_attribute(s);
+    CHECK(ret == false);
+
 }
 
 void Test_M2MBase::test_observation_to_be_sent()
@@ -551,4 +559,11 @@ void Test_M2MBase::test_max_age()
 {
     this->_max_age = 10000;
     CHECK(this->max_age() == 10000);
+}
+
+void Test_M2MBase::test_is_under_observation()
+{
+    CHECK(false == is_under_observation());
+    this->_is_under_observation = true;
+    CHECK(true == is_under_observation());
 }

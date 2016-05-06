@@ -1408,7 +1408,7 @@ void M2MNsdlInterface::send_resource_observation(M2MResource *resource,
                           length,
                           obs_number,
                           resource->max_age(),
-                          resource->coap_content_type(),
+                          content_type,
                           resource->uri_path());
 
         memory_free(value);

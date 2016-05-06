@@ -354,25 +354,11 @@ M2MBase::BaseType M2MObjectInstance::base_type() const
 void M2MObjectInstance::add_observation_level(M2MBase::Observation observation_level)
 {
     M2MBase::add_observation_level(observation_level);
-    if(!_resource_list.empty()) {
-        M2MResourceList::const_iterator it;
-        it = _resource_list.begin();
-        for ( ; it != _resource_list.end(); it++ ) {            
-            (*it)->add_observation_level(observation_level);
-        }
-    }
 }
 
 void M2MObjectInstance::remove_observation_level(M2MBase::Observation observation_level)
 {
     M2MBase::remove_observation_level(observation_level);
-    if(!_resource_list.empty()) {
-        M2MResourceList::const_iterator it;
-        it = _resource_list.begin();
-        for ( ; it != _resource_list.end(); it++ ) {            
-            (*it)->remove_observation_level(observation_level);
-        }
-    }
 }
 
 sn_coap_hdr_s* M2MObjectInstance::handle_get_request(nsdl_s *nsdl,
@@ -632,8 +618,6 @@ sn_coap_hdr_s* M2MObjectInstance::handle_post_request(nsdl_s *nsdl,
                 M2MTLVDeserializer *deserializer = new M2MTLVDeserializer();
                 if(deserializer) {
                     String obj_name = "";
-                    char *obj_inst_id = NULL;
-                    char *resource_id = NULL;
                     M2MTLVDeserializer::Error error = M2MTLVDeserializer::None;
                     error = deserializer->deserialize_resources(received_coap_header->payload_ptr,
                                                                 received_coap_header->payload_len,
@@ -695,13 +679,12 @@ sn_coap_hdr_s* M2MObjectInstance::handle_post_request(nsdl_s *nsdl,
 
 void M2MObjectInstance::notification_update(M2MBase::Observation observation_level)
 {
-    tr_debug("M2MObjectInstance::notification_update()");
+    tr_debug("M2MObjectInstance::notification_update() - level(%d)", observation_level);
     if(M2MBase::O_Attribute == observation_level) {
-         tr_debug("M2MObjectInstance::notification_update() - M2MBase::O_Attribute == observation_level");
         _object_callback.notification_update(instance_id());
     } else {
         M2MReportHandler *report_handler = M2MBase::report_handler();
-        if(report_handler && M2MBase::None != M2MBase::observation_level()) {
+        if(report_handler && is_under_observation()) {
             report_handler->set_notification_trigger();
         }
     }
