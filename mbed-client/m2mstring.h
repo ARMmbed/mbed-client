@@ -93,7 +93,6 @@ namespace m2m
     char& operator[](const size_type i)       { return p[i]; }
     char operator[](const size_type i) const { return p[i]; }
     // checked access:
-    char& at(const size_type i);
     char at(const size_type i) const;
 
     /// erase len characters at position pos
@@ -120,8 +119,6 @@ namespace m2m
     // reallocate the internal memory
     void new_realloc( size_type n);
     char* strdup(const char* other);
-
-    char _return_value;
 
     friend class ::Test_M2MString;
 
