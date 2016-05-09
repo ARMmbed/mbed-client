@@ -39,7 +39,7 @@ namespace m2m
     static const size_type npos;
 
     String();
-    virtual ~String();
+    ~String();
     String(const String&);
     String(const char*);
 
