@@ -39,7 +39,7 @@ M2MInterface* interface = M2MInterfaceFactory::create_interface(*this,
 
 ### Setting up own random number generator function
 
-To provide a stronger security mechanism, mbed Client requires a random number generator to feed into the underlying SSL library. There is a default PRNG seeded with RTC for security but some platforms do not have RTC, and for some, time value seeded PRNG is not secure enough. 
+To provide a stronger security mechanism, mbed Client requires a random number generator to feed a random number into the underlying SSL library. There is a default PRNG seeded with RTC for security but some platforms do not have RTC, and for some, time value seeded PRNG is not secure enough. 
 
 Now, an application can pass its own RNG implementation to mbed Client as function pointer callback through an API, `set_random_number_callback(random_number_cb callback)`.
 
@@ -62,7 +62,7 @@ _interface->set_random_number_callback(&get_random_number);
 
 ### Setting up own entropy function for additional secure connectivity 
 
-mbed Client provides an API to add your own entropy source to feed into underlying SSL library. There is a default entropy source provided by mbed Client. It uses PRNG seeded with RTC for the security but some platforms do not have RTC, and for some, this level of security may not be strong enough. 
+mbed Client provides an API to add your own entropy source into the underlying SSL library. There is a default entropy source provided by mbed Client. It uses PRNG seeded with RTC for the security but some platforms do not have RTC, and for some, this level of security may not be strong enough. 
 
 Now, an application can pass its own entropy source to mbed Client as function pointer callback through an API, `set_entropy_callback(entropy_cb callback)`.
 
