@@ -29,6 +29,7 @@
 #include "mbed-client/m2mtimer.h"
 
 #include <assert.h>
+#include <inttypes.h>
 
 #define BUFFER_SIZE 21
 #define TRACE_GROUP "mClt"
@@ -132,7 +133,7 @@ void M2MNsdlInterface::create_endpoint(const String &name,
                                        const uint8_t mode,
                                        const String &/*context_address*/)
 {
-    tr_debug("M2MNsdlInterface::create_endpoint( name %s type %s lifetime %d, domain %s, mode %d)",
+    tr_debug("M2MNsdlInterface::create_endpoint( name %s type %s lifetime %" PRId32 ", domain %s, mode %d)",
               name.c_str(), type.c_str(), life_time, domain.c_str(), mode);
     if(_endpoint){
         memset(_endpoint, 0, sizeof(sn_nsdl_ep_parameters_s)+1);
@@ -234,6 +235,7 @@ bool M2MNsdlInterface::create_bootstrap_resource(sn_nsdl_addr_s *address)
     }
     return success;
 #else
+    (void)address;
     return false;
 #endif //YOTTA_CFG_DISABLE_BOOTSTRAP_FEATURE
 }
@@ -248,7 +250,7 @@ bool M2MNsdlInterface::send_register_message(uint8_t* address,
         if(_register_id == 0) {
             _register_id = -1;
             _register_id = sn_nsdl_register_endpoint(_nsdl_handle,_endpoint);
-            tr_debug("M2MNsdlInterface::send_register_message - _register_id %d", _register_id);
+            tr_debug("M2MNsdlInterface::send_register_message - _register_id %" PRId32, _register_id);
             success = _register_id != 0;
         }
     }
@@ -257,7 +259,7 @@ bool M2MNsdlInterface::send_register_message(uint8_t* address,
 
 bool M2MNsdlInterface::send_update_registration(const uint32_t lifetime)
 {
-    tr_debug("M2MNsdlInterface::send_update_registration( lifetime %d)", lifetime);
+    tr_debug("M2MNsdlInterface::send_update_registration( lifetime %" PRIu32 ")", lifetime);
     bool success = false;
 
     create_nsdl_list_structure(_object_list);
@@ -280,14 +282,14 @@ bool M2MNsdlInterface::send_update_registration(const uint32_t lifetime)
             _update_id = sn_nsdl_update_registration(_nsdl_handle,
                                                      _endpoint->lifetime_ptr,
                                                      _endpoint->lifetime_len);
-            tr_debug("M2MNsdlInterface::send_update_registration - New lifetime value _update_id %d", _update_id);
+            tr_debug("M2MNsdlInterface::send_update_registration - New lifetime value _update_id %" PRId32, _update_id);
             success = _update_id != 0;
         }
     } else {
         if(_nsdl_handle) {
             _update_id = -1;
             _update_id = sn_nsdl_update_registration(_nsdl_handle, NULL, 0);
-            tr_debug("M2MNsdlInterface::send_update_registration - regular update- _update_id %d", _update_id);
+            tr_debug("M2MNsdlInterface::send_update_registration - regular update- _update_id %" PRId32, _update_id);
             success = _update_id != 0;
         }
     }
@@ -302,7 +304,7 @@ bool M2MNsdlInterface::send_unregister_message()
     if(_unregister_id == 0) {
        _unregister_id = -1;
        _unregister_id = sn_nsdl_unregister_endpoint(_nsdl_handle);
-       tr_debug("M2MNsdlInterface::send_unregister_message - unregister_id %d", _unregister_id);
+       tr_debug("M2MNsdlInterface::send_unregister_message - unregister_id %" PRId32, _unregister_id);
        success = _unregister_id != 0;
     }
     return success;
@@ -408,7 +410,7 @@ uint8_t M2MNsdlInterface::received_from_server_callback(struct nsdl_s * /*nsdl_h
                 _observer.registration_error(error);
             }
         } else if(coap_header->msg_id == _unregister_id || _unregister_id == -1) {
-            tr_debug("M2MNsdlInterface::received_from_server_callback - unregistration callback id:%d", _unregister_id);
+            tr_debug("M2MNsdlInterface::received_from_server_callback - unregistration callback id:%" PRId32, _unregister_id);
             if(coap_header->msg_code == COAP_MSG_CODE_RESPONSE_DELETED) {
                 _registration_timer->stop_timer();
                 if(_server) {
@@ -709,7 +711,9 @@ void M2MNsdlInterface::bootstrap_done_callback(sn_nsdl_oma_server_info_t *server
         // Bootstrap error inform to the application.
         _observer.bootstrap_error();
     }
-#endif //YOTTA_CFG_DISABLE_BOOTSTRAP_FEATURE
+#else //YOTTA_CFG_DISABLE_BOOTSTRAP_FEATURE
+    (void)server_info;
+#endif
 }
 
 bool M2MNsdlInterface::process_received_data(uint8_t *data,
