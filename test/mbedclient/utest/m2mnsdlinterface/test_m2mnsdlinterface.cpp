@@ -45,7 +45,7 @@ public:
         register_updated = true;
     }
 
-    void registration_error(uint8_t){
+    void registration_error(uint8_t, bool retry = false){
         register_error = true;
     }
 
@@ -239,9 +239,16 @@ void Test_M2MNsdlInterface::test_send_update_registration()
     nsdl->_nsdl_handle = (nsdl_s*)malloc(sizeof(1));
     CHECK(nsdl->send_update_registration(120) == true);
 
+    /* Update already in progress */
     common_stub::uint_value = 0;
-    CHECK(nsdl->send_update_registration(120) == false);
+    CHECK(nsdl->send_update_registration(120) == true);
 
+    /* Update lifetime value */
+    nsdl->_update_id = 0;
+    common_stub::uint_value = 1;
+    CHECK(nsdl->send_update_registration(100) == true);
+
+    /* Lifetime value is 0, don't change the existing lifetime value */
     nsdl->_update_id = 0;
     common_stub::uint_value = 1;
     CHECK(nsdl->send_update_registration(0) == true);
@@ -251,12 +258,13 @@ void Test_M2MNsdlInterface::test_send_update_registration()
 
 void Test_M2MNsdlInterface::test_send_unregister_message()
 {
+    nsdl->_update_id = 0;
     common_stub::uint_value = 22;
     CHECK(nsdl->send_unregister_message() == true);
 
+    /* Unreg already in progress */
     common_stub::uint_value = 0;
-    CHECK(nsdl->send_unregister_message() == false);
-
+    CHECK(nsdl->send_unregister_message() == true);
 }
 
 void Test_M2MNsdlInterface::test_memory_alloc()
@@ -461,12 +469,21 @@ void Test_M2MNsdlInterface::test_received_from_server_callback()
     observer->register_error = false;
     nsdl->_unregister_id = 8;
     coap_header->coap_status = COAP_STATUS_BUILDER_MESSAGE_SENDING_FAILED;
+    coap_header->msg_code = COAP_MSG_CODE_RESPONSE_BAD_REQUEST;
     nsdl->received_from_server_callback(NULL,coap_header,NULL);
     CHECK(observer->register_error == true);
 
     observer->register_error = false;
     nsdl->_unregister_id = 8;
     coap_header->coap_status = COAP_STATUS_PARSER_ERROR_IN_HEADER;
+    coap_header->msg_code = COAP_MSG_CODE_RESPONSE_METHOD_NOT_ALLOWED;
+    nsdl->received_from_server_callback(NULL,coap_header,NULL);
+    CHECK(observer->register_error == true);
+
+    observer->register_error = false;
+    nsdl->_unregister_id = 8;
+    coap_header->coap_status = COAP_STATUS_PARSER_ERROR_IN_HEADER;
+    coap_header->msg_code = COAP_MSG_CODE_RESPONSE_GATEWAY_TIMEOUT;
     nsdl->received_from_server_callback(NULL,coap_header,NULL);
     CHECK(observer->register_error == true);
 
