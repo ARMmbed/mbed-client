@@ -393,6 +393,7 @@ private:
     M2MSecurity                 *_security;
     uint8_t                     _retry_count;
     bool                        _reconnecting;
+    bool                        _retry_timer_expired;
 
    friend class Test_M2MInterfaceImpl;
 

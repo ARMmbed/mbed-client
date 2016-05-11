@@ -59,7 +59,8 @@ M2MInterfaceImpl::M2MInterfaceImpl(M2MInterfaceObserver& observer,
   _callback_handler(NULL),
   _security(NULL),
   _retry_count(0),
-  _reconnecting(false)
+  _reconnecting(false),
+  _retry_timer_expired(false)
 {
     M2MConnectionSecurity::SecurityMode sec_mode = M2MConnectionSecurity::DTLS;
     //Hack for now
@@ -383,8 +384,11 @@ void M2MInterfaceImpl::data_available(uint8_t* data,
 
 void M2MInterfaceImpl::socket_error(uint8_t error_code, bool retry)
 {
-    tr_debug("M2MInterfaceImpl::socket_error: %d, retry %d", error_code, retry);
-
+    tr_debug("M2MInterfaceImpl::socket_error: (%d), retry (%d), reconnecting (%d)", error_code, retry, _reconnecting);
+    if (!_retry_timer_expired && _reconnecting) {
+        tr_debug("M2MInterfaceImpl::socket_error - retry timer running - return");
+        return;
+    }
     M2MInterface::Error error = M2MInterface::ErrorNone;
     switch (error_code) {
     case M2MConnectionHandler::SSL_CONNECTION_ERROR:
@@ -418,6 +422,7 @@ void M2MInterfaceImpl::socket_error(uint8_t error_code, bool retry)
             _connection_handler->stop_listening();
             int retry_time = YOTTA_CFG_RECONNECTION_INTERVAL *
                     YOTTA_CFG_RECONNECTION_COUNT * _retry_count * 1000;
+            _retry_timer_expired = false;
             _retry_timer->start_timer(retry_time,
                                       M2MTimerObserver::RetryTimer);
             tr_debug("M2MInterfaceImpl::socket_error - reconnecting in %d(s), count %d/%d", retry_time / 1000,
@@ -483,6 +488,7 @@ void M2MInterfaceImpl::timer_expired(M2MTimerObserver::Type type)
         }
     }
     else if (M2MTimerObserver::RetryTimer == type) {
+        _retry_timer_expired = true;
         _listen_port = rand() % 65535 + 12345;
         _connection_handler->bind_connection(_listen_port);
         internal_event(STATE_REGISTER);
