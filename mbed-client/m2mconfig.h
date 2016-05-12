@@ -22,6 +22,18 @@
 #include "mbed-client/m2mstring.h"
 using namespace m2m;
 
+#ifndef YOTTA_CFG_RECONNECTION_COUNT
+#define YOTTA_CFG_RECONNECTION_COUNT 3
+#endif
+
+#ifndef YOTTA_CFG_RECONNECTION_INTERVAL
+#define YOTTA_CFG_RECONNECTION_INTERVAL 3
+#endif
+
+#ifndef YOTTA_CFG_TCP_KEEPALIVE_TIME
+#define YOTTA_CFG_TCP_KEEPALIVE_TIME 300
+#endif
+
 // This is valid for mbed-client-mbedtls
 // For other SSL implementation there
 // can be other
@@ -45,10 +57,11 @@ typedef uint32_t (*random_number_cb)(void) ;
 *                  a complement.
 */
 typedef struct mbedtls_entropy {
-int     (*entropy_source_ptr)(void *, unsigned char *,size_t , size_t *);
-void    *p_source;
-size_t  threshold;
-int     strong;
+    int     (*entropy_source_ptr)(void *, unsigned char *,size_t , size_t *);
+    void    *p_source;
+    size_t  threshold;
+    int     strong;
 }entropy_cb;
+
 
 #endif // M2MCONFIG_H

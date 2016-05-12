@@ -19,6 +19,7 @@
 #include "mbed-client/m2minterface.h"
 #include "mbed-client/m2mserver.h"
 #include "mbed-client/m2mconnectionobserver.h"
+#include "mbed-client/m2mconnectionsecurity.h"
 #include "include/m2mnsdlobserver.h"
 #include "mbed-client/m2mtimerobserver.h"
 
@@ -167,7 +168,7 @@ protected: // From M2MNsdlObserver
 
     virtual void registration_updated(const M2MServer &server_object);
 
-    virtual void registration_error(uint8_t error_code);
+    virtual void registration_error(uint8_t error_code, bool retry = false);
 
     virtual void client_unregistered();
 
@@ -185,7 +186,7 @@ protected: // From M2MConnectionObserver
                                 uint16_t data_size,
                                 const M2MConnectionObserver::SocketAddress &address);
 
-    virtual void socket_error(uint8_t error_code);
+    virtual void socket_error(uint8_t error_code, bool retry = true);
 
     virtual void address_ready(const M2MConnectionObserver::SocketAddress &address,
                                M2MConnectionObserver::ServerType server_type,
@@ -380,12 +381,19 @@ private:
     BindingMode                 _binding_mode;
     String                      _context_address;
     uint16_t                    _listen_port;
+    uint16_t                    _server_port;
+    String                      _server_ip_address;
     M2MSecurity                 *_register_server; //TODO: to be the list not owned
     bool                        _event_ignored;
     bool                        _register_ongoing;
     bool                        _update_register_ongoing;
     M2MTimer                    *_queue_sleep_timer;
+    M2MTimer                    *_retry_timer;
     callback_handler            _callback_handler;
+    M2MSecurity                 *_security;
+    uint8_t                     _retry_count;
+    bool                        _reconnecting;
+    bool                        _retry_timer_expired;
 
    friend class Test_M2MInterfaceImpl;
 

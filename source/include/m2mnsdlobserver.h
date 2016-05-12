@@ -59,8 +59,9 @@ public :
     * @brief Informs that some error occured during
     * registration.
     * @param error_code, Error code for registration error
+    * @param retry, Indicates state machine to re-establish connection
     */
-    virtual void registration_error(uint8_t error_code) = 0;
+    virtual void registration_error(uint8_t error_code, bool retry = false) = 0;
 
     /**
     * @brief Informs that client is unregistered successfully.
