@@ -19,7 +19,11 @@ uint32_t m2mresource_stub::int_value;
 uint8_t* m2mresource_stub::delayed_token;
 uint8_t m2mresource_stub::delayed_token_len;
 bool m2mresource_stub::bool_value;
-M2MResourceInstanceList m2mresource_stub::list;
+
+// The statically initialized list must be bigh enough to cater 
+// for all the tests, or the utest framework will complain for memory leak.
+M2MResourceInstanceList m2mresource_stub::list(12);
+
 M2MResourceInstance *m2mresource_stub::instance;
 sn_coap_hdr_s *m2mresource_stub::header;
 void m2mresource_stub::clear()

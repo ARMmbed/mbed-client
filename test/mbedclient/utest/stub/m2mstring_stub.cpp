@@ -36,7 +36,6 @@ char* String::strdup(const char* s)
 String::String()
     : p( strdup("") )
 {
-    _return_value = '\0';
 }
 
 String::~String()
@@ -55,13 +54,11 @@ String::String(const String& s)
         size_      = s.size_;
         memcpy(p, s.p, size_ + 1);
     }
-    _return_value = '\0';
 }
 
 String::String(const char* s)
     : p(strdup(s))
 {
-    _return_value = '\0';
 }
 
 String& String::operator=(const char* s)
@@ -179,16 +176,6 @@ String String::substr(const size_type pos, size_type length) const
 
 
 // checked access, accessing the NUL at end is allowed
-char& String::at(const size_type i)
-{
-    if ( i <= strlen(p) ) {
-        _return_value = p[i];
-    } else {
-        _return_value = '\0';
-    }
-    return _return_value;
-}
-
 char String::at(const size_type i) const
 {
     if ( i <= strlen(p) ) {
