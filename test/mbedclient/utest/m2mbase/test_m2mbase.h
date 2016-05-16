@@ -114,6 +114,8 @@ public:
     void test_set_max_age();
 
     void test_max_age();
+
+    void test_is_under_observation();
 };
 
 

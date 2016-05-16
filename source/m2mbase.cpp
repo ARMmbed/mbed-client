@@ -43,6 +43,7 @@ M2MBase& M2MBase::operator=(const M2MBase& other)
         _register_uri = other._register_uri;
         _uri_path = other._uri_path;
         _max_age = other._max_age;
+        _is_under_observation = other._is_under_observation;
 
         free(_token);
         _token = NULL;
@@ -79,7 +80,8 @@ M2MBase::M2MBase(const M2MBase& other) :
     _token_length(other._token_length),
     _register_uri(other._register_uri),
     _uri_path(other._uri_path),
-    _max_age(other._max_age)
+    _max_age(other._max_age),
+    _is_under_observation(other._is_under_observation)
 {
 
     if(other._token) {
@@ -107,7 +109,8 @@ M2MBase::M2MBase(const String & resource_name,
   _token_length(0),
   _register_uri(true),
   _uri_path(""),
-  _max_age(0)
+  _max_age(0),
+  _is_under_observation(false)
 {
     if(is_integer(_name) && _name.size() <= MAX_ALLOWED_STRING_LENGTH) {
         _name_id = strtoul(_name.c_str(), NULL, 10);
@@ -163,7 +166,7 @@ void M2MBase::add_observation_level(M2MBase::Observation obs_level)
 
 void M2MBase::remove_observation_level(M2MBase::Observation obs_level)
 {
-    _observation_level = (M2MBase::Observation)(_observation_level ^ obs_level);
+    _observation_level = (M2MBase::Observation)(_observation_level & ~obs_level);
 }
 
 void M2MBase::set_under_observation(bool observed,
@@ -172,6 +175,7 @@ void M2MBase::set_under_observation(bool observed,
 
     tr_debug("M2MBase::set_under_observation - observed: %d", observed);
     tr_debug("M2MBase::set_under_observation - base_type: %d", _base_type);
+    _is_under_observation = observed;
     _observation_handler = handler;
     if(handler) {
         if (_base_type != M2MBase::ResourceInstance) {
@@ -293,16 +297,16 @@ uint32_t M2MBase::max_age() const
 
 bool M2MBase::handle_observation_attribute(char *&query)
 {
-    tr_debug("M2MBase::handle_observation_attribute");
+    tr_debug("M2MBase::handle_observation_attribute - under observation(%d)", is_under_observation());
     bool success = false;
     if(_report_handler) {
         success = _report_handler->parse_notification_attribute(query,_base_type);
         if (success) {
-            if ((_report_handler->attribute_flags() & M2MReportHandler::Cancel) == 0) {
+            if (is_under_observation()) {
                 _report_handler->set_under_observation(true);
-            } else {
-                _report_handler->set_under_observation(false);
             }
+         } else {
+            _report_handler->set_default_values();
         }
     }
     return success;
@@ -311,7 +315,7 @@ bool M2MBase::handle_observation_attribute(char *&query)
 void M2MBase::observation_to_be_sent(m2m::Vector<uint16_t> changed_instance_ids, bool send_object)
 {
     //TODO: Move this to M2MResourceInstance
-    if(_observation_handler) {        
+    if(_observation_handler) {
        _observation_number++;
        _observation_handler->observation_to_be_sent(this,
                                                     _observation_number,
@@ -437,8 +441,12 @@ void M2MBase::set_uri_path(const String &path)
     _uri_path = path;
 }
 
-
 const String& M2MBase::uri_path() const
 {
     return _uri_path;
+}
+
+bool M2MBase::is_under_observation() const
+{
+    return _is_under_observation;
 }

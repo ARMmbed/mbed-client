@@ -38,7 +38,7 @@ public:
 
     }
 
-    void registration_error(uint8_t){
+    void registration_error(uint8_t, bool retry = false){
         register_error = true;
     }
 

@@ -34,7 +34,8 @@ public:
         PMinTimer,
         PMaxTimer,
         Dtls,
-        QueueSleep
+        QueueSleep,
+        RetryTimer
     }Type;
 
     /**

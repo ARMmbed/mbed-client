@@ -308,3 +308,8 @@ const String& M2MBase::uri_path() const
 {
     return *m2mbase_stub::string_value;
 }
+
+bool M2MBase::is_under_observation() const
+{
+    return m2mbase_stub::bool_value;
+}

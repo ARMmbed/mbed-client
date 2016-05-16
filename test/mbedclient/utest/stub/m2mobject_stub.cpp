@@ -18,7 +18,11 @@
 u_int16_t m2mobject_stub::int_value;
 bool m2mobject_stub::bool_value;
 M2MObjectInstance* m2mobject_stub::inst;
-M2MObjectInstanceList m2mobject_stub::instance_list;
+
+// The statically initialized object list must be bigh enough to cater 
+// for all the tests, or the utest framework will complain for memory leak.
+M2MObjectInstanceList m2mobject_stub::instance_list(12);
+
 M2MBase::BaseType m2mobject_stub::base_type;
 sn_coap_hdr_s *m2mobject_stub::header;
 

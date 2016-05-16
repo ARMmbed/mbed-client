@@ -197,17 +197,15 @@ bool M2MResource::delayed_response() const
 
 bool M2MResource::handle_observation_attribute(char *&query)
 {
-    tr_debug("M2MResource::handle_observation_attribute");
+    tr_debug("M2MResource::handle_observation_attribute - is_under_observation(%d)", is_under_observation());
     bool success = false;
     M2MReportHandler *handler = M2MBase::report_handler();
     if (handler) {
         success = handler->parse_notification_attribute(query,
                 M2MBase::base_type(), _resource_type);
-        if (success) {            
-            if ((handler->attribute_flags() & M2MReportHandler::Cancel) == 0) {
+        if (success) {
+            if (is_under_observation()) {
                 handler->set_under_observation(true);
-            } else {
-                handler->set_under_observation(false);
             }
         }
         else {
@@ -220,7 +218,7 @@ bool M2MResource::handle_observation_attribute(char *&query)
                 it = _resource_instance_list.begin();
                 for ( ; it != _resource_instance_list.end(); it++ ) {
                     M2MReportHandler *report_handler = (*it)->report_handler();
-                    if(report_handler && M2MBase::None != observation_level()) {
+                    if(report_handler && is_under_observation()) {
                         report_handler->set_notification_trigger();
                     }
                 }

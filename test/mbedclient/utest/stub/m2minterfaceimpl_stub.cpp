@@ -94,7 +94,7 @@ void M2MInterfaceImpl::client_registered(M2MServer*)
 
 }
 
-void M2MInterfaceImpl::registration_error(uint8_t)
+void M2MInterfaceImpl::registration_error(uint8_t, bool)
 {
 
 }
@@ -126,7 +126,7 @@ void M2MInterfaceImpl::data_available(uint8_t*,
 
 }
 
-void M2MInterfaceImpl::socket_error(uint8_t)
+void M2MInterfaceImpl::socket_error(uint8_t, bool)
 {
 
 }

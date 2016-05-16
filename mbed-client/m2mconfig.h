@@ -22,22 +22,34 @@
 #include "mbed-client/m2mstring.h"
 using namespace m2m;
 
+#ifndef YOTTA_CFG_RECONNECTION_COUNT
+#define YOTTA_CFG_RECONNECTION_COUNT 3
+#endif
+
+#ifndef YOTTA_CFG_RECONNECTION_INTERVAL
+#define YOTTA_CFG_RECONNECTION_INTERVAL 3
+#endif
+
+#ifndef YOTTA_CFG_TCP_KEEPALIVE_TIME
+#define YOTTA_CFG_TCP_KEEPALIVE_TIME 300
+#endif
+
 // This is valid for mbed-client-mbedtls
 // For other SSL implementation there
 // can be other
 
 /*
-*\brief Callback function for Random number
-* required by mbed-client-mbedtls module
+*\brief A callback function for Random number
+* required by the mbed-client-mbedtls module.
 */
 typedef uint32_t (*random_number_cb)(void) ;
 
 /*
-*\brief Entropy structure for mbedtls entropy source
-* \param entropy_source_ptr  Entropy function
-* \param p_source  Function data
+*\brief An entropy structure for mbedtls entropy source.
+* \param entropy_source_ptr Entropy function.
+* \param p_source  Function data.
 * \param threshold Minimum required from source before entropy is released
-*                  ( with mbedtls_entropy_func() ) (in bytes)
+*                  (with mbedtls_entropy_func()) (in bytes).
 * \param strong    MBEDTLS_ENTROPY_SOURCE_STRONG = 1 or
 *                  MBEDTSL_ENTROPY_SOURCE_WEAK = 0.
 *                  At least one strong source needs to be added.
@@ -45,10 +57,11 @@ typedef uint32_t (*random_number_cb)(void) ;
 *                  a complement.
 */
 typedef struct mbedtls_entropy {
-int     (*entropy_source_ptr)(void *, unsigned char *,size_t , size_t *);
-void    *p_source;
-size_t  threshold;
-int     strong;
+    int     (*entropy_source_ptr)(void *, unsigned char *,size_t , size_t *);
+    void    *p_source;
+    size_t  threshold;
+    int     strong;
 }entropy_cb;
+
 
 #endif // M2MCONFIG_H
