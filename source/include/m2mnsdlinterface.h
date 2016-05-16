@@ -320,10 +320,10 @@ private:
     sn_nsdl_addr_s                     _sn_nsdl_address;
     nsdl_s                            *_nsdl_handle;
     uint32_t                           _counter_for_nsdl;
-    int32_t                            _register_id;
-    int32_t                            _unregister_id;
-    int32_t                            _update_id;
     uint16_t                           _bootstrap_id;
+    bool                               _register_ongoing;
+    bool                               _unregister_ongoing;
+    bool                               _update_register_ongoing;
 
 friend class Test_M2MNsdlInterface;
 
