@@ -91,7 +91,6 @@ struct nsdl_s {
     uint8_t oma_bs_address_len;                                                 /* Bootstrap address length */
     uint16_t oma_bs_port;                                                       /* Bootstrap port */
     void (*sn_nsdl_oma_bs_done_cb)(sn_nsdl_oma_server_info_t *server_info_ptr); /* Callback to inform application when bootstrap is done */
-
     sn_nsdl_ep_parameters_s *ep_information_ptr;    // Endpoint parameters, Name, Domain etc..
     sn_nsdl_oma_server_info_t *nsp_address_ptr;     // NSP server address information
     uint8_t sn_nsdl_endpoint_registered;
@@ -103,6 +102,11 @@ struct nsdl_s {
     void (*sn_nsdl_free)(void *);
     uint8_t (*sn_nsdl_tx_callback)(struct nsdl_s *, sn_nsdl_capab_e , uint8_t *, uint16_t, sn_nsdl_addr_s *);
     uint8_t (*sn_nsdl_rx_callback)(struct nsdl_s *, sn_coap_hdr_s *, sn_nsdl_addr_s *);
+    void (*sn_nsdl_oma_bs_done_cb_handle)(sn_nsdl_oma_server_info_t *server_info_ptr,
+                                          struct nsdl_s *handle); /* Callback to inform application when bootstrap is done with nsdl handle */
+    uint16_t update_register_msg_id;
+    uint16_t register_msg_len;
+    uint16_t update_register_msg_len;
 };
 
 Test_M2MNsdlInterface::Test_M2MNsdlInterface()
@@ -244,12 +248,12 @@ void Test_M2MNsdlInterface::test_send_update_registration()
     CHECK(nsdl->send_update_registration(120) == true);
 
     /* Update lifetime value */
-    nsdl->_update_id = 0;
+    nsdl->_update_register_ongoing = false;
     common_stub::uint_value = 1;
     CHECK(nsdl->send_update_registration(100) == true);
 
     /* Lifetime value is 0, don't change the existing lifetime value */
-    nsdl->_update_id = 0;
+    nsdl->_update_register_ongoing = false;
     common_stub::uint_value = 1;
     CHECK(nsdl->send_update_registration(0) == true);
 
@@ -258,7 +262,6 @@ void Test_M2MNsdlInterface::test_send_update_registration()
 
 void Test_M2MNsdlInterface::test_send_unregister_message()
 {
-    nsdl->_update_id = 0;
     common_stub::uint_value = 22;
     CHECK(nsdl->send_unregister_message() == true);
 
@@ -298,6 +301,9 @@ void Test_M2MNsdlInterface::test_send_to_server_callback()
 
 void Test_M2MNsdlInterface::test_received_from_server_callback()
 {
+    nsdl_s* handle = (nsdl_s*)malloc(sizeof(nsdl_s));
+    memset(handle,0,sizeof(nsdl_s));
+
     sn_coap_hdr_s *coap_header = (sn_coap_hdr_s *)malloc(sizeof(sn_coap_hdr_s));
     memset(coap_header, 0, sizeof(sn_coap_hdr_s));
     coap_header->msg_code = COAP_MSG_CODE_RESPONSE_CREATED;
@@ -316,7 +322,7 @@ void Test_M2MNsdlInterface::test_received_from_server_callback()
 
     observer->data_processed = false;
     observer->registered = false;
-    nsdl->received_from_server_callback(NULL,coap_header,NULL);
+    nsdl->received_from_server_callback(handle,coap_header,NULL);
     CHECK(observer->data_processed == true);
     CHECK(observer->registered == true);
 
@@ -333,7 +339,7 @@ void Test_M2MNsdlInterface::test_received_from_server_callback()
 
     observer->data_processed = false;
     observer->registered = false;
-    nsdl->received_from_server_callback(NULL,coap_header,NULL);
+    nsdl->received_from_server_callback(handle,coap_header,NULL);
     CHECK(observer->data_processed == true);
     CHECK(observer->registered == true);
 
@@ -357,7 +363,7 @@ void Test_M2MNsdlInterface::test_received_from_server_callback()
     observer->data_processed = false;
     observer->registered = false;
 
-    nsdl->received_from_server_callback(NULL,coap_header,NULL);
+    nsdl->received_from_server_callback(handle,coap_header,NULL);
     CHECK(observer->data_processed == true);
     CHECK(observer->registered == true);
     free(nsdl->_endpoint->lifetime_ptr);
@@ -369,7 +375,7 @@ void Test_M2MNsdlInterface::test_received_from_server_callback()
     nsdl->_endpoint->lifetime_len = (uint8_t)sizeof(big_life);
     observer->data_processed = false;
     observer->registered = false;
-    nsdl->received_from_server_callback(NULL,coap_header,NULL);
+    nsdl->received_from_server_callback(handle,coap_header,NULL);
     CHECK(observer->data_processed == true);
     CHECK(observer->registered == true);
 
@@ -384,7 +390,7 @@ void Test_M2MNsdlInterface::test_received_from_server_callback()
     memcpy(nsdl->_endpoint->lifetime_ptr,less_life,sizeof(less_life));
     nsdl->_endpoint->lifetime_len = (uint8_t)sizeof(less_life);
 
-    nsdl->received_from_server_callback(NULL,coap_header,NULL);
+    nsdl->received_from_server_callback(handle,coap_header,NULL);
     CHECK(observer->data_processed == true);
     CHECK(observer->registered == true);
 
@@ -394,128 +400,127 @@ void Test_M2MNsdlInterface::test_received_from_server_callback()
     observer->register_error = false;
 
     coap_header->msg_code = COAP_MSG_CODE_RESPONSE_BAD_REQUEST;
-    nsdl->received_from_server_callback(NULL,coap_header,NULL);
+    nsdl->received_from_server_callback(handle,coap_header,NULL);
     CHECK(observer->data_processed == true);
     CHECK(observer->register_error == true);
 
     coap_header->msg_code = COAP_MSG_CODE_RESPONSE_BAD_OPTION;
-    nsdl->received_from_server_callback(NULL,coap_header,NULL);
+    nsdl->received_from_server_callback(handle,coap_header,NULL);
     CHECK(observer->data_processed == true);
     CHECK(observer->register_error == true);
 
     coap_header->msg_code = COAP_MSG_CODE_RESPONSE_REQUEST_ENTITY_INCOMPLETE;
-    nsdl->received_from_server_callback(NULL,coap_header,NULL);
+    nsdl->received_from_server_callback(handle,coap_header,NULL);
     CHECK(observer->data_processed == true);
     CHECK(observer->register_error == true);
 
     coap_header->msg_code = COAP_MSG_CODE_RESPONSE_PRECONDITION_FAILED;
-    nsdl->received_from_server_callback(NULL,coap_header,NULL);
+    nsdl->received_from_server_callback(handle,coap_header,NULL);
     CHECK(observer->data_processed == true);
     CHECK(observer->register_error == true);
 
     coap_header->msg_code = COAP_MSG_CODE_RESPONSE_REQUEST_ENTITY_TOO_LARGE;
-    nsdl->received_from_server_callback(NULL,coap_header,NULL);
+    nsdl->received_from_server_callback(handle,coap_header,NULL);
     CHECK(observer->data_processed == true);
     CHECK(observer->register_error == true);
 
     coap_header->msg_code = COAP_MSG_CODE_RESPONSE_UNSUPPORTED_CONTENT_FORMAT;
-    nsdl->received_from_server_callback(NULL,coap_header,NULL);
+    nsdl->received_from_server_callback(handle,coap_header,NULL);
     CHECK(observer->data_processed == true);
     CHECK(observer->register_error == true);
 
     coap_header->msg_code = COAP_MSG_CODE_RESPONSE_UNAUTHORIZED;
-    nsdl->received_from_server_callback(NULL,coap_header,NULL);
+    nsdl->received_from_server_callback(handle,coap_header,NULL);
     CHECK(observer->data_processed == true);
     CHECK(observer->register_error == true);
 
     coap_header->msg_code = COAP_MSG_CODE_RESPONSE_FORBIDDEN;
-    nsdl->received_from_server_callback(NULL,coap_header,NULL);
+    nsdl->received_from_server_callback(handle,coap_header,NULL);
     CHECK(observer->data_processed == true);
     CHECK(observer->register_error == true);
 
     coap_header->msg_code = COAP_MSG_CODE_RESPONSE_NOT_FOUND;
-    nsdl->received_from_server_callback(NULL,coap_header,NULL);
+    nsdl->received_from_server_callback(handle,coap_header,NULL);
     CHECK(observer->data_processed == true);
     CHECK(observer->register_error == true);
 
     coap_header->msg_code = COAP_MSG_CODE_RESPONSE_METHOD_NOT_ALLOWED;
-    nsdl->received_from_server_callback(NULL,coap_header,NULL);
+    nsdl->received_from_server_callback(handle,coap_header,NULL);
     CHECK(observer->data_processed == true);
     CHECK(observer->register_error == true);
 
     coap_header->msg_code = COAP_MSG_CODE_RESPONSE_BAD_GATEWAY;
     coap_header->coap_status = COAP_STATUS_BUILDER_MESSAGE_SENDING_FAILED;
-    nsdl->received_from_server_callback(NULL,coap_header,NULL);
+    nsdl->received_from_server_callback(handle,coap_header,NULL);
     CHECK(observer->data_processed == true);
     CHECK(observer->register_error == true);
 
-    //msg_id == _unregister_id
+
     coap_header->msg_id = 8;
-    nsdl->_unregister_id = 8;
+    handle->unregister_msg_id = 8;
 
     coap_header->msg_code = COAP_MSG_CODE_RESPONSE_DELETED;
     observer->register_error = false;
     nsdl->_server = new M2MServer();
-    nsdl->received_from_server_callback(NULL,coap_header,NULL);
+    nsdl->received_from_server_callback(handle,coap_header,NULL);
     CHECK(observer->unregistered == true);
 
     observer->register_error = false;
-    nsdl->_unregister_id = 8;
+    handle->unregister_msg_id = 8;
     coap_header->msg_code = COAP_MSG_CODE_RESPONSE_CREATED;
 
-    nsdl->received_from_server_callback(NULL,coap_header,NULL);
+    nsdl->received_from_server_callback(handle,coap_header,NULL);
     CHECK(observer->register_error == true);
 
     observer->register_error = false;
-    nsdl->_unregister_id = 8;
+    handle->unregister_msg_id = 8;
     coap_header->coap_status = COAP_STATUS_BUILDER_MESSAGE_SENDING_FAILED;
     coap_header->msg_code = COAP_MSG_CODE_RESPONSE_BAD_REQUEST;
-    nsdl->received_from_server_callback(NULL,coap_header,NULL);
+    nsdl->received_from_server_callback(handle,coap_header,NULL);
     CHECK(observer->register_error == true);
 
     observer->register_error = false;
-    nsdl->_unregister_id = 8;
+    handle->unregister_msg_id = 8;
     coap_header->coap_status = COAP_STATUS_PARSER_ERROR_IN_HEADER;
     coap_header->msg_code = COAP_MSG_CODE_RESPONSE_METHOD_NOT_ALLOWED;
-    nsdl->received_from_server_callback(NULL,coap_header,NULL);
+    nsdl->received_from_server_callback(handle,coap_header,NULL);
     CHECK(observer->register_error == true);
 
     observer->register_error = false;
-    nsdl->_unregister_id = 8;
+    handle->unregister_msg_id = 8;
     coap_header->coap_status = COAP_STATUS_PARSER_ERROR_IN_HEADER;
     coap_header->msg_code = COAP_MSG_CODE_RESPONSE_GATEWAY_TIMEOUT;
-    nsdl->received_from_server_callback(NULL,coap_header,NULL);
+    nsdl->received_from_server_callback(handle,coap_header,NULL);
     CHECK(observer->register_error == true);
 
+    handle->unregister_msg_id = 0;
     observer->boot_error = false;
     nsdl->_bootstrap_id = 8;
     coap_header->coap_status = COAP_STATUS_BUILDER_MESSAGE_SENDING_FAILED;
-    nsdl->received_from_server_callback(NULL,coap_header,NULL);
+    nsdl->received_from_server_callback(handle,coap_header,NULL);
     CHECK(observer->boot_error == true);
 
     //_update_id == msg_id
-    nsdl->_update_id = 10;
+    handle->update_register_msg_id = 10;
     coap_header->msg_id = 10;
     coap_header->msg_code = COAP_MSG_CODE_RESPONSE_CHANGED;
-    nsdl->received_from_server_callback(NULL,coap_header,NULL);
-    CHECK(nsdl->_update_id == 0);
+    nsdl->received_from_server_callback(handle,coap_header,NULL);
+    CHECK(nsdl->_update_register_ongoing == false);
     CHECK(observer->register_updated == true);
 
-    nsdl->_update_id = 10;
     coap_header->msg_id = 10;
     coap_header->msg_code = COAP_MSG_CODE_RESPONSE_FORBIDDEN;
     coap_header->coap_status = COAP_STATUS_OK;
-    nsdl->received_from_server_callback(NULL,coap_header,NULL);
-    CHECK(nsdl->_update_id == 0);
+    nsdl->received_from_server_callback(handle,coap_header,NULL);
+    CHECK(nsdl->_register_ongoing == true);
     CHECK(observer->register_error == true);
 
     coap_header->msg_id = 11;
-    CHECK( 0== nsdl->received_from_server_callback(NULL,coap_header,NULL) );
+    CHECK( 0== nsdl->received_from_server_callback(handle,coap_header,NULL) );
 
-    //msg_id is unique
-    nsdl->_update_id = 0;
-    nsdl->_register_id = 0;
-    nsdl->_unregister_id = 0;
+    handle->update_register_msg_id = 0;
+    handle->register_msg_id = 0;
+    handle->unregister_msg_id = 0;
     coap_header->msg_id = 10;
     coap_header->msg_code = COAP_MSG_CODE_REQUEST_POST;
 
@@ -524,7 +529,7 @@ void Test_M2MNsdlInterface::test_received_from_server_callback()
     coap_header->uri_path_ptr = object;
     coap_header->uri_path_len = sizeof(object);
 
-    CHECK(0== nsdl->received_from_server_callback(NULL,coap_header,NULL));
+    CHECK(0== nsdl->received_from_server_callback(handle,coap_header,NULL));
 
     uint8_t object_instance[] = {"name/0"};
 
@@ -533,7 +538,7 @@ void Test_M2MNsdlInterface::test_received_from_server_callback()
 
     coap_header->payload_ptr = (uint8_t*)malloc(1);
     m2mobjectinstance_stub::bool_value = true;
-    CHECK(0== nsdl->received_from_server_callback(NULL,coap_header,NULL));
+    CHECK(0== nsdl->received_from_server_callback(handle,coap_header,NULL));
 
     M2MObject *obj = new M2MObject("name");
 
@@ -550,21 +555,20 @@ void Test_M2MNsdlInterface::test_received_from_server_callback()
     memset(m2mobjectinstance_stub::header, 0, sizeof(sn_coap_hdr_s));
     m2mobjectinstance_stub::header->msg_code = COAP_MSG_CODE_RESPONSE_BAD_REQUEST;
 
-    CHECK(0== nsdl->received_from_server_callback(NULL,coap_header,NULL));
-
+    CHECK(0== nsdl->received_from_server_callback(handle,coap_header,NULL));
     m2mobjectinstance_stub::header = NULL;
 
     m2mobjectinstance_stub::header =  (sn_coap_hdr_s *)malloc(sizeof(sn_coap_hdr_s));
     memset(m2mobjectinstance_stub::header, 0, sizeof(sn_coap_hdr_s));
 
     m2mobjectinstance_stub::header->msg_code = COAP_MSG_CODE_RESPONSE_CREATED;
-    CHECK(0== nsdl->received_from_server_callback(NULL,coap_header,NULL));
+    CHECK(0== nsdl->received_from_server_callback(handle,coap_header,NULL));
 
 
     free(coap_header->payload_ptr);
     coap_header->payload_ptr = NULL;
 
-    CHECK(0== nsdl->received_from_server_callback(NULL,coap_header,NULL));
+    CHECK(0== nsdl->received_from_server_callback(handle,coap_header,NULL));
 
     delete m2mobject_stub::inst;
     delete m2mbase_stub::string_value;
@@ -592,7 +596,7 @@ void Test_M2MNsdlInterface::test_received_from_server_callback()
     m2mobject_stub::header = (sn_coap_hdr_s*) malloc(sizeof(sn_coap_hdr_s));
     memset(m2mobject_stub::header,0,sizeof(sn_coap_hdr_s));
 
-    CHECK(0== nsdl->received_from_server_callback(NULL,coap_header,NULL));
+    CHECK(0== nsdl->received_from_server_callback(handle,coap_header,NULL));
 
     delete m2mobject_stub::inst;
     delete m2mbase_stub::string_value;
@@ -607,9 +611,9 @@ void Test_M2MNsdlInterface::test_received_from_server_callback()
     coap_header->uri_path_ptr = resource;
     coap_header->uri_path_len = sizeof(resource);
 
-    CHECK(0== nsdl->received_from_server_callback(NULL,coap_header,NULL));
-
+    CHECK(0== nsdl->received_from_server_callback(handle,coap_header,NULL));
     free(coap_header);
+    free(handle);
 }
 
 void Test_M2MNsdlInterface::test_resource_callback()

@@ -255,6 +255,7 @@ bool M2MNsdlInterface::send_register_message(uint8_t* address,
     bool success = false;
     if(set_NSP_address(_nsdl_handle,address, port, address_type) == 0) {
         if(!_register_ongoing) {
+            _register_ongoing = true;
             success = sn_nsdl_register_endpoint(_nsdl_handle,_endpoint) != 0;
         }
     }
@@ -287,6 +288,7 @@ bool M2MNsdlInterface::send_update_registration(const uint32_t lifetime)
         if(_nsdl_handle &&
            _endpoint && _endpoint->lifetime_ptr) {
             tr_debug("M2MNsdlInterface::send_update_registration - new lifetime value");
+            _update_register_ongoing = true;
             success = sn_nsdl_update_registration(_nsdl_handle,
                                                   _endpoint->lifetime_ptr,
                                                   _endpoint->lifetime_len) != 0;
@@ -294,6 +296,7 @@ bool M2MNsdlInterface::send_update_registration(const uint32_t lifetime)
     } else {
         if(_nsdl_handle) {
             tr_debug("M2MNsdlInterface::send_update_registration - regular update");
+            _update_register_ongoing = true;
             success = sn_nsdl_update_registration(_nsdl_handle, NULL, 0) != 0;
         }
     }
@@ -309,8 +312,8 @@ bool M2MNsdlInterface::send_unregister_message()
     }
 
     bool success = false;
-    success = sn_nsdl_unregister_endpoint(_nsdl_handle) != 0;
     _unregister_ongoing = true;
+    success = sn_nsdl_unregister_endpoint(_nsdl_handle) != 0;
     return success;
 }
 
@@ -359,7 +362,7 @@ uint8_t M2MNsdlInterface::received_from_server_callback(struct nsdl_s * nsdl_han
     tr_debug("M2MNsdlInterface::received_from_server_callback()");
     _observer.coap_data_processed();
     uint8_t value = 0;
-    if(coap_header) {
+    if(nsdl_handle && coap_header) {
         if(coap_header->msg_id == nsdl_handle->register_msg_id) {
             _register_ongoing = false;
             if(coap_header->msg_code == COAP_MSG_CODE_RESPONSE_CREATED) {
@@ -436,8 +439,8 @@ uint8_t M2MNsdlInterface::received_from_server_callback(struct nsdl_s * nsdl_han
             } else {
                 tr_error("M2MNsdlInterface::received_from_server_callback - registration_updated failed %d", coap_header->msg_code);
                 _registration_timer->stop_timer();
-                sn_nsdl_register_endpoint(_nsdl_handle,_endpoint);
                 _register_ongoing = true;
+                sn_nsdl_register_endpoint(_nsdl_handle,_endpoint);
             }
         }
 #ifndef YOTTA_CFG_DISABLE_BOOTSTRAP_FEATURE
