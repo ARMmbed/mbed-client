@@ -20,6 +20,7 @@ void* nsdlaccesshelper_stub::void_value;
 uint8_t nsdlaccesshelper_stub::int_value;
 
 M2MNsdlInterface  *__nsdl_interface= NULL;
+M2MConnectionHandler *__connection_handler = NULL;
 #ifdef USE_LINUX
 M2MTimerImpl  *__timer_impl = NULL;
 M2MConnectionHandler *__connection_impl = NULL;
@@ -74,5 +75,13 @@ return nsdlaccesshelper_stub::void_value;
 }
 
 void __socket_free(void *, void *)
+{
+}
+
+void __mutex_claim()
+{
+}
+
+void __mutex_release()
 {
 }

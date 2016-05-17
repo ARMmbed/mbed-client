@@ -80,3 +80,15 @@ int M2MConnectionHandler::send_to_socket(const unsigned char *, size_t ){
 int M2MConnectionHandler::receive_from_socket(unsigned char *, size_t){
     return m2mconnectionhandler_stub::int_value;
 }
+
+void M2MConnectionHandler::set_platform_network_handler(void *)
+{
+}
+
+void M2MConnectionHandler::claim_mutex()
+{
+}
+
+void M2MConnectionHandler::release_mutex()
+{
+}

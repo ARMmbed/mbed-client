@@ -15,10 +15,11 @@
  */
 #ifndef NSDL_ACCESS_HELPER_H
 #define NSDL_ACCESS_HELPER_H
-
+#include "mbed-client/m2mconnectionhandler.h"
 #include "include/m2mnsdlinterface.h"
 
 extern M2MNsdlInterface  *__nsdl_interface;
+extern M2MConnectionHandler *__connection_handler;
 
 #ifdef __cplusplus
 extern "C" {
@@ -41,6 +42,8 @@ uint8_t __nsdl_c_received_from_server(struct nsdl_s * nsdl_handle,
 void __nsdl_c_bootstrap_done(sn_nsdl_oma_server_info_t *server_info_ptr);
 void *__socket_malloc( void * context, size_t size);
 void __socket_free(void * context, void * ptr);
+void __mutex_claim();
+void __mutex_release();
 
 #ifdef __cplusplus
 }

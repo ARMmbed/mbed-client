@@ -72,6 +72,11 @@ void M2MInterfaceImpl::set_queue_sleep_handler(callback_handler)
 
 }
 
+void M2MInterfaceImpl::set_platform_network_handler(void *)
+{
+
+}
+
 void M2MInterfaceImpl::set_random_number_callback(random_number_cb)
 {
 

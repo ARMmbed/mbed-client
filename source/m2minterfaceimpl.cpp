@@ -20,6 +20,7 @@
 #include "mbed-client/m2mconnectionhandler.h"
 #include "mbed-client/m2mconnectionsecurity.h"
 #include "include/m2mnsdlinterface.h"
+#include "include/nsdlaccesshelper.h"
 #include "mbed-client/m2msecurity.h"
 #include "mbed-client/m2mconstants.h"
 #include "mbed-client/m2mtimer.h"
@@ -83,6 +84,7 @@ M2MInterfaceImpl::M2MInterfaceImpl(M2MInterfaceObserver& observer,
     _security_connection = new M2MConnectionSecurity(sec_mode);
     //Here we must use TCP still
     _connection_handler = new M2MConnectionHandler(*this, _security_connection, mode, stack);
+    __connection_handler = _connection_handler;
     _connection_handler->bind_connection(_listen_port);
     tr_debug("M2MInterfaceImpl::M2MInterfaceImpl() -OUT");
 }
@@ -94,6 +96,7 @@ M2MInterfaceImpl::~M2MInterfaceImpl()
     delete _queue_sleep_timer;
     delete _nsdl_interface;
     _connection_handler->stop_listening();
+    __connection_handler = NULL;
     delete _connection_handler;
     delete _retry_timer;
     _security_connection = NULL;
@@ -282,6 +285,14 @@ void M2MInterfaceImpl::set_entropy_callback(entropy_cb callback)
 {
     if(_security_connection) {
         _security_connection->set_entropy_callback(callback);
+    }
+}
+
+void M2MInterfaceImpl::set_platform_network_handler(void *handler)
+{
+    tr_debug("M2MInterfaceImpl::set_platform_network_handler()");
+    if(_connection_handler) {
+        _connection_handler->set_platform_network_handler(handler);
     }
 }
 

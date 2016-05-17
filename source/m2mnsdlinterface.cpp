@@ -766,6 +766,7 @@ void M2MNsdlInterface::observation_to_be_sent(M2MBase *object,
                                               m2m::Vector<uint16_t> changed_instance_ids,
                                               bool send_object)
 {
+    __mutex_claim();
     tr_debug("M2MNsdlInterface::observation_to_be_sent(), %s", object->uri_path().c_str());
     if(object) {
         M2MBase::BaseType type = object->base_type();
@@ -780,10 +781,12 @@ void M2MNsdlInterface::observation_to_be_sent(M2MBase *object,
             send_resource_observation(static_cast<M2MResource*> (object), obs_number);
         }
     }
+    __mutex_release();
 }
 
 void M2MNsdlInterface::send_delayed_response(M2MBase *base)
 {
+    __mutex_claim();
     tr_debug("M2MNsdlInterface::send_delayed_response()");
     M2MResource *resource = NULL;
     if(base) {
@@ -818,12 +821,15 @@ void M2MNsdlInterface::send_delayed_response(M2MBase *base)
             }
         }
     }
+    __mutex_release();
 }
 
 void M2MNsdlInterface::resource_to_be_deleted(const String &resource_name)
 {
+    __mutex_claim();
     tr_debug("M2MNsdlInterface::resource_to_be_deleted(resource_name %s)", resource_name.c_str());
     delete_nsdl_resource(resource_name);
+    __mutex_release();
 }
 
 void M2MNsdlInterface::value_updated(M2MBase *base,
@@ -856,6 +862,7 @@ void M2MNsdlInterface::value_updated(M2MBase *base,
 
 void M2MNsdlInterface::remove_object(M2MBase *object)
 {
+    __mutex_claim();
     tr_debug("M2MNsdlInterface::remove_object()");
     M2MObject* rem_object = static_cast<M2MObject*> (object);
     if(rem_object && !_object_list.empty()) {
@@ -872,6 +879,7 @@ void M2MNsdlInterface::remove_object(M2MBase *object)
     if(_object_list.empty()) {
         _object_list.clear();
     }
+    __mutex_release();
 }
 
 bool M2MNsdlInterface::create_nsdl_object_structure(M2MObject *object)
@@ -971,6 +979,7 @@ bool M2MNsdlInterface::create_nsdl_resource_structure(M2MResource *res,
 
 bool M2MNsdlInterface::create_nsdl_resource(M2MBase *base, const String &name, bool publish_uri)
 {
+    __mutex_claim();
     tr_debug("M2MNsdlInterface::create_nsdl_resource(name %s)", name.c_str());
     bool success = false;
     uint8_t* buffer = 0;
@@ -1102,6 +1111,7 @@ bool M2MNsdlInterface::create_nsdl_resource(M2MBase *base, const String &name, b
             }
         }
     }
+    __mutex_release();
     return success;
 }
 
