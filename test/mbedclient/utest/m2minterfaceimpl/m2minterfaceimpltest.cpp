@@ -66,7 +66,6 @@ TEST(M2MInterfaceImpl, unregister_object)
     m2m_interface_impl->test_unregister_object();
 }
 
-
 TEST(M2MInterfaceImpl, set_queue_sleep_handler)
 {
     m2m_interface_impl->test_set_queue_sleep_handler();
@@ -80,6 +79,11 @@ TEST(M2MInterfaceImpl, test_set_random_number_callback)
 TEST(M2MInterfaceImpl, test_set_entropy_callback)
 {
     m2m_interface_impl->test_set_entropy_callback();
+}
+
+TEST(M2MInterfaceImpl, test_set_platform_network_handler)
+{
+    m2m_interface_impl->test_set_platform_network_handler();
 }
 
 TEST(M2MInterfaceImpl, coap_message_ready)
