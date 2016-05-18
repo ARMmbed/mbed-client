@@ -138,6 +138,15 @@ public:
     virtual void set_queue_sleep_handler(callback_handler handler);
 
     /**
+     * @brief Sets the network interface handler that is used by client to connect
+     * to a network over IP..
+     * @param handler A network interface handler that is used by client to connect.
+     *  This API is optional but provides a mechanism for different platforms to
+     * manage usage of underlying network interface by client.
+     */
+    virtual void set_platform_network_handler(void *handler = NULL);
+
+/**
      * \brief Sets the function callback that will be called by mbed-client for
      * fetching random number from application for ensuring strong entropy.
      * \param random_callback A function pointer that will be called by mbed-client

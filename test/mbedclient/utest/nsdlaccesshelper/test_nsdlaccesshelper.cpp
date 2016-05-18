@@ -18,8 +18,11 @@
 #include "common_stub.h"
 #include "m2mnsdlinterface_stub.h"
 #include "m2mnsdlobserver.h"
+#include "m2mconnectionobserver.h"
 
-class TestObserver : public M2MNsdlObserver {
+class TestObserver : public M2MNsdlObserver,
+                     public M2MConnectionObserver
+{
 
 public:
     TestObserver(){}
@@ -61,6 +64,26 @@ public:
     }
 
     void value_updated(M2MBase *){
+    }
+
+    void data_available(uint8_t*,
+                        uint16_t,
+                        const M2MConnectionObserver::SocketAddress &) {
+
+    }
+
+    void socket_error(uint8_t, bool) {
+
+    }
+
+    void address_ready(const M2MConnectionObserver::SocketAddress &,
+                               M2MConnectionObserver::ServerType,
+                               const uint16_t) {
+
+    }
+
+    void data_sent() {
+
     }
 
     bool register_error;
@@ -181,4 +204,25 @@ void Test_NsdlAccessHelper::test_socket_free()
     //No need to check anything, since memory leak is the test
 }
 
+void Test_NsdlAccessHelper::test_mutex_claim()
+{
+    __connection_handler = new M2MConnectionHandler(*observer,
+                                                    NULL,
+                                                    M2MInterface::UDP,
+                                                    M2MInterface::LwIP_IPv4);
+    __mutex_claim();
+
+    delete __connection_handler;
+}
+
+void Test_NsdlAccessHelper::test_mutex_release()
+{
+    __connection_handler = new M2MConnectionHandler(*observer,
+                                                    NULL,
+                                                    M2MInterface::UDP,
+                                                    M2MInterface::LwIP_IPv4);
+    __mutex_release();
+
+    delete __connection_handler;
+}
 

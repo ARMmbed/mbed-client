@@ -138,6 +138,27 @@ public:
     */
     void handle_connection_error(int error);
 
+    /**
+     * \brief Sets the network interface handler that is used by client to connect
+     * to a network over IP..
+     * \param handler A network interface handler that is used by client to connect.
+     *  This API is optional but provides a mechanism for different platforms to
+     * manage usage of underlying network interface by client.
+     */
+    void set_platform_network_handler(void *handler = NULL);
+
+    /**
+    * \brief Claims mutex to prevent thread clashes
+    * in multithreaded environment.
+    */
+    void claim_mutex();
+
+    /**
+    * \brief Releases mutex to prevent thread clashes
+    * in multithreaded environment.
+    */
+    void release_mutex();
+
 private:
 
     M2MConnectionObserver                       &_observer;

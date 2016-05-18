@@ -47,6 +47,8 @@ public:
 
     void test_set_entropy_callback();
 
+    void test_set_platform_network_handler();
+
     void test_coap_message_ready();
 
     void test_client_registered();

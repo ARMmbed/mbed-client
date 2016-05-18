@@ -445,6 +445,12 @@ void Test_M2MInterfaceImpl::test_set_entropy_callback()
     impl->set_entropy_callback(ent_cb);
 }
 
+void Test_M2MInterfaceImpl::test_set_platform_network_handler()
+{
+    void *test = NULL;
+    impl->set_platform_network_handler(test);
+}
+
 void Test_M2MInterfaceImpl::test_coap_message_ready()
 {
     m2mconnectionhandler_stub::bool_value = true;

@@ -169,6 +169,15 @@ public:
      *                                     size_t len, size_t *olen);
      */
     virtual void set_entropy_callback(entropy_cb callback) = 0;
+
+    /**
+     * \brief Sets the network interface handler that is used by client to connect
+     * to a network over IP..
+     * \param handler A network interface handler that is used by client to connect.
+     *  This API is optional but provides a mechanism for different platforms to
+     * manage usage of underlying network interface by client.
+     */
+    virtual void set_platform_network_handler(void *handler = NULL) = 0;
 };
 
 #endif // M2M_INTERFACE_H
