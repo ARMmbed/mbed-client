@@ -218,7 +218,7 @@ void M2MBase::observation_to_be_sent(m2m::Vector<uint16_t>, bool)
 {
 }
 
-void *M2MBase::memory_alloc(uint16_t size)
+void *M2MBase::memory_alloc(uint32_t size)
 {
     if(size)
         return malloc(size);
@@ -232,7 +232,7 @@ void M2MBase::memory_free(void *ptr)
         free(ptr);
 }
 
-uint8_t* M2MBase::alloc_string_copy(const uint8_t* source, uint16_t size)
+uint8_t* M2MBase::alloc_string_copy(const uint8_t* source, uint32_t size)
 {
     assert(source != NULL);
 
@@ -244,7 +244,7 @@ uint8_t* M2MBase::alloc_string_copy(const uint8_t* source, uint16_t size)
     return result;
 }
 
-uint8_t* M2MBase::alloc_copy(const uint8_t* source, uint16_t size)
+uint8_t* M2MBase::alloc_copy(const uint8_t* source, uint32_t size)
 {
     assert(source != NULL);
 
