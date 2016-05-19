@@ -359,7 +359,10 @@ uint8_t M2MNsdlInterface::received_from_server_callback(struct nsdl_s * nsdl_han
                                                         sn_coap_hdr_s *coap_header,
                                                         sn_nsdl_addr_s *address)
 {
-    tr_debug("M2MNsdlInterface::received_from_server_callback()");
+    tr_debug("M2MNsdlInterface::received_from_server_callback - msg id:%" PRId32, coap_header->msg_id);
+    tr_debug("M2MNsdlInterface::received_from_server_callback - registration id:%" PRId32, nsdl_handle->register_msg_id);
+    tr_debug("M2MNsdlInterface::received_from_server_callback - unregistration id:%" PRId32, nsdl_handle->unregister_msg_id);
+    tr_debug("M2MNsdlInterface::received_from_server_callback - update registration id:%" PRId32, nsdl_handle->update_register_msg_id);
     _observer.coap_data_processed();
     uint8_t value = 0;
     if(nsdl_handle && coap_header) {
@@ -418,7 +421,7 @@ uint8_t M2MNsdlInterface::received_from_server_callback(struct nsdl_s * nsdl_han
             }
         } else if(coap_header->msg_id == nsdl_handle->unregister_msg_id) {
             _unregister_ongoing = false;
-            tr_debug("M2MNsdlInterface::received_from_server_callback - unregistration callback id:%" PRId32, nsdl_handle->unregister_msg_id);
+            tr_debug("M2MNsdlInterface::received_from_server_callback - unregistration callback");
             if(coap_header->msg_code == COAP_MSG_CODE_RESPONSE_DELETED) {
                 _registration_timer->stop_timer();
                 if(_server) {

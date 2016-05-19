@@ -397,7 +397,7 @@ protected:
      * \brief Memory allocation required for libCoap.
      * \param size The size of memory to be reserved.
     */
-    virtual void* memory_alloc(uint16_t size);
+    virtual void* memory_alloc(uint32_t size);
 
     /**
      * \brief Memory free functions required for libCoap.
@@ -411,14 +411,14 @@ protected:
      * \param source Source string to copy, may not be NULL.
      * \param size The size of memory to be reserved.
     */
-    virtual uint8_t* alloc_string_copy(const uint8_t* source, uint16_t size);
+    virtual uint8_t* alloc_string_copy(const uint8_t* source, uint32_t size);
 
     /**
      * \brief Allocate (size) amount of memory, copy size bytes into it.
      * \param source Source buffer to copy, may not be NULL.
      * \param size The size of memory to be reserved.
     */
-    virtual uint8_t* alloc_copy(const uint8_t* source, uint16_t size);
+    virtual uint8_t* alloc_copy(const uint8_t* source, uint32_t size);
 
     /**
      * \brief Returns the Report Handler object.
