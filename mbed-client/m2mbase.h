@@ -198,7 +198,7 @@ public:
      * \param observation_number Observation number of the object.
      */
     virtual void set_observation_number(const uint16_t observation_number)
-        __attribute__ ((deprecated));
+        m2m_deprecated;
 
     /**
      * \brief Sets the max age for the resource value to be cached.
