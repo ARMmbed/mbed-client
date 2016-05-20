@@ -34,6 +34,12 @@ using namespace m2m;
 #define YOTTA_CFG_TCP_KEEPALIVE_TIME 300
 #endif
 
+#if defined (__ICCARM__)
+#define m2m_deprecated
+#else
+#define m2m_deprecated __attribute__ ((deprecated))
+#endif
+
 // This is valid for mbed-client-mbedtls
 // For other SSL implementation there
 // can be other
