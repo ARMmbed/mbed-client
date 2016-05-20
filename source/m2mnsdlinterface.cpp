@@ -417,7 +417,12 @@ uint8_t M2MNsdlInterface::received_from_server_callback(struct nsdl_s * nsdl_han
                 }
                 tr_error("M2MNsdlInterface::received_from_server_callback - registration error %d", coap_header->msg_code);
                 // Try to do clean register again
-                _observer.registration_error(M2MInterface::NetworkError, true);
+                if(COAP_MSG_CODE_RESPONSE_BAD_REQUEST == coap_header->msg_code) {
+                    _observer.registration_error(M2MInterface::InvalidParameters, false);
+                } else {
+                    _observer.registration_error(M2MInterface::NetworkError, true);
+                }
+
             }
         } else if(coap_header->msg_id == nsdl_handle->unregister_msg_id) {
             _unregister_ongoing = false;
