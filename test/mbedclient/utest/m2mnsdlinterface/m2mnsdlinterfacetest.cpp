@@ -183,3 +183,8 @@ TEST(M2MNsdlInterface, resource_callback_put)
 {
     m2m_nsdl_interface->test_resource_callback_put();
 }
+
+TEST(M2MNsdlInterface, get_nsdl_handle)
+{
+    m2m_nsdl_interface->test_get_nsdl_handle();
+}

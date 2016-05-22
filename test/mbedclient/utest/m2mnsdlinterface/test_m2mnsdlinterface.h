@@ -86,6 +86,8 @@ public:
 
     void test_send_delayed_response();
 
+    void test_get_nsdl_handle();
+
     M2MNsdlInterface* nsdl;
 
     TestObserver *observer;

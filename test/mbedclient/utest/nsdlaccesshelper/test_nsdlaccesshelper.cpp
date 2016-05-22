@@ -105,34 +105,34 @@ Test_NsdlAccessHelper::~Test_NsdlAccessHelper()
 {
     delete observer;
     observer = NULL;
+
+    clear_list();
 }
 
 void Test_NsdlAccessHelper::test_nsdl_c_callback()
 {
-
     CHECK(__nsdl_c_callback(NULL,NULL,NULL,SN_NSDL_PROTOCOL_HTTP) == 0 );
 
     m2mnsdlinterface_stub::int_value = 1;
-    __nsdl_interface = new M2MNsdlInterface(*observer);
+    m2mnsdlinterface_stub::void_value = malloc(1);
+    __nsdl_interface_list.push_back(new M2MNsdlInterface(*observer));
 
-    CHECK(__nsdl_c_callback(NULL,NULL,NULL,SN_NSDL_PROTOCOL_HTTP) == 1 );
-
-    delete __nsdl_interface;
-    __nsdl_interface = NULL;
+    CHECK(__nsdl_c_callback((nsdl_s*)m2mnsdlinterface_stub::void_value,
+                            NULL,NULL,SN_NSDL_PROTOCOL_HTTP) == 1 );
+    free(m2mnsdlinterface_stub::void_value);
+    clear_list();
 }
 
 void Test_NsdlAccessHelper::test_nsdl_c_memory_alloc()
 {
     void *ptr = __nsdl_c_memory_alloc(6);
+    CHECK(ptr != NULL);
+    free(ptr);
+    ptr = NULL;
+    ptr = __nsdl_c_memory_alloc(UINT16_MAX+1);
     CHECK(ptr == NULL);
 
-    __nsdl_interface = new M2MNsdlInterface(*observer);
-    ptr = __nsdl_c_memory_alloc(6);
-    CHECK(ptr != NULL);
-
-    delete __nsdl_interface;
-    __nsdl_interface = NULL;
-    free(ptr);
+//free(ptr);
 }
 
 void Test_NsdlAccessHelper::test_nsdl_c_memory_free()
@@ -142,11 +142,6 @@ void Test_NsdlAccessHelper::test_nsdl_c_memory_free()
 
     CHECK(ptr != NULL);
 
-    __nsdl_interface = new M2MNsdlInterface(*observer);
-    __nsdl_c_memory_free(ptr);
-
-    delete __nsdl_interface;
-    __nsdl_interface = NULL;
     ptr = NULL;
     //No need to check anything, since memory leak is the test
 }
@@ -156,11 +151,12 @@ void Test_NsdlAccessHelper::test_nsdl_c_send_to_server()
     CHECK(__nsdl_c_send_to_server(NULL, SN_NSDL_PROTOCOL_HTTP, NULL, 0, NULL) == 0);
 
     m2mnsdlinterface_stub::int_value = 1;
-    __nsdl_interface = new M2MNsdlInterface(*observer);
-    CHECK(__nsdl_c_send_to_server(NULL, SN_NSDL_PROTOCOL_HTTP, NULL, 0, NULL) == 1);
+    m2mnsdlinterface_stub::void_value = malloc(1);
+    __nsdl_interface_list.push_back(new M2MNsdlInterface(*observer));
 
-    delete __nsdl_interface;
-    __nsdl_interface = NULL;
+    CHECK(__nsdl_c_send_to_server((nsdl_s*)m2mnsdlinterface_stub::void_value, SN_NSDL_PROTOCOL_HTTP, NULL, 0, NULL) == 1);
+    free(m2mnsdlinterface_stub::void_value);
+    clear_list();
 }
 
 void Test_NsdlAccessHelper::test_nsdl_c_received_from_server()
@@ -168,23 +164,25 @@ void Test_NsdlAccessHelper::test_nsdl_c_received_from_server()
     CHECK( 0 == __nsdl_c_received_from_server(NULL, NULL, NULL));
 
     m2mnsdlinterface_stub::int_value = 1;
-    __nsdl_interface = new M2MNsdlInterface(*observer);
-    CHECK( 1 == __nsdl_c_received_from_server(NULL, NULL, NULL));
+    m2mnsdlinterface_stub::void_value = malloc(1);
 
-    delete __nsdl_interface;
-    __nsdl_interface = NULL;
+    __nsdl_interface_list.push_back(new M2MNsdlInterface(*observer));
+    CHECK( 1 == __nsdl_c_received_from_server((nsdl_s*)m2mnsdlinterface_stub::void_value, NULL, NULL));
+    free(m2mnsdlinterface_stub::void_value);
+    clear_list();
 }
 
 void Test_NsdlAccessHelper::test_nsdl_c_bootstrap_done()
 {
-    __nsdl_c_bootstrap_done(NULL);
+    __nsdl_c_bootstrap_done(NULL, NULL);
 
+    m2mnsdlinterface_stub::void_value = malloc(1);
     m2mnsdlinterface_stub::int_value = 1;
-    __nsdl_interface = new M2MNsdlInterface(*observer);
-    __nsdl_c_bootstrap_done(NULL);
+    __nsdl_interface_list.push_back(new M2MNsdlInterface(*observer));
+    __nsdl_c_bootstrap_done(NULL, (nsdl_s*)m2mnsdlinterface_stub::void_value);
+    free(m2mnsdlinterface_stub::void_value);
+    clear_list();
 
-    delete __nsdl_interface;
-    __nsdl_interface = NULL;
 }
 
 void Test_NsdlAccessHelper::test_socket_malloc()
@@ -226,3 +224,18 @@ void Test_NsdlAccessHelper::test_mutex_release()
     delete __connection_handler;
 }
 
+void Test_NsdlAccessHelper::clear_list()
+{
+    M2MNsdlInterfaceList::const_iterator it;
+    it = __nsdl_interface_list.begin();
+    int index = 0;
+    if (!__nsdl_interface_list.empty()) {
+        for (; it!=__nsdl_interface_list.end(); it++) {
+                delete __nsdl_interface_list[index];
+                __nsdl_interface_list.erase(index);
+                index++;
+                break;
+            }
+        __nsdl_interface_list.clear();
+    }
+}
