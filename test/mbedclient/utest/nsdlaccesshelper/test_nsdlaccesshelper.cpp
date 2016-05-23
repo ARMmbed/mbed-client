@@ -234,7 +234,6 @@ void Test_NsdlAccessHelper::clear_list()
                 delete __nsdl_interface_list[index];
                 __nsdl_interface_list.erase(index);
                 index++;
-                break;
             }
         __nsdl_interface_list.clear();
     }
