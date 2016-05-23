@@ -104,6 +104,7 @@ M2MNsdlInterface::~M2MNsdlInterface()
             __nsdl_interface_list.erase(index);
             break;
         }
+        index++;
     }
 
     tr_debug("M2MNsdlInterface::~M2MNsdlInterface() - OUT");
