@@ -115,6 +115,7 @@ void Test_NsdlAccessHelper::test_nsdl_c_callback()
 
     m2mnsdlinterface_stub::int_value = 1;
     m2mnsdlinterface_stub::void_value = malloc(1);
+    __nsdl_interface_list.clear();
     __nsdl_interface_list.push_back(new M2MNsdlInterface(*observer));
 
     CHECK(__nsdl_c_callback((nsdl_s*)m2mnsdlinterface_stub::void_value,
@@ -131,8 +132,7 @@ void Test_NsdlAccessHelper::test_nsdl_c_memory_alloc()
     ptr = NULL;
     ptr = __nsdl_c_memory_alloc(UINT16_MAX+1);
     CHECK(ptr == NULL);
-
-//free(ptr);
+    free(ptr);
 }
 
 void Test_NsdlAccessHelper::test_nsdl_c_memory_free()
@@ -152,6 +152,7 @@ void Test_NsdlAccessHelper::test_nsdl_c_send_to_server()
 
     m2mnsdlinterface_stub::int_value = 1;
     m2mnsdlinterface_stub::void_value = malloc(1);
+    __nsdl_interface_list.clear();
     __nsdl_interface_list.push_back(new M2MNsdlInterface(*observer));
 
     CHECK(__nsdl_c_send_to_server((nsdl_s*)m2mnsdlinterface_stub::void_value, SN_NSDL_PROTOCOL_HTTP, NULL, 0, NULL) == 1);
@@ -165,7 +166,7 @@ void Test_NsdlAccessHelper::test_nsdl_c_received_from_server()
 
     m2mnsdlinterface_stub::int_value = 1;
     m2mnsdlinterface_stub::void_value = malloc(1);
-
+    __nsdl_interface_list.clear();
     __nsdl_interface_list.push_back(new M2MNsdlInterface(*observer));
     CHECK( 1 == __nsdl_c_received_from_server((nsdl_s*)m2mnsdlinterface_stub::void_value, NULL, NULL));
     free(m2mnsdlinterface_stub::void_value);
@@ -178,6 +179,7 @@ void Test_NsdlAccessHelper::test_nsdl_c_bootstrap_done()
 
     m2mnsdlinterface_stub::void_value = malloc(1);
     m2mnsdlinterface_stub::int_value = 1;
+    __nsdl_interface_list.clear();
     __nsdl_interface_list.push_back(new M2MNsdlInterface(*observer));
     __nsdl_c_bootstrap_done(NULL, (nsdl_s*)m2mnsdlinterface_stub::void_value);
     free(m2mnsdlinterface_stub::void_value);
@@ -228,12 +230,11 @@ void Test_NsdlAccessHelper::clear_list()
 {
     M2MNsdlInterfaceList::const_iterator it;
     it = __nsdl_interface_list.begin();
-    int index = 0;
+    int size = __nsdl_interface_list.size();
     if (!__nsdl_interface_list.empty()) {
-        for (; it!=__nsdl_interface_list.end(); it++) {
-                delete __nsdl_interface_list[index];
-                __nsdl_interface_list.erase(index);
-                index++;
+        for (int i = 0; i < size; i++) {
+                delete __nsdl_interface_list[i];
+                __nsdl_interface_list.erase(i);
             }
         __nsdl_interface_list.clear();
     }
