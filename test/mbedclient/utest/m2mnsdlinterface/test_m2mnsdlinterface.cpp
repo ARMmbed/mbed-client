@@ -554,17 +554,18 @@ void Test_M2MNsdlInterface::test_received_from_server_callback()
     m2mobjectinstance_stub::header =  (sn_coap_hdr_s *)malloc(sizeof(sn_coap_hdr_s));
     memset(m2mobjectinstance_stub::header, 0, sizeof(sn_coap_hdr_s));
     m2mobjectinstance_stub::header->msg_code = COAP_MSG_CODE_RESPONSE_BAD_REQUEST;
+    common_stub::coap_header = NULL;
 
-    CHECK(0== nsdl->received_from_server_callback(handle,coap_header,NULL));
-    free(m2mobjectinstance_stub::header);
+    CHECK(0 == nsdl->received_from_server_callback(handle,coap_header,NULL));
     m2mobjectinstance_stub::header = NULL;
 
     m2mobjectinstance_stub::header =  (sn_coap_hdr_s *)malloc(sizeof(sn_coap_hdr_s));
     memset(m2mobjectinstance_stub::header, 0, sizeof(sn_coap_hdr_s));
 
     m2mobjectinstance_stub::header->msg_code = COAP_MSG_CODE_RESPONSE_CREATED;
-    CHECK(0== nsdl->received_from_server_callback(handle,coap_header,NULL));
-    free(m2mobjectinstance_stub::header);
+    CHECK(0 == nsdl->received_from_server_callback(handle,coap_header,NULL));
+
+    m2mobjectinstance_stub::header = NULL;
 
     free(coap_header->payload_ptr);
     coap_header->payload_ptr = NULL;
