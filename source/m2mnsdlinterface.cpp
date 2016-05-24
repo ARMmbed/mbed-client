@@ -56,10 +56,9 @@ M2MNsdlInterface::M2MNsdlInterface(M2MNsdlObserver &observer)
   _update_register_ongoing(false)
 {
     tr_debug("M2MNsdlInterface::M2MNsdlInterface()");
-    __nsdl_interface = this;
-
+    __nsdl_interface_list.push_back(this);
     _bootstrap_endpoint.device_object = NULL;
-    _bootstrap_endpoint.oma_bs_status_cb = NULL;
+    _bootstrap_endpoint.oma_bs_status_cb_handle = NULL;
 
     _bootstrap_device_setup.sn_oma_device_boot_callback = NULL;
     _bootstrap_device_setup.error_code = NO_ERROR;
@@ -96,7 +95,18 @@ M2MNsdlInterface::~M2MNsdlInterface()
     delete _server;
     sn_nsdl_destroy(_nsdl_handle);
     _nsdl_handle = NULL;
-    __nsdl_interface = NULL;
+
+    M2MNsdlInterfaceList::const_iterator it;
+    it = __nsdl_interface_list.begin();
+    int index = 0;
+    for (; it!=__nsdl_interface_list.end(); it++) {
+        if ((*it) == this) {
+            __nsdl_interface_list.erase(index);
+            break;
+        }
+        index++;
+    }
+
     tr_debug("M2MNsdlInterface::~M2MNsdlInterface() - OUT");
 }
 
@@ -225,7 +235,7 @@ bool M2MNsdlInterface::create_bootstrap_resource(sn_nsdl_addr_s *address)
     _bootstrap_device_setup.sn_oma_device_boot_callback = 0;
 
     _bootstrap_endpoint.device_object = &_bootstrap_device_setup;
-    _bootstrap_endpoint.oma_bs_status_cb = &__nsdl_c_bootstrap_done;
+    _bootstrap_endpoint.oma_bs_status_cb_handle = &__nsdl_c_bootstrap_done;
 
     if(_bootstrap_id == 0) {
         _bootstrap_id = sn_nsdl_oma_bootstrap(_nsdl_handle,
@@ -1546,4 +1556,9 @@ void M2MNsdlInterface::send_notification(uint8_t *token,
         }
         sn_nsdl_release_allocated_coap_msg_mem(_nsdl_handle, notification_message_ptr);
     }
+}
+
+nsdl_s * M2MNsdlInterface::get_nsdl_handle()
+{
+    return _nsdl_handle;
 }

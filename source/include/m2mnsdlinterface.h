@@ -204,6 +204,12 @@ public:
      */
     void stop_timers();
 
+    /**
+     * @brief Returns nsdl handle.
+     * @return ndsl handle
+     */
+    nsdl_s* get_nsdl_handle();
+
 protected: // from M2MTimerObserver
 
     virtual void timer_expired(M2MTimerObserver::Type type);

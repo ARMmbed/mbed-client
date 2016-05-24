@@ -49,6 +49,8 @@ public:
     void test_mutex_release();
 
     TestObserver *observer;
+private:
+    void clear_list();
 };
 
 #endif // TEST_NSDL_ACCESS_HELPER_H

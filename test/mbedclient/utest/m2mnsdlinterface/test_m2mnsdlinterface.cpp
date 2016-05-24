@@ -554,16 +554,18 @@ void Test_M2MNsdlInterface::test_received_from_server_callback()
     m2mobjectinstance_stub::header =  (sn_coap_hdr_s *)malloc(sizeof(sn_coap_hdr_s));
     memset(m2mobjectinstance_stub::header, 0, sizeof(sn_coap_hdr_s));
     m2mobjectinstance_stub::header->msg_code = COAP_MSG_CODE_RESPONSE_BAD_REQUEST;
+    common_stub::coap_header = NULL;
 
-    CHECK(0== nsdl->received_from_server_callback(handle,coap_header,NULL));
+    CHECK(0 == nsdl->received_from_server_callback(handle,coap_header,NULL));
     m2mobjectinstance_stub::header = NULL;
 
     m2mobjectinstance_stub::header =  (sn_coap_hdr_s *)malloc(sizeof(sn_coap_hdr_s));
     memset(m2mobjectinstance_stub::header, 0, sizeof(sn_coap_hdr_s));
 
     m2mobjectinstance_stub::header->msg_code = COAP_MSG_CODE_RESPONSE_CREATED;
-    CHECK(0== nsdl->received_from_server_callback(handle,coap_header,NULL));
+    CHECK(0 == nsdl->received_from_server_callback(handle,coap_header,NULL));
 
+    m2mobjectinstance_stub::header = NULL;
 
     free(coap_header->payload_ptr);
     coap_header->payload_ptr = NULL;
@@ -650,7 +652,7 @@ void Test_M2MNsdlInterface::test_resource_callback()
     CHECK(nsdl->resource_callback(NULL,coap_header,address,SN_NSDL_PROTOCOL_COAP) ==0);
 
     coap_header->msg_code = COAP_MSG_CODE_REQUEST_PUT;
-
+    m2mobject_stub::bool_value = true;
     CHECK(nsdl->resource_callback(NULL,coap_header,address,SN_NSDL_PROTOCOL_COAP) ==0);
 
     coap_header->msg_code = COAP_MSG_CODE_REQUEST_POST;
@@ -723,7 +725,6 @@ void Test_M2MNsdlInterface::test_resource_callback_put()
     m2mbase_stub::base_type = M2MBase::Resource;
     m2mobject_stub::bool_value = true;
     CHECK(nsdl->resource_callback(NULL,coap_header,address,SN_NSDL_PROTOCOL_HTTP) ==0);
-    m2mobject_stub::bool_value = false;
 
     m2mobject_stub::base_type = M2MBase::ObjectInstance;
     m2mbase_stub::base_type = M2MBase::ObjectInstance;
@@ -1646,4 +1647,9 @@ void Test_M2MNsdlInterface::test_send_delayed_response()
     free(m2mresource_stub::delayed_token);
     m2mresource_stub::delayed_token = NULL;
     m2mresource_stub::delayed_token_len = 0;
+}
+
+void Test_M2MNsdlInterface::test_get_nsdl_handle()
+{
+    CHECK(nsdl->get_nsdl_handle() == nsdl->_nsdl_handle);
 }

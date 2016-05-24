@@ -17,11 +17,12 @@
 
 bool m2mnsdlinterface_stub::bool_value;
 uint32_t m2mnsdlinterface_stub::int_value;
-
+void * m2mnsdlinterface_stub::void_value;
 void m2mnsdlinterface_stub::clear()
 {
     bool_value = false;
     int_value = 0;
+    void_value = NULL;
 }
 
 M2MNsdlInterface::M2MNsdlInterface(M2MNsdlObserver &observer)
@@ -156,4 +157,9 @@ void M2MNsdlInterface::value_updated(M2MBase *, const String&)
 
 void M2MNsdlInterface::remove_object(M2MBase *)
 {
+}
+
+nsdl_s* M2MNsdlInterface::get_nsdl_handle()
+{
+    return (nsdl_s*) m2mnsdlinterface_stub::void_value;
 }
