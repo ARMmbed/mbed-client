@@ -1,8 +1,8 @@
-<span style="background-color:#E6E6E6;  border:1px solid #000;display:block; height:100%; padding:10px">**Note:** To port mbed Client, you need to [install yotta and its dependencies](https://github.com/ARMmbed/yotta/blob/master/docs/index.md).</span>
+<span class="notes">**Note:** To port mbed Client, you need to [install yotta and its dependencies](https://github.com/ARMmbed/yotta/blob/master/docs/index.md).</span>
 
 # mbed Client structure and build process
 
-<span style="background-color:#E6E6E6;border:1px solid #000;display:block; height:100%; padding:10px">**Tip:** Before embarking on your own port, you should build the core mbed Client for an existing compilation target to get an understanding of how the mbed Client builds.</span>
+<span class="tips">**Tip:** Before embarking on your own port, you should build the core mbed Client for an existing compilation target to get an understanding of how the mbed Client builds.</span>
 
 mbed Client is structured as a set of modules. Each module declares which other modules it depends on. When you build a module, our build system `yotta` looks at these dependencies and installs the necessary modules before completing the build.
 
@@ -31,7 +31,7 @@ mbed-client x.x.x
 
 To list the dependency trees, use the [`yotta list --all` command](http://docs.yottabuild.org/reference/commands.html).
 
-<span style="background-color:#E6E6E6;  border:1px solid #000;display:block; height:100%; padding:10px">**Note**: In this case, we have listed the dependencies for the `x86-linux-native` compilation target. Different modules are needed for different compilation targets.</span>
+<span class="notes">**Note**: In this case, we have listed the dependencies for the `x86-linux-native` compilation target. Different modules are needed for different compilation targets.</span>
 
 We are using the [mbed Client Linux example](https://github.com/ARMmbed/mbed-client-linux-example) in this document. You can see that it depends directly only on the `mbed-client` and `mbed-client-linux` modules. These modules depend internally on various other modules.
 
@@ -97,7 +97,7 @@ Clone your `mbed-client-<your-platform-name>` module and `mbed-client` modules f
 
 The `mbed-client-<your-platform-name>` module needs to provide a socket and timer implementation for your target platform. The `mbed-client-xxx` module should include files `m2mconnectionhandler.h`and `m2mtimer.h` from `mbed-client` and implement a corresponding `.cpp` file that points to the platform-specific private implementations of the timer and the socket.
 
-<span style="background-color:#E6E6E6;  border:1px solid #000;display:block; height:100%; padding:10px">**Note**: Private implementation classes **must** be named as `M2MConnectionHandlerPimpl` and `M2MTimerPimpl`, because of forward declarations.</span>
+<span class="notes">**Note**: Private implementation classes **must** be named as `M2MConnectionHandlerPimpl` and `M2MTimerPimpl`, because of forward declarations.</span>
 
 An example of mbed-client-platform:
 
