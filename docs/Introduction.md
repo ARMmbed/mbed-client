@@ -128,7 +128,7 @@ To enable message deduplication, you need to create a `config.json` file in the 
 Recommended values for the `coap_duplication_max_msgs_count` flag are 0 to 6. Value 0 means that the feature is not used. It is not recommended to use higher value than 6, because it increases the memory consumption.
 
 ## How to use the API
-More information on how to use the API effectively to create and configure Objects, Object Instances and Resources, can be found [here](howto.md).
+More information on how to use the API effectively to create and configure Objects, Object Instances and Resources, can be found [here](Howto.md).
 
 ## API documentation
 
