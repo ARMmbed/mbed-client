@@ -138,7 +138,7 @@ Check the [LWM2M Specification](http://technical.openmobilealliance.org/Technica
 
 mbed Device Server uses the **Execute** operation to perform an action. This operation can only be performed on individual Resources. 
 
-<span style="background-color:#E6E6E6;  border:1px solid #000;display:block; height:100%; padding:10px">**Note:** mbed Client returns an error when the **Execute** operation is received for Object Instances or Resource Instances.</span>
+<span class="notes">**Note:** mbed Client returns an error when the **Execute** operation is received for Object Instances or Resource Instances.</span>
 
 If you want to execute a piece of code in your application, you can pass a `POST` request from mbed Device Server.
 When your Resource receives the `POST` request, mbed Client parses the payload from the request and wraps it in the `M2MResource::M2MExecuteParameter` class. The class object is passed through the execute callback function.
