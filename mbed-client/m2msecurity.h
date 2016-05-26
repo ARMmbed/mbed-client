@@ -203,8 +203,8 @@ private:
 
 private:
 
-    ServerType            _server_type;
     M2MObjectInstance*    _server_instance;
+    ServerType            _server_type;
 
     friend class Test_M2MSecurity;
     friend class Test_M2MInterfaceImpl;

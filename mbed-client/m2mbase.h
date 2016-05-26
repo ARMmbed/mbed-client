@@ -438,26 +438,25 @@ private:
 
 private:
 
-
     M2MReportHandler           *_report_handler;
     M2MObservationHandler      *_observation_handler;
+    String                      _name;
+    String                      _resource_type;
+    String                      _interface_description;
+    String                      _uri_path;
+    int32_t                     _name_id;
+    uint32_t                    _max_age;
+    uint16_t                    _instance_id;
+    uint16_t                    _observation_number;
+    uint8_t                     *_token;
+    uint8_t                     _token_length;
+    uint8_t                     _coap_content_type;
     M2MBase::Operation          _operation;
     M2MBase::Mode               _mode;
     M2MBase::BaseType           _base_type;
     M2MBase::Observation        _observation_level;
-    String                      _name;
-    String                      _resource_type;
-    int32_t                     _name_id;
-    String                      _interface_description;
-    uint8_t                     _coap_content_type;
-    uint16_t                    _instance_id;
     bool                        _observable;
-    uint16_t                    _observation_number;
-    uint8_t                     *_token;
-    uint8_t                     _token_length;
     bool                        _register_uri;
-    String                      _uri_path;
-    uint32_t                    _max_age;
     bool                        _is_under_observation;
 
 friend class Test_M2MBase;

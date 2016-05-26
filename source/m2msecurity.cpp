@@ -27,8 +27,8 @@
 
 M2MSecurity::M2MSecurity(ServerType ser_type)
 : M2MObject(M2M_SECURITY_ID),
- _server_type(ser_type),
- _server_instance(NULL)
+ _server_instance(NULL),
+ _server_type(ser_type)
 {
      _server_instance  = M2MObject::create_object_instance();
 
