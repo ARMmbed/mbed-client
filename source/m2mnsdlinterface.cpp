@@ -124,16 +124,16 @@ bool M2MNsdlInterface::initialize()
     _resource = (sn_nsdl_resource_info_s*)memory_alloc(sizeof(sn_nsdl_resource_info_s));
     if(_resource) {
         memset(_resource, 0, sizeof(sn_nsdl_resource_info_s));
-        _resource->resource_parameters_ptr = (sn_nsdl_resource_parameters_s*)memory_alloc(sizeof(sn_nsdl_resource_parameters_s)+1);
+        _resource->resource_parameters_ptr = (sn_nsdl_resource_parameters_s*)memory_alloc(sizeof(sn_nsdl_resource_parameters_s));
         if(_resource->resource_parameters_ptr) {
-            memset(_resource->resource_parameters_ptr, 0, sizeof(sn_nsdl_resource_parameters_s)+1);
+            memset(_resource->resource_parameters_ptr, 0, sizeof(sn_nsdl_resource_parameters_s));
         }
     }
 
     //Allocate the memory for endpoint
-    _endpoint = (sn_nsdl_ep_parameters_s*)memory_alloc(sizeof(sn_nsdl_ep_parameters_s)+1);
+    _endpoint = (sn_nsdl_ep_parameters_s*)memory_alloc(sizeof(sn_nsdl_ep_parameters_s));
     if(_endpoint) {
-        memset(_endpoint, 0, sizeof(sn_nsdl_ep_parameters_s)+1);
+        memset(_endpoint, 0, sizeof(sn_nsdl_ep_parameters_s));
         success = true;
     }
     return success;
@@ -149,7 +149,7 @@ void M2MNsdlInterface::create_endpoint(const String &name,
     tr_debug("M2MNsdlInterface::create_endpoint( name %s type %s lifetime %" PRId32 ", domain %s, mode %d)",
               name.c_str(), type.c_str(), life_time, domain.c_str(), mode);
     if(_endpoint){
-        memset(_endpoint, 0, sizeof(sn_nsdl_ep_parameters_s)+1);
+        memset(_endpoint, 0, sizeof(sn_nsdl_ep_parameters_s));
         if(!name.empty()) {
             _endpoint->endpoint_name_ptr = (uint8_t*)name.c_str();
             _endpoint->endpoint_name_len = name.length();
