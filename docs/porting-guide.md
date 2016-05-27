@@ -43,7 +43,7 @@ mbed-client-linux-example x.x.x
    |_mbed-client-c x.x.x
    |   |_mbed-client-libservice x.x.x
    |
-   |_mbed-client-linux 0.0.2
+   |_mbed-client-linux x.x.x
 ```
 
 ## Compilation targets
@@ -150,8 +150,8 @@ To see how this is done in Linux, check the `mbed-client-linux` module from the 
 #include "nsdl-c/sn_nsdl.h"
 
 /**
- * @brief M2MConnectionHandler.
- * This class handles the socket connection for Mbed Client
+ * \brief M2MConnectionHandler.
+ * This class handles the socket connection for the LWM2M Client.
  */
 
 class M2MConnectionHandler {
@@ -159,44 +159,53 @@ public:
 
     /**
      * @enum ConnectionError
-     * This enum defines the error that can come from
-     * the socket read or write operation.
+     * This enum defines an error that can come from
+     * socket read and write operation.
      */
     typedef enum {
         CONNECTION_ERROR_WANTS_READ = -1000,
-        CONNECTION_ERROR_WANTS_WRITE = -1001
+        CONNECTION_ERROR_WANTS_WRITE = -1001,
+        ERROR_NONE = 0,
+        SSL_CONNECTION_ERROR,
+        SOCKET_READ_ERROR,
+        SOCKET_SEND_ERROR,
+        SOCKET_ABORT,
+        DNS_RESOLVING_ERROR,
+        SSL_HANDSHAKE_ERROR
     }ConnectionError;
+
 
 public:
 
     /**
-    * @brief Constructor
+    * \brief Constructor
     */
     M2MConnectionHandler(M2MConnectionObserver &observer,
                          M2MConnectionSecurity* sec,
+                         M2MInterface::BindingMode mode,
                          M2MInterface::NetworkStack stack);
 
     /**
-    * @brief Destructor
+    * \brief Destructor
     */
     ~M2MConnectionHandler();
 
     /**
-    * @brief This binds the socket connection.
-    * @param listen_port Port to listen for incoming connection.
-    * @return true if successful, else false.
+    * \brief This binds the socket connection.
+    * \param listen_port Port to be listened to for an incoming connection.
+    * \return True if successful, else false.
     */
     bool bind_connection(const uint16_t listen_port);
 
     /**
-    * @brief This resolves the server address. Output is
-    * returned through callback
-    * @param String server address.
-    * @param uint16_t Server port.
-    * @param ServerType, Server Type to be resolved.
-    * @param security, M2MSecurity object which determines what
-    * kind of secure connection will be used by the socket.
-    * @return true if address is valid, else false.
+    * \brief This resolves the server address. Output is
+    * returned through a callback.
+    * \param String The server address.
+    * \param uint16_t The server port.
+    * \param ServerType The server type to be resolved.
+    * \param security The M2MSecurity object that determines which
+    * type of secure connection will be used by the socket.
+    * \return True if address is valid, else false.
     */
     bool resolve_server_address(const String& server_address,
                                 const uint16_t server_port,
@@ -204,50 +213,76 @@ public:
                                 const M2MSecurity* security);
 
     /**
-    * @brief Sends data, to the connected server.
-    * @param data_ptr, Data to be sent.
-    * @param data_len, Length of data to be sent.
-    * @param address_ptr, Address structure where data has to be sent.
-    * @return True if data send is successful, else false.
+    * \brief Sends data to the connected server.
+    * \param data_ptr The data to be sent.
+    * \param data_len The length of data to be sent.
+    * \param address_ptr The address structure to which the data needs to be sent.
+    * \return True if data is sent successfully, else false.
     */
     bool send_data(uint8_t *data_ptr,
                            uint16_t data_len,
                            sn_nsdl_addr_s *address_ptr);
 
     /**
-    * @brief Listens for incoming data from remote server
-    * @return true if successful, else false.
+    * \brief Listens to the incoming data from a remote server.
+    * \return True if successful, else false.
     */
     bool start_listening_for_data();
 
     /**
-    * @brief Stops listening for incoming data.
+    * \brief Stops listening to the incoming data.
     */
     void stop_listening();
 
     /**
-     * @brief sendToSocket Sends directly to socket. This is used by
-     * security classes to send after data has been encrypted.
-     * @param buf Buffer to send.
-     * @param len Length of the buffer.
-     * @return Number of bytes sent or -1 if failed.
+     * \brief Sends directly to the socket. This is used by
+     * security classes to send the data after it has been encrypted.
+     * \param buf Buffer to send.
+     * \param len The length of the buffer.
+     * \return Number of bytes sent or -1 if failed.
      */
-    int sendToSocket(const unsigned char *buf, size_t len);
+    int send_to_socket(const unsigned char *buf, size_t len);
 
     /**
-     * @brief receiveFromSocket Receives directly from a socket. This
-     * is used by security classes to receive raw data to be decrypted.
-     * @param buf Buffer to send.
-     * @param len Length of the buffer.
-     * @return Number of bytes read or -1 if failed.
+     * \brief Receives directly from the socket. This
+     * is used by the security classes to receive raw data to be decrypted.
+     * \param buf Buffer to send.
+     * \param len The length of the buffer.
+     * \return Number of bytes read or -1 if failed.
      */
-    int receiveFromSocket(unsigned char *buf, size_t len);
-
+    int receive_from_socket(unsigned char *buf, size_t len);
 
     /**
-    * @brief Closes the open connection.
+    * \brief Closes the open connection.
     */
     void close_connection();
+
+    /**
+    * \brief Error handling for DTLS connectivity.
+    * \param error Error code from the TLS library.
+    */
+    void handle_connection_error(int error);
+
+    /**
+     * \brief Sets the network interface handler that is used by client to connect
+     * to a network over IP..
+     * \param handler A network interface handler that is used by client to connect.
+     *  This API is optional but provides a mechanism for different platforms to
+     * manage usage of underlying network interface by client.
+     */
+    void set_platform_network_handler(void *handler = NULL);
+
+    /**
+    * \brief Claims mutex to prevent thread clashes
+    * in multithreaded environment.
+    */
+    void claim_mutex();
+
+    /**
+    * \brief Releases mutex to prevent thread clashes
+    * in multithreaded environment.
+    */
+    void release_mutex();
 
 private:
 
@@ -286,55 +321,58 @@ class M2MConnectionObserver
 
 public :
 
+    /**
+      * \enum ServerType, Defines the type of the
+      * server that the client wants to use.
+      */
     typedef enum {
         Bootstrap,
-        MbedServer
+        LWM2MServer
     }ServerType;
 
     /**
-     * @brief The M2MSocketAddress struct
+     * \brief The M2MSocketAddress struct.
      * Unified container for holding socket address data
      * across different platforms.
      */
     struct SocketAddress{
         M2MInterface::NetworkStack  _stack;
-        void                        *_address;    
+        void                        *_address;
         uint8_t                     _length;
         uint16_t                    _port;
     };
 
     /**
-    * @brief Indicates data is available from socket.
-    * @param data, data read from socket
-    * @param data_size, length of data read from socket.
-    * @param address, Server Address the data is coming from.
+    * \brief Indicates that data is available from socket.
+    * \param data The data read from the socket.
+    * \param data_size The length of the data read from the socket.
+    * \param address The address of the server where the data is coming from.
     */
     virtual void data_available(uint8_t* data,
                                 uint16_t data_size,
                                 const M2MConnectionObserver::SocketAddress &address) = 0;
 
     /**
-    * @brief Indicates some error occured in socket.
-    * @param error_code, Error code from socket indicating that the 
-    * socket cannot be used any further.
+    * \brief Indicates an error occured in socket.
+    * \param error_code The error code from socket, it cannot be used any further.
+    * \param retry Indicates whether to re-establish connection.
     */
-    virtual void socket_error(uint8_t error_code) = 0;
+    virtual void socket_error(uint8_t error_code, bool retry = true) = 0;
 
     /**
-    * @brief Indicates server address resolving is ready.
-    * @param address, Resolved socket address.
-    * @param server_type, Type of server.
-    * @param server_port, Port of the resolved server address.
+    * \brief Indicates that the server address resolving is ready.
+    * \param address The resolved socket address.
+    * \param server_type The type of the server.
+    * \param server_port The port of the resolved server address.
     */
     virtual void address_ready(const M2MConnectionObserver::SocketAddress &address,
                                M2MConnectionObserver::ServerType server_type,
                                const uint16_t server_port) = 0;
 
     /**
-    * @brief Indicates data has been sent successfully.
+    * \brief Indicates that data has been sent successfully.
     */
     virtual void data_sent() = 0;
-
 };
 
 #endif // M2M_CONNECTION_OBSERVER_H__
@@ -440,17 +478,24 @@ The file `m2mtimerobserver.h` is present in `mbed-client`. To see how the callba
 class M2MTimerObserver
 {
 public:
+    /**
+      * \enum Defines the types of timer
+      * that can be created for mbed Client.
+      */
     typedef enum {
         Notdefined,
         Registration,
         NsdlExecution,
         PMinTimer,
         PMaxTimer,
-        Dtls
+        Dtls,
+        QueueSleep,
+        RetryTimer
     }Type;
 
     /**
-    * Indicates that the timer has expired.
+    * \brief Indicates that the timer has expired.
+    * \param type The type of the timer that has expired.
     */
     virtual void timer_expired(M2MTimerObserver::Type type =
                                M2MTimerObserver::Notdefined) = 0;
@@ -468,11 +513,11 @@ Two platforms, mbed OS and Linux, are already supported. You just need to add yo
 ```
 {
   "name": "mbed-client",
-  "version": "0.1.6",
+  "version": "1.12.0",
   "description": "Mbed Client API",
   "private": true,
   "keywords": [],
-  "author": "Yogesh Pande <yogesh.pande@arm.com>",
+  "author": "XXX XXX <xxx.xxx@xxx.com>",
   "homepage": "https://github.com/ARMmbed/mbed-client",
   "licenses": [
     {
@@ -481,14 +526,14 @@ Two platforms, mbed OS and Linux, are already supported. You just need to add yo
     }
   ],
   "dependencies": {
-    "mbed-client-c": "~0.1.0"
+    "mbed-client-c": "^2.0.0"
   },
   "targetDependencies": {
     "arm": {
-      "mbed-client-mbed": "~0.0.3"
+      "mbed-client-mbed": "^3.0.0"
     },
     "linux": {
-      "mbed-client-linux": "~0.0.1"
+      "mbed-client-linux": "^3.0.0"
     },
     "<your platform as defined in target.json>" : {
       "mbed-client-platform": "<published version , can be done later, first link locally as explained in the steps above>"
