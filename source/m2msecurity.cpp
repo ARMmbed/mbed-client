@@ -245,6 +245,22 @@ uint32_t M2MSecurity::resource_value_buffer(SecurityResource resource,
     return size;
 }
 
+uint32_t M2MSecurity::resource_value_buffer(SecurityResource resource,
+                               const uint8_t *&data) const
+{
+    uint32_t size = 0;
+    M2MResource* res = get_resource(resource);
+    if(res) {
+        if(M2MSecurity::PublicKey == resource        ||
+           M2MSecurity::ServerPublicKey == resource  ||
+           M2MSecurity::Secretkey == resource) {
+            data = res->value();
+            size = res->value_length();
+        }
+    }
+    return size;
+}
+
 
 uint32_t M2MSecurity::resource_value_int(SecurityResource resource) const
 {
