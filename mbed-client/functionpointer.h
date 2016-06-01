@@ -100,7 +100,7 @@ private:
         R (*function)(void);               // static function pointer - 0 if none attached
         void *object;                         // object this pointer - 0 if none attached
     } _p;
-    uintptr_t _member[4];                     // aligned raw member function pointer storage - converted back by registered _membercaller
+    uintptr_t _member[2];                     // aligned raw member function pointer storage - converted back by registered _membercaller
     R (*_membercaller)(void*, uintptr_t*); // registered membercaller function to convert back and call _m.member on _object
 };
 
@@ -186,7 +186,7 @@ private:
         R (*function)(A1);               // static function pointer - 0 if none attached
         void *object;                         // object this pointer - 0 if none attached
     } _p;
-    uintptr_t _member[4];                     // aligned raw member function pointer storage - converted back by registered _membercaller
+    uintptr_t _member[2];                     // aligned raw member function pointer storage - converted back by registered _membercaller
     R (*_membercaller)(void*, uintptr_t*, A1); // registered membercaller function to convert back and call _m.member on _object
 };
 

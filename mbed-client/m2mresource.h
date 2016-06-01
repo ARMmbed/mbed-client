@@ -233,10 +233,10 @@ protected:
 private:
 
     M2MResourceInstanceList     _resource_instance_list; // owned
-    bool                        _has_multiple_instances;
-    bool                        _delayed_response;
     uint8_t                     *_delayed_token;
     uint8_t                     _delayed_token_len;
+    bool                        _has_multiple_instances;
+    bool                        _delayed_response;
 
 friend class Test_M2MResource;
 friend class Test_M2MObjectInstance;
@@ -303,10 +303,10 @@ public:
 
 private:
 
-    uint8_t *   _value;
-    uint16_t    _value_length;
     String      _object_name;
     String      _resource_name;
+    uint8_t *   _value;
+    uint16_t    _value_length;
     uint16_t    _object_instance_id;
 
 

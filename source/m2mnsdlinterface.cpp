@@ -124,16 +124,16 @@ bool M2MNsdlInterface::initialize()
     _resource = (sn_nsdl_resource_info_s*)memory_alloc(sizeof(sn_nsdl_resource_info_s));
     if(_resource) {
         memset(_resource, 0, sizeof(sn_nsdl_resource_info_s));
-        _resource->resource_parameters_ptr = (sn_nsdl_resource_parameters_s*)memory_alloc(sizeof(sn_nsdl_resource_parameters_s)+1);
+        _resource->resource_parameters_ptr = (sn_nsdl_resource_parameters_s*)memory_alloc(sizeof(sn_nsdl_resource_parameters_s));
         if(_resource->resource_parameters_ptr) {
-            memset(_resource->resource_parameters_ptr, 0, sizeof(sn_nsdl_resource_parameters_s)+1);
+            memset(_resource->resource_parameters_ptr, 0, sizeof(sn_nsdl_resource_parameters_s));
         }
     }
 
     //Allocate the memory for endpoint
-    _endpoint = (sn_nsdl_ep_parameters_s*)memory_alloc(sizeof(sn_nsdl_ep_parameters_s)+1);
+    _endpoint = (sn_nsdl_ep_parameters_s*)memory_alloc(sizeof(sn_nsdl_ep_parameters_s));
     if(_endpoint) {
-        memset(_endpoint, 0, sizeof(sn_nsdl_ep_parameters_s)+1);
+        memset(_endpoint, 0, sizeof(sn_nsdl_ep_parameters_s));
         success = true;
     }
     return success;
@@ -149,7 +149,7 @@ void M2MNsdlInterface::create_endpoint(const String &name,
     tr_debug("M2MNsdlInterface::create_endpoint( name %s type %s lifetime %" PRId32 ", domain %s, mode %d)",
               name.c_str(), type.c_str(), life_time, domain.c_str(), mode);
     if(_endpoint){
-        memset(_endpoint, 0, sizeof(sn_nsdl_ep_parameters_s)+1);
+        memset(_endpoint, 0, sizeof(sn_nsdl_ep_parameters_s));
         if(!name.empty()) {
             _endpoint->endpoint_name_ptr = (uint8_t*)name.c_str();
             _endpoint->endpoint_name_len = name.length();
@@ -391,11 +391,10 @@ uint8_t M2MNsdlInterface::received_from_server_callback(struct nsdl_s * nsdl_han
                 // If lifetime is less than zero then leave the field empty
                 if(coap_header->options_list_ptr) {
                     if(coap_header->options_list_ptr->max_age_ptr) {
-                        if(_endpoint->lifetime_ptr) {
-                            memory_free(_endpoint->lifetime_ptr);
-                            _endpoint->lifetime_ptr = NULL;
-                            _endpoint->lifetime_len = 0;
-                        }
+                        memory_free(_endpoint->lifetime_ptr);
+                        _endpoint->lifetime_ptr = NULL;
+                        _endpoint->lifetime_len = 0;
+
                         uint32_t max_time = 0;
                         for(int i=0;i < coap_header->options_list_ptr->max_age_len; i++) {
                             max_time += (*(coap_header->options_list_ptr->max_age_ptr + i) & 0xff) <<
@@ -421,10 +420,9 @@ uint8_t M2MNsdlInterface::received_from_server_callback(struct nsdl_s * nsdl_han
                                                      false);
                 }
             } else {
-                if(_server) {
-                    delete _server;
-                    _server = NULL;
-                }
+                delete _server;
+                _server = NULL;
+
                 tr_error("M2MNsdlInterface::received_from_server_callback - registration error %d", coap_header->msg_code);
                 // Try to do clean register again
                 if(COAP_MSG_CODE_RESPONSE_BAD_REQUEST == coap_header->msg_code) {
@@ -439,10 +437,10 @@ uint8_t M2MNsdlInterface::received_from_server_callback(struct nsdl_s * nsdl_han
             tr_debug("M2MNsdlInterface::received_from_server_callback - unregistration callback");
             if(coap_header->msg_code == COAP_MSG_CODE_RESPONSE_DELETED) {
                 _registration_timer->stop_timer();
-                if(_server) {
-                   delete _server;
-                   _server = NULL;
-                }
+
+                delete _server;
+                _server = NULL;
+
                 _observer.client_unregistered();
             } else {
                 tr_error("M2MNsdlInterface::received_from_server_callback - unregistration error %d", coap_header->msg_code);
@@ -677,7 +675,7 @@ void M2MNsdlInterface::bootstrap_done_callback(sn_nsdl_oma_server_info_t *server
         } else if(SN_NSDL_ADDRESS_TYPE_IPV6 == server_info->omalw_address_ptr->type) {
             char ipv6_address[40];
             ip6tos(server_info->omalw_address_ptr->addr_ptr, ipv6_address);
-            server_address += String(ipv6_address);
+            server_address += ipv6_address;
             tr_debug("M2MNsdlInterface::bootstrap_done_callback - IPv6 Server address received %s", server_address.c_str());
         }
 
@@ -835,7 +833,6 @@ void M2MNsdlInterface::send_delayed_response(M2MBase *base)
                     coap_response->token_ptr = NULL;
                 }
                 free(coap_response);
-                coap_response = NULL;
             }
         }
     }

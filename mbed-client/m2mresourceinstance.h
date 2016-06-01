@@ -258,11 +258,12 @@ private:
     execute_callback                        _execute_callback;
     uint8_t                                 *_value;
     uint32_t                                _value_length;
-    ResourceType                            _resource_type;
     M2MResourceCallback                     *_resource_callback; // Not owned
-    uint16_t                                _object_instance_id;
     String                                  _object_name;
     FP1<void, void*>                        *_function_pointer;
+
+    uint16_t                                _object_instance_id;
+    ResourceType                            _resource_type;
 
     friend class Test_M2MResourceInstance;
     friend class Test_M2MResource;
