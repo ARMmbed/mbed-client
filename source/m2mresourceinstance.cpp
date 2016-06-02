@@ -45,11 +45,11 @@ M2MResourceInstance::M2MResourceInstance(const M2MResourceInstance& other)
   _execute_callback(NULL),
   _value(NULL),
   _value_length(0),
-  _resource_type(M2MResourceInstance::STRING),
   _resource_callback(NULL),
-  _object_instance_id(other._object_instance_id),
   _object_name(other._object_name),
-  _function_pointer(NULL)
+  _function_pointer(NULL),
+  _object_instance_id(other._object_instance_id),
+  _resource_type(M2MResourceInstance::STRING)
 {
     this->operator=(other);
 }
@@ -66,11 +66,11 @@ M2MResourceInstance::M2MResourceInstance(const String &res_name,
  _execute_callback(NULL),
  _value(NULL),
  _value_length(0),
- _resource_type(type),
  _resource_callback(NULL),
- _object_instance_id(object_instance_id),
  _object_name(object_name),
- _function_pointer(NULL)
+ _function_pointer(NULL),
+ _object_instance_id(object_instance_id),
+ _resource_type(type)
 {
     M2MBase::set_resource_type(resource_type);
     M2MBase::set_base_type(M2MBase::ResourceInstance);
@@ -90,11 +90,11 @@ M2MResourceInstance::M2MResourceInstance(const String &res_name,
  _execute_callback(NULL),
  _value(NULL),
  _value_length(0),
- _resource_type(type),
  _resource_callback(NULL),
- _object_instance_id(object_instance_id),
  _object_name(object_name),
- _function_pointer(NULL)
+ _function_pointer(NULL),
+ _object_instance_id(object_instance_id),
+ _resource_type(type)
 {
     M2MBase::set_resource_type(resource_type);
     M2MBase::set_base_type(M2MBase::Resource);

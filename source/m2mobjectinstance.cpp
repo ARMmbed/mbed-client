@@ -70,19 +70,12 @@ M2MObjectInstance::~M2MObjectInstance()
         for (; it!=_resource_list.end(); it++ ) {
             //Free allocated memory for resources.
             res = *it;
-            char *obj_inst_id = (char*)malloc(BUFFER_SIZE);
-            if(obj_inst_id) {
-                uint32_t size = m2m::itoa_c(instance_id(), obj_inst_id);
-                if (size <= BUFFER_SIZE) {
-                    String obj_name = name();
-                    obj_name.push_back('/');
-                    obj_name += String(obj_inst_id);
-                    obj_name.push_back('/');
-                    obj_name += (*it)->name();
-                    (*it)->remove_resource_from_coap(obj_name);
-                }
-                free(obj_inst_id);
-            }
+            String obj_name = name();
+            obj_name.push_back('/');
+            obj_name.append_int(instance_id());
+            obj_name.push_back('/');
+            obj_name += (*it)->name();
+            (*it)->remove_resource_from_coap(obj_name);
             delete res;
         }
         _resource_list.clear();
@@ -223,23 +216,17 @@ bool M2MObjectInstance::remove_resource(const String &resource_name)
              if(((*it)->name() == resource_name)) {
                 // Resource found and deleted.
                 res = *it;
-                char *obj_inst_id = (char*)malloc(BUFFER_SIZE);
-                if(obj_inst_id) {
-                    uint32_t size = m2m::itoa_c(instance_id(), obj_inst_id);
-                    if (size <= BUFFER_SIZE) {
-                        String obj_name = name();
-                        obj_name.push_back('/');
-                        obj_name += String(obj_inst_id);
-                        obj_name.push_back('/');
-                        obj_name += res->name();
-                        res->remove_resource_from_coap(obj_name);
-                        delete res;
-                        res = NULL;
-                        _resource_list.erase(pos);
-                        success = true;
-                    }
-                    free(obj_inst_id);
-                }
+
+                String obj_name = name();
+                obj_name.push_back('/');
+                obj_name.append_int(instance_id());
+                obj_name.push_back('/');
+                obj_name += res->name();
+                res->remove_resource_from_coap(obj_name);
+                delete res;
+                res = NULL;
+                _resource_list.erase(pos);
+                success = true;
                 break;
              }
          }

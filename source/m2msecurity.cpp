@@ -27,8 +27,8 @@
 
 M2MSecurity::M2MSecurity(ServerType ser_type)
 : M2MObject(M2M_SECURITY_ID),
- _server_type(ser_type),
- _server_instance(NULL)
+ _server_instance(NULL),
+ _server_type(ser_type)
 {
      _server_instance  = M2MObject::create_object_instance();
 
@@ -240,6 +240,22 @@ uint32_t M2MSecurity::resource_value_buffer(SecurityResource resource,
            M2MSecurity::ServerPublicKey == resource  ||
            M2MSecurity::Secretkey == resource) {
             res->get_value(data,size);
+        }
+    }
+    return size;
+}
+
+uint32_t M2MSecurity::resource_value_buffer(SecurityResource resource,
+                               const uint8_t *&data) const
+{
+    uint32_t size = 0;
+    M2MResource* res = get_resource(resource);
+    if(res) {
+        if(M2MSecurity::PublicKey == resource        ||
+           M2MSecurity::ServerPublicKey == resource  ||
+           M2MSecurity::Secretkey == resource) {
+            data = res->value();
+            size = res->value_length();
         }
     }
     return size;

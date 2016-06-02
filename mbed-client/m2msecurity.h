@@ -161,11 +161,22 @@ public:
      * \brief Populates the data buffer and returns the size of the buffer.
      * \param resource With this function, the following resources can return a value:
      * 'PublicKey', 'ServerPublicKey', 'Secretkey'.
-     * \param [OUT]data The data buffer that contains the value.
+     * \param [OUT]data Copy of the data buffer that contains the value. Caller
+     * is responsible of freeing this buffer.
      * \return The size of the populated buffer.
      */
     uint32_t resource_value_buffer(SecurityResource resource,
                                    uint8_t *&data) const;
+
+    /**
+     * \brief Returns the pointer to the value and size of the buffer.
+     * \param resource With this function, the following resources can return a value:
+     * 'PublicKey', 'ServerPublicKey', 'Secretkey'.
+     * \param [OUT]data Pointer to the data buffer that contains the value.
+     * \return The size of the populated buffer.
+     */
+    uint32_t resource_value_buffer(SecurityResource resource,
+                                   const uint8_t *&data) const;
 
     /**
      * \brief Returns the value of the given resource name, in Integer.
@@ -203,8 +214,8 @@ private:
 
 private:
 
-    ServerType            _server_type;
     M2MObjectInstance*    _server_instance;
+    ServerType            _server_type;
 
     friend class Test_M2MSecurity;
     friend class Test_M2MInterfaceImpl;
