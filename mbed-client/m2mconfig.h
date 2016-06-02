@@ -22,8 +22,8 @@
 #include "mbed-client/m2mstring.h"
 using namespace m2m;
 
-#if defined(MBED_CONFIG_MBED_CLIENT_USER_CONFIG_FILE)
-#include MBED_CONFIG_MBED_CLIENT_USER_CONFIG_FILE
+#if defined(MBED_CONF_APP_USER_CONFIG_FILE)
+#include MBED_CONF_APP_USER_CONFIG_FILE
 #endif
 
 #ifdef M2M_CLIENT_RECONNECTION_COUNT
@@ -39,7 +39,7 @@ using namespace m2m;
 #endif
 
 #ifndef YOTTA_CFG_RECONNECTION_INTERVAL
-#define YOTTA_CFG_RECONNECTION_INTERVAL 3
+#define YOTTA_CFG_RECONNECTION_INTERVAL 5
 #endif
 
 #ifdef M2M_CLIENT_TCP_KEEPALIVE_TIME
