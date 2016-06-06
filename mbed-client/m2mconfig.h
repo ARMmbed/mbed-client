@@ -22,8 +22,8 @@
 #include "mbed-client/m2mstring.h"
 using namespace m2m;
 
-#if defined(MBED_CONF_APP_USER_CONFIG_FILE)
-#include MBED_CONF_APP_USER_CONFIG_FILE
+#if defined(MBED_CONF_APP_MBED_CLIENT_USER_CONFIG_FILE)
+#include MBED_CONF_APP_MBED_CLIENT_USER_CONFIG_FILE
 #endif
 
 #ifdef M2M_CLIENT_RECONNECTION_COUNT
