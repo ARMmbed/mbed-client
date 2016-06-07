@@ -369,10 +369,10 @@ uint8_t M2MNsdlInterface::received_from_server_callback(struct nsdl_s * nsdl_han
                                                         sn_coap_hdr_s *coap_header,
                                                         sn_nsdl_addr_s *address)
 {
-    tr_debug("M2MNsdlInterface::received_from_server_callback - msg id:%" PRId32, coap_header->msg_id);
-    tr_debug("M2MNsdlInterface::received_from_server_callback - registration id:%" PRId32, nsdl_handle->register_msg_id);
-    tr_debug("M2MNsdlInterface::received_from_server_callback - unregistration id:%" PRId32, nsdl_handle->unregister_msg_id);
-    tr_debug("M2MNsdlInterface::received_from_server_callback - update registration id:%" PRId32, nsdl_handle->update_register_msg_id);
+    tr_debug("M2MNsdlInterface::received_from_server_callback - msg id:%" PRIu16, coap_header->msg_id);
+    tr_debug("M2MNsdlInterface::received_from_server_callback - registration id:%" PRIu16, nsdl_handle->register_msg_id);
+    tr_debug("M2MNsdlInterface::received_from_server_callback - unregistration id:%" PRIu16, nsdl_handle->unregister_msg_id);
+    tr_debug("M2MNsdlInterface::received_from_server_callback - update registration id:%" PRIu16, nsdl_handle->update_register_msg_id);
     _observer.coap_data_processed();
     uint8_t value = 0;
     if(nsdl_handle && coap_header) {
