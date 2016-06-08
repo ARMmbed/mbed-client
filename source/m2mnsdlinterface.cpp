@@ -117,8 +117,8 @@ bool M2MNsdlInterface::initialize()
 
     //Sets the packet retransmission attempts and time interval
     sn_nsdl_set_retransmission_parameters(_nsdl_handle,
-                                          YOTTA_CFG_RECONNECTION_COUNT,
-                                          YOTTA_CFG_RECONNECTION_INTERVAL);
+                                          MBED_CLIENT_RECONNECTION_COUNT,
+                                          MBED_CLIENT_RECONNECTION_INTERVAL);
 
     // Allocate the memory for resources
     _resource = (sn_nsdl_resource_info_s*)memory_alloc(sizeof(sn_nsdl_resource_info_s));
@@ -228,7 +228,7 @@ bool M2MNsdlInterface::delete_nsdl_resource(const String &resource_name)
 
 bool M2MNsdlInterface::create_bootstrap_resource(sn_nsdl_addr_s *address)
 {
-#ifndef M2M_CLIENT_DISABLE_BOOTSTRAP_FEATURE
+#ifndef MBED_CLIENT_DISABLE_BOOTSTRAP_FEATURE
     tr_debug("M2MNsdlInterface::create_bootstrap_resource()");
     bool success = false;
     _bootstrap_device_setup.error_code = NO_ERROR;
@@ -250,7 +250,7 @@ bool M2MNsdlInterface::create_bootstrap_resource(sn_nsdl_addr_s *address)
 #else
     (void)address;
     return false;
-#endif //M2M_CLIENT_DISABLE_BOOTSTRAP_FEATURE
+#endif //MBED_CLIENT_DISABLE_BOOTSTRAP_FEATURE
 }
 
 bool M2MNsdlInterface::send_register_message(uint8_t* address,
@@ -369,10 +369,10 @@ uint8_t M2MNsdlInterface::received_from_server_callback(struct nsdl_s * nsdl_han
                                                         sn_coap_hdr_s *coap_header,
                                                         sn_nsdl_addr_s *address)
 {
-    tr_debug("M2MNsdlInterface::received_from_server_callback - msg id:%" PRId32, coap_header->msg_id);
-    tr_debug("M2MNsdlInterface::received_from_server_callback - registration id:%" PRId32, nsdl_handle->register_msg_id);
-    tr_debug("M2MNsdlInterface::received_from_server_callback - unregistration id:%" PRId32, nsdl_handle->unregister_msg_id);
-    tr_debug("M2MNsdlInterface::received_from_server_callback - update registration id:%" PRId32, nsdl_handle->update_register_msg_id);
+    tr_debug("M2MNsdlInterface::received_from_server_callback - msg id:%" PRIu16, coap_header->msg_id);
+    tr_debug("M2MNsdlInterface::received_from_server_callback - registration id:%" PRIu16, nsdl_handle->register_msg_id);
+    tr_debug("M2MNsdlInterface::received_from_server_callback - unregistration id:%" PRIu16, nsdl_handle->unregister_msg_id);
+    tr_debug("M2MNsdlInterface::received_from_server_callback - update registration id:%" PRIu16, nsdl_handle->update_register_msg_id);
     _observer.coap_data_processed();
     uint8_t value = 0;
     if(nsdl_handle && coap_header) {
@@ -459,7 +459,7 @@ uint8_t M2MNsdlInterface::received_from_server_callback(struct nsdl_s * nsdl_han
                 sn_nsdl_register_endpoint(_nsdl_handle,_endpoint);
             }
         }
-#ifndef M2M_CLIENT_DISABLE_BOOTSTRAP_FEATURE
+#ifndef MBED_CLIENT_DISABLE_BOOTSTRAP_FEATURE
         else if(coap_header->msg_id == _bootstrap_id) {
             _bootstrap_id = 0;
             M2MInterface::Error error = interface_error(coap_header);
@@ -467,7 +467,7 @@ uint8_t M2MNsdlInterface::received_from_server_callback(struct nsdl_s * nsdl_han
                 _observer.bootstrap_error();
             }
         }
-#endif //M2M_CLIENT_DISABLE_BOOTSTRAP_FEATURE
+#endif //MBED_CLIENT_DISABLE_BOOTSTRAP_FEATURE
         else {
             if(COAP_MSG_CODE_REQUEST_POST == coap_header->msg_code) {
                 if(coap_header->uri_path_ptr) {
@@ -640,7 +640,7 @@ uint8_t M2MNsdlInterface::resource_callback(struct nsdl_s */*nsdl_handle*/,
 
 void M2MNsdlInterface::bootstrap_done_callback(sn_nsdl_oma_server_info_t *server_info)
 {
-#ifndef M2M_CLIENT_DISABLE_BOOTSTRAP_FEATURE
+#ifndef MBED_CLIENT_DISABLE_BOOTSTRAP_FEATURE
     tr_debug("M2MNsdlInterface::bootstrap_done_callback()");
     _bootstrap_id = 0;
     M2MSecurity* security = NULL;
@@ -735,7 +735,7 @@ void M2MNsdlInterface::bootstrap_done_callback(sn_nsdl_oma_server_info_t *server
         // Bootstrap error inform to the application.
         _observer.bootstrap_error();
     }
-#else //M2M_CLIENT_DISABLE_BOOTSTRAP_FEATURE
+#else //MBED_CLIENT_DISABLE_BOOTSTRAP_FEATURE
     (void)server_info;
 #endif
 }
