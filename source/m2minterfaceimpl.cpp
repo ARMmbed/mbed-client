@@ -105,7 +105,7 @@ M2MInterfaceImpl::~M2MInterfaceImpl()
 
 void M2MInterfaceImpl::bootstrap(M2MSecurity *security)
 {
-#ifndef M2M_CLIENT_DISABLE_BOOTSTRAP_FEATURE
+#ifndef MBED_CLIENT_DISABLE_BOOTSTRAP_FEATURE
     tr_debug("M2MInterfaceImpl::bootstrap(M2MSecurity *security) - IN");
     // Transition to a new state based upon
     // the current state of the state machine
@@ -136,14 +136,14 @@ void M2MInterfaceImpl::bootstrap(M2MSecurity *security)
         _observer.error(M2MInterface::NotAllowed);
     }
     tr_debug("M2MInterfaceImpl::bootstrap(M2MSecurity *security) - OUT");
-#endif //M2M_CLIENT_DISABLE_BOOTSTRAP_FEATURE
+#endif //MBED_CLIENT_DISABLE_BOOTSTRAP_FEATURE
 }
 
 void M2MInterfaceImpl::cancel_bootstrap()
 {
-#ifndef M2M_CLIENT_DISABLE_BOOTSTRAP_FEATURE
+#ifndef MBED_CLIENT_DISABLE_BOOTSTRAP_FEATURE
 //TODO: Do we need this ?
-#endif //M2M_CLIENT_DISABLE_BOOTSTRAP_FEATURE
+#endif //MBED_CLIENT_DISABLE_BOOTSTRAP_FEATURE
 }
 
 void M2MInterfaceImpl::register_object(M2MSecurity *security, const M2MObjectList &object_list)
@@ -350,20 +350,20 @@ void M2MInterfaceImpl::client_unregistered()
 
 void M2MInterfaceImpl::bootstrap_done(M2MSecurity *security_object)
 {
-#ifndef M2M_CLIENT_DISABLE_BOOTSTRAP_FEATURE
+#ifndef MBED_CLIENT_DISABLE_BOOTSTRAP_FEATURE
     tr_debug("M2MInterfaceImpl::bootstrap_done(M2MSecurity *security_object)");
     internal_event(STATE_BOOTSTRAPPED);
     _observer.bootstrap_done(security_object);
-#endif //M2M_CLIENT_DISABLE_BOOTSTRAP_FEATURE
+#endif //MBED_CLIENT_DISABLE_BOOTSTRAP_FEATURE
 }
 
 void M2MInterfaceImpl::bootstrap_error()
 {
-#ifndef M2M_CLIENT_DISABLE_BOOTSTRAP_FEATURE
+#ifndef MBED_CLIENT_DISABLE_BOOTSTRAP_FEATURE
     tr_debug("M2MInterfaceImpl::bootstrap_error()");
     internal_event(STATE_IDLE);
     _observer.error(M2MInterface::BootstrapFailed);
-#endif //M2M_CLIENT_DISABLE_BOOTSTRAP_FEATURE
+#endif //MBED_CLIENT_DISABLE_BOOTSTRAP_FEATURE
 }
 
 void M2MInterfaceImpl::coap_data_processed()
@@ -426,18 +426,18 @@ void M2MInterfaceImpl::socket_error(uint8_t error_code, bool retry)
 
     // Try to do reconnecting
     if (retry) {
-        if (_retry_count < YOTTA_CFG_RECONNECTION_COUNT) {
+        if (_retry_count < MBED_CLIENT_RECONNECTION_COUNT) {
             internal_event(STATE_IDLE);
             _reconnecting = true;
             _retry_count++;
             _connection_handler->stop_listening();
-            int retry_time = YOTTA_CFG_RECONNECTION_INTERVAL *
-                    YOTTA_CFG_RECONNECTION_COUNT * _retry_count * 1000;
+            int retry_time = MBED_CLIENT_RECONNECTION_INTERVAL *
+                    MBED_CLIENT_RECONNECTION_COUNT * _retry_count * 1000;
             _retry_timer_expired = false;
             _retry_timer->start_timer(retry_time,
                                       M2MTimerObserver::RetryTimer);
             tr_debug("M2MInterfaceImpl::socket_error - reconnecting in %d(s), count %d/%d", retry_time / 1000,
-                     _retry_count, YOTTA_CFG_RECONNECTION_COUNT);
+                     _retry_count, MBED_CLIENT_RECONNECTION_COUNT);
         } else {
             tr_debug("M2MInterfaceImpl::socket_error - no more retries");
             _connection_handler->stop_listening();
@@ -483,7 +483,7 @@ void M2MInterfaceImpl::data_sent()
        _binding_mode == M2MInterface::UDP_SMS_QUEUE) {
         if(_callback_handler) {
             _queue_sleep_timer->stop_timer();
-            _queue_sleep_timer->start_timer(YOTTA_CFG_RECONNECTION_COUNT*YOTTA_CFG_RECONNECTION_INTERVAL*1000,
+            _queue_sleep_timer->start_timer(MBED_CLIENT_RECONNECTION_COUNT*MBED_CLIENT_RECONNECTION_INTERVAL*1000,
                                             M2MTimerObserver::QueueSleep);
         }
     }
@@ -518,7 +518,7 @@ void M2MInterfaceImpl::state_idle(EventData* /*data*/)
 
 void M2MInterfaceImpl::state_bootstrap( EventData *data)
 {
-#ifndef M2M_CLIENT_DISABLE_BOOTSTRAP_FEATURE
+#ifndef MBED_CLIENT_DISABLE_BOOTSTRAP_FEATURE
     tr_debug("M2MInterfaceImpl::state_bootstrap");
     // Start with bootstrapping preparation
     bool success = false;
@@ -566,12 +566,12 @@ void M2MInterfaceImpl::state_bootstrap( EventData *data)
         _observer.error(M2MInterface::InvalidParameters);
         internal_event(STATE_IDLE);
     }
-#endif //M2M_CLIENT_DISABLE_BOOTSTRAP_FEATURE
+#endif //MBED_CLIENT_DISABLE_BOOTSTRAP_FEATURE
 }
 
 void M2MInterfaceImpl::state_bootstrap_address_resolved( EventData *data)
 {
-#ifndef M2M_CLIENT_DISABLE_BOOTSTRAP_FEATURE
+#ifndef MBED_CLIENT_DISABLE_BOOTSTRAP_FEATURE
     tr_debug("M2MInterfaceImpl::state_bootstrap_address_resolved");
     ResolvedAddressData *event = static_cast<ResolvedAddressData *> (data);
     sn_nsdl_addr_s address;
@@ -600,21 +600,21 @@ void M2MInterfaceImpl::state_bootstrap_address_resolved( EventData *data)
         internal_event(STATE_IDLE);
         _observer.error(M2MInterface::InvalidParameters);
     }
-#endif //M2M_CLIENT_DISABLE_BOOTSTRAP_FEATURE
+#endif //MBED_CLIENT_DISABLE_BOOTSTRAP_FEATURE
 }
 
 void M2MInterfaceImpl::state_bootstrap_resource_created( EventData */*data*/)
 {
-#ifndef M2M_CLIENT_DISABLE_BOOTSTRAP_FEATURE
+#ifndef MBED_CLIENT_DISABLE_BOOTSTRAP_FEATURE
     tr_debug("M2MInterfaceImpl::state_bootstrap_resource_created");
-#endif //M2M_CLIENT_DISABLE_BOOTSTRAP_FEATURE
+#endif //MBED_CLIENT_DISABLE_BOOTSTRAP_FEATURE
 }
 
 void M2MInterfaceImpl::state_bootstrapped( EventData */*data*/)
 {
-#ifndef M2M_CLIENT_DISABLE_BOOTSTRAP_FEATURE
+#ifndef MBED_CLIENT_DISABLE_BOOTSTRAP_FEATURE
     tr_debug("M2MInterfaceImpl::state_bootstrapped");
-#endif //M2M_CLIENT_DISABLE_BOOTSTRAP_FEATURE
+#endif //MBED_CLIENT_DISABLE_BOOTSTRAP_FEATURE
 }
 
 void M2MInterfaceImpl::state_register( EventData *data)
@@ -890,24 +890,24 @@ void M2MInterfaceImpl::state_function( uint8_t current_state, EventData* data )
             M2MInterfaceImpl::state_idle(data);
             break;
         case STATE_BOOTSTRAP:
-        #ifndef M2M_CLIENT_DISABLE_BOOTSTRAP_FEATURE
+        #ifndef MBED_CLIENT_DISABLE_BOOTSTRAP_FEATURE
             M2MInterfaceImpl::state_bootstrap(data);
-        #endif //M2M_CLIENT_DISABLE_BOOTSTRAP_FEATURE
+        #endif //MBED_CLIENT_DISABLE_BOOTSTRAP_FEATURE
             break;
         case STATE_BOOTSTRAP_ADDRESS_RESOLVED:
-        #ifndef M2M_CLIENT_DISABLE_BOOTSTRAP_FEATURE
+        #ifndef MBED_CLIENT_DISABLE_BOOTSTRAP_FEATURE
             M2MInterfaceImpl::state_bootstrap_address_resolved(data);
-        #endif //M2M_CLIENT_DISABLE_BOOTSTRAP_FEATURE
+        #endif //MBED_CLIENT_DISABLE_BOOTSTRAP_FEATURE
             break;
         case STATE_BOOTSTRAP_RESOURCE_CREATED:
-        #ifndef M2M_CLIENT_DISABLE_BOOTSTRAP_FEATURE
+        #ifndef MBED_CLIENT_DISABLE_BOOTSTRAP_FEATURE
             M2MInterfaceImpl::state_bootstrap_resource_created(data);
-        #endif //M2M_CLIENT_DISABLE_BOOTSTRAP_FEATURE
+        #endif //MBED_CLIENT_DISABLE_BOOTSTRAP_FEATURE
             break;
         case STATE_BOOTSTRAPPED:
-        #ifndef M2M_CLIENT_DISABLE_BOOTSTRAP_FEATURE
+        #ifndef MBED_CLIENT_DISABLE_BOOTSTRAP_FEATURE
             M2MInterfaceImpl::state_bootstrapped(data);
-        #endif //M2M_CLIENT_DISABLE_BOOTSTRAP_FEATURE
+        #endif //MBED_CLIENT_DISABLE_BOOTSTRAP_FEATURE
             break;
         case STATE_REGISTER:
             M2MInterfaceImpl::state_register(data);
