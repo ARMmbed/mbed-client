@@ -75,6 +75,8 @@ public :
     */
     virtual void bootstrap_done(M2MSecurity *security_object) = 0;
 
+    //virtual void delete_bootstrap_data() = 0;
+
     /**
     * @brief Informs that some error occured during
     * bootstrapping.

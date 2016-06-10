@@ -33,48 +33,47 @@ M2MSecurity::M2MSecurity(ServerType ser_type)
      _server_instance  = M2MObject::create_object_instance();
 
     if(_server_instance) {
-
         M2MResource* res = _server_instance->create_dynamic_resource(SECURITY_M2M_SERVER_URI,
                                                                      OMA_RESOURCE_TYPE,
                                                                      M2MResourceInstance::STRING,
                                                                      false);
         if(res) {
-            res->set_operation(M2MBase::NOT_ALLOWED);
+            res->set_operation(M2MBase::GET_PUT_ALLOWED);
         }
         res = _server_instance->create_dynamic_resource(SECURITY_BOOTSTRAP_SERVER,
                                                         OMA_RESOURCE_TYPE,
                                                         M2MResourceInstance::BOOLEAN,
                                                         false);
         if(res) {
-            res->set_operation(M2MBase::NOT_ALLOWED);
+            res->set_operation(M2MBase::GET_PUT_ALLOWED);
         }
         res = _server_instance->create_dynamic_resource(SECURITY_SECURITY_MODE,
                                                         OMA_RESOURCE_TYPE,
                                                         M2MResourceInstance::INTEGER,
                                                         false);
         if(res) {
-            res->set_operation(M2MBase::NOT_ALLOWED);
+            res->set_operation(M2MBase::GET_PUT_ALLOWED);
         }
         res = _server_instance->create_dynamic_resource(SECURITY_PUBLIC_KEY,
                                                         OMA_RESOURCE_TYPE,
                                                         M2MResourceInstance::OPAQUE,
                                                         false);
         if(res) {
-            res->set_operation(M2MBase::NOT_ALLOWED);
+            res->set_operation(M2MBase::GET_PUT_ALLOWED);
         }
         res = _server_instance->create_dynamic_resource(SECURITY_SERVER_PUBLIC_KEY,
                                                         OMA_RESOURCE_TYPE,
                                                         M2MResourceInstance::OPAQUE,
                                                         false);
         if(res) {
-            res->set_operation(M2MBase::NOT_ALLOWED);
+            res->set_operation(M2MBase::GET_PUT_ALLOWED);
         }
         res = _server_instance->create_dynamic_resource(SECURITY_SECRET_KEY,
                                                         OMA_RESOURCE_TYPE,
                                                         M2MResourceInstance::OPAQUE,
                                                         false);
         if(res) {
-            res->set_operation(M2MBase::NOT_ALLOWED);
+            res->set_operation(M2MBase::GET_PUT_ALLOWED);
         }
         if(M2MSecurity::M2MServer == ser_type) {
             res = _server_instance->create_dynamic_resource(SECURITY_SHORT_SERVER_ID,
@@ -82,7 +81,7 @@ M2MSecurity::M2MSecurity(ServerType ser_type)
                                                             M2MResourceInstance::INTEGER,
                                                             false);
             if(res) {
-                res->set_operation(M2MBase::NOT_ALLOWED);
+                res->set_operation(M2MBase::GET_PUT_ALLOWED);
             }
         }
     }
@@ -119,7 +118,6 @@ M2MResource* M2MSecurity::create_resource(SecurityResource resource, uint32_t va
     
     if(!security_id.empty()) {
         if(_server_instance) {
-
             res = _server_instance->create_dynamic_resource(security_id,OMA_RESOURCE_TYPE,
                                                             M2MResourceInstance::INTEGER,
                                                             false);
@@ -128,6 +126,43 @@ M2MResource* M2MSecurity::create_resource(SecurityResource resource, uint32_t va
                 res->set_operation(M2MBase::NOT_ALLOWED);
 
                 res->set_value(value);
+            }
+        }
+    }
+    return res;
+}
+
+M2MResource* M2MSecurity::create_resource(SecurityResource resource, const String &value)
+{
+    M2MResource* res = NULL;
+    const char* security_id_ptr = "";
+    M2MBase::Operation operation = M2MBase::NOT_ALLOWED;
+    if(!is_resource_present(resource) && value.size() <= MAX_ALLOWED_STRING_LENGTH) {
+        switch(resource) {
+            case AccountId:
+               security_id_ptr = SECURITY_ACCOUNT_ID;
+               break;
+            default:
+                break;
+        }
+    }
+    const String security_id(security_id_ptr);
+
+    if(!security_id.empty()) {
+        if(_server_instance) {
+            res = _server_instance->create_dynamic_resource(security_id,
+                                                            OMA_RESOURCE_TYPE,
+                                                            M2MResourceInstance::STRING,
+                                                            false);
+            if(res ) {
+                res->set_operation(operation);
+                if (value.empty()) {
+                    res->clear_value();
+                } else {
+                    res->set_value((const uint8_t*)value.c_str(),
+                                   (uint32_t)value.length());
+                }
+                res->set_register_uri(false);
             }
         }
     }
@@ -153,6 +188,9 @@ bool M2MSecurity::delete_resource(SecurityResource resource)
         case ClientHoldOffTime:
             security_id_ptr = SECURITY_CLIENT_HOLD_OFF_TIME;
             break;
+        case AccountId:
+            security_id_ptr = SECURITY_ACCOUNT_ID;
+            break;
         default:
             // Others are mandatory resources hence cannot be deleted.
             break;
@@ -172,7 +210,8 @@ bool M2MSecurity::set_resource_value(SecurityResource resource,
                                      const String &value)
 {
     bool success = false;
-    if(M2MSecurity::M2MServerUri == resource) {
+    if(M2MSecurity::M2MServerUri == resource ||
+            M2MSecurity::AccountId == resource) {
         M2MResource* res = get_resource(resource);
         if(res) {
             success = res->set_value((const uint8_t*)value.c_str(),(uint32_t)value.length());
@@ -222,8 +261,8 @@ String M2MSecurity::resource_value_string(SecurityResource resource) const
     String value = "";
     M2MResource* res = get_resource(resource);
     if(res) {
-        if(M2MSecurity::M2MServerUri == resource) {
-
+        if(M2MSecurity::M2MServerUri == resource ||
+                M2MSecurity::AccountId == resource) {
             value = res->get_value_string();
         }
     }
@@ -344,6 +383,9 @@ M2MResource* M2MSecurity::get_resource(SecurityResource res) const
                 break;
             case ClientHoldOffTime:
                 res_name_ptr = SECURITY_CLIENT_HOLD_OFF_TIME;
+                break;
+            case AccountId:
+                res_name_ptr = SECURITY_ACCOUNT_ID;
                 break;
         }
         const String res_name(res_name_ptr);

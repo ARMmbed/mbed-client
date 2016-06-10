@@ -42,6 +42,14 @@ public:
     virtual void bootstrap_done(M2MSecurity *server_object) = 0;
 
     /**
+     * \brief A callback indicating that the bootstap has been performed successfully.
+     * \param server_object The server object that contains information fetched
+     * about the LWM2M server from the bootstrap server. This object can be used
+     * to register to the LWM2M server. The object ownership is passed.
+     */
+    /*virtual void delete_bootstrap_data() = 0;*/
+
+    /**
      * \brief A callback indicating that the device object has been registered
      * successfully to the LWM2M server.
      * \param security_object The server object on which the device object is

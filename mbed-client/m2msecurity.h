@@ -51,7 +51,8 @@ public:
         SMSBindingSecretKey,
         M2MServerSMSNumber,
         ShortServerID,
-        ClientHoldOffTime
+        ClientHoldOffTime,
+        AccountId
     }SecurityResource;
 
     /**
@@ -107,6 +108,15 @@ public:
      * \return M2MResource if created successfully, else NULL.
      */
     M2MResource* create_resource(SecurityResource rescource, uint32_t value);
+
+    /**
+     * \brief Creates a new resource for the given resource enum.
+     * \param resource With this function, the following resources can be created:
+     * 'AccountId'.
+     * \param value The value to be set on the resource, in String format.
+     * \return M2MResource if created successfully, else NULL.
+     */
+    M2MResource* create_resource(SecurityResource resource, const String &value);
 
     /**
      * \brief Deletes the resource with the given resource enum.

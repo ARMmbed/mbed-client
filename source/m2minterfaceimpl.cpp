@@ -351,11 +351,20 @@ void M2MInterfaceImpl::client_unregistered()
 void M2MInterfaceImpl::bootstrap_done(M2MSecurity *security_object)
 {
 #ifndef M2M_CLIENT_DISABLE_BOOTSTRAP_FEATURE
-    tr_debug("M2MInterfaceImpl::bootstrap_done(M2MSecurity *security_object)");
+    tr_debug("M2MInterfaceImpl::bootstrap_done");
     internal_event(STATE_BOOTSTRAPPED);
     _observer.bootstrap_done(security_object);
 #endif //M2M_CLIENT_DISABLE_BOOTSTRAP_FEATURE
 }
+/*
+void M2MInterfaceImpl::delete_bootstrap_data()
+{
+#ifndef M2M_CLIENT_DISABLE_BOOTSTRAP_FEATURE
+    tr_debug("M2MInterfaceImpl::delete_bootstrap_data");
+    internal_event(STATE_IDLE);
+    _observer.delete_bootstrap_data();
+#endif //M2M_CLIENT_DISABLE_BOOTSTRAP_FEATURE
+}*/
 
 void M2MInterfaceImpl::bootstrap_error()
 {
@@ -528,7 +537,9 @@ void M2MInterfaceImpl::state_bootstrap( EventData *data)
             if(M2MSecurity::Bootstrap == security->server_type()) {
                 tr_debug("M2MInterfaceImpl::state_bootstrap - server_type : M2MSecurity::Bootstrap");
                 String server_address = security->resource_value_string(M2MSecurity::M2MServerUri);
+                _account_id = security->resource_value_string(M2MSecurity::AccountId);
                 tr_debug("M2MInterfaceImpl::state_bootstrap - server_address %s", server_address.c_str());
+                tr_debug("M2MInterfaceImpl::state_bootstrap - account_id %s", _account_id.c_str());
                 String ip_address;
                 String  coap;
                 if(server_address.compare(0,sizeof(COAP)-1,COAP) == 0) {
@@ -590,7 +601,13 @@ void M2MInterfaceImpl::state_bootstrap_address_resolved( EventData *data)
     address.port = event->_port;
     address.addr_ptr = (uint8_t*)event->_address->_address;
     _connection_handler->start_listening_for_data();
-    if(_nsdl_interface->create_bootstrap_resource(&address)) {
+
+    // Include account id to be part of endpoint name
+    if (!_account_id.empty()) {
+        _endpoint_name += '@';
+        _endpoint_name += _account_id;
+    }
+    if(_nsdl_interface->create_bootstrap_resource(&address, _endpoint_name)) {
        tr_debug("M2MInterfaceImpl::state_bootstrap_address_resolved : create_bootstrap_resource - success");
        internal_event(STATE_BOOTSTRAP_RESOURCE_CREATED);
     } else{

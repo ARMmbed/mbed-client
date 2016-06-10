@@ -100,9 +100,10 @@ public:
     /**
      * @brief Creates the bootstrap object.
      * @param address Bootstrap address.
+     * @param account_id Account identification.
      * @return true if created and sent successfully else false.
     */
-    bool create_bootstrap_resource(sn_nsdl_addr_s *address);
+    bool create_bootstrap_resource(sn_nsdl_addr_s *address, const String &bs_endpoint_name);
 
     /**
      * @brief Sends the register message to the server.
@@ -181,12 +182,6 @@ public:
     uint8_t resource_callback(struct nsdl_s *nsdl_handle, sn_coap_hdr_s *coap,
                                sn_nsdl_addr_s *address,
                                sn_nsdl_capab_e nsdl_capab);
-
-    /**
-     * @brief Callback when the bootstrap information is received from bootstrap server.
-     * @param server_info, Server information received from bootstrap server.
-     */
-    void bootstrap_done_callback(sn_nsdl_oma_server_info_t *server_info);
 
     /**
      * @brief Callback when there is data received from server and needs to be processed.
@@ -298,10 +293,10 @@ private:
                            const String  &uri_path);
 
     /**
-     * \brief Allocate (size + 1) amount of memory, copy size bytes into
+     * @brief Allocate (size + 1) amount of memory, copy size bytes into
      * it and add zero termination.
-     * \param source Source string to copy, may not be NULL.
-     * \param size The size of memory to be reserved.
+     * @param source Source string to copy, may not be NULL.
+     * @param size The size of memory to be reserved.
     */
     uint8_t* alloc_string_copy(const uint8_t* source, uint16_t size);
 
@@ -312,11 +307,40 @@ private:
     */
     void set_endpoint_lifetime_buffer(int lifetime);
 
+    /**
+     * @brief Handle incoming bootstrap PUT message.
+     * @param coap_header, Received CoAP message
+     * @param address, Server address
+    */
+    void handle_bootstrap_put_message(sn_coap_hdr_s *coap_header, sn_nsdl_addr_s *address);
+
+    /**
+     * @brief Handle bootstrap finished message.
+     * @param coap_header, Received CoAP message
+     * @param address, Server address
+    */
+    void handle_bootstrap_finished(sn_coap_hdr_s *coap_header,sn_nsdl_addr_s *address);
+
+    /**
+     * @brief Handle bootstrap delete message.
+     * @param coap_header, Received CoAP message
+     * @param address, Server address
+    */
+    void handle_bootstrap_delete(sn_coap_hdr_s *coap_header,sn_nsdl_addr_s *address);
+
+    /**
+     * @brief Parse bootstrap TLV message.
+     * @param coap_header, Received CoAP message
+     * @return True if parsing was succesful else false
+    */
+    bool parse_bootstrap_message(sn_coap_hdr_s *coap_header);
+
 private:
 
     M2MNsdlObserver                   &_observer;
     M2MObjectList                      _object_list;
     M2MServer                         *_server;
+    M2MSecurity                       *_security; // Owned by application
     M2MTimer                          *_nsdl_exceution_timer;
     M2MTimer                          *_registration_timer;
     sn_nsdl_ep_parameters_s           *_endpoint;
@@ -336,3 +360,4 @@ friend class Test_M2MNsdlInterface;
 };
 
 #endif // M2MNSDLINTERFACE_H
+
