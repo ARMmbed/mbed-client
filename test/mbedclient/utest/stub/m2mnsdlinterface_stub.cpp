@@ -62,7 +62,7 @@ bool M2MNsdlInterface::delete_nsdl_resource(const String &)
     return m2mnsdlinterface_stub::bool_value;
 }
 
-bool M2MNsdlInterface::create_bootstrap_resource(sn_nsdl_addr_s *)
+bool M2MNsdlInterface::create_bootstrap_resource(sn_nsdl_addr_s *, const String& name)
 {
     return m2mnsdlinterface_stub::bool_value;
 }
@@ -119,9 +119,6 @@ uint8_t M2MNsdlInterface::resource_callback(struct nsdl_s *,
     return (uint8_t)m2mnsdlinterface_stub::int_value;
 }
 
-void M2MNsdlInterface::bootstrap_done_callback(sn_nsdl_oma_server_info_t *)
-{
-}
 
 bool M2MNsdlInterface::process_received_data(uint8_t *,
                                              uint16_t ,

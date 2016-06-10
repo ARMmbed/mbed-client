@@ -62,7 +62,6 @@ M2MNsdlInterface::M2MNsdlInterface(M2MNsdlObserver &observer)
     __nsdl_interface_list.push_back(this);
     _bootstrap_endpoint.device_object = NULL;
     _bootstrap_endpoint.oma_bs_status_cb_handle = NULL;
-
     _bootstrap_device_setup.sn_oma_device_boot_callback = NULL;
     _bootstrap_device_setup.error_code = NO_ERROR;
 
@@ -95,8 +94,7 @@ M2MNsdlInterface::~M2MNsdlInterface()
     delete _nsdl_exceution_timer;
     delete _registration_timer;
     _object_list.clear();
-    delete _server;
-    //delete _security;
+    delete _server;    
     sn_nsdl_destroy(_nsdl_handle);
     _nsdl_handle = NULL;
 
@@ -110,6 +108,7 @@ M2MNsdlInterface::~M2MNsdlInterface()
         }
         index++;
     }
+    _security = NULL;
 
     tr_debug("M2MNsdlInterface::~M2MNsdlInterface() - OUT");
 }
@@ -125,7 +124,9 @@ bool M2MNsdlInterface::initialize()
                                           MBED_CLIENT_RECONNECTION_INTERVAL);
 
     // We want to parse and handle bootstrap messages
-    _nsdl_handle->parse_bootstrap_msgs = false;
+    if (_nsdl_handle) {
+        _nsdl_handle->handle_bootstrap_msg = false;
+    }
 
     // Allocate the memory for resources
     _resource = (sn_nsdl_resource_info_s*)memory_alloc(sizeof(sn_nsdl_resource_info_s));
@@ -1490,15 +1491,13 @@ void M2MNsdlInterface::handle_bootstrap_put_message(sn_coap_hdr_s *coap_header,
     tr_debug("M2MNsdlInterface::handle_bootstrap_message");
     uint8_t response_code = COAP_MSG_CODE_RESPONSE_CHANGED;
     sn_coap_hdr_s *coap_response = NULL;
-    bool security_object = true;
     bool success = true;
-    int content_type = 0;
+    uint16_t content_type = 0;
 
     String resource_name = coap_to_string(coap_header->uri_path_ptr,
                                           coap_header->uri_path_len);
     if (resource_name.compare(0,1,"0") != 0) {
         tr_debug("M2MNsdlInterface::handle_bootstrap_message - NOT SECURITY object");
-        security_object = false;
         success = false;
     }
 
@@ -1529,25 +1528,23 @@ void M2MNsdlInterface::handle_bootstrap_put_message(sn_coap_hdr_s *coap_header,
             success = parse_bootstrap_message(coap_header);
         }
     }
+
     if (!success) {
         response_code = COAP_MSG_CODE_RESPONSE_BAD_REQUEST;
+        _observer.bootstrap_error();
     }
-
     coap_response = sn_nsdl_build_response(_nsdl_handle,
                                            coap_header,
                                            response_code);
-
     if (coap_response) {
         sn_nsdl_send_coap_message(_nsdl_handle, address, coap_response);
         sn_nsdl_release_allocated_coap_msg_mem(_nsdl_handle, coap_response);
-    } else {
-        success = false;
     }
 
-    if (!success) {
-        //_observer.bootstrap_done(_security);
-    }
     tr_debug("M2MNsdlInterface::handle_bootstrap_message - OUT");
+#else
+    (void) coap_header;
+    (void) address;
 #endif
 }
 
@@ -1590,6 +1587,7 @@ bool M2MNsdlInterface::parse_bootstrap_message(sn_coap_hdr_s *coap_header)
     delete deserializer;
     return ret;
 #else
+    (void) coap_header;
     return false;
 #endif
 }
@@ -1605,15 +1603,17 @@ void M2MNsdlInterface::handle_bootstrap_finished(sn_coap_hdr_s *coap_header,sn_n
     if(coap_response) {
         sn_nsdl_send_coap_message(_nsdl_handle, address, coap_response);
         sn_nsdl_release_allocated_coap_msg_mem(_nsdl_handle, coap_response);
-
-        String name = _security->resource_value_string(M2MSecurity::M2MServerUri);
-        bool type = _security->resource_value_int(M2MSecurity::BootstrapServer);
-        tr_debug("M2MNsdlInterface::handle_bootstrap_finished - server uri: %s", name.c_str());
-        tr_debug("M2MNsdlInterface::handle_bootstrap_finished - is bs server: %d", type);
+        tr_debug("M2MNsdlInterface::handle_bootstrap_finished - server uri: %s",
+                 _security->resource_value_string(M2MSecurity::M2MServerUri).c_str());
+        tr_debug("M2MNsdlInterface::handle_bootstrap_finished - is bs server: %d",
+                 _security->resource_value_int(M2MSecurity::BootstrapServer));
         _observer.bootstrap_done(_security);
     } else {
         _observer.bootstrap_error();
     }
+#else
+    (void) coap_header;
+    (void) address;
 #endif
 }
 
@@ -1622,8 +1622,6 @@ void M2MNsdlInterface::handle_bootstrap_delete(sn_coap_hdr_s *coap_header,sn_nsd
 #ifndef M2M_CLIENT_DISABLE_BOOTSTRAP_FEATURE
     tr_debug("M2MNsdlInterface::handle_bootstrap_delete");
     sn_coap_hdr_s *coap_response = NULL;
-    delete _security;
-    _security = new M2MSecurity(M2MSecurity::Bootstrap);
     coap_response = sn_nsdl_build_response(_nsdl_handle,
                                            coap_header,
                                            COAP_MSG_CODE_RESPONSE_DELETED);
@@ -1631,8 +1629,16 @@ void M2MNsdlInterface::handle_bootstrap_delete(sn_coap_hdr_s *coap_header,sn_nsd
         sn_nsdl_send_coap_message(_nsdl_handle, address, coap_response);
         sn_nsdl_release_allocated_coap_msg_mem(_nsdl_handle, coap_response);
         //_observer.delete_bootstrap_data();
+        _security = NULL;
+        _security = new M2MSecurity(M2MSecurity::M2MServer);
+        // Needed for leshan testing
+        _security->set_resource_value(M2MSecurity::SecurityMode, M2MSecurity::NoSecurity);
+
     } else {
         _observer.bootstrap_error();
     }
+#else
+    (void) coap_header;
+    (void) address;
 #endif
 }

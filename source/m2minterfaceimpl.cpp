@@ -136,6 +136,8 @@ void M2MInterfaceImpl::bootstrap(M2MSecurity *security)
         _observer.error(M2MInterface::NotAllowed);
     }
     tr_debug("M2MInterfaceImpl::bootstrap(M2MSecurity *security) - OUT");
+#else
+    _observer.error(M2MInterface::NotAllowed);
 #endif //MBED_CLIENT_DISABLE_BOOTSTRAP_FEATURE
 }
 
@@ -362,10 +364,10 @@ void M2MInterfaceImpl::delete_bootstrap_data()
 #ifndef M2M_CLIENT_DISABLE_BOOTSTRAP_FEATURE
     tr_debug("M2MInterfaceImpl::delete_bootstrap_data");
     internal_event(STATE_IDLE);
-    _observer.delete_bootstrap_data();
+    //_observer.delete_bootstrap_data();
 #endif //M2M_CLIENT_DISABLE_BOOTSTRAP_FEATURE
-}*/
-
+}
+*/
 void M2MInterfaceImpl::bootstrap_error()
 {
 #ifndef MBED_CLIENT_DISABLE_BOOTSTRAP_FEATURE

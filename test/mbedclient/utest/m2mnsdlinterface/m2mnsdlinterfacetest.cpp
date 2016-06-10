@@ -124,11 +124,6 @@ TEST(M2MNsdlInterface, resource_callback_reset)
     m2m_nsdl_interface->test_resource_callback_reset();
 }
 
-TEST(M2MNsdlInterface, bootstrap_done_callback)
-{
-    m2m_nsdl_interface->test_bootstrap_done_callback();
-}
-
 TEST(M2MNsdlInterface, timer_expired)
 {
     m2m_nsdl_interface->test_timer_expired();

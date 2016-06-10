@@ -65,10 +65,6 @@ uint8_t __nsdl_c_received_from_server(struct nsdl_s * ,
     return nsdlaccesshelper_stub::int_value;
 }
 
-void __nsdl_c_bootstrap_done(sn_nsdl_oma_server_info_t *, nsdl_s *nsdl_handle)
-{
-}
-
 void *__socket_malloc( void *, size_t)
 {
 return nsdlaccesshelper_stub::void_value;

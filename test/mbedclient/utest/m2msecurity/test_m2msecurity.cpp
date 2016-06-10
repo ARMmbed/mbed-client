@@ -71,6 +71,7 @@ void Test_M2MSecurity::test_create_resource_int()
     CHECK(security->create_resource(M2MSecurity::Secretkey,10) == NULL);
     CHECK(security->create_resource(M2MSecurity::SMSBindingKey,10) == NULL);
     CHECK(security->create_resource(M2MSecurity::SMSBindingSecretKey,10) == NULL);
+    CHECK(security->create_resource(M2MSecurity::AccountId,10) == NULL);
 
     CHECK(security->create_resource(M2MSecurity::M2MServerSMSNumber,10) != NULL);
     CHECK(security->create_resource(M2MSecurity::ShortServerID,10) != NULL);
@@ -101,6 +102,7 @@ void Test_M2MSecurity::test_delete_resource()
     CHECK(security->delete_resource(M2MSecurity::ShortServerID) == true);
     CHECK(security->delete_resource(M2MSecurity::ClientHoldOffTime) == true);
     CHECK(security->delete_resource(M2MSecurity::SMSSecurityMode) == true);
+    CHECK(security->delete_resource(M2MSecurity::AccountId) == true);
 
     delete m2mobjectinstance_stub::resource;
     m2mobjectinstance_stub::resource = NULL;
@@ -112,6 +114,7 @@ void Test_M2MSecurity::test_set_resource_value_string()
     m2mobjectinstance_stub::resource = new M2MResource(*m2mobject_stub::inst,"name","type",M2MResourceInstance::STRING,M2MBase::Dynamic);
 
     CHECK(security->set_resource_value(M2MSecurity::M2MServerUri,"test") == true);
+    CHECK(security->set_resource_value(M2MSecurity::AccountId,"test") == true);
 
     CHECK(security->set_resource_value(M2MSecurity::M2MServerSMSNumber,"test") == false);
     CHECK(security->set_resource_value(M2MSecurity::ShortServerID,"test") == false);
@@ -141,6 +144,7 @@ void Test_M2MSecurity::test_set_resource_value_int()
     CHECK(security->set_resource_value(M2MSecurity::ServerPublicKey,10) == false);
     CHECK(security->set_resource_value(M2MSecurity::PublicKey,10) == false);
     CHECK(security->set_resource_value(M2MSecurity::BootstrapServer,10) == false);
+    CHECK(security->set_resource_value(M2MSecurity::AccountId,10) == false);
 
     CHECK(security->set_resource_value(M2MSecurity::SecurityMode,10) == true);
     CHECK(security->set_resource_value(M2MSecurity::SMSSecurityMode,10) == true);
@@ -169,6 +173,7 @@ void Test_M2MSecurity::test_set_resource_value_buffer()
     CHECK(security->set_resource_value(M2MSecurity::SMSBindingKey,value,length) == false);
     CHECK(security->set_resource_value(M2MSecurity::SMSBindingSecretKey,value,length) == false);
     CHECK(security->set_resource_value(M2MSecurity::BootstrapServer,value,length) == false);
+    CHECK(security->set_resource_value(M2MSecurity::AccountId,value,length) == false);
 
     CHECK(security->set_resource_value(M2MSecurity::SecurityMode,value,length) == false);
     CHECK(security->set_resource_value(M2MSecurity::SMSSecurityMode,value,length) == false);
@@ -204,6 +209,7 @@ void Test_M2MSecurity::test_resource_value_int()
    CHECK(security->resource_value_int(M2MSecurity::SMSBindingSecretKey) == 0);
    CHECK(security->resource_value_int(M2MSecurity::SMSBindingKey) == 0);
    CHECK(security->resource_value_int(M2MSecurity::M2MServerUri) == 0);
+   CHECK(security->resource_value_int(M2MSecurity::AccountId) == 0);
 
    delete m2mobjectinstance_stub::resource;
    m2mobjectinstance_stub::resource = NULL;
@@ -225,6 +231,7 @@ void Test_M2MSecurity::test_resource_value_string()
     m2mobjectinstance_stub::resource = new M2MResource(*m2mobject_stub::inst,"name","type",M2MResourceInstance::STRING,M2MBase::Dynamic);
 
     CHECK(security->resource_value_string(M2MSecurity::M2MServerUri) == test);
+    CHECK(security->resource_value_string(M2MSecurity::AccountId) == test);
 
     CHECK(security->resource_value_string(M2MSecurity::SMSBindingKey) == "");
     CHECK(security->resource_value_string(M2MSecurity::SMSBindingSecretKey) == "");
@@ -264,6 +271,7 @@ void Test_M2MSecurity::test_resource_value_buffer()
     CHECK(security->resource_value_buffer(M2MSecurity::PublicKey,out_value) != 0);
 
     CHECK(security->resource_value_buffer(M2MSecurity::M2MServerUri,out_value) == 0);
+    CHECK(security->resource_value_buffer(M2MSecurity::AccountId,out_value) == 0);
 
     CHECK(security->resource_value_buffer(M2MSecurity::SMSBindingKey,out_value) == 0);
     CHECK(security->resource_value_buffer(M2MSecurity::SMSBindingSecretKey,out_value) == 0);
@@ -328,4 +336,20 @@ void Test_M2MSecurity::test_m2m_server_constructor()
 void Test_M2MSecurity::test_server_type()
 {
     CHECK(M2MSecurity::Bootstrap ==security->server_type());
+}
+
+void Test_M2MSecurity::test_create_resource_string()
+{
+    m2mobjectinstance_stub::create_resource = new M2MResource(*m2mobject_stub::inst,"name","type",M2MResourceInstance::STRING,M2MBase::Dynamic);
+
+    CHECK(security->create_resource(M2MSecurity::AccountId,"test") != NULL);
+    CHECK(M2MBase::NOT_ALLOWED == m2mbase_stub::operation);
+
+    CHECK(security->create_resource(M2MSecurity::AccountId,"") != NULL);
+    CHECK(M2MBase::NOT_ALLOWED == m2mbase_stub::operation);
+
+    CHECK(security->create_resource(M2MSecurity::ShortServerID,"test") == NULL);
+
+    delete m2mobjectinstance_stub::create_resource;
+    m2mobjectinstance_stub::create_resource = NULL;
 }

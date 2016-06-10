@@ -107,6 +107,8 @@ struct nsdl_s {
     uint16_t update_register_msg_id;
     uint16_t register_msg_len;
     uint16_t update_register_msg_len;
+    uint16_t bootstrap_msg_id;
+    bool handle_bootstrap_msg;
 };
 
 Test_M2MNsdlInterface::Test_M2MNsdlInterface()
@@ -222,10 +224,10 @@ void Test_M2MNsdlInterface::test_delete_nsdl_resource()
 void Test_M2MNsdlInterface::test_create_bootstrap_resource()
 {
     common_stub::uint_value = 11;
-    CHECK(nsdl->create_bootstrap_resource(NULL) == true);
+    CHECK(nsdl->create_bootstrap_resource(NULL, NULL) == true);
 
     common_stub::uint_value = 0;
-    CHECK(nsdl->create_bootstrap_resource(NULL) == false);
+    CHECK(nsdl->create_bootstrap_resource(NULL, NULL) == false);
 }
 
 void Test_M2MNsdlInterface::test_send_register_message()
@@ -1024,230 +1026,7 @@ void Test_M2MNsdlInterface::test_resource_callback_reset()
     free(coap_header);*/
 }
 
-void Test_M2MNsdlInterface::test_bootstrap_done_callback()
-{
-    const uint8_t server_address[] = {10, 45, 3, 85};
-    sn_nsdl_oma_server_info_t *server_info =(sn_nsdl_oma_server_info_t *)malloc(sizeof(sn_nsdl_oma_server_info_t));
-    server_info->omalw_address_ptr = (sn_nsdl_addr_ *)malloc(sizeof(sn_nsdl_addr_));
-    server_info->omalw_address_ptr->type = SN_NSDL_ADDRESS_TYPE_IPV4;
-    server_info->omalw_address_ptr->port = 5685;
-    server_info->omalw_address_ptr->addr_ptr = (uint8_t *)malloc(sizeof(server_address));
-    memcpy(server_info->omalw_address_ptr->addr_ptr,server_address,sizeof(server_address));
-    server_info->omalw_address_ptr->addr_len = sizeof(server_address);
-    server_info->omalw_server_security = SEC_NOT_SET;
 
-    nsdl->bootstrap_done_callback(server_info);
-    CHECK(observer->boot_done == true);
-
-    server_info->omalw_server_security = NO_SEC;
-
-    nsdl->bootstrap_done_callback(server_info);
-    CHECK(observer->boot_done == true);
-
-    server_info->omalw_server_security = CERTIFICATE;
-
-    common_stub::cert = (omalw_certificate_list_t *)malloc(sizeof(omalw_certificate_list_t));
-    common_stub::cert->certificate_ptr[0] = (uint8_t *)malloc(sizeof(uint8_t));
-    common_stub::cert->certificate_ptr[1] = (uint8_t *)malloc(sizeof(uint8_t));
-    common_stub::cert->own_private_key_ptr = (uint8_t *)malloc(sizeof(uint8_t));
-    common_stub::cert->certificate_len[0] = sizeof(uint8_t);
-    common_stub::cert->certificate_len[1] = sizeof(uint8_t);
-    common_stub::cert->own_private_key_len = sizeof(uint8_t);
-
-    nsdl->bootstrap_done_callback(server_info);
-    CHECK(observer->boot_done == true);
-
-    observer->boot_done = false;
-    server_info->omalw_address_ptr->type = SN_NSDL_ADDRESS_TYPE_IPV4;
-    nsdl->bootstrap_done_callback(server_info);
-    CHECK(observer->boot_done == true);
-
-    server_info->omalw_server_security = SEC_NOT_SET;
-    nsdl->bootstrap_done_callback(server_info);
-
-    server_info->omalw_server_security = PSK;
-    nsdl->bootstrap_done_callback(server_info);
-
-    server_info->omalw_server_security = RPK;
-    nsdl->bootstrap_done_callback(server_info);
-
-    server_info->omalw_server_security = NO_SEC;
-    nsdl->bootstrap_done_callback(server_info);
-
-    free(common_stub::cert->own_private_key_ptr);
-    common_stub::cert->own_private_key_ptr = NULL;
-    free(common_stub::cert->certificate_ptr[1]);
-    common_stub::cert->certificate_ptr[1] = NULL;
-    free(common_stub::cert->certificate_ptr[0]);
-    common_stub::cert->certificate_ptr[0] = NULL;
-    free(common_stub::cert);
-    common_stub::cert = NULL;
-
-    server_info->omalw_address_ptr->type = SN_NSDL_ADDRESS_TYPE_IPV4;
-    server_info->omalw_server_security = CERTIFICATE;
-    nsdl->bootstrap_done_callback(server_info);
-
-    server_info->omalw_address_ptr->type = SN_NSDL_ADDRESS_TYPE_NONE;
-    nsdl->bootstrap_done_callback(server_info);
-    CHECK(observer->boot_error == true);
-
-    free(server_info->omalw_address_ptr->addr_ptr);
-    server_info->omalw_address_ptr->addr_ptr = NULL;
-    free(server_info->omalw_address_ptr);
-    server_info->omalw_address_ptr = NULL;
-    free(server_info);
-    server_info = NULL;
-
-    common_stub::clear();
-
-    // Test for Hostname
-    const uint8_t hostname_address[] = {"abc.xyz.sss.sdsd"};
-    server_info =(sn_nsdl_oma_server_info_t *)malloc(sizeof(sn_nsdl_oma_server_info_t));
-    server_info->omalw_address_ptr = (sn_nsdl_addr_ *)malloc(sizeof(sn_nsdl_addr_));
-    server_info->omalw_address_ptr->type = SN_NSDL_ADDRESS_TYPE_HOSTNAME;
-    server_info->omalw_address_ptr->port = 5685;
-    server_info->omalw_address_ptr->addr_ptr = (uint8_t *)malloc(sizeof(hostname_address));
-    memcpy(server_info->omalw_address_ptr->addr_ptr,hostname_address,sizeof(hostname_address));
-    server_info->omalw_address_ptr->addr_len = sizeof(hostname_address);
-    server_info->omalw_server_security = SEC_NOT_SET;
-
-    nsdl->bootstrap_done_callback(server_info);
-    CHECK(observer->boot_done == true);
-
-    server_info->omalw_server_security = NO_SEC;
-
-    nsdl->bootstrap_done_callback(server_info);
-    CHECK(observer->boot_done == true);
-
-    server_info->omalw_server_security = CERTIFICATE;
-
-    common_stub::cert = (omalw_certificate_list_t *)malloc(sizeof(omalw_certificate_list_t));
-    common_stub::cert->certificate_ptr[0] = (uint8_t *)malloc(sizeof(uint8_t));
-    common_stub::cert->certificate_ptr[1] = (uint8_t *)malloc(sizeof(uint8_t));
-    common_stub::cert->own_private_key_ptr = (uint8_t *)malloc(sizeof(uint8_t));
-    common_stub::cert->certificate_len[0] = sizeof(uint8_t);
-    common_stub::cert->certificate_len[1] = sizeof(uint8_t);
-    common_stub::cert->own_private_key_len = sizeof(uint8_t);
-
-    nsdl->bootstrap_done_callback(server_info);
-    CHECK(observer->boot_done == true);
-
-    observer->boot_done = false;
-    server_info->omalw_address_ptr->type = SN_NSDL_ADDRESS_TYPE_HOSTNAME;
-    nsdl->bootstrap_done_callback(server_info);
-    CHECK(observer->boot_done == true);
-
-    server_info->omalw_server_security = SEC_NOT_SET;
-    nsdl->bootstrap_done_callback(server_info);
-
-    server_info->omalw_server_security = PSK;
-    nsdl->bootstrap_done_callback(server_info);
-
-    server_info->omalw_server_security = RPK;
-    nsdl->bootstrap_done_callback(server_info);
-
-    server_info->omalw_server_security = NO_SEC;
-    nsdl->bootstrap_done_callback(server_info);
-
-    free(common_stub::cert->own_private_key_ptr);
-    common_stub::cert->own_private_key_ptr = NULL;
-    free(common_stub::cert->certificate_ptr[1]);
-    common_stub::cert->certificate_ptr[1] = NULL;
-    free(common_stub::cert->certificate_ptr[0]);
-    common_stub::cert->certificate_ptr[0] = NULL;
-    free(common_stub::cert);
-    common_stub::cert = NULL;
-
-    server_info->omalw_address_ptr->type = SN_NSDL_ADDRESS_TYPE_HOSTNAME;
-    server_info->omalw_server_security = CERTIFICATE;
-    nsdl->bootstrap_done_callback(server_info);
-
-    free(server_info->omalw_address_ptr->addr_ptr);
-    server_info->omalw_address_ptr->addr_ptr = NULL;
-    free(server_info->omalw_address_ptr);
-    server_info->omalw_address_ptr = NULL;
-    free(server_info);
-    server_info = NULL;
-
-    common_stub::clear();
-
-    //Test for IPv6 address
-    // FD00:FF1:CE0B:A5E1:1068:AF13:9B61:D557
-    const uint8_t ipv6_address[16] = {0xFD, 0x00, 0x0F, 0xF1,
-                                      0xCE, 0x0B, 0xA5, 0xE1,
-                                      0x10, 0x68, 0xAF, 0x13,
-                                      0x9B, 0x61, 0xD5, 0x57};
-
-    server_info =(sn_nsdl_oma_server_info_t *)malloc(sizeof(sn_nsdl_oma_server_info_t));
-    server_info->omalw_address_ptr = (sn_nsdl_addr_ *)malloc(sizeof(sn_nsdl_addr_));
-    server_info->omalw_address_ptr->type = SN_NSDL_ADDRESS_TYPE_IPV6;
-    server_info->omalw_address_ptr->port = 5685;
-    server_info->omalw_address_ptr->addr_ptr = (uint8_t *)malloc(sizeof(ipv6_address));
-    memcpy(server_info->omalw_address_ptr->addr_ptr,ipv6_address,sizeof(ipv6_address));
-    server_info->omalw_address_ptr->addr_len = sizeof(ipv6_address);
-    server_info->omalw_server_security = SEC_NOT_SET;
-
-    nsdl->bootstrap_done_callback(server_info);
-    CHECK(observer->boot_done == true);
-
-    server_info->omalw_server_security = NO_SEC;
-
-    nsdl->bootstrap_done_callback(server_info);
-    CHECK(observer->boot_done == true);
-
-    server_info->omalw_server_security = CERTIFICATE;
-
-    common_stub::cert = (omalw_certificate_list_t *)malloc(sizeof(omalw_certificate_list_t));
-    common_stub::cert->certificate_ptr[0] = (uint8_t *)malloc(sizeof(uint8_t));
-    common_stub::cert->certificate_ptr[1] = (uint8_t *)malloc(sizeof(uint8_t));
-    common_stub::cert->own_private_key_ptr = (uint8_t *)malloc(sizeof(uint8_t));
-    common_stub::cert->certificate_len[0] = sizeof(uint8_t);
-    common_stub::cert->certificate_len[1] = sizeof(uint8_t);
-    common_stub::cert->own_private_key_len = sizeof(uint8_t);
-
-    nsdl->bootstrap_done_callback(server_info);
-    CHECK(observer->boot_done == true);
-
-    observer->boot_done = false;
-    server_info->omalw_address_ptr->type = SN_NSDL_ADDRESS_TYPE_IPV6;
-    nsdl->bootstrap_done_callback(server_info);
-    CHECK(observer->boot_done == true);
-
-    server_info->omalw_server_security = SEC_NOT_SET;
-    nsdl->bootstrap_done_callback(server_info);
-
-    server_info->omalw_server_security = PSK;
-    nsdl->bootstrap_done_callback(server_info);
-
-    server_info->omalw_server_security = RPK;
-    nsdl->bootstrap_done_callback(server_info);
-
-    server_info->omalw_server_security = NO_SEC;
-    nsdl->bootstrap_done_callback(server_info);
-
-    free(common_stub::cert->own_private_key_ptr);
-    common_stub::cert->own_private_key_ptr = NULL;
-    free(common_stub::cert->certificate_ptr[1]);
-    common_stub::cert->certificate_ptr[1] = NULL;
-    free(common_stub::cert->certificate_ptr[0]);
-    common_stub::cert->certificate_ptr[0] = NULL;
-    free(common_stub::cert);
-    common_stub::cert = NULL;
-
-    server_info->omalw_address_ptr->type = SN_NSDL_ADDRESS_TYPE_IPV6;
-    server_info->omalw_server_security = CERTIFICATE;
-    nsdl->bootstrap_done_callback(server_info);
-
-    free(server_info->omalw_address_ptr->addr_ptr);
-    server_info->omalw_address_ptr->addr_ptr = NULL;
-    free(server_info->omalw_address_ptr);
-    server_info->omalw_address_ptr = NULL;
-    free(server_info);
-    server_info = NULL;
-
-    common_stub::clear();
-
-}
 
 void Test_M2MNsdlInterface::test_process_received_data()
 {
