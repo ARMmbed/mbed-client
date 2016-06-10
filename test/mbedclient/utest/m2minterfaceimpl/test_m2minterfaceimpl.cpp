@@ -578,7 +578,7 @@ void Test_M2MInterfaceImpl::test_data_available()
 
 void Test_M2MInterfaceImpl::test_socket_error()
 {
-    for (int i = 0; i <= YOTTA_CFG_RECONNECTION_COUNT; i++) {
+    for (int i = 0; i <= MBED_CLIENT_RECONNECTION_COUNT; i++) {
         impl->socket_error(M2MConnectionHandler::SSL_CONNECTION_ERROR);
         impl->_retry_timer_expired = true;
     }
