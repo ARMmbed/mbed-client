@@ -103,7 +103,7 @@ public:
      * @param account_id Account identification.
      * @return true if created and sent successfully else false.
     */
-    bool create_bootstrap_resource(sn_nsdl_addr_s *address, const String &bs_endpoint_name);
+    bool create_bootstrap_resource(sn_nsdl_addr_s *address, const String &bootstrap_endpoint_name);
 
     /**
      * @brief Sends the register message to the server.
@@ -335,6 +335,13 @@ private:
     */
     bool parse_bootstrap_message(sn_coap_hdr_s *coap_header);
 
+    /**
+     * @brief Parse bootstrap TLV message.
+     * @param coap_header, Received CoAP message
+     * @return True if parsing was succesful else false
+    */
+    bool validate_security_object();
+
 private:
 
     M2MNsdlObserver                   &_observer;
@@ -354,6 +361,7 @@ private:
     bool                               _register_ongoing;
     bool                               _unregister_ongoing;
     bool                               _update_register_ongoing;
+    String                             _endpoint_name;
 
 friend class Test_M2MNsdlInterface;
 

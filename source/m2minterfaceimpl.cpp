@@ -606,11 +606,13 @@ void M2MInterfaceImpl::state_bootstrap_address_resolved( EventData *data)
     _connection_handler->start_listening_for_data();
 
     // Include account id to be part of endpoint name
+    String new_ep_name;
+    new_ep_name += _endpoint_name;
     if (!_account_id.empty()) {
-        _endpoint_name += '@';
-        _endpoint_name += _account_id;
+        new_ep_name += '@';
+        new_ep_name += _account_id;
     }
-    if(_nsdl_interface->create_bootstrap_resource(&address, _endpoint_name)) {
+    if(_nsdl_interface->create_bootstrap_resource(&address, new_ep_name)) {
        tr_debug("M2MInterfaceImpl::state_bootstrap_address_resolved : create_bootstrap_resource - success");
        internal_event(STATE_BOOTSTRAP_RESOURCE_CREATED);
     } else{
