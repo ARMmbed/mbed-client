@@ -333,7 +333,7 @@ private:
      * @param coap_header, Received CoAP message
      * @return True if parsing was succesful else false
     */
-    bool parse_bootstrap_message(sn_coap_hdr_s *coap_header);
+    bool parse_bootstrap_message(sn_coap_hdr_s *coap_header, bool is_security_object);
 
     /**
      * @brief Parse bootstrap TLV message.
@@ -341,6 +341,8 @@ private:
      * @return True if parsing was succesful else false
     */
     bool validate_security_object();
+
+    void handle_bootstrap_error();
 
 private:
 

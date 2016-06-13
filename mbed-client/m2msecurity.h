@@ -221,6 +221,7 @@ public:
 private:
 
     M2MResource* get_resource(SecurityResource resource) const;
+    void clear_resource_values();
 
 private:
 

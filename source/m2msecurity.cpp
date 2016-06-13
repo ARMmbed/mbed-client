@@ -20,7 +20,7 @@
 #include "mbed-client/m2mobjectinstance.h"
 #include "mbed-client/m2mresource.h"
 #include "mbed-client/m2mstring.h"
-
+#include "mbed-trace/mbed_trace.h"
 #define TRACE_GROUP "mClt"
 
 #define BUFFER_SIZE 21
@@ -393,4 +393,14 @@ M2MResource* M2MSecurity::get_resource(SecurityResource res) const
         res_object = _server_instance->resource(res_name);
     }
     return res_object;
+}
+
+void M2MSecurity::clear_resource_values()
+{
+    for(int i = 0; i <= SecurityResource::AccountId; i++) {
+        M2MResource *res = get_resource((SecurityResource) i);
+        if (res) {
+            res->clear_value();
+        }
+    }
 }
