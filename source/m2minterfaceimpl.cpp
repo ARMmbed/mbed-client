@@ -57,6 +57,7 @@ M2MInterfaceImpl::M2MInterfaceImpl(M2MInterfaceObserver& observer,
   _update_register_ongoing(false),
   _queue_sleep_timer(new M2MTimer(*this)),  
   _retry_timer(new M2MTimer(*this)),
+  _bootstrap_timer(NULL),
   _callback_handler(NULL),
   _security(NULL),
   _retry_count(0),
@@ -86,6 +87,9 @@ M2MInterfaceImpl::M2MInterfaceImpl(M2MInterfaceObserver& observer,
     _connection_handler = new M2MConnectionHandler(*this, _security_connection, mode, stack);
     __connection_handler = _connection_handler;
     _connection_handler->bind_connection(_listen_port);
+#ifndef MBED_CLIENT_DISABLE_BOOTSTRAP_FEATURE
+    _bootstrap_timer = new M2MTimer(*this);
+#endif
     tr_debug("M2MInterfaceImpl::M2MInterfaceImpl() -OUT");
 }
 
@@ -99,6 +103,7 @@ M2MInterfaceImpl::~M2MInterfaceImpl()
     __connection_handler = NULL;
     delete _connection_handler;
     delete _retry_timer;
+    delete _bootstrap_timer;
     _security_connection = NULL;
     tr_debug("M2MInterfaceImpl::~M2MInterfaceImpl() - OUT");
 }
@@ -354,24 +359,17 @@ void M2MInterfaceImpl::bootstrap_done(M2MSecurity *security_object)
 {
 #ifndef MBED_CLIENT_DISABLE_BOOTSTRAP_FEATURE
     tr_debug("M2MInterfaceImpl::bootstrap_done");
+    _bootstrap_timer->stop_timer();
     internal_event(STATE_BOOTSTRAPPED);
     _observer.bootstrap_done(security_object);
 #endif //MBED_CLIENT_DISABLE_BOOTSTRAP_FEATURE
 }
-/*
-void M2MInterfaceImpl::delete_bootstrap_data()
-{
-#ifndef M2M_CLIENT_DISABLE_BOOTSTRAP_FEATURE
-    tr_debug("M2MInterfaceImpl::delete_bootstrap_data");
-    internal_event(STATE_IDLE);
-    //_observer.delete_bootstrap_data();
-#endif //M2M_CLIENT_DISABLE_BOOTSTRAP_FEATURE
-}
-*/
+
 void M2MInterfaceImpl::bootstrap_error()
 {
 #ifndef MBED_CLIENT_DISABLE_BOOTSTRAP_FEATURE
     tr_debug("M2MInterfaceImpl::bootstrap_error()");
+    _bootstrap_timer->stop_timer();
     internal_event(STATE_IDLE);
     _observer.error(M2MInterface::BootstrapFailed);
 #endif //MBED_CLIENT_DISABLE_BOOTSTRAP_FEATURE
@@ -516,6 +514,9 @@ void M2MInterfaceImpl::timer_expired(M2MTimerObserver::Type type)
         _connection_handler->bind_connection(_listen_port);
         internal_event(STATE_REGISTER);
     }
+    else if (M2MTimerObserver::BootstrapTimer == type) {
+        bootstrap_error();
+    }
 }
 
 // state machine sits here.
@@ -543,6 +544,8 @@ void M2MInterfaceImpl::state_bootstrap( EventData *data)
                 _account_id = security->resource_value_string(M2MSecurity::AccountId);
                 tr_debug("M2MInterfaceImpl::state_bootstrap - server_address %s", server_address.c_str());
                 tr_debug("M2MInterfaceImpl::state_bootstrap - account_id %s", _account_id.c_str());
+                _bootstrap_timer->start_timer(MBED_CLIENT_BOOTSTRAP_TIMEOUT,
+                                              M2MTimerObserver::BootstrapTimer);
                 String ip_address;
                 String  coap;
                 if(server_address.compare(0,sizeof(COAP)-1,COAP) == 0) {

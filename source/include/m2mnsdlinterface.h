@@ -349,13 +349,11 @@ private:
     M2MNsdlObserver                   &_observer;
     M2MObjectList                      _object_list;
     M2MServer                         *_server;
-    M2MSecurity                       *_security; // Owned by application
+    M2MSecurity                       *_security; // Not owned
     M2MTimer                          *_nsdl_exceution_timer;
     M2MTimer                          *_registration_timer;
     sn_nsdl_ep_parameters_s           *_endpoint;
     sn_nsdl_resource_info_s           *_resource;
-    sn_nsdl_bs_ep_info_t               _bootstrap_endpoint;
-    sn_nsdl_oma_device_t               _bootstrap_device_setup;
     sn_nsdl_addr_s                     _sn_nsdl_address;
     nsdl_s                            *_nsdl_handle;
     uint32_t                           _counter_for_nsdl;

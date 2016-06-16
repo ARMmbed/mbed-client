@@ -401,6 +401,7 @@ private:
     bool                        _update_register_ongoing;
     M2MTimer                    *_queue_sleep_timer;
     M2MTimer                    *_retry_timer;
+    M2MTimer                    *_bootstrap_timer;
     callback_handler            _callback_handler;
     M2MSecurity                 *_security;
     uint8_t                     _retry_count;

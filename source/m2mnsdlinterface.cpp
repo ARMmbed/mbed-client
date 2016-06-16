@@ -60,11 +60,6 @@ M2MNsdlInterface::M2MNsdlInterface(M2MNsdlObserver &observer)
 {
     tr_debug("M2MNsdlInterface::M2MNsdlInterface()");
     __nsdl_interface_list.push_back(this);
-    _bootstrap_endpoint.device_object = NULL;
-    _bootstrap_endpoint.oma_bs_status_cb_handle = NULL;
-    _bootstrap_device_setup.sn_oma_device_boot_callback = NULL;
-    _bootstrap_device_setup.error_code = NO_ERROR;
-
     _sn_nsdl_address.addr_len = 0;
     _sn_nsdl_address.addr_ptr = NULL;
     _sn_nsdl_address.port = 0;
@@ -164,6 +159,7 @@ void M2MNsdlInterface::create_endpoint(const String &name,
     if(_endpoint){
         memset(_endpoint, 0, sizeof(sn_nsdl_ep_parameters_s));
         if(!_endpoint_name.empty()) {
+            memory_free(_endpoint->endpoint_name_ptr);
             _endpoint->endpoint_name_ptr = alloc_string_copy((uint8_t*)_endpoint_name.c_str(), _endpoint_name.length());
             _endpoint->endpoint_name_len = _endpoint_name.length();
         }
@@ -244,8 +240,7 @@ bool M2MNsdlInterface::create_bootstrap_resource(sn_nsdl_addr_s *address, const 
 #ifndef MBED_CLIENT_DISABLE_BOOTSTRAP_FEATURE
     tr_debug("M2MNsdlInterface::create_bootstrap_resource()");
     bool success = false;
-    _bootstrap_device_setup.error_code = NO_ERROR;
-
+    sn_nsdl_bs_ep_info_t bootstrap_endpoint;
     tr_debug("M2MNsdlInterface::create_bootstrap_resource() - endpoint name: %s", bootstrap_endpoint_name.c_str());
     if (_endpoint->endpoint_name_ptr) {
         memory_free(_endpoint->endpoint_name_ptr);
@@ -257,7 +252,7 @@ bool M2MNsdlInterface::create_bootstrap_resource(sn_nsdl_addr_s *address, const 
         _bootstrap_id = sn_nsdl_oma_bootstrap(_nsdl_handle,
                                                address,
                                                _endpoint,
-                                               &_bootstrap_endpoint);
+                                               &bootstrap_endpoint);
         tr_debug("M2MNsdlInterface::create_bootstrap_resource - _bootstrap_id %d", _bootstrap_id);
         success = _bootstrap_id != 0;
 
@@ -1493,7 +1488,7 @@ nsdl_s * M2MNsdlInterface::get_nsdl_handle()
 void M2MNsdlInterface::handle_bootstrap_put_message(sn_coap_hdr_s *coap_header,
                                                 sn_nsdl_addr_s *address) {
 #ifndef M2M_CLIENT_DISABLE_BOOTSTRAP_FEATURE
-    tr_debug("M2MNsdlInterface::handle_bootstrap_message");
+    tr_error("M2MNsdlInterface::handle_bootstrap_message");
     uint8_t response_code = COAP_MSG_CODE_RESPONSE_CHANGED;
     sn_coap_hdr_s *coap_response = NULL;
     bool success = true;
@@ -1559,7 +1554,7 @@ void M2MNsdlInterface::handle_bootstrap_put_message(sn_coap_hdr_s *coap_header,
         sn_nsdl_release_allocated_coap_msg_mem(_nsdl_handle, coap_response);
     }
 
-    tr_debug("M2MNsdlInterface::handle_bootstrap_message - OUT");
+    tr_error("M2MNsdlInterface::handle_bootstrap_message - OUT");
 #else
     (void) coap_header;
     (void) address;
@@ -1569,7 +1564,7 @@ void M2MNsdlInterface::handle_bootstrap_put_message(sn_coap_hdr_s *coap_header,
 bool M2MNsdlInterface::parse_bootstrap_message(sn_coap_hdr_s *coap_header, bool is_security_object)
 {
 #ifndef M2M_CLIENT_DISABLE_BOOTSTRAP_FEATURE
-    tr_debug("M2MNsdlInterface::parse_bootstrap_put_message");
+    tr_error("M2MNsdlInterface::parse_bootstrap_put_message");
     M2MTLVDeserializer *deserializer = new M2MTLVDeserializer();
     bool ret = true;
     bool is_obj_instance = false;
@@ -1638,7 +1633,7 @@ bool M2MNsdlInterface::parse_bootstrap_message(sn_coap_hdr_s *coap_header, bool 
 void M2MNsdlInterface::handle_bootstrap_finished(sn_coap_hdr_s *coap_header,sn_nsdl_addr_s *address)
 {
 #ifndef M2M_CLIENT_DISABLE_BOOTSTRAP_FEATURE
-    tr_debug("M2MNsdlInterface::handle_bootstrap_finished");
+    tr_error("M2MNsdlInterface::handle_bootstrap_finished");
     sn_coap_hdr_s *coap_response = NULL;
     uint8_t msg_code = COAP_MSG_CODE_RESPONSE_CHANGED;
     if (!validate_security_object()) {
@@ -1672,7 +1667,7 @@ void M2MNsdlInterface::handle_bootstrap_finished(sn_coap_hdr_s *coap_header,sn_n
 void M2MNsdlInterface::handle_bootstrap_delete(sn_coap_hdr_s *coap_header,sn_nsdl_addr_s *address)
 {
 #ifndef M2M_CLIENT_DISABLE_BOOTSTRAP_FEATURE
-    tr_debug("M2MNsdlInterface::handle_bootstrap_delete");
+    tr_error("M2MNsdlInterface::handle_bootstrap_delete");
 
     sn_coap_hdr_s *coap_response = NULL;
     coap_response = sn_nsdl_build_response(_nsdl_handle,
@@ -1684,7 +1679,6 @@ void M2MNsdlInterface::handle_bootstrap_delete(sn_coap_hdr_s *coap_header,sn_nsd
         _security->clear_resource_values();
         // Needed for leshan testing
         _security->set_resource_value(M2MSecurity::SecurityMode, M2MSecurity::NoSecurity);
-
     } else {
         handle_bootstrap_error();
     }
@@ -1698,18 +1692,47 @@ void M2MNsdlInterface::handle_bootstrap_delete(sn_coap_hdr_s *coap_header,sn_nsd
 bool M2MNsdlInterface::validate_security_object()
 {
 #ifndef M2M_CLIENT_DISABLE_BOOTSTRAP_FEATURE
-    tr_debug("M2MNsdlInterface::validate_security_object");
+    tr_error("M2MNsdlInterface::validate_security_object");
     if (_security) {
         String address;
+        String pkey;
+        String public_key;
+        String server_key;
+
         address = _security->resource_value_string(M2MSecurity::M2MServerUri);
-        tr_debug("M2MNsdlInterface::validate_security_object - address: %s", address.c_str());
-        if (address.empty()) {
+        public_key = _security->resource_value_string(M2MSecurity::PublicKey);
+        server_key = _security->resource_value_string(M2MSecurity::ServerPublicKey);
+        pkey = _security->resource_value_string(M2MSecurity::Secretkey);
+        int sec_mode = _security->resource_value_int(M2MSecurity::SecurityMode);
+        bool is_bs_server = _security->resource_value_int(M2MSecurity::BootstrapServer);
+        tr_error("M2MNsdlInterface::validate_security_object - Server URI /0/0: %s", address.c_str());
+        tr_error("M2MNsdlInterface::validate_security_object - is bs server /0/1: %d", is_bs_server);
+        tr_error("M2MNsdlInterface::validate_security_object - Security Mode /0/2: %d", sec_mode);
+        tr_error("M2MNsdlInterface::validate_security_object - Public key /0/3: %s", public_key.c_str());
+        tr_error("M2MNsdlInterface::validate_security_object - Server Public key /0/4: %s", server_key.c_str());
+        tr_error("M2MNsdlInterface::validate_security_object - Secret key /0/5: %s", pkey.c_str());
+        tr_error("M2MNsdlInterface::validate_security_object - Short Server ID /0/10: %d", _security->resource_value_int(M2MSecurity::ShortServerID));
+
+        // Only NoSec and Certificate modes are supported
+        if (!address.empty() && !is_bs_server) {
+            if (M2MSecurity::Certificate == sec_mode) {
+                if (public_key.empty() || server_key.empty() || pkey.empty()) {
+                    tr_error("M2MNsdlInterface::validate_security_object - some of the keys are empty!");
+                    return false;
+                } else {
+                    return true;
+                }
+            } else if (M2MSecurity::NoSecurity == sec_mode){
+                return true;
+            } else {
+                tr_error("M2MNsdlInterface::validate_security_object - not supported security mode");
+                return false;
+            }
+        } else {
             return false;
         }
-    } else {
-        return false;
     }
-    return true;
+    return false;
 #else
     return false;
 #endif
