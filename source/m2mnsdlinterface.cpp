@@ -549,6 +549,11 @@ uint8_t M2MNsdlInterface::resource_callback(struct nsdl_s */*nsdl_handle*/,
 {
     tr_debug("M2MNsdlInterface::resource_callback()");
     _observer.coap_data_processed();
+    if(received_coap_header &&
+       received_coap_header->coap_status == COAP_STATUS_PARSER_DUPLICATED_MSG) {
+        tr_error("M2MNsdlInterface::resource_callback() - Duplicate Message received Ignore !!");
+        return 0;
+    }
     uint8_t result = 1;
     sn_coap_hdr_s *coap_response = NULL;
     sn_coap_msg_code_e msg_code = COAP_MSG_CODE_RESPONSE_CHANGED; // 4.00
