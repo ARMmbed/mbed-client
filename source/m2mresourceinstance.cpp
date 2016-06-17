@@ -361,12 +361,6 @@ sn_coap_hdr_s* M2MResourceInstance::handle_get_request(nsdl_s *nsdl,
                         m2m::String::convert_integer_to_array(max_age(),
                             coap_response->options_list_ptr->max_age_len);
 
-                if(received_coap_header->token_ptr) {
-                    tr_debug("M2MResourceInstance::handle_get_request - Sets Observation Token to resource");
-                    set_observation_token(received_coap_header->token_ptr,
-                                          received_coap_header->token_len);
-                }
-
                 if(received_coap_header->options_list_ptr) {
                     if(received_coap_header->options_list_ptr->observe) {
                         if (is_observable()) {
@@ -383,6 +377,11 @@ sn_coap_hdr_s* M2MResourceInstance::handle_get_request(nsdl_s *nsdl,
                                         number = (*(received_coap_header->options_list_ptr->observe_ptr + i) & 0xff) <<
                                                  8*(received_coap_header->options_list_ptr->observe_len- 1 - i);
                                         }
+                                }
+                                if(received_coap_header->token_ptr) {
+                                    tr_debug("M2MResourceInstance::handle_get_request - Sets Observation Token to resource");
+                                    set_observation_token(received_coap_header->token_ptr,
+                                                          received_coap_header->token_len);
                                 }
                                 // If the observe value is 0 means register for observation.
                                 if(number == 0) {
