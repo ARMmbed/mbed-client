@@ -197,25 +197,25 @@ void Test_M2MSecurity::test_resource_value_int()
 
     m2mobjectinstance_stub::resource = new M2MResource(*m2mobject_stub::inst,"name","type",M2MResourceInstance::STRING,M2MBase::Dynamic);
 
-   CHECK(security->resource_value_int(M2MSecurity::SecurityMode) == 10);
-   CHECK(security->resource_value_int(M2MSecurity::SMSSecurityMode) == 10);
-   CHECK(security->resource_value_int(M2MSecurity::M2MServerSMSNumber) == 10);
-   CHECK(security->resource_value_int(M2MSecurity::ShortServerID) == 10);
-   CHECK(security->resource_value_int(M2MSecurity::ClientHoldOffTime) == 10);
-   CHECK(security->resource_value_int(M2MSecurity::BootstrapServer) == 0);
-   CHECK(security->resource_value_int(M2MSecurity::PublicKey) == 0);
-   CHECK(security->resource_value_int(M2MSecurity::ServerPublicKey) == 0);
-   CHECK(security->resource_value_int(M2MSecurity::Secretkey) == 0);
-   CHECK(security->resource_value_int(M2MSecurity::SMSBindingSecretKey) == 0);
-   CHECK(security->resource_value_int(M2MSecurity::SMSBindingKey) == 0);
-   CHECK(security->resource_value_int(M2MSecurity::M2MServerUri) == 0);
-   CHECK(security->resource_value_int(M2MSecurity::AccountId) == 0);
+    CHECK(security->resource_value_int(M2MSecurity::SecurityMode) == 10);
+    CHECK(security->resource_value_int(M2MSecurity::SMSSecurityMode) == 10);
+    CHECK(security->resource_value_int(M2MSecurity::M2MServerSMSNumber) == 10);
+    CHECK(security->resource_value_int(M2MSecurity::ShortServerID) == 10);
+    CHECK(security->resource_value_int(M2MSecurity::ClientHoldOffTime) == 10);
+    CHECK(security->resource_value_int(M2MSecurity::BootstrapServer) == 0);
+    CHECK(security->resource_value_int(M2MSecurity::PublicKey) == 0);
+    CHECK(security->resource_value_int(M2MSecurity::ServerPublicKey) == 0);
+    CHECK(security->resource_value_int(M2MSecurity::Secretkey) == 0);
+    CHECK(security->resource_value_int(M2MSecurity::SMSBindingSecretKey) == 0);
+    CHECK(security->resource_value_int(M2MSecurity::SMSBindingKey) == 0);
+    CHECK(security->resource_value_int(M2MSecurity::M2MServerUri) == 0);
+    CHECK(security->resource_value_int(M2MSecurity::AccountId) == 0);
 
-   delete m2mobjectinstance_stub::resource;
-   m2mobjectinstance_stub::resource = NULL;
+    delete m2mobjectinstance_stub::resource;
+    m2mobjectinstance_stub::resource = NULL;
 
-   free(m2mresourceinstance_stub::value);
-   m2mresourceinstance_stub::value = NULL;
+    free(m2mresourceinstance_stub::value);
+    m2mresourceinstance_stub::value = NULL;
 }
 
 void Test_M2MSecurity::test_resource_value_string()

@@ -114,3 +114,13 @@ M2MSecurity::ServerType M2MSecurity::server_type() const
 {
     return _server_type;
 }
+
+void M2MSecurity::clear_resource_values()
+{
+
+}
+
+M2MResource* M2MSecurity::get_resource(SecurityResource res) const
+{
+
+}

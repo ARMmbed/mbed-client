@@ -115,7 +115,7 @@ Test_M2MNsdlInterface::Test_M2MNsdlInterface()
 {
     observer = new TestObserver();
     nsdl = new M2MNsdlInterface(*observer);
-    nsdl->_server = new M2MServer();
+    //nsdl->_server = new M2MServer();
 }
 
 Test_M2MNsdlInterface:: ~Test_M2MNsdlInterface()
@@ -224,10 +224,10 @@ void Test_M2MNsdlInterface::test_delete_nsdl_resource()
 void Test_M2MNsdlInterface::test_create_bootstrap_resource()
 {
     common_stub::uint_value = 11;
-    CHECK(nsdl->create_bootstrap_resource(NULL, NULL) == true);
+    CHECK(nsdl->create_bootstrap_resource(NULL, "") == true);
 
     common_stub::uint_value = 0;
-    CHECK(nsdl->create_bootstrap_resource(NULL, NULL) == false);
+    CHECK(nsdl->create_bootstrap_resource(NULL, "") == false);
 }
 
 void Test_M2MNsdlInterface::test_send_register_message()
@@ -463,7 +463,7 @@ void Test_M2MNsdlInterface::test_received_from_server_callback()
 
     coap_header->msg_code = COAP_MSG_CODE_RESPONSE_DELETED;
     observer->register_error = false;
-    nsdl->_server = new M2MServer();
+    //nsdl->_server = new M2MServer();
     nsdl->received_from_server_callback(handle,coap_header,NULL);
     CHECK(observer->unregistered == true);
 
@@ -495,12 +495,12 @@ void Test_M2MNsdlInterface::test_received_from_server_callback()
     nsdl->received_from_server_callback(handle,coap_header,NULL);
     CHECK(observer->register_error == true);
 
-    handle->unregister_msg_id = 0;
+    /*handle->unregister_msg_id = 0;
     observer->boot_error = false;
     nsdl->_bootstrap_id = 8;
     coap_header->coap_status = COAP_STATUS_BUILDER_MESSAGE_SENDING_FAILED;
     nsdl->received_from_server_callback(handle,coap_header,NULL);
-    CHECK(observer->boot_error == true);
+    CHECK(observer->boot_error == true);*/
 
     //_update_id == msg_id
     handle->update_register_msg_id = 10;
@@ -616,6 +616,7 @@ void Test_M2MNsdlInterface::test_received_from_server_callback()
     coap_header->uri_path_len = sizeof(resource);
 
     CHECK(0== nsdl->received_from_server_callback(handle,coap_header,NULL));
+
     free(coap_header);
     free(handle);
 }

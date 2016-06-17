@@ -183,3 +183,4 @@ TEST(M2MNsdlInterface, get_nsdl_handle)
 {
     m2m_nsdl_interface->test_get_nsdl_handle();
 }
+

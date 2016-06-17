@@ -15,6 +15,7 @@
  */
 #include "m2mnsdlinterface_stub.h"
 
+
 bool m2mnsdlinterface_stub::bool_value;
 uint32_t m2mnsdlinterface_stub::int_value;
 void * m2mnsdlinterface_stub::void_value;
@@ -159,4 +160,34 @@ void M2MNsdlInterface::remove_object(M2MBase *)
 nsdl_s* M2MNsdlInterface::get_nsdl_handle()
 {
     return (nsdl_s*) m2mnsdlinterface_stub::void_value;
+}
+
+void M2MNsdlInterface::handle_bootstrap_put_message(sn_coap_hdr_s *coap_header, sn_nsdl_addr_s *address)
+{
+
+}
+
+void M2MNsdlInterface::handle_bootstrap_finished(sn_coap_hdr_s *coap_header,sn_nsdl_addr_s *address)
+{
+
+}
+
+void M2MNsdlInterface::handle_bootstrap_delete(sn_coap_hdr_s *coap_header,sn_nsdl_addr_s *address)
+{
+
+}
+
+bool M2MNsdlInterface::parse_bootstrap_message(sn_coap_hdr_s *coap_header, bool is_security_object)
+{
+
+}
+
+bool M2MNsdlInterface::validate_security_object()
+{
+
+}
+
+void M2MNsdlInterface::handle_bootstrap_error()
+{
+
 }

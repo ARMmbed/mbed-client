@@ -298,6 +298,7 @@ int M2MResourceInstance::get_value_int()
     uint32_t length;
     get_value(buffer,length);
     if(buffer) {
+        //value_int = String::convert_array_to_integer(buffer,length);
         value_int = atoi((const char*)buffer);
         free(buffer);
     }
