@@ -16,6 +16,7 @@
 #include "CppUTest/TestHarness.h"
 #include "test_m2mnsdlinterface.h"
 #include "common_stub.h"
+#include "m2msecurity_stub.h"
 #include "m2mnsdlobserver.h"
 #include "m2mobject_stub.h"
 #include "m2mobjectinstance_stub.h"
@@ -25,7 +26,7 @@
 #include "m2mbase_stub.h"
 #include "m2mserver.h"
 #include "m2msecurity.h"
-
+#include "m2mtlvdeserializer_stub.h"
 class TestObserver : public M2MNsdlObserver {
 
 public:
@@ -203,7 +204,7 @@ void Test_M2MNsdlInterface::test_create_nsdl_list_structure()
     instance = NULL;
     m2mobjectinstance_stub::resource_list.clear();
     delete create_resource;
-    create_resource = NULL;    
+    create_resource = NULL;
 
     m2mresource_stub::list.clear();
     delete res_instance;
@@ -278,7 +279,7 @@ void Test_M2MNsdlInterface::test_memory_alloc()
     uint8_t *ptr = 0;
     ptr = (uint8_t*)nsdl->memory_alloc(sizeof(uint8_t));
     CHECK(ptr != NULL);
-    nsdl->memory_free(ptr);    
+    nsdl->memory_free(ptr);
 }
 
 void Test_M2MNsdlInterface::test_memory_free()
@@ -495,12 +496,13 @@ void Test_M2MNsdlInterface::test_received_from_server_callback()
     nsdl->received_from_server_callback(handle,coap_header,NULL);
     CHECK(observer->register_error == true);
 
-    /*handle->unregister_msg_id = 0;
+    handle->unregister_msg_id = 0;
     observer->boot_error = false;
     nsdl->_bootstrap_id = 8;
+    handle->bootstrap_msg_id = 8;
     coap_header->coap_status = COAP_STATUS_BUILDER_MESSAGE_SENDING_FAILED;
     nsdl->received_from_server_callback(handle,coap_header,NULL);
-    CHECK(observer->boot_error == true);*/
+    CHECK(observer->boot_error == true);
 
     //_update_id == msg_id
     handle->update_register_msg_id = 10;
@@ -617,7 +619,223 @@ void Test_M2MNsdlInterface::test_received_from_server_callback()
 
     CHECK(0== nsdl->received_from_server_callback(handle,coap_header,NULL));
 
+    common_stub::coap_header = (sn_coap_hdr_s *) malloc(sizeof(sn_coap_hdr_s));
+    sn_nsdl_addr_s *address = (sn_nsdl_addr_s *)malloc(sizeof(sn_nsdl_addr_s));
+    memset(address, 0, sizeof(sn_nsdl_addr_s));
+    address->addr_len = 1;
+    address->addr_ptr = (uint8_t *)malloc(1);
+    address->addr_ptr[0] = 1;
+    address->port = 5683;
+    handle->oma_bs_address_len = 1;
+    handle->oma_bs_port = 5683;
+    handle->oma_bs_address_ptr = (uint8_t *)malloc(1);
+    handle->oma_bs_address_ptr[0] = 1;
+    coap_header->msg_code = COAP_MSG_CODE_REQUEST_PUT;
+
+    observer->boot_error = false;
+    CHECK(0== nsdl->received_from_server_callback(handle,coap_header,address));
+    CHECK(observer->boot_error == true);
+
+    obj = new M2MObject("0");
+    m2mbase_stub::string_value = new String("0");
+    nsdl->_object_list.push_back(obj);
+    m2mobject_stub::inst = new M2MObjectInstance("name",*obj);
+    uint8_t security[] = {"0"};
+    coap_header->uri_path_ptr = security;
+    coap_header->uri_path_len = sizeof(security);
+
+
+    observer->boot_error = false;
+    m2msecurity_stub::resource = new M2MResource(*m2mobject_stub::inst,"1","type",M2MResourceInstance::STRING,M2MBase::Dynamic);
+    CHECK(0 == nsdl->received_from_server_callback(handle,coap_header,address));
+    CHECK(observer->boot_error == true);
+
+    coap_header->token_ptr = String::convert_integer_to_array(1,coap_header->token_len);
+    observer->boot_error = false;
+    m2mtlvdeserializer_stub::is_object_bool_value = true;
+    CHECK(0 == nsdl->received_from_server_callback(handle,coap_header,address));
+    CHECK(observer->boot_error == true);
+
+    coap_header->content_type_ptr = String::convert_integer_to_array(99,coap_header->content_type_len);
+    observer->boot_error = false;
+    observer->boot_done = false;
+    m2mtlvdeserializer_stub::is_object_bool_value = true;
+    CHECK(0 == nsdl->received_from_server_callback(handle,coap_header,address));
+    CHECK(observer->boot_error == false);
+
+    observer->boot_error = false;
+    observer->boot_done = false;
+    m2mtlvdeserializer_stub::is_object_bool_value = false;
+    m2mtlvdeserializer_stub::bool_value = true;
+    CHECK(0 == nsdl->received_from_server_callback(handle,coap_header,address));
+    CHECK(observer->boot_error == false);
+
+    observer->boot_error = false;
+    observer->boot_done = false;
+    m2mtlvdeserializer_stub::is_object_bool_value = false;
+    m2mtlvdeserializer_stub::bool_value = true;
+    m2mtlvdeserializer_stub::error = M2MTLVDeserializer::NotAllowed;
+    CHECK(0 == nsdl->received_from_server_callback(handle,coap_header,address));
+    CHECK(observer->boot_error == true);
+
+
+    delete m2mobject_stub::inst;
+    delete m2mbase_stub::string_value;
+    m2mbase_stub::string_value = NULL;
+    nsdl->_object_list.clear();
+    delete obj;
+
+    obj = new M2MObject("1");
+    m2mbase_stub::string_value = new String("1");
+    nsdl->_object_list.push_back(obj);
+    m2mobject_stub::inst = new M2MObjectInstance("name",*obj);
+    uint8_t server[] = {"1"};
+    coap_header->uri_path_ptr = server;
+    coap_header->uri_path_len = sizeof(server);
+
+    observer->boot_error = false;
+    observer->boot_done = false;
+    m2mtlvdeserializer_stub::is_object_bool_value = false;
+    m2mtlvdeserializer_stub::bool_value = true;
+    m2mtlvdeserializer_stub::error = M2MTLVDeserializer::None;
+    CHECK(0 == nsdl->received_from_server_callback(handle,coap_header,address));
+    CHECK(observer->boot_error == false);
+
+    observer->boot_error = false;
+    observer->boot_done = false;
+    m2mtlvdeserializer_stub::is_object_bool_value = true;
+    m2mtlvdeserializer_stub::bool_value = false;
+    m2mtlvdeserializer_stub::error = M2MTLVDeserializer::None;
+    CHECK(0 == nsdl->received_from_server_callback(handle,coap_header,address));
+    CHECK(observer->boot_error == false);
+
+
+    observer->boot_error = false;
+    observer->boot_done = false;
+    m2mtlvdeserializer_stub::is_object_bool_value = false;
+    m2mtlvdeserializer_stub::bool_value = false;
+    m2mtlvdeserializer_stub::error = M2MTLVDeserializer::None;
+    CHECK(0 == nsdl->received_from_server_callback(handle,coap_header,address));
+    CHECK(observer->boot_error == true);
+
+    observer->boot_error = false;
+    observer->boot_done = false;
+    coap_header->msg_code = COAP_MSG_CODE_REQUEST_DELETE;
+    CHECK(0 == nsdl->received_from_server_callback(handle,coap_header,address));
+    CHECK(observer->boot_error == false);
+
+    free(common_stub::coap_header);
+    common_stub::coap_header = NULL;
+    observer->boot_error = false;
+    observer->boot_done = false;
+    coap_header->msg_code = COAP_MSG_CODE_REQUEST_DELETE;
+    CHECK(0 == nsdl->received_from_server_callback(handle,coap_header,address));
+    CHECK(observer->boot_error == true);
+
+    observer->boot_error = false;
+    observer->boot_done = false;
+    coap_header->msg_code = COAP_MSG_CODE_REQUEST_POST;
+    CHECK(0 == nsdl->received_from_server_callback(handle,coap_header,address));
+    CHECK(observer->boot_error == true);
+
+    common_stub::coap_header = (sn_coap_hdr_s *) malloc(sizeof(sn_coap_hdr_s));
+    m2msecurity_stub::string_value = new String("coaps://");
+    observer->boot_error = false;
+    observer->boot_done = false;
+    coap_header->msg_code = COAP_MSG_CODE_REQUEST_POST;
+    CHECK(0 == nsdl->received_from_server_callback(handle,coap_header,address));
+    CHECK(observer->boot_error == true);
+
+
+    m2msecurity_stub::sec_mode = M2MSecurity::NoSecurity;
+    m2msecurity_stub::int_value = true;
+    m2msecurity_stub::bool_value = false;
+    observer->boot_error = false;
+    observer->boot_done = false;
+    coap_header->uri_path_ptr = (uint8_t*)malloc(2);
+    coap_header->uri_path_len = 2;
+    coap_header->uri_path_ptr[0] = 'b';
+    coap_header->uri_path_ptr[1] = 's';
+    coap_header->msg_code = COAP_MSG_CODE_REQUEST_POST;
+    CHECK(0 == nsdl->received_from_server_callback(handle,coap_header,address));
+    CHECK(observer->boot_error == false);
+    CHECK(observer->boot_done == true);
+
+
+    m2msecurity_stub::sec_mode = M2MSecurity::Certificate;
+    m2msecurity_stub::int_value = true;
+    m2msecurity_stub::bool_value = false;
+    observer->boot_error = false;
+    observer->boot_done = false;
+    coap_header->msg_code = COAP_MSG_CODE_REQUEST_POST;
+    nsdl->_security = new M2MSecurity(M2MSecurity::M2MServer);
+    CHECK(0 == nsdl->received_from_server_callback(handle,coap_header,address));
+    CHECK(observer->boot_error == false);
+    CHECK(observer->boot_done == true);
+
+    m2msecurity_stub::sec_mode = M2MSecurity::Psk;
+    m2msecurity_stub::int_value = true;
+    m2msecurity_stub::bool_value = false;
+    observer->boot_error = false;
+    observer->boot_done = false;
+    coap_header->msg_code = COAP_MSG_CODE_REQUEST_POST;
+    CHECK(0 == nsdl->received_from_server_callback(handle,coap_header,address));
+    CHECK(observer->boot_error == true);
+    CHECK(observer->boot_done == false);
+
+    m2msecurity_stub::sec_mode = M2MSecurity::Certificate;
+    m2msecurity_stub::int_value = true;
+    m2msecurity_stub::bool_value = true;
+    observer->boot_error = false;
+    observer->boot_done = false;
+    coap_header->msg_code = COAP_MSG_CODE_REQUEST_POST;
+    CHECK(0 == nsdl->received_from_server_callback(handle,coap_header,address));
+    CHECK(observer->boot_error == true);
+    CHECK(observer->boot_done == false);
+
+    m2msecurity_stub::sec_mode = M2MSecurity::Certificate;
+    m2msecurity_stub::int_value = false;
+    m2msecurity_stub::bool_value = false;
+    observer->boot_error = false;
+    observer->boot_done = false;
+    coap_header->msg_code = COAP_MSG_CODE_REQUEST_POST;
+    CHECK(0 == nsdl->received_from_server_callback(handle,coap_header,address));
+    CHECK(observer->boot_error == true);
+    CHECK(observer->boot_done == false);
+
+
+    free(coap_header->uri_path_ptr);
+    coap_header->uri_path_ptr = (uint8_t*)malloc(4);
+    coap_header->uri_path_len = 4;
+    coap_header->uri_path_ptr[0] = 'b';
+    coap_header->uri_path_ptr[1] = 's';
+    coap_header->uri_path_ptr[2] = 's';
+    coap_header->uri_path_ptr[3] = 's';
+    m2msecurity_stub::sec_mode = M2MSecurity::Certificate;
+    m2msecurity_stub::int_value = true;
+    m2msecurity_stub::bool_value = false;
+    observer->boot_error = false;
+    observer->boot_done = false;
+    coap_header->msg_code = COAP_MSG_CODE_REQUEST_POST;
+    CHECK(0 == nsdl->received_from_server_callback(handle,coap_header,address));
+    CHECK(observer->boot_error == true);
+    CHECK(observer->boot_done == false);
+
+    delete m2mobject_stub::inst;
+    delete m2mbase_stub::string_value;
+    m2mbase_stub::string_value = NULL;
+    nsdl->_object_list.clear();
+    delete obj;
+    delete m2msecurity_stub::string_value;
+    delete m2msecurity_stub::resource;
+    free(common_stub::coap_header);
+    free(address->addr_ptr);
+    free(address);
+    free(coap_header->content_type_ptr);
+    free(coap_header->token_ptr);
+    free(coap_header->uri_path_ptr);
     free(coap_header);
+    free(handle->oma_bs_address_ptr);
     free(handle);
 }
 
@@ -984,7 +1202,7 @@ void Test_M2MNsdlInterface::test_resource_callback_reset()
     String *name = new String("name");
     common_stub::int_value = 0;
     m2mbase_stub::string_value = new String("name");
-    M2MObject *object = new M2MObject(*name);    
+    M2MObject *object = new M2MObject(*name);
     nsdl->_object_list.push_back(object);
     CHECK(nsdl->resource_callback(NULL,coap_header,address,SN_NSDL_PROTOCOL_HTTP) == 0);
 
@@ -1136,7 +1354,7 @@ void Test_M2MNsdlInterface::test_observation_to_be_sent()
     nsdl->observation_to_be_sent(res, 500, instance_list_ids);
 
     M2MObjectInstance *object_instance = new M2MObjectInstance("name",*object);
-    m2mobject_stub::int_value = 1;    
+    m2mobject_stub::int_value = 1;
     m2mobject_stub::base_type = M2MBase::Object;
     m2mobject_stub::inst = object_instance;
     m2mobjectinstance_stub::resource_list.push_back(res);
