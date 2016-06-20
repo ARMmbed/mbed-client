@@ -55,7 +55,7 @@ M2MInterfaceImpl::M2MInterfaceImpl(M2MInterfaceObserver& observer,
   _event_ignored(false),
   _register_ongoing(false),
   _update_register_ongoing(false),
-  _queue_sleep_timer(new M2MTimer(*this)),  
+  _queue_sleep_timer(new M2MTimer(*this)),
   _retry_timer(new M2MTimer(*this)),
   _bootstrap_timer(NULL),
   _callback_handler(NULL),
@@ -541,9 +541,7 @@ void M2MInterfaceImpl::state_bootstrap( EventData *data)
             if(M2MSecurity::Bootstrap == security->server_type()) {
                 tr_debug("M2MInterfaceImpl::state_bootstrap - server_type : M2MSecurity::Bootstrap");
                 String server_address = security->resource_value_string(M2MSecurity::M2MServerUri);
-                _account_id = security->resource_value_string(M2MSecurity::AccountId);
                 tr_debug("M2MInterfaceImpl::state_bootstrap - server_address %s", server_address.c_str());
-                tr_debug("M2MInterfaceImpl::state_bootstrap - account_id %s", _account_id.c_str());
                 _bootstrap_timer->start_timer(MBED_CLIENT_BOOTSTRAP_TIMEOUT,
                                               M2MTimerObserver::BootstrapTimer);
                 String ip_address;
@@ -559,7 +557,7 @@ void M2MInterfaceImpl::state_bootstrap( EventData *data)
                                                        server_address.size()-coap.size());
 
                     process_address(server_address, ip_address, _server_port);
-                    
+
                     tr_debug("M2MInterfaceImpl::state_bootstrap - IP address %s , Port %d", ip_address.c_str(), _server_port);
                     // If bind and resolving server address succeed then proceed else
                     // return error to the application and go to Idle state.
@@ -608,12 +606,12 @@ void M2MInterfaceImpl::state_bootstrap_address_resolved( EventData *data)
     address.addr_ptr = (uint8_t*)event->_address->_address;
     _connection_handler->start_listening_for_data();
 
-    // Include account id to be part of endpoint name
+    // Include domain id to be part of endpoint name
     String new_ep_name;
     new_ep_name += _endpoint_name;
-    if (!_account_id.empty()) {
+    if (!_domain.empty()) {
         new_ep_name += '@';
-        new_ep_name += _account_id;
+        new_ep_name += _domain;
     }
     if(_nsdl_interface->create_bootstrap_resource(&address, new_ep_name)) {
        tr_debug("M2MInterfaceImpl::state_bootstrap_address_resolved : create_bootstrap_resource - success");
@@ -696,7 +694,7 @@ void M2MInterfaceImpl::state_register( EventData *data)
 }
 
 void M2MInterfaceImpl::process_address(const String& server_address, String& ip_address, uint16_t& port) {
-    
+
     int colonFound = server_address.find_last_of(':'); //10
     if(colonFound != -1) {
         ip_address = server_address.substr(0,colonFound);

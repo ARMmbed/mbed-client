@@ -394,7 +394,6 @@ private:
     uint16_t                    _listen_port;
     uint16_t                    _server_port;
     String                      _server_ip_address;
-    String                      _account_id;
     M2MSecurity                 *_register_server; //TODO: to be the list not owned
     bool                        _event_ignored;
     bool                        _register_ongoing;

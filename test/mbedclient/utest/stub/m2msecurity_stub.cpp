@@ -124,7 +124,7 @@ M2MSecurity::ServerType M2MSecurity::server_type() const
     return _server_type;
 }
 
-void M2MSecurity::clear_resource_values()
+void M2MSecurity::clear_resources()
 {
 
 }

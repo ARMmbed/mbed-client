@@ -41,11 +41,6 @@ TEST(M2MSecurity, create_resource_int)
     m2m_security->test_create_resource_int();
 }
 
-TEST(M2MSecurity, create_resource_string)
-{
-    m2m_security->test_create_resource_string();
-}
-
 TEST(M2MSecurity, delete_resource)
 {
     m2m_security->test_delete_resource();

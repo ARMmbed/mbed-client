@@ -100,7 +100,6 @@ public:
     /**
      * @brief Creates the bootstrap object.
      * @param address Bootstrap address.
-     * @param account_id Account identification.
      * @return true if created and sent successfully else false.
     */
     bool create_bootstrap_resource(sn_nsdl_addr_s *address, const String &bootstrap_endpoint_name);
@@ -301,7 +300,7 @@ private:
     uint8_t* alloc_string_copy(const uint8_t* source, uint16_t size);
 
     /**
-     * \brief Utility method to convert given lifetime int to ascii 
+     * \brief Utility method to convert given lifetime int to ascii
      * and allocate a buffer for it and set it to _endpoint->lifetime_ptr.
      * \param lifetime A new value for lifetime.
     */
