@@ -185,10 +185,12 @@ void Test_M2MSecurity::test_resource_value_int()
     m2mresourceinstance_stub::bool_value = true;
 
     uint8_t value[] = {"10"};
-    m2mresourceinstance_stub::value = (uint8_t*)malloc((uint32_t)sizeof(value));
-    memset(m2mresourceinstance_stub::value,0,(uint32_t)sizeof(value));
-    memcpy(m2mresourceinstance_stub::value, value, sizeof(value));
-    m2mresourceinstance_stub::int_value = (uint16_t)sizeof(value);
+    //m2mresourceinstance_stub::value = (uint8_t*)malloc((uint32_t)sizeof(value));
+    uint8_t size = 0;
+    m2mresourceinstance_stub::value = String::convert_integer_to_array(10,size);
+    /*memset(m2mresourceinstance_stub::value,0,(uint32_t)size);
+    memcpy(m2mresourceinstance_stub::value, 10, size);*/
+    m2mresourceinstance_stub::int_value = (uint16_t)size;
 
     m2mobjectinstance_stub::resource = new M2MResource(*m2mobject_stub::inst,
                                                        "name",

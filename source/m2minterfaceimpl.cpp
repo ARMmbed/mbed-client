@@ -542,7 +542,7 @@ void M2MInterfaceImpl::state_bootstrap( EventData *data)
                 tr_debug("M2MInterfaceImpl::state_bootstrap - server_type : M2MSecurity::Bootstrap");
                 String server_address = security->resource_value_string(M2MSecurity::M2MServerUri);
                 tr_debug("M2MInterfaceImpl::state_bootstrap - server_address %s", server_address.c_str());
-                _bootstrap_timer->start_timer(MBED_CLIENT_BOOTSTRAP_TIMEOUT,
+                _bootstrap_timer->start_timer(MBED_CLIENT_RECONNECTION_COUNT * MBED_CLIENT_RECONNECTION_INTERVAL * 4 * 1000,
                                               M2MTimerObserver::BootstrapTimer);
                 String ip_address;
                 String  coap;

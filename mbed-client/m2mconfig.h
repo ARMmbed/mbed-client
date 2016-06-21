@@ -58,8 +58,6 @@ using namespace m2m;
 #define m2m_deprecated __attribute__ ((deprecated))
 #endif
 
-#define MBED_CLIENT_BOOTSTRAP_TIMEOUT 300 * 1000
-
 // This is valid for mbed-client-mbedtls
 // For other SSL implementation there
 // can be other

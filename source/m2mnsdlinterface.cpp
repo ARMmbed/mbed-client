@@ -1476,7 +1476,7 @@ void M2MNsdlInterface::handle_bootstrap_put_message(sn_coap_hdr_s *coap_header,
     tr_debug("M2MNsdlInterface::handle_bootstrap_message");
     uint8_t response_code = COAP_MSG_CODE_RESPONSE_CHANGED;
     sn_coap_hdr_s *coap_response = NULL;
-    bool success = true;
+    bool success = false;
     bool security_object = false;
     uint16_t content_type = 0;
 
@@ -1491,6 +1491,7 @@ void M2MNsdlInterface::handle_bootstrap_put_message(sn_coap_hdr_s *coap_header,
             _security = new M2MSecurity(M2MSecurity::M2MServer);
         }
         if(_security) {
+            success = true;
             _security->create_resource(M2MSecurity::ShortServerID, 1);
             for (int i = 0; i <= M2MSecurity::ClientHoldOffTime; i++) {
                 M2MResource* res = _security->get_resource((M2MSecurity::SecurityResource)i);
@@ -1498,12 +1499,10 @@ void M2MNsdlInterface::handle_bootstrap_put_message(sn_coap_hdr_s *coap_header,
                     res->set_operation(M2MBase::PUT_ALLOWED);
                 }
             }
-        } else {
-            success = false;
         }
     }
-    else if (resource_name.compare(0,1,"1") != 0) {
-        success = false;
+    else if (resource_name.compare(0,1,"1") == 0) {
+        success = true;
     }
 
     if (success) {
@@ -1563,11 +1562,11 @@ bool M2MNsdlInterface::parse_bootstrap_message(sn_coap_hdr_s *coap_header, bool 
 #ifndef M2M_CLIENT_DISABLE_BOOTSTRAP_FEATURE
     tr_debug("M2MNsdlInterface::parse_bootstrap_put_message");
     M2MTLVDeserializer *deserializer = new M2MTLVDeserializer();
-    bool ret = true;
+    bool ret = false;
     bool is_obj_instance = false;
     uint16_t instance_id = 0;
     if (deserializer && _security) {
-        is_obj_instance = deserializer->is_object_instance(coap_header->payload_ptr);
+        ret = is_obj_instance = deserializer->is_object_instance(coap_header->payload_ptr);
         if (!is_obj_instance) {
             ret = deserializer->is_resource(coap_header->payload_ptr);
         }
@@ -1610,8 +1609,6 @@ bool M2MNsdlInterface::parse_bootstrap_message(sn_coap_hdr_s *coap_header, bool 
                 ret = false;
             }
         }
-    } else {
-        ret = false;
     }
     delete deserializer;
     return ret;
@@ -1698,7 +1695,6 @@ bool M2MNsdlInterface::validate_security_object()
         String address = _security->resource_value_string(M2MSecurity::M2MServerUri);
         uint32_t sec_mode = _security->resource_value_int(M2MSecurity::SecurityMode);
         bool is_bs_server = _security->resource_value_int(M2MSecurity::BootstrapServer);
-
         uint8_t *buffer = NULL;
         uint32_t public_key_size = _security->resource_value_buffer(M2MSecurity::PublicKey, buffer);
         free(buffer);
