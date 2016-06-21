@@ -1686,7 +1686,6 @@ void M2MNsdlInterface::handle_bootstrap_delete(sn_coap_hdr_s *coap_header,sn_nsd
 #endif
 }
 
-
 bool M2MNsdlInterface::validate_security_object()
 {
 #ifndef M2M_CLIENT_DISABLE_BOOTSTRAP_FEATURE

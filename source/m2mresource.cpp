@@ -500,7 +500,7 @@ sn_coap_hdr_s* M2MResource::handle_put_request(nsdl_s *nsdl,
         if(coap_response) {
             coap_response->msg_code = msg_code;
         }
-    } else {        
+    } else {
         coap_response = M2MResourceInstance::handle_put_request(nsdl,
                             received_coap_header,
                             observation_handler,
@@ -558,7 +558,7 @@ sn_coap_hdr_s* M2MResource::handle_post_request(nsdl_s *nsdl,
                         free(_delayed_token);
                         _delayed_token_len = 0;
 
-                        _delayed_token = alloc_copy(received_coap_header->token_ptr, _delayed_token_len);
+                        _delayed_token = alloc_copy(received_coap_header->token_ptr, received_coap_header->token_len);
                         if(_delayed_token) {
                             _delayed_token_len = received_coap_header->token_len;
                         }
