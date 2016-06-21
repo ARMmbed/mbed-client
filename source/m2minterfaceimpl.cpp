@@ -55,8 +55,9 @@ M2MInterfaceImpl::M2MInterfaceImpl(M2MInterfaceObserver& observer,
   _event_ignored(false),
   _register_ongoing(false),
   _update_register_ongoing(false),
-  _queue_sleep_timer(new M2MTimer(*this)),  
+  _queue_sleep_timer(new M2MTimer(*this)),
   _retry_timer(new M2MTimer(*this)),
+  _bootstrap_timer(NULL),
   _callback_handler(NULL),
   _security(NULL),
   _retry_count(0),
@@ -86,6 +87,9 @@ M2MInterfaceImpl::M2MInterfaceImpl(M2MInterfaceObserver& observer,
     _connection_handler = new M2MConnectionHandler(*this, _security_connection, mode, stack);
     __connection_handler = _connection_handler;
     _connection_handler->bind_connection(_listen_port);
+#ifndef MBED_CLIENT_DISABLE_BOOTSTRAP_FEATURE
+    _bootstrap_timer = new M2MTimer(*this);
+#endif
     tr_debug("M2MInterfaceImpl::M2MInterfaceImpl() -OUT");
 }
 
@@ -99,6 +103,7 @@ M2MInterfaceImpl::~M2MInterfaceImpl()
     __connection_handler = NULL;
     delete _connection_handler;
     delete _retry_timer;
+    delete _bootstrap_timer;
     _security_connection = NULL;
     tr_debug("M2MInterfaceImpl::~M2MInterfaceImpl() - OUT");
 }
@@ -136,6 +141,8 @@ void M2MInterfaceImpl::bootstrap(M2MSecurity *security)
         _observer.error(M2MInterface::NotAllowed);
     }
     tr_debug("M2MInterfaceImpl::bootstrap(M2MSecurity *security) - OUT");
+#else
+    _observer.error(M2MInterface::NotAllowed);
 #endif //MBED_CLIENT_DISABLE_BOOTSTRAP_FEATURE
 }
 
@@ -351,7 +358,8 @@ void M2MInterfaceImpl::client_unregistered()
 void M2MInterfaceImpl::bootstrap_done(M2MSecurity *security_object)
 {
 #ifndef MBED_CLIENT_DISABLE_BOOTSTRAP_FEATURE
-    tr_debug("M2MInterfaceImpl::bootstrap_done(M2MSecurity *security_object)");
+    tr_debug("M2MInterfaceImpl::bootstrap_done");
+    _bootstrap_timer->stop_timer();
     internal_event(STATE_BOOTSTRAPPED);
     _observer.bootstrap_done(security_object);
 #endif //MBED_CLIENT_DISABLE_BOOTSTRAP_FEATURE
@@ -361,6 +369,7 @@ void M2MInterfaceImpl::bootstrap_error()
 {
 #ifndef MBED_CLIENT_DISABLE_BOOTSTRAP_FEATURE
     tr_debug("M2MInterfaceImpl::bootstrap_error()");
+    _bootstrap_timer->stop_timer();
     internal_event(STATE_IDLE);
     _observer.error(M2MInterface::BootstrapFailed);
 #endif //MBED_CLIENT_DISABLE_BOOTSTRAP_FEATURE
@@ -505,6 +514,9 @@ void M2MInterfaceImpl::timer_expired(M2MTimerObserver::Type type)
         _connection_handler->bind_connection(_listen_port);
         internal_event(STATE_REGISTER);
     }
+    else if (M2MTimerObserver::BootstrapTimer == type) {
+        bootstrap_error();
+    }
 }
 
 // state machine sits here.
@@ -530,6 +542,8 @@ void M2MInterfaceImpl::state_bootstrap( EventData *data)
                 tr_debug("M2MInterfaceImpl::state_bootstrap - server_type : M2MSecurity::Bootstrap");
                 String server_address = security->resource_value_string(M2MSecurity::M2MServerUri);
                 tr_debug("M2MInterfaceImpl::state_bootstrap - server_address %s", server_address.c_str());
+                _bootstrap_timer->start_timer(MBED_CLIENT_RECONNECTION_COUNT * MBED_CLIENT_RECONNECTION_INTERVAL * 4 * 1000,
+                                              M2MTimerObserver::BootstrapTimer);
                 String ip_address;
                 String  coap;
                 if(server_address.compare(0,sizeof(COAP)-1,COAP) == 0) {
@@ -543,7 +557,7 @@ void M2MInterfaceImpl::state_bootstrap( EventData *data)
                                                        server_address.size()-coap.size());
 
                     process_address(server_address, ip_address, _server_port);
-                    
+
                     tr_debug("M2MInterfaceImpl::state_bootstrap - IP address %s , Port %d", ip_address.c_str(), _server_port);
                     // If bind and resolving server address succeed then proceed else
                     // return error to the application and go to Idle state.
@@ -591,7 +605,15 @@ void M2MInterfaceImpl::state_bootstrap_address_resolved( EventData *data)
     address.port = event->_port;
     address.addr_ptr = (uint8_t*)event->_address->_address;
     _connection_handler->start_listening_for_data();
-    if(_nsdl_interface->create_bootstrap_resource(&address)) {
+
+    // Include domain id to be part of endpoint name
+    String new_ep_name;
+    new_ep_name += _endpoint_name;
+    if (!_domain.empty()) {
+        new_ep_name += '@';
+        new_ep_name += _domain;
+    }
+    if(_nsdl_interface->create_bootstrap_resource(&address, new_ep_name)) {
        tr_debug("M2MInterfaceImpl::state_bootstrap_address_resolved : create_bootstrap_resource - success");
        internal_event(STATE_BOOTSTRAP_RESOURCE_CREATED);
     } else{
@@ -672,7 +694,7 @@ void M2MInterfaceImpl::state_register( EventData *data)
 }
 
 void M2MInterfaceImpl::process_address(const String& server_address, String& ip_address, uint16_t& port) {
-    
+
     int colonFound = server_address.find_last_of(':'); //10
     if(colonFound != -1) {
         ip_address = server_address.substr(0,colonFound);

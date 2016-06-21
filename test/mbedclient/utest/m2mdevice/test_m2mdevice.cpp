@@ -99,6 +99,7 @@ void Test_M2MDevice::test_create_resource_instance()
 
 void Test_M2MDevice::test_create_resource_string()
 {
+    m2mresourceinstance_stub::value = NULL;
     CHECK(device->create_resource(M2MDevice::Reboot,"test") == NULL);
     CHECK(device->create_resource(M2MDevice::ErrorCode,"test") == NULL);
     CHECK(device->create_resource(M2MDevice::SupportedBindingMode,"test") == NULL);
@@ -295,6 +296,7 @@ void Test_M2MDevice::test_delete_resource_instance()
 void Test_M2MDevice::test_set_resource_value_string()
 {
     // Length 65, should fail
+    m2mresourceinstance_stub::value = NULL;
     String max_lenght = "65656565656565656565656565656565656565656565656565656565656565656";
     m2mbase_stub::bool_value = true;
     m2mresourceinstance_stub::bool_value = true;

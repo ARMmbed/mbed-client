@@ -28,6 +28,8 @@ public:
 
     void test_create_resource_int();
 
+    void test_create_resource_string();
+
     void test_delete_resource();
 
     void test_set_resource_value_int();

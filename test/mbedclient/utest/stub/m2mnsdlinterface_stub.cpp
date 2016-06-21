@@ -15,6 +15,7 @@
  */
 #include "m2mnsdlinterface_stub.h"
 
+
 bool m2mnsdlinterface_stub::bool_value;
 uint32_t m2mnsdlinterface_stub::int_value;
 void * m2mnsdlinterface_stub::void_value;
@@ -62,7 +63,7 @@ bool M2MNsdlInterface::delete_nsdl_resource(const String &)
     return m2mnsdlinterface_stub::bool_value;
 }
 
-bool M2MNsdlInterface::create_bootstrap_resource(sn_nsdl_addr_s *)
+bool M2MNsdlInterface::create_bootstrap_resource(sn_nsdl_addr_s *, const String& name)
 {
     return m2mnsdlinterface_stub::bool_value;
 }
@@ -119,9 +120,6 @@ uint8_t M2MNsdlInterface::resource_callback(struct nsdl_s *,
     return (uint8_t)m2mnsdlinterface_stub::int_value;
 }
 
-void M2MNsdlInterface::bootstrap_done_callback(sn_nsdl_oma_server_info_t *)
-{
-}
 
 bool M2MNsdlInterface::process_received_data(uint8_t *,
                                              uint16_t ,
@@ -162,4 +160,34 @@ void M2MNsdlInterface::remove_object(M2MBase *)
 nsdl_s* M2MNsdlInterface::get_nsdl_handle()
 {
     return (nsdl_s*) m2mnsdlinterface_stub::void_value;
+}
+
+void M2MNsdlInterface::handle_bootstrap_put_message(sn_coap_hdr_s *coap_header, sn_nsdl_addr_s *address)
+{
+
+}
+
+void M2MNsdlInterface::handle_bootstrap_finished(sn_coap_hdr_s *coap_header,sn_nsdl_addr_s *address)
+{
+
+}
+
+void M2MNsdlInterface::handle_bootstrap_delete(sn_coap_hdr_s *coap_header,sn_nsdl_addr_s *address)
+{
+
+}
+
+bool M2MNsdlInterface::parse_bootstrap_message(sn_coap_hdr_s *coap_header, bool is_security_object)
+{
+
+}
+
+bool M2MNsdlInterface::validate_security_object()
+{
+
+}
+
+void M2MNsdlInterface::handle_bootstrap_error()
+{
+
 }

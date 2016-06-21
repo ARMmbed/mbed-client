@@ -173,20 +173,6 @@ void Test_NsdlAccessHelper::test_nsdl_c_received_from_server()
     clear_list();
 }
 
-void Test_NsdlAccessHelper::test_nsdl_c_bootstrap_done()
-{
-    __nsdl_c_bootstrap_done(NULL, NULL);
-
-    m2mnsdlinterface_stub::void_value = malloc(1);
-    m2mnsdlinterface_stub::int_value = 1;
-    __nsdl_interface_list.clear();
-    __nsdl_interface_list.push_back(new M2MNsdlInterface(*observer));
-    __nsdl_c_bootstrap_done(NULL, (nsdl_s*)m2mnsdlinterface_stub::void_value);
-    free(m2mnsdlinterface_stub::void_value);
-    clear_list();
-
-}
-
 void Test_NsdlAccessHelper::test_socket_malloc()
 {
     void *ptr = __socket_malloc(NULL, 6);

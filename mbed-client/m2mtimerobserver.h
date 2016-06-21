@@ -35,7 +35,8 @@ public:
         PMaxTimer,
         Dtls,
         QueueSleep,
-        RetryTimer
+        RetryTimer,
+        BootstrapTimer
     }Type;
 
     /**

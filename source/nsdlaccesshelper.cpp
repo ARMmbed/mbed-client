@@ -81,16 +81,6 @@ uint8_t __nsdl_c_received_from_server(struct nsdl_s * nsdl_handle,
     return status;
 }
 
-void __nsdl_c_bootstrap_done(sn_nsdl_oma_server_info_t *server_info_ptr, struct nsdl_s * nsdl_handle)
-{
-#ifndef MBED_CLIENT_DISABLE_BOOTSTRAP_FEATURE
-    M2MNsdlInterface  *interface = get_interface(nsdl_handle);
-    if(interface) {
-        interface->bootstrap_done_callback(server_info_ptr);
-    }
-#endif //MBED_CLIENT_DISABLE_BOOTSTRAP_FEATURE
-}
-
 void* __socket_malloc( void * context, size_t size)
 {
     (void) context;
