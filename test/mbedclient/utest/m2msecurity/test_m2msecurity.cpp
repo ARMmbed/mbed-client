@@ -294,6 +294,11 @@ void Test_M2MSecurity::test_resource_value_buffer()
     CHECK(security->resource_value_buffer(M2MSecurity::SMSSecurityMode,out_value) == 0);
     CHECK(security->resource_value_buffer(M2MSecurity::SecurityMode,out_value) == 0);
 
+    const uint8_t *outvalue = NULL;
+    CHECK(security->resource_value_buffer(M2MSecurity::Secretkey,outvalue) != 0);
+    CHECK(security->resource_value_buffer(M2MSecurity::ServerPublicKey,outvalue) != 0);
+    CHECK(security->resource_value_buffer(M2MSecurity::PublicKey,outvalue) != 0);
+
     free(out_value);
     out_value = NULL;
 
