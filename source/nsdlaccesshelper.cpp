@@ -33,6 +33,11 @@ uint8_t __nsdl_c_callback(struct nsdl_s *nsdl_handle,
     if(interface) {
         status = interface->resource_callback(nsdl_handle,received_coap_ptr,
                                                      address, nsdl_capab);
+        // Payload freeing must be done in app level if blockwise message
+        if (received_coap_ptr->options_list_ptr && received_coap_ptr->options_list_ptr->block1_len > 0) {
+            free(received_coap_ptr->payload_ptr);
+            received_coap_ptr->payload_ptr = NULL;
+        }
     }
     return status;
 }
@@ -77,6 +82,11 @@ uint8_t __nsdl_c_received_from_server(struct nsdl_s * nsdl_handle,
         status = interface->received_from_server_callback(nsdl_handle,
                                                                  coap_header,
                                                                  address_ptr);
+        // Payload freeing must be done in app level if blockwise message
+        if (coap_header->options_list_ptr && coap_header->options_list_ptr->block1_len > 0) {
+            free(coap_header->payload_ptr);
+            coap_header->payload_ptr = NULL;
+        }
     }
     return status;
 }

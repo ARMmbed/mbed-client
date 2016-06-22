@@ -19,10 +19,12 @@
 bool m2mnsdlinterface_stub::bool_value;
 uint32_t m2mnsdlinterface_stub::int_value;
 void * m2mnsdlinterface_stub::void_value;
+String m2mnsdlinterface_stub::string_value;
 void m2mnsdlinterface_stub::clear()
 {
     bool_value = false;
     int_value = 0;
+    string_value = "";
     void_value = NULL;
 }
 
@@ -190,4 +192,9 @@ bool M2MNsdlInterface::validate_security_object()
 void M2MNsdlInterface::handle_bootstrap_error()
 {
 
+}
+
+const String& M2MNsdlInterface::endpoint_name() const
+{
+    return m2mnsdlinterface_stub::string_value;
 }

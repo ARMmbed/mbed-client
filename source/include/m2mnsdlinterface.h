@@ -204,6 +204,12 @@ public:
      */
     nsdl_s* get_nsdl_handle();
 
+    /**
+     * @brief Get endpoint name
+     * @return endpoint name
+     */
+    const String& endpoint_name() const;
+
 protected: // from M2MTimerObserver
 
     virtual void timer_expired(M2MTimerObserver::Type type);
@@ -300,9 +306,9 @@ private:
     uint8_t* alloc_string_copy(const uint8_t* source, uint16_t size);
 
     /**
-     * \brief Utility method to convert given lifetime int to ascii
+     * @brief Utility method to convert given lifetime int to ascii
      * and allocate a buffer for it and set it to _endpoint->lifetime_ptr.
-     * \param lifetime A new value for lifetime.
+     * @param lifetime A new value for lifetime.
     */
     void set_endpoint_lifetime_buffer(int lifetime);
 
@@ -341,6 +347,9 @@ private:
     */
     bool validate_security_object();
 
+    /**
+     * @brief Handle bootstrap errors.
+    */
     void handle_bootstrap_error();
 
 private:

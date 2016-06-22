@@ -382,8 +382,6 @@ private:
     const int                   _max_states;
     bool                        _event_generated;
     EventData                   *_event_data;
-
-    String                      _endpoint_name;
     String                      _endpoint_type;
     String                      _domain;
     int32_t                     _life_time;

@@ -43,7 +43,6 @@ M2MInterfaceImpl::M2MInterfaceImpl(M2MInterfaceObserver& observer,
   _max_states( STATE_MAX_STATES ),
   _event_generated(false),
   _event_data(NULL),
-  _endpoint_name(ep_name),
   _endpoint_type(ep_type),
   _domain( dmn),
   _life_time(l_time),
@@ -74,7 +73,7 @@ M2MInterfaceImpl::M2MInterfaceImpl(M2MInterfaceObserver& observer,
         sec_mode = M2MConnectionSecurity::TLS;
     }
     tr_debug("M2MInterfaceImpl::M2MInterfaceImpl() -IN");
-    _nsdl_interface->create_endpoint(_endpoint_name,
+    _nsdl_interface->create_endpoint(ep_name,
                                      _endpoint_type,
                                      _life_time,
                                      _domain,
@@ -542,7 +541,7 @@ void M2MInterfaceImpl::state_bootstrap( EventData *data)
                 tr_debug("M2MInterfaceImpl::state_bootstrap - server_type : M2MSecurity::Bootstrap");
                 String server_address = security->resource_value_string(M2MSecurity::M2MServerUri);
                 tr_debug("M2MInterfaceImpl::state_bootstrap - server_address %s", server_address.c_str());
-                _bootstrap_timer->start_timer(MBED_CLIENT_RECONNECTION_COUNT * MBED_CLIENT_RECONNECTION_INTERVAL * 4 * 1000,
+                _bootstrap_timer->start_timer(MBED_CLIENT_RECONNECTION_COUNT * MBED_CLIENT_RECONNECTION_INTERVAL * 8 * 1000,
                                               M2MTimerObserver::BootstrapTimer);
                 String ip_address;
                 String  coap;
@@ -608,7 +607,7 @@ void M2MInterfaceImpl::state_bootstrap_address_resolved( EventData *data)
 
     // Include domain id to be part of endpoint name
     String new_ep_name;
-    new_ep_name += _endpoint_name;
+    new_ep_name += _nsdl_interface->endpoint_name();
     if (!_domain.empty()) {
         new_ep_name += '@';
         new_ep_name += _domain;

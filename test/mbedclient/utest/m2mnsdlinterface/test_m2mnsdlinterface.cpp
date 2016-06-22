@@ -464,7 +464,6 @@ void Test_M2MNsdlInterface::test_received_from_server_callback()
 
     coap_header->msg_code = COAP_MSG_CODE_RESPONSE_DELETED;
     observer->register_error = false;
-    //nsdl->_server = new M2MServer();
     nsdl->received_from_server_callback(handle,coap_header,NULL);
     CHECK(observer->unregistered == true);
 
@@ -645,6 +644,9 @@ void Test_M2MNsdlInterface::test_received_from_server_callback()
     coap_header->uri_path_len = sizeof(security);
 
 
+    M2MResource res(*m2mobject_stub::inst,"test","test",M2MResourceInstance::STRING,M2MBase::Dynamic);
+
+    m2mobjectinstance_stub::resource_list.push_back(&res);
     observer->boot_error = false;
     m2msecurity_stub::resource = new M2MResource(*m2mobject_stub::inst,"1","type",M2MResourceInstance::STRING,M2MBase::Dynamic);
     CHECK(0 == nsdl->received_from_server_callback(handle,coap_header,address));
@@ -709,7 +711,6 @@ void Test_M2MNsdlInterface::test_received_from_server_callback()
     CHECK(0 == nsdl->received_from_server_callback(handle,coap_header,address));
     CHECK(observer->boot_error == false);
 
-
     observer->boot_error = false;
     observer->boot_done = false;
     m2mtlvdeserializer_stub::is_object_bool_value = false;
@@ -717,7 +718,9 @@ void Test_M2MNsdlInterface::test_received_from_server_callback()
     m2mtlvdeserializer_stub::error = M2MTLVDeserializer::None;
     CHECK(0 == nsdl->received_from_server_callback(handle,coap_header,address));
     CHECK(observer->boot_error == true);
+    CHECK(nsdl->_security == NULL);
 
+    nsdl->_security = new M2MSecurity(M2MSecurity::M2MServer);
     observer->boot_error = false;
     observer->boot_done = false;
     coap_header->msg_code = COAP_MSG_CODE_REQUEST_DELETE;
@@ -731,13 +734,17 @@ void Test_M2MNsdlInterface::test_received_from_server_callback()
     coap_header->msg_code = COAP_MSG_CODE_REQUEST_DELETE;
     CHECK(0 == nsdl->received_from_server_callback(handle,coap_header,address));
     CHECK(observer->boot_error == true);
+    CHECK(nsdl->_security == NULL);
 
+    nsdl->_security = new M2MSecurity(M2MSecurity::M2MServer);
     observer->boot_error = false;
     observer->boot_done = false;
     coap_header->msg_code = COAP_MSG_CODE_REQUEST_POST;
     CHECK(0 == nsdl->received_from_server_callback(handle,coap_header,address));
     CHECK(observer->boot_error == true);
+    CHECK(nsdl->_security == NULL);
 
+    nsdl->_security = new M2MSecurity(M2MSecurity::M2MServer);
     common_stub::coap_header = (sn_coap_hdr_s *) malloc(sizeof(sn_coap_hdr_s));
     m2msecurity_stub::string_value = new String("coaps://");
     observer->boot_error = false;
@@ -745,8 +752,10 @@ void Test_M2MNsdlInterface::test_received_from_server_callback()
     coap_header->msg_code = COAP_MSG_CODE_REQUEST_POST;
     CHECK(0 == nsdl->received_from_server_callback(handle,coap_header,address));
     CHECK(observer->boot_error == true);
+    CHECK(nsdl->_security == NULL);
 
 
+    nsdl->_security = new M2MSecurity(M2MSecurity::M2MServer);
     m2msecurity_stub::sec_mode = M2MSecurity::NoSecurity;
     m2msecurity_stub::int_value = true;
     m2msecurity_stub::bool_value = false;
@@ -761,18 +770,20 @@ void Test_M2MNsdlInterface::test_received_from_server_callback()
     CHECK(observer->boot_error == false);
     CHECK(observer->boot_done == true);
 
-
+    nsdl->_security = new M2MSecurity(M2MSecurity::M2MServer);
     m2msecurity_stub::sec_mode = M2MSecurity::Certificate;
+    m2mresourceinstance_stub::int_value = 10;
     m2msecurity_stub::int_value = true;
     m2msecurity_stub::bool_value = false;
     observer->boot_error = false;
     observer->boot_done = false;
     coap_header->msg_code = COAP_MSG_CODE_REQUEST_POST;
-    nsdl->_security = new M2MSecurity(M2MSecurity::M2MServer);
+
     CHECK(0 == nsdl->received_from_server_callback(handle,coap_header,address));
     CHECK(observer->boot_error == false);
     CHECK(observer->boot_done == true);
 
+    nsdl->_security = new M2MSecurity(M2MSecurity::M2MServer);
     m2msecurity_stub::sec_mode = M2MSecurity::Psk;
     m2msecurity_stub::int_value = true;
     m2msecurity_stub::bool_value = false;
@@ -783,6 +794,7 @@ void Test_M2MNsdlInterface::test_received_from_server_callback()
     CHECK(observer->boot_error == true);
     CHECK(observer->boot_done == false);
 
+    nsdl->_security = new M2MSecurity(M2MSecurity::M2MServer);
     m2msecurity_stub::sec_mode = M2MSecurity::Certificate;
     m2msecurity_stub::int_value = true;
     m2msecurity_stub::bool_value = true;
@@ -793,9 +805,11 @@ void Test_M2MNsdlInterface::test_received_from_server_callback()
     CHECK(observer->boot_error == true);
     CHECK(observer->boot_done == false);
 
+    nsdl->_security = new M2MSecurity(M2MSecurity::M2MServer);
     m2msecurity_stub::sec_mode = M2MSecurity::Certificate;
     m2msecurity_stub::int_value = false;
     m2msecurity_stub::bool_value = false;
+    m2mresourceinstance_stub::int_value = 0;
     observer->boot_error = false;
     observer->boot_done = false;
     coap_header->msg_code = COAP_MSG_CODE_REQUEST_POST;
@@ -803,7 +817,7 @@ void Test_M2MNsdlInterface::test_received_from_server_callback()
     CHECK(observer->boot_error == true);
     CHECK(observer->boot_done == false);
 
-
+    nsdl->_security = new M2MSecurity(M2MSecurity::M2MServer);
     free(coap_header->uri_path_ptr);
     coap_header->uri_path_ptr = (uint8_t*)malloc(4);
     coap_header->uri_path_len = 4;
@@ -825,6 +839,7 @@ void Test_M2MNsdlInterface::test_received_from_server_callback()
     delete m2mbase_stub::string_value;
     m2mbase_stub::string_value = NULL;
     nsdl->_object_list.clear();
+    m2mobjectinstance_stub::resource_list.clear();
     delete obj;
     delete m2msecurity_stub::string_value;
     delete m2msecurity_stub::resource;
@@ -1650,4 +1665,11 @@ void Test_M2MNsdlInterface::test_send_delayed_response()
 void Test_M2MNsdlInterface::test_get_nsdl_handle()
 {
     CHECK(nsdl->get_nsdl_handle() == nsdl->_nsdl_handle);
+}
+
+void Test_M2MNsdlInterface::test_endpoint_name()
+{
+    String endpoint = "test";
+    nsdl->_endpoint_name = endpoint;
+    CHECK(nsdl->endpoint_name() == endpoint);
 }

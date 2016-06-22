@@ -258,7 +258,7 @@ bool M2MNsdlInterface::create_bootstrap_resource(sn_nsdl_addr_s *address, const 
     return success;
 #else
     (void)address;
-    (void)bs_endpoint_name;
+    (void)bootstrap_endpoint_name;
     return false;
 #endif //MBED_CLIENT_DISABLE_BOOTSTRAP_FEATURE
 }
@@ -647,6 +647,7 @@ uint8_t M2MNsdlInterface::resource_callback(struct nsdl_s */*nsdl_handle*/,
     if (execute_value_updated) {
         value_updated(base,base->uri_path());
     }
+
     return result;
 }
 
@@ -923,7 +924,7 @@ bool M2MNsdlInterface::create_nsdl_resource(M2MBase *base, const String &name, b
                 if((M2MBase::Resource == base->base_type() ||
                    M2MBase::ResourceInstance == base->base_type()) &&
                    M2MBase::Static == base->mode()) {
-                    M2MResourceInstance *res = (M2MResourceInstance*)base;
+                    M2MResourceInstance *res = (M2MResourceInstance*) base;
                     res->get_value(buffer,length);
                     if(resource->resource) {
                         memory_free(resource->resource);
@@ -1480,6 +1481,10 @@ void M2MNsdlInterface::handle_bootstrap_put_message(sn_coap_hdr_s *coap_header,
     bool security_object = false;
     uint16_t content_type = 0;
 
+    if (!_security) {
+        _security = new M2MSecurity(M2MSecurity::M2MServer);
+    }
+
     String resource_name = coap_to_string(coap_header->uri_path_ptr,
                                           coap_header->uri_path_len);
     tr_debug("M2MNsdlInterface::handle_bootstrap_message - uri %s", resource_name.c_str());
@@ -1487,16 +1492,17 @@ void M2MNsdlInterface::handle_bootstrap_put_message(sn_coap_hdr_s *coap_header,
     // Check incoming object
     if (resource_name.compare(0,1,"0") == 0) {
         security_object = true;
-        if (!_security) {
-            _security = new M2MSecurity(M2MSecurity::M2MServer);
-        }
         if(_security) {
             success = true;
+            // Not mandatory resource that's why it must be created first
             _security->create_resource(M2MSecurity::ShortServerID, 1);
-            for (int i = 0; i <= M2MSecurity::ClientHoldOffTime; i++) {
-                M2MResource* res = _security->get_resource((M2MSecurity::SecurityResource)i);
-                if (res) {
-                    res->set_operation(M2MBase::PUT_ALLOWED);
+            // Change operation mode
+            M2MResourceList list = _security->object_instance()->resources();
+            if(!list.empty()) {
+                M2MResourceList::const_iterator it;
+                it = list.begin();
+                for ( ; it != list.end(); it++ ) {
+                    (*it)->set_operation(M2MBase::PUT_ALLOWED);
                 }
             }
         }
@@ -1530,11 +1536,15 @@ void M2MNsdlInterface::handle_bootstrap_put_message(sn_coap_hdr_s *coap_header,
         }
         if (success) {
             success = parse_bootstrap_message(coap_header, security_object);
-            // Set operations back to default ones
-            for (int i = 0; i <= M2MSecurity::ClientHoldOffTime; i++) {
-                M2MResource* res = _security->get_resource((M2MSecurity::SecurityResource)i);
-                if (res) {
-                    res->set_operation(M2MBase::NOT_ALLOWED);
+            // Set operation back to default ones
+            if (_security) {
+                M2MResourceList list = _security->object_instance()->resources();
+                if(!list.empty()) {
+                    M2MResourceList::const_iterator it;
+                    it = list.begin();
+                    for ( ; it != list.end(); it++ ) {
+                        (*it)->set_operation(M2MBase::NOT_ALLOWED);
+                    }
                 }
             }
         }
@@ -1694,16 +1704,15 @@ bool M2MNsdlInterface::validate_security_object()
         String address = _security->resource_value_string(M2MSecurity::M2MServerUri);
         uint32_t sec_mode = _security->resource_value_int(M2MSecurity::SecurityMode);
         bool is_bs_server = _security->resource_value_int(M2MSecurity::BootstrapServer);
-        uint8_t *buffer = NULL;
-        uint32_t public_key_size = _security->resource_value_buffer(M2MSecurity::PublicKey, buffer);
-        free(buffer);
-        buffer = NULL;
-        uint32_t server_key_size = _security->resource_value_buffer(M2MSecurity::ServerPublicKey, buffer);
-        free(buffer);
-        buffer = NULL;
-        uint32_t pkey_size = _security->resource_value_buffer(M2MSecurity::Secretkey, buffer);
-        free(buffer);
-        buffer = NULL;
+        uint32_t public_key_size = _security->get_resource(M2MSecurity::PublicKey)->value_length();
+        uint32_t server_key_size = _security->get_resource(M2MSecurity::ServerPublicKey)->value_length();
+        uint32_t pkey_size = _security->get_resource(M2MSecurity::Secretkey)->value_length();
+        tr_debug("M2MNsdlInterface::validate_security_object - Server URI /0/0: %s", address.c_str());
+        tr_debug("M2MNsdlInterface::validate_security_object - is bs server /0/1: %d", is_bs_server);
+        tr_debug("M2MNsdlInterface::validate_security_object - Security Mode /0/2: %d", sec_mode);
+        tr_debug("M2MNsdlInterface::validate_security_object - Public key size /0/3: %d", public_key_size);
+        tr_debug("M2MNsdlInterface::validate_security_object - Server Public key size /0/4: %d", server_key_size);
+        tr_debug("M2MNsdlInterface::validate_security_object - Secret key size /0/5: %d", pkey_size);
         // Only NoSec and Certificate modes are supported
         if (!address.empty() && !is_bs_server) {
             if (M2MSecurity::Certificate == sec_mode) {
@@ -1731,7 +1740,13 @@ void M2MNsdlInterface::handle_bootstrap_error()
 {
     tr_debug("M2MNsdlInterface::handle_bootstrap_error()");
     if (_security) {
-        _security->clear_resources();
+        delete _security;
+        _security = NULL;
     }
     _observer.bootstrap_error();
+}
+
+const String& M2MNsdlInterface::endpoint_name() const
+{
+    return _endpoint_name;
 }

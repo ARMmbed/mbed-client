@@ -184,3 +184,8 @@ TEST(M2MNsdlInterface, get_nsdl_handle)
     m2m_nsdl_interface->test_get_nsdl_handle();
 }
 
+TEST(M2MNsdlInterface, endpoint_name)
+{
+    m2m_nsdl_interface->test_endpoint_name();
+}
+
