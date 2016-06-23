@@ -88,6 +88,8 @@ public:
 
     void test_get_nsdl_handle();
 
+    void test_endpoint_name();
+
     M2MNsdlInterface* nsdl;
 
     TestObserver *observer;

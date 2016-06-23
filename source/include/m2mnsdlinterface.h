@@ -102,7 +102,7 @@ public:
      * @param address Bootstrap address.
      * @return true if created and sent successfully else false.
     */
-    bool create_bootstrap_resource(sn_nsdl_addr_s *address);
+    bool create_bootstrap_resource(sn_nsdl_addr_s *address, const String &bootstrap_endpoint_name);
 
     /**
      * @brief Sends the register message to the server.
@@ -183,12 +183,6 @@ public:
                                sn_nsdl_capab_e nsdl_capab);
 
     /**
-     * @brief Callback when the bootstrap information is received from bootstrap server.
-     * @param server_info, Server information received from bootstrap server.
-     */
-    void bootstrap_done_callback(sn_nsdl_oma_server_info_t *server_info);
-
-    /**
      * @brief Callback when there is data received from server and needs to be processed.
      * @param data, data received from server.
      * @param data_size, data size received from server.
@@ -209,6 +203,12 @@ public:
      * @return ndsl handle
      */
     nsdl_s* get_nsdl_handle();
+
+    /**
+     * @brief Get endpoint name
+     * @return endpoint name
+     */
+    const String& endpoint_name() const;
 
 protected: // from M2MTimerObserver
 
@@ -298,31 +298,70 @@ private:
                            const String  &uri_path);
 
     /**
-     * \brief Allocate (size + 1) amount of memory, copy size bytes into
+     * @brief Allocate (size + 1) amount of memory, copy size bytes into
      * it and add zero termination.
-     * \param source Source string to copy, may not be NULL.
-     * \param size The size of memory to be reserved.
+     * @param source Source string to copy, may not be NULL.
+     * @param size The size of memory to be reserved.
     */
     uint8_t* alloc_string_copy(const uint8_t* source, uint16_t size);
 
     /**
-     * \brief Utility method to convert given lifetime int to ascii 
+     * @brief Utility method to convert given lifetime int to ascii
      * and allocate a buffer for it and set it to _endpoint->lifetime_ptr.
-     * \param lifetime A new value for lifetime.
+     * @param lifetime A new value for lifetime.
     */
     void set_endpoint_lifetime_buffer(int lifetime);
+
+    /**
+     * @brief Handle incoming bootstrap PUT message.
+     * @param coap_header, Received CoAP message
+     * @param address, Server address
+    */
+    void handle_bootstrap_put_message(sn_coap_hdr_s *coap_header, sn_nsdl_addr_s *address);
+
+    /**
+     * @brief Handle bootstrap finished message.
+     * @param coap_header, Received CoAP message
+     * @param address, Server address
+    */
+    void handle_bootstrap_finished(sn_coap_hdr_s *coap_header,sn_nsdl_addr_s *address);
+
+    /**
+     * @brief Handle bootstrap delete message.
+     * @param coap_header, Received CoAP message
+     * @param address, Server address
+    */
+    void handle_bootstrap_delete(sn_coap_hdr_s *coap_header,sn_nsdl_addr_s *address);
+
+    /**
+     * @brief Parse bootstrap TLV message.
+     * @param coap_header, Received CoAP message
+     * @return True if parsing was succesful else false
+    */
+    bool parse_bootstrap_message(sn_coap_hdr_s *coap_header, bool is_security_object);
+
+    /**
+     * @brief Parse bootstrap TLV message.
+     * @param coap_header, Received CoAP message
+     * @return True if parsing was succesful else false
+    */
+    bool validate_security_object();
+
+    /**
+     * @brief Handle bootstrap errors.
+    */
+    void handle_bootstrap_error();
 
 private:
 
     M2MNsdlObserver                   &_observer;
     M2MObjectList                      _object_list;
-    M2MServer                         *_server;
+    M2MServer                         *_server; // Not owned
+    M2MSecurity                       *_security; // Not owned
     M2MTimer                          *_nsdl_exceution_timer;
     M2MTimer                          *_registration_timer;
     sn_nsdl_ep_parameters_s           *_endpoint;
     sn_nsdl_resource_info_s           *_resource;
-    sn_nsdl_bs_ep_info_t               _bootstrap_endpoint;
-    sn_nsdl_oma_device_t               _bootstrap_device_setup;
     sn_nsdl_addr_s                     _sn_nsdl_address;
     nsdl_s                            *_nsdl_handle;
     uint32_t                           _counter_for_nsdl;
@@ -330,9 +369,11 @@ private:
     bool                               _register_ongoing;
     bool                               _unregister_ongoing;
     bool                               _update_register_ongoing;
+    String                             _endpoint_name;
 
 friend class Test_M2MNsdlInterface;
 
 };
 
 #endif // M2MNSDLINTERFACE_H
+

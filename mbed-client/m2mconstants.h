@@ -36,6 +36,7 @@ const float REDUCTION_FACTOR = 0.75f;
 
 #define COAP "coap://"
 #define COAPS  "coaps://"
+#define BOOTSTRAP_URI "bs"
 // PUT attributes to be checked from server
 #define EQUAL  "="
 #define AMP  "&"

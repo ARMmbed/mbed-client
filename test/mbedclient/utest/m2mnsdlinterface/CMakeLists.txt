@@ -18,6 +18,7 @@ add_executable(m2mnsdlinterface
         "../stub/common_stub.cpp"
         "../stub/nsdlaccesshelper_stub.cpp"
         "../stub/m2mtlvserializer_stub.cpp"
+        "../stub/m2mtlvdeserializer_stub.cpp"
         "../../../../source/m2mnsdlinterface.cpp"
 )
 target_link_libraries(m2mnsdlinterface

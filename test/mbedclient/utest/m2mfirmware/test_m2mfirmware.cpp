@@ -154,6 +154,7 @@ void Test_M2MFirmware::test_delete_resource()
 
 void Test_M2MFirmware::test_set_resource_value_string()
 {
+    m2mresourceinstance_stub::value = NULL;
     m2mbase_stub::bool_value = true;
     m2mresourceinstance_stub::bool_value = true;
 
