@@ -789,7 +789,13 @@ void M2MNsdlInterface::value_updated(M2MBase *base,
             break;
         }
     }
-    _observer.value_updated(base);
+
+    if (base->is_value_updated_function_set()) {
+        base->execute_value_updated(base->name());
+    }
+    else {
+        _observer.value_updated(base);
+    }
 }
 
 void M2MNsdlInterface::remove_object(M2MBase *object)

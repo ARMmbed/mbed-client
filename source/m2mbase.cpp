@@ -81,7 +81,8 @@ M2MBase::M2MBase(const M2MBase& other) :
     _observation_level(other._observation_level),
     _observable(other._observable),
     _register_uri(other._register_uri),
-    _is_under_observation(other._is_under_observation)
+    _is_under_observation(other._is_under_observation),
+    _function_pointer(NULL)
 {
 
     if(other._token) {
@@ -105,12 +106,13 @@ M2MBase::M2MBase(const String & resource_name,
   _token(NULL),
   _token_length(0),
   _coap_content_type(0),
-  _operation(M2MBase::NOT_ALLOWED),  
+  _operation(M2MBase::NOT_ALLOWED),
   _mode(mde),
   _observation_level(M2MBase::None),
   _observable(false),
   _register_uri(true),
-  _is_under_observation(false)
+  _is_under_observation(false),
+  _function_pointer(NULL)
 {
     if(is_integer(_name) && _name.size() <= MAX_ALLOWED_STRING_LENGTH) {
         _name_id = strtoul(_name.c_str(), NULL, 10);
@@ -126,6 +128,7 @@ M2MBase::~M2MBase()
 {
     delete _report_handler;
     free(_token);
+    delete _function_pointer;
 }
 
 void M2MBase::set_operation(M2MBase::Operation opr)
@@ -449,4 +452,28 @@ const String& M2MBase::uri_path() const
 bool M2MBase::is_under_observation() const
 {
     return _is_under_observation;
+}
+
+void M2MBase::set_value_updated_function(value_updated_callback callback)
+{
+    _value_updated_callback = callback;
+}
+
+void M2MBase::set_value_updated_function(value_updated_callback2 callback)
+{
+    delete _function_pointer;
+    _function_pointer = new FP1<void, const char*>(callback);
+    set_value_updated_function(value_updated_callback(_function_pointer,
+                                                      &FP1<void, const char*>::call));
+}
+bool M2MBase::is_value_updated_function_set()
+{
+    return (_value_updated_callback) ? true : false;
+}
+
+void M2MBase::execute_value_updated(const String& name)
+{
+    if(_value_updated_callback) {
+        _value_updated_callback(name.c_str());
+    }
 }
