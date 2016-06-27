@@ -20,6 +20,12 @@
 #define __STDC_FORMAT_MACROS
 #endif
 
+// Note: this macro is needed on armcc to get the the limit macros like UINT16_MAX
+#ifndef __STDC_LIMIT_MACROS
+#define __STDC_LIMIT_MACROS
+#endif
+
+
 #include "include/nsdlaccesshelper.h"
 #include "include/m2mnsdlobserver.h"
 #include "include/m2mtlvdeserializer.h"
