@@ -418,6 +418,11 @@ uint8_t M2MNsdlInterface::received_from_server_callback(struct nsdl_s * nsdl_han
                         }
                     }
                     if(coap_header->options_list_ptr->location_path_ptr) {
+                        
+                        if(_endpoint->location_ptr) {
+                            memory_free(_endpoint->location_ptr);
+                        }
+                        
                         _endpoint->location_ptr = alloc_string_copy(coap_header->options_list_ptr->location_path_ptr, coap_header->options_list_ptr->location_path_len);
                         if (_endpoint->location_ptr != NULL) {
                             _endpoint->location_len = coap_header->options_list_ptr->location_path_len;
