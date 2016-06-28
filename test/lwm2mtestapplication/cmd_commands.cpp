@@ -22,7 +22,6 @@
 #include "eventOS_event_timer.h"
 #include "net_interface.h"
 #include "socket_api.h"
-#include "socket_security.h"
 #include "mbed-trace/mbed_trace.h"
 #include "common_functions.h"
 
