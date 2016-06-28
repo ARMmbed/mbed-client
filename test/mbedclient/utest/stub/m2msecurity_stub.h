@@ -23,6 +23,7 @@ namespace m2msecurity_stub
 {
     extern bool has_value;
     extern uint32_t int_value;
+    extern uint32_t sec_mode;
     extern bool bool_value;
     extern String *string_value;
     extern M2MResource* resource;

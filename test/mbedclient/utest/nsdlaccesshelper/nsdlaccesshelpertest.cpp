@@ -62,10 +62,6 @@ TEST(NsdlAccessHelper, test_nsdl_c_received_from_server)
     nsdl->test_nsdl_c_received_from_server();
 }
 
-TEST(NsdlAccessHelper, test_nsdl_c_bootstrap_done)
-{
-    nsdl->test_nsdl_c_bootstrap_done();
-}
 
 TEST(NsdlAccessHelper, test_socket_malloc)
 {

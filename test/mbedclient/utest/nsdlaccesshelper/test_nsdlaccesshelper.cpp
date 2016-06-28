@@ -97,7 +97,7 @@ public:
 };
 
 Test_NsdlAccessHelper::Test_NsdlAccessHelper()
-{    
+{
     observer = new TestObserver();
 }
 
@@ -117,9 +117,15 @@ void Test_NsdlAccessHelper::test_nsdl_c_callback()
     m2mnsdlinterface_stub::void_value = malloc(1);
     __nsdl_interface_list.clear();
     __nsdl_interface_list.push_back(new M2MNsdlInterface(*observer));
+    common_stub::coap_header = (sn_coap_hdr_s *) malloc(sizeof(sn_coap_hdr_s));
+    memset(common_stub::coap_header, 0, sizeof(sn_coap_hdr_s));
+    common_stub::coap_header->options_list_ptr = (sn_coap_options_list_s *) malloc(sizeof(sn_coap_options_list_s));
+    common_stub::coap_header->options_list_ptr->block1_len = 2;
 
     CHECK(__nsdl_c_callback((nsdl_s*)m2mnsdlinterface_stub::void_value,
-                            NULL,NULL,SN_NSDL_PROTOCOL_HTTP) == 1 );
+                            common_stub::coap_header,NULL,SN_NSDL_PROTOCOL_HTTP) == 1 );
+    free(common_stub::coap_header->options_list_ptr);
+    free(common_stub::coap_header);
     free(m2mnsdlinterface_stub::void_value);
     clear_list();
 }
@@ -168,23 +174,15 @@ void Test_NsdlAccessHelper::test_nsdl_c_received_from_server()
     m2mnsdlinterface_stub::void_value = malloc(1);
     __nsdl_interface_list.clear();
     __nsdl_interface_list.push_back(new M2MNsdlInterface(*observer));
-    CHECK( 1 == __nsdl_c_received_from_server((nsdl_s*)m2mnsdlinterface_stub::void_value, NULL, NULL));
+    common_stub::coap_header = (sn_coap_hdr_s *) malloc(sizeof(sn_coap_hdr_s));
+    memset(common_stub::coap_header, 0, sizeof(sn_coap_hdr_s));
+    common_stub::coap_header->options_list_ptr = (sn_coap_options_list_s *) malloc(sizeof(sn_coap_options_list_s));
+    common_stub::coap_header->options_list_ptr->block1_len = 2;
+    CHECK( 1 == __nsdl_c_received_from_server((nsdl_s*)m2mnsdlinterface_stub::void_value, common_stub::coap_header, NULL));
+    free(common_stub::coap_header->options_list_ptr);
+    free(common_stub::coap_header);
     free(m2mnsdlinterface_stub::void_value);
     clear_list();
-}
-
-void Test_NsdlAccessHelper::test_nsdl_c_bootstrap_done()
-{
-    __nsdl_c_bootstrap_done(NULL, NULL);
-
-    m2mnsdlinterface_stub::void_value = malloc(1);
-    m2mnsdlinterface_stub::int_value = 1;
-    __nsdl_interface_list.clear();
-    __nsdl_interface_list.push_back(new M2MNsdlInterface(*observer));
-    __nsdl_c_bootstrap_done(NULL, (nsdl_s*)m2mnsdlinterface_stub::void_value);
-    free(m2mnsdlinterface_stub::void_value);
-    clear_list();
-
 }
 
 void Test_NsdlAccessHelper::test_socket_malloc()

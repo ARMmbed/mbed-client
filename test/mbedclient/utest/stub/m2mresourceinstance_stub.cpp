@@ -117,6 +117,11 @@ bool M2MResourceInstance::set_value(int64_t value)
 
 void M2MResourceInstance::clear_value()
 {
+    if (m2mresourceinstance_stub::value) {
+        free(m2mresourceinstance_stub::value);
+        m2mresourceinstance_stub::value = NULL;
+        m2mresourceinstance_stub::int_value = 0;
+    }
 }
 
 void M2MResourceInstance::execute(void *)
@@ -162,7 +167,7 @@ String M2MResourceInstance::get_value_string() const
     if (m2mresourceinstance_stub::value) {
         value.append_raw((char*)m2mresourceinstance_stub::value, m2mresourceinstance_stub::int_value);
     }
-    
+
     return value;
 }
 

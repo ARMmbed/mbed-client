@@ -20,7 +20,7 @@
 #include "mbed-client/m2mobjectinstance.h"
 #include "mbed-client/m2mresource.h"
 #include "mbed-client/m2mstring.h"
-
+#include "mbed-trace/mbed_trace.h"
 #define TRACE_GROUP "mClt"
 
 #define BUFFER_SIZE 21
@@ -33,7 +33,6 @@ M2MSecurity::M2MSecurity(ServerType ser_type)
      _server_instance  = M2MObject::create_object_instance();
 
     if(_server_instance) {
-
         M2MResource* res = _server_instance->create_dynamic_resource(SECURITY_M2M_SERVER_URI,
                                                                      OMA_RESOURCE_TYPE,
                                                                      M2MResourceInstance::STRING,
@@ -116,17 +115,15 @@ M2MResource* M2MSecurity::create_resource(SecurityResource resource, uint32_t va
     }
 
     const String security_id(security_id_ptr);
-    
+
     if(!security_id.empty()) {
         if(_server_instance) {
-
             res = _server_instance->create_dynamic_resource(security_id,OMA_RESOURCE_TYPE,
                                                             M2MResourceInstance::INTEGER,
                                                             false);
 
             if(res) {
                 res->set_operation(M2MBase::NOT_ALLOWED);
-
                 res->set_value(value);
             }
         }
@@ -194,8 +191,10 @@ bool M2MSecurity::set_resource_value(SecurityResource resource,
            M2MSecurity::ClientHoldOffTime == resource) {
             // If it is any of the above resource
             // set the value of the resource.
-
-            success = res->set_value(value);
+            uint8_t size = 0;
+            uint8_t *buffer = String::convert_integer_to_array(value, size);
+            success = res->set_value(buffer,size);
+            free(buffer);
         }
     }
     return success;
@@ -223,7 +222,6 @@ String M2MSecurity::resource_value_string(SecurityResource resource) const
     M2MResource* res = get_resource(resource);
     if(res) {
         if(M2MSecurity::M2MServerUri == resource) {
-
             value = res->get_value_string();
         }
     }
@@ -272,8 +270,15 @@ uint32_t M2MSecurity::resource_value_int(SecurityResource resource) const
            M2MSecurity::M2MServerSMSNumber == resource  ||
            M2MSecurity::ShortServerID == resource       ||
            M2MSecurity::ClientHoldOffTime == resource) {
-
-            value = res->get_value_int();
+            // Get the value and convert it into integer. This is not the most
+            // efficient way, as it takes pointless heap copy to get the zero termination.
+            uint8_t* buffer = NULL;
+            uint32_t length = 0;
+            res->get_value(buffer,length);
+            if(buffer) {
+                value = String::convert_array_to_integer(buffer,length);
+                free(buffer);
+            }
         }
     }
     return value;
@@ -347,8 +352,18 @@ M2MResource* M2MSecurity::get_resource(SecurityResource res) const
                 break;
         }
         const String res_name(res_name_ptr);
-        
+
         res_object = _server_instance->resource(res_name);
     }
     return res_object;
+}
+
+void M2MSecurity::clear_resources()
+{
+    for(int i = 0; i <= M2MSecurity::ClientHoldOffTime; i++) {
+        M2MResource *res = get_resource((SecurityResource) i);
+        if (res) {
+            res->clear_value();
+        }
+    }
 }
