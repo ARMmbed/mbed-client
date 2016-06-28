@@ -138,8 +138,8 @@ class Vector
     void erase(int position) {
         if(position < _size) {
             _object_template[position] = 0;
-            for(int k = position; k < _size; k++) {
-                _object_template[k] = _object_template[k+1];
+            for(int k = position; k + 1 < _size; k++) {
+                _object_template[k] = _object_template[k + 1];
             }
             _size--;
         }
