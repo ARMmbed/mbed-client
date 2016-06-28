@@ -434,7 +434,8 @@ uint8_t M2MNsdlInterface::received_from_server_callback(struct nsdl_s * nsdl_han
             } else {
                 tr_error("M2MNsdlInterface::received_from_server_callback - registration error %d", coap_header->msg_code);
                 // Try to do clean register again
-                if(COAP_MSG_CODE_RESPONSE_BAD_REQUEST == coap_header->msg_code) {
+                if(COAP_MSG_CODE_RESPONSE_BAD_REQUEST == coap_header->msg_code ||
+                   COAP_MSG_CODE_RESPONSE_FORBIDDEN == coap_header->msg_code) {
                     _observer.registration_error(M2MInterface::InvalidParameters, false);
                 } else {
                     _observer.registration_error(M2MInterface::NetworkError, true);
