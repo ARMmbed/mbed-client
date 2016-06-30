@@ -265,3 +265,8 @@ TEST(M2MBase, test_is_under_observation)
 {
     m2m_base->test_is_under_observation();
 }
+
+TEST(M2MBase, test_value_updated_function)
+{
+    m2m_base->test_value_updated_function();
+}

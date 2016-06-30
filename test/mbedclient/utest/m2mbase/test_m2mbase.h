@@ -20,7 +20,7 @@
 
 class Test_M2MBase : M2MBase
 {
-public:    
+public:
     Test_M2MBase();
 
     virtual ~Test_M2MBase();
@@ -79,7 +79,7 @@ public:
 
     void test_coap_content_type();
 
-    void test_base_type();    
+    void test_base_type();
 
     void test_handle_observation_attribute();
 
@@ -116,6 +116,8 @@ public:
     void test_max_age();
 
     void test_is_under_observation();
+
+    void test_value_updated_function();
 };
 
 

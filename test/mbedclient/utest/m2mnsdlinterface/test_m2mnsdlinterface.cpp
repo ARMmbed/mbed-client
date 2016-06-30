@@ -1472,7 +1472,6 @@ void Test_M2MNsdlInterface::test_value_updated()
     m2mobject_stub::base_type = M2MBase::Object;
     m2mbase_stub::string_value = new String("name");
     m2mbase_stub::operation = M2MBase::GET_ALLOWED;
-
     nsdl->value_updated(object,"name");
     CHECK(observer->value_update == true);
     observer->value_update = false;
@@ -1529,6 +1528,11 @@ void Test_M2MNsdlInterface::test_value_updated()
 
     nsdl->value_updated(resource_instance,"name/0/name/0");
     CHECK(observer->value_update == true);
+    observer->value_update = false;
+
+    m2mbase_stub::is_value_updated_function_set = true;
+    nsdl->value_updated(resource_instance,"name/0/name/0");
+    CHECK(observer->value_update == false);
     observer->value_update = false;
 
     delete m2mbase_stub::string_value;

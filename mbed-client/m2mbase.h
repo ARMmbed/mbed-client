@@ -20,12 +20,15 @@
 #include <stdint.h>
 #include "mbed-client/m2mconfig.h"
 #include "mbed-client/m2mreportobserver.h"
+#include "mbed-client/functionpointer.h"
 
 //FORWARD DECLARATION
 struct sn_coap_hdr_;
 typedef sn_coap_hdr_ sn_coap_hdr_s;
 struct nsdl_s;
 
+typedef FP1<void, const char*> value_updated_callback;
+typedef void(*value_updated_callback2) (const char* object_name);
 class M2MObservationHandler;
 class M2MReportHandler;
 
@@ -369,6 +372,32 @@ public:
      */
     virtual bool is_under_observation() const;
 
+    /**
+     * @brief Sets the function that is executed when this
+     * object receives a PUT or POST command.
+     * @param callback The function pointer that is called.
+     */
+    virtual void set_value_updated_function(value_updated_callback callback);
+
+    /**
+     * @brief Sets the function that is executed when this
+     * object receives a PUT or POST command.
+     * @param callback The function pointer that is called.
+     */
+    virtual void set_value_updated_function(value_updated_callback2 callback);
+
+    /**
+     * @brief Returns whether callback function is set or not.
+     * @return True if the callback function is set, else false.
+     */
+    virtual bool is_value_updated_function_set();
+
+    /**
+     * @brief Calls the function that is set in "set_value_updated_function".
+     * @param name Name of the object.
+     */
+    virtual void execute_value_updated(const String& name);
+
 protected : // from M2MReportObserver
 
     virtual void observation_to_be_sent(m2m::Vector<uint16_t> changed_instance_ids,
@@ -458,6 +487,8 @@ private:
     bool                        _observable;
     bool                        _register_uri;
     bool                        _is_under_observation;
+    value_updated_callback      _value_updated_callback;
+    FP1<void, const char*>      *_function_pointer;
 
 friend class Test_M2MBase;
 
