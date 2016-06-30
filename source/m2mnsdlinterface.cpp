@@ -1699,10 +1699,8 @@ void M2MNsdlInterface::handle_bootstrap_delete(sn_coap_hdr_s *coap_header,sn_nsd
     if (object_name.size() == 2 || object_name.size() > 3) {
         msg_code = COAP_MSG_CODE_RESPONSE_BAD_REQUEST;
     }
-    else if (object_name.size() == 1 &&
-             object_name.compare(0,1,"0") != 0 ||
-            (object_name.size() == 3 &&
-             object_name.compare(0,3,"0/0") != 0)) {
+    else if ((object_name.size() == 1 && object_name.compare(0,1,"0") != 0) ||
+            (object_name.size() == 3 && object_name.compare(0,3,"0/0") != 0)) {
         msg_code = COAP_MSG_CODE_RESPONSE_BAD_REQUEST;
     }
 
