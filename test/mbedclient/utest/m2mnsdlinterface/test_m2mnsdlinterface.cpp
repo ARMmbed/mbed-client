@@ -693,7 +693,7 @@ void Test_M2MNsdlInterface::test_received_from_server_callback()
     m2mobject_stub::inst = new M2MObjectInstance("name",*obj);
     uint8_t server[] = {"1"};
     coap_header->uri_path_ptr = server;
-    coap_header->uri_path_len = sizeof(server);
+    coap_header->uri_path_len = 1;
 
     observer->boot_error = false;
     observer->boot_done = false;
@@ -736,6 +736,32 @@ void Test_M2MNsdlInterface::test_received_from_server_callback()
     CHECK(observer->boot_error == true);
     CHECK(nsdl->_security == NULL);
 
+    free(common_stub::coap_header);
+    common_stub::coap_header = NULL;
+    uint8_t object_name[] = {"0/0"};
+    coap_header->uri_path_ptr = object_name;
+    coap_header->uri_path_len = 3;
+    observer->boot_error = false;
+    observer->boot_done = false;
+    coap_header->msg_code = COAP_MSG_CODE_REQUEST_DELETE;
+    CHECK(0 == nsdl->received_from_server_callback(handle,coap_header,address));
+    CHECK(observer->boot_error == true);
+    CHECK(nsdl->_security == NULL);
+
+    free(common_stub::coap_header);
+    common_stub::coap_header = NULL;
+    uint8_t invalid[] = {"0/0/1"};
+    coap_header->uri_path_ptr = invalid;
+    coap_header->uri_path_len = 5;
+    observer->boot_error = false;
+    observer->boot_done = false;
+    coap_header->msg_code = COAP_MSG_CODE_REQUEST_DELETE;
+    CHECK(0 == nsdl->received_from_server_callback(handle,coap_header,address));
+    CHECK(observer->boot_error == true);
+    CHECK(nsdl->_security == NULL);
+
+    coap_header->uri_path_ptr = server;
+    coap_header->uri_path_len = 1;
     nsdl->_security = new M2MSecurity(M2MSecurity::M2MServer);
     observer->boot_error = false;
     observer->boot_done = false;
@@ -1446,7 +1472,6 @@ void Test_M2MNsdlInterface::test_value_updated()
     m2mobject_stub::base_type = M2MBase::Object;
     m2mbase_stub::string_value = new String("name");
     m2mbase_stub::operation = M2MBase::GET_ALLOWED;
-
     nsdl->value_updated(object,"name");
     CHECK(observer->value_update == true);
     observer->value_update = false;
@@ -1503,6 +1528,11 @@ void Test_M2MNsdlInterface::test_value_updated()
 
     nsdl->value_updated(resource_instance,"name/0/name/0");
     CHECK(observer->value_update == true);
+    observer->value_update = false;
+
+    m2mbase_stub::is_value_updated_function_set = true;
+    nsdl->value_updated(resource_instance,"name/0/name/0");
+    CHECK(observer->value_update == false);
     observer->value_update = false;
 
     delete m2mbase_stub::string_value;

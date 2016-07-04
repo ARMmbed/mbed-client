@@ -26,7 +26,7 @@ namespace m2mbase_stub
     extern uint32_t uint32_value;
     extern uint16_t int_value;
     extern int32_t name_id_value;
-    extern String *string_value;    
+    extern String *string_value;
     extern bool bool_value;
     extern M2MBase::BaseType base_type;
     extern M2MBase::Mode mode_value;
@@ -35,6 +35,7 @@ namespace m2mbase_stub
     extern M2MObservationHandler *observe;
     extern M2MReportHandler *report;
     extern M2MBase::Observation observation_level_value;
+    extern bool is_value_updated_function_set;
     void clear();
 }
 
