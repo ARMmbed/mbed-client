@@ -119,7 +119,8 @@ void value_updated(M2MBase *base, M2MBase::BaseType type) {
         }
     }
 ```
-By default callbacks are handled in value_updated() function but application can also define callback function for individual resource.
+By default, callbacks are handled in the `value_updated()` function but the application can also define a callback function for an individual resource.
+
 Check the code snippet below for usage.
 
 ```
