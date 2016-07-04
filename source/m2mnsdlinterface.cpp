@@ -794,7 +794,13 @@ void M2MNsdlInterface::value_updated(M2MBase *base,
             break;
         }
     }
-    _observer.value_updated(base);
+
+    if (base->is_value_updated_function_set()) {
+        base->execute_value_updated(base->name());
+    }
+    else {
+        _observer.value_updated(base);
+    }
 }
 
 void M2MNsdlInterface::remove_object(M2MBase *object)
@@ -1649,7 +1655,7 @@ void M2MNsdlInterface::handle_bootstrap_finished(sn_coap_hdr_s *coap_header,sn_n
     sn_coap_hdr_s *coap_response = NULL;
     uint8_t msg_code = COAP_MSG_CODE_RESPONSE_CHANGED;
 
-    // Accept only '/bs' path
+    // Accept only '/bs' path and check that needed data is in security object
     if (object_name.size() != 2 ||
             object_name.compare(0,2,BOOTSTRAP_URI) != 0 ||
             !validate_security_object()) {
@@ -1687,11 +1693,25 @@ void M2MNsdlInterface::handle_bootstrap_finished(sn_coap_hdr_s *coap_header,sn_n
 void M2MNsdlInterface::handle_bootstrap_delete(sn_coap_hdr_s *coap_header,sn_nsdl_addr_s *address)
 {
 #ifndef M2M_CLIENT_DISABLE_BOOTSTRAP_FEATURE
-    tr_debug("M2MNsdlInterface::handle_bootstrap_delete");
     sn_coap_hdr_s *coap_response = NULL;
+    uint8_t msg_code = COAP_MSG_CODE_RESPONSE_DELETED;
+    String object_name = coap_to_string(coap_header->uri_path_ptr,
+                                          coap_header->uri_path_len);
+    tr_debug("M2MNsdlInterface::handle_bootstrap_delete - obj %s", object_name.c_str());
+
+    // Only following paths are accepted, 0, 0/0
+    if (object_name.size() == 2 || object_name.size() > 3) {
+        msg_code = COAP_MSG_CODE_RESPONSE_BAD_REQUEST;
+    }
+    else if ((object_name.size() == 1 && object_name.compare(0,1,"0") != 0) ||
+            (object_name.size() == 3 && object_name.compare(0,3,"0/0") != 0)) {
+        msg_code = COAP_MSG_CODE_RESPONSE_BAD_REQUEST;
+    }
+
     coap_response = sn_nsdl_build_response(_nsdl_handle,
                                            coap_header,
-                                           COAP_MSG_CODE_RESPONSE_DELETED);
+                                           msg_code);
+
     if(coap_response) {
         sn_nsdl_send_coap_message(_nsdl_handle, address, coap_response);
         sn_nsdl_release_allocated_coap_msg_mem(_nsdl_handle, coap_response);

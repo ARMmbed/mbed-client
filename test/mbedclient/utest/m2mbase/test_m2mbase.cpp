@@ -19,7 +19,19 @@
 #include "m2mreportobserver.h"
 #include "m2mreporthandler.h"
 #include "m2mreporthandler_stub.h"
+static bool value_update_called = false;
+static void value_updated_function(const char* name) {
+    value_update_called = true;
+}
 
+class MyTest{
+public:
+    void value_updated_function(const char* name) {
+        visited = true;
+    }
+
+    bool visited;
+};
 
 class Handler : public M2MObservationHandler {
 
@@ -54,7 +66,7 @@ Test_M2MBase::Test_M2MBase()
 }
 
 Test_M2MBase::~Test_M2MBase()
-{    
+{
 }
 
 void Test_M2MBase::test_copy_constructor()
@@ -85,7 +97,7 @@ void Test_M2MBase::test_copy_constructor()
     CHECK(copy->_report_handler != NULL);
 
     delete test;
-    delete copy;    
+    delete copy;
 }
 
 void Test_M2MBase::test_assignment_operator()
@@ -573,3 +585,22 @@ void Test_M2MBase::test_is_under_observation()
     this->_is_under_observation = true;
     CHECK(true == is_under_observation());
 }
+
+void Test_M2MBase::test_value_updated_function()
+{
+    MyTest test;
+    test.visited = false;
+
+    CHECK(this->is_value_updated_function_set() == false);
+
+    this->set_value_updated_function(value_updated_callback(&test,&MyTest::value_updated_function));
+    this->execute_value_updated("test");
+    CHECK(this->is_value_updated_function_set() == true);
+    CHECK(test.visited == true);
+
+    value_update_called = false;
+    this->set_value_updated_function(value_updated_callback2(value_updated_function));
+    this->execute_value_updated("test");
+    CHECK(value_update_called == true);
+}
+

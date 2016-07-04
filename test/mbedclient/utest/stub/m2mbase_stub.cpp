@@ -34,6 +34,7 @@ M2MBase::Observation m2mbase_stub::observation_level_value;
 void *m2mbase_stub::void_value;
 M2MObservationHandler *m2mbase_stub::observe;
 M2MReportHandler *m2mbase_stub::report;
+bool m2mbase_stub::is_value_updated_function_set;
 
 
 void m2mbase_stub::clear()
@@ -52,12 +53,12 @@ void m2mbase_stub::clear()
     void_value = NULL;
     observe = NULL;
     report = NULL;
-
+    is_value_updated_function_set = false;
 }
 
 M2MBase::M2MBase(const String &/*resource_name*/,
                  M2MBase::Mode /*mode*/)
-{    
+{
 }
 
 M2MBase& M2MBase::operator=(const M2MBase& other)
@@ -86,7 +87,7 @@ void M2MBase::set_interface_description(const String &/*desc*/)
 }
 
 void M2MBase::set_resource_type(const String &/*res_type*/)
-{    
+{
 }
 
 void M2MBase::set_coap_content_type(const uint8_t /*con_type*/)
@@ -179,7 +180,7 @@ M2MBase::Observation M2MBase::observation_level() const
 
 void M2MBase::get_observation_token(uint8_t *&/*token*/,
                                     uint32_t &/*length*/)
-{    
+{
 }
 
 void M2MBase::set_base_type(M2MBase::BaseType /*type*/)
@@ -278,7 +279,7 @@ sn_coap_hdr_s* M2MBase::handle_put_request(nsdl_s */*nsdl*/,
                                            M2MObservationHandler */*observation_handler*/,
                                            bool &execute_value_updated)
 {
-    //Handled in M2MResource, M2MObjectInstance and M2MObject classes    
+    //Handled in M2MResource, M2MObjectInstance and M2MObject classes
     return NULL;
 }
 
@@ -312,4 +313,24 @@ const String& M2MBase::uri_path() const
 bool M2MBase::is_under_observation() const
 {
     return m2mbase_stub::bool_value;
+}
+
+void M2MBase::set_value_updated_function(value_updated_callback callback)
+{
+
+}
+
+void M2MBase::set_value_updated_function(value_updated_callback2 callback)
+{
+
+}
+
+bool M2MBase::is_value_updated_function_set()
+{
+    return m2mbase_stub::is_value_updated_function_set;
+}
+
+void M2MBase::execute_value_updated(const String& name)
+{
+
 }
