@@ -180,6 +180,9 @@ public:
      * \param resource With this function, the following resources can return a value:
      * 'Package'.
      * \param [OUT]data The data buffer containing the value.
+     * Tha value of the pointer MUST be set as NULL before calling this function unless it has been
+     * allocated using malloc. In that case the data is freed when calling this function.
+     * The buffer is allocated using malloc when this function is called and MUST be passed to function free after use.
      * \return The size of the buffer populated.
      */
     uint32_t resource_value_buffer(FirmwareResource resource,
