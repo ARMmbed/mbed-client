@@ -418,6 +418,9 @@ uint8_t M2MNsdlInterface::received_from_server_callback(struct nsdl_s * nsdl_han
                         }
                     }
                     if(coap_header->options_list_ptr->location_path_ptr) {
+                        
+                        memory_free(_endpoint->location_ptr);
+                        
                         _endpoint->location_ptr = alloc_string_copy(coap_header->options_list_ptr->location_path_ptr, coap_header->options_list_ptr->location_path_len);
                         if (_endpoint->location_ptr != NULL) {
                             _endpoint->location_len = coap_header->options_list_ptr->location_path_len;
@@ -663,10 +666,12 @@ bool M2MNsdlInterface::process_received_data(uint8_t *data,
                                              sn_nsdl_addr_s *address)
 {
     tr_debug("M2MNsdlInterface::process_received_data( data size %d)", data_size);
+    __mutex_claim();
     return (0 == sn_nsdl_process_coap(_nsdl_handle,
                                       data,
                                       data_size,
                                       address)) ? true : false;
+    __mutex_release();
 }
 
 void M2MNsdlInterface::stop_timers()
@@ -687,7 +692,9 @@ void M2MNsdlInterface::stop_timers()
 void M2MNsdlInterface::timer_expired(M2MTimerObserver::Type type)
 {
     if(M2MTimerObserver::NsdlExecution == type) {
+        __mutex_claim();
         sn_nsdl_exec(_nsdl_handle, _counter_for_nsdl);
+        __mutex_release();
         _counter_for_nsdl++;
     } else if(M2MTimerObserver::Registration == type) {
         tr_debug("M2MNsdlInterface::timer_expired - M2MTimerObserver::Registration - Send update registration");
