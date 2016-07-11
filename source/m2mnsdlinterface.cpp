@@ -418,9 +418,9 @@ uint8_t M2MNsdlInterface::received_from_server_callback(struct nsdl_s * nsdl_han
                         }
                     }
                     if(coap_header->options_list_ptr->location_path_ptr) {
-                        
+
                         memory_free(_endpoint->location_ptr);
-                        
+
                         _endpoint->location_ptr = alloc_string_copy(coap_header->options_list_ptr->location_path_ptr, coap_header->options_list_ptr->location_path_len);
                         if (_endpoint->location_ptr != NULL) {
                             _endpoint->location_len = coap_header->options_list_ptr->location_path_len;
@@ -1677,13 +1677,13 @@ void M2MNsdlInterface::handle_bootstrap_finished(sn_coap_hdr_s *coap_header,sn_n
         sn_nsdl_release_allocated_coap_msg_mem(_nsdl_handle, coap_response);
     }
     if (COAP_MSG_CODE_RESPONSE_CHANGED == msg_code) {
-        _observer.bootstrap_done(_security);
         // Switch back to original ep name
         if (_endpoint->endpoint_name_ptr) {
             memory_free(_endpoint->endpoint_name_ptr);
         }
         _endpoint->endpoint_name_ptr = alloc_string_copy((uint8_t*)_endpoint_name.c_str(), _endpoint_name.length());
         _endpoint->endpoint_name_len = _endpoint_name.length();
+        _observer.bootstrap_done(_security);
     } else {
         handle_bootstrap_error();
     }
