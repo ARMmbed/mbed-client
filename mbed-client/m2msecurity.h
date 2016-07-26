@@ -211,6 +211,7 @@ public:
 private:
 
     M2MResource* get_resource(SecurityResource resource) const;
+    void clear_resources();
 
 private:
 
@@ -223,6 +224,7 @@ private:
     friend class Test_M2MConnectionHandlerPimpl_linux;
     friend class Test_M2MConnectionHandlerPimpl_mbed;
     friend class Test_M2MConnectionSecurityPimpl;
+    friend class Test_M2MNsdlInterface;
 };
 
 #endif // M2M_SECURITY_H
