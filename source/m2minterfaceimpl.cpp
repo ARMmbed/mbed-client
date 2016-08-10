@@ -635,6 +635,9 @@ void M2MInterfaceImpl::state_bootstrapped( EventData */*data*/)
 {
 #ifndef MBED_CLIENT_DISABLE_BOOTSTRAP_FEATURE
     tr_debug("M2MInterfaceImpl::state_bootstrapped");
+    _connection_handler->stop_listening();
+    _listen_port = rand() % 64511 + 1024;
+    _connection_handler->bind_connection(_listen_port);
 #endif //MBED_CLIENT_DISABLE_BOOTSTRAP_FEATURE
 }
 
