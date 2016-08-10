@@ -76,7 +76,6 @@ M2MNsdlInterface::M2MNsdlInterface(M2MNsdlObserver &observer)
     _nsdl_handle = sn_nsdl_init(&(__nsdl_c_send_to_server), &(__nsdl_c_received_from_server),
                  &(__nsdl_c_memory_alloc), &(__nsdl_c_memory_free));
 
-
     _server = new M2MServer();
     initialize();
 }
@@ -565,6 +564,7 @@ uint8_t M2MNsdlInterface::received_from_server_callback(struct nsdl_s * nsdl_han
     return value;
 }
 
+
 uint8_t M2MNsdlInterface::resource_callback(struct nsdl_s */*nsdl_handle*/,
                                             sn_coap_hdr_s *received_coap_header,
                                             sn_nsdl_addr_s *address,
@@ -644,8 +644,8 @@ uint8_t M2MNsdlInterface::resource_callback(struct nsdl_s */*nsdl_handle*/,
                                                    received_coap_header,
                                                    msg_code);
     }
-
-    if(coap_response) {
+    if(coap_response &&
+            coap_response->coap_status != COAP_STATUS_PARSER_BLOCKWISE_MSG_RECEIVING) {
         tr_debug("M2MNsdlInterface::resource_callback() - send CoAP response");
         (sn_nsdl_send_coap_message(_nsdl_handle, address, coap_response) == 0) ? result = 0 : result = 1;
         if(coap_response->payload_ptr) {
@@ -654,10 +654,10 @@ uint8_t M2MNsdlInterface::resource_callback(struct nsdl_s */*nsdl_handle*/,
         }
         sn_nsdl_release_allocated_coap_msg_mem(_nsdl_handle, coap_response);
     }
-    if (execute_value_updated) {
+    if (execute_value_updated &&
+            coap_response && coap_response->coap_status != COAP_STATUS_PARSER_BLOCKWISE_MSG_RECEIVING) {
         value_updated(base,base->uri_path());
     }
-
     return result;
 }
 
@@ -988,9 +988,15 @@ bool M2MNsdlInterface::create_nsdl_resource(M2MBase *base, const String &name, b
             }
 
             if(M2MBase::Dynamic == base->mode()){
-              // Dynamic resource is updated
-               _resource->mode = SN_GRS_DYNAMIC;
-               _resource->sn_grs_dyn_res_callback = __nsdl_c_callback;
+                // Dynamic resource is updated
+                _resource->mode = SN_GRS_DYNAMIC;
+                _resource->sn_grs_dyn_res_callback = __nsdl_c_callback;
+                if(M2MBase::Resource == base->base_type()) {
+                    M2MResource *res = (M2MResource*)base;
+                    if (res) {
+                        _resource->external_memory_block = (res->block_message()) ? 1 : 0;
+                    }
+                }
             }
 
             if( _resource->path != NULL ){
