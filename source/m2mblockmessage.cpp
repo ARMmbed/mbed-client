@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 #include "mbed-client/m2mblockmessage.h"
-#include <assert.h>
-#include <cstdlib>
-#include <cstring>
+#include <stdlib.h>
+#include <string.h>
+
 M2MBlockMessage::M2MBlockMessage() :
     _block_number(0),
     _total_message_size(0),
