@@ -182,12 +182,14 @@ void Test_M2MNsdlInterface::test_create_nsdl_list_structure()
     m2mbase_stub::string_value = name;
     m2mbase_stub::mode_value = M2MBase::Static;
 
+
     CHECK(nsdl->create_nsdl_list_structure(list)== true);
 
     m2mresource_stub::bool_value = true;
     m2mbase_stub::mode_value = M2MBase::Dynamic;
 
     m2mresource_stub::list.push_back(res_instance);
+    m2mresourceinstance_stub::base_type = M2MBase::Resource;
 
     CHECK(nsdl->create_nsdl_list_structure(list)== true);
 

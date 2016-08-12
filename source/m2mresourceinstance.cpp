@@ -357,8 +357,10 @@ sn_coap_hdr_s* M2MResourceInstance::handle_get_request(nsdl_s *nsdl,
                 uint32_t payload_len = 0;
 
                 //If handler exists it means that resource value is stored in application side
-                if (_block_message_data && _block_message_data->is_block_message()) {
-                    outgoing_block_message(uri_path(), coap_response->payload_ptr, payload_len);
+                if (block_message() && block_message()->is_block_message()) {
+                    if(_outgoing_block_message_cb) {
+                        _outgoing_block_message_cb(uri_path(), coap_response->payload_ptr, payload_len);
+                    }
                 } else {
                     get_value(coap_response->payload_ptr,payload_len);
                 }
@@ -476,19 +478,21 @@ sn_coap_hdr_s* M2MResourceInstance::handle_put_request(nsdl_s *nsdl,
                     msg_code = COAP_MSG_CODE_RESPONSE_UNSUPPORTED_CONTENT_FORMAT;
                 } else {
                     bool external_block_store = false;
-                    if (_block_message_data) {
-                        _block_message_data->set_message_info(received_coap_header);
-                        if (_block_message_data->is_block_message()) {
+                    if (block_message()) {
+                        block_message()->set_message_info(received_coap_header);
+                        if (block_message()->is_block_message()) {
                             external_block_store = true;
-                            incoming_block_message();
-                            if (_block_message_data->is_last_block()) {
-                                _block_message_data->clear_values();
+                            if(_incoming_block_message_cb) {
+                                _incoming_block_message_cb(_block_message_data);
+                            }
+                            if (block_message()->is_last_block()) {
+                                block_message()->clear_values();
                                 coap_response->coap_status = COAP_STATUS_PARSER_BLOCKWISE_MSG_RECEIVED;
                             } else {
                                 coap_response->coap_status = COAP_STATUS_PARSER_BLOCKWISE_MSG_RECEIVING;
                             }
-                            if (_block_message_data->error_code() != M2MBlockMessage::ErrorNone) {
-                                _block_message_data->clear_values();
+                            if (block_message()->error_code() != M2MBlockMessage::ErrorNone) {
+                                block_message()->clear_values();
                             }
                         }
                     }
@@ -536,20 +540,6 @@ const String& M2MResourceInstance::object_name() const
 uint16_t M2MResourceInstance::object_instance_id() const
 {
     return _object_instance_id;
-}
-
-void M2MResourceInstance::incoming_block_message()
-{
-    if(_incoming_block_message_cb) {
-        _incoming_block_message_cb(_block_message_data);
-    }
-}
-
-void M2MResourceInstance::outgoing_block_message(const String &resource, uint8_t *&data, uint32_t &data_len)
-{
-    if(_outgoing_block_message_cb) {
-        _outgoing_block_message_cb(resource,data,data_len);
-    }
 }
 
 M2MBlockMessage* M2MResourceInstance::block_message() const

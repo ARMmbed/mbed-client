@@ -275,10 +275,6 @@ private:
 
     bool is_value_changed(const uint8_t* value, const uint32_t value_len);
 
-    void incoming_block_message();
-
-    void outgoing_block_message(const String &resource, uint8_t *&data, uint32_t &data_len);
-
 private:
 
     M2MObjectInstanceCallback               &_object_instance_callback;

@@ -95,9 +95,11 @@ void M2MBlockMessage::set_message_info(sn_coap_hdr_s *coap_header)
             free(_block_data_ptr);
             _block_data_ptr = NULL;
             _block_data_len = coap_header->payload_len;
-            _block_data_ptr = (uint8_t*)malloc(_block_data_len);
-            if (_block_data_ptr) {
-                memcpy(_block_data_ptr, coap_header->payload_ptr, _block_data_len);
+            if(_block_data_len > 0) {
+                _block_data_ptr = (uint8_t *)malloc(_block_data_len);
+                if (_block_data_ptr) {
+                    memcpy(_block_data_ptr, coap_header->payload_ptr, _block_data_len);
+                }
             }
         }
     }
