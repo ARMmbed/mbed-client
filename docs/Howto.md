@@ -414,4 +414,48 @@ static void c_style_function(void *) {
 }
 resource->set_execute_function(&c_style_function);
 ```
-There are additional APIs that provide getter and remove functions for Resource and Resource Instances in the `M2MResource` and `M2MResourceInstance` classes. Check [the API documentation](https://docs.mbed.com/docs/mbed-client-guide/en/latest/api/annotated.html) for their usage. 
+There are additional APIs that provide getter and remove functions for Resource and Resource Instances in the `M2MResource` and `M2MResourceInstance` classes. Check [the API documentation](https://docs.mbed.com/docs/mbed-client-guide/en/latest/api/annotated.html) for their usage.
+
+##### Setting an external handler for block-wise messages
+
+For dynamic Resources, you can pass a function pointer to the Resource Instance. It will be executed when mbed Device Server calls a `PUT` method on that resource with large payload using block-wise operation. The Resource Instance must support the `PUT` operation mode for this feature to work. If the callback is set then application will be notified for every incoming block-wise message and the message is not stored anymore in mbed-client side. In this case it's applications responsibility to store each block-wise message and combine them when the last block has arrived. 
+
+<span class="notes">**Note:** Due to limitation in mbed-client-c library GET request can only contain data size up to 65KB.</span>
+
+To pass the function pointer for incoming block-wise message:
+
+```
+virtual void set_incoming_block_message_callback(incoming_block_message_callback callback);
+void block_message_received(M2MBlockMessage *argument) {
+// Code
+}
+resource->set_incoming_block_message_callback(incoming_block_message_callback(this, &block_message_received));
+```
+
+To pass the function pointer for outgoing block-wise message:
+```
+virtual void set_outgoing_block_message_callback(outgoing_block_message_callback callback);
+void block_message_requested(const String& resource, uint8_t *&data, uint32_t &len) {
+// Code
+}
+resource->set_outgoing_block_message_callback(outgoing_block_message_callback(this, &block_message_requested));
+```
+
+Applications can define their own maximum incoming message size in bytes at build time.
+For mbed OS, create a `mbed_app.json` file in the application level and overwrite the value as described below:
+
+```
+"target_overrides": {
+        "*": {
+            "mbed-client.sn-coap-max-incoming-message-size": 100000
+        }
+
+```
+For yotta based builds, to change the message size, you need to create a `config.json` file in the application level.
+
+*Example:*
+```
+{
+"coap_max_incoming_block_message_size": 100000
+}
+```

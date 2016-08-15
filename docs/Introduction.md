@@ -99,7 +99,7 @@ _interface->set_entropy_callback(ent_cb);
 
 The maximum single UDP message size that mbed Client can receive is 1152 bytes. The actual payload size is 1137 bytes, the header information using the remaining 15 bytes. 
 
-For transferring larger amounts of data, the Blockwise feature must be deployed. When using this feature, mbed Client can handle messages up to 64KB. This feature is disabled by default.
+For transferring larger amounts of data, the Blockwise feature must be deployed. When using this feature, mbed Client can handle messages up to 65KB by default. This feature is disabled by default. To receive more than 65KB see [Setting an external handler for block-wise messages](Howto.md).
 
 For mbed OS, to enable Blockwise feature , create a `mbed_app.json` file in the application level and overwrite Blockwise value as described below:
 
