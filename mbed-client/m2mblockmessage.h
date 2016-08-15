@@ -53,7 +53,7 @@ public:
     void set_message_info(sn_coap_hdr_s *coap_header);
 
     /**
-     * \brief Clear payload data.
+     * \brief Clear values.
      */
     void clear_values();
 
@@ -72,7 +72,7 @@ public:
 
     /**
      * \brief Returns total size of the message.
-     * \return Total size.
+     * \return Total size in bytes.
      */
     uint32_t total_message_size() const;
 

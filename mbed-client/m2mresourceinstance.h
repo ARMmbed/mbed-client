@@ -250,7 +250,9 @@ public:
 
     /**
      * @brief Sets the function that is executed when this
-     * object receives a GET request for the data stored externally.
+     * object receives a GET request.
+     * This is called if resource values is stored in application side.
+     * NOTE! Due to limitation in mbed-client-c library GET request can only contain data size up to 65KB.
      * @param callback The function pointer that is called.
      */
     virtual void set_outgoing_block_message_callback(outgoing_block_message_callback callback);
