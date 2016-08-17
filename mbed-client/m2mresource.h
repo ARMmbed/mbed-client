@@ -226,7 +226,7 @@ public:
                                                sn_coap_hdr_s *received_coap_header,
                                                M2MObservationHandler *observation_handler,
                                                bool &execute_value_updated,
-                                               sn_nsdl_addr_s *address);
+                                               sn_nsdl_addr_s *address = NULL);
 
 protected:
     virtual void notification_update();
