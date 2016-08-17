@@ -590,7 +590,11 @@ uint8_t M2MNsdlInterface::resource_callback(struct nsdl_s */*nsdl_handle*/,
             if(base->base_type() == M2MBase::ResourceInstance) {
                 msg_code = COAP_MSG_CODE_RESPONSE_BAD_REQUEST;
             } else {
-                coap_response = base->handle_post_request(_nsdl_handle, received_coap_header,this, execute_value_updated);
+                coap_response = base->handle_post_request(_nsdl_handle,
+                                                          received_coap_header,
+                                                          this,
+                                                          execute_value_updated,
+                                                          address);
             }
         } else if(COAP_MSG_CODE_REQUEST_DELETE == received_coap_header->msg_code) {
             // Delete the object instance
@@ -645,17 +649,20 @@ uint8_t M2MNsdlInterface::resource_callback(struct nsdl_s */*nsdl_handle*/,
                                                    msg_code);
     }
     if(coap_response &&
-            coap_response->coap_status != COAP_STATUS_PARSER_BLOCKWISE_MSG_RECEIVING) {
+            coap_response->coap_status != COAP_STATUS_PARSER_BLOCKWISE_MSG_RECEIVING &&
+            coap_response->msg_code != COAP_MSG_CODE_EMPTY) {
+
         tr_debug("M2MNsdlInterface::resource_callback() - send CoAP response");
         (sn_nsdl_send_coap_message(_nsdl_handle, address, coap_response) == 0) ? result = 0 : result = 1;
         if(coap_response->payload_ptr) {
             free(coap_response->payload_ptr);
             coap_response->payload_ptr = NULL;
         }
-        sn_nsdl_release_allocated_coap_msg_mem(_nsdl_handle, coap_response);
     }
+    sn_nsdl_release_allocated_coap_msg_mem(_nsdl_handle, coap_response);
     if (execute_value_updated &&
-            coap_response && coap_response->coap_status != COAP_STATUS_PARSER_BLOCKWISE_MSG_RECEIVING) {
+            coap_response &&
+            coap_response->coap_status != COAP_STATUS_PARSER_BLOCKWISE_MSG_RECEIVING) {
         value_updated(base,base->uri_path());
     }
     return result;
