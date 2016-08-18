@@ -418,7 +418,7 @@ There are additional APIs that provide getter and remove functions for Resource 
 
 ##### Setting an external handler for block-wise messages
 
-For dynamic Resources, you can pass a function pointer to the Resource Instance. It will be executed when mbed Device Server calls a `PUT` method on that resource with large payload using block-wise operation. The Resource Instance must support the `PUT` operation mode for this feature to work. If the callback is set, the application will be notified for every incoming block-wise message and the message is not stored in mbed Client side anymore. In such case, it is application's responsibility to store each block-wise message and combine them when the last block has arrived. 
+For dynamic Resources, you can pass a function pointer to the Resource Instance. It will be executed when mbed Device Server calls a `PUT` method on that resource with large payload using block-wise operation. The Resource must support the `PUT` operation mode for this feature to work. If the callback is set, the application will be notified for every incoming block-wise message and the message is not stored in mbed Client side anymore. In such case, it is application's responsibility to store each block-wise message and combine them when the last block has arrived. 
 
 <span class="notes">**Note:** Due to a limitation in the mbed-client-c library, GET request can only contain data up to 65KB.</span>
 
