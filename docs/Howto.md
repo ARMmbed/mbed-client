@@ -418,11 +418,11 @@ There are additional APIs that provide getter and remove functions for Resource 
 
 ##### Setting an external handler for block-wise messages
 
-For dynamic Resources, you can pass a function pointer to the Resource Instance. It will be executed when mbed Device Server calls a `PUT` method on that resource with large payload using block-wise operation. The Resource Instance must support the `PUT` operation mode for this feature to work. If the callback is set then application will be notified for every incoming block-wise message and the message is not stored anymore in mbed-client side. In this case it's applications responsibility to store each block-wise message and combine them when the last block has arrived. 
+For dynamic Resources, you can pass a function pointer to the Resource Instance. It will be executed when mbed Device Server calls a `PUT` method on that resource with large payload using block-wise operation. The Resource Instance must support the `PUT` operation mode for this feature to work. If the callback is set, the application will be notified for every incoming block-wise message and the message is not stored in mbed Client side anymore. In such case, it is application's responsibility to store each block-wise message and combine them when the last block has arrived. 
 
-<span class="notes">**Note:** Due to limitation in mbed-client-c library GET request can only contain data size up to 65KB.</span>
+<span class="notes">**Note:** Due to a limitation in the mbed-client-c library, GET request can only contain data up to 65KB.</span>
 
-To pass the function pointer for incoming block-wise message:
+To pass the function pointer for an incoming block-wise message:
 
 ```
 virtual void set_incoming_block_message_callback(incoming_block_message_callback callback);
@@ -432,7 +432,8 @@ void block_message_received(M2MBlockMessage *argument) {
 resource->set_incoming_block_message_callback(incoming_block_message_callback(this, &block_message_received));
 ```
 
-To pass the function pointer for outgoing block-wise message:
+To pass the function pointer for an outgoing block-wise message:
+
 ```
 virtual void set_outgoing_block_message_callback(outgoing_block_message_callback callback);
 void block_message_requested(const String& resource, uint8_t *&data, uint32_t &len) {
@@ -441,8 +442,7 @@ void block_message_requested(const String& resource, uint8_t *&data, uint32_t &l
 resource->set_outgoing_block_message_callback(outgoing_block_message_callback(this, &block_message_requested));
 ```
 
-Applications can define their own maximum incoming message size in bytes at build time.
-For mbed OS, create a `mbed_app.json` file in the application level and overwrite the value as described below:
+Applications can define their own maximum incoming message size in bytes at build time. For mbed OS, create a `mbed_app.json` file in the application level and overwrite the value as described below:
 
 ```
 "target_overrides": {
@@ -451,9 +451,8 @@ For mbed OS, create a `mbed_app.json` file in the application level and overwrit
         }
 
 ```
-For yotta based builds, to change the message size, you need to create a `config.json` file in the application level.
+For yotta based builds, you need to create a `config.json` file in the application level:
 
-*Example:*
 ```
 {
 "coap_max_incoming_block_message_size": 100000
