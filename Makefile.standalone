@@ -43,12 +43,63 @@ endif
 
 COVERAGEFILE := ./lcov/coverage.info
 
+# Set the target path where submodules will be deployed to,
+# functionally similar than the yotta_modules.
+SUBMODULE_BASE_PATH ?= $(CURDIR)/standalone_modules
+
+# List of libraries to build with Makefile.standalone
+LIBS := \
+	mbed-client-c \
+	mbed-client-mbed-tls \
+
+# these will be downloaded, but built with special rules
+SPECIAL_LIBS := \
+
 #
 # Define compiler toolchain
 #
 include ../../libService/toolchain_rules.mk
 
 $(eval $(call generate_rules,$(LIB),$(SRCS)))
+
+FETCH_SUB_MODULES := $(LIBS:%=fetch-%)
+.PHONY: $(FETCH_SUB_MODULES)
+$(FETCH_SUB_MODULES): $(LIBS) $(SUBMODULE_BASE_PATH)
+	@echo $@
+	make -C $(SUBMODULE_BASE_PATH)/$(@:fetch-%=%) -f Makefile.standalone fetch_source SUBMODULE_BASE_PATH=$(SUBMODULE_BASE_PATH) CC=gcc 
+
+# create the submodule dir if one does not exist
+$(SUBMODULE_BASE_PATH):
+	mkdir -p $(SUBMODULE_BASE_PATH)
+
+# macro for fetching the file content to a variable
+LIB_CONTENT = $(shell cat $1)
+
+GIT_URL = $(word 1, $(subst \#, , $1))
+GIT_HASH = $(word 2, $(subst \#, , $1))
+
+# Rule for processing the mbed-cli's submodule reference files (.lib).
+# The lib files contain a <repository-git-url>#<commit-hash> as a string
+# which is extracted and used for "git clone" + "git checkout" commands
+% : %.lib
+	cd $(SUBMODULE_BASE_PATH) && \
+	if [ -d $@ ]; then \
+		echo Just update the repository && \
+		pwd &&\
+		cd $@ && \
+		git fetch; \
+	else \
+		echo Clone the repository && \
+		pwd && \
+		git clone $(call GIT_URL, $(call LIB_CONTENT, $<)) && \
+		cd $@; \
+	fi; \
+	git checkout $(call GIT_HASH, $(call LIB_CONTENT, $<))
+
+# perform a git clone of the submodules listed in $(LIBS)
+.PHONY: fetch_source
+fetch_source: $(FETCH_SUB_MODULES)
+
 
 # Extend default clean rule
 clean: clean-extra
