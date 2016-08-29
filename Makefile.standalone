@@ -62,15 +62,31 @@ include ../../libService/toolchain_rules.mk
 
 $(eval $(call generate_rules,$(LIB),$(SRCS)))
 
+BUILDDIRS := $(LIBS:%=build-%)
+.PHONY: $(BUILDDIRS)
+$(BUILDDIRS): 
+	echo $(@:build-%=%)
+	make -C $(SUBMODULE_BASE_PATH)/$(@:build-%=%) -f Makefile.standalone SUBMODULE_BASE_PATH=$(SUBMODULE_BASE_PATH) CC=gcc 
+
 FETCH_SUB_MODULES := $(LIBS:%=fetch-%)
 .PHONY: $(FETCH_SUB_MODULES)
-$(FETCH_SUB_MODULES): $(LIBS) $(SUBMODULE_BASE_PATH)
+$(FETCH_SUB_MODULES): $(SUBMODULE_BASE_PATH)
 	@echo $@
 	make -C $(SUBMODULE_BASE_PATH)/$(@:fetch-%=%) -f Makefile.standalone fetch_source SUBMODULE_BASE_PATH=$(SUBMODULE_BASE_PATH) CC=gcc 
+
+.PHONY: all 
+all: $(SUBMODULE_BASE_PATH) $(TARGET_MODULES) $(BUILDDIRS)
+	@echo Build OK!
 
 # create the submodule dir if one does not exist
 $(SUBMODULE_BASE_PATH):
 	mkdir -p $(SUBMODULE_BASE_PATH)
+
+
+TARGET_MODULES := $(addprefix $(SUBMODULE_BASE_PATH)/, $(LIBS))
+TARGET_MODULES += $(addprefix $(SUBMODULE_BASE_PATH)/, $(SPECIAL_LIBS))
+
+$(TARGET_MODULES): | $(SUBMODULE_BASE_PATH)
 
 # macro for fetching the file content to a variable
 LIB_CONTENT = $(shell cat $1)
@@ -81,7 +97,7 @@ GIT_HASH = $(word 2, $(subst \#, , $1))
 # Rule for processing the mbed-cli's submodule reference files (.lib).
 # The lib files contain a <repository-git-url>#<commit-hash> as a string
 # which is extracted and used for "git clone" + "git checkout" commands
-% : %.lib
+$(SUBMODULE_BASE_PATH)/% : %.lib
 	cd $(SUBMODULE_BASE_PATH) && \
 	if [ -d $@ ]; then \
 		echo Just update the repository && \
@@ -98,7 +114,7 @@ GIT_HASH = $(word 2, $(subst \#, , $1))
 
 # perform a git clone of the submodules listed in $(LIBS)
 .PHONY: fetch_source
-fetch_source: $(FETCH_SUB_MODULES)
+fetch_source: $(TARGET_MODULES) $(FETCH_SUB_MODULES)
 
 
 # Extend default clean rule
