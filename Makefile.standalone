@@ -68,6 +68,14 @@ $(BUILDDIRS):
 	echo $(@:build-%=%)
 	make -C $(SUBMODULE_BASE_PATH)/$(@:build-%=%) -f Makefile.standalone SUBMODULE_BASE_PATH=$(SUBMODULE_BASE_PATH) CC=$(CC) 
 
+# Note: the correct CC is needed as parameter as the library names are also constructed uring it,
+# eg. libnsdl.a is actually libnsdl_gcc.a on GCC compilation.
+CLEANDIRS := $(LIBS:%=clean-%)
+.PHONY: $(CLEANDIRS)
+$(CLEANDIRS): 
+	echo $(@:clean-%=%)
+	make -C $(SUBMODULE_BASE_PATH)/$(@:clean-%=%) -f Makefile.standalone clean SUBMODULE_BASE_PATH=$(SUBMODULE_BASE_PATH) CC=$(CC)
+
 FETCH_SUB_MODULES := $(LIBS:%=fetch-%)
 .PHONY: $(FETCH_SUB_MODULES)
 $(FETCH_SUB_MODULES): $(SUBMODULE_BASE_PATH)
@@ -119,8 +127,5 @@ fetch_source: $(TARGET_MODULES) $(FETCH_SUB_MODULES)
 
 # Extend default clean rule
 clean: clean-extra
-
-$(CLEANDIRS):
-	@make -C $(@:clean-%=%) clean
 
 clean-extra: $(CLEANDIRS)
