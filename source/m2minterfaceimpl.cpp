@@ -732,7 +732,8 @@ void M2MInterfaceImpl::state_register_address_resolved( EventData *data)
             address_type = SN_NSDL_ADDRESS_TYPE_IPV6;
         }
         _connection_handler->start_listening_for_data();
-        if(_nsdl_interface->send_register_message((uint8_t*)event->_address->_address,event->_port, address_type)) {
+        if(_nsdl_interface->send_register_message((uint8_t*)event->_address->_address,event->_address->_length,
+                                                  event->_port, address_type)) {
             internal_event(STATE_REGISTER_RESOURCE_CREATED);
         } else {
             // If resource creation fails then inform error to application

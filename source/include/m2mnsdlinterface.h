@@ -112,6 +112,7 @@ public:
      * @return  true if register sent successfully else false.
     */
     bool send_register_message(uint8_t* address,
+                               uint8_t address_length,
                                const uint16_t port,
                                sn_nsdl_addr_type_e address_type);
 
