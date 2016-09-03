@@ -594,12 +594,10 @@ void M2MInterfaceImpl::state_bootstrap_address_resolved( EventData *data)
     if(M2MInterface::LwIP_IPv4 == stack) {
         tr_debug("M2MInterfaceImpl::state_bootstrap_address_resolved : IPv4 address");
         address.type = SN_NSDL_ADDRESS_TYPE_IPV4;
-        address.addr_len = 4;
     } else if((M2MInterface::LwIP_IPv6 == stack) ||
               (M2MInterface::Nanostack_IPv6 == stack)) {
         tr_debug("M2MInterfaceImpl::state_bootstrap_address_resolved : IPv6 address");
         address.type = SN_NSDL_ADDRESS_TYPE_IPV6;
-        address.addr_len = 16;
     }
     address.port = event->_port;
     address.addr_ptr = (uint8_t*)event->_address->_address;
