@@ -603,6 +603,7 @@ void M2MInterfaceImpl::state_bootstrap_address_resolved( EventData *data)
     }
     address.port = event->_port;
     address.addr_ptr = (uint8_t*)event->_address->_address;
+    address.addr_len = event->_address->_length;
     _connection_handler->start_listening_for_data();
 
     // Include domain id to be part of endpoint name
@@ -635,9 +636,6 @@ void M2MInterfaceImpl::state_bootstrapped( EventData */*data*/)
 {
 #ifndef MBED_CLIENT_DISABLE_BOOTSTRAP_FEATURE
     tr_debug("M2MInterfaceImpl::state_bootstrapped");
-    _connection_handler->stop_listening();
-    _listen_port = rand() % 64511 + 1024;
-    _connection_handler->bind_connection(_listen_port);
 #endif //MBED_CLIENT_DISABLE_BOOTSTRAP_FEATURE
 }
 
@@ -819,6 +817,7 @@ void M2MInterfaceImpl::state_coap_data_received( EventData *data)
         }
         address.port = event->_address->_port;
         address.addr_ptr = (uint8_t*)event->_address->_address;
+        address.addr_len = event->_address->_length;
 
         // Process received data
         internal_event(STATE_PROCESSING_COAP_DATA);
