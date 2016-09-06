@@ -236,10 +236,10 @@ void Test_M2MNsdlInterface::test_create_bootstrap_resource()
 void Test_M2MNsdlInterface::test_send_register_message()
 {
     common_stub::uint_value = 12;
-    CHECK(nsdl->send_register_message(NULL,100,SN_NSDL_ADDRESS_TYPE_IPV6) == true);
+    CHECK(nsdl->send_register_message(NULL,4,100,SN_NSDL_ADDRESS_TYPE_IPV6) == true);
 
     common_stub::uint_value = 0;
-    CHECK(nsdl->send_register_message(NULL,100,SN_NSDL_ADDRESS_TYPE_IPV6) == false);
+    CHECK(nsdl->send_register_message(NULL,4,100,SN_NSDL_ADDRESS_TYPE_IPV6) == false);
 }
 
 void Test_M2MNsdlInterface::test_send_update_registration()

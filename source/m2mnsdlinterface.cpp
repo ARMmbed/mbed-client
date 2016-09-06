@@ -269,6 +269,7 @@ bool M2MNsdlInterface::create_bootstrap_resource(sn_nsdl_addr_s *address, const 
 }
 
 bool M2MNsdlInterface::send_register_message(uint8_t* address,
+                                             uint8_t address_length,
                                              const uint16_t port,
                                              sn_nsdl_addr_type_e address_type)
 {
@@ -278,7 +279,7 @@ bool M2MNsdlInterface::send_register_message(uint8_t* address,
                                        M2MTimerObserver::NsdlExecution,
                                        false);
     bool success = false;
-    if(set_NSP_address(_nsdl_handle,address, port, address_type) == 0) {
+    if(set_NSP_address_2(_nsdl_handle, address, address_length, port, address_type) == 0) {
         if(!_register_ongoing) {
             _register_ongoing = true;
             success = sn_nsdl_register_endpoint(_nsdl_handle,_endpoint) != 0;
