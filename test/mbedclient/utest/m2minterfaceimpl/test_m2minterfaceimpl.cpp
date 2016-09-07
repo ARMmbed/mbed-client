@@ -600,7 +600,7 @@ void Test_M2MInterfaceImpl::test_socket_error()
         impl->socket_error(M2MConnectionHandler::SSL_CONNECTION_ERROR);
         impl->_retry_timer_expired = true;
     }
-    CHECK(observer->error_occured == true);
+    CHECK(observer->error_occured == false);
     CHECK(impl->_current_state == M2MInterfaceImpl::STATE_IDLE);
 
     observer->error_occured = false;

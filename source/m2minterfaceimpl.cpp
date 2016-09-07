@@ -404,10 +404,13 @@ void M2MInterfaceImpl::data_available(uint8_t* data,
 void M2MInterfaceImpl::socket_error(uint8_t error_code, bool retry)
 {
     tr_debug("M2MInterfaceImpl::socket_error: (%d), retry (%d), reconnecting (%d)", error_code, retry, _reconnecting);
+#if MBED_CLIENT_INFINITE_RECONNECTION_LOOP < 1
     if (!_retry_timer_expired && _reconnecting) {
         tr_debug("M2MInterfaceImpl::socket_error - retry timer running - return");
         return;
     }
+#endif
+
     M2MInterface::Error error = M2MInterface::ErrorNone;
     switch (error_code) {
     case M2MConnectionHandler::SSL_CONNECTION_ERROR:
@@ -437,15 +440,19 @@ void M2MInterfaceImpl::socket_error(uint8_t error_code, bool retry)
         if (_retry_count < MBED_CLIENT_RECONNECTION_COUNT) {
             _retry_count++;
         }
-        else if (MBED_CLIENT_INFINITE_RECONNECTION_LOOP) {
+#if MBED_CLIENT_INFINITE_RECONNECTION_LOOP > 0
+        else {
+            tr_debug("M2MInterfaceImpl::socket_error - start again");
             _retry_count = 1;
         }
+#else
         else {
             tr_debug("M2MInterfaceImpl::socket_error - no more retries");
             _connection_handler->stop_listening();
             _retry_timer->stop_timer();
             retry = false;
         }
+#endif
 
         if (retry) {
             internal_event(STATE_IDLE);
