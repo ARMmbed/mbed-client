@@ -61,7 +61,8 @@ M2MNsdlInterface::M2MNsdlInterface(M2MNsdlObserver &observer)
   _bootstrap_id(0),
   _register_ongoing(false),
   _unregister_ongoing(false),
-  _update_register_ongoing(false)
+  _update_register_ongoing(false),
+  _identity_accepted(false)
 {
     tr_debug("M2MNsdlInterface::M2MNsdlInterface()");
     __nsdl_interface_list.push_back(this);
@@ -242,13 +243,14 @@ bool M2MNsdlInterface::create_bootstrap_resource(sn_nsdl_addr_s *address, const 
 {
 #ifndef MBED_CLIENT_DISABLE_BOOTSTRAP_FEATURE
     tr_debug("M2MNsdlInterface::create_bootstrap_resource()");
+    _identity_accepted = false;
     bool success = false;
     sn_nsdl_bs_ep_info_t bootstrap_endpoint;
     tr_debug("M2MNsdlInterface::create_bootstrap_resource() - endpoint name: %s", bootstrap_endpoint_name.c_str());
     if (_endpoint->endpoint_name_ptr) {
         memory_free(_endpoint->endpoint_name_ptr);
     }
-    //_endpoint->endpoint_name_ptr = (uint8_t*)bootstrap_endpoint_name.c_str();
+
     _endpoint->endpoint_name_ptr = alloc_string_copy((uint8_t*)bootstrap_endpoint_name.c_str(), bootstrap_endpoint_name.length());
     _endpoint->endpoint_name_len = bootstrap_endpoint_name.length();
     if(_bootstrap_id == 0) {
@@ -258,7 +260,6 @@ bool M2MNsdlInterface::create_bootstrap_resource(sn_nsdl_addr_s *address, const 
                                                &bootstrap_endpoint);
         tr_debug("M2MNsdlInterface::create_bootstrap_resource - _bootstrap_id %d", _bootstrap_id);
         success = _bootstrap_id != 0;
-
     }
     return success;
 #else
@@ -475,6 +476,8 @@ uint8_t M2MNsdlInterface::received_from_server_callback(struct nsdl_s * nsdl_han
             M2MInterface::Error error = interface_error(coap_header);
             if(error != M2MInterface::ErrorNone) {
                 handle_bootstrap_error();
+            } else {
+                _identity_accepted = true;
             }
         }
 #endif //MBED_CLIENT_DISABLE_BOOTSTRAP_FEATURE
@@ -1712,9 +1715,11 @@ void M2MNsdlInterface::handle_bootstrap_delete(sn_coap_hdr_s *coap_header,sn_nsd
     String object_name = coap_to_string(coap_header->uri_path_ptr,
                                           coap_header->uri_path_len);
     tr_debug("M2MNsdlInterface::handle_bootstrap_delete - obj %s", object_name.c_str());
-
+    if(!_identity_accepted) {
+        msg_code = COAP_MSG_CODE_RESPONSE_BAD_REQUEST;
+    }
     // Only following paths are accepted, 0, 0/0
-    if (object_name.size() == 2 || object_name.size() > 3) {
+    else if (object_name.size() == 2 || object_name.size() > 3) {
         msg_code = COAP_MSG_CODE_RESPONSE_BAD_REQUEST;
     }
     else if ((object_name.size() == 1 && object_name.compare(0,1,"0") != 0) ||
@@ -1732,7 +1737,8 @@ void M2MNsdlInterface::handle_bootstrap_delete(sn_coap_hdr_s *coap_header,sn_nsd
         if(_security) {
             _security->clear_resources();
         }
-    } else {
+    }
+    if (!coap_response || COAP_MSG_CODE_RESPONSE_DELETED != msg_code) {
         handle_bootstrap_error();
     }
 #else
@@ -1784,6 +1790,7 @@ bool M2MNsdlInterface::validate_security_object()
 void M2MNsdlInterface::handle_bootstrap_error()
 {
     tr_debug("M2MNsdlInterface::handle_bootstrap_error()");
+    _identity_accepted = false;
     if (_security) {
         delete _security;
         _security = NULL;
