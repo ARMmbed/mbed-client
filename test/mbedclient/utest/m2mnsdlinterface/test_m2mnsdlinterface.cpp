@@ -86,30 +86,31 @@ public:
 };
 
 struct nsdl_s {
-    struct grs_s *grs;
-
-    uint8_t *oma_bs_address_ptr;                                                /* Bootstrap address pointer. If null, no bootstrap in use */
-    uint8_t oma_bs_address_len;                                                 /* Bootstrap address length */
-    uint16_t oma_bs_port;                                                       /* Bootstrap port */
-    void (*sn_nsdl_oma_bs_done_cb)(sn_nsdl_oma_server_info_t *server_info_ptr); /* Callback to inform application when bootstrap is done */
-    sn_nsdl_ep_parameters_s *ep_information_ptr;    // Endpoint parameters, Name, Domain etc..
-    sn_nsdl_oma_server_info_t *nsp_address_ptr;     // NSP server address information
-    uint8_t sn_nsdl_endpoint_registered;
+    uint16_t update_register_msg_id;
+    uint16_t register_msg_len;
+    uint16_t update_register_msg_len;
 
     uint16_t register_msg_id;
     uint16_t unregister_msg_id;
 
+    uint16_t bootstrap_msg_id;
+    uint16_t oma_bs_port;                                                       /* Bootstrap port */
+    uint8_t oma_bs_address_len;                                                 /* Bootstrap address length */
+    unsigned int sn_nsdl_endpoint_registered:1;
+    bool handle_bootstrap_msg:1;
+
+    struct grs_s *grs;
+    uint8_t *oma_bs_address_ptr;                                                /* Bootstrap address pointer. If null, no bootstrap in use */
+    sn_nsdl_ep_parameters_s *ep_information_ptr;                                // Endpoint parameters, Name, Domain etc..
+    sn_nsdl_oma_server_info_t *nsp_address_ptr;                                 // NSP server address information
+
+    void (*sn_nsdl_oma_bs_done_cb)(sn_nsdl_oma_server_info_t *server_info_ptr); /* Callback to inform application when bootstrap is done */
     void *(*sn_nsdl_alloc)(uint16_t);
     void (*sn_nsdl_free)(void *);
     uint8_t (*sn_nsdl_tx_callback)(struct nsdl_s *, sn_nsdl_capab_e , uint8_t *, uint16_t, sn_nsdl_addr_s *);
     uint8_t (*sn_nsdl_rx_callback)(struct nsdl_s *, sn_coap_hdr_s *, sn_nsdl_addr_s *);
     void (*sn_nsdl_oma_bs_done_cb_handle)(sn_nsdl_oma_server_info_t *server_info_ptr,
                                           struct nsdl_s *handle); /* Callback to inform application when bootstrap is done with nsdl handle */
-    uint16_t update_register_msg_id;
-    uint16_t register_msg_len;
-    uint16_t update_register_msg_len;
-    uint16_t bootstrap_msg_id;
-    bool handle_bootstrap_msg;
 };
 
 Test_M2MNsdlInterface::Test_M2MNsdlInterface()
@@ -317,9 +318,7 @@ void Test_M2MNsdlInterface::test_received_from_server_callback()
     coap_header->options_list_ptr = (sn_coap_options_list_s *)malloc(sizeof(sn_coap_options_list_s));
     memset(coap_header->options_list_ptr, 0, sizeof(sn_coap_options_list_s));
 
-    coap_header->options_list_ptr->max_age_len = 2;
-    coap_header->options_list_ptr->max_age_ptr = (uint8_t *)malloc(sizeof(coap_header->options_list_ptr->max_age_len));
-    memset(coap_header->options_list_ptr->max_age_ptr, 0, sizeof(coap_header->options_list_ptr->max_age_len));
+    coap_header->options_list_ptr->max_age = 2;
 
     coap_header->options_list_ptr->location_path_len = 2;
     coap_header->options_list_ptr->location_path_ptr = (uint8_t *)malloc(sizeof(coap_header->options_list_ptr->location_path_len));
@@ -347,9 +346,6 @@ void Test_M2MNsdlInterface::test_received_from_server_callback()
     nsdl->received_from_server_callback(handle,coap_header,NULL);
     CHECK(observer->data_processed == true);
     CHECK(observer->registered == true);
-
-    free(coap_header->options_list_ptr->max_age_ptr);
-    coap_header->options_list_ptr->max_age_ptr = NULL;
 
     free(coap_header->options_list_ptr->location_path_ptr);
     coap_header->options_list_ptr->location_path_ptr = NULL;
@@ -661,7 +657,7 @@ void Test_M2MNsdlInterface::test_received_from_server_callback()
     m2mtlvdeserializer_stub::is_object_bool_value = true;
     CHECK(0 == nsdl->received_from_server_callback(handle,coap_header,address));
     CHECK(observer->boot_error == true);
-    coap_header->content_type_ptr = String::convert_integer_to_array(99,coap_header->content_type_len);
+    coap_header->content_format = sn_coap_content_format_e(99);
     observer->boot_error = false;
     observer->boot_done = false;
     m2mtlvdeserializer_stub::is_object_bool_value = true;
@@ -891,7 +887,6 @@ void Test_M2MNsdlInterface::test_received_from_server_callback()
     free(common_stub::coap_header);
     free(address->addr_ptr);
     free(address);
-    free(coap_header->content_type_ptr);
     free(coap_header->token_ptr);
     free(coap_header->uri_path_ptr);
     free(coap_header);
@@ -1025,10 +1020,6 @@ void Test_M2MNsdlInterface::test_resource_callback_put()
     free(coap_header->options_list_ptr->uri_query_ptr);
     free(coap_header->options_list_ptr);
     if(common_stub::coap_header){
-        if( common_stub::coap_header->content_type_ptr ){
-            free(common_stub::coap_header->content_type_ptr);
-            common_stub::coap_header->content_type_ptr = NULL;
-        }
         if( common_stub::coap_header->options_list_ptr){
             free(common_stub::coap_header->options_list_ptr);
             common_stub::coap_header->options_list_ptr = NULL;
@@ -1122,10 +1113,6 @@ void Test_M2MNsdlInterface::test_resource_callback_post()
     free(coap_header->options_list_ptr->uri_query_ptr);
     free(coap_header->options_list_ptr);
     if(common_stub::coap_header){
-        if( common_stub::coap_header->content_type_ptr ){
-            free(common_stub::coap_header->content_type_ptr);
-            common_stub::coap_header->content_type_ptr = NULL;
-        }
         if( common_stub::coap_header->options_list_ptr){
             free(common_stub::coap_header->options_list_ptr);
             common_stub::coap_header->options_list_ptr = NULL;

@@ -166,10 +166,6 @@ int8_t sn_nsdl_set_retransmission_parameters(struct nsdl_s *, uint8_t, uint8_t)
 void sn_nsdl_release_allocated_coap_msg_mem(struct nsdl_s *, sn_coap_hdr_s *header)
 {
     if(header && header != common_stub::coap_header){
-        if( header->content_type_ptr ){
-            free(header->content_type_ptr);
-            header->content_type_ptr = NULL;
-        }
         if( header->options_list_ptr){
             free(header->options_list_ptr);
             header->options_list_ptr = NULL;

@@ -85,7 +85,7 @@ uint8_t __nsdl_c_received_from_server(struct nsdl_s * nsdl_handle,
         // Payload freeing must be done in app level if blockwise message
         if (coap_header &&
                 coap_header->options_list_ptr &&
-                coap_header->options_list_ptr->block1_len > 0) {
+                coap_header->options_list_ptr->block1 != -1) {
             free(coap_header->payload_ptr);
             coap_header->payload_ptr = NULL;
         }
