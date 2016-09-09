@@ -60,11 +60,10 @@ SPECIAL_LIBS := \
 #
 include toolchain_rules.mk
 
-# Get the generic rules for fetching source and building submodules
-include standalone_rules.mk
-
 $(eval $(call generate_rules,$(LIB),$(SRCS)))
 
+# Get the generic rules for fetching source and building submodules
+include standalone_rules.mk
 
 # create the submodule dir if one does not exist
 $(SUBMODULE_BASE_PATH):

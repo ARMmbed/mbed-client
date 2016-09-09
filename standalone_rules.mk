@@ -32,7 +32,7 @@ BUILDDIRS := $(LIBS:%=build-%)
 .PHONY: $(BUILDDIRS)
 $(BUILDDIRS): 
 	echo $(@:build-%=%)
-	make -C $(SUBMODULE_BASE_PATH)/$(@:build-%=%) -f Makefile.standalone SUBMODULE_BASE_PATH=$(SUBMODULE_BASE_PATH) CC=$(CC) CPU=$(CPU)
+	make -C $(SUBMODULE_BASE_PATH)/$(@:build-%=%) -f Makefile.standalone SUBMODULE_BASE_PATH=$(SUBMODULE_BASE_PATH) CC=$(CC) CPU=$(CPU) PLATFORM=$(PLATFORM)
 
 # Note: the correct CC is needed as parameter as the library names are also constructed uring it,
 # eg. libnsdl.a is actually libnsdl_gcc.a on GCC compilation.
@@ -40,7 +40,7 @@ CLEANDIRS := $(LIBS:%=clean-%)
 .PHONY: $(CLEANDIRS)
 $(CLEANDIRS): 
 	echo $(@:clean-%=%)
-	make -C $(SUBMODULE_BASE_PATH)/$(@:clean-%=%) -f Makefile.standalone clean SUBMODULE_BASE_PATH=$(SUBMODULE_BASE_PATH) CC=$(CC) CPU=$(CPU)
+	make -C $(SUBMODULE_BASE_PATH)/$(@:clean-%=%) -f Makefile.standalone clean SUBMODULE_BASE_PATH=$(SUBMODULE_BASE_PATH) CC=$(CC) CPU=$(CPU) PLATFORM=$(PLATFORM)
 
 CLEAN_SPECIAL_DIRS := $(SPECIAL_LIBS:%=clean-%)
 .PHONY: $(CLEAN_SPECIAL_DIRS)
@@ -52,4 +52,30 @@ FETCH_SUB_MODULES := $(LIBS:%=fetch-%)
 .PHONY: $(FETCH_SUB_MODULES)
 $(FETCH_SUB_MODULES): $(SUBMODULE_BASE_PATH)
 	@echo $@
-	make -C $(SUBMODULE_BASE_PATH)/$(@:fetch-%=%) -f Makefile.standalone fetch_source SUBMODULE_BASE_PATH=$(SUBMODULE_BASE_PATH) CC=$(CC) CPU=$(CPU)
+	make -C $(SUBMODULE_BASE_PATH)/$(@:fetch-%=%) -f Makefile.standalone fetch_source SUBMODULE_BASE_PATH=$(SUBMODULE_BASE_PATH) CC=$(CC) CPU=$(CPU) PLATFORM=$(PLATFORM)
+
+#
+# Use:                                                     
+#   $(eval $(call generate_platform_rules,$(TARGET_PLATFORM),$(LIBS_PLATFORM)))
+
+define generate_platform_rules
+
+PLATFORM_NAME := $(1)
+PLATFORM_LIBS := $(2)
+
+# rule for fetching the platform specific submodules
+FETCH_SUB_MODULES_$$(PLATFORM_NAME) := $$(PLATFORM_LIBS:%=fetch-%)
+.PHONY: $$(FETCH_SUB_MODULES_$$(PLATFORM_NAME))
+$$(FETCH_SUB_MODULES_$$(PLATFORM_NAME)): $$(SUBMODULE_BASE_PATH)
+	@echo $$@
+	make -C $$(SUBMODULE_BASE_PATH)/$$(@:fetch-%=%) -f Makefile.standalone fetch_source SUBMODULE_BASE_PATH=$(SUBMODULE_BASE_PATH) CC=$(CC) CPU=$(CPU) PLATFORM=$(PLATFORM)
+
+# build rule plaform specific submodules
+BUILDDIRS_$$(PLATFORM_NAME) := $$(PLATFORM_LIBS:%=build-%)
+.PHONY: $$(BUILDDIRS_$$(PLATFORM_NAME))
+$$(BUILDDIRS_$$(PLATFORM_NAME)):
+	echo $$(@:build-%=%)
+	make -C $$(SUBMODULE_BASE_PATH)/$$(@:build-%=%) -f Makefile.standalone SUBMODULE_BASE_PATH=$(SUBMODULE_BASE_PATH) CC=$(CC) CPU=$(CPU) PLATFORM=$(PLATFORM)
+
+endef
+
