@@ -404,10 +404,13 @@ void M2MInterfaceImpl::data_available(uint8_t* data,
 void M2MInterfaceImpl::socket_error(uint8_t error_code, bool retry)
 {
     tr_debug("M2MInterfaceImpl::socket_error: (%d), retry (%d), reconnecting (%d)", error_code, retry, _reconnecting);
+#if MBED_CLIENT_RECONNECTION_LOOP < 1
     if (!_retry_timer_expired && _reconnecting) {
         tr_debug("M2MInterfaceImpl::socket_error - retry timer running - return");
         return;
     }
+#endif
+
     M2MInterface::Error error = M2MInterface::ErrorNone;
     switch (error_code) {
     case M2MConnectionHandler::SSL_CONNECTION_ERROR:
@@ -435,9 +438,25 @@ void M2MInterfaceImpl::socket_error(uint8_t error_code, bool retry)
     // Try to do reconnecting
     if (retry) {
         if (_retry_count < MBED_CLIENT_RECONNECTION_COUNT) {
+            _retry_count++;
+        }
+#if MBED_CLIENT_RECONNECTION_LOOP > 0
+        else {
+            tr_debug("M2MInterfaceImpl::socket_error - start again");
+            _retry_count = 1;
+        }
+#else
+        else {
+            tr_debug("M2MInterfaceImpl::socket_error - no more retries");
+            _connection_handler->stop_listening();
+            _retry_timer->stop_timer();
+            retry = false;
+        }
+#endif
+
+        if (retry) {
             internal_event(STATE_IDLE);
             _reconnecting = true;
-            _retry_count++;
             _connection_handler->stop_listening();
             int retry_time = MBED_CLIENT_RECONNECTION_INTERVAL *
                     MBED_CLIENT_RECONNECTION_COUNT * _retry_count * 1000;
@@ -446,11 +465,6 @@ void M2MInterfaceImpl::socket_error(uint8_t error_code, bool retry)
                                       M2MTimerObserver::RetryTimer);
             tr_debug("M2MInterfaceImpl::socket_error - reconnecting in %d(s), count %d/%d", retry_time / 1000,
                      _retry_count, MBED_CLIENT_RECONNECTION_COUNT);
-        } else {
-            tr_debug("M2MInterfaceImpl::socket_error - no more retries");
-            _connection_handler->stop_listening();
-            _retry_timer->stop_timer();
-            retry = false;
         }
     }
     // Inform application
