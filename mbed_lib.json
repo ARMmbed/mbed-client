@@ -10,6 +10,6 @@
         "sn-coap-max-blockwise-payload-size" : 0,
         "sn-coap-duplication-max-msgs-count": 0,
         "sn-coap-max-incoming-message-size": null,
-        "infinite-reconnection-loop": 1
+        "reconnection-loop": 1
      }
  }
