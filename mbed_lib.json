@@ -9,6 +9,7 @@
         "coap-disable-obs-feature":null,
         "sn-coap-max-blockwise-payload-size" : 0,
         "sn-coap-duplication-max-msgs-count": 0,
-        "sn-coap-max-incoming-message-size": null
+        "sn-coap-max-incoming-message-size": null,
+        "reconnection-loop": 1
      }
  }
