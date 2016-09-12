@@ -663,13 +663,14 @@ uint8_t M2MNsdlInterface::resource_callback(struct nsdl_s */*nsdl_handle*/,
             coap_response->payload_ptr = NULL;
         }
     }
-    sn_nsdl_release_allocated_coap_msg_mem(_nsdl_handle, coap_response);
-
+    // If the external blockwise storing is enabled call value updated once all the blocks have been received
     if (execute_value_updated &&
             coap_response &&
             coap_response->coap_status != COAP_STATUS_PARSER_BLOCKWISE_MSG_RECEIVING) {
         value_updated(base,base->uri_path());
     }
+    
+    sn_nsdl_release_allocated_coap_msg_mem(_nsdl_handle, coap_response);
     return result;
 }
 
