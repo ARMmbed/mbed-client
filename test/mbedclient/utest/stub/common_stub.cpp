@@ -29,7 +29,6 @@ addrinfo* common_stub::addrinfo;
 uint16_t common_stub::uint_value;
 omalw_certificate_list_t *common_stub::cert;
 sn_coap_hdr_s *common_stub::coap_header;
-sn_coap_options_list_s *opt_list;
 sn_nsdl_resource_info_s *common_stub::resource;
 pthread_t common_stub::thread;
 const char* common_stub::char_value;
@@ -50,7 +49,6 @@ void common_stub::clear()
     visited = false;
     bool_value= false;
     coap_header = NULL;
-    opt_list = NULL;
     resource = NULL;
     addrinfo = NULL;
     char_value = NULL;
@@ -179,7 +177,10 @@ void sn_nsdl_release_allocated_coap_msg_mem(struct nsdl_s *, sn_coap_hdr_s *head
 
 sn_coap_options_list_s *sn_nsdl_alloc_options_list(struct nsdl_s *handle, sn_coap_hdr_s *coap_msg_ptr)
 {
-    return common_stub::opt_list;
+    if( common_stub::coap_header ) {
+        return common_stub::coap_header->options_list_ptr;
+    }
+    return NULL;
 }
 
 int8_t sn_nsdl_create_resource(struct nsdl_s *, sn_nsdl_resource_info_s *)

@@ -38,7 +38,6 @@ namespace common_stub
     extern omalw_certificate_list_t *cert;
     extern addrinfo* addrinfo;
     extern sn_coap_hdr_s *coap_header;
-    extern sn_coap_options_list_s *opt_list;
     extern sn_nsdl_resource_info_s *resource;
     extern pthread_t thread;
     extern const char *char_value;

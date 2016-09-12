@@ -247,6 +247,7 @@ void Test_M2MResource::test_handle_get_request()
 
     common_stub::coap_header = (sn_coap_hdr_ *)malloc(sizeof(sn_coap_hdr_));
     memset(common_stub::coap_header,0,sizeof(sn_coap_hdr_));
+    common_stub::coap_header->options_list_ptr = (sn_coap_options_list_s*)malloc(sizeof(sn_coap_options_list_s));
 
     coap_header->token_ptr = (uint8_t*)malloc(sizeof(value));
     memcpy(coap_header->token_ptr, value, sizeof(value));
@@ -273,43 +274,20 @@ void Test_M2MResource::test_handle_get_request()
 
     CHECK(resource->handle_get_request(NULL,coap_header,handler) != NULL);
 
-    if(common_stub::coap_header->options_list_ptr) {
-        free(common_stub::coap_header->options_list_ptr);
-        common_stub::coap_header->options_list_ptr = NULL;
-    }
-    CHECK(resource->handle_get_request(NULL,coap_header,handler) != NULL);
 
-    if(common_stub::coap_header->options_list_ptr) {
-        free(common_stub::coap_header->options_list_ptr);
-        common_stub::coap_header->options_list_ptr = NULL;
-    }
+    CHECK(resource->handle_get_request(NULL,coap_header,handler) != NULL);
 
     // Not OMA TLV or JSON
     m2mbase_stub::uint8_value = 110;
     CHECK(resource->handle_get_request(NULL,coap_header,handler) != NULL);
 
-    if(common_stub::coap_header->options_list_ptr) {
-        free(common_stub::coap_header->options_list_ptr);
-        common_stub::coap_header->options_list_ptr = NULL;
-    }
-
     // OMA TLV
     m2mbase_stub::uint8_value = 99;
     CHECK(resource->handle_get_request(NULL,coap_header,handler) != NULL);
 
-    if(common_stub::coap_header->options_list_ptr) {
-        free(common_stub::coap_header->options_list_ptr);
-        common_stub::coap_header->options_list_ptr = NULL;
-    }
-
     // OMA JSON
     m2mbase_stub::uint8_value = 100;
     CHECK(resource->handle_get_request(NULL,coap_header,handler) != NULL);
-
-    if(common_stub::coap_header->options_list_ptr) {
-        free(common_stub::coap_header->options_list_ptr);
-        common_stub::coap_header->options_list_ptr = NULL;
-    }
 
     coap_header->options_list_ptr->observe = 0;
     m2mbase_stub::uint16_value = 0x1c1c;
@@ -317,44 +295,19 @@ void Test_M2MResource::test_handle_get_request()
 
     CHECK(resource->handle_get_request(NULL,coap_header,handler) != NULL);
 
-    if(common_stub::coap_header->options_list_ptr) {
-        free(common_stub::coap_header->options_list_ptr);
-        common_stub::coap_header->options_list_ptr = NULL;
-    }
-
     m2mbase_stub::uint16_value = 10;
     CHECK(resource->handle_get_request(NULL,coap_header,handler) != NULL);
-
-    if(common_stub::coap_header->options_list_ptr) {
-        free(common_stub::coap_header->options_list_ptr);
-        common_stub::coap_header->options_list_ptr = NULL;
-    }
 
     coap_header->options_list_ptr->observe = 0;
 
     CHECK(resource->handle_get_request(NULL,coap_header,handler) != NULL);
 
-    if(common_stub::coap_header->options_list_ptr) {
-        free(common_stub::coap_header->options_list_ptr);
-        common_stub::coap_header->options_list_ptr = NULL;
-    }
-
     coap_header->options_list_ptr->observe = 1;
     CHECK(resource->handle_get_request(NULL,coap_header,handler) != NULL);
-
-    if(common_stub::coap_header->options_list_ptr) {
-        free(common_stub::coap_header->options_list_ptr);
-        common_stub::coap_header->options_list_ptr = NULL;
-    }
 
     // Not observable
     m2mbase_stub::bool_value = false;
     CHECK(resource->handle_get_request(NULL,coap_header,handler) != NULL);
-
-    if(common_stub::coap_header->options_list_ptr) {
-        free(common_stub::coap_header->options_list_ptr);
-        common_stub::coap_header->options_list_ptr = NULL;
-    }
 
     m2mbase_stub::operation = M2MBase::NOT_ALLOWED;
     CHECK(resource->handle_get_request(NULL,coap_header,handler) != NULL);

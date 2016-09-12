@@ -39,6 +39,7 @@ void Test_M2MBlockMessage::test_set_message_info()
     memset(coap_header->options_list_ptr, 0, sizeof(sn_coap_options_list_s));
     coap_header->options_list_ptr->size1 = 0xffff;
     coap_header->options_list_ptr->use_size1 = true;
+    coap_header->options_list_ptr->block1 = -1;
 
     block_message->set_message_info(coap_header);
     CHECK(block_message->total_message_size() == 0xffff);
