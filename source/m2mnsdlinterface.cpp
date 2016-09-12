@@ -1418,11 +1418,8 @@ void M2MNsdlInterface::send_notification(uint8_t *token,
     if (notification_message_ptr) {
         memset(notification_message_ptr, 0, sizeof(sn_coap_hdr_s));
 
-        notification_message_ptr->options_list_ptr = (sn_coap_options_list_s *)memory_alloc(sizeof(sn_coap_options_list_s));
+        notification_message_ptr->options_list_ptr = sn_nsdl_alloc_options_list(_nsdl_handle, notification_message_ptr);
         if (notification_message_ptr->options_list_ptr) {
-
-            memset(notification_message_ptr->options_list_ptr , 0, sizeof(sn_coap_options_list_s));
-
             /* Fill header */
             notification_message_ptr->msg_type = COAP_MSG_TYPE_CONFIRMABLE;
             notification_message_ptr->msg_code = COAP_MSG_CODE_RESPONSE_CONTENT;

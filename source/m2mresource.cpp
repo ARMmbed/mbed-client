@@ -319,8 +319,7 @@ sn_coap_hdr_s* M2MResource::handle_get_request(nsdl_s *nsdl,
                     coap_response->payload_len = data_length;
                     coap_response->payload_ptr = data;
 
-                    coap_response->options_list_ptr = (sn_coap_options_list_s*)malloc(sizeof(sn_coap_options_list_s));
-                    memset(coap_response->options_list_ptr, 0, sizeof(sn_coap_options_list_s));
+                    coap_response->options_list_ptr = sn_nsdl_alloc_options_list(nsdl, coap_response);
 
                     coap_response->options_list_ptr->max_age = max_age();
 
