@@ -2,6 +2,14 @@
 # Execute script with root path where to find binaries. 
 # For example ./run_unit_tests_with_valgrind.sh ./build/x86-linux-native-coverage/test/mbedclient/
 
+if ./tools_check.sh
+then
+	echo "Tools-check OK"
+else
+	echo "Tools-check failure - STOP."
+	exit 1
+fi
+
 input="binaries.txt"
 valgrind_logs="valgrind_logs"
 rm -rf $valgrind_logs
