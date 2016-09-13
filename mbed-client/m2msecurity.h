@@ -36,7 +36,7 @@ friend class M2MNsdlInterface;
 public:
 
     /**
-     * \brief Enum defining all resources associated with a
+     * \brief An enum defining all resources associated with a
      * Security Object in the LWM2M framework.
      */
     typedef enum {
@@ -55,7 +55,7 @@ public:
     }SecurityResource;
 
     /**
-     * \brief Enum defining the type of a security attribute
+     * \brief An enum defining the type of the security attribute
      * used by the Security Object.
      */
     typedef enum {
@@ -66,7 +66,7 @@ public:
     } SecurityModeType;
 
     /**
-     * \brief Enum defining an interface operation that can be
+     * \brief An enum defining an interface operation that can be
      * handled by the Security Object.
      */
     typedef enum {
@@ -99,17 +99,17 @@ public:
     virtual ~M2MSecurity();
 
     /**
-     * \brief Creates a new resource for the given resource enum.
+     * \brief Creates a new resource for a given resource enum.
      * \param rescource With this function, the following resources can be created:
      * ' BootstrapServer', 'SecurityMode', 'SMSSecurityMode',
      * 'M2MServerSMSNumber', 'ShortServerID', 'ClientHoldOffTime'.
-     * \param value The value to be set on the resource, in Integer format.
+     * \param value The value to be set on the resource, in integer format.
      * \return M2MResource if created successfully, else NULL.
      */
     M2MResource* create_resource(SecurityResource rescource, uint32_t value);
 
     /**
-     * \brief Deletes the resource with the given resource enum.
+     * \brief Deletes a resource with a given resource enum.
      * Mandatory resources cannot be deleted.
      * \param resource The resource to be deleted.
      * \return True if deleted, else false.
@@ -117,28 +117,28 @@ public:
     bool delete_resource(SecurityResource rescource);
 
     /**
-     * \brief Sets the value of the given resource enum.
+     * \brief Sets the value of a given resource enum.
      * \param resource With this function, a value can be set for the following resources:
      * 'M2MServerUri', 'SMSBindingKey', 'SMSBindingSecretKey'.
-     * \param value The value to be set on the resource, in String format.
+     * \param value The value to be set on the resource, in string format.
      * \return True if successfully set, else false.
      */
     bool set_resource_value(SecurityResource resource,
                             const String &value);
 
     /**
-     * \brief Sets the value of the given resource enum.
+     * \brief Sets the value of a given resource enum.
      * \param resource With this function, a value can be set for the following resourecs:
      * 'BootstrapServer', 'SecurityMode', 'SMSSecurityMode',
      * 'M2MServerSMSNumber', 'ShortServerID', 'ClientHoldOffTime'.
-     * \param value The value to be set on the resource, in Integer format.
+     * \param value The value to be set on the resource, in integer format.
      * \return True if successfully set, else false.
      */
     bool set_resource_value(SecurityResource resource,
                             uint32_t value);
 
     /**
-     * \brief Sets the value of the given resource enum.
+     * \brief Sets the value of a given resource enum.
      * \param resource With this function, a value can be set for the follwing resources:
      * 'PublicKey', 'ServerPublicKey', 'Secretkey'.
      * \param value The value to be set on the resource, in uint8_t format.
@@ -150,7 +150,7 @@ public:
                             const uint16_t length);
 
     /**
-     * \brief Returns the value of the given resource enum, in String.
+     * \brief Returns the value of a given resource enum, in string format.
      * \param resource With this function, the following resources can return a value:
      * 'M2MServerUri','SMSBindingKey', 'SMSBindingSecretKey'.
      * \return The value associated with the resource. If the resource is not valid an empty string is returned.
@@ -161,25 +161,25 @@ public:
      * \brief Populates the data buffer and returns the size of the buffer.
      * \param resource With this function, the following resources can return a value:
      * 'PublicKey', 'ServerPublicKey', 'Secretkey'.
-     * \param [OUT]data Copy of the data buffer that contains the value. Caller
-     * is responsible of freeing this buffer.
+     * \param [OUT]data A copy of the data buffer that contains the value. The caller
+     * is responsible for freeing this buffer.
      * \return The size of the populated buffer.
      */
     uint32_t resource_value_buffer(SecurityResource resource,
                                    uint8_t *&data) const;
 
     /**
-     * \brief Returns the pointer to the value and size of the buffer.
+     * \brief Returns a pointer to the value and size of the buffer.
      * \param resource With this function, the following resources can return a value:
      * 'PublicKey', 'ServerPublicKey', 'Secretkey'.
-     * \param [OUT]data Pointer to the data buffer that contains the value.
+     * \param [OUT]data A pointer to the data buffer that contains the value.
      * \return The size of the populated buffer.
      */
     uint32_t resource_value_buffer(SecurityResource resource,
                                    const uint8_t *&data) const;
 
     /**
-     * \brief Returns the value of the given resource name, in Integer.
+     * \brief Returns the value of a given resource name, in integer format.
      * \param resource With this function, the following resources can return a value:
      * 'BootstrapServer', 'SecurityMode', 'SMSSecurityMode',
      * 'M2MServerSMSNumber', 'ShortServerID', 'ClientHoldOffTime'.
@@ -189,7 +189,7 @@ public:
 
 
     /**
-     * \brief Returns whether the resource instance with the given resource enum exists or not
+     * \brief Returns whether a resource instance with a given resource enum exists or not
      * \param resource Resource enum.
      * \return True if at least one instance exists, else false.
      */
