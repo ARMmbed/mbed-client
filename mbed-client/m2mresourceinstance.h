@@ -45,7 +45,7 @@ friend class M2MResource;
 public:
 
     /**
-     * Enum defining a resource type that can be
+     * An enum defining a resource type that can be
      * supported by a given resource.
     */
     typedef enum {
@@ -147,7 +147,7 @@ public:
     virtual void set_execute_function(execute_callback_2 callback);
 
     /**
-     * \brief Sets the value of the given resource.
+     * \brief Sets a value of a given resource.
      * \param value, A pointer to the value to be set on the resource.
      * \param value_length The length of the value pointer.
      * \return True if successfully set, else false.
@@ -155,21 +155,21 @@ public:
     virtual bool set_value(const uint8_t *value, const uint32_t value_length);
 
     /**
-     * \brief Sets the value of the given resource.
-     * \param value, new value which is to be formatted into a string
+     * \brief Sets a value of a given resource.
+     * \param value, A new value formatted as a string
      * and set on the resource.
      * \return True if successfully set, else false.
      */
     virtual bool set_value(int64_t value);
 
     /**
-     * \brief Clears the value of the given resource.
+     * \brief Clears the value of a given resource.
      */
     virtual void clear_value();
 
     /**
      * \brief Executes the function that is set in "set_execute_function".
-     * \param arguments The arguments that will be passed to be executed.
+     * \param arguments The arguments that are passed to be executed.
      */
     void execute(void *arguments);
 
@@ -181,14 +181,14 @@ public:
     virtual void get_value(uint8_t *&value, uint32_t &value_length);
 
     /**
-     * \brief Converts value to int and return it. Note: conversion
+     * \brief Converts a value to integer and returns it. Note: Conversion
      * errors are not detected.
      */
     int get_value_int();
 
     /**
-     * Get the value as a String object. No encoding/charset conversions
-     * done for the value, just a raw copy.
+     * Get the value as a string object. No encoding/charset conversions
+     * are done for the value, just a raw copy.
      */
     String get_value_string() const;
 
@@ -206,9 +206,9 @@ public:
 
     /**
      * \brief Handles the GET request for the registered objects.
-     * \param nsdl The NSDL handler for the CoAP library.
+     * \param nsdl An NSDL handler for the CoAP library.
      * \param received_coap_header The CoAP message received from the server.
-     * \param observation_handler The handler object for sending
+     * \param observation_handler A handler object for sending
      * observation callbacks.
      * \return sn_coap_hdr_s The message that needs to be sent to the server.
      */
@@ -217,9 +217,9 @@ public:
                                               M2MObservationHandler *observation_handler = NULL);
     /**
      * \brief Handles the PUT request for the registered objects.
-     * \param nsdl The NSDL handler for the CoAP library.
+     * \param nsdl An NSDL handler for the CoAP library.
      * \param received_coap_header The CoAP message received from the server.
-     * \param observation_handler The handler object for sending
+     * \param observation_handler A handler object for sending
      * observation callbacks.
      * \param execute_value_updated True will execute the "value_updated" callback.
      * \return sn_coap_hdr_s The message that needs to be sent to the server.
@@ -230,20 +230,20 @@ public:
                                               bool &execute_value_updated);
 
     /**
-     * \brief Returns the object instance id where resource exists.
-     * \return Object instance id.
+     * \brief Returns the instance ID of the object where the resource exists.
+     * \return Object instance ID.
     */
     uint16_t object_instance_id() const;
 
     /**
-     * \brief Returns the object name where resource exists.
+     * \brief Returns the name of the object where the resource exists.
      * \return Object name.
     */
     const String& object_name() const;
 
     /**
      * @brief Sets the function that is executed when this
-     * object receives block-wise message.
+     * object receives a block-wise message.
      * @param callback The function pointer that is called.
      */
     virtual void set_incoming_block_message_callback(incoming_block_message_callback callback);
@@ -251,8 +251,8 @@ public:
     /**
      * @brief Sets the function that is executed when this
      * object receives a GET request.
-     * This is called if resource values is stored in application side.
-     * NOTE! Due to limitation in mbed-client-c library GET request can only contain data size up to 65KB.
+     * This is called if resource values are stored on the application side.
+     * NOTE! Due to a limitation in the mbed-client-c library, a GET request can only contain data size up to 65KB.
      * @param callback The function pointer that is called.
      */
     virtual void set_outgoing_block_message_callback(outgoing_block_message_callback callback);
@@ -266,7 +266,7 @@ public:
 protected:
 
     /**
-     * \brief Set observer for sending the notification update.
+     * \brief Set an observer for sending the notification update.
      * \param resource The callback handle.
      */
     void set_resource_observer(M2MResourceCallback *resource);
