@@ -71,16 +71,16 @@ using namespace m2m;
 // can be other
 
 /*
-*\brief A callback function for Random number
+*\brief A callback function for a random number
 * required by the mbed-client-mbedtls module.
 */
 typedef uint32_t (*random_number_cb)(void) ;
 
 /*
-*\brief An entropy structure for mbedtls entropy source.
-* \param entropy_source_ptr Entropy function.
-* \param p_source  Function data.
-* \param threshold Minimum required from source before entropy is released
+*\brief An entropy structure for an mbedtls entropy source.
+* \param entropy_source_ptr The entropy function.
+* \param p_source  The function data.
+* \param threshold A minimum required from the source before entropy is released
 *                  (with mbedtls_entropy_func()) (in bytes).
 * \param strong    MBEDTLS_ENTROPY_SOURCE_STRONG = 1 or
 *                  MBEDTSL_ENTROPY_SOURCE_WEAK = 0.
