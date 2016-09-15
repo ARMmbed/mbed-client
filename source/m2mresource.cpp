@@ -288,7 +288,7 @@ sn_coap_hdr_s* M2MResource::handle_get_request(nsdl_s *nsdl,
                     bool content_type_present = false;
                     if(received_coap_header->content_format != COAP_CT_NONE){
                         content_type_present = true;
-                        coap_content_type = coap_response->content_format;
+                        coap_content_type = received_coap_header->content_format;
                     }
 
                     if(!content_type_present &&
