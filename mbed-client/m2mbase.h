@@ -243,13 +243,13 @@ public:
      * \brief Returns the interface description of the object.
      * \return Description of the object.
      */
-    virtual const String& interface_description() const;
+    String interface_description() const;
 
     /**
      * \brief Returns the resource type of the object.
      * \return Resource type of the object.
      */
-    virtual const String& resource_type() const;
+     String resource_type() const;
 
     /**
      * \brief Returns the CoAP content type of the object.
@@ -365,7 +365,7 @@ public:
      * \brief Returns the URI path of the object.
      * \return URI path of the object.
      */
-    virtual const String &uri_path() const;
+     String uri_path() const;
 
     /**
      * @brief Returns whether this resource is under observation or not.
@@ -469,17 +469,22 @@ private:
 private:
 
     M2MReportHandler           *_report_handler;
-    M2MObservationHandler      *_observation_handler;
+    M2MObservationHandler      *_observation_handler;    
+    uint8_t                     *_resource_type;
+    uint8_t                     *_uri_path;
+    //uint8_t                     *_name;
     String                      _name;
-    String                      _resource_type;
-    String                      _interface_description;
-    String                      _uri_path;
+    uint8_t                      *_interface_description;
     int32_t                     _name_id;
     uint32_t                    _max_age;
     uint16_t                    _instance_id;
     uint16_t                    _observation_number;
     uint8_t                     *_token;
     uint8_t                     _token_length;
+    uint8_t                     _resource_type_length;
+    uint8_t                     _uri_path_length;
+    uint8_t                     _interface_description_length;
+    //uint8_t                     _name_length;
     uint8_t                     _coap_content_type;
     M2MBase::Operation          _operation;
     M2MBase::Mode               _mode;

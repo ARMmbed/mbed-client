@@ -31,9 +31,15 @@ M2MBase& M2MBase::operator=(const M2MBase& other)
     if (this != &other) { // protect against invalid self-assignment
         _operation = other._operation;
         _mode = other._mode;
+        _resource_type = alloc_copy(other._resource_type, other._resource_type_length);
+        _resource_type_length = other._resource_type_length;
+        _uri_path = alloc_copy(other._uri_path, other._uri_path_length);
+        _uri_path_length = other._uri_path_length;
         _name = other._name;
-        _resource_type = other._resource_type;
-        _interface_description = other._interface_description;
+        //_name = alloc_copy(other._name, other._name_length);
+        //_name_length = other._name_length;        
+        _interface_description = alloc_copy(other._interface_description, other._uri_path_length);
+        _interface_description_length = other._interface_description_length;
         _coap_content_type = other._coap_content_type;
         _instance_id = other._instance_id;
         _observable = other._observable;
@@ -41,7 +47,6 @@ M2MBase& M2MBase::operator=(const M2MBase& other)
         _observation_level = other._observation_level;
         _observation_handler = other._observation_handler;
         _register_uri = other._register_uri;
-        _uri_path = other._uri_path;
         _max_age = other._max_age;
         _is_under_observation = other._is_under_observation;
 
@@ -66,10 +71,9 @@ M2MBase& M2MBase::operator=(const M2MBase& other)
 M2MBase::M2MBase(const M2MBase& other) :
     _report_handler(NULL),
     _observation_handler(other._observation_handler),
-    _name(other._name),
-    _resource_type(other._resource_type),
+    _resource_type(NULL),
+    _uri_path(NULL),
     _interface_description(other._interface_description),
-    _uri_path(other._uri_path),
     _max_age(other._max_age),
     _instance_id(other._instance_id),
     _observation_number(other._observation_number),
@@ -84,6 +88,15 @@ M2MBase::M2MBase(const M2MBase& other) :
     _is_under_observation(other._is_under_observation),
     _function_pointer(NULL)
 {
+    _resource_type = alloc_copy(other._resource_type, other._resource_type_length);
+    _resource_type_length = other._resource_type_length;
+    _uri_path = alloc_copy(other._uri_path, other._uri_path_length);
+    _uri_path_length = other._uri_path_length;
+    _interface_description = alloc_copy(other._interface_description, other._uri_path_length);
+    _interface_description_length = other._interface_description_length;
+    _name = other._name;
+    //_name = alloc_copy(other._name, other._name_length);
+    //_name_length = other._name_length;
 
     if(other._token) {
         _token = alloc_string_copy((uint8_t *)other._token, other._token_length);
@@ -98,13 +111,19 @@ M2MBase::M2MBase(const String & resource_name,
                  M2MBase::Mode mde)
 : _report_handler(NULL),
   _observation_handler(NULL),
-  _name(resource_name),
-  _uri_path(""),
+  _resource_type(NULL),
+  _uri_path(NULL),
+  _interface_description(NULL),
   _max_age(0),
   _instance_id(0),
+  _name(resource_name),
   _observation_number(0),
   _token(NULL),
   _token_length(0),
+  _resource_type_length(0),
+  _uri_path_length(0),
+  _interface_description_length(0),
+  //_name_length(0),
   _coap_content_type(0),
   _operation(M2MBase::NOT_ALLOWED),
   _mode(mde),
@@ -114,6 +133,10 @@ M2MBase::M2MBase(const String & resource_name,
   _is_under_observation(false),
   _function_pointer(NULL)
 {
+   //_name = alloc_copy((const uint8_t*)resource_name.c_str(), resource_name.size());
+  // _name_length = resource_name.size();
+   //tr_debug("new name (%s) len: %d", resource_name, _name_length);
+
     if(is_integer(_name) && _name.size() <= MAX_ALLOWED_STRING_LENGTH) {
         _name_id = strtoul(_name.c_str(), NULL, 10);
         if(_name_id > 65535){
@@ -129,6 +152,14 @@ M2MBase::~M2MBase()
     delete _report_handler;
     free(_token);
     delete _function_pointer;
+    //free(_name);
+    //_name=NULL;
+    free(_resource_type);
+    _resource_type=NULL;
+    free(_uri_path);
+    _uri_path=NULL;
+    free(_interface_description);
+    _interface_description=NULL;
 }
 
 void M2MBase::set_operation(M2MBase::Operation opr)
@@ -144,13 +175,31 @@ void M2MBase::set_operation(M2MBase::Operation opr)
 
 void M2MBase::set_interface_description(const String &desc)
 {
-    _interface_description = desc;
+    free(_interface_description);
+    _interface_description=NULL;
+
+    _interface_description = alloc_copy((const uint8_t*)desc.c_str(), (uint32_t)desc.size());
+    _interface_description_length = desc.size();
 }
 
 void M2MBase::set_resource_type(const String &res_type)
 {
-    _resource_type = res_type;
+    _resource_type = alloc_copy((const uint8_t*)res_type.c_str(), (uint32_t)res_type.size());
+    _resource_type_length = res_type.size();
 }
+
+/*
+void M2MBase::set_name(const String &name)
+{
+    if (_name) {
+        free(_name);
+        _name=NULL;
+    }
+    _name = alloc_copy((const uint8_t*)name.c_str(), (uint32_t)name.size());
+    _name_length = name.size();
+    tr_debug("set_name: (%s) len: %d", name, _name_length);
+}
+*/
 
 void M2MBase::set_coap_content_type(const uint8_t con_type)
 {
@@ -235,6 +284,16 @@ M2MBase::Operation M2MBase::operation() const
 const String& M2MBase::name() const
 {
     return _name;
+    /*
+    if(_name!=NULL) {
+        tr_debug("get _name: (%s) len: %d", String ((const char*)_name), _name_length);
+        return String ((const char*)_name);
+        }
+    else {
+        tr_debug("get _name empty: (%s) len: %d", String(""), _name_length);
+        return String("");
+    }
+    */
 }
 
 int32_t M2MBase::name_id() const
@@ -247,14 +306,24 @@ uint16_t M2MBase::instance_id() const
     return _instance_id;
 }
 
-const String& M2MBase::interface_description() const
+String M2MBase::interface_description() const
 {
-    return _interface_description;
+    if(_interface_description!=NULL) {
+        return String ((const char*)_interface_description);
+        }
+    else {
+        return String("");
+    }
 }
 
-const String& M2MBase::resource_type() const
+String M2MBase::resource_type() const
 {
-    return _resource_type;
+    if(_resource_type!=NULL) {
+        return String ((const char*)_resource_type);
+        }
+    else {
+        return String("");
+    }
 }
 
 uint8_t M2MBase::coap_content_type() const
@@ -442,12 +511,21 @@ bool M2MBase::is_integer(const String &value)
 
 void M2MBase::set_uri_path(const String &path)
 {
-    _uri_path = path;
+    free(_uri_path);
+    _uri_path = NULL;
+
+    _uri_path = alloc_copy((const uint8_t*)path.c_str(), (uint32_t)path.size());
+    _uri_path_length = path.size();
 }
 
-const String& M2MBase::uri_path() const
+String M2MBase::uri_path() const
 {
-    return _uri_path;
+    if(_uri_path!=NULL) {
+        return String ((const char*)_uri_path);
+        }
+    else {
+        return String("");
+    }
 }
 
 bool M2MBase::is_under_observation() const
