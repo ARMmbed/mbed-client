@@ -375,11 +375,9 @@ void Test_M2MObjectInstance::test_handle_get_request()
 
     coap_header->options_list_ptr = (sn_coap_options_list_s*)malloc(sizeof(sn_coap_options_list_s));
     coap_header->options_list_ptr->observe = 0;
-
     coap_header->content_format = sn_coap_content_format_e(110);
 
     CHECK(object->handle_get_request(NULL,coap_header,handler) != NULL);
-
 
     if(common_stub::coap_header->options_list_ptr) {
         free(common_stub::coap_header->options_list_ptr);
@@ -395,23 +393,24 @@ void Test_M2MObjectInstance::test_handle_get_request()
         common_stub::coap_header->options_list_ptr = NULL;
     }
 
+    // Content type set CT_NONE
+    common_stub::coap_header->options_list_ptr = (sn_coap_options_list_s*)malloc(sizeof(sn_coap_options_list_s));
+    m2mbase_stub::uint8_value = 99;
+    coap_header->content_format = sn_coap_content_format_e(-1);
+    CHECK(object->handle_get_request(NULL,coap_header,handler) != NULL);
+
+    common_stub::coap_header->content_format = sn_coap_content_format_e(-1); // CT_NONE
+    m2mbase_stub::uint8_value = 100;
+    coap_header->content_format = sn_coap_content_format_e(-1);
+    CHECK(object->handle_get_request(NULL,coap_header,handler) != NULL);
+
     // OMA TLV
     m2mbase_stub::uint8_value = 99;
     CHECK(object->handle_get_request(NULL,coap_header,handler) != NULL);
 
-    if(common_stub::coap_header->options_list_ptr) {
-        free(common_stub::coap_header->options_list_ptr);
-        common_stub::coap_header->options_list_ptr = NULL;
-    }
-
     // OMA JSON
     m2mbase_stub::uint8_value = 100;
     CHECK(object->handle_get_request(NULL,coap_header,handler) != NULL);
-
-    if(common_stub::coap_header->options_list_ptr) {
-        free(common_stub::coap_header->options_list_ptr);
-        common_stub::coap_header->options_list_ptr = NULL;
-    }
 
     coap_header->options_list_ptr->observe = 0;
     m2mbase_stub::uint16_value = 0x1c1c;
@@ -420,49 +419,20 @@ void Test_M2MObjectInstance::test_handle_get_request()
 
     CHECK(object->handle_get_request(NULL,coap_header,handler) != NULL);
 
-    if(common_stub::coap_header->options_list_ptr) {
-        free(common_stub::coap_header->options_list_ptr);
-        common_stub::coap_header->options_list_ptr = NULL;
-    }
-
     m2mbase_stub::uint16_value = 10;
 
     CHECK(object->handle_get_request(NULL,coap_header,handler) != NULL);
-
-    if(common_stub::coap_header->options_list_ptr) {
-        free(common_stub::coap_header->options_list_ptr);
-        common_stub::coap_header->options_list_ptr = NULL;
-    }
-
     // Not observable
     m2mbase_stub::bool_value = false;
     CHECK(object->handle_get_request(NULL,coap_header,handler) != NULL);
 
     m2mbase_stub::bool_value = true;
-
-    if(common_stub::coap_header->options_list_ptr) {
-        free(common_stub::coap_header->options_list_ptr);
-        common_stub::coap_header->options_list_ptr = NULL;
-    }
-
     coap_header->options_list_ptr->observe = 0;
 
     CHECK(object->handle_get_request(NULL,coap_header,handler) != NULL);
-
-    if(common_stub::coap_header->options_list_ptr) {
-        free(common_stub::coap_header->options_list_ptr);
-        common_stub::coap_header->options_list_ptr = NULL;
-    }
-
     coap_header->options_list_ptr->observe = 1;
     m2mbase_stub::uint8_value = 99;
     CHECK(object->handle_get_request(NULL,coap_header,handler) != NULL);
-
-    if(common_stub::coap_header->options_list_ptr) {
-        free(common_stub::coap_header->options_list_ptr);
-        common_stub::coap_header->options_list_ptr = NULL;
-    }
-
     m2mbase_stub::operation = M2MBase::NOT_ALLOWED;
     CHECK(object->handle_get_request(NULL,coap_header,handler) != NULL);
 
@@ -517,7 +487,7 @@ void Test_M2MObjectInstance::test_handle_put_request()
     memset(common_stub::coap_header,0,sizeof(sn_coap_hdr_));
 
     coap_header->payload_ptr = (uint8_t*)malloc(1);
-
+    coap_header->content_format = sn_coap_content_format_e(-1);
     sn_coap_hdr_s *coap_response = NULL;
     m2mbase_stub::uint8_value = 99;
     coap_response = object->handle_put_request(NULL,coap_header,handler,execute_value_updated);
@@ -644,6 +614,8 @@ void Test_M2MObjectInstance::test_handle_post_request()
     sn_coap_hdr_s * coap_response = NULL;
     m2mbase_stub::uint8_value = 99;
 
+    common_stub::coap_header->options_list_ptr = (sn_coap_options_list_s*)malloc(sizeof(sn_coap_options_list_s));
+    coap_header->content_format = sn_coap_content_format_e(-1);
     coap_response = object->handle_post_request(NULL,coap_header,handler,execute_value_updated);
     CHECK( coap_response != NULL);
     if(coap_response) {

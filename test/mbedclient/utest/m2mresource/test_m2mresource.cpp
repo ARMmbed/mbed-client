@@ -278,7 +278,10 @@ void Test_M2MResource::test_handle_get_request()
     CHECK(resource->handle_get_request(NULL,coap_header,handler) != NULL);
 
     // Not OMA TLV or JSON
+    common_stub::coap_header->content_format = sn_coap_content_format_e(-1);
     m2mbase_stub::uint8_value = 110;
+    coap_header->content_format = sn_coap_content_format_e(-1);
+
     CHECK(resource->handle_get_request(NULL,coap_header,handler) != NULL);
 
     // OMA TLV
@@ -376,7 +379,7 @@ void Test_M2MResource::test_handle_put_request()
 
     resource->_has_multiple_instances = true;
     m2mbase_stub::uint8_value = 99;
-
+    coap_header->content_format = sn_coap_content_format_e(-1);
     coap_response = resource->handle_put_request(NULL,coap_header,handler,execute_value_updated);
     CHECK( coap_response != NULL);
 

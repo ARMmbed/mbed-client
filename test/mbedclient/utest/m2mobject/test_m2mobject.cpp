@@ -198,7 +198,6 @@ void Test_M2MObject::test_handle_get_request()
     common_stub::coap_header = (sn_coap_hdr_ *)malloc(sizeof(sn_coap_hdr_));
     memset(common_stub::coap_header,0,sizeof(sn_coap_hdr_));
     common_stub::coap_header->options_list_ptr = (sn_coap_options_list_s*)malloc(sizeof(sn_coap_options_list_s));
-
     m2mtlvserializer_stub::uint8_value = (uint8_t*)malloc(1);
 
     coap_header->token_ptr = (uint8_t*)malloc(sizeof(value));
@@ -215,11 +214,23 @@ void Test_M2MObject::test_handle_get_request()
     m2mbase_stub::uint8_value = 110;
     CHECK(object->handle_get_request(NULL,coap_header,handler) != NULL);
 
+    // Content type set CT_NONE
+    m2mbase_stub::uint8_value = 99;
+    coap_header->content_format = sn_coap_content_format_e(-1);
+    CHECK(object->handle_get_request(NULL,coap_header,handler) != NULL);
+
+    common_stub::coap_header->content_format = sn_coap_content_format_e(-1); // CT_NONE
+    m2mbase_stub::uint8_value = 100;
+    coap_header->content_format = sn_coap_content_format_e(-1);
+    CHECK(object->handle_get_request(NULL,coap_header,handler) != NULL);
+
     // OMA TLV
+    coap_header->content_format = sn_coap_content_format_e(99);
     m2mbase_stub::uint8_value = 99;
     CHECK(object->handle_get_request(NULL,coap_header,handler) != NULL);
 
     // OMA JSON
+    coap_header->content_format = sn_coap_content_format_e(100);
     m2mbase_stub::uint8_value = 100;
     CHECK(object->handle_get_request(NULL,coap_header,handler) != NULL);
 
@@ -227,6 +238,7 @@ void Test_M2MObject::test_handle_get_request()
     m2mbase_stub::uint16_value = 0x1c1c;
     m2mbase_stub::uint8_value = 99;
     m2mbase_stub::bool_value = true;
+    coap_header->content_format = sn_coap_content_format_e(99);
 
     CHECK(object->handle_get_request(NULL,coap_header,handler) != NULL);
 
@@ -427,7 +439,7 @@ void Test_M2MObject::test_handle_post_request()
     M2MObjectInstance *ins = new M2MObjectInstance(*test,*object);
     ins->set_instance_id(0);
     object->_instance_list.push_back(ins);
-
+    coap_header->content_format = sn_coap_content_format_e(-1);
     coap_response = object->handle_post_request(NULL,coap_header,handler,execute_value_updated);
     CHECK( coap_response != NULL);
 

@@ -1387,18 +1387,27 @@ void Test_M2MNsdlInterface::test_observation_to_be_sent()
     nsdl->_nsdl_handle->nsp_address_ptr->omalw_address_ptr = address;
 
     //CHECK if nothing crashes
+    common_stub::coap_header = (sn_coap_hdr_s *) malloc(sizeof(sn_coap_hdr_s));
+    common_stub::coap_header->options_list_ptr = (sn_coap_options_list_s*)malloc(sizeof(sn_coap_options_list_s));
     nsdl->observation_to_be_sent(res2, 1, instance_list_ids);
+    free(common_stub::coap_header);
 
     m2mresourceinstance_stub::resource_type = M2MResource::OPAQUE;
 
     //CHECK if nothing crashes
+    common_stub::coap_header = (sn_coap_hdr_s *) malloc(sizeof(sn_coap_hdr_s));
+    common_stub::coap_header->options_list_ptr = (sn_coap_options_list_s*)malloc(sizeof(sn_coap_options_list_s));
     nsdl->observation_to_be_sent(res2, 1, instance_list_ids);
+    free(common_stub::coap_header);
 
     m2mresource_stub::list.clear();
     m2mresource_stub::int_value = 0;
 
     //CHECK if nothing crashes
+    common_stub::coap_header = (sn_coap_hdr_s *) malloc(sizeof(sn_coap_hdr_s));
+    common_stub::coap_header->options_list_ptr = (sn_coap_options_list_s*)malloc(sizeof(sn_coap_options_list_s));
     nsdl->observation_to_be_sent(res, 500, instance_list_ids);
+    free(common_stub::coap_header);
 
     M2MObjectInstance *object_instance = new M2MObjectInstance("name",*object);
     m2mobject_stub::int_value = 1;
@@ -1408,13 +1417,26 @@ void Test_M2MNsdlInterface::test_observation_to_be_sent()
     nsdl->_object_list.push_back(object);
     instance_list_ids.push_back(1);
     //CHECK if nothing crashes
+    common_stub::coap_header = (sn_coap_hdr_s *) malloc(sizeof(sn_coap_hdr_s));
+    common_stub::coap_header->options_list_ptr = (sn_coap_options_list_s*)malloc(sizeof(sn_coap_options_list_s));
     nsdl->observation_to_be_sent(object, 1, instance_list_ids);
+    free(common_stub::coap_header);
+
+    common_stub::coap_header = (sn_coap_hdr_s *) malloc(sizeof(sn_coap_hdr_s));
+    common_stub::coap_header->options_list_ptr = (sn_coap_options_list_s*)malloc(sizeof(sn_coap_options_list_s));
     nsdl->observation_to_be_sent(object, 500, instance_list_ids, true);
+    free(common_stub::coap_header);
 
     //CHECK if nothing crashes
+    common_stub::coap_header = (sn_coap_hdr_s *) malloc(sizeof(sn_coap_hdr_s));
+    common_stub::coap_header->options_list_ptr = (sn_coap_options_list_s*)malloc(sizeof(sn_coap_options_list_s));
     nsdl->observation_to_be_sent(object_instance, 1, instance_list_ids);
-    nsdl->observation_to_be_sent(object_instance, 500, instance_list_ids);
+    free(common_stub::coap_header);
 
+    common_stub::coap_header = (sn_coap_hdr_s *) malloc(sizeof(sn_coap_hdr_s));
+    common_stub::coap_header->options_list_ptr = (sn_coap_options_list_s*)malloc(sizeof(sn_coap_options_list_s));
+    nsdl->observation_to_be_sent(object_instance, 500, instance_list_ids);
+    free(common_stub::coap_header);
     delete owned;
     owned = NULL;
 
