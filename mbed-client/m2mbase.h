@@ -40,6 +40,9 @@ class M2MReportHandler;
  *  This class is the base class based on which all LWM2M object models
  *  can be created. This serves base class for Object, ObjectInstances and Resources.
  */
+
+
+
 class M2MBase : public M2MReportObserver {
 
 public:
@@ -225,7 +228,7 @@ public:
      * \brief Returns the object name.
      * \return Name of the object.
      */
-    virtual const String &name() const;
+    const String& name() const;
 
     /**
      * \brief Returns the object name in integer.
@@ -240,13 +243,13 @@ public:
     virtual uint16_t instance_id() const;
 
     /**
-     * \brief Returns the interface description of the object.
+     * \brief Returns a copy of the interface description object.
      * \return Description of the object.
      */
     String interface_description() const;
 
     /**
-     * \brief Returns the resource type of the object.
+     * \brief Returns a copy of the resource type object.
      * \return Resource type of the object.
      */
      String resource_type() const;
@@ -362,7 +365,7 @@ public:
     virtual void set_uri_path(const String &path);
 
     /**
-     * \brief Returns the URI path of the object.
+     * \brief Returns a copy of the URI path object.
      * \return URI path of the object.
      */
      String uri_path() const;
@@ -450,6 +453,7 @@ protected:
     */
     virtual uint8_t* alloc_copy(const uint8_t* source, uint32_t size);
 
+    char* stringdup(const char* s);
     /**
      * \brief Returns the Report Handler object.
      * \return M2MReportHandler object.
@@ -470,21 +474,16 @@ private:
 
     M2MReportHandler           *_report_handler;
     M2MObservationHandler      *_observation_handler;    
-    uint8_t                     *_resource_type;
-    uint8_t                     *_uri_path;
-    //uint8_t                     *_name;
+    char                     *_resource_type;
+    char                     *_uri_path;    
     String                      _name;
-    uint8_t                      *_interface_description;
+    char                      *_interface_description;
     int32_t                     _name_id;
     uint32_t                    _max_age;
     uint16_t                    _instance_id;
     uint16_t                    _observation_number;
     uint8_t                     *_token;
-    uint8_t                     _token_length;
-    uint8_t                     _resource_type_length;
-    uint8_t                     _uri_path_length;
-    uint8_t                     _interface_description_length;
-    //uint8_t                     _name_length;
+    uint8_t                     _token_length;    
     uint8_t                     _coap_content_type;
     M2MBase::Operation          _operation;
     M2MBase::Mode               _mode;
