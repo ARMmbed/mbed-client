@@ -239,7 +239,7 @@ public:
      * \brief Returns the object name where resource exists.
      * \return Object name.
     */
-    const String& object_name() const;
+    String object_name() const;
 
     /**
      * @brief Sets the function that is executed when this
@@ -284,7 +284,7 @@ private:
     uint8_t                                 *_value;
     uint32_t                                _value_length;
     M2MResourceCallback                     *_resource_callback; // Not owned
-    String                                  _object_name;
+    char                                    *_object_name;
     FP1<void, void*>                        *_function_pointer;
     uint16_t                                _object_instance_id;
     ResourceType                            _resource_type;
