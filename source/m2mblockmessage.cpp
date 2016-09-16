@@ -38,16 +38,12 @@ void M2MBlockMessage::set_message_info(sn_coap_hdr_s *coap_header)
 {
     _is_block_message = (coap_header &&
                 coap_header->options_list_ptr &&
-                coap_header->options_list_ptr->block1_ptr &&
-                coap_header->options_list_ptr->block1_len > 0) ? true : false;
+                coap_header->options_list_ptr->block1 != -1) ? true : false;
 
     if (coap_header && coap_header->options_list_ptr) {
         // Check total size
-        if (coap_header->options_list_ptr->size1_ptr) {
-            for(int i=0;i < coap_header->options_list_ptr->size1_len; i++) {
-                _total_message_size += (*(coap_header->options_list_ptr->size1_ptr + i) & 0xff) <<
-                         8*(coap_header->options_list_ptr->size1_len- 1 - i);
-                }
+        if (coap_header->options_list_ptr->use_size1) {
+            _total_message_size = coap_header->options_list_ptr->size1;
         }
 
         // Default value in coap library is 65kb
@@ -65,31 +61,33 @@ void M2MBlockMessage::set_message_info(sn_coap_hdr_s *coap_header)
         }
         if (M2MBlockMessage::ErrorNone == _error_code) {
             // Is last block
-            if (coap_header->options_list_ptr->block1_ptr) {
-                if (!(*(coap_header->options_list_ptr->block1_ptr + (coap_header->options_list_ptr->block1_len - 1)) & 0x08)) {
+            if (coap_header->options_list_ptr->block1 != -1) {
+//                if (!(*(coap_header->options_list_ptr->block1_ptr + (coap_header->options_list_ptr->block1_len - 1)) & 0x08)) {
+                if (!((coap_header->options_list_ptr->block1) & 0x08)) {
                     _is_last_block = true;
                 } else {
                     _is_last_block = false;
                 }
             }
 
+            _block_number = coap_header->options_list_ptr->block1 >> 4;
             // Block number
-            if (coap_header->options_list_ptr->block1_len == 3) {
-                _block_number = *(coap_header->options_list_ptr->block1_ptr) << 12;
-                _block_number |= *(coap_header->options_list_ptr->block1_ptr + 1) << 4;
-                _block_number |= (*(coap_header->options_list_ptr->block1_ptr + 2)) >> 4;
-            }
+//            if (coap_header->options_list_ptr->block1_len == 3) {
+//                _block_number = *(coap_header->options_list_ptr->block1_ptr) << 12;
+//                _block_number |= *(coap_header->options_list_ptr->block1_ptr + 1) << 4;
+//                _block_number |= (*(coap_header->options_list_ptr->block1_ptr + 2)) >> 4;
+//            }
 
-            else if (coap_header->options_list_ptr->block1_len == 2) {
-                _block_number = *(coap_header->options_list_ptr->block1_ptr) << 4;
-                _block_number |= (*(coap_header->options_list_ptr->block1_ptr + 1)) >> 4;
-            }
-            else if (coap_header->options_list_ptr->block1_len == 1) {
-                _block_number = (*coap_header->options_list_ptr->block1_ptr) >> 4;
-            }
-            else {
-                _block_number = 0;
-            }
+//            else if (coap_header->options_list_ptr->block1_len == 2) {
+//                _block_number = *(coap_header->options_list_ptr->block1_ptr) << 4;
+//                _block_number |= (*(coap_header->options_list_ptr->block1_ptr + 1)) >> 4;
+//            }
+//            else if (coap_header->options_list_ptr->block1_len == 1) {
+//                _block_number = (*coap_header->options_list_ptr->block1_ptr) >> 4;
+//            }
+//            else {
+//                _block_number = 0;
+//            }
 
             // Payload
             free(_block_data_ptr);

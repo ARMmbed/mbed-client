@@ -37,55 +37,41 @@ void Test_M2MBlockMessage::test_set_message_info()
 
     coap_header->options_list_ptr = (sn_coap_options_list_s *)malloc(sizeof(sn_coap_options_list_s));
     memset(coap_header->options_list_ptr, 0, sizeof(sn_coap_options_list_s));
-    coap_header->options_list_ptr->size1_ptr = (uint8_t*)malloc(2);
-    coap_header->options_list_ptr->size1_ptr[0] = 0xff;
-    coap_header->options_list_ptr->size1_ptr[1] = 0xff;
-    coap_header->options_list_ptr->size1_len = 2;
+    coap_header->options_list_ptr->size1 = 0xffff;
+    coap_header->options_list_ptr->use_size1 = true;
+    coap_header->options_list_ptr->block1 = -1;
 
     block_message->set_message_info(coap_header);
     CHECK(block_message->total_message_size() == 0xffff);
     CHECK(!block_message->is_block_message());
     block_message->clear_values();
 
-    free(coap_header->options_list_ptr->size1_ptr);
-    coap_header->options_list_ptr->size1_ptr = NULL;
-    coap_header->options_list_ptr->size1_ptr = (uint8_t*)malloc(3);
-    coap_header->options_list_ptr->size1_ptr[0] = 0xff;
-    coap_header->options_list_ptr->size1_ptr[1] = 0xff;
-    coap_header->options_list_ptr->size1_ptr[2] = 0xff;
-    coap_header->options_list_ptr->size1_len = 3;
+    coap_header->options_list_ptr->size1 = 0xffffff;
 
     block_message->set_message_info(coap_header);
     CHECK(block_message->error_code() == M2MBlockMessage::EntityTooLarge);
     block_message->clear_values();
 
-    coap_header->options_list_ptr->size1_len = 2;
-    coap_header->options_list_ptr->block1_ptr = (uint8_t *)malloc(3);
-    coap_header->options_list_ptr->block1_ptr[0] = 0x1;
-    coap_header->options_list_ptr->block1_ptr[1] = 0x1;
-    coap_header->options_list_ptr->block1_ptr[2] = 0x1;
-    coap_header->options_list_ptr->block1_len = 3;
+    coap_header->options_list_ptr->size1 = 0xffff;
+    coap_header->options_list_ptr->block1 = 0x010101;
     block_message->set_message_info(coap_header);
     CHECK(block_message->is_block_message());
     CHECK(block_message->block_number() == 4112);
     block_message->clear_values();
 
-    coap_header->options_list_ptr->block1_len = 2;
+    coap_header->options_list_ptr->block1 = 0x0101;
     block_message->set_message_info(coap_header);
     CHECK(block_message->is_block_message());
     CHECK(block_message->block_number() == 16);
     block_message->clear_values();
 
-    coap_header->options_list_ptr->block1_len = 1;
+    coap_header->options_list_ptr->block1 = 0x01;
     block_message->set_message_info(coap_header);
     CHECK(block_message->is_block_message());
     CHECK(block_message->block_number() == 0);
     block_message->clear_values();
 
-    coap_header->options_list_ptr->block1_len = 3;
-    coap_header->options_list_ptr->block1_ptr[0] = 0x1;
-    coap_header->options_list_ptr->block1_ptr[1] = 0x1;
-    coap_header->options_list_ptr->block1_ptr[2] = 0x8;
+    coap_header->options_list_ptr->block1 = 0x010108;
     block_message->set_message_info(coap_header);
     CHECK(!block_message->is_last_block());
     block_message->clear_values();
@@ -100,8 +86,6 @@ void Test_M2MBlockMessage::test_set_message_info()
     block_message->clear_values();
 
     free(coap_header->payload_ptr);
-    free(coap_header->options_list_ptr->block1_ptr);
-    free(coap_header->options_list_ptr->size1_ptr);
     free(coap_header->options_list_ptr);
     free(coap_header);
 }
