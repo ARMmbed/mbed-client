@@ -110,8 +110,8 @@ M2MInterfaceImpl::~M2MInterfaceImpl()
 void M2MInterfaceImpl::bootstrap(M2MSecurity *security)
 {
 #ifndef MBED_CLIENT_DISABLE_BOOTSTRAP_FEATURE
+    tr_debug("M2MInterfaceImpl::bootstrap(M2MSecurity *security) - IN");
     if (security) {
-        tr_debug("M2MInterfaceImpl::bootstrap(M2MSecurity *security) - IN");
         // Transition to a new state based upon
         // the current state of the state machine
         M2MSecurityData* data = new M2MSecurityData();
