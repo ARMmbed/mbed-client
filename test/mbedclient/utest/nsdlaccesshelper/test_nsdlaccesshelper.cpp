@@ -120,7 +120,7 @@ void Test_NsdlAccessHelper::test_nsdl_c_callback()
     common_stub::coap_header = (sn_coap_hdr_s *) malloc(sizeof(sn_coap_hdr_s));
     memset(common_stub::coap_header, 0, sizeof(sn_coap_hdr_s));
     common_stub::coap_header->options_list_ptr = (sn_coap_options_list_s *) malloc(sizeof(sn_coap_options_list_s));
-    common_stub::coap_header->options_list_ptr->block1_len = 2;
+    common_stub::coap_header->options_list_ptr->block1 = 0x0101;
 
     CHECK(__nsdl_c_callback((nsdl_s*)m2mnsdlinterface_stub::void_value,
                             common_stub::coap_header,NULL,SN_NSDL_PROTOCOL_HTTP) == 1 );
@@ -177,7 +177,7 @@ void Test_NsdlAccessHelper::test_nsdl_c_received_from_server()
     common_stub::coap_header = (sn_coap_hdr_s *) malloc(sizeof(sn_coap_hdr_s));
     memset(common_stub::coap_header, 0, sizeof(sn_coap_hdr_s));
     common_stub::coap_header->options_list_ptr = (sn_coap_options_list_s *) malloc(sizeof(sn_coap_options_list_s));
-    common_stub::coap_header->options_list_ptr->block1_len = 2;
+    common_stub::coap_header->options_list_ptr->block1 = 0x0101;
     CHECK( 1 == __nsdl_c_received_from_server((nsdl_s*)m2mnsdlinterface_stub::void_value, common_stub::coap_header, NULL));
     free(common_stub::coap_header->options_list_ptr);
     free(common_stub::coap_header);

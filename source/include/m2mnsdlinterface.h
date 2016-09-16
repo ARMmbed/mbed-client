@@ -286,10 +286,6 @@ private:
 
     void send_resource_observation(M2MResource *resource, uint16_t obs_number);
 
-    void build_observation_number(uint8_t *obs_number,
-                                  uint8_t *obs_len,
-                                  uint16_t number);
-
     void send_notification(uint8_t *token,
                            uint8_t  token_length,
                            uint8_t *value,

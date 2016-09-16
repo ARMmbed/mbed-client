@@ -32,5 +32,7 @@ yotta_modules
 yotta_targets
 build
 lcov/*
+coverage/*
+results/*
 output/*
 .yotta.json
