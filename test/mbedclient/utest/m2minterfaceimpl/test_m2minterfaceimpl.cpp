@@ -125,6 +125,10 @@ void Test_M2MInterfaceImpl::test_bootstrap()
     m2mnsdlinterface_stub::bool_value = true;
     m2mconnectionhandler_stub::bool_value = true;
 
+
+    impl->bootstrap(NULL);
+    CHECK(impl->_current_state == M2MInterfaceImpl::STATE_IDLE);
+
     impl->bootstrap(sec);
 
     CHECK(impl->_current_state == M2MInterfaceImpl::STATE_BOOTSTRAP);
@@ -230,6 +234,10 @@ void Test_M2MInterfaceImpl::test_register_object()
     m2msecurity_stub::string_value = val;
     m2mnsdlinterface_stub::bool_value = true;
     m2mconnectionhandler_stub::bool_value = true;
+
+    impl->register_object(NULL,list);
+    CHECK(impl->_current_state == M2MInterfaceImpl::STATE_IDLE);
+
     impl->register_object(sec,list);
     CHECK(impl->_current_state == M2MInterfaceImpl::STATE_REGISTER);
 
@@ -377,43 +385,44 @@ void Test_M2MInterfaceImpl::test_update_registration()
 {
     impl->_current_state = M2MInterfaceImpl::STATE_REGISTERED;
     m2mnsdlinterface_stub::bool_value = true;
+    M2MSecurity *sec = new M2MSecurity(M2MSecurity::M2MServer);
     impl->update_registration(NULL,120);
-
-    CHECK(impl->_current_state == M2MInterfaceImpl::STATE_UPDATE_REGISTRATION);
+    CHECK(impl->_current_state == M2MInterfaceImpl::STATE_REGISTERED);
 
     impl->_update_register_ongoing = false;
     impl->_current_state = M2MInterfaceImpl::STATE_REGISTERED;
     m2mnsdlinterface_stub::bool_value = false;
-    impl->update_registration(NULL,120);
+    impl->update_registration(sec,120);
 
     CHECK(impl->_current_state == M2MInterfaceImpl::STATE_UPDATE_REGISTRATION);
 
     impl->_current_state = M2MInterfaceImpl::STATE_REGISTERED;
     m2mnsdlinterface_stub::bool_value = false;
-    impl->update_registration(NULL,120);
+    impl->update_registration(sec,120);
 
     CHECK(impl->_current_state == M2MInterfaceImpl::STATE_REGISTERED);
 
     impl->_current_state = M2MInterfaceImpl::STATE_IDLE;
-    impl->update_registration(NULL,120);
+    impl->update_registration(sec,120);
 
     CHECK(impl->_current_state == M2MInterfaceImpl::STATE_IDLE);
     CHECK(observer->error_occured == true);
 
     impl->_update_register_ongoing = false;
     impl->_current_state = M2MInterfaceImpl::STATE_BOOTSTRAP;
-    impl->update_registration(NULL,120);
+    impl->update_registration(sec,120);
 
     CHECK(impl->_current_state == M2MInterfaceImpl::STATE_BOOTSTRAP);
     CHECK(observer->error_occured == true);
 
-    impl->update_registration(NULL,30);
+    impl->update_registration(sec,30);
     CHECK(observer->error_occured == true);
 
     impl->_update_register_ongoing = true;
-    impl->update_registration(NULL,120);
+    impl->update_registration(sec,120);
     CHECK(observer->error_occured == true);
 
+    delete sec;
 }
 
 void Test_M2MInterfaceImpl::test_unregister_object()
