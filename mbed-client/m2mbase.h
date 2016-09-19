@@ -123,7 +123,7 @@ protected:
      * \param name Name of the object
      * \param id ID of the object
      */
-    M2MBase(const String &name,
+    M2MBase(const String name,
             M2MBase::Mode mode);
 public:
 
@@ -228,7 +228,7 @@ public:
      * \brief Returns the object name.
      * \return Name of the object.
      */
-    const String& name() const;
+    String name() const;
 
     /**
      * \brief Returns the object name in integer.
@@ -472,27 +472,27 @@ private:
 
 private:
 
-    M2MReportHandler           *_report_handler;
-    M2MObservationHandler      *_observation_handler;    
-    char                     *_resource_type;
-    char                     *_uri_path;    
-    String                      _name;
-    char                      *_interface_description;
+    bool                        _observable;
+    bool                        _register_uri;
+    bool                        _is_under_observation;
+    uint8_t                     _token_length;
+    uint8_t                     _coap_content_type;
+    uint16_t                    _observation_number;
+    uint16_t                    _instance_id;
     int32_t                     _name_id;
     uint32_t                    _max_age;
-    uint16_t                    _instance_id;
-    uint16_t                    _observation_number;
-    uint8_t                     *_token;
-    uint8_t                     _token_length;    
-    uint8_t                     _coap_content_type;
     M2MBase::Operation          _operation;
     M2MBase::Mode               _mode;
     M2MBase::BaseType           _base_type;
     M2MBase::Observation        _observation_level;
-    bool                        _observable;
-    bool                        _register_uri;
-    bool                        _is_under_observation;
     value_updated_callback      _value_updated_callback;
+    M2MReportHandler            *_report_handler;
+    M2MObservationHandler       *_observation_handler;
+    char                        *_resource_type;
+    char                        *_uri_path;
+    char                        *_interface_description;
+    char                        * _name;
+    uint8_t                     *_token;
     FP1<void, const char*>      *_function_pointer;
 
 friend class Test_M2MBase;

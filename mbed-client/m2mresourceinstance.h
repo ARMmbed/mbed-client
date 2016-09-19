@@ -236,7 +236,7 @@ public:
     uint16_t object_instance_id() const;
 
     /**
-     * \brief Returns the object name where resource exists.
+     * \brief Returns a copy of the object name where resource exists.
      * \return Object name.
     */
     String object_name() const;
