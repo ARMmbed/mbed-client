@@ -966,10 +966,12 @@ void M2MInterfaceImpl::state_function( uint8_t current_state, EventData* data )
 
 void M2MInterfaceImpl::start_register_update(M2MUpdateRegisterData *data) {
     tr_debug("M2MInterfaceImpl::start_register_update - IN");
+    bool started = false;
     if(!data || (data->_lifetime != 0 && (data->_lifetime < MINIMUM_REGISTRATION_TIME))) {
         _observer.error(M2MInterface::InvalidParameters);
     } else if(!_update_register_ongoing){
         tr_debug("M2MInterfaceImpl::start_register_update - already ongoing");
+        started = true;
         _update_register_ongoing = true;
         BEGIN_TRANSITION_MAP                                    // - Current State -
             TRANSITION_MAP_ENTRY (EVENT_IGNORED)                // state_idle
@@ -1001,5 +1003,9 @@ void M2MInterfaceImpl::start_register_update(M2MUpdateRegisterData *data) {
         _observer.error(M2MInterface::NotAllowed);
     } else {
         tr_debug("M2MInterfaceImpl::start_register_update - reconnecting");
+    }
+
+    if(!started && data) {
+        delete data;
     }
 }

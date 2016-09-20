@@ -414,6 +414,29 @@ void Test_M2MInterfaceImpl::test_update_registration()
     impl->update_registration(NULL,120);
     CHECK(observer->error_occured == true);
 
+
+    M2MObject *object = new M2MObject("test");
+    M2MObjectInstance *ins = object->create_object_instance();
+    ins->create_dynamic_resource("test","type",M2MResourceInstance::STRING,false,false);
+
+    M2MObjectList list;
+    list.push_back(object);
+    impl->_update_register_ongoing = false;
+    impl->_current_state = M2MInterfaceImpl::STATE_REGISTERED;
+    m2mnsdlinterface_stub::bool_value = false;
+    impl->update_registration(NULL, list);
+
+    CHECK(impl->_current_state == M2MInterfaceImpl::STATE_UPDATE_REGISTRATION);
+    list.clear();
+
+    impl->_current_state = M2MInterfaceImpl::STATE_REGISTERED;
+    impl->_update_register_ongoing = false;
+    m2mnsdlinterface_stub::bool_value = false;
+    impl->update_registration(NULL, list);
+
+    CHECK(impl->_current_state == M2MInterfaceImpl::STATE_UPDATE_REGISTRATION);
+    delete object;
+
 }
 
 void Test_M2MInterfaceImpl::test_unregister_object()
