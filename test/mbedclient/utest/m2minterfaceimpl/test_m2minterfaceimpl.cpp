@@ -125,6 +125,10 @@ void Test_M2MInterfaceImpl::test_bootstrap()
     m2mnsdlinterface_stub::bool_value = true;
     m2mconnectionhandler_stub::bool_value = true;
 
+
+    impl->bootstrap(NULL);
+    CHECK(impl->_current_state == M2MInterfaceImpl::STATE_IDLE);
+
     impl->bootstrap(sec);
 
     CHECK(impl->_current_state == M2MInterfaceImpl::STATE_BOOTSTRAP);
@@ -230,6 +234,10 @@ void Test_M2MInterfaceImpl::test_register_object()
     m2msecurity_stub::string_value = val;
     m2mnsdlinterface_stub::bool_value = true;
     m2mconnectionhandler_stub::bool_value = true;
+
+    impl->register_object(NULL,list);
+    CHECK(impl->_current_state == M2MInterfaceImpl::STATE_IDLE);
+
     impl->register_object(sec,list);
     CHECK(impl->_current_state == M2MInterfaceImpl::STATE_REGISTER);
 
