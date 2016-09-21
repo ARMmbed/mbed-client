@@ -158,8 +158,9 @@ protected :
 
 private:
 
-    M2MObjectInstanceList     _instance_list; // owned
     uint16_t                  _max_instance_count;
+    M2MObjectInstanceList     _instance_list; // owned
+
 
 friend class Test_M2MObject;
 friend class Test_M2MInterfaceImpl;

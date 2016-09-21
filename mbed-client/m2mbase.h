@@ -40,9 +40,6 @@ class M2MReportHandler;
  *  This class is the base class based on which all LWM2M object models
  *  can be created. This serves base class for Object, ObjectInstances and Resources.
  */
-
-
-
 class M2MBase : public M2MReportObserver {
 
 public:
@@ -476,15 +473,14 @@ private:
     bool                        _register_uri;
     bool                        _is_under_observation;
     uint8_t                     _token_length;
-    uint8_t                     _coap_content_type;
-    uint16_t                    _observation_number;
-    uint16_t                    _instance_id;
-    int32_t                     _name_id;
-    uint32_t                    _max_age;
     M2MBase::Operation          _operation;
     M2MBase::Mode               _mode;
     M2MBase::BaseType           _base_type;
     M2MBase::Observation        _observation_level;
+    uint16_t                    _observation_number;
+    uint16_t                    _instance_id;
+    int32_t                     _name_id;
+    uint32_t                    _max_age;
     value_updated_callback      _value_updated_callback;
     M2MReportHandler            *_report_handler;
     M2MObservationHandler       *_observation_handler;
@@ -494,6 +490,7 @@ private:
     char                        * _name;
     uint8_t                     *_token;
     FP1<void, const char*>      *_function_pointer;
+    uint8_t                     _coap_content_type; // remember to adjust padding in the inheritsing classes!
 
 friend class Test_M2MBase;
 

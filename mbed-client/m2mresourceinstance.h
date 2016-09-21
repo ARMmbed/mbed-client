@@ -279,6 +279,8 @@ private:
 
 private:
 
+    ResourceType                            _resource_type;
+    uint16_t                                _object_instance_id;
     M2MObjectInstanceCallback               &_object_instance_callback;
     execute_callback                        _execute_callback;
     uint8_t                                 *_value;
@@ -286,8 +288,6 @@ private:
     M2MResourceCallback                     *_resource_callback; // Not owned
     char                                    *_object_name;
     FP1<void, void*>                        *_function_pointer;
-    uint16_t                                _object_instance_id;
-    ResourceType                            _resource_type;
     incoming_block_message_callback         _incoming_block_message_cb;
     outgoing_block_message_callback         _outgoing_block_message_cb;
     M2MBlockMessage                         *_block_message_data;
