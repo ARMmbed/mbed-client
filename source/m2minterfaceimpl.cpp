@@ -530,9 +530,6 @@ void M2MInterfaceImpl::timer_expired(M2MTimerObserver::Type type)
     }
     else if (M2MTimerObserver::RetryTimer == type) {
         _retry_timer_expired = true;
-        _listen_port = rand() % 64511 + 1024;
-        tr_debug("M2MInterfaceImpl::timer_expired() - new port: %d", _listen_port);
-        _connection_handler->bind_connection(_listen_port);
         internal_event(STATE_REGISTER);
     }
     else if (M2MTimerObserver::BootstrapTimer == type) {
@@ -709,6 +706,10 @@ void M2MInterfaceImpl::state_register( EventData *data)
             _observer.error(error);
         }
     } else {
+        _listen_port = rand() % 64511 + 1024;
+        _connection_handler->stop_listening();
+        tr_debug("M2MInterfaceImpl::state_register() - new port: %d", _listen_port);
+        _connection_handler->bind_connection(_listen_port);
         _connection_handler->resolve_server_address(_server_ip_address,_server_port,
                                                     M2MConnectionObserver::LWM2MServer,
                                                     _security);
