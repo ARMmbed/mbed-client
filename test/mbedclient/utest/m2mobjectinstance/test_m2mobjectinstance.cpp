@@ -375,22 +375,10 @@ void Test_M2MObjectInstance::test_handle_get_request()
 
     coap_header->options_list_ptr = (sn_coap_options_list_s*)malloc(sizeof(sn_coap_options_list_s));
     coap_header->options_list_ptr->observe = 0;
-
-    coap_header->content_type_ptr = (uint8_t*)malloc(1);
-    coap_header->content_type_len = 1;
-    *coap_header->content_type_ptr = 110;
+    coap_header->content_format = sn_coap_content_format_e(110);
 
     CHECK(object->handle_get_request(NULL,coap_header,handler) != NULL);
 
-    if(coap_header->content_type_ptr) {
-        free(coap_header->content_type_ptr);
-        coap_header->content_type_ptr = NULL;
-    }
-
-    if(common_stub::coap_header->content_type_ptr) {
-        free(common_stub::coap_header->content_type_ptr);
-        common_stub::coap_header->content_type_ptr = NULL;
-    }
     if(common_stub::coap_header->options_list_ptr) {
         free(common_stub::coap_header->options_list_ptr);
         common_stub::coap_header->options_list_ptr = NULL;
@@ -400,167 +388,51 @@ void Test_M2MObjectInstance::test_handle_get_request()
     m2mbase_stub::uint8_value = 110;
     CHECK(object->handle_get_request(NULL,coap_header,handler) != NULL);
 
-    if(common_stub::coap_header->content_type_ptr) {
-        free(common_stub::coap_header->content_type_ptr);
-        common_stub::coap_header->content_type_ptr = NULL;
-    }
     if(common_stub::coap_header->options_list_ptr) {
         free(common_stub::coap_header->options_list_ptr);
         common_stub::coap_header->options_list_ptr = NULL;
     }
+
+    // Content type set CT_NONE
+    common_stub::coap_header->options_list_ptr = (sn_coap_options_list_s*)malloc(sizeof(sn_coap_options_list_s));
+    m2mbase_stub::uint8_value = 99;
+    coap_header->content_format = sn_coap_content_format_e(-1);
+    CHECK(object->handle_get_request(NULL,coap_header,handler) != NULL);
+
+    common_stub::coap_header->content_format = sn_coap_content_format_e(-1); // CT_NONE
+    m2mbase_stub::uint8_value = 100;
+    coap_header->content_format = sn_coap_content_format_e(-1);
+    CHECK(object->handle_get_request(NULL,coap_header,handler) != NULL);
 
     // OMA TLV
     m2mbase_stub::uint8_value = 99;
     CHECK(object->handle_get_request(NULL,coap_header,handler) != NULL);
 
-    if(common_stub::coap_header->content_type_ptr) {
-        free(common_stub::coap_header->content_type_ptr);
-        common_stub::coap_header->content_type_ptr = NULL;
-    }
-    if(common_stub::coap_header->options_list_ptr->max_age_ptr) {
-        free(common_stub::coap_header->options_list_ptr->max_age_ptr);
-        common_stub::coap_header->options_list_ptr->max_age_ptr = NULL;
-    }
-    if(common_stub::coap_header->options_list_ptr) {
-        free(common_stub::coap_header->options_list_ptr);
-        common_stub::coap_header->options_list_ptr = NULL;
-    }
-
     // OMA JSON
     m2mbase_stub::uint8_value = 100;
     CHECK(object->handle_get_request(NULL,coap_header,handler) != NULL);
 
-    if(common_stub::coap_header->content_type_ptr) {
-        free(common_stub::coap_header->content_type_ptr);
-        common_stub::coap_header->content_type_ptr = NULL;
-    }
-    if(common_stub::coap_header->options_list_ptr) {
-        free(common_stub::coap_header->options_list_ptr);
-        common_stub::coap_header->options_list_ptr = NULL;
-    }
-
-    coap_header->options_list_ptr->observe = 1;
-
-    uint8_t obs = 0;
-    coap_header->options_list_ptr->observe_ptr = (uint8_t*)malloc(sizeof(obs));
-    memcpy(coap_header->options_list_ptr->observe_ptr,&obs,sizeof(obs));
-    coap_header->options_list_ptr->observe_len = 0;
+    coap_header->options_list_ptr->observe = 0;
     m2mbase_stub::uint16_value = 0x1c1c;
     m2mbase_stub::uint8_value = 99;
     m2mbase_stub::bool_value = true;
 
     CHECK(object->handle_get_request(NULL,coap_header,handler) != NULL);
 
-    if(common_stub::coap_header->content_type_ptr) {
-        free(common_stub::coap_header->content_type_ptr);
-        common_stub::coap_header->content_type_ptr = NULL;
-    }
-
-    if(common_stub::coap_header->options_list_ptr->observe_ptr) {
-        free(common_stub::coap_header->options_list_ptr->observe_ptr);
-        common_stub::coap_header->options_list_ptr->observe_ptr = NULL;
-    }
-    if(common_stub::coap_header->options_list_ptr->max_age_ptr) {
-        free(common_stub::coap_header->options_list_ptr->max_age_ptr);
-        common_stub::coap_header->options_list_ptr->max_age_ptr = NULL;
-    }
-    if(common_stub::coap_header->options_list_ptr) {
-        free(common_stub::coap_header->options_list_ptr);
-        common_stub::coap_header->options_list_ptr = NULL;
-    }
-
     m2mbase_stub::uint16_value = 10;
 
     CHECK(object->handle_get_request(NULL,coap_header,handler) != NULL);
-
-    if(common_stub::coap_header->content_type_ptr) {
-        free(common_stub::coap_header->content_type_ptr);
-        common_stub::coap_header->content_type_ptr = NULL;
-    }
-
-    if(common_stub::coap_header->options_list_ptr->observe_ptr) {
-        free(common_stub::coap_header->options_list_ptr->observe_ptr);
-        common_stub::coap_header->options_list_ptr->observe_ptr = NULL;
-    }
-    if(common_stub::coap_header->options_list_ptr->max_age_ptr) {
-        free(common_stub::coap_header->options_list_ptr->max_age_ptr);
-        common_stub::coap_header->options_list_ptr->max_age_ptr = NULL;
-    }
-    if(common_stub::coap_header->options_list_ptr) {
-        free(common_stub::coap_header->options_list_ptr);
-        common_stub::coap_header->options_list_ptr = NULL;
-    }
-
     // Not observable
     m2mbase_stub::bool_value = false;
     CHECK(object->handle_get_request(NULL,coap_header,handler) != NULL);
 
     m2mbase_stub::bool_value = true;
-
-    if(common_stub::coap_header->content_type_ptr) {
-        free(common_stub::coap_header->content_type_ptr);
-        common_stub::coap_header->content_type_ptr = NULL;
-    }
-
-    if(common_stub::coap_header->options_list_ptr->observe_ptr) {
-        free(common_stub::coap_header->options_list_ptr->observe_ptr);
-        common_stub::coap_header->options_list_ptr->observe_ptr = NULL;
-    }
-    if(common_stub::coap_header->options_list_ptr->max_age_ptr) {
-        free(common_stub::coap_header->options_list_ptr->max_age_ptr);
-        common_stub::coap_header->options_list_ptr->max_age_ptr = NULL;
-    }
-    if(common_stub::coap_header->options_list_ptr) {
-        free(common_stub::coap_header->options_list_ptr);
-        common_stub::coap_header->options_list_ptr = NULL;
-    }
-
-    coap_header->options_list_ptr->observe_len = 1;
+    coap_header->options_list_ptr->observe = 0;
 
     CHECK(object->handle_get_request(NULL,coap_header,handler) != NULL);
-
-    if(common_stub::coap_header->content_type_ptr) {
-        free(common_stub::coap_header->content_type_ptr);
-        common_stub::coap_header->content_type_ptr = NULL;
-    }
-
-    if(common_stub::coap_header->options_list_ptr->observe_ptr) {
-        free(common_stub::coap_header->options_list_ptr->observe_ptr);
-        common_stub::coap_header->options_list_ptr->observe_ptr = NULL;
-    }
-    if(common_stub::coap_header->options_list_ptr->max_age_ptr) {
-        free(common_stub::coap_header->options_list_ptr->max_age_ptr);
-        common_stub::coap_header->options_list_ptr->max_age_ptr = NULL;
-    }
-    if(common_stub::coap_header->options_list_ptr) {
-        free(common_stub::coap_header->options_list_ptr);
-        common_stub::coap_header->options_list_ptr = NULL;
-    }
-
-
-    obs = 1;
-    memcpy(coap_header->options_list_ptr->observe_ptr,&obs,sizeof(obs));
+    coap_header->options_list_ptr->observe = 1;
     m2mbase_stub::uint8_value = 99;
     CHECK(object->handle_get_request(NULL,coap_header,handler) != NULL);
-
-    if(common_stub::coap_header->content_type_ptr) {
-        free(common_stub::coap_header->content_type_ptr);
-        common_stub::coap_header->content_type_ptr = NULL;
-    }
-
-    if(common_stub::coap_header->options_list_ptr->observe_ptr) {
-        free(common_stub::coap_header->options_list_ptr->observe_ptr);
-        common_stub::coap_header->options_list_ptr->observe_ptr = NULL;
-    }
-    if(common_stub::coap_header->options_list_ptr->max_age_ptr) {
-        free(common_stub::coap_header->options_list_ptr->max_age_ptr);
-        common_stub::coap_header->options_list_ptr->max_age_ptr = NULL;
-    }
-    if(common_stub::coap_header->options_list_ptr) {
-        free(common_stub::coap_header->options_list_ptr);
-        common_stub::coap_header->options_list_ptr = NULL;
-    }
-
     m2mbase_stub::operation = M2MBase::NOT_ALLOWED;
     CHECK(object->handle_get_request(NULL,coap_header,handler) != NULL);
 
@@ -570,24 +442,12 @@ void Test_M2MObjectInstance::test_handle_get_request()
         free(coap_header->token_ptr);
         coap_header->token_ptr = NULL;
     }
-    if(coap_header->content_type_ptr) {
-        free(coap_header->content_type_ptr);
-        coap_header->content_type_ptr = NULL;
-    }
-    if(coap_header->options_list_ptr->observe_ptr) {
-        free(coap_header->options_list_ptr->observe_ptr);
-        coap_header->options_list_ptr->observe_ptr = NULL;
-    }
     if(coap_header->options_list_ptr) {
         free(coap_header->options_list_ptr);
         coap_header->options_list_ptr = NULL;
     }
 
     if(common_stub::coap_header){
-        if(common_stub::coap_header->content_type_ptr) {
-            free(common_stub::coap_header->content_type_ptr);
-            common_stub::coap_header->content_type_ptr = NULL;
-        }
         if(common_stub::coap_header->options_list_ptr) {
             free(common_stub::coap_header->options_list_ptr);
             common_stub::coap_header->options_list_ptr = NULL;
@@ -627,7 +487,7 @@ void Test_M2MObjectInstance::test_handle_put_request()
     memset(common_stub::coap_header,0,sizeof(sn_coap_hdr_));
 
     coap_header->payload_ptr = (uint8_t*)malloc(1);
-
+    coap_header->content_format = sn_coap_content_format_e(-1);
     sn_coap_hdr_s *coap_response = NULL;
     m2mbase_stub::uint8_value = 99;
     coap_response = object->handle_put_request(NULL,coap_header,handler,execute_value_updated);
@@ -639,9 +499,7 @@ void Test_M2MObjectInstance::test_handle_put_request()
     coap_header->options_list_ptr->uri_query_ptr = value;
     coap_header->options_list_ptr->uri_query_len = sizeof(value);
 
-    coap_header->content_type_ptr = (uint8_t*)malloc(1);
-    coap_header->content_type_len = 1;
-    *coap_header->content_type_ptr = 99;
+    coap_header->content_format = sn_coap_content_format_e(99);
     m2mtlvdeserializer_stub::bool_value = true;
     m2mtlvdeserializer_stub::error = M2MTLVDeserializer::None;
 
@@ -650,23 +508,11 @@ void Test_M2MObjectInstance::test_handle_put_request()
 
     coap_response = object->handle_put_request(NULL,coap_header,handler,execute_value_updated);
     CHECK( coap_response != NULL);
-    if(coap_response) {
-        if(coap_response->content_type_ptr) {
-            free(coap_response->content_type_ptr);
-            coap_response->content_type_ptr = NULL;
-        }
-    }
 
     m2mbase_stub::bool_value = true;
 
     coap_response = object->handle_put_request(NULL,coap_header,handler,execute_value_updated);
     CHECK( coap_response != NULL);
-    if(coap_response) {
-        if(coap_response->content_type_ptr) {
-            free(coap_response->content_type_ptr);
-            coap_response->content_type_ptr = NULL;
-        }
-    }
 
     free(coap_header->options_list_ptr);
     coap_header->options_list_ptr = NULL;
@@ -675,12 +521,6 @@ void Test_M2MObjectInstance::test_handle_put_request()
 
     coap_response = object->handle_put_request(NULL,coap_header,handler,execute_value_updated);
     CHECK( coap_response != NULL);
-    if(coap_response) {
-        if(coap_response->content_type_ptr) {
-            free(coap_response->content_type_ptr);
-            coap_response->content_type_ptr = NULL;
-        }
-    }
 
     m2mtlvdeserializer_stub::error = M2MTLVDeserializer::NotFound;
 
@@ -689,12 +529,6 @@ void Test_M2MObjectInstance::test_handle_put_request()
 
     coap_response = object->handle_put_request(NULL,coap_header,handler,execute_value_updated);
     CHECK( coap_response != NULL);
-    if(coap_response) {
-        if(coap_response->content_type_ptr) {
-            free(coap_response->content_type_ptr);
-            coap_response->content_type_ptr = NULL;
-        }
-    }
 
     m2mtlvdeserializer_stub::error = M2MTLVDeserializer::NotValid;
 
@@ -703,12 +537,6 @@ void Test_M2MObjectInstance::test_handle_put_request()
 
     coap_response = object->handle_put_request(NULL,coap_header,handler,execute_value_updated);
     CHECK( coap_response != NULL);
-    if(coap_response) {
-        if(coap_response->content_type_ptr) {
-            free(coap_response->content_type_ptr);
-            coap_response->content_type_ptr = NULL;
-        }
-    }
 
     m2mtlvdeserializer_stub::error = M2MTLVDeserializer::NotAllowed;
 
@@ -717,34 +545,16 @@ void Test_M2MObjectInstance::test_handle_put_request()
 
     coap_response = object->handle_put_request(NULL,coap_header,handler,execute_value_updated);
     CHECK( coap_response != NULL);
-    if(coap_response) {
-        if(coap_response->content_type_ptr) {
-            free(coap_response->content_type_ptr);
-            coap_response->content_type_ptr = NULL;
-        }
-    }
 
     m2mtlvdeserializer_stub::bool_value = false;
 
     coap_response = object->handle_put_request(NULL,coap_header,handler,execute_value_updated);
     CHECK( coap_response != NULL);
-    if(coap_response) {
-        if(coap_response->content_type_ptr) {
-            free(coap_response->content_type_ptr);
-            coap_response->content_type_ptr = NULL;
-        }
-    }
 
-    *coap_header->content_type_ptr = 100;
+    coap_header->content_format = sn_coap_content_format_e(100);
 
     coap_response = object->handle_put_request(NULL,coap_header,handler,execute_value_updated);
     CHECK( coap_response != NULL);
-    if(coap_response) {
-        if(coap_response->content_type_ptr) {
-            free(coap_response->content_type_ptr);
-            coap_response->content_type_ptr = NULL;
-        }
-    }
 
     free(coap_header->payload_ptr);
     coap_header->payload_ptr = NULL;
@@ -753,47 +563,21 @@ void Test_M2MObjectInstance::test_handle_put_request()
 
     coap_response = object->handle_put_request(NULL,coap_header,handler,execute_value_updated);
     CHECK( coap_response != NULL);
-    if(coap_response) {
-        if(coap_response->content_type_ptr) {
-            free(coap_response->content_type_ptr);
-            coap_response->content_type_ptr = NULL;
-        }
-    }
 
     m2mbase_stub::bool_value = false;
 
     coap_response = object->handle_put_request(NULL,coap_header,handler,execute_value_updated);
     CHECK( coap_response != NULL);
-    if(coap_response) {
-        if(coap_response->content_type_ptr) {
-            free(coap_response->content_type_ptr);
-            coap_response->content_type_ptr = NULL;
-        }
-    }
 
     m2mbase_stub::operation = M2MBase::NOT_ALLOWED;
 
     coap_response = object->handle_put_request(NULL,coap_header,handler,execute_value_updated);
     CHECK( coap_response != NULL);
-    if(coap_response) {
-        if(coap_response->content_type_ptr) {
-            free(coap_response->content_type_ptr);
-            coap_response->content_type_ptr = NULL;
-        }
-    }
 
     coap_response = object->handle_put_request(NULL,NULL,handler,execute_value_updated);
 
     CHECK( coap_response != NULL);
-    if(coap_response) {
-        if(coap_response->content_type_ptr) {
-            free(coap_response->content_type_ptr);
-            coap_response->content_type_ptr = NULL;
-        }
-    }
 
-
-    free(coap_header->content_type_ptr);
     //free(coap_header->options_list_ptr);
     free(common_stub::coap_header);
     delete m2mbase_stub::string_value;
@@ -830,13 +614,11 @@ void Test_M2MObjectInstance::test_handle_post_request()
     sn_coap_hdr_s * coap_response = NULL;
     m2mbase_stub::uint8_value = 99;
 
+    common_stub::coap_header->options_list_ptr = (sn_coap_options_list_s*)malloc(sizeof(sn_coap_options_list_s));
+    coap_header->content_format = sn_coap_content_format_e(-1);
     coap_response = object->handle_post_request(NULL,coap_header,handler,execute_value_updated);
     CHECK( coap_response != NULL);
     if(coap_response) {
-        if(coap_response->content_type_ptr) {
-            free(coap_response->content_type_ptr);
-            coap_response->content_type_ptr = NULL;
-        }
         if (coap_response->options_list_ptr) {
             if (coap_response->options_list_ptr->location_path_ptr) {
                 free(coap_response->options_list_ptr->location_path_ptr);
@@ -852,10 +634,6 @@ void Test_M2MObjectInstance::test_handle_post_request()
     coap_response = object->handle_post_request(NULL,coap_header,handler,execute_value_updated);
     CHECK( coap_response != NULL);
     if(coap_response) {
-        if(coap_response->content_type_ptr) {
-            free(coap_response->content_type_ptr);
-            coap_response->content_type_ptr = NULL;
-        }
         if (coap_response->options_list_ptr) {
             if (coap_response->options_list_ptr->location_path_ptr) {
                 free(coap_response->options_list_ptr->location_path_ptr);
@@ -870,10 +648,6 @@ void Test_M2MObjectInstance::test_handle_post_request()
     coap_response = object->handle_post_request(NULL,coap_header,handler,execute_value_updated);
     CHECK( coap_response != NULL);
     if(coap_response) {
-        if(coap_response->content_type_ptr) {
-            free(coap_response->content_type_ptr);
-            coap_response->content_type_ptr = NULL;
-        }
         if (coap_response->options_list_ptr) {
             if (coap_response->options_list_ptr->location_path_ptr) {
                 free(coap_response->options_list_ptr->location_path_ptr);
@@ -888,10 +662,6 @@ void Test_M2MObjectInstance::test_handle_post_request()
     coap_response = object->handle_post_request(NULL,coap_header,handler,execute_value_updated);
     CHECK( coap_response != NULL);
     if(coap_response) {
-        if(coap_response->content_type_ptr) {
-            free(coap_response->content_type_ptr);
-            coap_response->content_type_ptr = NULL;
-        }
         if (coap_response->options_list_ptr) {
             if (coap_response->options_list_ptr->location_path_ptr) {
                 free(coap_response->options_list_ptr->location_path_ptr);
@@ -908,9 +678,7 @@ void Test_M2MObjectInstance::test_handle_post_request()
     coap_header->options_list_ptr->uri_query_ptr = value;
     coap_header->options_list_ptr->uri_query_len = sizeof(value);
 
-    coap_header->content_type_ptr = (uint8_t*)malloc(1);
-    coap_header->content_type_len = 1;
-    *coap_header->content_type_ptr = 99;
+    coap_header->content_format = sn_coap_content_format_e(99);
     m2mtlvdeserializer_stub::is_object_bool_value = true;
     m2mtlvdeserializer_stub::bool_value = false;
     m2mbase_stub::bool_value = false;
@@ -920,10 +688,6 @@ void Test_M2MObjectInstance::test_handle_post_request()
 
     CHECK( coap_response != NULL);
     if(coap_response) {
-        if(coap_response->content_type_ptr) {
-            free(coap_response->content_type_ptr);
-            coap_response->content_type_ptr = NULL;
-        }
         if (coap_response->options_list_ptr) {
             if (coap_response->options_list_ptr->location_path_ptr) {
                 free(coap_response->options_list_ptr->location_path_ptr);
@@ -945,10 +709,6 @@ void Test_M2MObjectInstance::test_handle_post_request()
 
     CHECK( coap_response != NULL);
     if(coap_response) {
-        if(coap_response->content_type_ptr) {
-            free(coap_response->content_type_ptr);
-            coap_response->content_type_ptr = NULL;
-        }
         if (coap_response->options_list_ptr) {
             if (coap_response->options_list_ptr->location_path_ptr) {
                 free(coap_response->options_list_ptr->location_path_ptr);
@@ -965,10 +725,6 @@ void Test_M2MObjectInstance::test_handle_post_request()
 
     CHECK( coap_response != NULL);
     if(coap_response) {
-        if(coap_response->content_type_ptr) {
-            free(coap_response->content_type_ptr);
-            coap_response->content_type_ptr = NULL;
-        }
         if (coap_response->options_list_ptr) {
             if (coap_response->options_list_ptr->location_path_ptr) {
                 free(coap_response->options_list_ptr->location_path_ptr);
@@ -990,10 +746,6 @@ void Test_M2MObjectInstance::test_handle_post_request()
 
     CHECK( coap_response != NULL);
     if(coap_response) {
-        if(coap_response->content_type_ptr) {
-            free(coap_response->content_type_ptr);
-            coap_response->content_type_ptr = NULL;
-        }
         if (coap_response->options_list_ptr) {
             if (coap_response->options_list_ptr->location_path_ptr) {
                 free(coap_response->options_list_ptr->location_path_ptr);
@@ -1014,10 +766,6 @@ void Test_M2MObjectInstance::test_handle_post_request()
 
     CHECK( coap_response != NULL);
     if(coap_response) {
-        if(coap_response->content_type_ptr) {
-            free(coap_response->content_type_ptr);
-            coap_response->content_type_ptr = NULL;
-        }
         if (coap_response->options_list_ptr) {
             if (coap_response->options_list_ptr->location_path_ptr) {
                 free(coap_response->options_list_ptr->location_path_ptr);
@@ -1035,10 +783,6 @@ void Test_M2MObjectInstance::test_handle_post_request()
 
     CHECK( coap_response != NULL);
     if(coap_response) {
-        if(coap_response->content_type_ptr) {
-            free(coap_response->content_type_ptr);
-            coap_response->content_type_ptr = NULL;
-        }
         if (coap_response->options_list_ptr) {
             if (coap_response->options_list_ptr->location_path_ptr) {
                 free(coap_response->options_list_ptr->location_path_ptr);
@@ -1050,16 +794,12 @@ void Test_M2MObjectInstance::test_handle_post_request()
     }
 
 
-    *coap_header->content_type_ptr = 100;
+    coap_header->content_format = sn_coap_content_format_e(100);
 
     coap_response = object->handle_post_request(NULL,coap_header,handler,execute_value_updated);
 
     CHECK( coap_response != NULL);
     if(coap_response) {
-        if(coap_response->content_type_ptr) {
-            free(coap_response->content_type_ptr);
-            coap_response->content_type_ptr = NULL;
-        }
         if (coap_response->options_list_ptr) {
             if (coap_response->options_list_ptr->location_path_ptr) {
                 free(coap_response->options_list_ptr->location_path_ptr);
@@ -1077,10 +817,6 @@ void Test_M2MObjectInstance::test_handle_post_request()
 
     CHECK( coap_response != NULL);
     if(coap_response) {
-        if(coap_response->content_type_ptr) {
-            free(coap_response->content_type_ptr);
-            coap_response->content_type_ptr = NULL;
-        }
         if (coap_response->options_list_ptr) {
             if (coap_response->options_list_ptr->location_path_ptr) {
                 free(coap_response->options_list_ptr->location_path_ptr);
@@ -1098,10 +834,6 @@ void Test_M2MObjectInstance::test_handle_post_request()
 
     CHECK( coap_response != NULL);
     if(coap_response) {
-        if(coap_response->content_type_ptr) {
-            free(coap_response->content_type_ptr);
-            coap_response->content_type_ptr = NULL;
-        }
         if (coap_response->options_list_ptr) {
             if (coap_response->options_list_ptr->location_path_ptr) {
                 free(coap_response->options_list_ptr->location_path_ptr);
@@ -1116,10 +848,6 @@ void Test_M2MObjectInstance::test_handle_post_request()
 
     CHECK( coap_response != NULL);
     if(coap_response) {
-        if(coap_response->content_type_ptr) {
-            free(coap_response->content_type_ptr);
-            coap_response->content_type_ptr = NULL;
-        }
         if (coap_response->options_list_ptr) {
             if (coap_response->options_list_ptr->location_path_ptr) {
                 free(coap_response->options_list_ptr->location_path_ptr);
@@ -1130,7 +858,6 @@ void Test_M2MObjectInstance::test_handle_post_request()
         }
     }
 
-    free(coap_header->content_type_ptr);
     free(coap_header->options_list_ptr);
     free(coap_header->payload_ptr);
     free(common_stub::coap_header);

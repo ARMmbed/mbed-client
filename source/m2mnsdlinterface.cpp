@@ -382,7 +382,7 @@ uint8_t M2MNsdlInterface::send_to_server_callback(struct nsdl_s * /*nsdl_handle*
     return 1;
 }
 
-uint8_t M2MNsdlInterface::received_from_server_callback(struct nsdl_s * nsdl_handle,
+uint8_t M2MNsdlInterface::received_from_server_callback(struct nsdl_s *nsdl_handle,
                                                         sn_coap_hdr_s *coap_header,
                                                         sn_nsdl_addr_s *address)
 {
@@ -403,20 +403,14 @@ uint8_t M2MNsdlInterface::received_from_server_callback(struct nsdl_s * nsdl_han
                 _observer.client_registered(_server);
                 // If lifetime is less than zero then leave the field empty
                 if(coap_header->options_list_ptr) {
-                    if(coap_header->options_list_ptr->max_age_ptr) {
-                        memory_free(_endpoint->lifetime_ptr);
-                        _endpoint->lifetime_ptr = NULL;
-                        _endpoint->lifetime_len = 0;
+                    memory_free(_endpoint->lifetime_ptr);
+                    _endpoint->lifetime_ptr = NULL;
+                    _endpoint->lifetime_len = 0;
 
-                        uint32_t max_time = 0;
-                        for(int i=0;i < coap_header->options_list_ptr->max_age_len; i++) {
-                            max_time += (*(coap_header->options_list_ptr->max_age_ptr + i) & 0xff) <<
-                                     8*(coap_header->options_list_ptr->max_age_len- 1 - i);
-                            }
-                        // If lifetime is less than zero then leave the field empty
-                        if( max_time > 0) {
-                            set_endpoint_lifetime_buffer(max_time);
-                        }
+                    uint32_t max_time = coap_header->options_list_ptr->max_age;
+                    // If lifetime is less than zero then leave the field empty
+                    if( max_time > 0) {
+                        set_endpoint_lifetime_buffer(max_time);
                     }
                     if(coap_header->options_list_ptr->location_path_ptr) {
 
@@ -663,13 +657,14 @@ uint8_t M2MNsdlInterface::resource_callback(struct nsdl_s */*nsdl_handle*/,
             coap_response->payload_ptr = NULL;
         }
     }
-    sn_nsdl_release_allocated_coap_msg_mem(_nsdl_handle, coap_response);
-
+    // If the external blockwise storing is enabled call value updated once all the blocks have been received
     if (execute_value_updated &&
             coap_response &&
             coap_response->coap_status != COAP_STATUS_PARSER_BLOCKWISE_MSG_RECEIVING) {
         value_updated(base,base->uri_path());
     }
+    
+    sn_nsdl_release_allocated_coap_msg_mem(_nsdl_handle, coap_response);
     return result;
 }
 
@@ -1406,20 +1401,6 @@ void M2MNsdlInterface::send_resource_observation(M2MResource *resource,
     }
 }
 
-void M2MNsdlInterface::build_observation_number(uint8_t *obs_number,
-                                                uint8_t *obs_len,
-                                                uint16_t number)
-{
-    if(number > 0xFF) {
-        *obs_len = 2;
-        *(obs_number) = (number >> 8) & 0x00FF;
-        obs_number[1] = number & 0x00FF;
-    } else {
-        *obs_len = 1;
-        *(obs_number) = number & 0x00FF;
-    }
-}
-
 void M2MNsdlInterface::send_notification(uint8_t *token,
                                          uint8_t  token_length,
                                          uint8_t *value,
@@ -1438,11 +1419,8 @@ void M2MNsdlInterface::send_notification(uint8_t *token,
     if (notification_message_ptr) {
         memset(notification_message_ptr, 0, sizeof(sn_coap_hdr_s));
 
-        notification_message_ptr->options_list_ptr = (sn_coap_options_list_s *)memory_alloc(sizeof(sn_coap_options_list_s));
+        notification_message_ptr->options_list_ptr = sn_nsdl_alloc_options_list(_nsdl_handle, notification_message_ptr);
         if (notification_message_ptr->options_list_ptr) {
-
-            memset(notification_message_ptr->options_list_ptr , 0, sizeof(sn_coap_options_list_s));
-
             /* Fill header */
             notification_message_ptr->msg_type = COAP_MSG_TYPE_CONFIRMABLE;
             notification_message_ptr->msg_code = COAP_MSG_CODE_RESPONSE_CONTENT;
@@ -1460,22 +1438,11 @@ void M2MNsdlInterface::send_notification(uint8_t *token,
             notification_message_ptr->uri_path_ptr = (uint8_t *)uri_path.c_str();
 
             /* Fill observe */
-            uint8_t observation_number[2];
-            uint8_t observation_number_length = 0;
+            notification_message_ptr->options_list_ptr->observe = observation;
 
-            build_observation_number(observation_number,
-                                     &observation_number_length,
-                                     observation);
-            notification_message_ptr->options_list_ptr->observe_len = observation_number_length;
-            notification_message_ptr->options_list_ptr->observe_ptr = observation_number;
+            notification_message_ptr->options_list_ptr->max_age = max_age;
 
-            notification_message_ptr->options_list_ptr->max_age_ptr =
-                    m2m::String::convert_integer_to_array(max_age,
-                                                          notification_message_ptr->options_list_ptr->max_age_len);
-
-            notification_message_ptr->content_type_ptr =
-                    m2m::String::convert_integer_to_array(coap_content_type,
-                                                          notification_message_ptr->content_type_len);
+            notification_message_ptr->content_format = sn_coap_content_format_e(coap_content_type);
 
             /* Send message */
             sn_nsdl_send_coap_message(_nsdl_handle,
@@ -1485,16 +1452,8 @@ void M2MNsdlInterface::send_notification(uint8_t *token,
             /* Free memory */
             notification_message_ptr->uri_path_ptr = NULL;
             notification_message_ptr->payload_ptr = NULL;
-            notification_message_ptr->options_list_ptr->observe_ptr = NULL;
+            notification_message_ptr->options_list_ptr->observe = -1;
             notification_message_ptr->token_ptr = NULL;
-            if (notification_message_ptr->content_type_ptr) {
-                free(notification_message_ptr->content_type_ptr);
-            }
-            notification_message_ptr->content_type_ptr = NULL;
-            if (notification_message_ptr->options_list_ptr->max_age_ptr) {
-                free(notification_message_ptr->options_list_ptr->max_age_ptr);
-            }
-            notification_message_ptr->options_list_ptr->max_age_ptr = NULL;
         }
         sn_nsdl_release_allocated_coap_msg_mem(_nsdl_handle, notification_message_ptr);
     }
@@ -1559,9 +1518,8 @@ void M2MNsdlInterface::handle_bootstrap_put_message(sn_coap_hdr_s *coap_header,
             }
         }
 
-        if(coap_header->content_type_ptr) {
-            content_type = String::convert_array_to_integer(coap_header->content_type_ptr,
-                                                            coap_header->content_type_len);
+        if(coap_header->content_format != COAP_CT_NONE) {
+            content_type = coap_header->content_format;
         }
 
         tr_debug("M2MNsdlInterface::handle_bootstrap_message - content_type %d", content_type);

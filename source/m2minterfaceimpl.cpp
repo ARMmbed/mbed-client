@@ -111,6 +111,10 @@ void M2MInterfaceImpl::bootstrap(M2MSecurity *security)
 {
 #ifndef MBED_CLIENT_DISABLE_BOOTSTRAP_FEATURE
     tr_debug("M2MInterfaceImpl::bootstrap(M2MSecurity *security) - IN");
+    if(!security) {
+        _observer.error(M2MInterface::InvalidParameters);
+        return;
+    }
     // Transition to a new state based upon
     // the current state of the state machine
     M2MSecurityData* data = new M2MSecurityData();
@@ -155,6 +159,10 @@ void M2MInterfaceImpl::cancel_bootstrap()
 void M2MInterfaceImpl::register_object(M2MSecurity *security, const M2MObjectList &object_list)
 {
     tr_debug("M2MInterfaceImpl::register_object - IN");
+    if(!security) {
+        _observer.error(M2MInterface::InvalidParameters);
+        return;
+    }
     // Transition to a new state based upon
     // the current state of the state machine
     //TODO: manage register object in a list.
@@ -600,39 +608,41 @@ void M2MInterfaceImpl::state_bootstrap_address_resolved( EventData *data)
 {
 #ifndef MBED_CLIENT_DISABLE_BOOTSTRAP_FEATURE
     tr_debug("M2MInterfaceImpl::state_bootstrap_address_resolved");
-    ResolvedAddressData *event = static_cast<ResolvedAddressData *> (data);
-    sn_nsdl_addr_s address;
+    if (data) {
+        ResolvedAddressData *event = static_cast<ResolvedAddressData *> (data);
+        sn_nsdl_addr_s address;
 
-    M2MInterface::NetworkStack stack = event->_address->_stack;
+        M2MInterface::NetworkStack stack = event->_address->_stack;
 
-    if(M2MInterface::LwIP_IPv4 == stack) {
-        tr_debug("M2MInterfaceImpl::state_bootstrap_address_resolved : IPv4 address");
-        address.type = SN_NSDL_ADDRESS_TYPE_IPV4;
-    } else if((M2MInterface::LwIP_IPv6 == stack) ||
-              (M2MInterface::Nanostack_IPv6 == stack)) {
-        tr_debug("M2MInterfaceImpl::state_bootstrap_address_resolved : IPv6 address");
-        address.type = SN_NSDL_ADDRESS_TYPE_IPV6;
-    }
-    address.port = event->_port;
-    address.addr_ptr = (uint8_t*)event->_address->_address;
-    address.addr_len = event->_address->_length;
-    _connection_handler->start_listening_for_data();
+        if(M2MInterface::LwIP_IPv4 == stack) {
+            tr_debug("M2MInterfaceImpl::state_bootstrap_address_resolved : IPv4 address");
+            address.type = SN_NSDL_ADDRESS_TYPE_IPV4;
+        } else if((M2MInterface::LwIP_IPv6 == stack) ||
+                  (M2MInterface::Nanostack_IPv6 == stack)) {
+            tr_debug("M2MInterfaceImpl::state_bootstrap_address_resolved : IPv6 address");
+            address.type = SN_NSDL_ADDRESS_TYPE_IPV6;
+        }
+        address.port = event->_port;
+        address.addr_ptr = (uint8_t*)event->_address->_address;
+        address.addr_len = event->_address->_length;
+        _connection_handler->start_listening_for_data();
 
-    // Include domain id to be part of endpoint name
-    String new_ep_name;
-    new_ep_name += _nsdl_interface->endpoint_name();
-    if (!_domain.empty()) {
-        new_ep_name += '@';
-        new_ep_name += _domain;
-    }
-    if(_nsdl_interface->create_bootstrap_resource(&address, new_ep_name)) {
-       tr_debug("M2MInterfaceImpl::state_bootstrap_address_resolved : create_bootstrap_resource - success");
-       internal_event(STATE_BOOTSTRAP_RESOURCE_CREATED);
-    } else{
-        // If resource creation fails then inform error to application
-        tr_error("M2MInterfaceImpl::state_bootstrap_address_resolved : M2MInterface::InvalidParameters");
-        internal_event(STATE_IDLE);
-        _observer.error(M2MInterface::InvalidParameters);
+        // Include domain id to be part of endpoint name
+        String new_ep_name;
+        new_ep_name += _nsdl_interface->endpoint_name();
+        if (!_domain.empty()) {
+            new_ep_name += '@';
+            new_ep_name += _domain;
+        }
+        if(_nsdl_interface->create_bootstrap_resource(&address, new_ep_name)) {
+           tr_debug("M2MInterfaceImpl::state_bootstrap_address_resolved : create_bootstrap_resource - success");
+           internal_event(STATE_BOOTSTRAP_RESOURCE_CREATED);
+        } else{
+            // If resource creation fails then inform error to application
+            tr_error("M2MInterfaceImpl::state_bootstrap_address_resolved : M2MInterface::InvalidParameters");
+            internal_event(STATE_IDLE);
+            _observer.error(M2MInterface::InvalidParameters);
+        }
     }
 #endif //MBED_CLIENT_DISABLE_BOOTSTRAP_FEATURE
 }
