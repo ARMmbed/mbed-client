@@ -36,6 +36,11 @@ TEST(M2MString, Create)
     CHECK(m2m_string != NULL);
 }
 
+TEST(M2MString, string_and_len_constructor)
+{
+    m2m_string->test_string_and_len_constructor();
+}
+
 TEST(M2MString, copy_constructor)
 {
     m2m_string->test_copy_constructor();
