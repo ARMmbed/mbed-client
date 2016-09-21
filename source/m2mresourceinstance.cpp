@@ -47,12 +47,13 @@ M2MResourceInstance::M2MResourceInstance(const M2MResourceInstance& other)
   _value(NULL),
   _value_length(0),
   _resource_callback(NULL),
-  _object_name(other._object_name),
+  _object_name(NULL),
   _function_pointer(NULL),
   _object_instance_id(other._object_instance_id),
   _resource_type(M2MResourceInstance::STRING),
   _block_message_data(NULL)
 {
+    _object_name = M2MBase::stringdup(other._object_name);
     this->operator=(other);
 }
 
@@ -68,13 +69,13 @@ M2MResourceInstance::M2MResourceInstance(const String &res_name,
  _execute_callback(NULL),
  _value(NULL),
  _value_length(0),
- _resource_callback(NULL),
- _object_name(object_name),
+ _resource_callback(NULL), 
  _function_pointer(NULL),
  _object_instance_id(object_instance_id),
  _resource_type(type),
  _block_message_data(NULL)
 {
+    _object_name = M2MBase::stringdup(object_name.c_str());
     M2MBase::set_resource_type(resource_type);
     M2MBase::set_base_type(M2MBase::ResourceInstance);
 }
@@ -93,13 +94,13 @@ M2MResourceInstance::M2MResourceInstance(const String &res_name,
  _execute_callback(NULL),
  _value(NULL),
  _value_length(0),
- _resource_callback(NULL),
- _object_name(object_name),
+ _resource_callback(NULL), 
  _function_pointer(NULL),
  _object_instance_id(object_instance_id),
  _resource_type(type),
  _block_message_data(NULL)
 {
+    _object_name = M2MBase::stringdup(object_name.c_str());
     M2MBase::set_resource_type(resource_type);
     M2MBase::set_base_type(M2MBase::Resource);
     if( value != NULL && value_length > 0 ) {
@@ -114,6 +115,7 @@ M2MResourceInstance::~M2MResourceInstance()
 {
     free(_value);
     delete _function_pointer;
+	free (_object_name); 
     delete _block_message_data;
 }
 
@@ -511,10 +513,16 @@ void M2MResourceInstance::set_resource_observer(M2MResourceCallback *resource)
     _resource_callback = resource;
 }
 
-const String& M2MResourceInstance::object_name() const
+String M2MResourceInstance::object_name() const
 {
-    return _object_name;
+    if(_object_name!=NULL) {
+        return String ((const char*)_object_name);
+        }
+    else {
+        return String("");
+    }
 }
+
 
 uint16_t M2MResourceInstance::object_instance_id() const
 {

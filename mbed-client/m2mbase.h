@@ -40,6 +40,9 @@ class M2MReportHandler;
  *  This class is the base class based on which all LWM2M object models
  *  can be created. This serves base class for Object, ObjectInstances and Resources.
  */
+
+
+
 class M2MBase : public M2MReportObserver {
 
 public:
@@ -120,7 +123,7 @@ protected:
      * \param name Name of the object
      * \param id ID of the object
      */
-    M2MBase(const String &name,
+    M2MBase(const String name,
             M2MBase::Mode mode);
 public:
 
@@ -225,7 +228,7 @@ public:
      * \brief Returns the object name.
      * \return Name of the object.
      */
-    virtual const String &name() const;
+    String name() const;
 
     /**
      * \brief Returns the object name in integer.
@@ -240,16 +243,16 @@ public:
     virtual uint16_t instance_id() const;
 
     /**
-     * \brief Returns the interface description of the object.
+     * \brief Returns a copy of the interface description object.
      * \return Description of the object.
      */
-    virtual const String& interface_description() const;
+    String interface_description() const;
 
     /**
-     * \brief Returns the resource type of the object.
+     * \brief Returns a copy of the resource type object.
      * \return Resource type of the object.
      */
-    virtual const String& resource_type() const;
+     String resource_type() const;
 
     /**
      * \brief Returns the CoAP content type of the object.
@@ -362,10 +365,10 @@ public:
     virtual void set_uri_path(const String &path);
 
     /**
-     * \brief Returns the URI path of the object.
+     * \brief Returns a copy of the URI path object.
      * \return URI path of the object.
      */
-    virtual const String &uri_path() const;
+     String uri_path() const;
 
     /**
      * @brief Returns whether this resource is under observation or not.
@@ -450,6 +453,7 @@ protected:
     */
     virtual uint8_t* alloc_copy(const uint8_t* source, uint32_t size);
 
+    char* stringdup(const char* s);
     /**
      * \brief Returns the Report Handler object.
      * \return M2MReportHandler object.
@@ -468,27 +472,27 @@ private:
 
 private:
 
-    M2MReportHandler           *_report_handler;
-    M2MObservationHandler      *_observation_handler;
-    String                      _name;
-    String                      _resource_type;
-    String                      _interface_description;
-    String                      _uri_path;
-    int32_t                     _name_id;
-    uint32_t                    _max_age;
-    uint16_t                    _instance_id;
-    uint16_t                    _observation_number;
-    uint8_t                     *_token;
+    bool                        _observable;
+    bool                        _register_uri;
+    bool                        _is_under_observation;
     uint8_t                     _token_length;
     uint8_t                     _coap_content_type;
+    uint16_t                    _observation_number;
+    uint16_t                    _instance_id;
+    int32_t                     _name_id;
+    uint32_t                    _max_age;
     M2MBase::Operation          _operation;
     M2MBase::Mode               _mode;
     M2MBase::BaseType           _base_type;
     M2MBase::Observation        _observation_level;
-    bool                        _observable;
-    bool                        _register_uri;
-    bool                        _is_under_observation;
     value_updated_callback      _value_updated_callback;
+    M2MReportHandler            *_report_handler;
+    M2MObservationHandler       *_observation_handler;
+    char                        *_resource_type;
+    char                        *_uri_path;
+    char                        *_interface_description;
+    char                        * _name;
+    uint8_t                     *_token;
     FP1<void, const char*>      *_function_pointer;
 
 friend class Test_M2MBase;
