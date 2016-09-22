@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 #include "mbed-client/m2mblockmessage.h"
+#include "mbed-client/m2mconfig.h"
 #include <stdlib.h>
 #include <string.h>
 
@@ -47,13 +48,7 @@ void M2MBlockMessage::set_message_info(sn_coap_hdr_s *coap_header)
         }
 
         // Default value in coap library is 65kb
-        uint32_t max_size = UINT16_MAX;
-        #if YOTTA_CFG_COAP_MAX_INCOMING_BLOCK_MESSAGE_SIZE
-            max_size = YOTTA_CFG_COAP_MAX_INCOMING_BLOCK_MESSAGE_SIZE;
-        #endif
-        #if MBED_CONF_MBED_CLIENT_SN_COAP_MAX_INCOMING_MESSAGE_SIZE
-            max_size = MBED_CONF_MBED_CLIENT_SN_COAP_MAX_INCOMING_MESSAGE_SIZE;
-        #endif
+        uint32_t max_size = SN_COAP_MAX_INCOMING_MESSAGE_SIZE;
         if (_total_message_size > max_size) {
             _error_code = M2MBlockMessage::EntityTooLarge;
         } else {

@@ -37,7 +37,7 @@ friend class M2MNsdlInterface;
 public:
 
     /**
-     * \brief Enum defining all resources associated with
+     * \brief Am enum defining all resources associated with
      * a Server Object in the LWM2M framework.
      */
     typedef enum {
@@ -78,7 +78,7 @@ public:
      * \param resource With this function, a value can be set to the following resources:
      *  'ShortServerID','Lifetime','DefaultMinPeriod','DefaultMaxPeriod','DisableTimeout',
      *  'NotificationStorage'.
-     * \param value The value to be set on the resource, in Integer format.
+     * \param value The value to be set on the resource, in integer format.
      * \return M2MResource if created successfully, else NULL.
      */
     M2MResource* create_resource(ServerResource resource, uint32_t value);
@@ -100,27 +100,27 @@ public:
     bool delete_resource(ServerResource rescource);
 
     /**
-     * \brief Sets the value of the given resource enum.
+     * \brief Sets the value of a given resource enum.
      * \param resource With this function, a value can be set on the following resources: 
      * 'Binding'.
-     * \param value The value to be set on the resource, in String format.
+     * \param value The value to be set on the resource, in string format.
      * \return True if successfully set, else false.
      */
     bool set_resource_value(ServerResource resource,
                             const String &value);
 
     /**
-     * \brief Sets the value of the given resource enum.
+     * \brief Sets the value of a given resource enum.
      * \param resource With this function, a value can be set to the following resources:
      *  'ShortServerID','Lifetime','DefaultMinPeriod','DefaultMaxPeriod','DisableTimeout',
      *  'NotificationStorage'.
-     * \param value The value to be set on the resource, in Integer format.
-     * \return True if successfully set else false.
+     * \param value The value to be set on the resource, in integer format.
+     * \return True if successfully set, else false.
      */
     bool set_resource_value(ServerResource resource,
                             uint32_t value);
     /**
-     * \brief Returns the value of the given resource enum, in String.
+     * \brief Returns the value of the given resource enum, in string format.
      * \param resource With this function, the following resources can return a value:
      * 'Binding'.
      * \return The value associated with the resource. If the resource is not valid an empty string is returned.
@@ -128,7 +128,7 @@ public:
     String resource_value_string(ServerResource resource) const;
 
     /**
-     * \brief Returns the value of the given resource name, in Integer.
+     * \brief Returns the value of a given resource name, in integer format.
      * \param resource With this function, the following resources can return a value:
      *  'ShortServerID','Lifetime','DefaultMinPeriod','DefaultMaxPeriod','DisableTimeout',
      *  'NotificationStorage'

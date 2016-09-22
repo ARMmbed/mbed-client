@@ -7,9 +7,11 @@
         "tcp-keepalive-time": 300,
         "disable-bootstrap-feature": null,
         "coap-disable-obs-feature":null,
+        "reconnection-loop": 1,
         "sn-coap-max-blockwise-payload-size" : 0,
-        "sn-coap-duplication-max-msgs-count": 0,
+        "sn-coap-duplication-max-msgs-count": null,
         "sn-coap-max-incoming-message-size": null,
-        "reconnection-loop": 1
-     }
- }
+        "sn-coap-resending-queue-size-msgs": null,
+        "sn-coap-resending-queue-size-bytes": null
+    }
+}
