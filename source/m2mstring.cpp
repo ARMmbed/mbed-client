@@ -61,6 +61,16 @@ String::String(const char* s)
 {
 }
 
+String::String(const char* str, size_t n)
+{
+    p = static_cast<char*>(malloc(n + 1));
+
+    allocated_ = n + 1;
+    size_      = n;
+    memcpy(p, str, n);
+    p[n] = 0;
+}
+
 String& String::operator=(const char* s)
 {
     if ( p != s ) {
