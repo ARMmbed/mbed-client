@@ -135,6 +135,20 @@ public:
     virtual void update_registration(M2MSecurity *security_object, const uint32_t lifetime = 0) = 0;
 
     /**
+     * \brief Updates or refreshes the client's registration on the LWM2M
+     * server. Use this function to publish new objects to LWM2M server.
+     * \param security_object The security object from which the device object
+     * needs to update the registration. If there is only one LWM2M server registered,
+     * this parameter can be NULL.
+     * \param object_list Objects that contain information about the
+     * client attempting to register to the LWM2M server.
+     * \param lifetime The lifetime of the endpoint client in seconds. If the same value
+     * has to be passed, set the default value to 0.
+     */
+    virtual void update_registration(M2MSecurity *security_object, const M2MObjectList &object_list,
+                                     const uint32_t lifetime = 0) = 0;
+
+    /**
      * \brief Unregisters the registered object from the LWM2M server.
      * \param security_object The security object from which the device object
      * needs to be unregistered. If there is only one LWM2M server registered,
