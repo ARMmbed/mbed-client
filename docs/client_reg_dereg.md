@@ -114,6 +114,12 @@ To update your registration:
 M2MInterface::update_registration(M2MSecurity* security_object, const uint32_t lifetime)
 ```
 
+To update your registration and publish newly created objects to mbed Device Server:
+
+```
+M2MInterface::update_registration(M2MSecurity *security_object, const M2MObjectList &object_list, const uint32_t lifetime);
+```
+
 **Success or failure callback**
 
 _Success_

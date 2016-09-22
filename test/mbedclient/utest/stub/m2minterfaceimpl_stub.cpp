@@ -62,6 +62,11 @@ void M2MInterfaceImpl::register_object(M2MSecurity *, const M2MObjectList &)
 void M2MInterfaceImpl::update_registration(M2MSecurity *, const uint32_t)
 {
 }
+void M2MInterfaceImpl::update_registration(M2MSecurity *,
+                                           const M2MObjectList &,
+                                           const uint32_t)
+{
+}
 
 void M2MInterfaceImpl::unregister_object(M2MSecurity*)
 {

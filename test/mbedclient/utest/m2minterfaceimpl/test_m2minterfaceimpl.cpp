@@ -125,6 +125,10 @@ void Test_M2MInterfaceImpl::test_bootstrap()
     m2mnsdlinterface_stub::bool_value = true;
     m2mconnectionhandler_stub::bool_value = true;
 
+
+    impl->bootstrap(NULL);
+    CHECK(impl->_current_state == M2MInterfaceImpl::STATE_IDLE);
+
     impl->bootstrap(sec);
 
     CHECK(impl->_current_state == M2MInterfaceImpl::STATE_BOOTSTRAP);
@@ -230,6 +234,10 @@ void Test_M2MInterfaceImpl::test_register_object()
     m2msecurity_stub::string_value = val;
     m2mnsdlinterface_stub::bool_value = true;
     m2mconnectionhandler_stub::bool_value = true;
+
+    impl->register_object(NULL,list);
+    CHECK(impl->_current_state == M2MInterfaceImpl::STATE_IDLE);
+
     impl->register_object(sec,list);
     CHECK(impl->_current_state == M2MInterfaceImpl::STATE_REGISTER);
 
@@ -413,6 +421,29 @@ void Test_M2MInterfaceImpl::test_update_registration()
     impl->_update_register_ongoing = true;
     impl->update_registration(NULL,120);
     CHECK(observer->error_occured == true);
+
+
+    M2MObject *object = new M2MObject("test");
+    M2MObjectInstance *ins = object->create_object_instance();
+    ins->create_dynamic_resource("test","type",M2MResourceInstance::STRING,false,false);
+
+    M2MObjectList list;
+    list.push_back(object);
+    impl->_update_register_ongoing = false;
+    impl->_current_state = M2MInterfaceImpl::STATE_REGISTERED;
+    m2mnsdlinterface_stub::bool_value = false;
+    impl->update_registration(NULL, list);
+
+    CHECK(impl->_current_state == M2MInterfaceImpl::STATE_UPDATE_REGISTRATION);
+    list.clear();
+
+    impl->_current_state = M2MInterfaceImpl::STATE_REGISTERED;
+    impl->_update_register_ongoing = false;
+    m2mnsdlinterface_stub::bool_value = false;
+    impl->update_registration(NULL, list);
+
+    CHECK(impl->_current_state == M2MInterfaceImpl::STATE_UPDATE_REGISTRATION);
+    delete object;
 
 }
 

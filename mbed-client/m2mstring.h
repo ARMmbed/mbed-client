@@ -42,6 +42,7 @@ namespace m2m
     ~String();
     String(const String&);
     String(const char*);
+    String(const char*, size_t);
 
     String& operator=(const char*);
     String& operator=(const String&);
