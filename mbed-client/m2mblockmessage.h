@@ -21,15 +21,15 @@
 
 /**
  *  \brief M2MBlockMessage.
- *  This class contains the data of incoming block message.
+ *  This class contains the data of an incoming block message.
  */
 class M2MBlockMessage {
 
 public:
 
     /**
-     * \brief Enum defining different kinds of errors
-     * that can occur during block-wise operation.
+     * \brief An enum defining different kinds of errors
+     * that can occur during the block-wise operation.
      */
     typedef enum {
         ErrorNone = 0,
@@ -47,8 +47,8 @@ public:
     virtual ~M2MBlockMessage();
 
     /**
-     * \brief Store the data from coap message.
-     * \param coap_header Message to parse.
+     * \brief Store the data from a CoAP message.
+     * \param coap_header The message to parse.
      */
     void set_message_info(sn_coap_hdr_s *coap_header);
 
@@ -58,44 +58,44 @@ public:
     void clear_values();
 
     /**
-     * \brief Check if the message is block message.
-     * \param coap_header Message to check.
-     * \return True if block message else false.
+     * \brief Check if the message is a block message.
+     * \param coap_header The message to check.
+     * \return True if block message, else false.
      */
     bool is_block_message() const;
 
     /**
-     * \brief Returns number of incoming block.
+     * \brief Returns the number of an incoming block.
      * \return Block number, starting from 0.
      */
     uint16_t block_number() const;
 
     /**
-     * \brief Returns total size of the message.
-     * \return Total size in bytes.
+     * \brief Returns the total size of the message.
+     * \return The total size in bytes.
      */
     uint32_t total_message_size() const;
 
     /**
      * \brief Check if last block.
-     * \return True if last block else false.
+     * \return True if last block, else false.
      */
     bool is_last_block() const;
 
     /**
-     * \brief Returns payload of the message.
-     * \return Payload
+     * \brief Returns the payload of the message.
+     * \return The message payload.
      */
     uint8_t* block_data() const;
 
     /**
-     * \brief Returns length of the payload.
-     * \return Payload length.
+     * \brief Returns the length of the payload.
+     * \return The payload length.
      */
     uint32_t block_data_len() const;
 
     /**
-     * \brief Returns error code.
+     * \brief Returns an error code.
      * \return Error code.
      */
     Error error_code() const;

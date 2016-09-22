@@ -25,14 +25,14 @@ class Test_M2MString;
 namespace m2m
 {
 
-  /** \brief Simple C++ string class, used as replacement for
+  /** \brief A simple C++ string class, used as replacement for
    std::string.
    */
   class String
   {
-    char* p;           ///< The data
-    size_t allocated_;  ///< The allocated memory size (including trailing NULL)
-    size_t size_;       ///< The currently used memory size (excluding trailing NULL)
+    char* p;           ///< The data.
+    size_t allocated_;  ///< The allocated memory size (including trailing NULL).
+    size_t size_;       ///< The currently used memory size (excluding trailing NULL).
 
   public:
     typedef size_t size_type;
@@ -55,7 +55,7 @@ namespace m2m
     bool operator==(const char*) const;
     bool operator==(const String&) const;
 
-    void clear();       // set string to empty string (memory remains reserved)
+    void clear();       // Set the string to empty (memory remains reserved).
 
     size_type size()   const   { return size_; }   ///< size without terminating NULL
     size_type length() const   { return size_; }   ///< as size()
@@ -68,20 +68,20 @@ namespace m2m
 
     /** Reserve internal string memory so that n characters can be put into the
         string (plus 1 for the NULL char). If there is already enough memory,
-        nothing happens, if not, the memory will be realloated to exactly this
+        nothing happens, if not, the memory is realloated to exactly this
         amount.
         */
     void reserve( size_type n);
 
-    /** Resize string. If n is less than the current size, the string will be truncated.
-        If n is larger, the memory will be reallocated to exactly this amount, and
-        the additional characters will be NULL characters.
+    /** Resize string. If n is less than the current size, the string is truncated.
+        If n is larger, the memory is reallocated to exactly this amount, and
+        the additional characters are NULL characters.
         */
     void resize( size_type n);
 
-    /** Resize string. If n is less than the current size, the string will be truncated.
-        If n is larger, the memory will be reallocated to exactly this amount, and
-        the additional characters will be c characters.
+    /** Resize string. If n is less than the current size, the string is truncated.
+        If n is larger, the memory is reallocated to exactly this amount, and
+        the additional characters are c characters.
         */
     void resize( size_type n, char c);
 
