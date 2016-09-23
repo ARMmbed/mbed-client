@@ -297,7 +297,8 @@ bool M2MNsdlInterface::send_update_registration(const uint32_t lifetime)
     }
     tr_debug("M2MNsdlInterface::send_update_registration( lifetime %" PRIu32 ")", lifetime);
     bool success = false;
-
+    create_nsdl_list_structure(_object_list);
+    
     //If Lifetime value is 0, then don't change the existing lifetime value
     if(lifetime != 0) {
         if(_endpoint->lifetime_ptr) {
