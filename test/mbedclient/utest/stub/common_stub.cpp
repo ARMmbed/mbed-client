@@ -166,10 +166,6 @@ int8_t sn_nsdl_set_retransmission_parameters(struct nsdl_s *, uint8_t, uint8_t)
 void sn_nsdl_release_allocated_coap_msg_mem(struct nsdl_s *, sn_coap_hdr_s *header)
 {
     if(header && header != common_stub::coap_header){
-        if( header->content_type_ptr ){
-            free(header->content_type_ptr);
-            header->content_type_ptr = NULL;
-        }
         if( header->options_list_ptr){
             free(header->options_list_ptr);
             header->options_list_ptr = NULL;
@@ -177,6 +173,14 @@ void sn_nsdl_release_allocated_coap_msg_mem(struct nsdl_s *, sn_coap_hdr_s *head
         free(header);
         header = NULL;
     }
+}
+
+sn_coap_options_list_s *sn_nsdl_alloc_options_list(struct nsdl_s *handle, sn_coap_hdr_s *coap_msg_ptr)
+{
+    if( common_stub::coap_header ) {
+        return common_stub::coap_header->options_list_ptr;
+    }
+    return NULL;
 }
 
 int8_t sn_nsdl_create_resource(struct nsdl_s *, sn_nsdl_resource_info_s *)
@@ -199,7 +203,7 @@ int8_t sn_nsdl_update_resource(struct nsdl_s *, sn_nsdl_resource_info_s *)
     return common_stub::int_value;
 }
 
-int8_t set_NSP_address(struct nsdl_s *, uint8_t *, uint16_t, sn_nsdl_addr_type_e)
+int8_t set_NSP_address_2(struct nsdl_s *, uint8_t *, uint8_t, uint16_t, sn_nsdl_addr_type_e)
 {
     return common_stub::int_value;
 }

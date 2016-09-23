@@ -42,7 +42,7 @@ class M2MResource : public M2MResourceInstance, M2MResourceCallback {
 public:
     class M2MExecuteParameter;
 
-private: // Constructor and destructor are private
+private: // Constructor and destructor are private,
          // which means that these objects can be created or
          // deleted only through a function provided by the M2MObjectInstance.
 
@@ -53,8 +53,8 @@ private: // Constructor and destructor are private
      * \param type The resource data type of the object.
      * \param value The value pointer of the object.
      * \param value_length The length of the value pointer.
-     * \param object_instance_id Object instance id where resource exists.
-     * \param object_name Object name where resource exists.
+     * \param object_instance_id The instance ID of the object where the resource exists.
+     * \param object_name The name of the object where the resource exists.
      * \param multiple_instance True if the resource supports instances.
      */
     M2MResource(M2MObjectInstanceCallback &object_instance_callback,
@@ -73,8 +73,8 @@ private: // Constructor and destructor are private
      * \param resource_type The resource type of the object.
      * \param type The resource data type of the object.
      * \param observable Indicates whether the resource is observable or not.
-     * \param object_instance_id Object instance id where resource exists.
-     * \param object_name Object name where resource exists.
+     * \param object_instance_id The ID of the object instance where the resource exists.
+     * \param object_name The name of the object where the resource exists.
      * \param multiple_instance True if the resource supports instances.
      */
     M2MResource(M2MObjectInstanceCallback &object_instance_callback,
@@ -86,13 +86,13 @@ private: // Constructor and destructor are private
                 const String &object_name = "",
                 bool multiple_instance = false);
 
-    // Prevents the use of default constructor.
+    // Prevents the use of a default constructor.
     M2MResource();
 
-    // Prevents the use of assignment operator.
+    // Prevents the use of an assignment operator.
     M2MResource& operator=( const M2MResource& /*other*/ );
 
-    // Prevents the use of copy constructor
+    // Prevents the use of a copy constructor
     M2MResource( const M2MResource& /*other*/ );
 
     /**
@@ -103,7 +103,7 @@ private: // Constructor and destructor are private
 public:
 
     /**
-     * \brief Adds resource instances to the M2MResource.
+     * \brief Adds resource instances to a M2MResource.
      * \param resource_instance The resource instance to be added.
      */
     void add_resource_instance(M2MResourceInstance *resource_instance);
@@ -117,7 +117,7 @@ public:
     bool supports_multiple_instances() const;
 
     /**
-     * \brief Sets whether the resource should send a delayed response for POST request.
+     * \brief Sets whether the resource should send a delayed response for a POST request.
      * \param delayed_response A boolean value to set the delayed response.
      */
     void set_delayed_response(bool delayed_response);
@@ -126,7 +126,7 @@ public:
      * \brief A trigger to send the delayed response for the POST request.
      * The delayed_response flag must be set before receiving the POST request
      * and the value of the resource must be updated before calling this function.
-     * \return True if response is sent, else false.
+     * \return True if a response is sent, else false.
      */
     bool send_delayed_post_response();
 
@@ -138,7 +138,7 @@ public:
     void get_delayed_token(uint8_t *&token, uint8_t &token_length);
 
     /**
-     * \brief Removes the resource with the given name.
+     * \brief Removes a resource with a given name.
      * \param name The name of the resource to be removed.
      * \param instance_id The instance ID of the resource to be removed, default is 0.
      * \return True if removed, else false.
@@ -146,7 +146,7 @@ public:
     virtual bool remove_resource_instance(uint16_t instance_id = 0);
 
     /**
-     * \brief Returns the resource instance with the given name.
+     * \brief Returns a resource instance with a given name.
      * \param instance_id The instance ID of the requested resource, default is 0
      * \return M2MResourceInstance object if found, else NULL.
      */
@@ -179,21 +179,21 @@ public:
 
     /**
      * \brief Adds the observation level for the object.
-     * \param observation_level The öevel of observation.
+     * \param observation_level The level of observation.
      */
     virtual void add_observation_level(M2MBase::Observation observation_level);
 
     /**
-     * \brief Removes the observation level from the object.
+     * \brief Removes the observation level from an object.
      * \param observation_level The level of observation.
      */
     virtual void remove_observation_level(M2MBase::Observation observation_level);
 
     /**
-     * \brief Handles the GET request for the registered objects.
-     * \param nsdl The NSDL handler for the CoAP library.
+     * \brief Handles the GET request for registered objects.
+     * \param nsdl An NSDL handler for the CoAP library.
      * \param received_coap_header The CoAP message received from the server.
-     * \param observation_handler The handler object for sending
+     * \param observation_handler A handler object for sending
      * observation callbacks.
      * \return sn_coap_hdr_s The message that needs to be sent to the server.
      */
@@ -201,12 +201,12 @@ public:
                                               sn_coap_hdr_s *received_coap_header,
                                               M2MObservationHandler *observation_handler = NULL);
     /**
-     * \brief Handles the PUT request for the registered objects.
-     * \param nsdl The NSDL handler for the CoAP library.
+     * \brief Handles the PUT request for registered objects.
+     * \param nsdl An NSDL handler for the CoAP library.
      * \param received_coap_header The CoAP message received from the server.
-     * \param observation_handler The handler object for sending
+     * \param observation_handler A handler object for sending
      * observation callbacks.
-     * \param execute_value_updated True will execute the "value_updated" callback.
+     * \param execute_value_updated True executes the "value_updated" callback.
      * \return sn_coap_hdr_s The message that needs to be sent to the server.
      */
     virtual sn_coap_hdr_s* handle_put_request(nsdl_s *nsdl,
@@ -214,18 +214,19 @@ public:
                                               M2MObservationHandler *observation_handler,
                                               bool &execute_value_updated);
     /**
-     * \brief Handles the POST request for the registered objects.
-     * \param nsdl The NSDL handler for the CoAP library.
+     * \brief Handles the POST request for registered objects.
+     * \param nsdl An NSDL handler for the CoAP library.
      * \param received_coap_header The CoAP message received from the server.
-     * \param observation_handler The handler object for sending
+     * \param observation_handler A handler object for sending
      * observation callbacks.
-     * \param execute_value_updated True will execute the "value_updated" callback.
+     * \param execute_value_updated True executes the "value_updated" callback.
      * \return sn_coap_hdr_s The message that needs to be sent to the server.
      */
     virtual sn_coap_hdr_s* handle_post_request(nsdl_s *nsdl,
                                                sn_coap_hdr_s *received_coap_header,
                                                M2MObservationHandler *observation_handler,
-                                               bool &execute_value_updated);
+                                               bool &execute_value_updated,
+                                               sn_nsdl_addr_s *address = NULL);
 
 protected:
     virtual void notification_update();
@@ -272,7 +273,7 @@ private:
 public:
 
     /**
-     * \brief Returns the value of the argument.
+     * \brief Returns the value of an argument.
      * \return uint8_t * The argument value.
      */
     uint8_t *get_argument_value() const;
@@ -284,7 +285,7 @@ public:
     uint16_t get_argument_value_length() const;
 
     /**
-     * \brief Returns the object name where resource exists.
+     * \brief Returns the name of the object where the resource exists.
      * \return Object name.
     */
     const String& get_argument_object_name() const;
@@ -296,8 +297,8 @@ public:
     const String& get_argument_resource_name() const;
 
     /**
-     * \brief Returns the object instance id where resource exists.
-     * \return Object instance id.
+     * \brief Returns the instance ID of the object where the resource exists.
+     * \return Object instance ID.
     */
     uint16_t get_argument_object_instance_id() const;
 

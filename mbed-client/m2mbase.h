@@ -27,6 +27,9 @@ struct sn_coap_hdr_;
 typedef sn_coap_hdr_ sn_coap_hdr_s;
 struct nsdl_s;
 
+struct sn_nsdl_addr_;
+typedef sn_nsdl_addr_ sn_nsdl_addr_s;
+
 typedef FP1<void, const char*> value_updated_callback;
 typedef void(*value_updated_callback2) (const char* object_name);
 class M2MObservationHandler;
@@ -37,9 +40,6 @@ class M2MReportHandler;
  *  This class is the base class based on which all LWM2M object models
  *  can be created. This serves base class for Object, ObjectInstances and Resources.
  */
-
-
-
 class M2MBase : public M2MReportObserver {
 
 public:
@@ -116,9 +116,9 @@ protected:
 
     /**
      * \brief Constructor
-     * \param baseType Type of the object created
-     * \param name Name of the object
-     * \param id ID of the object
+     * \param baseType The type of the object created.
+     * \param name The name of the object.
+     * \param id The ID of the object.
      */
     M2MBase(const String &name,
             M2MBase::Mode mode);
@@ -131,51 +131,51 @@ public:
 
     /**
      * \brief Sets the operation type for an object.
-     * \param operation Operation to be set.
+     * \param operation The operation to be set.
      */
     virtual void set_operation(M2MBase::Operation operation);
 
     /**
      * \brief Sets the interface description of the object.
-     * \param description Description to be set.
+     * \param description The description to be set.
      */
     virtual void set_interface_description(const String &description);
 
     /**
      * \brief Sets the resource type of the object.
-     * \param resource_type Resource type to be set.
+     * \param resource_type The resource type to be set.
      */
     virtual void set_resource_type(const String &resource_type);
 
     /**
      * \brief Sets the CoAP content type of the object.
-     * \param content_type Content Type to be set based on
+     * \param content_type The content type to be set based on
      * CoAP specifications.
      */
     virtual void set_coap_content_type(const uint8_t content_type);
 
     /**
      * \brief Sets the observable mode for the object.
-     * \param observable Value for the observation.
+     * \param observable A value for the observation.
      */
     virtual void set_observable(bool observable);
 
     /**
      * \brief Adds the observation level for the object.
-     * \param observation_level Level of the observation.
+     * \param observation_level The level of observation.
      */
     virtual void add_observation_level(M2MBase::Observation observation_level);
 
     /**
      * \brief Removes the observation level for the object.
-     * \param observation_level Level of the observation.
+     * \param observation_level The level of observation.
      */
     virtual void remove_observation_level(M2MBase::Observation observation_level);
 
     /**
      * \brief Sets the object under observation.
-     * \param observed Value for the observation. When true, starts observing. When false, ongoing observation is cancelled.
-     * \param handler Handler object for sending
+     * \param observed The value for observation. When true, starts observing. When false, the ongoing observation is cancelled.
+     * \param handler A handler object for sending
      * observation callbacks.
      */
     virtual void set_under_observation(bool observed,
@@ -183,77 +183,77 @@ public:
 
     /**
      * \brief Sets the observation token value.
-     * \param token Pointer to the token of the resource.
-     * \param length Length of the token pointer.
+     * \param token A pointer to the token of the resource.
+     * \param length The length of the token pointer.
      */
     virtual void set_observation_token(const uint8_t *token,
                                        const uint8_t length);
 
     /**
      * \brief Sets the instance ID of the object.
-     * \param instance_id Instance ID of the object.
+     * \param instance_id The instance ID of the object.
      */
     virtual void set_instance_id(const uint16_t instance_id);
 
     /**
-     * Function is deprecated. Increment of observation number is done internally.
+     * This function is deprecated. An increment of the observation number is done internally.
      * \brief Sets the observation number of the object.
-     * \param observation_number Observation number of the object.
+     * \param observation_number The observation number of the object.
      */
     virtual void set_observation_number(const uint16_t observation_number)
         m2m_deprecated;
 
     /**
      * \brief Sets the max age for the resource value to be cached.
-     * \param max_age Max age in seconds.
+     * \param max_age The max age in seconds.
      */
     virtual void set_max_age(const uint32_t max_age);
 
     /**
-     * \brief Returns object type.
-     * \return BaseType of the object.
+     * \brief Returns the object type.
+     * \return The base type of the object.
      */
     virtual M2MBase::BaseType base_type() const;
 
     /**
      * \brief Returns the operation type of the object.
-     * \return Operation Supported operation on the object.
+     * \return The supported operation on the object.
      */
     virtual M2MBase::Operation operation() const;
 
     /**
      * \brief Returns the object name.
-     * \return Name of the object.
+     * \return The name of the object.
      */
     virtual const String &name() const;
 
     /**
      * \brief Returns the object name in integer.
-     * \return Name of the object in integer.
+     * \return The naame of the object in integer.
      */
     virtual int32_t name_id() const;
 
     /**
-     * \brief Returns the object's Instance ID.
-     * \returns Instance ID of the object.
+     * \brief Returns the object's instance ID.
+     * \returns The instance ID of the object.
      */
     virtual uint16_t instance_id() const;
 
     /**
      * \brief Returns the interface description of the object.
-     * \return Description of the object.
+     * \return The interface description of the object.
      */
     virtual const String& interface_description() const;
 
     /**
      * \brief Returns the resource type of the object.
-     * \return Resource type of the object.
+     * \return The resource type of the object.
      */
     virtual const String& resource_type() const;
 
     /**
      * \brief Returns the CoAP content type of the object.
-     * \return Content type of the object.
+     * \return The CoAP content type of the object.
      */
     virtual uint8_t coap_content_type() const;
 
@@ -265,32 +265,32 @@ public:
 
     /**
      * \brief Returns the observation level of the object.
-     * \return Observation level of the object.
+     * \return The observation level of the object.
      */
     virtual M2MBase::Observation observation_level() const;
 
     /**
      * \brief Provides the observation token of the object.
      * \param value[OUT] A pointer to the value of the token.
-     * \param value_length[OUT] Length of the token pointer.
+     * \param value_length[OUT] The length of the token pointer.
      */
     virtual void get_observation_token(uint8_t *&token, uint32_t &token_length);
 
     /**
      * \brief Returns the mode of the resource.
-     * \return Mode of the resource.
+     * \return The mode of the resource.
      */
      virtual Mode mode() const;
 
     /**
      * \brief Returns the observation number.
-     * \return Observation number of the object.
+     * \return The observation number of the object.
      */
     virtual uint16_t observation_number() const;
 
     /**
-     * \brief Returns max age for the resource value to be cached.
-     * \return Max age in seconds.
+     * \brief Returns the max age for the resource value to be cached.
+     * \return The maax age in seconds.
      */
     virtual uint32_t max_age() const;
 
@@ -305,9 +305,9 @@ public:
 
     /**
      * \brief Handles GET request for the registered objects.
-     * \param nsdl NSDL handler for the CoAP library.
-     * \param received_coap_header Received CoAP message from the server.
-     * \param observation_handler Handler object for sending
+     * \param nsdl An NSDL handler for the CoAP library.
+     * \param received_coap_header The received CoAP message from the server.
+     * \param observation_handler A handler object for sending
      * observation callbacks.
      * \return sn_coap_hdr_s The message that needs to be sent to server.
      */
@@ -316,11 +316,11 @@ public:
                                               M2MObservationHandler *observation_handler = NULL);
     /**
      * \brief Handles PUT request for the registered objects.
-     * \param nsdl NSDL handler for the CoAP library.
+     * \param nsdl An NSDL handler for the CoAP library.
      * \param received_coap_header The received CoAP message from the server.
-     * \param observation_handler The handler object for sending
+     * \param observation_handler A handler object for sending
      * observation callbacks.
-     * \param execute_value_updated True will execute "value_updated" callback.
+     * \param execute_value_updated True executes the "value_updated" callback.
      * \return sn_coap_hdr_s The message that needs to be sent to server.
      */
     virtual sn_coap_hdr_s* handle_put_request(nsdl_s *nsdl,
@@ -330,39 +330,40 @@ public:
 
     /**
      * \brief Handles GET request for the registered objects.
-     * \param nsdl NSDL handler for the CoAP library.
+     * \param nsdl An NSDL handler for the CoAP library.
      * \param received_coap_header The received CoAP message from the server.
-     * \param observation_handler The handler object for sending
+     * \param observation_handler A handler object for sending
      * observation callbacks.
-     * \param execute_value_updated True will execute "value_updated" callback.
+     * \param execute_value_updated True executes the "value_updated" callback.
      * \return sn_coap_hdr_s  The message that needs to be sent to server.
      */
     virtual sn_coap_hdr_s* handle_post_request(nsdl_s *nsdl,
                                                sn_coap_hdr_s *received_coap_header,
                                                M2MObservationHandler *observation_handler,
-                                               bool &execute_value_updated);
+                                               bool &execute_value_updated,
+                                               sn_nsdl_addr_s *address = NULL);
 
     /**
-     * \brief Sets whether this resource will be published to server or not.
+     * \brief Sets whether this resource is published to server or not.
      * \param register_uri True sets the resource as part of registration message.
      */
     virtual void set_register_uri( bool register_uri);
 
     /**
-     * \brief Returns whether this resource will be published to server or not.
-     * \return True if the resource is part of the registration message, else false.
+     * \brief Returns whether this resource is published to server or not.
+     * \return True if the resource is a part of the registration message, else false.
      */
     virtual bool register_uri();
 
     /**
      * \brief Sets object URI path.
-     * \param path Object path
+     * \param path The URI path of the object.
      */
     virtual void set_uri_path(const String &path);
 
     /**
      * \brief Returns the URI path of the object.
-     * \return URI path of the object.
+     * \return The URI path of the object.
      */
     virtual const String &uri_path() const;
 
@@ -387,14 +388,14 @@ public:
     virtual void set_value_updated_function(value_updated_callback2 callback);
 
     /**
-     * @brief Returns whether callback function is set or not.
+     * @brief Returns whether a callback function is set or not.
      * @return True if the callback function is set, else false.
      */
     virtual bool is_value_updated_function_set();
 
     /**
-     * @brief Calls the function that is set in "set_value_updated_function".
-     * @param name Name of the object.
+     * @brief Calls the function that is set in the "set_value_updated_function".
+     * @param name The name of the object.
      */
     virtual void execute_value_updated(const String& name);
 
@@ -406,13 +407,13 @@ protected : // from M2MReportObserver
 protected:
 
     /**
-     * \brief Sets the Base type for object.
-     * \param type The type of the base object.
+     * \brief Sets the base type for an object.
+     * \param type The base type of the object.
      */
     virtual void set_base_type(M2MBase::BaseType type);
 
     /**
-     * \brief Removes the resource from the CoAP structure.
+     * \brief Removes a resource from the CoAP structure.
      * \param resource_name The name of the resource.
      */
     virtual void remove_resource_from_coap(const String &resource_name);
@@ -430,21 +431,21 @@ protected:
 
     /**
      * \brief Memory free functions required for libCoap.
-     * \param ptr The Object whose memory needs to be freed.
+     * \param ptr The object whose memory needs to be freed.
     */
     virtual void memory_free(void *ptr);
 
     /**
      * \brief Allocate (size + 1) amount of memory, copy size bytes into
      * it and add zero termination.
-     * \param source Source string to copy, may not be NULL.
+     * \param source The source string to copy, may not be NULL.
      * \param size The size of memory to be reserved.
     */
     virtual uint8_t* alloc_string_copy(const uint8_t* source, uint32_t size);
 
     /**
      * \brief Allocate (size) amount of memory, copy size bytes into it.
-     * \param source Source buffer to copy, may not be NULL.
+     * \param source The source buffer to copy, may not be NULL.
      * \param size The size of memory to be reserved.
     */
     virtual uint8_t* alloc_copy(const uint8_t* source, uint32_t size);

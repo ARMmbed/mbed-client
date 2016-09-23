@@ -107,11 +107,13 @@ public:
     /**
      * @brief Sends the register message to the server.
      * @param address M2MServer address.
+     * @param address_length M2MServer address length.
      * @param port M2MServer port.
      * @param address_type IP Address type.
      * @return  true if register sent successfully else false.
     */
     bool send_register_message(uint8_t* address,
+                               uint8_t address_length,
                                const uint16_t port,
                                sn_nsdl_addr_type_e address_type);
 
@@ -284,10 +286,6 @@ private:
 
     void send_resource_observation(M2MResource *resource, uint16_t obs_number);
 
-    void build_observation_number(uint8_t *obs_number,
-                                  uint8_t *obs_len,
-                                  uint16_t number);
-
     void send_notification(uint8_t *token,
                            uint8_t  token_length,
                            uint8_t *value,
@@ -370,6 +368,7 @@ private:
     bool                               _unregister_ongoing;
     bool                               _update_register_ongoing;
     String                             _endpoint_name;
+    bool                               _identity_accepted;
 
 friend class Test_M2MNsdlInterface;
 

@@ -20,7 +20,7 @@
 
 /**
  * \brief M2MConnectionObserver
- * Observer class for informing socket activity to the state machine.
+ * The observer class for passing the socket activity to the state machine.
  */
 
 class M2MConnectionObserver
@@ -39,7 +39,7 @@ public :
 
     /**
      * \brief The M2MSocketAddress struct.
-     * Unified container for holding socket address data
+     * A unified container for holding socket address data
      * across different platforms.
      */
     struct SocketAddress{
@@ -62,7 +62,7 @@ public :
     /**
     * \brief Indicates an error occured in socket.
     * \param error_code The error code from socket, it cannot be used any further.
-    * \param retry Indicates whether to re-establish connection.
+    * \param retry Indicates whether to re-establish the connection.
     */
     virtual void socket_error(uint8_t error_code, bool retry = true) = 0;
 

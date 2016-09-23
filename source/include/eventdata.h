@@ -86,6 +86,7 @@ public:
     virtual ~M2MUpdateRegisterData() {}
     M2MSecurity     *_object;
     uint32_t        _lifetime;
+    M2MObjectList    _object_list;
 };
 
 
