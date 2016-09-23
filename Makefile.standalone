@@ -1,0 +1,90 @@
+#
+# Makefile for mbed Client C++ Library
+#
+# List of subdirectories to build
+TEST_FOLDER := ./test/
+
+# Define compiler toolchain with CC or PLATFORM variables
+# Example (GCC toolchains, default $CC and $AR are used)
+# make
+#
+# OR (Cross-compile GCC toolchain)
+# make PLATFORM=arm-linux-gnueabi-
+#
+# OR (ArmCC/Keil)
+# make CC=ArmCC AR=ArmAR
+#
+# OR (IAR-ARM)
+# make CC=iccarm
+
+LIB = libmbedclient.a
+
+# List of unit test directories for libraries
+UNITTESTS := $(sort $(dir $(wildcard $(TEST_FOLDER)*/utest/*)))
+
+# If configuration is not specified, use linux
+ifeq (,$(CONFIG))
+CONFIG := linux
+endif
+
+include sources.mk
+include include_dirs.mk
+include config/$(CONFIG).mk
+
+SERVLIB_DIR := ../../libService
+NSDL_C_DIR := ../../nsdl-c
+override CFLAGS += -I$(SERVLIB_DIR)/libService
+override CFLAGS += -I$(NSDL_C_DIR)/nsdl-c
+override CFLAGS += $(addprefix -I,$(INCLUDE_DIRS))
+override CFLAGS += $(addprefix -D,$(FLAGS))
+ifeq ($(DEBUG),1)
+override CFLAGS += -DHAVE_DEBUG
+endif
+
+COVERAGEFILE := ./lcov/coverage.info
+
+# Set the target path where submodules will be deployed to,
+# functionally similar than the yotta_modules.
+SUBMODULE_BASE_PATH ?= $(CURDIR)/standalone_modules
+
+# List of libraries to build with Makefile.standalone
+LIBS := \
+	mbed-client-c \
+	mbed-client-mbed-tls \
+
+# these will be downloaded, but built with special rules
+SPECIAL_LIBS := \
+
+#
+# Define compiler toolchain
+#
+include toolchain_rules.mk
+
+$(eval $(call generate_rules,$(LIB),$(SRCS)))
+
+# Get the generic rules for fetching source and building submodules
+include standalone_rules.mk
+
+# create the submodule dir if one does not exist
+$(SUBMODULE_BASE_PATH):
+	mkdir -p $(SUBMODULE_BASE_PATH)
+
+.PHONY: all 
+all: $(SUBMODULE_BASE_PATH) $(TARGET_MODULES) $(BUILDDIRS)
+	@echo Build OK!
+
+TARGET_MODULES := $(addprefix $(SUBMODULE_BASE_PATH)/, $(LIBS))
+TARGET_MODULES += $(addprefix $(SUBMODULE_BASE_PATH)/, $(SPECIAL_LIBS))
+
+$(TARGET_MODULES): | $(SUBMODULE_BASE_PATH)
+
+
+# perform a git clone of the submodules listed in $(LIBS)
+.PHONY: fetch_source
+fetch_source: $(TARGET_MODULES) $(FETCH_SUB_MODULES)
+
+
+# Extend default clean rule
+clean: clean-extra
+
+clean-extra: $(CLEANDIRS)
