@@ -4,6 +4,7 @@
 # List of subdirectories to build
 TEST_FOLDER := ./test/
 
+
 # Define compiler toolchain with CC or PLATFORM variables
 # Example (GCC toolchains, default $CC and $AR are used)
 # make
