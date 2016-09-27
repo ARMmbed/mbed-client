@@ -17,6 +17,7 @@ TEST_FOLDER := ./test/
 # OR (IAR-ARM)
 # make CC=iccarm
 
+
 LIB = libmbedclient.a
 
 # List of unit test directories for libraries
