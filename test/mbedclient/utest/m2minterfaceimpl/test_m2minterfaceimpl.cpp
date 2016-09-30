@@ -767,9 +767,8 @@ void Test_M2MInterfaceImpl::test_timer_expired()
     impl->timer_expired(M2MTimerObserver::QueueSleep);
     CHECK(visited == true);
 
-    int port = impl->_listen_port;
     impl->timer_expired(M2MTimerObserver::RetryTimer);
-    CHECK(impl->_listen_port != port);
+    CHECK(visited == true);
 
     observer->error_occured = false;
     impl->timer_expired(M2MTimerObserver::BootstrapTimer);
