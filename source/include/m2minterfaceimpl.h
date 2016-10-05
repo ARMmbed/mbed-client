@@ -411,8 +411,6 @@ private:
     String                      _server_ip_address;
     M2MSecurity                 *_register_server; //TODO: to be the list not owned
     bool                        _event_ignored;
-    bool                        _register_ongoing;
-    bool                        _update_register_ongoing;
     M2MTimer                    *_queue_sleep_timer;
     M2MTimer                    *_retry_timer;
     M2MTimer                    *_bootstrap_timer;
