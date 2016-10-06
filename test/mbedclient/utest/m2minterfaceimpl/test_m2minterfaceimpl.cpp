@@ -654,17 +654,11 @@ void Test_M2MInterfaceImpl::test_address_ready()
     // Test for Address resolving for LWM2M server
     server_type = M2MConnectionObserver::LWM2MServer;
 
-    address->_stack = M2MInterface::LwIP_IPv6;
-    m2mnsdlinterface_stub::bool_value = true;
-
-    impl->address_ready(*address,server_type,server_port);
-    CHECK(impl->_current_state == M2MInterfaceImpl::STATE_REGISTER_RESOURCE_CREATED);
-
     address->_stack = M2MInterface::LwIP_IPv4;
     m2mnsdlinterface_stub::bool_value = true;
 
     impl->address_ready(*address,server_type,server_port);
-    CHECK(impl->_current_state == M2MInterfaceImpl::STATE_REGISTER_RESOURCE_CREATED);
+    CHECK(impl->_current_state == M2MInterfaceImpl::STATE_REGISTER_ADDRESS_RESOLVED);
 
 
     address->_stack = M2MInterface::LwIP_IPv6;

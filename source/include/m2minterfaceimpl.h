@@ -260,11 +260,6 @@ private: // state machine state functions
     void state_register_address_resolved( EventData *data);
 
     /**
-    * When the register resource is created.
-    */
-    void state_register_resource_created( EventData *data);
-
-    /**
     * When the client is registered.
     */
     void state_registered( EventData *data);
@@ -336,16 +331,15 @@ private: // state machine state functions
         STATE_BOOTSTRAPPED,
         STATE_REGISTER, //5
         STATE_REGISTER_ADDRESS_RESOLVED,
-        STATE_REGISTER_RESOURCE_CREATED,
         STATE_REGISTERED,
         STATE_UPDATE_REGISTRATION,
-        STATE_UNREGISTER, //10
-        STATE_UNREGISTERED,
+        STATE_UNREGISTER,
+        STATE_UNREGISTERED, //10
         STATE_SENDING_COAP_DATA,
         STATE_COAP_DATA_SENT,
         STATE_COAP_DATA_RECEIVED,
-        STATE_PROCESSING_COAP_DATA, //15
-        STATE_COAP_DATA_PROCESSED,
+        STATE_PROCESSING_COAP_DATA,
+        STATE_COAP_DATA_PROCESSED, //15
         STATE_WAITING,
         STATE_MAX_STATES
     };

@@ -125,7 +125,6 @@ void M2MInterfaceImpl::bootstrap(M2MSecurity *security)
         TRANSITION_MAP_ENTRY (EVENT_IGNORED)                // state_bootstrapped
         TRANSITION_MAP_ENTRY (EVENT_IGNORED)                // state_register
         TRANSITION_MAP_ENTRY (EVENT_IGNORED)                // state_register_address_resolved
-        TRANSITION_MAP_ENTRY (EVENT_IGNORED)                // state_register_resource_created
         TRANSITION_MAP_ENTRY (EVENT_IGNORED)                // state_registered
         TRANSITION_MAP_ENTRY (EVENT_IGNORED)                // state_update_registration
         TRANSITION_MAP_ENTRY (EVENT_IGNORED)                // state_unregister
@@ -176,7 +175,6 @@ void M2MInterfaceImpl::register_object(M2MSecurity *security, const M2MObjectLis
         TRANSITION_MAP_ENTRY (STATE_REGISTER)               // state_bootstrapped
         TRANSITION_MAP_ENTRY (EVENT_IGNORED)                // state_register
         TRANSITION_MAP_ENTRY (EVENT_IGNORED)                // state_register_address_resolved
-        TRANSITION_MAP_ENTRY (EVENT_IGNORED)                // state_register_resource_created
         TRANSITION_MAP_ENTRY (STATE_REGISTER)               // state_registered
         TRANSITION_MAP_ENTRY (EVENT_IGNORED)                // state_update_registration
         TRANSITION_MAP_ENTRY (EVENT_IGNORED)                // state_unregister
@@ -230,7 +228,6 @@ void M2MInterfaceImpl::unregister_object(M2MSecurity* /*security*/)
         TRANSITION_MAP_ENTRY (EVENT_IGNORED)                // state_bootstrapped
         TRANSITION_MAP_ENTRY (EVENT_IGNORED)                // state_register
         TRANSITION_MAP_ENTRY (EVENT_IGNORED)                // state_register_address_resolved
-        TRANSITION_MAP_ENTRY (EVENT_IGNORED)                // state_register_resource_created
         TRANSITION_MAP_ENTRY (STATE_UNREGISTER)             // state_registered
         TRANSITION_MAP_ENTRY (STATE_UNREGISTER)             // state_update_registration
         TRANSITION_MAP_ENTRY (EVENT_IGNORED)                // state_unregister
@@ -730,11 +727,6 @@ void M2MInterfaceImpl::state_register_address_resolved( EventData *data)
     }
 }
 
-void M2MInterfaceImpl::state_register_resource_created( EventData */*data*/)
-{
-    tr_debug("M2MInterfaceImpl::state_register_resource_created");
-}
-
 void M2MInterfaceImpl::state_registered( EventData */*data*/)
 {
     tr_debug("M2MInterfaceImpl::state_registered");
@@ -926,9 +918,6 @@ void M2MInterfaceImpl::state_function( uint8_t current_state, EventData* data )
         case STATE_REGISTER_ADDRESS_RESOLVED:
             M2MInterfaceImpl::state_register_address_resolved(data);
             break;
-        case STATE_REGISTER_RESOURCE_CREATED:
-            M2MInterfaceImpl::state_register_resource_created(data);
-            break;
         case STATE_REGISTERED:
             M2MInterfaceImpl::state_registered(data);
             break;
@@ -975,7 +964,6 @@ void M2MInterfaceImpl::start_register_update(M2MUpdateRegisterData *data) {
         TRANSITION_MAP_ENTRY (EVENT_IGNORED)                // state_bootstrapped
         TRANSITION_MAP_ENTRY (EVENT_IGNORED)                // state_register
         TRANSITION_MAP_ENTRY (EVENT_IGNORED)                // state_register_address_resolved
-        TRANSITION_MAP_ENTRY (EVENT_IGNORED)                // state_register_resource_created
         TRANSITION_MAP_ENTRY (STATE_UPDATE_REGISTRATION)    // state_registered
         TRANSITION_MAP_ENTRY (EVENT_IGNORED)                // state_update_registration
         TRANSITION_MAP_ENTRY (EVENT_IGNORED)                // state_unregister
