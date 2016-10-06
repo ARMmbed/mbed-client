@@ -364,9 +364,7 @@ private:
     nsdl_s                            *_nsdl_handle;
     uint32_t                           _counter_for_nsdl;
     uint16_t                           _bootstrap_id;
-    bool                               _register_ongoing;
     bool                               _unregister_ongoing;
-    bool                               _update_register_ongoing;
     String                             _endpoint_name;
     bool                               _identity_accepted;
 

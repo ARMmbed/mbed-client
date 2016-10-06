@@ -59,9 +59,7 @@ M2MNsdlInterface::M2MNsdlInterface(M2MNsdlObserver &observer)
   _nsdl_handle(NULL),
   _counter_for_nsdl(0),
   _bootstrap_id(0),
-  _register_ongoing(false),
   _unregister_ongoing(false),
-  _update_register_ongoing(false),
   _identity_accepted(false)
 {
     tr_debug("M2MNsdlInterface::M2MNsdlInterface()");
@@ -281,24 +279,17 @@ bool M2MNsdlInterface::send_register_message(uint8_t* address,
                                        false);
     bool success = false;
     if(set_NSP_address_2(_nsdl_handle, address, address_length, port, address_type) == 0) {
-        if(!_register_ongoing) {
-            _register_ongoing = true;
-            success = sn_nsdl_register_endpoint(_nsdl_handle,_endpoint) != 0;
-        }
+        success = sn_nsdl_register_endpoint(_nsdl_handle,_endpoint) != 0;
     }
     return success;
 }
 
 bool M2MNsdlInterface::send_update_registration(const uint32_t lifetime)
 {
-    if (_update_register_ongoing) {
-        tr_debug("M2MNsdlInterface::send_update_registration - update already in progress");
-        return true;
-    }
     tr_debug("M2MNsdlInterface::send_update_registration( lifetime %" PRIu32 ")", lifetime);
     bool success = false;
     create_nsdl_list_structure(_object_list);
-    
+
     //If Lifetime value is 0, then don't change the existing lifetime value
     if(lifetime != 0) {
         if(_endpoint->lifetime_ptr) {
@@ -315,7 +306,6 @@ bool M2MNsdlInterface::send_update_registration(const uint32_t lifetime)
         if(_nsdl_handle &&
            _endpoint && _endpoint->lifetime_ptr) {
             tr_debug("M2MNsdlInterface::send_update_registration - new lifetime value");
-            _update_register_ongoing = true;
             success = sn_nsdl_update_registration(_nsdl_handle,
                                                   _endpoint->lifetime_ptr,
                                                   _endpoint->lifetime_len) != 0;
@@ -323,7 +313,6 @@ bool M2MNsdlInterface::send_update_registration(const uint32_t lifetime)
     } else {
         if(_nsdl_handle) {
             tr_debug("M2MNsdlInterface::send_update_registration - regular update");
-            _update_register_ongoing = true;
             success = sn_nsdl_update_registration(_nsdl_handle, NULL, 0) != 0;
         }
     }
@@ -386,7 +375,7 @@ uint8_t M2MNsdlInterface::received_from_server_callback(struct nsdl_s *nsdl_hand
                                                         sn_coap_hdr_s *coap_header,
                                                         sn_nsdl_addr_s *address)
 {
-    tr_debug("M2MNsdlInterface::received_from_server_callback - msg id:%" PRIu16, coap_header->msg_id);
+    tr_debug("M2MNsdlInterface::received_from_server_callback - incoming msg id:%" PRIu16, coap_header->msg_id);
     tr_debug("M2MNsdlInterface::received_from_server_callback - registration id:%" PRIu16, nsdl_handle->register_msg_id);
     tr_debug("M2MNsdlInterface::received_from_server_callback - unregistration id:%" PRIu16, nsdl_handle->unregister_msg_id);
     tr_debug("M2MNsdlInterface::received_from_server_callback - update registration id:%" PRIu16, nsdl_handle->update_register_msg_id);
@@ -397,7 +386,6 @@ uint8_t M2MNsdlInterface::received_from_server_callback(struct nsdl_s *nsdl_hand
                                    (nsdl_handle->oma_bs_port == address->port) &&
                                    !memcmp(nsdl_handle->oma_bs_address_ptr, address->addr_ptr, nsdl_handle->oma_bs_address_len);
         if(coap_header->msg_id == nsdl_handle->register_msg_id) {
-            _register_ongoing = false;
             if(coap_header->msg_code == COAP_MSG_CODE_RESPONSE_CREATED) {
                 tr_debug("M2MNsdlInterface::received_from_server_callback - registration callback");
                 _observer.client_registered(_server);
@@ -452,14 +440,12 @@ uint8_t M2MNsdlInterface::received_from_server_callback(struct nsdl_s *nsdl_hand
                 _observer.registration_error(error);
             }
         } else if(coap_header->msg_id == nsdl_handle->update_register_msg_id) {
-            _update_register_ongoing = false;
             if(coap_header->msg_code == COAP_MSG_CODE_RESPONSE_CHANGED) {
                 tr_debug("M2MNsdlInterface::received_from_server_callback - registration_updated successfully");
                 _observer.registration_updated(*_server);
             } else {
                 tr_error("M2MNsdlInterface::received_from_server_callback - registration_updated failed %d", coap_header->msg_code);
                 _registration_timer->stop_timer();
-                _register_ongoing = true;
                 sn_nsdl_register_endpoint(_nsdl_handle,_endpoint);
             }
         }
@@ -689,9 +675,7 @@ void M2MNsdlInterface::stop_timers()
         _nsdl_exceution_timer->stop_timer();
     }
     _bootstrap_id = 0;
-    _register_ongoing = false;
     _unregister_ongoing = false;
-    _update_register_ongoing = false;
 }
 
 void M2MNsdlInterface::timer_expired(M2MTimerObserver::Type type)
