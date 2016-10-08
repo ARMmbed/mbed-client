@@ -1,5 +1,5 @@
 #!/bin/bash
-# Copyright (c) 2015 ARM Limited. All rights reserved.
+# Copyright (c) 2015-2016 ARM Limited. All rights reserved.
 # SPDX-License-Identifier: Apache-2.0
 # Licensed under the Apache License, Version 2.0 (the License); you may
 # not use this file except in compliance with the License.
@@ -12,6 +12,13 @@
 # WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+if ./tools_check.sh
+then
+	echo "Tools-check OK"
+else
+	echo "Tools-check failure - STOP."
+	exit 1
+fi
 
 echo
 echo "Build mbed Client API unit tests"
