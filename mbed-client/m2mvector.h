@@ -21,7 +21,6 @@
 * \brief A simple C++ Vector class, used as replacement for std::vector.
 */
 
-#include <stdio.h>
 
 namespace m2m
 {

@@ -16,6 +16,8 @@
 #include "include/nsdlaccesshelper.h"
 #include "include/m2mnsdlinterface.h"
 
+#include <stdlib.h>
+
 M2MNsdlInterfaceList __nsdl_interface_list;
 
 // callback function for NSDL library to call into

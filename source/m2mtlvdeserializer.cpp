@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include <stdio.h>
 #include "include/m2mtlvdeserializer.h"
 #include "mbed-client/m2mconstants.h"
 #include "include/nsdllinker.h"

@@ -13,10 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include <stdio.h>
 #include "include/m2mtlvserializer.h"
 #include "include/nsdllinker.h"
 #include "mbed-client/m2mconstants.h"
+
+#include <stdlib.h>
 
 #define TRACE_GROUP "mClt"
 

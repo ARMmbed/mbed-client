@@ -44,6 +44,7 @@
 
 #include <assert.h>
 #include <inttypes.h>
+#include <stdlib.h>
 
 #define BUFFER_SIZE 21
 #define TRACE_GROUP "mClt"

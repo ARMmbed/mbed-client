@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include <cstdio>
 #include "mbed-client/m2msecurity.h"
 #include "mbed-client/m2mconstants.h"
 #include "mbed-client/m2mobject.h"
@@ -21,6 +20,9 @@
 #include "mbed-client/m2mresource.h"
 #include "mbed-client/m2mstring.h"
 #include "mbed-trace/mbed_trace.h"
+
+#include <stdlib.h>
+
 #define TRACE_GROUP "mClt"
 
 #define BUFFER_SIZE 21
