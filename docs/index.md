@@ -12,4 +12,6 @@ This document introduces the mbed Client and the use of its API. The document is
 - [**Porting mbed Client**](porting-guide.md) is meant for advanced users and tells how to build mbed Client and port it for different platforms.
 - [**Useful reading**](further-reading.md) links you to mbed Device Connector documentation and the developer site.
 
+Read the doxygen API documentation [here](https://docs.mbed.com/docs/mbed-client-guide/en/latest/api/index.html).
+
 
