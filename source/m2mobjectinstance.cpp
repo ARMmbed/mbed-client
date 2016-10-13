@@ -26,6 +26,8 @@
 #include "include/m2mreporthandler.h"
 #include "mbed-trace/mbed_trace.h"
 
+#include <stdlib.h>
+
 #define BUFFER_SIZE 10
 #define TRACE_GROUP "mClt"
 

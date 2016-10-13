@@ -17,7 +17,6 @@
 #ifndef M2M_VECTOR_H
 #define M2M_VECTOR_H
 
-#include <stdio.h>
 
 namespace m2m
 {

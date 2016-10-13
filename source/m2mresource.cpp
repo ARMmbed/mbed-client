@@ -22,6 +22,8 @@
 #include "include/nsdllinker.h"
 #include "mbed-trace/mbed_trace.h"
 
+#include <stdlib.h>
+
 #define TRACE_GROUP "mClt"
 
 M2MResource& M2MResource::operator=(const M2MResource& other)
