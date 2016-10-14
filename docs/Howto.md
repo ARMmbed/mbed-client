@@ -12,6 +12,7 @@ As per the OMA LWM2M specification:
 - The client must have created Resources under Object Instance. You can create M2MResource from the M2MObjectInstance class.
 - The client must have created Resource Instances under Resources. You can create M2MResourceInstance from the M2MObjectInstance class.
 
+Read the API doxygen documentation [here](https://docs.mbed.com/docs/mbed-client-guide/en/latest/api/index.html).
 
 ## How to create and configure Objects
 
