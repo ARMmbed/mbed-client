@@ -170,11 +170,16 @@ bool M2MSecurity::delete_resource(SecurityResource resource)
 bool M2MSecurity::set_resource_value(SecurityResource resource,
                                      const String &value)
 {
+    tr_debug("M2MSecurity::set_resource_value(%d, %s) 1", resource, value.c_str());
+    
     bool success = false;
     if(M2MSecurity::M2MServerUri == resource) {
         M2MResource* res = get_resource(resource);
         if(res) {
+            tr_debug("M2MSecurity::set_resource_value(%d, %s) inner", resource, value.c_str());
+          
             success = res->set_value((const uint8_t*)value.c_str(),(uint32_t)value.length());
+            tr_debug("M2MSecurity::set_resource_value(%d, %s) 2, succ: %d", resource, value.c_str(), (int)success);
         }
     }
     return success;
@@ -206,6 +211,12 @@ bool M2MSecurity::set_resource_value(SecurityResource resource,
                                      const uint8_t *value,
                                      const uint16_t length)
 {
+    tr_debug("M2MSecurity::set_resource_value(%d, 0x%x, %d)", resource, value, length);
+
+    if (value) {
+        tr_debug("M2MSecurity::set_resource_value(%d, %.*s)", resource, length, value);
+    }
+  
     bool success = false;
     M2MResource* res = get_resource(resource);
     if(res) {
@@ -222,9 +233,13 @@ String M2MSecurity::resource_value_string(SecurityResource resource) const
 {
     String value = "";
     M2MResource* res = get_resource(resource);
+    tr_debug("M2MSecurity::resource_value_string(%d, 0x%x)", resource, res);
+    
     if(res) {
         if(M2MSecurity::M2MServerUri == resource) {
+            tr_debug("M2MSecurity::resource_value_string(%d, 0x%x) 2 ", resource, res);
             value = res->get_value_string();
+            tr_debug("M2MSecurity::resource_value_string(%d, 0x%x, %s) 2 ", resource, res, value.c_str());
         }
     }
     return value;

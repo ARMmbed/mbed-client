@@ -192,7 +192,6 @@ bool M2MResourceInstance::set_value(const uint8_t *value,
         value_changed = true;
     }
     if( value != NULL && value_length > 0 ) {
-        success = true;
 
         free(_value);
         _value_length = 0;
@@ -211,6 +210,7 @@ bool M2MResourceInstance::set_value(const uint8_t *value,
                     report();
                 }
             }
+            success = true;
         }
     }
     return success;

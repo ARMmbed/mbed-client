@@ -115,6 +115,7 @@ void M2MInterfaceImpl::bootstrap(M2MSecurity *security)
         _observer.error(M2MInterface::InvalidParameters);
         return;
     }
+    tr_debug("M2MInterfaceImpl::bootstrap(M2MSecurity *security) - ");
     // Transition to a new state based upon
     // the current state of the state machine
     M2MSecurityData* data = new M2MSecurityData();
@@ -520,6 +521,7 @@ void M2MInterfaceImpl::state_bootstrap( EventData *data)
         M2MSecurityData *event = static_cast<M2MSecurityData *> (data);
         M2MSecurity *security = event->_object;
         if(security) {
+            tr_debug("M2MInterfaceImpl::state_bootstrap - security: 0x%x", (int)security);
             if(M2MSecurity::Bootstrap == security->server_type()) {
                 tr_debug("M2MInterfaceImpl::state_bootstrap - server_type : M2MSecurity::Bootstrap");
                 String server_address = security->resource_value_string(M2MSecurity::M2MServerUri);
@@ -890,6 +892,7 @@ void M2MInterfaceImpl::state_engine (void)
 
 void M2MInterfaceImpl::state_function( uint8_t current_state, EventData* data )
 {
+    tr_debug("M2MInterfaceImpl::state_bootstrap() state: %d, data: 0x%x", (int)current_state, (int)data);
     switch( current_state ) {
         case STATE_IDLE:
             M2MInterfaceImpl::state_idle(data);

@@ -374,17 +374,17 @@ sn_coap_hdr_s* M2MBase::handle_post_request(nsdl_s */*nsdl*/,
     return NULL;
 }
 
+void* our_raw_malloc(size_t size);
+void our_raw_free(void *ptr);
+
 void *M2MBase::memory_alloc(uint32_t size)
 {
-    if(size)
-        return malloc(size);
-    else
-        return 0;
+    return our_raw_malloc(size);
 }
 
 void M2MBase::memory_free(void *ptr)
 {
-    free(ptr);
+    our_raw_free(ptr);
 }
 
 uint8_t* M2MBase::alloc_string_copy(const uint8_t* source, uint32_t size)
@@ -392,6 +392,7 @@ uint8_t* M2MBase::alloc_string_copy(const uint8_t* source, uint32_t size)
     assert(source != NULL);
 
     uint8_t* result = (uint8_t*)memory_alloc(size + 1);
+    assert(result);
     if (result) {
         memcpy(result, source, size);
         result[size] = '\0';
@@ -404,6 +405,7 @@ uint8_t* M2MBase::alloc_copy(const uint8_t* source, uint32_t size)
     assert(source != NULL);
 
     uint8_t* result = (uint8_t*)memory_alloc(size);
+    assert(result);
     if (result) {
         memcpy(result, source, size);
     }
