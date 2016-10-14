@@ -225,6 +225,7 @@ private:
     friend class Test_M2MConnectionHandlerPimpl_mbed;
     friend class Test_M2MConnectionSecurityPimpl;
     friend class Test_M2MNsdlInterface;
+    friend class Test_M2MConnectionHandlerPimpl_classic;
 };
 
 #endif // M2M_SECURITY_H
