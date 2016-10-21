@@ -462,14 +462,31 @@ uint8_t M2MNsdlInterface::received_from_server_callback(struct nsdl_s *nsdl_hand
         }
 #endif //MBED_CLIENT_DISABLE_BOOTSTRAP_FEATURE
         else {
+
+            sn_coap_hdr_s *coap_response = NULL;
+            bool execute_value_updated = false;
+            M2MObjectInstance *obj_instance = NULL;
+
             if(COAP_MSG_CODE_REQUEST_PUT == coap_header->msg_code) {
                 if (is_bootstrap_msg) {
                     handle_bootstrap_put_message(coap_header, address);
+                }
+                else{
+                    tr_debug("Method not allowed (PUT).");
+                    coap_response = sn_nsdl_build_response(_nsdl_handle,
+                                                           coap_header,
+                                                           COAP_MSG_CODE_RESPONSE_METHOD_NOT_ALLOWED);
                 }
             }
             else if(COAP_MSG_CODE_REQUEST_DELETE == coap_header->msg_code) {
                 if (is_bootstrap_msg) {
                     handle_bootstrap_delete(coap_header, address);
+                }
+                else{
+                    tr_debug("Method not allowed (DELETE).");
+                    coap_response = sn_nsdl_build_response(_nsdl_handle,
+                                                           coap_header,
+                                                           COAP_MSG_CODE_RESPONSE_METHOD_NOT_ALLOWED);
                 }
             }
             else if(COAP_MSG_CODE_REQUEST_POST == coap_header->msg_code) {
@@ -477,9 +494,7 @@ uint8_t M2MNsdlInterface::received_from_server_callback(struct nsdl_s *nsdl_hand
                     handle_bootstrap_finished(coap_header, address);
                 }
                 else if(coap_header->uri_path_ptr) {
-                    sn_coap_hdr_s *coap_response = NULL;
-                    bool execute_value_updated = false;
-                    M2MObjectInstance *obj_instance = NULL;
+
                     String resource_name = coap_to_string(coap_header->uri_path_ptr,
                                                           coap_header->uri_path_len);
 
@@ -533,16 +548,26 @@ uint8_t M2MNsdlInterface::received_from_server_callback(struct nsdl_s *nsdl_hand
                                                                coap_header,
                                                                COAP_MSG_CODE_RESPONSE_NOT_FOUND);
                     }
-                    if(coap_response) {
-                        tr_debug("M2MNsdlInterface::received_from_server_callback - send CoAP response");
-                        (sn_nsdl_send_coap_message(_nsdl_handle, address, coap_response) == 0) ? value = 0 : value = 1;
-                        sn_nsdl_release_allocated_coap_msg_mem(_nsdl_handle, coap_response);
-                    }
-                    if (execute_value_updated) {
-                        value_updated(obj_instance, obj_instance->name());
-                    }
+
                 }
             }
+            else if(COAP_MSG_CODE_REQUEST_GET == coap_header->msg_code) {
+                tr_debug("Method not allowed (GET).");
+                coap_response = sn_nsdl_build_response(_nsdl_handle,
+                                                       coap_header,
+                                                       COAP_MSG_CODE_RESPONSE_METHOD_NOT_ALLOWED);
+            }
+
+            if(coap_response) {
+                tr_debug("M2MNsdlInterface::received_from_server_callback - send CoAP response");
+                (sn_nsdl_send_coap_message(_nsdl_handle, address, coap_response) == 0) ? value = 0 : value = 1;
+                sn_nsdl_release_allocated_coap_msg_mem(_nsdl_handle, coap_response);
+            }
+
+            if (execute_value_updated) {
+                value_updated(obj_instance, obj_instance->name());
+            }
+
         }
     }
     return value;
