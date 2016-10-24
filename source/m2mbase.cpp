@@ -164,7 +164,9 @@ void M2MBase::set_observable(bool observable)
 
 void M2MBase::add_observation_level(M2MBase::Observation obs_level)
 {
+    tr_debug("M2MBase::add_observation_level, level %d", obs_level);
     _observation_level = (M2MBase::Observation)(_observation_level | obs_level);
+    tr_debug("M2MBase::add_observation_level, after level %d", _observation_level);
 }
 
 void M2MBase::remove_observation_level(M2MBase::Observation obs_level)

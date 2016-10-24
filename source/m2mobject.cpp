@@ -156,11 +156,13 @@ M2MBase::BaseType M2MObject::base_type() const
 
 void M2MObject::add_observation_level(M2MBase::Observation observation_level)
 {
+    tr_debug("M2MObject::add_observation_level - level %d", observation_level);
     M2MBase::add_observation_level(observation_level);
     if(!_instance_list.empty()) {
          M2MObjectInstanceList::const_iterator it;
          it = _instance_list.begin();
          for ( ; it != _instance_list.end(); it++ ) {
+             tr_debug("M2MObject::add_observation_level - instance level %d", observation_level);
              (*it)->add_observation_level(observation_level);
          }
     }
@@ -168,6 +170,7 @@ void M2MObject::add_observation_level(M2MBase::Observation observation_level)
 
 void M2MObject::remove_observation_level(M2MBase::Observation observation_level)
 {
+    tr_debug("M2MObject::remove_observation_level - level %d", observation_level);
     M2MBase::remove_observation_level(observation_level);
     if(!_instance_list.empty()) {
         M2MObjectInstanceList::const_iterator it;
@@ -256,6 +259,8 @@ sn_coap_hdr_s* M2MObject::handle_get_request(nsdl_s *nsdl,
                                         add_observation_level(M2MBase::O_Attribute);
                                         tr_debug("M2MObject::handle_get_request - Observation Number %d", observation_number());
                                         coap_response->options_list_ptr->observe = observation_number();
+                                        tr_debug("M2MObject::handle_get_request - Observation level", observation_level());
+
                                     }
                                 } else if (STOP_OBSERVATION == observe_option) {
                                     tr_debug("M2MObject::handle_get_request - Stops Observation");
