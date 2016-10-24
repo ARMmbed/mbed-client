@@ -472,7 +472,7 @@ uint8_t M2MNsdlInterface::received_from_server_callback(struct nsdl_s *nsdl_hand
                     handle_bootstrap_put_message(coap_header, address);
                 }
                 else{
-                    tr_debug("Method not allowed (PUT).");
+                    tr_debug("M2MNsdlInterface::received_from_server_callback - Method not allowed (PUT).");
                     coap_response = sn_nsdl_build_response(_nsdl_handle,
                                                            coap_header,
                                                            COAP_MSG_CODE_RESPONSE_METHOD_NOT_ALLOWED);
@@ -483,7 +483,7 @@ uint8_t M2MNsdlInterface::received_from_server_callback(struct nsdl_s *nsdl_hand
                     handle_bootstrap_delete(coap_header, address);
                 }
                 else{
-                    tr_debug("Method not allowed (DELETE).");
+                    tr_debug("M2MNsdlInterface::received_from_server_callback - Method not allowed (DELETE).");
                     coap_response = sn_nsdl_build_response(_nsdl_handle,
                                                            coap_header,
                                                            COAP_MSG_CODE_RESPONSE_METHOD_NOT_ALLOWED);
@@ -552,7 +552,7 @@ uint8_t M2MNsdlInterface::received_from_server_callback(struct nsdl_s *nsdl_hand
                 }
             }
             else if(COAP_MSG_CODE_REQUEST_GET == coap_header->msg_code) {
-                tr_debug("Method not allowed (GET).");
+                tr_debug("M2MNsdlInterface::received_from_server_callback - Method not allowed (GET).");
                 coap_response = sn_nsdl_build_response(_nsdl_handle,
                                                        coap_header,
                                                        COAP_MSG_CODE_RESPONSE_METHOD_NOT_ALLOWED);
