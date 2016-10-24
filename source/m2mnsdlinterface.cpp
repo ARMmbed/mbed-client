@@ -831,7 +831,7 @@ bool M2MNsdlInterface::create_nsdl_object_structure(M2MObject *object)
            }
         }
     }
-    if((object->operation() != M2MBase::NOT_ALLOWED)) {
+    if(object && object->operation() != M2MBase::NOT_ALLOWED) {
         success = create_nsdl_resource(object,object->name(),object->register_uri());
     }
     return success;
