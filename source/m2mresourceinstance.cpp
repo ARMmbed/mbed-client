@@ -220,11 +220,15 @@ void M2MResourceInstance::report()
 {
     tr_debug("M2MResourceInstance::report()");
     M2MBase::Observation  observation_level = M2MBase::observation_level();
-    if(M2MBase::R_Attribute != observation_level) {
-        tr_debug("M2MResourceInstance::report() -- object level");
+    tr_debug("M2MResourceInstance::report() - level %d", observation_level);
+    if((M2MBase::O_Attribute & observation_level) == M2MBase::O_Attribute ||
+       (M2MBase::OI_Attribute & observation_level) == M2MBase::OI_Attribute) {
+        tr_debug("M2MResourceInstance::report() -- object/instance level");
         _object_instance_callback.notification_update(observation_level);
     }
-    if(M2MBase::Dynamic == mode() && M2MBase::R_Attribute == observation_level) {
+
+    if(M2MBase::Dynamic == mode() &&
+       (M2MBase::R_Attribute & observation_level) == M2MBase::R_Attribute) {
         tr_debug("M2MResourceInstance::report() - resource level");
         if(!_resource_callback && _resource_type != M2MResourceInstance::STRING) {
             M2MReportHandler *report_handler = M2MBase::report_handler();
