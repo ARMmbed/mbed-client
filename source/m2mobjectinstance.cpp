@@ -340,11 +340,13 @@ M2MBase::BaseType M2MObjectInstance::base_type() const
 
 void M2MObjectInstance::add_observation_level(M2MBase::Observation observation_level)
 {
+    tr_debug("M2MObjectInstance::add_observation_level - level %d", observation_level);
     M2MBase::add_observation_level(observation_level);
     if(!_resource_list.empty()) {
         M2MResourceList::const_iterator it;
         it = _resource_list.begin();
         for ( ; it != _resource_list.end(); it++ ) {
+            tr_debug("M2MObjectInstance::add_observation_level - resource level %d", observation_level);
             (*it)->add_observation_level(observation_level);
         }
     }

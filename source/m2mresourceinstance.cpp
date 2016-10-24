@@ -220,6 +220,7 @@ void M2MResourceInstance::report()
 {
     tr_debug("M2MResourceInstance::report()");
     M2MBase::Observation  observation_level = M2MBase::observation_level();
+    tr_debug("M2MResourceInstance::report() - level %d", observation_level);
     if(M2MBase::R_Attribute != observation_level) {
         tr_debug("M2MResourceInstance::report() -- object level");
         _object_instance_callback.notification_update(observation_level);
