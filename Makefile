@@ -1,6 +1,7 @@
 #
 # Makefile for mbed Client C++ Library
 #
+
 # List of subdirectories to build
 TEST_FOLDER := ./test/
 
