@@ -620,14 +620,14 @@ void M2MInterfaceImpl::state_bootstrapped( EventData */*data*/)
 #endif //MBED_CLIENT_DISABLE_BOOTSTRAP_FEATURE
 }
 
-void M2MInterfaceImpl::state_register( EventData *data)
+void M2MInterfaceImpl::state_register(EventData *data)
 {
     tr_debug("M2MInterfaceImpl::state_register");
+    M2MRegisterData *event = static_cast<M2MRegisterData *> (data);
     if (!_security) {
         M2MInterface::Error error = M2MInterface::InvalidParameters;
         // Start with registration preparation
-        if(data) {
-            M2MRegisterData *event = static_cast<M2MRegisterData *> (data);
+        if(event) {
             _security = event->_object;
             if(_security) {
                 if(M2MSecurity::M2MServer == _security->server_type()) {
@@ -670,7 +670,9 @@ void M2MInterfaceImpl::state_register( EventData *data)
     } else {
         _listen_port = rand() % 64511 + 1024;
         _connection_handler->stop_listening();
-        tr_debug("M2MInterfaceImpl::state_register() - new port: %d", _listen_port);
+        if (event) {
+            _nsdl_interface->create_nsdl_list_structure(event->_object_list);
+        }
         _connection_handler->bind_connection(_listen_port);
         _connection_handler->resolve_server_address(_server_ip_address,_server_port,
                                                     M2MConnectionObserver::LWM2MServer,
