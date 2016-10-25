@@ -35,6 +35,16 @@ M2MObject::M2MObject(const String &object_name)
     }
 }
 
+M2MObject::M2MObject(const M2MBase::lwm2m_parameters_s* stat_res)
+: M2MBase(stat_res),
+  _max_instance_count(MAX_UNINT_16_COUNT)
+{
+    //M2MBase::set_base_type(M2MBase::Object);
+    if(stat_res->name_id != -1) {
+        M2MBase::set_coap_content_type(COAP_CONTENT_OMA_TLV_TYPE);
+    }
+}
+
 M2MObject::~M2MObject()
 {
     if(!_instance_list.empty()) {
@@ -93,6 +103,26 @@ M2MObjectInstance* M2MObject::create_object_instance(uint16_t instance_id)
     }
     return instance;
 }
+
+// KS: is this needed for object instance??
+M2MObjectInstance* M2MObject::create_object_instance(const lwm2m_parameters_s* s)
+{
+    tr_debug("M2MObject::create_object_instance - id: %d", s->instance_id);
+    M2MObjectInstance *instance = NULL;
+    if(!object_instance(s->instance_id)) {
+        instance = new M2MObjectInstance(this->name(),*this);
+        if(instance) {
+            instance->add_observation_level(observation_level());
+            //instance->set_instance_id(instance_id);
+            //if(M2MBase::name_id() != -1) {
+              //  instance->set_coap_content_type(COAP_CONTENT_OMA_TLV_TYPE);
+            //}
+            _instance_list.push_back(instance);
+        }
+    }
+    return instance;
+}
+
 
 bool M2MObject::remove_object_instance(uint16_t inst_id)
 {

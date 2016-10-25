@@ -29,12 +29,17 @@ public:
  *  This class is the base class for mbed Client Resources. All defined
  *  LWM2M resource models can be created based on it.
  */
+
+
+#ifndef RAM_OPTIMIZED
 class M2MBlockMessage;
 typedef FP1<void,void*> execute_callback;
 typedef void(*execute_callback_2) (void *arguments);
 typedef FP1<void, M2MBlockMessage *> incoming_block_message_callback;
 typedef FP3<void, const String &, uint8_t *&, uint32_t &> outgoing_block_message_callback;
-
+#else
+typedef int(*execute_callback)(void *args);
+#endif
 class M2MResourceCallback;
 
 class M2MResourceInstance : public M2MBase {
@@ -62,6 +67,12 @@ public:
 private: // Constructor and destructor are private
          // which means that these objects can be created or
          // deleted only through a function provided by the M2MObjectInstance.
+     M2MResourceInstance(const lwm2m_parameters_s* s,
+                                         M2MObjectInstanceCallback &object_instance_callback,
+                                         M2MResourceInstance::ResourceType type,
+                                         const uint16_t object_instance_id,
+                                         const String &object_name);
+
     /**
      * \brief A constructor for creating a resource.
      * \param resource_name The name of the resource.
@@ -70,7 +81,7 @@ private: // Constructor and destructor are private
      * \param object_instance_id Object instance id where resource exists.
      * \param object_name Object name where resource exists.
      */
-    M2MResourceInstance(const String &resource_name,
+    M2MResourceInstance(const String resource_name,
                         const String &resource_type,
                         M2MResourceInstance::ResourceType type,
                         M2MObjectInstanceCallback &object_instance_callback,
@@ -88,7 +99,7 @@ private: // Constructor and destructor are private
      * \param object_instance_id Object instance id where resource exists.
      * \param object_name Object name where resource exists.
      */
-    M2MResourceInstance(const String &resource_name,
+    M2MResourceInstance(const String resource_name,
                         const String &resource_type,
                         M2MResourceInstance::ResourceType type,
                         const uint8_t *value,
@@ -139,12 +150,14 @@ public:
      */
     virtual void set_execute_function(execute_callback callback);
 
+    #ifndef RAM_OPTIMIZED
     /**
      * \brief Sets the function that should be executed when this
      * resource receives a POST command.
      * \param callback The function pointer that needs to be executed.
      */
     virtual void set_execute_function(execute_callback_2 callback);
+    #endif
 
     /**
      * \brief Sets a value of a given resource.
@@ -239,13 +252,15 @@ public:
      * \brief Returns the name of the object where the resource exists.
      * \return Object name.
     */
-    const String& object_name() const;
+    // TBD: Make backwards compability function
+    String object_name() const;
 
     /**
      * @brief Sets the function that is executed when this
      * object receives a block-wise message.
      * @param callback The function pointer that is called.
      */
+    #ifndef RAM_OPTIMIZED
     virtual void set_incoming_block_message_callback(incoming_block_message_callback callback);
 
     /**
@@ -256,12 +271,14 @@ public:
      * @param callback The function pointer that is called.
      */
     virtual void set_outgoing_block_message_callback(outgoing_block_message_callback callback);
-
+    #endif
     /**
      * \brief Returns the block message object.
      * \return Block message.
     */
+    #ifndef RAM_OPTIMIZED
     virtual M2MBlockMessage* block_message() const;
+    #endif
 
 protected:
 
@@ -279,19 +296,24 @@ private:
 
 private:
 
-    M2MObjectInstanceCallback               &_object_instance_callback;
+    // to M2MBase struct=flash?
+    ResourceType                            _resource_type;
+    //TBD: to be removed
+    uint16_t                                _object_instance_id;
+    M2MObjectInstanceCallback               &_object_instance_callback;    
     execute_callback                        _execute_callback;
+    //TBD: use c-library resource field??
     uint8_t                                 *_value;
     uint32_t                                _value_length;
     M2MResourceCallback                     *_resource_callback; // Not owned
-    String                                  _object_name;
+    //TBD: to be removed
+    char                                    *_object_name;        
+    #ifndef RAM_OPTIMIZED
     FP1<void, void*>                        *_function_pointer;
-    uint16_t                                _object_instance_id;
-    ResourceType                            _resource_type;
     incoming_block_message_callback         _incoming_block_message_cb;
     outgoing_block_message_callback         _outgoing_block_message_cb;
     M2MBlockMessage                         *_block_message_data;
-
+    #endif
     friend class Test_M2MResourceInstance;
     friend class Test_M2MResource;
     friend class Test_M2MObjectInstance;

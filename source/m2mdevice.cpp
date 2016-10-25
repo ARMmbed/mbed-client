@@ -26,6 +26,12 @@
 
 M2MDevice* M2MDevice::_instance = NULL;
 
+// may be better use this for resource created here
+ns_list_link_t device_link;
+sn_nsdl_dynamic_resource_parameters_s device_dyn_param = {0,0,0,0,1};
+sn_nsdl_static_resource_parameters_s const device_static_res = {1,1,1,0,0,&device_dyn_param, 0, 0, 0, 0, 0, 0, device_link};
+M2MBase::lwm2m_parameters_s const lwm2m_device_params = {100, 1, 1, (char*)M2M_DEVICE_ID, (M2MBase::BaseType)M2MBase::Object, (sn_nsdl_static_resource_parameters_s*)&device_static_res};
+
 M2MDevice* M2MDevice::get_instance()
 {
     if(_instance == NULL) {
@@ -41,14 +47,17 @@ void M2MDevice::delete_instance()
 }
 
 M2MDevice::M2MDevice()
-: M2MObject(M2M_DEVICE_ID)
+: M2MObject(&lwm2m_device_params)
 {
-    M2MBase::set_register_uri(false);
+    //TBD: removed inrelevant functions and make resources constant.
+    //M2MBase::set_register_uri(false);
     M2MBase::set_operation(M2MBase::GET_ALLOWED);
 
+    //_device_instance = M2MObject::create_object_instance(&lwm2m_device_params);
     _device_instance = M2MObject::create_object_instance();
     _device_instance->set_operation(M2MBase::GET_ALLOWED);
-    _device_instance->set_register_uri(true);
+    //ks: tbd
+    //_device_instance->set_register_uri(true);
     if(_device_instance) {
         _device_instance->set_coap_content_type(COAP_CONTENT_OMA_TLV_TYPE);        
         M2MResource* res = _device_instance->create_dynamic_resource(DEVICE_REBOOT,

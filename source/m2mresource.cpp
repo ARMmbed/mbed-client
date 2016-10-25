@@ -48,16 +48,30 @@ M2MResource& M2MResource::operator=(const M2MResource& other)
 }
 
 M2MResource::M2MResource(const M2MResource& other)
-: M2MResourceInstance(other),
-  _delayed_token(NULL),
+: M2MResourceInstance(other),  
   _delayed_token_len(0),
-  _delayed_response(false)
+  _delayed_response(false),
+  _delayed_token(NULL)
 {
     this->operator=(other);
 }
 
 M2MResource::M2MResource(M2MObjectInstanceCallback &object_instance_callback,
-                         const String &resource_name,
+                         const lwm2m_parameters_s* s,
+                          M2MResourceInstance::ResourceType type,
+                         const uint16_t object_instance_id,
+                         const String &object_name)
+    : M2MResourceInstance(s, object_instance_callback, type, object_instance_id, object_name),
+    _delayed_token_len(0),
+    _has_multiple_instances(false),
+    _delayed_response(false),
+    _delayed_token(NULL)
+{
+    // tbd: _has_multiple_instances could be in flash, but no real benefit, because of current alignment.
+}
+
+M2MResource::M2MResource(M2MObjectInstanceCallback &object_instance_callback,
+                         const String resource_name,
                          const String &resource_type,
                          M2MResourceInstance::ResourceType type,
                          const uint8_t *value,
@@ -66,11 +80,11 @@ M2MResource::M2MResource(M2MObjectInstanceCallback &object_instance_callback,
                          const String &object_name,
                          bool multiple_instance)
 : M2MResourceInstance(resource_name, resource_type, type, value, value_length,
-                      object_instance_callback, object_instance_id, object_name),
-  _delayed_token(NULL),
+                      object_instance_callback, object_instance_id, object_name),  
   _delayed_token_len(0),
   _has_multiple_instances(multiple_instance),
-  _delayed_response(false)
+  _delayed_response(false),
+  _delayed_token(NULL)
 {
     M2MBase::set_base_type(M2MBase::Resource);
     M2MBase::set_operation(M2MBase::GET_ALLOWED);
@@ -78,7 +92,7 @@ M2MResource::M2MResource(M2MObjectInstanceCallback &object_instance_callback,
 }
 
 M2MResource::M2MResource(M2MObjectInstanceCallback &object_instance_callback,
-                         const String &resource_name,
+                         const String resource_name,
                          const String &resource_type,
                          M2MResourceInstance::ResourceType type,
                          bool observable,
@@ -87,10 +101,10 @@ M2MResource::M2MResource(M2MObjectInstanceCallback &object_instance_callback,
                          bool multiple_instance)
 : M2MResourceInstance(resource_name, resource_type, type,
                       object_instance_callback, object_instance_id, object_name),
-  _delayed_token(NULL),
   _delayed_token_len(0),
   _has_multiple_instances(multiple_instance),
-  _delayed_response(false)
+  _delayed_response(false),
+  _delayed_token(NULL)
 {
     M2MBase::set_base_type(M2MBase::Resource);
     M2MBase::set_operation(M2MBase::GET_PUT_ALLOWED);

@@ -44,6 +44,12 @@ protected :
      */
     M2MObject(const String &object_name);
 
+    /**
+     * \brief Constructor
+     * \param name The name of the object.
+     */
+    M2MObject(const M2MBase::lwm2m_parameters_s* stat_res);
+
     // Prevents the use of default constructor.
     M2MObject();
 
@@ -66,6 +72,8 @@ public:
      * \return M2MObjectInstance. An object instance for managing other client operations.
      */
     M2MObjectInstance* create_object_instance(uint16_t instance_id = 0);
+
+    M2MObjectInstance* create_object_instance(const lwm2m_parameters_s* s);
 
     /**
      * \brief Removes the object instance resource with the given instance id.
@@ -158,8 +166,10 @@ protected :
 
 private:
 
-    M2MObjectInstanceList     _instance_list; // owned
+    // use define directly #define MAX_UNINT_16_COUNT
     uint16_t                  _max_instance_count;
+    M2MObjectInstanceList     _instance_list; // owned
+
 
 friend class Test_M2MObject;
 friend class Test_M2MInterfaceImpl;
