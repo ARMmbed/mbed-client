@@ -525,6 +525,19 @@ void Test_M2MNsdlInterface::test_received_from_server_callback()
 
     CHECK(0== nsdl->received_from_server_callback(handle,coap_header,NULL));
 
+    //Test methods that are not allowed
+    coap_header->msg_code = COAP_MSG_CODE_REQUEST_GET;
+    nsdl->received_from_server_callback(handle,coap_header,NULL);
+
+    coap_header->msg_code = COAP_MSG_CODE_REQUEST_PUT;
+    nsdl->received_from_server_callback(handle,coap_header,NULL);
+
+    coap_header->msg_code = COAP_MSG_CODE_REQUEST_DELETE;
+    nsdl->received_from_server_callback(handle,coap_header,NULL);
+
+    //Continue testing with post method
+    coap_header->msg_code = COAP_MSG_CODE_REQUEST_POST;
+
     uint8_t object_instance[] = {"name/0"};
 
     coap_header->uri_path_ptr = object_instance;
