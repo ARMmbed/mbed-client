@@ -22,7 +22,6 @@
 namespace m2minterfaceimpl_stub
 {
     extern u_int8_t int_value;
-    extern String string_value;
     extern bool bool_value;
     void clear();
 }
