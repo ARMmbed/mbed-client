@@ -16,19 +16,22 @@
 //CppUTest includes should be after your and system includes
 #include "CppUTest/TestHarness.h"
 #include "test_m2minterfaceimpl.h"
+#include "m2mnsdlinterface_stub.h"
 
 TEST_GROUP(M2MInterfaceImpl)
 {
-  Test_M2MInterfaceImpl* m2m_interface_impl;
+    Test_M2MInterfaceImpl* m2m_interface_impl;
 
-  void setup()
-  {
-    m2m_interface_impl = new Test_M2MInterfaceImpl();
-  }
-  void teardown()
-  {
-    delete m2m_interface_impl;
-  }
+    void setup()
+    {
+        m2mnsdlinterface_stub::string_value = new String();
+        m2m_interface_impl = new Test_M2MInterfaceImpl();
+    }
+    void teardown()
+    {
+        delete m2mnsdlinterface_stub::string_value;
+        delete m2m_interface_impl;
+    }
 };
 
 TEST(M2MInterfaceImpl, create)

@@ -18,23 +18,25 @@
 uint32_t m2mdevice_stub::int_value;
 bool m2mdevice_stub::bool_value;
 M2MResource* m2mdevice_stub::resource;
-String m2mdevice_stub::string_value;
+String *m2mdevice_stub::string_value;
 
 void m2mdevice_stub::clear()
 {
     int_value = -1;
     bool_value = false;
-    string_value = "";
+    *string_value = "";
     resource = NULL;
 }
 
 M2MDevice::M2MDevice()
 : M2MObject("3")
 {
+    m2mdevice_stub::string_value = new String("");
 }
 
 M2MDevice::~M2MDevice()
 {
+    delete m2mdevice_stub::string_value;
 }
 
 M2MDevice* M2MDevice::get_instance()
@@ -83,7 +85,7 @@ bool M2MDevice::set_resource_value(DeviceResource,
 String M2MDevice::resource_value_string(DeviceResource,
                                         uint16_t) const
 {
-    return m2mdevice_stub::string_value;
+    return *m2mdevice_stub::string_value;
 }
 
 int64_t M2MDevice::resource_value_int(DeviceResource,

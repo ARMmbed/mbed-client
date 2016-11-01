@@ -24,7 +24,7 @@ namespace m2mserver_stub
 {
     extern uint32_t int_value;
     extern bool bool_value;
-    extern String string_value;
+    extern String *string_value;
     extern M2MResource* resource;
     void clear();
 }

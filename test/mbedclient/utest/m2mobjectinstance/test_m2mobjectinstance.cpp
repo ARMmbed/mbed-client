@@ -24,7 +24,7 @@
 #include "m2mreporthandler_stub.h"
 
 // Length is 65
-String max_length = "65656565656565656565656565656565656565656565656565656565656565656";
+String *max_length;
 
 class Handler : public M2MObservationHandler {
 
@@ -70,6 +70,7 @@ Test_M2MObjectInstance::Test_M2MObjectInstance()
     handler = new Handler();
     callback = new Callback();
     object = new M2MObjectInstance("name",*callback);
+    max_length = new String("65656565656565656565656565656565656565656565656565656565656565656");
 }
 
 void Test_M2MObjectInstance::test_copy_constructor()
@@ -95,6 +96,7 @@ Test_M2MObjectInstance::~Test_M2MObjectInstance()
     m2mbase_stub::clear();
     m2mtlvdeserializer_stub::clear();
     m2mtlvserializer_stub::clear();
+    delete max_length;
 
 }
 
@@ -117,7 +119,7 @@ void Test_M2MObjectInstance::test_create_static_resource()
     res = object->create_static_resource("","type",M2MResourceInstance::STRING,value,(u_int32_t)sizeof(value));
     CHECK(res == NULL);
 
-    res = object->create_static_resource(max_length,"type",M2MResourceInstance::STRING,value,(u_int32_t)sizeof(value));
+    res = object->create_static_resource(*max_length,"type",M2MResourceInstance::STRING,value,(u_int32_t)sizeof(value));
     CHECK(res == NULL);
 }
 
@@ -156,7 +158,7 @@ void Test_M2MObjectInstance::test_create_static_resource_instance()
 
     delete ins;
 
-    ins = object->create_static_resource_instance(max_length,"type",
+    ins = object->create_static_resource_instance(*max_length,"type",
                                                   M2MResourceInstance::STRING,value,
                                                   (u_int32_t)sizeof(value),0);
     CHECK(ins == NULL);
@@ -191,7 +193,7 @@ void Test_M2MObjectInstance::test_create_dynamic_resource_instance()
 
     CHECK(ins == NULL);
 
-    ins = object->create_dynamic_resource_instance(max_length,"type",
+    ins = object->create_dynamic_resource_instance(*max_length,"type",
                                                    M2MResourceInstance::STRING,
                                                    false,1);
     CHECK(ins == NULL);
@@ -217,7 +219,7 @@ void Test_M2MObjectInstance::test_create_dynamic_resource()
     M2MResource * res2 = object->create_dynamic_resource("","type",M2MResourceInstance::STRING,false,false);
     CHECK(res2 == NULL);
 
-    M2MResource * res3 = object->create_dynamic_resource(max_length,"type",M2MResourceInstance::STRING,false,false);
+    M2MResource * res3 = object->create_dynamic_resource(*max_length,"type",M2MResourceInstance::STRING,false,false);
     CHECK(res3 == NULL);
 }
 

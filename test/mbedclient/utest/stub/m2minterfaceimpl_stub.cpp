@@ -17,14 +17,12 @@
 #include "common_stub.h"
 
 u_int8_t m2minterfaceimpl_stub::int_value;
-String m2minterfaceimpl_stub::string_value;
 bool m2minterfaceimpl_stub::bool_value;
 
 void m2minterfaceimpl_stub::clear()
 {
     int_value = 0;
     bool_value = false;
-    string_value = "";
 }
 
 M2MInterfaceImpl::M2MInterfaceImpl(M2MInterfaceObserver& observer,
