@@ -28,7 +28,7 @@ public:
     virtual void notification_update(uint16_t obj_instance_id) = 0;
 };
 
-/**
+/*! \file m2mobjectinstance.h
  *  \brief M2MObjectInstance.
  *  This class is the instance class for mbed Client Objects. All defined
  *  LWM2M object models can be created based on it. This class also holds all resource
