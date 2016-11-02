@@ -21,7 +21,7 @@
 // FORWARD DECLARATION
 class M2MResource;
 
-/**
+/*! \file m2msecurity.h
  *  \brief M2MSecurity.
  *  This class represents an interface for the Security Object model of the LWM2M framework.
  *  It handles the security object instances and all corresponding
