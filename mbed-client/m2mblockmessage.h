@@ -19,7 +19,7 @@
 #include "ns_types.h"
 #include "nsdl-c/sn_coap_header.h"
 
-/**
+/*! \file m2mblockmessage.h
  *  \brief M2MBlockMessage.
  *  This class contains the data of an incoming block message.
  */

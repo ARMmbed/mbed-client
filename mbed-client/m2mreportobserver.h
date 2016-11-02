@@ -19,8 +19,8 @@
 #include <inttypes.h>
 #include <mbed-client/m2mvector.h>
 
-/**
- * \brief M2MReportObserver
+/*! \file m2mreportobserver.h
+ * \brief M2MReportObserver.
  * An interface for inviting the base class
  * to send a report to the server.
  *

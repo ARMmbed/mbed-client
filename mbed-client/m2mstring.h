@@ -25,8 +25,8 @@ class Test_M2MString;
 namespace m2m
 {
 
-  /** \brief A simple C++ string class, used as replacement for
-   std::string.
+/*! \file m2mstring.h 
+* \brief A simple C++ string class, used as replacement for std::string.
    */
   class String
   {

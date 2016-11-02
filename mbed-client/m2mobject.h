@@ -23,7 +23,7 @@
 //FORWARD DECLARATION
 typedef Vector<M2MObjectInstance *> M2MObjectInstanceList;
 
-/**
+/*! \file m2mobject.h
  *  \brief M2MObject.
  *  This class is the base class for the mbed Client Objects. All defined
  *  LWM2M object models can be created based on it. This class also holds all object
