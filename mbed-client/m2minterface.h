@@ -29,7 +29,7 @@ class M2MInterfaceObserver;
 typedef Vector<M2MObject *> M2MObjectList;
 typedef FP callback_handler;
 
-/**
+/*! \file m2minterface.h
  *  \brief M2MInterface.
  *  This class provides an interface for handling all mbed Client interface operations
  *  defined in the OMA LWM2M specifications.
