@@ -19,9 +19,10 @@
 #include <string.h>
 #include <stdint.h>
 
-
-/** A class for storing and calling a pointer to a static or member void function.
+/*! \file functionpointer.h
+* \brief A class for storing and calling a pointer to a static or member void function.
  */
+
 template <typename R>
 class FP0{
 public:
