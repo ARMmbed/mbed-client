@@ -28,7 +28,7 @@ public:
     virtual void notification_update() = 0;
 };
 
-/**
+/*! \file m2mresource.h
  *  \brief M2MResource.
  *  This class is the base class for mbed Client Resources. All defined
  *  LWM2M object models can be created using it. This class will also hold all resources
