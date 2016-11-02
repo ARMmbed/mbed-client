@@ -27,7 +27,7 @@ class M2MServer;
 class M2MInterfaceImpl;
 class M2MFirmware;
 
-/**
+/*! \file m2minterfacefactory.h
  *  \brief M2MInterfaceFactory.
  *  This is a factory class that provides an interface for creating an mbed Client Interface
  *  object for an application to utilize the LWM2M features provided by the client.
