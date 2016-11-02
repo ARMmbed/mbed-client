@@ -21,7 +21,7 @@ class M2MConnectionHandler;
 class M2MSecurity;
 class M2MConnectionSecurityPimpl;
 
-/**
+/*! \file m2mconnectionsecurity.h
  * \brief M2MConnectionSecurity.
  * This class provides a method to create a secure socket connection
  * to handle connectivity for the mbed Client. It handles sending, receiving
