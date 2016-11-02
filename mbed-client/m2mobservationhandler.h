@@ -20,8 +20,8 @@
 class M2MBase;
 class M2MResourceInstance;
 
-/**
- * \brief M2MObservationHandler
+/*! \file m2mobservationhandler.h
+ * \brief M2MObservationHandler.
  * An interface for handling observation
  * callbacks from different objects.
  *
