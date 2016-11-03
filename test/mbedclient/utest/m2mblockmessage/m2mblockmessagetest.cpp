@@ -13,21 +13,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef M2M_SERVER_STUB_H
-#define M2M_SERVER_STUB_H
+//CppUTest includes should be after your and system includes
+#include "CppUTest/TestHarness.h"
+#include "test_m2mblockmessage.h"
 
-#include "m2mserver.h"
-#include "m2mresource.h"
-
-//some internal test related stuff
-namespace m2mserver_stub
+TEST_GROUP(M2MBlockMessage)
 {
-    extern uint32_t int_value;
-    extern bool bool_value;
-    extern String *string_value;
-    extern M2MResource* resource;
-    void clear();
+    Test_M2MBlockMessage* block_message;
+    void setup()
+    {
+        block_message = new Test_M2MBlockMessage();
+    }
+    void teardown()
+    {
+        delete block_message;
+    }
+};
+
+TEST(M2MBlockMessage, Create)
+{
+    CHECK(block_message->block_message != NULL);
 }
 
-#endif // M2M_SERVER_STUB_H
+TEST(M2MBlockMessage, test_set_message_info)
+{
+    block_message->test_set_message_info();
+}
 

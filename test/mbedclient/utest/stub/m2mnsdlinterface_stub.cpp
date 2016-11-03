@@ -19,22 +19,25 @@
 bool m2mnsdlinterface_stub::bool_value;
 uint32_t m2mnsdlinterface_stub::int_value;
 void * m2mnsdlinterface_stub::void_value;
-String m2mnsdlinterface_stub::string_value;
+String *m2mnsdlinterface_stub::string_value;
+
 void m2mnsdlinterface_stub::clear()
 {
     bool_value = false;
     int_value = 0;
-    string_value = "";
+    *string_value = "";
     void_value = NULL;
 }
 
 M2MNsdlInterface::M2MNsdlInterface(M2MNsdlObserver &observer)
 : _observer(observer)
 {
+    //m2mnsdlinterface_stub::string_value = new String("");
 }
 
 M2MNsdlInterface::~M2MNsdlInterface()
 {
+    //delete m2mnsdlinterface_stub::string_value;
 }
 
 bool M2MNsdlInterface::initialize()
@@ -71,6 +74,7 @@ bool M2MNsdlInterface::create_bootstrap_resource(sn_nsdl_addr_s *, const String&
 }
 
 bool M2MNsdlInterface::send_register_message(uint8_t*,
+                                             uint8_t,
                                              const uint16_t,
                                              sn_nsdl_addr_type_e)
 {
@@ -196,5 +200,5 @@ void M2MNsdlInterface::handle_bootstrap_error()
 
 const String& M2MNsdlInterface::endpoint_name() const
 {
-    return m2mnsdlinterface_stub::string_value;
+    return *m2mnsdlinterface_stub::string_value;
 }

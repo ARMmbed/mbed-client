@@ -26,6 +26,7 @@ public:
     Test_M2MString();
     virtual ~Test_M2MString();
 
+    void test_string_and_len_constructor();
     void test_copy_constructor();
     void test_operator_assign();
     void test_operator_add();

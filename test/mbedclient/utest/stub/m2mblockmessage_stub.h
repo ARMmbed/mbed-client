@@ -13,21 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef M2M_SERVER_STUB_H
-#define M2M_SERVER_STUB_H
+#ifndef M2M_BLOCKMESSAGE_STUB_H
+#define M2M_BLOCKMESSAGE_STUB_H
 
-#include "m2mserver.h"
-#include "m2mresource.h"
+#include "m2mblockmessage.h"
 
 //some internal test related stuff
-namespace m2mserver_stub
+namespace m2mblockmessage_stub
 {
-    extern uint32_t int_value;
-    extern bool bool_value;
-    extern String *string_value;
-    extern M2MResource* resource;
+    extern bool is_block_message;
+    extern bool is_last_block;
     void clear();
 }
 
-#endif // M2M_SERVER_STUB_H
+#endif // M2M_BLOCKMESSAGE_STUB_H
 

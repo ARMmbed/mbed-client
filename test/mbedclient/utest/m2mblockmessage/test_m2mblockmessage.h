@@ -13,21 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef M2M_SERVER_STUB_H
-#define M2M_SERVER_STUB_H
+#ifndef TEST_M2M_BLOCKMESSAGE_H
+#define TEST_M2M_BLOCKMESSAGE_H
 
-#include "m2mserver.h"
-#include "m2mresource.h"
+#include "m2mblockmessage.h"
 
-//some internal test related stuff
-namespace m2mserver_stub
+class Test_M2MBlockMessage
 {
-    extern uint32_t int_value;
-    extern bool bool_value;
-    extern String *string_value;
-    extern M2MResource* resource;
-    void clear();
-}
+public:
+    Test_M2MBlockMessage();
+    virtual ~Test_M2MBlockMessage();
 
-#endif // M2M_SERVER_STUB_H
+    void test_set_message_info();
+
+    M2MBlockMessage* block_message;
+
+};
+
+#endif // TEST_M2M_BLOCKMESSAGE_H
 

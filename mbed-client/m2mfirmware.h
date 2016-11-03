@@ -22,7 +22,7 @@
 class M2MResource;
 class M2MResourceInstance;
 
-/**
+/*! \file m2mfirmware.h
  *  \brief M2MFirmware.
  *  This class represents the Firmware Object model of the LWM2M framework.
  *  It provides an interface for handling the Firmware Object
@@ -36,7 +36,7 @@ friend class M2MInterfaceFactory;
 public:
 
      /**
-      * \brief Enum defining all the resources associated with a
+      * \brief An enum defining all the resources associated with a
       * Firmware Object in the LWM2M framework.
       */
     typedef enum {
@@ -51,7 +51,7 @@ public:
     } FirmwareResource;
 
     /**
-     * \brief Enum defining the state of the firmware update.
+     * \brief An enum defining the state of the firmware update.
      */
     typedef enum {
        Idle = 0,
@@ -61,7 +61,7 @@ public:
     } UpdateState;
 
     /**
-     * \brief Enum defining the result of the firmware update.
+     * \brief An enum defining the result of the firmware update.
      */
     typedef enum {
        Default = 0,
@@ -97,30 +97,30 @@ private:
 public:
 
     /**
-     * \brief Deletes the M2MFirmware instance.
+     * \brief Deletes a M2MFirmware instance.
      */
     static void delete_instance();
 
     /**
-     * \brief Creates a new resource for given resource enum.
+     * \brief Creates a new resource for a given resource enum.
      * \param resource With this function, the following resources can be created:
      * 'PackageUri', 'PackageName','PackageVersion'.
-     * \param value The value to be set on the resource, in String format.
+     * \param value The value to be set on the resource, in string format.
      * \return M2MResource if created successfully, else NULL.
      */
     M2MResource* create_resource(FirmwareResource resource, const String &value);
 
     /**
-     * \brief Creates a new resource for given resource enum.
+     * \brief Creates a new resource for a given resource enum.
      * \param resource With this function, the following resources can be created:
      * 'State','UpdateSupportedObjects','UpdateResult'.
-     * \param value The value to be set on the resource, in Integer format.
+     * \param value The value to be set on the resource, in integer format.
      * \return M2MResource if created successfully, else NULL.
      */
     M2MResource* create_resource(FirmwareResource resource, int64_t value);
 
     /**
-     * \brief Deletes the resource with the given resource enum.
+     * \brief Deletes a resource with a given resource enum.
      * Mandatory resources cannot be deleted.
      * \param resource The name of the resource to be deleted.
      * \return True if deleted, else false.
@@ -128,27 +128,27 @@ public:
     bool delete_resource(FirmwareResource resource);
 
     /**
-     * \brief Sets the value of the given resource enum.
+     * \brief Sets a value of a given resource enum.
      * \param resource With this function, a value can be set on the following resources:
      * 'Package', 'PackageUri', 'PackageName','PackageVersion'.
-     * \param value The value to be set on the resource, in String format.     
+     * \param value The value to be set on the resource, in string format.     
      * \return True if successfully set, else false.
      */
     bool set_resource_value(FirmwareResource resource,
                             const String &value);
 
     /**
-     * \brief Sets the value of the given resource enum.
+     * \brief Sets a value of a given resource enum.
      * \param resource With this function, a value can be set for the following resources:
      * 'State','UpdateSupportedObjects','UpdateResult'.
-     * \param value The value to be set on the resource, in Integer format.
+     * \param value The value to be set on the resource, in integer format.
      * \return True if successfully set, else false.
      */
     bool set_resource_value(FirmwareResource resource,
                             int64_t value);
 
     /**
-     * \brief Sets the value of the given resource enum.
+     * \brief Sets a value of a given resource enum.
      * \param resource With this function, a value can be set for the following resources:
      * 'Package'.
      * \param value The value to be set on the resource, in uint8_t format.
@@ -160,15 +160,15 @@ public:
                             const uint32_t length);
 
     /**
-     * \brief Returns the value of the given resource enum, in String.
-     * \param resource With this function, the following resources can return value:
+     * \brief Returns a value of a given resource enum, in string format.
+     * \param resource With this function, the following resources can return a value:
      * 'PackageUri', 'PackageName','PackageVersion'.
-     * \return The value associated with that resource, if key is not valid it returns NULL.
+     * \return The value associated with that resource, if the key is not valid it returns NULL.
      */
     String resource_value_string(FirmwareResource resource) const;
 
     /**
-     * \brief Returns the value of the given resource key name, in Integer.
+     * \brief Returns a value of a given resource key name, in integer format.
      * \param resource With this function, the following resources can return a value:
      * 'State','UpdateSupportedObjects','UpdateResult'.     
      * \return The value associated with that resource. If the resource is not valid -1 is returned.
@@ -189,23 +189,23 @@ public:
                                    uint8_t *&data) const;
 
     /**
-     * \brief Returns whether the resource instance with given resource enum exists or not.
-     * \param resource Resource enum.
+     * \brief Returns whether a resource instance with a given resource enum exists or not.
+     * \param resource The resource enum.
      * \return True if at least one instance exists, else false.
      */
     bool is_resource_present(FirmwareResource resource) const;
 
     /**
-     * \brief Returns the number of resources for the whole firmware object.
+     * \brief Returns the number of resources for a whole firmware object.
      * \return Total number of resources belonging to the firmware object.
      */
     uint16_t total_resource_count() const;
 
     /**
      * \brief Returns the number of resources for a given resource enum.
-     * \param resource Resource enum.
+     * \param resource The resource enum.
      * \return The number of resources for a given resource enum. Returns 1 for the
-     * mandatory resources. Can be 0 as well if no instance exists for an
+     * mandatory resources. Can be 0 as well if no instances exist for an
      * optional resource.
      */
     uint16_t per_resource_count(FirmwareResource resource) const;

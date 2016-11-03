@@ -21,10 +21,10 @@ class M2MConnectionHandler;
 class M2MSecurity;
 class M2MConnectionSecurityPimpl;
 
-/**
+/*! \file m2mconnectionsecurity.h
  * \brief M2MConnectionSecurity.
  * This class provides a method to create a secure socket connection
- * to handle connectivity for the mbed Client. It will handle sending, receiving
+ * to handle connectivity for the mbed Client. It handles sending, receiving
  * and establishing a secure connection for mbed Client on top of the
  * normal socket connection.
  */
@@ -72,7 +72,7 @@ public:
     int start_connecting_non_blocking(M2MConnectionHandler* connHandler);
 
     /**
-     * \brief Continues connectivity logic for secure connection.
+     * \brief Continues connectivity logic for a secure connection.
      * \return Returns an error code if any while continuing the connection sequence.
      */
     int continue_connecting();
@@ -101,16 +101,16 @@ public:
     int read(unsigned char* buffer, uint16_t len);
 
     /**
-     * \brief Sets the function callback that is called by mbed-client to
+     * \brief Sets the function callback that is called by mbed Client to
      * fetch a random number from an application to ensure strong entropy.
-     * \param random_callback A function pointer that is called by mbed-client
+     * \param random_callback A function pointer that is called by mbed Client
      * while performing a secure handshake.
      * The function signature should be uint32_t (*random_number_callback)(void);
      */
     void set_random_number_callback(random_number_cb callback);
 
     /**
-     * \brief Sets the function callback that is called by mbed-client to
+     * \brief Sets the function callback that is called by mbed Client to
      * provide an entropy source from an application to ensure strong entropy.
      * \param entropy_callback A function pointer that is called by mbed-client
      * while performing a secure handshake.

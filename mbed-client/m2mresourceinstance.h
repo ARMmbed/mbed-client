@@ -24,13 +24,16 @@ public:
     virtual void notification_update(M2MBase::Observation observation_level) = 0;
 };
 
-/**
+/*! \file m2mresourceinstance.h
  *  \brief M2MResourceInstance.
  *  This class is the base class for mbed Client Resources. All defined
  *  LWM2M resource models can be created based on it.
  */
+class M2MBlockMessage;
 typedef FP1<void,void*> execute_callback;
 typedef void(*execute_callback_2) (void *arguments);
+typedef FP1<void, M2MBlockMessage *> incoming_block_message_callback;
+typedef FP3<void, const String &, uint8_t *&, uint32_t &> outgoing_block_message_callback;
 
 class M2MResourceCallback;
 
@@ -42,7 +45,7 @@ friend class M2MResource;
 public:
 
     /**
-     * Enum defining a resource type that can be
+     * An enum defining a resource type that can be
      * supported by a given resource.
     */
     typedef enum {
@@ -63,7 +66,7 @@ private: // Constructor and destructor are private
      * \brief A constructor for creating a resource.
      * \param resource_name The name of the resource.
      * \param resource_type The type of the resource.
-     * \param type, The resource data type of the object.
+     * \param type The resource data type of the object.
      * \param object_instance_id Object instance id where resource exists.
      * \param object_name Object name where resource exists.
      */
@@ -144,29 +147,29 @@ public:
     virtual void set_execute_function(execute_callback_2 callback);
 
     /**
-     * \brief Sets the value of the given resource.
-     * \param value, A pointer to the value to be set on the resource.
+     * \brief Sets a value of a given resource.
+     * \param value A pointer to the value to be set on the resource.
      * \param value_length The length of the value pointer.
      * \return True if successfully set, else false.
      */
     virtual bool set_value(const uint8_t *value, const uint32_t value_length);
 
     /**
-     * \brief Sets the value of the given resource.
-     * \param value, new value which is to be formatted into a string
+     * \brief Sets a value of a given resource.
+     * \param value, A new value formatted as a string
      * and set on the resource.
      * \return True if successfully set, else false.
      */
     virtual bool set_value(int64_t value);
 
     /**
-     * \brief Clears the value of the given resource.
+     * \brief Clears the value of a given resource.
      */
     virtual void clear_value();
 
     /**
      * \brief Executes the function that is set in "set_execute_function".
-     * \param arguments The arguments that will be passed to be executed.
+     * \param arguments The arguments that are passed to be executed.
      */
     void execute(void *arguments);
 
@@ -178,14 +181,14 @@ public:
     virtual void get_value(uint8_t *&value, uint32_t &value_length);
 
     /**
-     * \brief Converts value to int and return it. Note: conversion
+     * \brief Converts a value to integer and returns it. Note: Conversion
      * errors are not detected.
      */
     int get_value_int();
 
     /**
-     * Get the value as a String object. No encoding/charset conversions
-     * done for the value, just a raw copy.
+     * Get the value as a string object. No encoding/charset conversions
+     * are done for the value, just a raw copy.
      */
     String get_value_string() const;
 
@@ -203,9 +206,9 @@ public:
 
     /**
      * \brief Handles the GET request for the registered objects.
-     * \param nsdl The NSDL handler for the CoAP library.
+     * \param nsdl An NSDL handler for the CoAP library.
      * \param received_coap_header The CoAP message received from the server.
-     * \param observation_handler The handler object for sending
+     * \param observation_handler A handler object for sending
      * observation callbacks.
      * \return sn_coap_hdr_s The message that needs to be sent to the server.
      */
@@ -214,34 +217,56 @@ public:
                                               M2MObservationHandler *observation_handler = NULL);
     /**
      * \brief Handles the PUT request for the registered objects.
-     * \param nsdl The NSDL handler for the CoAP library.
+     * \param nsdl An NSDL handler for the CoAP library.
      * \param received_coap_header The CoAP message received from the server.
-     * \param observation_handler The handler object for sending
+     * \param observation_handler A handler object for sending
      * observation callbacks.
      * \param execute_value_updated True will execute the "value_updated" callback.
      * \return sn_coap_hdr_s The message that needs to be sent to the server.
      */
     virtual sn_coap_hdr_s* handle_put_request(nsdl_s *nsdl,
-                                              sn_coap_hdr_s *received_coap_header,                                                                                            
+                                              sn_coap_hdr_s *received_coap_header,
                                               M2MObservationHandler *observation_handler,
                                               bool &execute_value_updated);
 
     /**
-     * \brief Returns the object instance id where resource exists.
-     * \return Object instance id.
+     * \brief Returns the instance ID of the object where the resource exists.
+     * \return Object instance ID.
     */
     uint16_t object_instance_id() const;
 
     /**
-     * \brief Returns the object name where resource exists.
+     * \brief Returns the name of the object where the resource exists.
      * \return Object name.
     */
     const String& object_name() const;
 
+    /**
+     * @brief Sets the function that is executed when this
+     * object receives a block-wise message.
+     * @param callback The function pointer that is called.
+     */
+    virtual void set_incoming_block_message_callback(incoming_block_message_callback callback);
+
+    /**
+     * @brief Sets the function that is executed when this
+     * object receives a GET request.
+     * This is called if resource values are stored on the application side.
+     * NOTE! Due to a limitation in the mbed-client-c library, a GET request can only contain data size up to 65KB.
+     * @param callback The function pointer that is called.
+     */
+    virtual void set_outgoing_block_message_callback(outgoing_block_message_callback callback);
+
+    /**
+     * \brief Returns the block message object.
+     * \return Block message.
+    */
+    virtual M2MBlockMessage* block_message() const;
+
 protected:
 
     /**
-     * \brief Set observer for sending the notification update.
+     * \brief Set an observer for sending the notification update.
      * \param resource The callback handle.
      */
     void set_resource_observer(M2MResourceCallback *resource);
@@ -261,9 +286,11 @@ private:
     M2MResourceCallback                     *_resource_callback; // Not owned
     String                                  _object_name;
     FP1<void, void*>                        *_function_pointer;
-
     uint16_t                                _object_instance_id;
     ResourceType                            _resource_type;
+    incoming_block_message_callback         _incoming_block_message_cb;
+    outgoing_block_message_callback         _outgoing_block_message_cb;
+    M2MBlockMessage                         *_block_message_data;
 
     friend class Test_M2MResourceInstance;
     friend class Test_M2MResource;

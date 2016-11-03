@@ -18,13 +18,13 @@ bool m2mfirmware_stub::has_value;
 uint32_t m2mfirmware_stub::int_value;
 bool m2mfirmware_stub::bool_value;
 M2MResource* m2mfirmware_stub::resource;
-String m2mfirmware_stub::string_value;
+String *m2mfirmware_stub::string_value;
 
 void m2mfirmware_stub::clear()
 {
     int_value = -1;
     bool_value = false;
-    string_value = "";
+    *string_value = "";
     resource = NULL;
     has_value = false;
 }
@@ -32,10 +32,12 @@ void m2mfirmware_stub::clear()
 M2MFirmware::M2MFirmware()
 : M2MObject("5")
 {
+    m2mfirmware_stub::string_value = new String("");
 }
 
 M2MFirmware::~M2MFirmware()
 {
+    delete m2mfirmware_stub::string_value;
 }
 
 M2MFirmware* M2MFirmware::get_instance()
@@ -89,7 +91,7 @@ bool M2MFirmware::set_resource_value(FirmwareResource,
 
 String M2MFirmware::resource_value_string(FirmwareResource) const
 {
-    return m2mfirmware_stub::string_value;
+    return *m2mfirmware_stub::string_value;
 }
 
 int64_t M2MFirmware::resource_value_int(FirmwareResource) const

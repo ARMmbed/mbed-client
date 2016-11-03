@@ -23,7 +23,7 @@ namespace m2mfirmware_stub
 {
     extern uint32_t int_value;
     extern M2MResource* resource;
-    extern String string_value;
+    extern String *string_value;
     extern bool bool_value;
     void clear();
     extern bool has_value;

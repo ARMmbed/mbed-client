@@ -23,7 +23,7 @@
 //FORWARD DECLARATION
 typedef Vector<M2MObjectInstance *> M2MObjectInstanceList;
 
-/**
+/*! \file m2mobject.h
  *  \brief M2MObject.
  *  This class is the base class for the mbed Client Objects. All defined
  *  LWM2M object models can be created based on it. This class also holds all object
@@ -149,7 +149,8 @@ public:
     virtual sn_coap_hdr_s* handle_post_request(nsdl_s *nsdl,
                                                sn_coap_hdr_s *received_coap_header,
                                                M2MObservationHandler *observation_handler,
-                                               bool &execute_value_updated);
+                                               bool &execute_value_updated,
+                                               sn_nsdl_addr_s *address = NULL);
 
 protected :
 
@@ -157,7 +158,7 @@ protected :
 
 private:
 
-    M2MObjectInstanceList     _instance_list; // owned    
+    M2MObjectInstanceList     _instance_list; // owned
     uint16_t                  _max_instance_count;
 
 friend class Test_M2MObject;

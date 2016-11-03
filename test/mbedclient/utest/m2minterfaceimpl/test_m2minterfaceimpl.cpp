@@ -125,6 +125,10 @@ void Test_M2MInterfaceImpl::test_bootstrap()
     m2mnsdlinterface_stub::bool_value = true;
     m2mconnectionhandler_stub::bool_value = true;
 
+
+    impl->bootstrap(NULL);
+    CHECK(impl->_current_state == M2MInterfaceImpl::STATE_IDLE);
+
     impl->bootstrap(sec);
 
     CHECK(impl->_current_state == M2MInterfaceImpl::STATE_BOOTSTRAP);
@@ -133,7 +137,6 @@ void Test_M2MInterfaceImpl::test_bootstrap()
 
     val = new String("coaps://[10.45.3.83:5685");
 
-    impl->_register_ongoing = false;
     impl->_current_state = M2MInterfaceImpl::STATE_IDLE;
 
     m2msecurity_stub::string_value = val;
@@ -147,7 +150,6 @@ void Test_M2MInterfaceImpl::test_bootstrap()
 
     val = new String("coaps://10.45.3.83]:5685");
 
-    impl->_register_ongoing = false;
     impl->_current_state = M2MInterfaceImpl::STATE_IDLE;
 
     m2msecurity_stub::string_value = val;
@@ -162,7 +164,6 @@ void Test_M2MInterfaceImpl::test_bootstrap()
 
     val = new String("coaps://10.45.3.83:5685");
 
-    impl->_register_ongoing = false;
     impl->_current_state = M2MInterfaceImpl::STATE_IDLE;
 
     m2msecurity_stub::string_value = val;
@@ -230,17 +231,19 @@ void Test_M2MInterfaceImpl::test_register_object()
     m2msecurity_stub::string_value = val;
     m2mnsdlinterface_stub::bool_value = true;
     m2mconnectionhandler_stub::bool_value = true;
+
+    impl->register_object(NULL,list);
+    CHECK(impl->_current_state == M2MInterfaceImpl::STATE_IDLE);
+
     impl->register_object(sec,list);
     CHECK(impl->_current_state == M2MInterfaceImpl::STATE_REGISTER);
 
-    impl->_register_ongoing = false;
     impl->_current_state = M2MInterfaceImpl::STATE_IDLE;
     impl->register_object(sec,list);
     CHECK(impl->_current_state == M2MInterfaceImpl::STATE_REGISTER);
 
     delete val;
     val = new String("coaps://[10.45.3.83:5685");
-    impl->_register_ongoing = false;
     impl->_current_state = M2MInterfaceImpl::STATE_IDLE;
     m2msecurity_stub::string_value = val;
     m2mnsdlinterface_stub::bool_value = true;
@@ -257,7 +260,6 @@ void Test_M2MInterfaceImpl::test_register_object()
     delete val;
     val = new String("coaps://10.45.3.83]:5685");
 
-    impl->_register_ongoing = false;
     impl->_current_state = M2MInterfaceImpl::STATE_IDLE;
 
     m2msecurity_stub::string_value = val;
@@ -279,7 +281,6 @@ void Test_M2MInterfaceImpl::test_register_object()
     impl->_security = NULL;
     sec = new M2MSecurity(M2MSecurity::M2MServer);
 
-    impl->_register_ongoing = false;
     impl->_current_state = M2MInterfaceImpl::STATE_IDLE;
 
     m2msecurity_stub::string_value = val;
@@ -297,7 +298,6 @@ void Test_M2MInterfaceImpl::test_register_object()
     impl->_security = NULL;
     sec = new M2MSecurity(M2MSecurity::M2MServer);
 
-    impl->_register_ongoing = false;
     impl->_current_state = M2MInterfaceImpl::STATE_IDLE;
 
     m2msecurity_stub::string_value = val;
@@ -326,18 +326,6 @@ void Test_M2MInterfaceImpl::test_register_object()
     CHECK(impl->_current_state == M2MInterfaceImpl::STATE_IDLE);
     CHECK(observer->error_occured == true);
 
-
-    impl->_current_state =  M2MInterfaceImpl::STATE_IDLE;
-    m2mconnectionhandler_stub::bool_value = false;
-    m2mnsdlinterface_stub::bool_value = true;
-
-    impl->register_object(sec,list);
-
-    CHECK(impl->_current_state == M2MInterfaceImpl::STATE_IDLE);
-    CHECK(observer->error_occured == true);
-
-
-    impl->_register_ongoing = false;
     impl->_current_state =  M2MInterfaceImpl::STATE_BOOTSTRAP;
     m2mconnectionhandler_stub::bool_value = true;
     m2mnsdlinterface_stub::bool_value = true;
@@ -345,15 +333,6 @@ void Test_M2MInterfaceImpl::test_register_object()
     impl->register_object(sec,list);
 
     CHECK(impl->_current_state == M2MInterfaceImpl::STATE_BOOTSTRAP);
-    CHECK(observer->error_occured == true);
-
-    impl->_current_state =  M2MInterfaceImpl::STATE_IDLE;
-    m2mconnectionhandler_stub::bool_value = true;
-    m2mnsdlinterface_stub::bool_value = true;
-
-    impl->register_object(sec,list);
-
-    CHECK(impl->_current_state == M2MInterfaceImpl::STATE_IDLE);
     CHECK(observer->error_occured == true);
 
     impl->_current_state =  M2MInterfaceImpl::STATE_BOOTSTRAP;
@@ -381,18 +360,11 @@ void Test_M2MInterfaceImpl::test_update_registration()
 
     CHECK(impl->_current_state == M2MInterfaceImpl::STATE_UPDATE_REGISTRATION);
 
-    impl->_update_register_ongoing = false;
     impl->_current_state = M2MInterfaceImpl::STATE_REGISTERED;
     m2mnsdlinterface_stub::bool_value = false;
     impl->update_registration(NULL,120);
 
     CHECK(impl->_current_state == M2MInterfaceImpl::STATE_UPDATE_REGISTRATION);
-
-    impl->_current_state = M2MInterfaceImpl::STATE_REGISTERED;
-    m2mnsdlinterface_stub::bool_value = false;
-    impl->update_registration(NULL,120);
-
-    CHECK(impl->_current_state == M2MInterfaceImpl::STATE_REGISTERED);
 
     impl->_current_state = M2MInterfaceImpl::STATE_IDLE;
     impl->update_registration(NULL,120);
@@ -400,7 +372,6 @@ void Test_M2MInterfaceImpl::test_update_registration()
     CHECK(impl->_current_state == M2MInterfaceImpl::STATE_IDLE);
     CHECK(observer->error_occured == true);
 
-    impl->_update_register_ongoing = false;
     impl->_current_state = M2MInterfaceImpl::STATE_BOOTSTRAP;
     impl->update_registration(NULL,120);
 
@@ -410,9 +381,29 @@ void Test_M2MInterfaceImpl::test_update_registration()
     impl->update_registration(NULL,30);
     CHECK(observer->error_occured == true);
 
-    impl->_update_register_ongoing = true;
     impl->update_registration(NULL,120);
     CHECK(observer->error_occured == true);
+
+
+    M2MObject *object = new M2MObject("test");
+    M2MObjectInstance *ins = object->create_object_instance();
+    ins->create_dynamic_resource("test","type",M2MResourceInstance::STRING,false,false);
+
+    M2MObjectList list;
+    list.push_back(object);
+    impl->_current_state = M2MInterfaceImpl::STATE_REGISTERED;
+    m2mnsdlinterface_stub::bool_value = false;
+    impl->update_registration(NULL, list);
+
+    CHECK(impl->_current_state == M2MInterfaceImpl::STATE_UPDATE_REGISTRATION);
+    list.clear();
+
+    impl->_current_state = M2MInterfaceImpl::STATE_REGISTERED;
+    m2mnsdlinterface_stub::bool_value = false;
+    impl->update_registration(NULL, list);
+
+    CHECK(impl->_current_state == M2MInterfaceImpl::STATE_UPDATE_REGISTRATION);
+    delete object;
 
 }
 
@@ -601,7 +592,6 @@ void Test_M2MInterfaceImpl::test_socket_error()
         impl->_retry_timer_expired = true;
     }
     CHECK(observer->error_occured == true);
-    CHECK(impl->_current_state == M2MInterfaceImpl::STATE_IDLE);
 
     observer->error_occured = false;
     impl->socket_error(M2MConnectionHandler::SOCKET_READ_ERROR, false);
@@ -664,17 +654,11 @@ void Test_M2MInterfaceImpl::test_address_ready()
     // Test for Address resolving for LWM2M server
     server_type = M2MConnectionObserver::LWM2MServer;
 
-    address->_stack = M2MInterface::LwIP_IPv6;
-    m2mnsdlinterface_stub::bool_value = true;
-
-    impl->address_ready(*address,server_type,server_port);
-    CHECK(impl->_current_state == M2MInterfaceImpl::STATE_REGISTER_RESOURCE_CREATED);
-
     address->_stack = M2MInterface::LwIP_IPv4;
     m2mnsdlinterface_stub::bool_value = true;
 
     impl->address_ready(*address,server_type,server_port);
-    CHECK(impl->_current_state == M2MInterfaceImpl::STATE_REGISTER_RESOURCE_CREATED);
+    CHECK(impl->_current_state == M2MInterfaceImpl::STATE_REGISTER_ADDRESS_RESOLVED);
 
 
     address->_stack = M2MInterface::LwIP_IPv6;
@@ -736,9 +720,8 @@ void Test_M2MInterfaceImpl::test_timer_expired()
     impl->timer_expired(M2MTimerObserver::QueueSleep);
     CHECK(visited == true);
 
-    int port = impl->_listen_port;
     impl->timer_expired(M2MTimerObserver::RetryTimer);
-    CHECK(impl->_listen_port != port);
+    CHECK(visited == true);
 
     observer->error_occured = false;
     impl->timer_expired(M2MTimerObserver::BootstrapTimer);
