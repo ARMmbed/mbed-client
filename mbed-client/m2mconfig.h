@@ -16,6 +16,10 @@
 #ifndef M2MCONFIG_H
 #define M2MCONFIG_H
 
+/*! \file m2mconfig.h
+* \brief File defining all system build time configuration used by mbed-client.
+*/
+
 #include <stdlib.h>
 #include <cstring>
 #include <cstdio>

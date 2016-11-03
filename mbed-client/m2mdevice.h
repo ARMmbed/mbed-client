@@ -22,7 +22,7 @@
 class M2MResource;
 class M2MResourceInstance;
 
-/**
+/*! \file m2mdevice.h
  *  \brief M2MDevice.
  *  This class represents the Device Object model of the LWM2M framework.
  *  It provides an interface for handling the device object

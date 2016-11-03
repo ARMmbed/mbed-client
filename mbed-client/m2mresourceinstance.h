@@ -24,7 +24,7 @@ public:
     virtual void notification_update(M2MBase::Observation observation_level) = 0;
 };
 
-/**
+/*! \file m2mresourceinstance.h
  *  \brief M2MResourceInstance.
  *  This class is the base class for mbed Client Resources. All defined
  *  LWM2M resource models can be created based on it.
@@ -66,7 +66,7 @@ private: // Constructor and destructor are private
      * \brief A constructor for creating a resource.
      * \param resource_name The name of the resource.
      * \param resource_type The type of the resource.
-     * \param type, The resource data type of the object.
+     * \param type The resource data type of the object.
      * \param object_instance_id Object instance id where resource exists.
      * \param object_name Object name where resource exists.
      */
@@ -148,7 +148,7 @@ public:
 
     /**
      * \brief Sets a value of a given resource.
-     * \param value, A pointer to the value to be set on the resource.
+     * \param value A pointer to the value to be set on the resource.
      * \param value_length The length of the value pointer.
      * \return True if successfully set, else false.
      */

@@ -35,7 +35,7 @@ typedef void(*value_updated_callback2) (const char* object_name);
 class M2MObservationHandler;
 class M2MReportHandler;
 
-/**
+/*! \file m2mbase.h
  *  \brief M2MBase.
  *  This class is the base class based on which all LWM2M object models
  *  can be created. This serves base class for Object, ObjectInstances and Resources.

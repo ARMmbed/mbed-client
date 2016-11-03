@@ -22,7 +22,7 @@
 class M2MResource;
 class M2MResourceInstance;
 
-/**
+/*! \file m2mfirmware.h
  *  \brief M2MFirmware.
  *  This class represents the Firmware Object model of the LWM2M framework.
  *  It provides an interface for handling the Firmware Object

@@ -249,17 +249,11 @@ void Test_M2MNsdlInterface::test_send_update_registration()
     nsdl->_nsdl_handle = (nsdl_s*)malloc(sizeof(1));
     CHECK(nsdl->send_update_registration(120) == true);
 
-    /* Update already in progress */
-    common_stub::uint_value = 0;
-    CHECK(nsdl->send_update_registration(120) == true);
-
     /* Update lifetime value */
-    nsdl->_update_register_ongoing = false;
     common_stub::uint_value = 1;
     CHECK(nsdl->send_update_registration(100) == true);
 
     /* Lifetime value is 0, don't change the existing lifetime value */
-    nsdl->_update_register_ongoing = false;
     common_stub::uint_value = 1;
     CHECK(nsdl->send_update_registration(0) == true);
 
@@ -507,14 +501,12 @@ void Test_M2MNsdlInterface::test_received_from_server_callback()
     coap_header->msg_id = 10;
     coap_header->msg_code = COAP_MSG_CODE_RESPONSE_CHANGED;
     nsdl->received_from_server_callback(handle,coap_header,NULL);
-    CHECK(nsdl->_update_register_ongoing == false);
     CHECK(observer->register_updated == true);
 
     coap_header->msg_id = 10;
     coap_header->msg_code = COAP_MSG_CODE_RESPONSE_FORBIDDEN;
     coap_header->coap_status = COAP_STATUS_OK;
     nsdl->received_from_server_callback(handle,coap_header,NULL);
-    CHECK(nsdl->_register_ongoing == true);
     CHECK(observer->register_error == true);
 
     coap_header->msg_id = 11;
@@ -532,6 +524,19 @@ void Test_M2MNsdlInterface::test_received_from_server_callback()
     coap_header->uri_path_len = sizeof(object);
 
     CHECK(0== nsdl->received_from_server_callback(handle,coap_header,NULL));
+
+    //Test methods that are not allowed
+    coap_header->msg_code = COAP_MSG_CODE_REQUEST_GET;
+    nsdl->received_from_server_callback(handle,coap_header,NULL);
+
+    coap_header->msg_code = COAP_MSG_CODE_REQUEST_PUT;
+    nsdl->received_from_server_callback(handle,coap_header,NULL);
+
+    coap_header->msg_code = COAP_MSG_CODE_REQUEST_DELETE;
+    nsdl->received_from_server_callback(handle,coap_header,NULL);
+
+    //Continue testing with post method
+    coap_header->msg_code = COAP_MSG_CODE_REQUEST_POST;
 
     uint8_t object_instance[] = {"name/0"};
 
