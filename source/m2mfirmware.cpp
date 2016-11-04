@@ -90,7 +90,7 @@ void M2MFirmware::create_mandatory_resources()
                                                     M2MResourceInstance::INTEGER,
                                                     true);
     set_zero_value(res);
-    if(res) {        
+    if(res) {
         res->set_operation(M2MBase::GET_ALLOWED);
         res->set_register_uri(false);
     }
@@ -165,7 +165,7 @@ M2MResource* M2MFirmware::create_resource(FirmwareResource resource, int64_t val
     }
 
     const String firmware_id(firmware_id_ptr);
-    
+
     if(!firmware_id.empty()) {
         if(_firmware_instance) {
             res = _firmware_instance->create_dynamic_resource(firmware_id,
@@ -218,7 +218,7 @@ bool M2MFirmware::set_resource_value(FirmwareResource resource,
             // If it is any of the above resource
             // set the value of the resource.
             if (check_value_range(resource, value)) {
-                
+
                 success = res->set_value(value);
             }
         }
@@ -345,7 +345,7 @@ M2MResource* M2MFirmware::get_resource(FirmwareResource res) const
                 break;
         }
         const String res_name(res_name_ptr);
-        
+
         res_object = _firmware_instance->resource(res_name);
     }
     return res_object;
@@ -430,5 +430,7 @@ bool M2MFirmware::check_value_range(FirmwareResource resource, int64_t value) co
 
 void M2MFirmware::set_zero_value(M2MResource *resource)
 {
-    resource->set_value((const uint8_t*)"0", 1);
+    if(resource) {
+        resource->set_value((const uint8_t*)"0", 1);
+    }
 }
