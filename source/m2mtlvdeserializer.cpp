@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include <stdio.h>
 #include "include/m2mtlvdeserializer.h"
 #include "mbed-client/m2mconstants.h"
 #include "include/nsdllinker.h"
@@ -145,8 +144,8 @@ M2MTLVDeserializer::Error M2MTLVDeserializer::deserialize_object_instances(uint8
         if(offset < tlv_size) {
             error = deserialize_object_instances(tlv, tlv_size, offset, object, operation, update_value);
         }
-        delete til;
     }
+    delete til;
     return error;
 }
 

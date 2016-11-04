@@ -17,9 +17,13 @@
 #define __M2M_CONNECTION_SECURITY_H__
 
 #include "mbed-client/m2mconfig.h"
+
+#include <stdint.h>
+
 class M2MConnectionHandler;
 class M2MSecurity;
 class M2MConnectionSecurityPimpl;
+class M2MConnectionHandler;
 
 /*! \file m2mconnectionsecurity.h
  * \brief M2MConnectionSecurity.

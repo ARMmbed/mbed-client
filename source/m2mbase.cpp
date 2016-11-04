@@ -23,6 +23,7 @@
 #include <assert.h>
 #include <ctype.h>
 #include <string.h>
+#include <stdlib.h>
 
 #define TRACE_GROUP "mClt"
 
