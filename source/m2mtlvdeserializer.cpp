@@ -145,8 +145,8 @@ M2MTLVDeserializer::Error M2MTLVDeserializer::deserialize_object_instances(uint8
         if(offset < tlv_size) {
             error = deserialize_object_instances(tlv, tlv_size, offset, object, operation, update_value);
         }
-        delete til;
     }
+    delete til;
     return error;
 }
 
