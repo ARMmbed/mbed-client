@@ -26,6 +26,9 @@
 #include "test_env.h"
 #endif
 
+#include <time.h>
+#include <stdio.h>
+
 // Enter your mbed Device Server's IPv4 address and Port number in
 // mentioned format like 192.168.0.1:5693
 const String &BOOTSTRAP_SERVER_ADDRESS = "coap://10.45.3.10:5693";

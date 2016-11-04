@@ -22,6 +22,7 @@
 #include <stdarg.h>
 #include <pthread.h>
 #include <signal.h> /* For SIGIGN and SIGINT */
+#include <time.h>
 #else
 #include "sockets/UDPSocket.h"
 #ifdef SIXLOWPAN_INTERFACE
