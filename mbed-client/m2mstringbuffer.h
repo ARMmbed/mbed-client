@@ -23,17 +23,80 @@ template <int SIZE>
 class StringBuffer
 {
 public:
+    /**
+     * Initialize a empty buffer with zero length and zero content.
+     */
     inline StringBuffer();
-    //inline StringBuffer(const char *initial_string);
 
-    inline bool ensure_space(size_t required_size) const;
-    inline bool append(char data);
-    inline bool append(const char *data);
+    //
+    // This is not implemented on purpose, as the given string may conflict with
+    // templated size. Otoh, if we used compile time assert, the overflow
+    // could be prevented at compile time.
+    //
+    // inline StringBuffer(const char *initial_string);
 
+    /**
+     * Verify, if the buffer has still room for given amount of bytes.
+     * Note: the given size value must include the zero terminator as it is not
+     * implicitly taken into account for.
+     */
+    bool ensure_space(size_t required_size) const;
+
+    /**
+     * Append given char to end of string.
+     * Return false if the buffer would overflow, true otherwise.
+     */
+    bool append(char data);
+
+    /**
+     * Append given zero terminated string to end of buffer.
+     *
+     * Return false if the buffer would overflow, true otherwise.
+     *
+     * Note: the whole string, including the zero terminator must fit
+     * to buffer or the append operation is not done and false is returned.
+     */
+    bool append(const char *data);
+
+    /**
+     * Append given block of chars to end of buffer.
+     *
+     * Return false if the buffer would overflow, true otherwise.
+     *
+     * Note: the whole string, including the zero terminator must fit
+     * to buffer or the append operation is not done and false is returned.
+     */
+    bool append(const char *data, size_t data_len);
+
+    /**
+     * Convert given uint16_t into string representation and add it to the
+     * end of buffer.
+     *
+     * Note: the whole string, including the zero terminator must fit
+     * to buffer or the append operation is not done and false is returned.
+     */
+    bool append_int(uint16_t data);
+
+    /**
+     * Get the amount of bytes added to the buffer.
+     *
+     * Note: the size does not include the terminating zero, so this is
+     * functionally equal to strlen().
+     */
     inline size_t get_size() const;
 
+    // API functionality copied from m2mstring:
+
+    // find the index of last occurance of given char in string, or negative if not found
+    int find_last_of(char search_char) const;
+
+    /**
+     * Get a read only pointer to the data.
+     */
     inline const char* c_str() const;
-    // inline char* c_str();
+
+    // Add this only if needed
+    //inline char* c_str();
 private:
     //const size_t _max_size;
     size_t _curr_size;
@@ -50,7 +113,7 @@ inline StringBuffer<SIZE>::StringBuffer() : _curr_size(0)
 }
 
 template <int SIZE>
-inline bool StringBuffer<SIZE>::ensure_space(size_t required_size) const
+bool StringBuffer<SIZE>::ensure_space(size_t required_size) const
 {
     const size_t space_left = SIZE - _curr_size;
 
@@ -64,7 +127,7 @@ inline bool StringBuffer<SIZE>::ensure_space(size_t required_size) const
 }
 
 template <int SIZE>
-inline bool StringBuffer<SIZE>::append(const char *data)
+bool StringBuffer<SIZE>::append(const char *data)
 {
     const size_t string_len = strlen(data);
     bool space_available = ensure_space(string_len + 1);
@@ -72,6 +135,23 @@ inline bool StringBuffer<SIZE>::append(const char *data)
         memcpy(_buff + _curr_size, data, string_len + 1); // copy the zero terminator too
         _curr_size += string_len;
         assert(_curr_size < SIZE);
+    }
+    return space_available;
+}
+
+template <int SIZE>
+bool StringBuffer<SIZE>::append(const char *data, size_t data_len)
+{
+    bool space_available = true;
+    if (data_len > 0) {
+        bool space_available = ensure_space(data_len + 1);
+        if (space_available) {
+            memcpy(_buff + _curr_size, data, data_len);
+            _curr_size += data_len;
+            // Todo: should the code actually check, if the data already contained zero or not?
+            _buff[_curr_size] = '\0';
+            assert(_curr_size < SIZE);
+        }
     }
     return space_available;
 }
@@ -89,19 +169,45 @@ inline bool StringBuffer<SIZE>::append(char data)
 }
 
 template <int SIZE>
+bool StringBuffer<SIZE>::append_int(uint16_t data)
+{
+    // max len of "-9223372036854775808" plus zero termination
+    char conv_buff[20+1];
+
+    // re-use the String's functionality, a more optimal version would use snprintf() or int size specific converter
+    int len = m2m::itoa_c(data, conv_buff);
+
+    return append(conv_buff, len);
+}
+
+
+template <int SIZE>
+int StringBuffer<SIZE>::find_last_of(char search_char) const
+{
+    int last_index = -1;
+    // search from the end of string, return upon first found matching char
+    for (int index = _curr_size; index >= 0; index--) {
+        if (_buff[index] == search_char) {
+            last_index = index;
+            break;
+        }
+    }
+
+    return last_index;
+}
+
+
+template <int SIZE>
 inline const char* StringBuffer<SIZE>::c_str() const
 {
     return _buff;
 }
 
 
-/*
 template <int SIZE>
-inline StringBuffer<SIZE>::StringBuffer(const char *initial_string)
+inline size_t StringBuffer<SIZE>::get_size() const
 {
-    size_t string_len = strlen(initial_string);
-    strlcpy(_buff, 
+    return _curr_size;
 }
-*/
 
 #endif // !__STRING_BUFFER_H__
