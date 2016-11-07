@@ -44,7 +44,7 @@ public:
     /**
     * Destructor.
     */
-    virtual ~M2MTimer();
+    ~M2MTimer();
 
     /**
     * \brief Starts the timer.

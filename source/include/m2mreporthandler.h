@@ -60,7 +60,7 @@ public:
     /**
      * Destructor
      */
-    virtual ~M2MReportHandler();
+    ~M2MReportHandler();
 
     /**
      * @brief Sets that object is under observation.
@@ -68,13 +68,13 @@ public:
      * @param handler, Handler object for sending
      * observation callbacks.
      */
-    virtual void set_under_observation(bool observed);
+    void set_under_observation(bool observed);
 
     /**
      * @brief Sets the value of the given resource.
      * @param value, Value of the observed resource.
      */
-    virtual void set_value(float value);
+    void set_value(float value);
 
     /**
      * @brief Sets notification trigger.
@@ -90,7 +90,7 @@ public:
      * @param resource_type Type of the Resource.
      * @return true if required attributes are present else false.
      */
-    virtual bool parse_notification_attribute(char *&query,
+    bool parse_notification_attribute(char *&query,
                                               M2MBase::BaseType type,
                                               M2MResourceInstance::ResourceType resource_type = M2MResourceInstance::OPAQUE);
 
@@ -106,7 +106,7 @@ public:
 
 protected : // from M2MTimerObserver
 
-    virtual void timer_expired(M2MTimerObserver::Type type =
+    void timer_expired(M2MTimerObserver::Type type =
                                M2MTimerObserver::Notdefined);
 
 private:
