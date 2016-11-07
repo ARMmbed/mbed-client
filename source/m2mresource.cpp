@@ -435,37 +435,34 @@ sn_coap_hdr_s* M2MResource::handle_put_request(nsdl_s *nsdl,
                 tr_debug("M2MResource::handle_put_request() - Request Content-Type %d", coap_content_type);
 
                 if(COAP_CONTENT_OMA_TLV_TYPE == coap_content_type) {
-                    M2MTLVDeserializer *deserializer = new M2MTLVDeserializer();
-                    if(deserializer) {
-                        M2MTLVDeserializer::Error error = M2MTLVDeserializer::None;
-                        error = deserializer->deserialize_resource_instances(received_coap_header->payload_ptr,
-                                                                             received_coap_header->payload_len,
-                                                                             *this,
-                                                                             M2MTLVDeserializer::Put);
-                        switch(error) {
-                            case M2MTLVDeserializer::None:
-                                if(observation_handler) {
-                                    String value = "";
-                                    if (received_coap_header->uri_path_ptr != NULL &&
-                                        received_coap_header->uri_path_len > 0) {
+                    M2MTLVDeserializer deserializer;
+                    M2MTLVDeserializer::Error error = M2MTLVDeserializer::None;
+                    error = deserializer.deserialize_resource_instances(received_coap_header->payload_ptr,
+                                                                         received_coap_header->payload_len,
+                                                                         *this,
+                                                                         M2MTLVDeserializer::Put);
+                    switch(error) {
+                        case M2MTLVDeserializer::None:
+                            if(observation_handler) {
+                                String value = "";
+                                if (received_coap_header->uri_path_ptr != NULL &&
+                                    received_coap_header->uri_path_len > 0) {
 
-                                        value.append_raw((char*)received_coap_header->uri_path_ptr,received_coap_header->uri_path_len);
-                                    }
-                                    execute_value_updated = true;
+                                    value.append_raw((char*)received_coap_header->uri_path_ptr,received_coap_header->uri_path_len);
                                 }
-                                msg_code = COAP_MSG_CODE_RESPONSE_CHANGED;
-                                break;
-                            case M2MTLVDeserializer::NotFound:
-                                msg_code = COAP_MSG_CODE_RESPONSE_NOT_FOUND;
-                                break;
-                            case M2MTLVDeserializer::NotAllowed:
-                                msg_code = COAP_MSG_CODE_RESPONSE_METHOD_NOT_ALLOWED;
-                                break;
-                            case M2MTLVDeserializer::NotValid:
-                                msg_code = COAP_MSG_CODE_RESPONSE_BAD_REQUEST;
-                                break;
-                        }
-                        delete deserializer;
+                                execute_value_updated = true;
+                            }
+                            msg_code = COAP_MSG_CODE_RESPONSE_CHANGED;
+                            break;
+                        case M2MTLVDeserializer::NotFound:
+                            msg_code = COAP_MSG_CODE_RESPONSE_NOT_FOUND;
+                            break;
+                        case M2MTLVDeserializer::NotAllowed:
+                            msg_code = COAP_MSG_CODE_RESPONSE_METHOD_NOT_ALLOWED;
+                            break;
+                        case M2MTLVDeserializer::NotValid:
+                            msg_code = COAP_MSG_CODE_RESPONSE_BAD_REQUEST;
+                            break;
                     }
                 } else {
                     msg_code =COAP_MSG_CODE_RESPONSE_UNSUPPORTED_CONTENT_FORMAT;
