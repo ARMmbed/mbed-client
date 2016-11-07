@@ -18,8 +18,8 @@
 #include "mbed-client/m2mtimer.h"
 #include "include/m2mreporthandler.h"
 #include "mbed-trace/mbed_trace.h"
-#include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
 
 #define TRACE_GROUP "mClt"
 
