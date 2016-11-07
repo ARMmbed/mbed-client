@@ -216,9 +216,8 @@ sn_coap_hdr_s* M2MObject::handle_get_request(nsdl_s *nsdl,
                 }
                 // fill in the CoAP response payload
                 if(COAP_CONTENT_OMA_TLV_TYPE == coap_content_type) {
-                    M2MTLVSerializer *serializer = new M2MTLVSerializer();
-                    data = serializer->serialize(_instance_list, data_length);
-                    delete serializer;
+                    M2MTLVSerializer serializer;
+                    data = serializer.serialize(_instance_list, data_length);
 
                 } else { // TOD0: Implement JSON Format.
                     msg_code = COAP_MSG_CODE_RESPONSE_UNSUPPORTED_CONTENT_FORMAT; // Content format not supported
