@@ -190,7 +190,7 @@ void M2MNsdlInterface::set_endpoint_lifetime_buffer(int lifetime)
 
     uint32_t size = m2m::itoa_c(lifetime, buffer);
 
-    if (size <= sizeof(buffer)) {
+    if (_endpoint && size <= sizeof(buffer)) {
         _endpoint->lifetime_ptr = alloc_string_copy((uint8_t*)buffer, size);
         if(_endpoint->lifetime_ptr) {
             _endpoint->lifetime_len =  size;
@@ -1093,7 +1093,7 @@ String M2MNsdlInterface::coap_to_string(uint8_t *coap_data,int coap_data_length)
 uint64_t M2MNsdlInterface::registration_time()
 {
     uint64_t value = 0;
-    if(_endpoint->lifetime_ptr) {
+    if(_endpoint && _endpoint->lifetime_ptr) {
         value = atol((const char*)_endpoint->lifetime_ptr);
     }
 
