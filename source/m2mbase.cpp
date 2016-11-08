@@ -27,42 +27,6 @@
 
 #define TRACE_GROUP "mClt"
 
-M2MBase& M2MBase::operator=(const M2MBase& other)
-{
-    if (this != &other) { // protect against invalid self-assignment
-        _operation = other._operation;
-        _mode = other._mode;
-        _name = other._name;
-        _resource_type = other._resource_type;
-        _interface_description = other._interface_description;
-        _coap_content_type = other._coap_content_type;
-        _instance_id = other._instance_id;
-        _observable = other._observable;
-        _observation_number = other._observation_number;
-        _observation_level = other._observation_level;
-        _observation_handler = other._observation_handler;
-        _register_uri = other._register_uri;
-        _uri_path = other._uri_path;
-        _max_age = other._max_age;
-        _is_under_observation = other._is_under_observation;
-
-        free(_token);
-        _token = NULL;
-
-        _token_length = other._token_length;
-        if(other._token) {
-            _token = alloc_string_copy(other._token, other._token_length);
-        }
-
-        delete _report_handler;
-        _report_handler = NULL;
-
-        if(other._report_handler) {
-            _report_handler = new M2MReportHandler(*other._report_handler);
-        }
-    }
-    return *this;
-}
 
 M2MBase::M2MBase(const M2MBase& other) :
     _report_handler(NULL),
@@ -299,7 +263,7 @@ uint32_t M2MBase::max_age() const
     return _max_age;
 }
 
-bool M2MBase::handle_observation_attribute(char *&query)
+bool M2MBase::handle_observation_attribute(const char *query)
 {
     tr_debug("M2MBase::handle_observation_attribute - under observation(%d)", is_under_observation());
     bool success = false;

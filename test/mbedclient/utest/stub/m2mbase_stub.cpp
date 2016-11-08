@@ -210,7 +210,7 @@ void M2MBase::remove_object_from_coap()
 {
 }
 
-bool M2MBase::handle_observation_attribute(char *&query)
+bool M2MBase::handle_observation_attribute(const char *query)
 {
     return m2mbase_stub::bool_value;
 }

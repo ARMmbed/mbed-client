@@ -76,7 +76,6 @@ void Test_M2MBase::test_copy_constructor()
     Test_M2MBase b;
     Test_M2MBase c(b);
     Test_M2MBase a;
-    a = b;
 
     //Test heap constructor
     Test_M2MBase* test = new Test_M2MBase();
@@ -98,44 +97,6 @@ void Test_M2MBase::test_copy_constructor()
 
     delete test;
     delete copy;
-}
-
-void Test_M2MBase::test_assignment_operator()
-{
-    //Test stack
-    M2MBase b("name", M2MBase::Static);
-    Test_M2MBase a;
-    M2MBase c = a;
-    c = b;
-
-    //Test heap
-    Test_M2MBase* test = new Test_M2MBase();
-    Test_M2MBase* test2 = new Test_M2MBase();
-    Test_M2MBase* test3 = new Test_M2MBase();
-
-    test->operator=(*test3);
-    delete test3;
-
-    test->_token_length = 3;
-    test->_token = (u_int8_t *)malloc(test->_token_length);
-
-    Observer obs;
-    test->_report_handler = new M2MReportHandler(obs);
-
-    test2->_token_length = 8;
-    test2->_token = (u_int8_t *)malloc(test2->_token_length);
-
-    Observer obs2;
-    test2->_report_handler = new M2MReportHandler(obs2);
-
-    *test = *test2;
-
-    CHECK(test->_token != NULL);
-
-    CHECK(test->_report_handler != NULL);
-
-    delete test2;
-    delete test;
 }
 
 void Test_M2MBase::test_set_operation()

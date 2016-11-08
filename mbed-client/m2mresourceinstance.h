@@ -130,7 +130,7 @@ public:
      * attribute.
      * \return True if required attributes are present, else false.
      */
-    virtual bool handle_observation_attribute(char *&query);
+    virtual bool handle_observation_attribute(const char *query);
 
     /**
      * \brief Sets the function that should be executed when this

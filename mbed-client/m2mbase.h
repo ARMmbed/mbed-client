@@ -229,7 +229,7 @@ public:
 
     /**
      * \brief Returns the object name in integer.
-     * \return The naame of the object in integer.
+     * \return The name of the object in integer.
      */
     virtual int32_t name_id() const;
 
@@ -301,7 +301,7 @@ public:
      * \param query The query that needs to be parsed.
      * \return True if required attributes are present, else false.
      */
-    virtual bool handle_observation_attribute(char *&query);
+    virtual bool handle_observation_attribute(const char *query);
 
     /**
      * \brief Handles GET request for the registered objects.

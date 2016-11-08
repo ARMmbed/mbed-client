@@ -206,7 +206,7 @@ bool M2MResource::delayed_response() const
     return _delayed_response;
 }
 
-bool M2MResource::handle_observation_attribute(char *&query)
+bool M2MResource::handle_observation_attribute(const char *query)
 {
     tr_debug("M2MResource::handle_observation_attribute - is_under_observation(%d)", is_under_observation());
     bool success = false;

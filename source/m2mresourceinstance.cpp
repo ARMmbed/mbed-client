@@ -127,7 +127,7 @@ M2MResourceInstance::ResourceType M2MResourceInstance::resource_instance_type() 
     return _resource_type;
 }
 
-bool M2MResourceInstance::handle_observation_attribute(char *&query)
+bool M2MResourceInstance::handle_observation_attribute(const char *query)
 {
     tr_debug("M2MResourceInstance::handle_observation_attribute - is_under_observation(%d)", is_under_observation());
     bool success = false;
