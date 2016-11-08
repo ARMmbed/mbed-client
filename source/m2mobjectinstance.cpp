@@ -20,6 +20,7 @@
 #include "mbed-client/m2mresource.h"
 #include "mbed-client/m2mobservationhandler.h"
 #include "mbed-client/m2mstring.h"
+#include "mbed-client/m2mstringbuffer.h"
 #include "include/m2mtlvserializer.h"
 #include "include/m2mtlvdeserializer.h"
 #include "include/nsdllinker.h"
@@ -556,6 +557,13 @@ sn_coap_hdr_s* M2MObjectInstance::handle_put_request(nsdl_s *nsdl,
     return coap_response;
 }
 
+//                               <name></><inst-id></><res-name>
+//#define MAX_OBJECT_INSTANCE_NAME (255 + 1 + 5 + 1 + 255 + 1 + 5)
+
+//                           <name></><inst-id></><inst-id><zero-terminator>
+#define MAX_OBJECT_PATH_NAME (255 + 1 + 5 + 1 + 5 + 1)
+
+
 sn_coap_hdr_s* M2MObjectInstance::handle_post_request(nsdl_s *nsdl,
                                                       sn_coap_hdr_s *received_coap_header,
                                                       M2MObservationHandler *observation_handler,
@@ -586,7 +594,6 @@ sn_coap_hdr_s* M2MObjectInstance::handle_post_request(nsdl_s *nsdl,
 
             if(COAP_CONTENT_OMA_TLV_TYPE == coap_content_type) {
                 M2MTLVDeserializer deserializer;
-                String obj_name = "";
                 M2MTLVDeserializer::Error error = M2MTLVDeserializer::None;
                 error = deserializer.deserialize_resources(received_coap_header->payload_ptr,
                                                             received_coap_header->payload_len,
@@ -602,18 +609,22 @@ sn_coap_hdr_s* M2MObjectInstance::handle_post_request(nsdl_s *nsdl,
                         coap_response->options_list_ptr = sn_nsdl_alloc_options_list(nsdl, coap_response);
 
                         if (coap_response->options_list_ptr) {
+                            StringBuffer<MAX_OBJECT_PATH_NAME> obj_name;
 
-                            obj_name += M2MBase::name();
-                            obj_name += "/";
-                            obj_name.append_int(M2MBase::instance_id());
-                            obj_name += "/";
-                            obj_name.append_int(instance_id);
+                            size_t needed_space = M2MBase::name().length() + (1 + 5 + 1 + 5 + 1);
+                            if (obj_name.ensure_space(needed_space)) {
+                                obj_name.append(M2MBase::name().c_str());
+                                obj_name.append('/');
+                                obj_name.append_int(M2MBase::instance_id());
+                                obj_name.append('/');
+                                obj_name.append_int(instance_id);
 
-                            coap_response->options_list_ptr->location_path_len = obj_name.length();
-                            if (coap_response->options_list_ptr->location_path_len != 0) {
+                                coap_response->options_list_ptr->location_path_len = obj_name.get_size();
                                 coap_response->options_list_ptr->location_path_ptr =
                                     alloc_string_copy((uint8_t*)obj_name.c_str(),
                                            coap_response->options_list_ptr->location_path_len);
+
+                                // todo: handle allocation error
                             }
                         }
                         msg_code = COAP_MSG_CODE_RESPONSE_CREATED;
