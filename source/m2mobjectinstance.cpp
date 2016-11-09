@@ -557,11 +557,7 @@ sn_coap_hdr_s* M2MObjectInstance::handle_put_request(nsdl_s *nsdl,
     return coap_response;
 }
 
-//                               <name></><inst-id></><res-name>
-//#define MAX_OBJECT_INSTANCE_NAME (255 + 1 + 5 + 1 + 255 + 1 + 5)
 
-//                           <name></><inst-id></><inst-id><zero-terminator>
-#define MAX_OBJECT_PATH_NAME (255 + 1 + 5 + 1 + 5 + 1)
 
 
 sn_coap_hdr_s* M2MObjectInstance::handle_post_request(nsdl_s *nsdl,

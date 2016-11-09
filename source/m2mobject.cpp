@@ -21,6 +21,7 @@
 #include "include/nsdllinker.h"
 #include "include/m2mreporthandler.h"
 #include "mbed-trace/mbed_trace.h"
+#include "mbed-client/m2mstringbuffer.h"
 
 #include <stdlib.h>
 
@@ -390,7 +391,6 @@ sn_coap_hdr_s* M2MObject::handle_post_request(nsdl_s *nsdl,
                                 obj_instance->set_operation(M2MBase::GET_PUT_ALLOWED);
                             }
 
-                            String obj_name = "";
                             M2MTLVDeserializer::Error error = M2MTLVDeserializer::None;
                             if(is_obj_instance) {
                                 tr_debug("M2MObject::handle_post_request() - TLV data contains ObjectInstance");
@@ -417,21 +417,20 @@ sn_coap_hdr_s* M2MObject::handle_post_request(nsdl_s *nsdl,
 
                                     if (coap_response->options_list_ptr) {
 
-                                        obj_name = M2MBase::name();
-                                        obj_name.push_back('/');
-                                        obj_name.append_int(instance_id);
+                                        StringBuffer<MAX_OBJECT_PATH_NAME> obj_name;
 
-                                        coap_response->options_list_ptr->location_path_len = obj_name.length();
-                                        if (coap_response->options_list_ptr->location_path_len != 0) {
+                                        if (obj_name.ensure_space(M2MBase::name().length() + (1 + 5 + 1))) {
+                                            obj_name.append(M2MBase::name().c_str());
+                                            obj_name.append('/');
+                                            obj_name.append_int(instance_id);
+
+                                            coap_response->options_list_ptr->location_path_len = obj_name.get_size();
                                             coap_response->options_list_ptr->location_path_ptr =
-                                                    (uint8_t*)malloc(coap_response->options_list_ptr->location_path_len);
-                                            if (coap_response->options_list_ptr->location_path_ptr) {
-                                                memcpy(coap_response->options_list_ptr->location_path_ptr,
-                                                       obj_name.c_str(),
-                                                       coap_response->options_list_ptr->location_path_len);
-                                            }
+                                                    alloc_copy((uint8_t*)obj_name.c_str(), obj_name.get_size());
+                                            // todo: else return error
                                         }
                                     }
+                                    // todo: else return error
                                     msg_code = COAP_MSG_CODE_RESPONSE_CREATED;
                                     break;
                                 case M2MTLVDeserializer::NotAllowed:
