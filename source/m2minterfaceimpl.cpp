@@ -68,18 +68,12 @@ M2MInterfaceImpl::M2MInterfaceImpl(M2MInterfaceObserver& observer,
   _reconnecting(false),
   _retry_timer_expired(false)
 {
-    //Hack for now
-    if( _binding_mode == M2MInterface::TCP ){
-        _binding_mode = M2MInterface::UDP;
-    }else if( _binding_mode == M2MInterface::TCP_QUEUE ){
-        _binding_mode = M2MInterface::UDP_QUEUE;
-    }
     tr_debug("M2MInterfaceImpl::M2MInterfaceImpl() -IN");
     _nsdl_interface.create_endpoint(ep_name,
                                      _endpoint_type,
                                      _life_time,
                                      _domain,
-                                     (uint8_t)_binding_mode,
+                                     (uint8_t)_binding_mode & 0x07, // nsdl binding mode is only 3 least significant bits
                                      _context_address);
 
     //Here we must use TCP still

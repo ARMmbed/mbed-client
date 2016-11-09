@@ -72,8 +72,10 @@ public:
         SMS = 0x04,
         SMS_QUEUE =0x06,
         UDP_SMS_QUEUE = 0x07,
-        TCP = 0x08, //not real value, spec does not have one!
-        TCP_QUEUE = 0x09 //not real value, spec does not have one!
+        TCP = 0x09, //not real value, spec does not have one!
+                    //this has nsdl binding mode bit UDP set
+        TCP_QUEUE = 0x0b //not real value, spec does not have one!
+                         //this has nsdl binding mode bits, UDP and UDP_QUEUE set
     }BindingMode;
 
     /**
