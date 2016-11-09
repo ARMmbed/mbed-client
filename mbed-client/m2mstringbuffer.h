@@ -16,11 +16,13 @@
 #ifndef __STRING_BUFFER_H__
 #define __STRING_BUFFER_H__
 
+#include "mbed-client/m2mstringbufferbase.h"
+
 #include <assert.h>
 #include <stddef.h>
 
 template <int SIZE>
-class StringBuffer
+class StringBuffer : private StringBufferBase
 {
 public:
     /**
@@ -98,13 +100,11 @@ public:
     // Add this only if needed
     //inline char* c_str();
 private:
-    //const size_t _max_size;
-    size_t _curr_size;
     char _buff[SIZE];
 };
 
 template <int SIZE>
-inline StringBuffer<SIZE>::StringBuffer() : _curr_size(0)
+inline StringBuffer<SIZE>::StringBuffer()
 {
     // actually a assert_compile() would be better as this is completely a code problem
     assert(SIZE > 0);
@@ -115,94 +115,44 @@ inline StringBuffer<SIZE>::StringBuffer() : _curr_size(0)
 template <int SIZE>
 bool StringBuffer<SIZE>::ensure_space(size_t required_size) const
 {
-    const size_t space_left = SIZE - _curr_size;
-
-    bool space_available = false;
-
-    if (required_size <= space_left) {
-
-        space_available = true;
-    }
-    return space_available;
+    return StringBufferBase::ensure_space(SIZE, required_size);
 }
 
 template <int SIZE>
 bool StringBuffer<SIZE>::append(const char *data)
 {
-    const size_t string_len = strlen(data);
-    bool space_available = ensure_space(string_len + 1);
-    if (space_available) {
-        memcpy(_buff + _curr_size, data, string_len + 1); // copy the zero terminator too
-        _curr_size += string_len;
-        assert(_curr_size < SIZE);
-    }
-    return space_available;
+    return StringBufferBase::append(_buff, SIZE, data);
 }
 
 template <int SIZE>
 bool StringBuffer<SIZE>::append(const char *data, size_t data_len)
 {
-    bool space_available = true;
-    if (data_len > 0) {
-        bool space_available = ensure_space(data_len + 1);
-        if (space_available) {
-            memcpy(_buff + _curr_size, data, data_len);
-            _curr_size += data_len;
-            // Todo: should the code actually check, if the data already contained zero or not?
-            _buff[_curr_size] = '\0';
-            assert(_curr_size < SIZE);
-        }
-    }
-    return space_available;
+    return StringBufferBase::append(_buff, SIZE, data, data_len);
 }
 
 template <int SIZE>
 inline bool StringBuffer<SIZE>::append(char data)
 {
-    bool space_available = ensure_space(1 + 1); // there must be space for trailing zero too
-    if (space_available) {
-        _buff[_curr_size++] = data;
-        _buff[_curr_size] = '\0';
-        assert(_curr_size < SIZE);
-    }
-    return space_available;
+    return StringBufferBase::append(_buff, SIZE, data);
 }
 
 template <int SIZE>
 bool StringBuffer<SIZE>::append_int(uint16_t data)
 {
-    // max len of "-9223372036854775808" plus zero termination
-    char conv_buff[20+1];
-
-    // re-use the String's functionality, a more optimal version would use snprintf() or int size specific converter
-    int len = m2m::itoa_c(data, conv_buff);
-
-    return append(conv_buff, len);
+    return StringBufferBase::append_int(_buff, SIZE, data);
 }
-
 
 template <int SIZE>
 int StringBuffer<SIZE>::find_last_of(char search_char) const
 {
-    int last_index = -1;
-    // search from the end of string, return upon first found matching char
-    for (int index = _curr_size; index >= 0; index--) {
-        if (_buff[index] == search_char) {
-            last_index = index;
-            break;
-        }
-    }
-
-    return last_index;
+    return StringBufferBase::find_last_of(_buff, search_char);
 }
-
 
 template <int SIZE>
 inline const char* StringBuffer<SIZE>::c_str() const
 {
     return _buff;
 }
-
 
 template <int SIZE>
 inline size_t StringBuffer<SIZE>::get_size() const
