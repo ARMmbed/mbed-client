@@ -31,6 +31,8 @@
 
 #define TRACE_GROUP "mClt"
 
+#define RESOLVE_SEC_MODE(mode)  ((mode == M2MInterface::TCP || mode == M2MInterface::TCP_QUEUE) ? M2MConnectionSecurity::TLS : M2MConnectionSecurity::DTLS)
+
 M2MInterfaceImpl::M2MInterfaceImpl(M2MInterfaceObserver& observer,
                                    const String &ep_name,
                                    const String &ep_type,
@@ -41,6 +43,8 @@ M2MInterfaceImpl::M2MInterfaceImpl(M2MInterfaceObserver& observer,
                                    M2MInterface::NetworkStack stack,
                                    const String &con_addr)
 : _observer(observer),
+  _security_connection( new M2MConnectionSecurity( RESOLVE_SEC_MODE(mode) )),
+  _connection_handler(*this, _security_connection, mode, stack),
   _nsdl_interface(*this),
   _current_state(0),
   _max_states( STATE_MAX_STATES ),
@@ -62,18 +66,13 @@ M2MInterfaceImpl::M2MInterfaceImpl(M2MInterfaceObserver& observer,
   _security(NULL),
   _retry_count(0),
   _reconnecting(false),
-  _retry_timer_expired(false),
-  _security_connection(NULL),
-  _connection_handler(*this, _security_connection, mode, stack)
+  _retry_timer_expired(false)
 {
-    M2MConnectionSecurity::SecurityMode sec_mode = M2MConnectionSecurity::DTLS;
     //Hack for now
     if( _binding_mode == M2MInterface::TCP ){
         _binding_mode = M2MInterface::UDP;
-        sec_mode = M2MConnectionSecurity::TLS;
     }else if( _binding_mode == M2MInterface::TCP_QUEUE ){
         _binding_mode = M2MInterface::UDP_QUEUE;
-        sec_mode = M2MConnectionSecurity::TLS;
     }
     tr_debug("M2MInterfaceImpl::M2MInterfaceImpl() -IN");
     _nsdl_interface.create_endpoint(ep_name,
@@ -83,8 +82,6 @@ M2MInterfaceImpl::M2MInterfaceImpl(M2MInterfaceObserver& observer,
                                      (uint8_t)_binding_mode,
                                      _context_address);
 
-    //Doesn't own, ownership is passed to ConnectionHandler class
-    _security_connection = new M2MConnectionSecurity(sec_mode);
     //Here we must use TCP still
     __connection_handler = &_connection_handler;
     _connection_handler.bind_connection(_listen_port);
