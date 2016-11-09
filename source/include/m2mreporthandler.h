@@ -106,7 +106,7 @@ public:
 
 protected : // from M2MTimerObserver
 
-    void timer_expired(M2MTimerObserver::Type type =
+    virtual void timer_expired(M2MTimerObserver::Type type =
                                M2MTimerObserver::Notdefined);
 
 private:
