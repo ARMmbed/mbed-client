@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 #include <assert.h>
+#include <stdlib.h>
 #include "include/m2minterfaceimpl.h"
 #include "include/eventdata.h"
 #include "mbed-client/m2minterfaceobserver.h"
@@ -40,7 +41,7 @@ M2MInterfaceImpl::M2MInterfaceImpl(M2MInterfaceObserver& observer,
                                    M2MInterface::NetworkStack stack,
                                    const String &con_addr)
 : _observer(observer),
-  _nsdl_interface(new M2MNsdlInterface(*this)),
+  _nsdl_interface(*this),
   _current_state(0),
   _max_states( STATE_MAX_STATES ),
   _event_generated(false),
@@ -73,7 +74,7 @@ M2MInterfaceImpl::M2MInterfaceImpl(M2MInterfaceObserver& observer,
         sec_mode = M2MConnectionSecurity::TLS;
     }
     tr_debug("M2MInterfaceImpl::M2MInterfaceImpl() -IN");
-    _nsdl_interface->create_endpoint(ep_name,
+    _nsdl_interface.create_endpoint(ep_name,
                                      _endpoint_type,
                                      _life_time,
                                      _domain,
@@ -97,7 +98,6 @@ M2MInterfaceImpl::~M2MInterfaceImpl()
 {
     tr_debug("M2MInterfaceImpl::~M2MInterfaceImpl() - IN");
     delete _queue_sleep_timer;
-    delete _nsdl_interface;
     _connection_handler->stop_listening();
     __connection_handler = NULL;
     delete _connection_handler;
@@ -507,7 +507,7 @@ void M2MInterfaceImpl::timer_expired(M2MTimerObserver::Type type)
 void M2MInterfaceImpl::state_idle(EventData* /*data*/)
 {
     tr_debug("M2MInterfaceImpl::state_idle");
-    _nsdl_interface->stop_timers();
+    _nsdl_interface.stop_timers();
 }
 
 void M2MInterfaceImpl::state_bootstrap( EventData *data)
@@ -591,18 +591,18 @@ void M2MInterfaceImpl::state_bootstrap_address_resolved( EventData *data)
         // Include domain id to be part of endpoint name
         StringBuffer<M2MBase::MAX_PATH_SIZE> new_ep_name;
 
-        if(!new_ep_name.ensure_space(_nsdl_interface->endpoint_name().size() + 1))
+        if(!new_ep_name.ensure_space(_nsdl_interface.endpoint_name().size() + 1))
         {
             tr_error("MM2MInterfaceImpl::state_bootstrap_address_resolved : name too long");
             _observer.error(M2MInterface::InvalidParameters);
             return;
         }
 
-        new_ep_name.append(_nsdl_interface->endpoint_name().c_str());
+        new_ep_name.append(_nsdl_interface.endpoint_name().c_str());
 
         if (!_domain.empty()) {
 
-            if(!new_ep_name.ensure_space(_nsdl_interface->endpoint_name().size() + 1 + _domain.size() + 1))
+            if(!new_ep_name.ensure_space(_nsdl_interface.endpoint_name().size() + 1 + _domain.size() + 1))
             {
                 tr_error("MM2MInterfaceImpl::state_bootstrap_address_resolved : name + domain too long");
                 _observer.error(M2MInterface::InvalidParameters);
@@ -613,7 +613,7 @@ void M2MInterfaceImpl::state_bootstrap_address_resolved( EventData *data)
             new_ep_name.append(_domain.c_str());
 
         }
-        if(_nsdl_interface->create_bootstrap_resource(&address, new_ep_name.c_str())) {
+        if(_nsdl_interface.create_bootstrap_resource(&address, new_ep_name.c_str())) {
            tr_debug("M2MInterfaceImpl::state_bootstrap_address_resolved : create_bootstrap_resource - success");
            internal_event(STATE_BOOTSTRAP_RESOURCE_CREATED);
         } else{
@@ -652,7 +652,7 @@ void M2MInterfaceImpl::state_register(EventData *data)
             if(_security) {
                 if(M2MSecurity::M2MServer == _security->server_type()) {
                     tr_debug("M2MInterfaceImpl::state_register - server_type : M2MSecurity::M2MServer");
-                    if(_nsdl_interface->create_nsdl_list_structure(event->_object_list)) {
+                    if(_nsdl_interface.create_nsdl_list_structure(event->_object_list)) {
                         tr_debug("M2MInterfaceImpl::state_register - create_nsdl_list_structure - success");
                         // If the nsdl resource structure is created successfully
                         String server_address = _security->resource_value_string(M2MSecurity::M2MServerUri);
@@ -691,7 +691,7 @@ void M2MInterfaceImpl::state_register(EventData *data)
         _listen_port = rand() % 64511 + 1024;
         _connection_handler->stop_listening();
         if (event) {
-            _nsdl_interface->create_nsdl_list_structure(event->_object_list);
+            _nsdl_interface.create_nsdl_list_structure(event->_object_list);
         }
         _connection_handler->bind_connection(_listen_port);
         _connection_handler->resolve_server_address(_server_ip_address,_server_port,
@@ -739,7 +739,7 @@ void M2MInterfaceImpl::state_register_address_resolved( EventData *data)
             address_type = SN_NSDL_ADDRESS_TYPE_IPV6;
         }
         _connection_handler->start_listening_for_data();
-        if(!_nsdl_interface->send_register_message((uint8_t*)event->_address->_address,event->_address->_length,
+        if(!_nsdl_interface.send_register_message((uint8_t*)event->_address->_address,event->_address->_length,
                                                   event->_port, address_type)) {
             // If resource creation fails then inform error to application
             tr_error("M2MInterfaceImpl::state_register_address_resolved : M2MInterface::InvalidParameters");
@@ -763,9 +763,9 @@ void M2MInterfaceImpl::state_update_registration(EventData *data)
         M2MUpdateRegisterData *event = static_cast<M2MUpdateRegisterData *> (data);
         // Create new resources if any
         if (!event->_object_list.empty()) {
-            _nsdl_interface->create_nsdl_list_structure(event->_object_list);
+            _nsdl_interface.create_nsdl_list_structure(event->_object_list);
         }
-        _nsdl_interface->send_update_registration(event->_lifetime);
+        _nsdl_interface.send_update_registration(event->_lifetime);
     }
 }
 
@@ -773,7 +773,7 @@ void M2MInterfaceImpl::state_unregister( EventData */*data*/)
 {
     tr_debug("M2MInterfaceImpl::state_unregister");
     internal_event(STATE_SENDING_COAP_DATA);
-    if(!_nsdl_interface->send_unregister_message()) {
+    if(!_nsdl_interface.send_unregister_message()) {
         tr_error("M2MInterfaceImpl::state_unregister : M2MInterface::NotRegistered");
         internal_event(STATE_IDLE);
         _observer.error(M2MInterface::NotRegistered);
@@ -823,7 +823,7 @@ void M2MInterfaceImpl::state_coap_data_received( EventData *data)
 
         // Process received data
         internal_event(STATE_PROCESSING_COAP_DATA);
-        if(!_nsdl_interface->process_received_data(event->_data,
+        if(!_nsdl_interface.process_received_data(event->_data,
                                                   event->_size,
                                                   &address)) {
            tr_error("M2MInterfaceImpl::state_coap_data_received : M2MInterface::ResponseParseFailed");
