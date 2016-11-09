@@ -22,6 +22,7 @@
 #include "mbed-client/m2mtimerobserver.h"
 #include "mbed-client/m2mobservationhandler.h"
 #include "mbed-client/m2mbase.h"
+#include "mbed-client/m2mserver.h"
 #include "include/nsdllinker.h"
 
 //FORWARD DECLARARTION
@@ -354,7 +355,7 @@ private:
 
     M2MNsdlObserver                   &_observer;
     M2MObjectList                      _object_list;
-    M2MServer                         *_server; // Not owned
+    M2MServer                         _server;
     M2MSecurity                       *_security; // Not owned
     M2MTimer                          *_nsdl_exceution_timer;
     M2MTimer                          *_registration_timer;
