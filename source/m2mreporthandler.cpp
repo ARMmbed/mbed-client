@@ -114,14 +114,14 @@ void M2MReportHandler::set_notification_trigger(uint16_t obj_instance_id)
     schedule_report();
 }
 
-bool M2MReportHandler::parse_notification_attribute(char *&query,
+bool M2MReportHandler::parse_notification_attribute(const char *query,
                                                     M2MBase::BaseType type,
                                                     M2MResourceInstance::ResourceType resource_type)
 {
     tr_debug("M2MReportHandler::parse_notification_attribute(Query %s, Base type %d)", query, (int)type);
     bool success = false;
-    char* sep_pos = strchr(query, '&');
-    char* rest = query;
+    const char* sep_pos = strchr(query, '&');
+    const char* rest = query;
     if( sep_pos != NULL ){
         char query_options[5][20];
         float pmin = _pmin;
@@ -215,7 +215,7 @@ void M2MReportHandler::timer_expired(M2MTimerObserver::Type type)
     }
 }
 
-bool M2MReportHandler::set_notification_attribute(char* option,
+bool M2MReportHandler::set_notification_attribute(const char* option,
                                                   M2MBase::BaseType type,
                                                   M2MResourceInstance::ResourceType resource_type)
 {
@@ -226,7 +226,7 @@ bool M2MReportHandler::set_notification_attribute(char* option,
     memset(&attribute, 0, 20);
     memset(&value, 0, 20);
 
-    char* pos = strstr(option, EQUAL);
+    const char* pos = strstr(option, EQUAL);
     if( pos != NULL ){        
         memcpy(attribute, option, (size_t)(pos-option));
         pos++;

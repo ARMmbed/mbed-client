@@ -27,8 +27,6 @@ public:
 
     void test_copy_constructor();
 
-    void test_assignment_operator();
-
     void test_set_operation();
 
     void test_set_base_type();

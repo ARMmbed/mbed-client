@@ -33,6 +33,12 @@ const uint16_t OPTIMUM_LIFETIME = 3600;
 const uint16_t REDUCE_LIFETIME = 900;
 const float REDUCTION_FACTOR = 0.75f;
 
+// XXX:
+//                               <name></><inst-id></><res-name>
+//#define MAX_OBJECT_INSTANCE_NAME (255 + 1 + 5 + 1 + 255 + 1 + 5)
+//                           <name></><inst-id></><inst-id><zero-terminator>
+#define MAX_OBJECT_PATH_NAME (255 + 1 + 5 + 1 + 5 + 1)
+
 // values per: draft-ietf-core-observe-16
 // OMA LWM2M CR ref.
 #define START_OBSERVATION 0

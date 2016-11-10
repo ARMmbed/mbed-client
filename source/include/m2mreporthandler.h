@@ -90,7 +90,7 @@ public:
      * @param resource_type Type of the Resource.
      * @return true if required attributes are present else false.
      */
-    bool parse_notification_attribute(char *&query,
+    bool parse_notification_attribute(const char *query,
                                               M2MBase::BaseType type,
                                               M2MResourceInstance::ResourceType resource_type = M2MResourceInstance::OPAQUE);
 
@@ -113,7 +113,7 @@ private:
 
 
 
-    bool set_notification_attribute(char* option,
+    bool set_notification_attribute(const char* option,
             M2MBase::BaseType type,
             M2MResourceInstance::ResourceType resource_type);
 

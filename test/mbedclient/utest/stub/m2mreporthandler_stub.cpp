@@ -41,7 +41,7 @@ void M2MReportHandler::set_value(float)
 {
 }
 
-bool M2MReportHandler::parse_notification_attribute(char *&,
+bool M2MReportHandler::parse_notification_attribute(const char *,
                                                     M2MBase::BaseType,
                                                     M2MResourceInstance::ResourceType resource_type)
 {
