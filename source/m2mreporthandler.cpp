@@ -331,7 +331,7 @@ void M2MReportHandler::handle_timers()
             _pmin_exceeded = true;
         } else {
             _pmin_exceeded = false;
-            time_interval = static_cast<uint64_t>(_pmin * 1000);
+            time_interval = (uint64_t) ((uint64_t)_pmin * 1000);
             tr_debug("M2MReportHandler::handle_timers() - Start PMIN interval: %d", (int)time_interval);
             if (!_pmin_timer) {
                 _pmin_timer = new M2MTimer(*this);
@@ -346,7 +346,7 @@ void M2MReportHandler::handle_timers()
             if (!_pmax_timer) {
                 _pmax_timer = new M2MTimer(*this);
             }
-            time_interval = static_cast<uint64_t>(_pmax * 1000);
+            time_interval = (uint64_t) ((uint64_t)_pmax * 1000);
             tr_debug("M2MReportHandler::handle_timers() - Start PMAX interval: %d", (int)time_interval);
             _pmax_timer->start_timer(time_interval,
                                      M2MTimerObserver::PMaxTimer,
