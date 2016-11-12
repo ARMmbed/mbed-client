@@ -17,7 +17,6 @@
 #define M2M_STRING_H
 
 #include <stddef.h> // size_t
-#include <stdexcept>
 #include <stdint.h>
 
 class Test_M2MString;
