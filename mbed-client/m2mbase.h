@@ -21,6 +21,7 @@
 #include "mbed-client/m2mconfig.h"
 #include "mbed-client/m2mreportobserver.h"
 #include "mbed-client/functionpointer.h"
+#include "mbed-client/m2mstringbuffer.h"
 
 //FORWARD DECLARATION
 struct sn_coap_hdr_;
@@ -102,6 +103,13 @@ public:
         GET_PUT_POST_DELETE_ALLOWED = 0x0F,
 
     }Operation;
+
+    enum{
+        MAX_PAHTH_SIZE = 142,
+        MAX_PAHTH_SIZE_2 = 135,
+        MAX_PAHTH_SIZE_3 = 77,
+        MAX_PAHTH_SIZE_4 = 72,
+    }MaxPathSize;
 
 protected:
 
@@ -461,6 +469,14 @@ protected:
      * \return M2MObservationHandler object.
     */
     M2MObservationHandler* observation_handler();
+
+    static bool build_path(StringBuffer<MAX_PAHTH_SIZE> &buffer, const char *s1, uint16_t i1, const char *s2, uint16_t i2);
+
+    static bool build_path(StringBuffer<MAX_PAHTH_SIZE_2> &buffer, const char *s1, uint16_t i1, const char *s2);
+
+    static bool build_path(StringBuffer<MAX_PAHTH_SIZE_3> &buffer, const char *s1, uint16_t i1, uint16_t i2);
+
+    static bool build_path(StringBuffer<MAX_PAHTH_SIZE_4> &buffer, const char *s1, uint16_t i1);
 
 private:
 
