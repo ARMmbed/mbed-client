@@ -870,9 +870,9 @@ bool M2MNsdlInterface::create_nsdl_object_instance_structure(M2MObjectInstance *
     if( object_instance) {
 
         // Append object instance id to the object name.
-        String object_name = object_instance->name();
-        object_name.push_back('/');
-        object_name.append_int(object_instance->instance_id());
+
+        StringBuffer<M2MBase::MAX_PAHTH_SIZE_4> obj_name;
+        M2MBase::build_path(obj_name, object_instance->name().c_str(), object_instance->instance_id());
 
         M2MResourceList res_list = object_instance->resources();
         tr_debug("M2MNsdlInterface::create_nsdl_object_instance_structure - ResourceBase count %d", res_list.size());
@@ -881,12 +881,12 @@ bool M2MNsdlInterface::create_nsdl_object_instance_structure(M2MObjectInstance *
             it = res_list.begin();
             for ( ; it != res_list.end(); it++ ) {
                 // Create NSDL structure for all resources inside
-                success = create_nsdl_resource_structure(*it,object_name,
+                success = create_nsdl_resource_structure(*it,obj_name.c_str(),
                                                          (*it)->supports_multiple_instances());
             }
         }
         if(object_instance->operation() != M2MBase::NOT_ALLOWED) {
-            success = create_nsdl_resource(object_instance,object_name,object_instance->register_uri());
+            success = create_nsdl_resource(object_instance,obj_name.c_str(),object_instance->register_uri());
         }
     }
     return success;
@@ -902,9 +902,22 @@ bool M2MNsdlInterface::create_nsdl_resource_structure(M2MResource *res,
         // Append object name to the resource.
         // Take out the instance Id and append to the
         // resource name like "object/0/+ resource + / + 0"
-        String res_name = object_name;
+        StringBuffer<M2MBase::MAX_PAHTH_SIZE> res_name;
+        if(!res_name.ensure_space(object_name.size()))
+        {
+            tr_error("M2MNsdlInterface::create_nsdl_resource_structure - object creation failed");
+            return false;
+        }
+        res_name.append(object_name.c_str());
         if (strcmp(res_name.c_str(), res->uri_path().c_str()) != 0) {
-            res_name.push_back('/');
+
+            if(!res_name.ensure_space(object_name.size() + 1 + res->name().length() + 1))
+            {
+                tr_error("M2MNsdlInterface::create_nsdl_resource_structure - object creation failed");
+                return false;
+            }
+
+            res_name.append('/');
             res_name.append(res->name().c_str(),res->name().length());
         }
 
@@ -918,20 +931,38 @@ bool M2MNsdlInterface::create_nsdl_resource_structure(M2MResource *res,
                 M2MResourceInstanceList::const_iterator it;
                 it = res_list.begin();
                 for ( ; it != res_list.end(); it++ ) {
-                    String inst_name = res_name;
+                    StringBuffer<M2MBase::MAX_PAHTH_SIZE> inst_name;
+
                     // Create NSDL structure for all resources inside
-                    inst_name.push_back('/');
+
+                    if(!inst_name.ensure_space(res_name.get_size() + 5 + 1 + 1))
+                    {
+                        tr_error("M2MNsdlInterface::create_nsdl_resource_structure - instance creation failed");
+                        return false;
+                    }
+                    inst_name.append(res_name.c_str());
+                    inst_name.append('/');
                     inst_name.append_int((*it)->instance_id());
 
-                    success = create_nsdl_resource((*it),inst_name,(*it)->register_uri());
+                    success = create_nsdl_resource((*it),inst_name.c_str(),(*it)->register_uri());
+
+                    if(!success)
+                    {
+                        tr_error("M2MNsdlInterface::create_nsdl_resource_structure - instance creation failed");
+                        return false;
+                    }
+
                 }
                 // Register the main Resource as well along with ResourceInstances
-                success = create_nsdl_resource(res,res_name,res->register_uri());
+                success = create_nsdl_resource(res, res_name.c_str(), res->register_uri());
             }
         } else {
+
             tr_debug("M2MNsdlInterface::create_nsdl_resource_structure - res_name %s", res_name.c_str());
-            success = create_nsdl_resource(res,res_name,res->register_uri());
+            success = create_nsdl_resource(res, res_name.c_str(), res->register_uri());
+
         }
+
     }
     return success;
 }
@@ -1138,12 +1169,12 @@ M2MBase* M2MNsdlInterface::find_resource(const M2MObject *object,
             M2MObjectInstanceList::const_iterator it;
             it = list.begin();
             for ( ; it != list.end(); it++ ) {
-                // Append object instance id to the object name.
-                String name = (*it)->name();
-                name.push_back('/');
-                name.append_int((*it)->instance_id());
+                StringBuffer<M2MObject::MAX_PAHTH_SIZE_4> obj_name;
 
-                if(name == object_instance){
+                // Append object instance id to the object name.
+
+                M2MObject::build_path(obj_name, (*it)->name().c_str(), (*it)->instance_id());
+                if(!strcmp(obj_name.c_str(), object_instance.c_str())){//do we need some check here for the len? ten memcmp instead?
                     instance = (*it);
                     break;
                 }
@@ -1167,19 +1198,17 @@ M2MBase* M2MNsdlInterface::find_resource(const M2MObjectInstance *object_instanc
             M2MResourceList::const_iterator it;
             it = list.begin();
             for ( ; it != list.end(); it++ ) {
-                String name = object_instance->name();
+                StringBuffer<M2MObject::MAX_PAHTH_SIZE_2> obj_name;
+
                 // Append object instance id to the object name.
-                name.push_back('/');
-                name.append_int(object_instance->instance_id());
 
-                name.push_back('/');
-                name+= (*it)->name();
+                M2MObject::build_path(obj_name, object_instance->name().c_str(), object_instance->instance_id(), (*it)->name().c_str());
 
-                if(name == resource_instance) {
+                if(!strcmp(obj_name.c_str(), resource_instance.c_str())) {//todo: check name len?
                     instance = *it;
                     break;
                 } else if((*it)->supports_multiple_instances()) {
-                    instance = find_resource((*it),name, resource_instance);
+                    instance = find_resource((*it),obj_name.c_str(), resource_instance);
                     if(instance != NULL){
                         break;
                     }
@@ -1202,15 +1231,15 @@ M2MBase* M2MNsdlInterface::find_resource(const M2MResource *resource,
                 M2MResourceInstanceList::const_iterator it;
                 it = list.begin();
                 for ( ; it != list.end(); it++ ) {
-                    String name = object_name;
+                    StringBuffer<M2MObject::MAX_PAHTH_SIZE_4> obj_name;
+
                     // if there are multiple instances supported
                     // then add instance Id into creating resource path
                     // else normal /object_id/object_instance/resource_id format.
 
-                    name.push_back('/');
-                    name.append_int((*it)->instance_id());
+                    M2MObject::build_path(obj_name, object_name.c_str(), (*it)->instance_id());
 
-                    if(name == resource_instance){
+                    if(!strcmp(obj_name.c_str(), resource_instance.c_str())){//todo: check name len?
                         res = (*it);
                         break;
                     }
