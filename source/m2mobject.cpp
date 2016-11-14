@@ -110,10 +110,9 @@ bool M2MObject::remove_object_instance(uint16_t inst_id)
             if((*it)->instance_id() == inst_id) {
                 // Instance found and deleted.
                 obj = *it;
-                String obj_name = name();
-                obj_name.push_back('/');
-                obj_name.append_int(obj->instance_id());
-                obj->remove_resource_from_coap(obj_name);
+                StringBuffer<MAX_PAHTH_SIZE_4> obj_name;
+                build_path(obj_name, name().c_str(), obj->instance_id());
+                obj->remove_resource_from_coap(obj_name.c_str());
                 _instance_list.erase(pos);
                 delete obj;
                 success = true;
