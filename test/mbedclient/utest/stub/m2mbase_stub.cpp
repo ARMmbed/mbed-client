@@ -334,3 +334,23 @@ void M2MBase::execute_value_updated(const String& name)
 {
 
 }
+
+bool M2MBase::build_path(StringBuffer<MAX_PAHTH_SIZE> &buffer, const char *s1, uint16_t i1, const char *s2, uint16_t i2)
+{
+    return m2mbase_stub::bool_value;
+}
+
+bool M2MBase::build_path(StringBuffer<MAX_PAHTH_SIZE_2> &buffer, const char *s1, uint16_t i1, const char *s2)
+{
+    return m2mbase_stub::bool_value;
+}
+
+bool M2MBase::build_path(StringBuffer<MAX_PAHTH_SIZE_3> &buffer, const char *s1, uint16_t i1, uint16_t i2)
+{
+    return m2mbase_stub::bool_value;
+}
+
+bool M2MBase::build_path(StringBuffer<MAX_PAHTH_SIZE_4> &buffer, const char *s1, uint16_t i1)
+{
+    return m2mbase_stub::bool_value;
+}

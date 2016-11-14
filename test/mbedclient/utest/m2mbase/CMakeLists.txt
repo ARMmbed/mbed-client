@@ -7,6 +7,7 @@ add_executable(m2mbase
         "../stub/m2mstring_stub.cpp"
 	"m2mbasetest.cpp"
 	"test_m2mbase.cpp"
+        "../../../../source/m2mstringbufferbase.cpp"
 )
 target_link_libraries(m2mbase
     CppUTest
