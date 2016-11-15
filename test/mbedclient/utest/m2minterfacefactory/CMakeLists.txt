@@ -16,6 +16,7 @@ add_executable(m2minterfacefactorytest
         "../stub/m2mserver_stub.cpp"
         "../stub/m2minterfaceimpl_stub.cpp"
         "../../../../source/m2minterfacefactory.cpp"
+        "../../../../source/m2mstringbufferbase.cpp"
 )
 target_link_libraries(m2minterfacefactorytest
     CppUTest

@@ -18,6 +18,7 @@ add_executable(m2minterfaceimpl
         "../stub/m2mconnectionsecurity_stub.cpp"
         "../stub/nsdlaccesshelper_stub.cpp"
         "../../../../source/m2minterfaceimpl.cpp"
+        "../../../../source/m2mstringbufferbase.cpp"
 )
 target_link_libraries(m2minterfaceimpl
     CppUTest
