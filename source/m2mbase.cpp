@@ -144,8 +144,8 @@ void M2MBase::set_under_observation(bool observed,
     tr_debug("M2MBase::set_under_observation - observed: %d", observed);
     tr_debug("M2MBase::set_under_observation - base_type: %d", _base_type);
     _is_under_observation = observed;
-    _observation_handler = handler;
-    if(handler) {
+    if(handler && observed) {
+        _observation_handler = handler;
         if (_base_type != M2MBase::ResourceInstance) {
             if(!_report_handler){
                 _report_handler = new M2MReportHandler(*this);
@@ -155,6 +155,7 @@ void M2MBase::set_under_observation(bool observed,
     } else {
         delete _report_handler;
         _report_handler = NULL;
+        _observation_handler = NULL;
     }
 }
 
