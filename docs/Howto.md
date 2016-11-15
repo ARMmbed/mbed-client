@@ -36,7 +36,7 @@ Because there can be only one instance of M2MDevice, it is a static class and yo
 
 `M2MDevice::delete_instance();`
 
-Check the [M2MDevice class documentation](https://docs.mbed.com/docs/mbed-client-guide/en/latest/api/classM2MDevice.html) to see how to configure the Device Object. 
+Check the [M2MDevice class documentation](https://docs.mbed.com/docs/mbed-client-guide/en/latest/api/m2mdevice_8h.html) to see how to configure the Device Object. 
 
 #### Security Object
 
@@ -46,7 +46,7 @@ To create a Security Object:
 
 You can create a Bootstrap or normal mbed Device Server by passing the appropriate `enum` value.
 
-Check the [M2MSecurity class documentation](https://docs.mbed.com/docs/mbed-client-guide/en/latest/api/classM2MSecurity.html) to see how to configure the Security Object, as well as how to create appropriate Resources and assign values to them.
+Check the [M2MSecurity class documentation](https://docs.mbed.com/docs/mbed-client-guide/en/latest/api/m2msecurity_8h.html) to see how to configure the Security Object, as well as how to create appropriate Resources and assign values to them.
 
 #### Custom Object
 
