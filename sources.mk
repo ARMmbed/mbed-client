@@ -1,5 +1,6 @@
 SRCS += \
 	source/m2mbase.cpp \
+	source/m2mblockmessage.cpp \
 	source/m2mdevice.cpp \
 	source/m2mfirmware.cpp \
 	source/m2minterfacefactory.cpp \
