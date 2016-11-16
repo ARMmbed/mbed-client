@@ -33,16 +33,16 @@ M2MResourceInstance::M2MResourceInstance(const String &res_name,
                                          const String &object_name)
 : M2MBase(res_name,
           M2MBase::Dynamic),
- _object_instance_callback(object_instance_callback),
- _execute_callback(NULL),
  _value(NULL),
  _value_length(0),
+ _block_message_data(NULL),
+ _function_pointer(NULL),
+ _execute_callback(NULL),
  _resource_callback(NULL),
  _object_name(object_name),
- _function_pointer(NULL),
+ _object_instance_callback(object_instance_callback),
  _object_instance_id(object_instance_id),
- _resource_type(type),
- _block_message_data(NULL)
+ _resource_type(type)
 {
     M2MBase::set_resource_type(resource_type);
     M2MBase::set_base_type(M2MBase::ResourceInstance);
@@ -58,16 +58,16 @@ M2MResourceInstance::M2MResourceInstance(const String &res_name,
                                          const String &object_name)
 : M2MBase(res_name,
           M2MBase::Static),
- _object_instance_callback(object_instance_callback),
- _execute_callback(NULL),
  _value(NULL),
  _value_length(0),
+ _block_message_data(NULL),
+ _function_pointer(NULL),
+ _execute_callback(NULL),
  _resource_callback(NULL),
  _object_name(object_name),
- _function_pointer(NULL),
+ _object_instance_callback(object_instance_callback),
  _object_instance_id(object_instance_id),
- _resource_type(type),
- _block_message_data(NULL)
+ _resource_type(type)
 {
     M2MBase::set_resource_type(resource_type);
     M2MBase::set_base_type(M2MBase::Resource);
