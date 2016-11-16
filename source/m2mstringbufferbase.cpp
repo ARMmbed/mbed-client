@@ -63,7 +63,7 @@ bool StringBufferBase::append(char *buff, size_t max_size, const char *data, siz
 {
     bool space_available = true;
     if (data_len > 0) {
-        bool space_available = ensure_space(max_size, data_len + 1);
+        space_available = ensure_space(max_size, data_len + 1);
         if (space_available) {
             memcpy(buff + _curr_size, data, data_len);
             _curr_size += data_len;
