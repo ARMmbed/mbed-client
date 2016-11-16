@@ -387,34 +387,34 @@ private: // state machine state functions
 
 private:
 
-    M2MInterfaceObserver        &_observer;
-    M2MConnectionSecurity       *_security_connection; // Doesn't own
-    M2MConnectionHandler        _connection_handler;
-    M2MNsdlInterface            _nsdl_interface;
-    uint8_t                     _current_state;
-    const uint8_t               _max_states;
-    bool                        _event_generated;
     EventData                   *_event_data;
+    M2MTimer                    *_bootstrap_timer;
+    uint16_t                    _server_port;
+    uint16_t                    _listen_port;
     String                      _endpoint_type;
     String                      _domain;
     int32_t                     _life_time;
-    BindingMode                 _binding_mode;
     String                      _context_address;
-    uint16_t                    _listen_port;
-    uint16_t                    _server_port;
     String                      _server_ip_address;
     M2MSecurity                 *_register_server; //TODO: to be the list not owned
-    bool                        _event_ignored;
     M2MTimer                    _queue_sleep_timer;
     M2MTimer                    _retry_timer;
-    M2MTimer                    *_bootstrap_timer;
     callback_handler            _callback_handler;
-    M2MSecurity                 *_security;
-    uint8_t                     _retry_count;
+    const uint8_t               _max_states;
+    bool                        _event_ignored;
+    bool                        _event_generated;
     bool                        _reconnecting;
     bool                        _retry_timer_expired;
+    uint8_t                     _current_state;
+    uint8_t                     _retry_count;
+    BindingMode                 _binding_mode;
+    M2MInterfaceObserver        &_observer;
+    M2MConnectionHandler        _connection_handler;
+    M2MNsdlInterface            _nsdl_interface;
+    M2MConnectionSecurity       *_security_connection; // Doesn't own
+    M2MSecurity                 *_security;
 
-   friend class Test_M2MInterfaceImpl;
+    friend class Test_M2MInterfaceImpl;
 
 };
 
