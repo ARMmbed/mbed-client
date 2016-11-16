@@ -309,7 +309,7 @@ For each of these types, the Resource and Resource Instances can be either stati
 
 **Creating dynamic and static single-instance Resources**
 
-- To create a single-instance Resource with a static value (`/Test/0/Resource`): [see parameters here](https://docs.mbed.com/docs/mbed-client-guide/en/latest/api/classM2MObjectInstance.html#aaa596f731688730d7a883b7f1251a662) 
+- To create a single-instance Resource with a static value (`/Test/0/Resource`): 
 
 ```
 M2MObject * object = M2MInterfaceFactory::create_object("Test");
@@ -319,7 +319,7 @@ uint8_t value[] ={"value"};
 M2MResource* resource = object_instance->create_static_resource("Resource", "sensor",M2MResourceInstance::INTEGER,value,sizeof(value),false);
 ```
 
-- To create an observable single-instance Resource (`/Test/0/Resource`) with a dynamic value that can be set later on: [see parameters here](https://docs.mbed.com/docs/mbed-client-guide/en/latest/api/classM2MObjectInstance.html#a9b3f88dc2d28512ea6c3db6f74168c3f)  
+- To create an observable single-instance Resource (`/Test/0/Resource`) with a dynamic value that can be set later on:  
 
 ```
 M2MObject * object = M2MInterfaceFactory::create_object("Test");
@@ -331,7 +331,7 @@ M2MResource* resource = object_instance->create_dynamic_resource("Resource", "se
 
 **Creating dynamic and static Resource Instances**
 
-- To create a Resource Instance (`/Test/0/Resource/0`) with a static value: [see parameters here](https://docs.mbed.com/docs/mbed-client-guide/en/latest/api/classM2MObjectInstance.html#a6acac6e65bfbc8b731ab4afcc805c41b)
+- To create a Resource Instance (`/Test/0/Resource/0`) with a static value:
 
 ```
 M2MObject * object = M2MInterfaceFactory::create_object("Test");
@@ -342,7 +342,7 @@ M2MResourceInstance* resource_instance = object_instance->create_static_resource
 ```
 
 
-- To create an observable Resource Instance (`/Test/0/Resource/0`) with a dynamic value that can be set later on: [see parameters here](https://docs.mbed.com/docs/mbed-client-guide/en/latest/api/classM2MObjectInstance.html#adcaba046a484282983380edf8a370cfa)  
+- To create an observable Resource Instance (`/Test/0/Resource/0`) with a dynamic value that can be set later on: 
 
 ```
 M2MObject * object = M2MInterfaceFactory::create_object("Test");
@@ -369,6 +369,7 @@ virtual void set_operation(M2MBase::Operation operation);
 resource->set_operation(M2MBase::GET_PUT_POST_ALLOWED); // This defines the REST operations that can be performed on this Resource.
 resource_instance->set_operation(M2MBase::GET_PUT_POST_ALLOWED); // This defines the REST operations that can be performed on this Resource Instance.
 ```
+
 ##### Setting Observable Mode
 
 To set the Resource or Resource Instance to be an observable resource:
@@ -407,6 +408,7 @@ void execute_function_example(void *) {
 };
 resource->set_execute_function(execute_callback(this,&execute_function_example));
 ```
+
 In case execute callback function is defined as a global function and it's outside of your class scope you can use overloaded set_execute_function:
 ```
 virtual void set_execute_function(execute_callback_2 callback);
@@ -452,6 +454,7 @@ Applications can define their own maximum incoming message size in bytes at buil
         }
 
 ```
+
 For yotta based builds, you need to create a `config.json` file in the application level:
 
 ```
