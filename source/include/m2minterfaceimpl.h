@@ -392,7 +392,7 @@ private:
     M2MConnectionHandler        _connection_handler;
     M2MNsdlInterface            _nsdl_interface;
     uint8_t                     _current_state;
-    const int                   _max_states;
+    const uint8_t               _max_states;
     bool                        _event_generated;
     EventData                   *_event_data;
     String                      _endpoint_type;
