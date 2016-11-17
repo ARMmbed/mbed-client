@@ -56,29 +56,6 @@ M2MObject::~M2MObject()
     }
 }
 
-M2MObject& M2MObject::operator=(const M2MObject& other)
-{
-    if (this != &other) { // protect against invalid self-assignment
-        if(!other._instance_list.empty()){
-            M2MObjectInstance* ins = NULL;
-            M2MObjectInstanceList::const_iterator it;
-            it = other._instance_list.begin();
-            for (; it!=other._instance_list.end(); it++ ) {
-                ins = *it;
-                _instance_list.push_back(new M2MObjectInstance(*ins));
-            }
-        }
-    }
-    return *this;
-}
-
-M2MObject::M2MObject(const M2MObject& other)
-: M2MBase(other),
-  _max_instance_count(MAX_UNINT_16_COUNT)
-{
-    this->operator=(other);
-}
-
 M2MObjectInstance* M2MObject::create_object_instance(uint16_t instance_id)
 {
     tr_debug("M2MObject::create_object_instance - id: %d", instance_id);

@@ -26,38 +26,6 @@
 
 #define TRACE_GROUP "mClt"
 
-M2MResource& M2MResource::operator=(const M2MResource& other)
-{
-    if (this != &other) { // protect against invalid self-assignment
-        _has_multiple_instances = other._has_multiple_instances;
-        if(!other._resource_instance_list.empty()){
-            M2MResourceInstance* ins = NULL;
-            M2MResourceInstanceList::const_iterator it;
-            it = other._resource_instance_list.begin();
-            for (; it!=other._resource_instance_list.end(); it++ ) {
-                ins = *it;
-                _resource_instance_list.push_back(new M2MResourceInstance(*ins));
-            }
-        }
-        if(other._delayed_token) {
-            _delayed_token = (uint8_t*)alloc_copy(other._delayed_token,other._delayed_token_len);
-            if(_delayed_token) {
-                _delayed_token_len = other._delayed_token_len;
-            }
-        }
-    }
-    return *this;
-}
-
-M2MResource::M2MResource(const M2MResource& other)
-: M2MResourceInstance(other),
-  _delayed_token(NULL),
-  _delayed_token_len(0),
-  _delayed_response(false)
-{
-    this->operator=(other);
-}
-
 M2MResource::M2MResource(M2MObjectInstanceCallback &object_instance_callback,
                          const String &resource_name,
                          const String &resource_type,

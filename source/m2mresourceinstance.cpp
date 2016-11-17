@@ -25,37 +25,6 @@
 
 #define TRACE_GROUP "mClt"
 
-M2MResourceInstance& M2MResourceInstance::operator=(const M2MResourceInstance& other)
-{
-    if (this != &other) { // protect against invalid self-assignment
-
-        free(_value);
-        _value = NULL;
-
-        _value_length = other._value_length;
-        if(other._value) {
-            _value = (uint8_t *)alloc_string_copy(other._value, other._value_length);
-        }
-    }
-    return *this;
-}
-
-M2MResourceInstance::M2MResourceInstance(const M2MResourceInstance& other)
-: M2MBase(other),
-  _object_instance_callback(other._object_instance_callback),
-  _execute_callback(NULL),
-  _value(NULL),
-  _value_length(0),
-  _resource_callback(NULL),
-  _object_name(other._object_name),
-  _function_pointer(NULL),
-  _object_instance_id(other._object_instance_id),
-  _resource_type(M2MResourceInstance::STRING),
-  _block_message_data(NULL)
-{
-    this->operator=(other);
-}
-
 M2MResourceInstance::M2MResourceInstance(const String &res_name,
                                          const String &resource_type,
                                          M2MResourceInstance::ResourceType type,
