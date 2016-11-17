@@ -51,7 +51,8 @@ M2MResourceInstance::M2MResourceInstance(const M2MResourceInstance& other)
   _function_pointer(NULL),
   _object_instance_id(other._object_instance_id),
   _resource_type(M2MResourceInstance::STRING),
-  _block_message_data(NULL)
+  _block_message_data(NULL),
+  _notification_sent_callback(NULL)
 {
     this->operator=(other);
 }
@@ -73,7 +74,8 @@ M2MResourceInstance::M2MResourceInstance(const String &res_name,
  _function_pointer(NULL),
  _object_instance_id(object_instance_id),
  _resource_type(type),
- _block_message_data(NULL)
+ _block_message_data(NULL),
+ _notification_sent_callback(NULL)
 {
     M2MBase::set_resource_type(resource_type);
     M2MBase::set_base_type(M2MBase::ResourceInstance);
@@ -98,7 +100,8 @@ M2MResourceInstance::M2MResourceInstance(const String &res_name,
  _function_pointer(NULL),
  _object_instance_id(object_instance_id),
  _resource_type(type),
- _block_message_data(NULL)
+ _block_message_data(NULL),
+ _notification_sent_callback(NULL)
 {
     M2MBase::set_resource_type(resource_type);
     M2MBase::set_base_type(M2MBase::Resource);
@@ -541,4 +544,16 @@ void M2MResourceInstance::set_incoming_block_message_callback(incoming_block_mes
 void M2MResourceInstance::set_outgoing_block_message_callback(outgoing_block_message_callback callback)
 {
     _outgoing_block_message_cb = callback;
+}
+
+void M2MResourceInstance::set_notification_sent_callback(notification_sent_callback callback)
+{
+    _notification_sent_callback = callback;
+}
+
+void M2MResourceInstance::notification_sent()
+{
+    if (_notification_sent_callback) {
+        _notification_sent_callback();
+    }
 }

@@ -32,6 +32,7 @@ public:
 class M2MBlockMessage;
 typedef FP1<void,void*> execute_callback;
 typedef void(*execute_callback_2) (void *arguments);
+typedef void(*notification_sent_callback) (void);
 typedef FP1<void, M2MBlockMessage *> incoming_block_message_callback;
 typedef FP3<void, const String &, uint8_t *&, uint32_t &> outgoing_block_message_callback;
 
@@ -263,6 +264,18 @@ public:
     */
     virtual M2MBlockMessage* block_message() const;
 
+    /**
+     * @brief Sets the function that is executed when this object receives
+     * response(Empty ACK) for notification message.
+     * @param callback The function pointer that is called.
+     */
+    void set_notification_sent_callback(notification_sent_callback callback);
+
+    /**
+     * \brief Executes the function that is set in "set_notification_sent_callback".
+     */
+    void notification_sent();
+
 protected:
 
     /**
@@ -291,6 +304,7 @@ private:
     incoming_block_message_callback         _incoming_block_message_cb;
     outgoing_block_message_callback         _outgoing_block_message_cb;
     M2MBlockMessage                         *_block_message_data;
+    notification_sent_callback              _notification_sent_callback;
 
     friend class Test_M2MResourceInstance;
     friend class Test_M2MResource;

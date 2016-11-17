@@ -277,10 +277,11 @@ void M2MBase::get_observation_token(uint8_t *&token, uint32_t &token_length)
 {
     token_length = 0;
     free(token);
-
-    token = alloc_string_copy((uint8_t *)_token, _token_length);
-    if(token) {
-        token_length = _token_length;
+    if (_token) {
+        token = alloc_string_copy((uint8_t *)_token, _token_length);
+        if(token) {
+            token_length = _token_length;
+        }
     }
 }
 
