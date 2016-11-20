@@ -272,7 +272,7 @@ private:
 
     bool object_present(M2MObject * object) const;
 
-    void clear_resource(sn_nsdl_resource_info_s *&resource);
+    void clear_resource(sn_nsdl_dynamic_resource_parameters_s *&resource);
 
     M2MInterface::Error interface_error(sn_coap_hdr_s *coap_header);
 
@@ -359,7 +359,7 @@ private:
     M2MTimer                          *_nsdl_exceution_timer;
     M2MTimer                          *_registration_timer;
     sn_nsdl_ep_parameters_s           *_endpoint;
-    sn_nsdl_resource_info_s           *_resource;
+    sn_nsdl_dynamic_resource_parameters_s           *_resource;
     sn_nsdl_addr_s                     _sn_nsdl_address;
     nsdl_s                            *_nsdl_handle;
     uint32_t                           _counter_for_nsdl;
