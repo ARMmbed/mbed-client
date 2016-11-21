@@ -23,6 +23,7 @@ namespace m2mtimer_stub
 {
     extern bool bool_value;
     extern bool total_bool_value;
+    extern bool enable_mock;
     void clear();
 }
 
