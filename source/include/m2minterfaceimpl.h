@@ -388,8 +388,8 @@ private: // state machine state functions
 private:
 
     M2MInterfaceObserver        &_observer;
-    M2MConnectionHandler        _connection_handler;
     M2MConnectionSecurity       *_security_connection; // Doesn't own
+    M2MConnectionHandler        _connection_handler;
     M2MNsdlInterface            _nsdl_interface;
     uint8_t                     _current_state;
     const int                   _max_states;
