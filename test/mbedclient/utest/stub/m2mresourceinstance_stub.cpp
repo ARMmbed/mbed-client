@@ -227,3 +227,15 @@ void M2MResourceInstance::set_outgoing_block_message_callback(outgoing_block_mes
 {
 
 }
+
+void M2MResourceInstance::set_notification_sent_callback(notification_sent_callback callback)
+{
+}
+
+void M2MResourceInstance::set_notification_sent_callback(notification_sent_callback_2 callback)
+{
+}
+
+void M2MResourceInstance::notification_sent()
+{
+}
