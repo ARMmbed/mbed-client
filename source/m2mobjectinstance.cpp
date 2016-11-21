@@ -63,6 +63,16 @@ M2MObjectInstance::M2MObjectInstance(const String &object_name,
     M2MBase::set_coap_content_type(COAP_CONTENT_OMA_TLV_TYPE);
 }
 
+M2MObjectInstance::M2MObjectInstance(const lwm2m_parameters_s* s,
+                                     M2MObjectCallback &object_callback)
+: M2MBase(s),
+  _object_callback(object_callback)
+{
+    //M2MBase::set_base_type(M2MBase::ObjectInstance);
+    M2MBase::set_coap_content_type(COAP_CONTENT_OMA_TLV_TYPE);
+}
+
+
 M2MObjectInstance::~M2MObjectInstance()
 {
     if(!_resource_list.empty()) {
@@ -83,6 +93,29 @@ M2MObjectInstance::~M2MObjectInstance()
         _resource_list.clear();
     }
 }
+
+// TBD, ResourceType to the base class struct??
+M2MResource* M2MObjectInstance::create_static_resource(const lwm2m_parameters_s* s, M2MResourceInstance::ResourceType type)
+{
+    tr_debug("M2MObjectInstance::create_static_resource(resource_name %s)", (const char*)s->name);
+    M2MResource *res = NULL;
+    String resource_name = stringdup((const char*)s->name);
+    if( resource_name.empty() || resource_name.size() > MAX_ALLOWED_STRING_LENGTH){
+        return res;
+    }
+    if(!resource(resource_name)) {
+        res = new M2MResource(*this, s, type, (const uint16_t) M2MBase::instance_id(), M2MBase::name());
+        if(res) {
+            res->add_observation_level(observation_level());
+            //if (multiple_instance) {
+                //res->set_coap_content_type(COAP_CONTENT_OMA_TLV_TYPE);
+            //}
+            _resource_list.push_back(res);
+        }
+    }
+    return res;
+}
+
 
 M2MResource* M2MObjectInstance::create_static_resource(const String &resource_name,
                                                        const String &resource_type,
@@ -110,6 +143,31 @@ M2MResource* M2MObjectInstance::create_static_resource(const String &resource_na
     }
     return res;
 }
+
+M2MResource* M2MObjectInstance::create_dynamic_resource(const lwm2m_parameters_s* s,
+                                                        M2MResourceInstance::ResourceType type,
+                                                        bool observable)
+{
+    String resource_name = stringdup((const char*)s->name);
+    tr_debug("M2MObjectInstance::create_dynamic_resource(resource_name %s)",resource_name.c_str());
+    M2MResource *res = NULL;
+
+    if( resource_name.empty() || resource_name.size() > MAX_ALLOWED_STRING_LENGTH){
+        return res;
+    }
+    if(!resource(resource_name)) {
+        res = new M2MResource(*this, s, type, M2MBase::instance_id(), M2MBase::name());
+        if(res) {
+            //if (multiple_instance) {
+              //  res->set_coap_content_type(COAP_CONTENT_OMA_TLV_TYPE);
+            //}
+            res->add_observation_level(observation_level());
+            _resource_list.push_back(res);
+        }
+    }
+    return res;
+}
+
 
 M2MResource* M2MObjectInstance::create_dynamic_resource(const String &resource_name,
                                                 const String &resource_type,

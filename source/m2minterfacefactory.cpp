@@ -121,3 +121,17 @@ M2MObject* M2MInterfaceFactory::create_object(const String &name)
     object = new M2MObject(name);
     return object;
 }
+// if desired that object can be created on flash..
+M2MObject* M2MInterfaceFactory::create_object(const M2MBase::lwm2m_parameters_s* stat_res)
+{    
+    tr_debug("M2MInterfaceFactory::create_object : Path : %s", (const char*)stat_res->static_resource_params->path);
+
+    //KS: change comparison for the path
+    /*if(name.size() > MAX_ALLOWED_STRING_LENGTH || name.empty()){
+        return NULL;
+    }
+    */
+    M2MObject *object = NULL;
+    object = new M2MObject(stat_res);
+    return object;
+}

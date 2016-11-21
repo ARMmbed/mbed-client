@@ -16,11 +16,32 @@
 #ifndef M2M_BASE_H
 #define M2M_BASE_H
 
+#include "include/nsdllinker.h"
+
+// Note: this macro is needed on armcc to get the the PRI*32 macros
+// from inttypes.h in a C++ code.
+#ifndef __STDC_FORMAT_MACROS
+#define __STDC_FORMAT_MACROS
+#endif
+
+// Note: this macro is needed on armcc to get the the limit macros like UINT16_MAX
+#ifndef __STDC_LIMIT_MACROS
+#define __STDC_LIMIT_MACROS
+#endif
+
+#define RAM_OPTIMIZED
 // Support for std args
 #include <stdint.h>
 #include "mbed-client/m2mconfig.h"
 #include "mbed-client/m2mreportobserver.h"
+
+
+#ifndef RAM_OPTIMIZED
 #include "mbed-client/functionpointer.h"
+#endif
+
+// put this and related stuff also behind the flag?
+#include "include/nsdllinker.h"
 
 //FORWARD DECLARATION
 struct sn_coap_hdr_;
@@ -30,8 +51,10 @@ struct nsdl_s;
 struct sn_nsdl_addr_;
 typedef sn_nsdl_addr_ sn_nsdl_addr_s;
 
+#ifndef RAM_OPTIMIZED
 typedef FP1<void, const char*> value_updated_callback;
 typedef void(*value_updated_callback2) (const char* object_name);
+#endif
 class M2MObservationHandler;
 class M2MReportHandler;
 
@@ -74,7 +97,7 @@ public:
      * supported by a given resource.
     */
     typedef enum {
-        Static,
+        Static=0,
         Dynamic,
         Directory
     }Mode;
@@ -103,6 +126,16 @@ public:
 
     }Operation;
 
+    typedef struct lwm2m_parameters {
+        //add multiple_instances
+        uint32_t            max_age;
+        uint32_t            instance_id;
+        int32_t             name_id;
+        char*               name; //for backwards compability
+        BaseType            base_type;
+        sn_nsdl_static_resource_parameters_s * static_resource_params;
+    } lwm2m_parameters_s;
+
 protected:
 
     // Prevents the use of default constructor.
@@ -120,14 +153,21 @@ protected:
      * \param name The name of the object.
      * \param id The ID of the object.
      */
-    M2MBase(const String &name,
+    M2MBase(const String name,
             M2MBase::Mode mode);
+
+
+    M2MBase(const lwm2m_parameters_s* s);
+
 public:
 
     /**
      * Destructor
      */
     virtual ~M2MBase();
+
+    bool is_static();
+
 
     /**
      * \brief Sets the operation type for an object.
@@ -139,13 +179,13 @@ public:
      * \brief Sets the interface description of the object.
      * \param description The description to be set.
      */
-    virtual void set_interface_description(const String &description);
+    void set_interface_description(const String &description);
 
     /**
      * \brief Sets the resource type of the object.
      * \param resource_type The resource type to be set.
      */
-    virtual void set_resource_type(const String &resource_type);
+    void set_resource_type(const String &resource_type);
 
     /**
      * \brief Sets the CoAP content type of the object.
@@ -158,7 +198,7 @@ public:
      * \brief Sets the observable mode for the object.
      * \param observable A value for the observation.
      */
-    virtual void set_observable(bool observable);
+    void set_observable(bool observable);
 
     /**
      * \brief Adds the observation level for the object.
@@ -186,14 +226,14 @@ public:
      * \param token A pointer to the token of the resource.
      * \param length The length of the token pointer.
      */
-    virtual void set_observation_token(const uint8_t *token,
+    void set_observation_token(const uint8_t *token,
                                        const uint8_t length);
 
     /**
      * \brief Sets the instance ID of the object.
      * \param instance_id The instance ID of the object.
      */
-    virtual void set_instance_id(const uint16_t instance_id);
+    void set_instance_id(const uint16_t instance_id);
 
     /**
      * This function is deprecated. An increment of the observation number is done internally.
@@ -203,12 +243,7 @@ public:
     virtual void set_observation_number(const uint16_t observation_number)
         m2m_deprecated;
 
-    /**
-     * \brief Sets the max age for the resource value to be cached.
-     * \param max_age The max age in seconds.
-     */
-    virtual void set_max_age(const uint32_t max_age);
-
+  
     /**
      * \brief Returns the object type.
      * \return The base type of the object.
@@ -225,7 +260,7 @@ public:
      * \brief Returns the object name.
      * \return The name of the object.
      */
-    virtual const String &name() const;
+    String name() const;
 
     /**
      * \brief Returns the object name in integer.
@@ -240,16 +275,16 @@ public:
     virtual uint16_t instance_id() const;
 
     /**
-     * \brief Returns the interface description of the object.
-     * \return The interface description of the object.
+     * \brief Returns a copy of the interface description object.
+     * \return Description of the object.
      */
-    virtual const String& interface_description() const;
+    String interface_description() const;
 
     /**
-     * \brief Returns the resource type of the object.
-     * \return The resource type of the object.
+     * \brief Returns a copy of the resource type object.
+     * \return Resource type of the object.
      */
-    virtual const String& resource_type() const;
+     String resource_type() const;
 
     /**
      * \brief Returns the CoAP content type of the object.
@@ -347,25 +382,25 @@ public:
      * \brief Sets whether this resource is published to server or not.
      * \param register_uri True sets the resource as part of registration message.
      */
-    virtual void set_register_uri( bool register_uri);
+    void set_register_uri( bool register_uri);
 
     /**
      * \brief Returns whether this resource is published to server or not.
      * \return True if the resource is a part of the registration message, else false.
      */
-    virtual bool register_uri();
+    bool register_uri();
 
     /**
      * \brief Sets object URI path.
      * \param path The URI path of the object.
      */
-    virtual void set_uri_path(const String &path);
+    void set_uri_path(const String &path);
 
     /**
-     * \brief Returns the URI path of the object.
-     * \return The URI path of the object.
+     * \brief Returns a copy of the URI path object.
+     * \return URI path of the object.
      */
-    virtual const String &uri_path() const;
+    String uri_path() const;
 
     /**
      * @brief Returns whether this resource is under observation or not.
@@ -373,6 +408,7 @@ public:
      */
     virtual bool is_under_observation() const;
 
+    #ifndef RAM_OPTIMIZED
     /**
      * @brief Sets the function that is executed when this
      * object receives a PUT or POST command.
@@ -398,6 +434,11 @@ public:
      * @param name The name of the object.
      */
     virtual void execute_value_updated(const String& name);
+    #endif
+
+     char* stringdup(const char* s);
+
+    sn_nsdl_static_resource_parameters_s * get_nsdl_resource();
 
 protected : // from M2MReportObserver
 
@@ -410,7 +451,7 @@ protected:
      * \brief Sets the base type for an object.
      * \param type The base type of the object.
      */
-    virtual void set_base_type(M2MBase::BaseType type);
+    void set_base_type(M2MBase::BaseType type);
 
     /**
      * \brief Removes a resource from the CoAP structure.
@@ -465,31 +506,25 @@ protected:
 private:
 
     static bool is_integer(const String &value);
-
+    void free_resources();
 private:
 
-    M2MReportHandler           *_report_handler;
-    M2MObservationHandler      *_observation_handler;
-    String                      _name;
-    String                      _resource_type;
-    String                      _interface_description;
-    String                      _uri_path;
-    int32_t                     _name_id;
-    uint32_t                    _max_age;
-    uint16_t                    _instance_id;
-    uint16_t                    _observation_number;
+
+    // is the resource struct defined as const or is it created on heap
+    bool                          _is_static;
+    bool                          _is_under_observation;
+    uint8_t                       _token_length;
+    M2MBase::Observation          _observation_level;
+    uint16_t                      _observation_number;   
+    M2MReportHandler            *_report_handler;       
     uint8_t                     *_token;
-    uint8_t                     _token_length;
-    uint8_t                     _coap_content_type;
-    M2MBase::Operation          _operation;
-    M2MBase::Mode               _mode;
-    M2MBase::BaseType           _base_type;
-    M2MBase::Observation        _observation_level;
-    bool                        _observable;
-    bool                        _register_uri;
-    bool                        _is_under_observation;
+    #ifndef RAM_OPTIMIZED
     value_updated_callback      _value_updated_callback;
     FP1<void, const char*>      *_function_pointer;
+    #endif
+    M2MObservationHandler       *_observation_handler;
+    lwm2m_parameters_s          *_sn_resource;
+
 
 friend class Test_M2MBase;
 

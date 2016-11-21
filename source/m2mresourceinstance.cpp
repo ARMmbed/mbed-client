@@ -42,21 +42,59 @@ M2MResourceInstance& M2MResourceInstance::operator=(const M2MResourceInstance& o
 
 M2MResourceInstance::M2MResourceInstance(const M2MResourceInstance& other)
 : M2MBase(other),
-  _object_instance_callback(other._object_instance_callback),
-  _execute_callback(NULL),
+  _resource_type(M2MResourceInstance::STRING),
+  _object_instance_id(other._object_instance_id),
+  _object_instance_callback(other._object_instance_callback),  
   _value(NULL),
   _value_length(0),
   _resource_callback(NULL),
-  _object_name(other._object_name),
+  _object_name(NULL)
+  #ifndef RAM_OPTIMIZED
+  ,_execute_callback(NULL),
   _function_pointer(NULL),
-  _object_instance_id(other._object_instance_id),
-  _resource_type(M2MResourceInstance::STRING),
   _block_message_data(NULL)
+  #endif
 {
+    _object_name = M2MBase::stringdup(other._object_name);
     this->operator=(other);
 }
 
-M2MResourceInstance::M2MResourceInstance(const String &res_name,
+M2MResourceInstance::M2MResourceInstance(const lwm2m_parameters_s* s,
+                                         M2MObjectInstanceCallback &object_instance_callback,
+                                         M2MResourceInstance::ResourceType type,
+                                         const uint16_t object_instance_id,
+                                         const String &object_name)
+: M2MBase(s),
+  _resource_type(type),
+  _object_instance_id(object_instance_id),
+ _object_instance_callback(object_instance_callback),
+ _execute_callback(NULL),
+ _value(NULL),
+ _value_length(0),
+ _resource_callback(NULL)
+ #ifndef RAM_OPTIMIZED
+ ,_function_pointer(NULL),
+ _block_message_data(NULL)
+ #endif
+{
+    //TBD: put to flash, or parse from the uri_path!!!!
+    //same for the _object_instance_id.
+    _object_name = M2MBase::stringdup((const char*)object_name.c_str());
+    tr_debug("M2MResourceInstance(object_name %s)", _object_name);
+
+    // TBD: we dont need _value here, because in c-struct there is resource field!!!!
+    if( s->static_resource_params->resource != NULL && s->static_resource_params->resourcelen > 0 ) {
+        _value = alloc_string_copy(s->static_resource_params->resource, s->static_resource_params->resourcelen);
+        if(_value) {
+            _value_length = s->static_resource_params->resourcelen;
+        }
+    }
+    //M2MBase::set_resource_type(resource_type);
+    //M2MBase::set_base_type(M2MBase::ResourceInstance);
+}
+
+
+M2MResourceInstance::M2MResourceInstance(const String res_name,
                                          const String &resource_type,
                                          M2MResourceInstance::ResourceType type,
                                          M2MObjectInstanceCallback &object_instance_callback,
@@ -64,22 +102,24 @@ M2MResourceInstance::M2MResourceInstance(const String &res_name,
                                          const String &object_name)
 : M2MBase(res_name,
           M2MBase::Dynamic),
+  _resource_type(type),
+  _object_instance_id(object_instance_id),
  _object_instance_callback(object_instance_callback),
  _execute_callback(NULL),
  _value(NULL),
  _value_length(0),
- _resource_callback(NULL),
- _object_name(object_name),
- _function_pointer(NULL),
- _object_instance_id(object_instance_id),
- _resource_type(type),
+ _resource_callback(NULL)
+ #ifndef RAM_OPTIMIZED
+ ,_function_pointer(NULL),
  _block_message_data(NULL)
+ #endif
 {
+    _object_name = M2MBase::stringdup(object_name.c_str());
     M2MBase::set_resource_type(resource_type);
     M2MBase::set_base_type(M2MBase::ResourceInstance);
 }
 
-M2MResourceInstance::M2MResourceInstance(const String &res_name,
+M2MResourceInstance::M2MResourceInstance(const String res_name,
                                          const String &resource_type,
                                          M2MResourceInstance::ResourceType type,
                                          const uint8_t *value,
@@ -89,17 +129,19 @@ M2MResourceInstance::M2MResourceInstance(const String &res_name,
                                          const String &object_name)
 : M2MBase(res_name,
           M2MBase::Static),
+  _resource_type(type),
+  _object_instance_id(object_instance_id),
  _object_instance_callback(object_instance_callback),
  _execute_callback(NULL),
  _value(NULL),
  _value_length(0),
- _resource_callback(NULL),
- _object_name(object_name),
- _function_pointer(NULL),
- _object_instance_id(object_instance_id),
- _resource_type(type),
+ _resource_callback(NULL)
+#ifndef RAM_OPTIMIZED
+ ,_function_pointer(NULL),
  _block_message_data(NULL)
+#endif
 {
+    _object_name = M2MBase::stringdup(object_name.c_str());
     M2MBase::set_resource_type(resource_type);
     M2MBase::set_base_type(M2MBase::Resource);
     if( value != NULL && value_length > 0 ) {
@@ -111,10 +153,14 @@ M2MResourceInstance::M2MResourceInstance(const String &res_name,
 }
 
 M2MResourceInstance::~M2MResourceInstance()
-{
+{    
     free(_value);
+    #ifndef RAM_OPTIMIZED
     delete _function_pointer;
     delete _block_message_data;
+    #endif
+    free (_object_name);
+
 }
 
 M2MBase::BaseType M2MResourceInstance::base_type() const
@@ -146,18 +192,21 @@ bool M2MResourceInstance::handle_observation_attribute(char *&query)
     return success;
 }
 
+
 void M2MResourceInstance::set_execute_function(execute_callback callback)
 {
     _execute_callback = callback;
 }
 
+#ifndef RAM_OPTIMIZED
 void M2MResourceInstance::set_execute_function(execute_callback_2 callback)
-{
+{    
     delete _function_pointer;
 
     _function_pointer = new FP1<void, void*>(callback);
-    set_execute_function(execute_callback(_function_pointer, &FP1<void, void*>::call));
+    set_execute_function(execute_callback(_function_pointer, &FP1<void, void*>::call));    
 }
+#endif
 
 void M2MResourceInstance::clear_value()
 {
@@ -357,6 +406,7 @@ sn_coap_hdr_s* M2MResourceInstance::handle_get_request(nsdl_s *nsdl,
                 uint32_t payload_len = 0;
 
                 //If handler exists it means that resource value is stored in application side
+                #ifndef RAM_OPTIMIZED
                 if (block_message() && block_message()->is_block_message()) {
                     if(_outgoing_block_message_cb) {
                         _outgoing_block_message_cb(uri_path(), coap_response->payload_ptr, payload_len);
@@ -364,7 +414,9 @@ sn_coap_hdr_s* M2MResourceInstance::handle_get_request(nsdl_s *nsdl,
                 } else {
                     get_value(coap_response->payload_ptr,payload_len);
                 }
-
+                #else
+                get_value(coap_response->payload_ptr,payload_len);
+                #endif
                 coap_response->payload_len = payload_len;
                 coap_response->options_list_ptr = sn_nsdl_alloc_options_list(nsdl, coap_response);
 
@@ -461,6 +513,7 @@ sn_coap_hdr_s* M2MResourceInstance::handle_put_request(nsdl_s *nsdl,
                     msg_code = COAP_MSG_CODE_RESPONSE_UNSUPPORTED_CONTENT_FORMAT;
                 } else {
                     bool external_block_store = false;
+                    #ifndef RAM_OPTIMIZED
                     if (block_message()) {
                         block_message()->set_message_info(received_coap_header);
                         if (block_message()->is_block_message()) {
@@ -479,6 +532,7 @@ sn_coap_hdr_s* M2MResourceInstance::handle_put_request(nsdl_s *nsdl,
                             }
                         }
                     }
+                    #endif
                     if (!external_block_store) {
                         set_value(received_coap_header->payload_ptr, received_coap_header->payload_len);
                     }
@@ -515,20 +569,28 @@ void M2MResourceInstance::set_resource_observer(M2MResourceCallback *resource)
     _resource_callback = resource;
 }
 
-const String& M2MResourceInstance::object_name() const
+String M2MResourceInstance::object_name() const
 {
-    return _object_name;
+    if(_object_name!=NULL) {        
+        return String ((const char*)_object_name);
+        }
+    else {
+        return String("");
+    }
 }
+
 
 uint16_t M2MResourceInstance::object_instance_id() const
 {
     return _object_instance_id;
 }
 
+#ifndef RAM_OPTIMIZED
 M2MBlockMessage* M2MResourceInstance::block_message() const
 {
     return _block_message_data;
 }
+
 
 void M2MResourceInstance::set_incoming_block_message_callback(incoming_block_message_callback callback)
 {
@@ -542,3 +604,4 @@ void M2MResourceInstance::set_outgoing_block_message_callback(outgoing_block_mes
 {
     _outgoing_block_message_cb = callback;
 }
+#endif

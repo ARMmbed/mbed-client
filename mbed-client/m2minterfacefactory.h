@@ -113,6 +113,7 @@ public:
      */
     static M2MObject *create_object(const String &name);
 
+    static M2MObject *create_object(const M2MBase::lwm2m_parameters_s* stat_res);
 
     friend class Test_M2MInterfaceFactory;
 };

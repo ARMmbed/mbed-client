@@ -42,9 +42,15 @@ class M2MResource : public M2MResourceInstance, M2MResourceCallback {
 public:
     class M2MExecuteParameter;
 
-private: // Constructor and destructor are private,
+private: // Constructor and destructor are private
          // which means that these objects can be created or
          // deleted only through a function provided by the M2MObjectInstance.
+
+    M2MResource(M2MObjectInstanceCallback &object_instance_callback,
+                             const lwm2m_parameters_s* s,
+                              M2MResourceInstance::ResourceType type,
+                             const uint16_t object_instance_id,
+                             const String &object_name);
 
     /**
      * \brief Constructor
@@ -53,12 +59,12 @@ private: // Constructor and destructor are private,
      * \param type The resource data type of the object.
      * \param value The value pointer of the object.
      * \param value_length The length of the value pointer.
-     * \param object_instance_id The instance ID of the object where the resource exists.
-     * \param object_name The name of the object where the resource exists.
+     * \param object_instance_id Object instance id where resource exists.
+     * \param object_name Object name where resource exists.
      * \param multiple_instance True if the resource supports instances.
      */
     M2MResource(M2MObjectInstanceCallback &object_instance_callback,
-                const String &resource_name,
+                const String resource_name,
                 const String &resource_type,
                 M2MResourceInstance::ResourceType type,
                 const uint8_t *value,
@@ -78,7 +84,7 @@ private: // Constructor and destructor are private,
      * \param multiple_instance True if the resource supports instances.
      */
     M2MResource(M2MObjectInstanceCallback &object_instance_callback,
-                const String &resource_name,
+                const String resource_name,
                 const String &resource_type,
                 M2MResourceInstance::ResourceType type,
                 bool observable,
@@ -233,11 +239,11 @@ protected:
 
 private:
 
-    M2MResourceInstanceList     _resource_instance_list; // owned
-    uint8_t                     *_delayed_token;
     uint8_t                     _delayed_token_len;
     bool                        _has_multiple_instances;
     bool                        _delayed_response;
+    uint8_t                     *_delayed_token;
+    M2MResourceInstanceList     _resource_instance_list; // owned
 
 friend class Test_M2MResource;
 friend class Test_M2MObjectInstance;

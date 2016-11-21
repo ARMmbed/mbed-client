@@ -52,6 +52,8 @@ private: // Constructor and destructor are private which means
     M2MObjectInstance(const String &object_name,
                       M2MObjectCallback &object_callback);
 
+    M2MObjectInstance(const lwm2m_parameters_s* s,
+                      M2MObjectCallback &object_callback);
 
     // Prevents the use of default constructor.
     M2MObjectInstance();
@@ -69,6 +71,7 @@ private: // Constructor and destructor are private which means
 
 public:
 
+    M2MResource* create_static_resource(const lwm2m_parameters_s* s, M2MResourceInstance::ResourceType type);
     /**
      * \brief Creates a static resource for a given mbed Client Inteface object. With this, the
      * client can respond to server's GET methods with the provided value.
@@ -86,6 +89,10 @@ public:
                                         const uint8_t *value,
                                         const uint8_t value_length,
                                         bool multiple_instance = false);
+
+    M2MResource* create_dynamic_resource(const lwm2m_parameters_s* s,
+                                        M2MResourceInstance::ResourceType type,
+                                        bool observable);
 
     /**
      * \brief Creates a dynamic resource for a given mbed Client Inteface object. With this,
