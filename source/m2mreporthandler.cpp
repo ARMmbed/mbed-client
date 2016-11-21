@@ -25,21 +25,21 @@
 
 M2MReportHandler::M2MReportHandler(M2MReportObserver &observer)
 : _observer(observer),
-  _pmax(-1.0f),
-  _pmin(1.0f),
-  _gt(0.0f),
-  _lt(0.0f),
-  _st(0.0f),
+  _attribute_state(0),
+  _notify(false),
   _pmin_exceeded(false),
   _pmax_exceeded(false),
   _pmin_timer(*this),
   _pmax_timer(*this),
+  _pmax(-1.0f),
+  _pmin(1.0f),
+  _current_value(0.0f),
+  _gt(0.0f),
+  _lt(0.0f),
+  _st(0.0f),
   _high_step(0.0f),
   _low_step(0.0f),
-  _current_value(0.0f),
-  _last_value(-1.0f),
-  _attribute_state(0),
-  _notify(false)
+  _last_value(-1.0f)
 {
     tr_debug("M2MReportHandler::M2MReportHandler()");
 }
