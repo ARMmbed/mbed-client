@@ -63,6 +63,7 @@ M2MInterfaceImpl::M2MInterfaceImpl(M2MInterfaceObserver& observer,
   _retry_count(0),
   _reconnecting(false),
   _retry_timer_expired(false),
+  _security_connection(NULL),
   _connection_handler(*this, _security_connection, mode, stack)
 {
     M2MConnectionSecurity::SecurityMode sec_mode = M2MConnectionSecurity::DTLS;
