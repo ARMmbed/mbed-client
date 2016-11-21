@@ -37,11 +37,6 @@ TEST(M2MBase, Create)
     CHECK(m2m_base != NULL);
 }
 
-TEST(M2MBase, copy_constructor)
-{
-    m2m_base->test_copy_constructor();
-}
-
 TEST(M2MBase, set_operation)
 {
     m2m_base->test_set_operation();
