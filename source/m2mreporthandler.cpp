@@ -32,8 +32,8 @@ M2MReportHandler::M2MReportHandler(M2MReportObserver &observer)
   _st(0.0f),
   _pmin_exceeded(false),
   _pmax_exceeded(false),
-  _pmin_timer(NULL),
-  _pmax_timer(NULL),  
+  _pmin_timer(*this),
+  _pmax_timer(*this),
   _high_step(0.0f),
   _low_step(0.0f),
   _current_value(0.0f),
@@ -47,9 +47,6 @@ M2MReportHandler::M2MReportHandler(M2MReportObserver &observer)
 M2MReportHandler::~M2MReportHandler()
 {
     tr_debug("M2MReportHandler::~M2MReportHandler()");
-
-    delete _pmax_timer;
-    delete _pmin_timer;
 }
 
 void M2MReportHandler::set_under_observation(bool observed)
@@ -81,10 +78,8 @@ void M2MReportHandler::set_value(float value)
                     (_attribute_state & M2MReportHandler::Gt) == M2MReportHandler::Gt ||
                     (_attribute_state & M2MReportHandler::St) == M2MReportHandler::St) {
                 tr_debug("M2MReportHandler::set_value - stop pmin timer");
-                if (_pmin_timer) {
-                    _pmin_timer->stop_timer();
-                    _pmin_exceeded = true;
-                }
+                _pmin_timer.stop_timer();
+                _pmin_exceeded = true;
             }
         }
         _high_step = _current_value + _st;
@@ -304,9 +299,7 @@ void M2MReportHandler::report()
         _notify = false;
         _observer.observation_to_be_sent(_changed_instance_ids);
         _changed_instance_ids.clear();
-        if (_pmax_timer) {
-            _pmax_timer->stop_timer();
-        }
+        _pmax_timer.stop_timer();
     }
     else {
         if (_pmax_exceeded) {
@@ -333,22 +326,16 @@ void M2MReportHandler::handle_timers()
             _pmin_exceeded = false;
             time_interval = (uint64_t)(_pmin * 1000);
             tr_debug("M2MReportHandler::handle_timers() - Start PMIN interval: %d", (int)time_interval);
-            if (!_pmin_timer) {
-                _pmin_timer = new M2MTimer(*this);
-            }
-            _pmin_timer->start_timer(time_interval,
+            _pmin_timer.start_timer(time_interval,
                                      M2MTimerObserver::PMinTimer,
                                      true);
         }
     }
     if ((_attribute_state & M2MReportHandler::Pmax) == M2MReportHandler::Pmax) {
         if (_pmax > 0) {
-            if (!_pmax_timer) {
-                _pmax_timer = new M2MTimer(*this);
-            }
             time_interval = (uint64_t)(_pmax * 1000);
             tr_debug("M2MReportHandler::handle_timers() - Start PMAX interval: %d", (int)time_interval);
-            _pmax_timer->start_timer(time_interval,
+            _pmax_timer.start_timer(time_interval,
                                      M2MTimerObserver::PMaxTimer,
                                      true);
         }
@@ -373,19 +360,13 @@ bool M2MReportHandler::check_attribute_validity()
 void M2MReportHandler::stop_timers()
 {
     tr_debug("M2MReportHandler::stop_timers()");
-    if (_pmin_timer) {
-        _pmin_exceeded = false;
-        _pmin_timer->stop_timer();
 
-        delete _pmin_timer;
-        _pmin_timer = NULL;
-    }
-    if (_pmax_timer) {
-        _pmax_exceeded = false;
-        _pmax_timer->stop_timer();
-        delete _pmax_timer;
-        _pmax_timer = NULL;
-    }
+    _pmin_exceeded = false;
+    _pmin_timer.stop_timer();
+
+    _pmax_exceeded = false;
+    _pmax_timer.stop_timer();
+
     tr_debug("M2MReportHandler::stop_timers() - out");
 }
 

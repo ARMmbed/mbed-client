@@ -32,29 +32,6 @@
 #define BUFFER_SIZE 10
 #define TRACE_GROUP "mClt"
 
-M2MObjectInstance& M2MObjectInstance::operator=(const M2MObjectInstance& other)
-{
-    if (this != &other) { // protect against invalid self-assignment
-        if(!other._resource_list.empty()){
-            M2MResource* ins = NULL;
-            M2MResourceList::const_iterator it;
-            it = other._resource_list.begin();
-            for (; it!=other._resource_list.end(); it++ ) {
-                ins = *it;
-                _resource_list.push_back(new M2MResource(*ins));
-            }
-        }
-    }
-    return *this;
-}
-
-M2MObjectInstance::M2MObjectInstance(const M2MObjectInstance& other)
-: M2MBase(other),
-  _object_callback(other._object_callback)
-{
-    this->operator=(other);
-}
-
 M2MObjectInstance::M2MObjectInstance(const String &object_name,
                                      M2MObjectCallback &object_callback)
 : M2MBase(object_name,M2MBase::Dynamic),

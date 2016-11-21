@@ -69,36 +69,6 @@ Test_M2MBase::~Test_M2MBase()
 {
 }
 
-void Test_M2MBase::test_copy_constructor()
-{
-    String test_string = "test";
-    //Test stack constructor
-    Test_M2MBase b;
-    Test_M2MBase c(b);
-    Test_M2MBase a;
-
-    //Test heap constructor
-    Test_M2MBase* test = new Test_M2MBase();
-    test->_interface_description = test_string;
-
-    test->_token_length = 3;
-    test->_token = (u_int8_t *)malloc(test->_token_length);
-
-    Observer obs;
-    test->_report_handler = new M2MReportHandler(obs);
-
-    Test_M2MBase* copy = new Test_M2MBase(*test);
-
-    CHECK(copy->_interface_description.compare(0,test_string.size(),test_string) == 0);
-
-    CHECK(copy->_token != NULL);
-
-    CHECK(copy->_report_handler != NULL);
-
-    delete test;
-    delete copy;
-}
-
 void Test_M2MBase::test_set_operation()
 {
     M2MBase::Operation test = M2MBase::GET_ALLOWED;

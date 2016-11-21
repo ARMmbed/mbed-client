@@ -21,14 +21,14 @@
 #include "mbed-client/m2mconnectionobserver.h"
 #include "mbed-client/m2mconnectionsecurity.h"
 #include "include/m2mnsdlobserver.h"
+#include "include/m2mnsdlinterface.h"
 #include "mbed-client/m2mtimerobserver.h"
+#include "mbed-client/m2mtimer.h"
+#include "mbed-client/m2mconnectionhandler.h"
 
 //FORWARD DECLARATION
-class M2MNsdlInterface;
-class M2MConnectionHandler;
 class M2MConnectionSecurity;
 class EventData;
-class M2MTimer;
 class M2MUpdateRegisterData;
 /**
  *  @brief M2MInterfaceImpl.
@@ -388,9 +388,9 @@ private: // state machine state functions
 private:
 
     M2MInterfaceObserver        &_observer;
-    M2MConnectionHandler        *_connection_handler;
     M2MConnectionSecurity       *_security_connection; // Doesn't own
-    M2MNsdlInterface            *_nsdl_interface;
+    M2MConnectionHandler        _connection_handler;
+    M2MNsdlInterface            _nsdl_interface;
     uint8_t                     _current_state;
     const int                   _max_states;
     bool                        _event_generated;
@@ -405,8 +405,8 @@ private:
     String                      _server_ip_address;
     M2MSecurity                 *_register_server; //TODO: to be the list not owned
     bool                        _event_ignored;
-    M2MTimer                    *_queue_sleep_timer;
-    M2MTimer                    *_retry_timer;
+    M2MTimer                    _queue_sleep_timer;
+    M2MTimer                    _retry_timer;
     M2MTimer                    *_bootstrap_timer;
     callback_handler            _callback_handler;
     M2MSecurity                 *_security;

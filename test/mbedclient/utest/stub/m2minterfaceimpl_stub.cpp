@@ -31,14 +31,18 @@ M2MInterfaceImpl::M2MInterfaceImpl(M2MInterfaceObserver& observer,
                                    const int32_t,
                                    const uint16_t,
                                    const String &,
-                                   M2MInterface::BindingMode,
-                                   M2MInterface::NetworkStack,
+                                   M2MInterface::BindingMode mode,
+                                   M2MInterface::NetworkStack stack,
                                    const String &)
 : _observer(observer),
   _current_state(0),
   _max_states( STATE_MAX_STATES ),
   _event_generated(false),
-  _event_data(NULL)
+  _event_data(NULL),
+  _nsdl_interface(*this),
+  _queue_sleep_timer(*this),
+  _retry_timer(*this),
+  _connection_handler(*this, NULL, mode, stack)
 {
 }
 

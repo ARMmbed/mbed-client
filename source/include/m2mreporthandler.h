@@ -23,6 +23,7 @@
 #include "mbed-client/m2mtimerobserver.h"
 #include "mbed-client/m2mresourceinstance.h"
 #include "mbed-client/m2mvector.h"
+#include "mbed-client/m2mtimer.h"
 
 //FORWARD DECLARATION
 class M2MReportObserver;
@@ -165,8 +166,8 @@ private:
     float                       _st;
     bool                        _pmin_exceeded;
     bool                        _pmax_exceeded;
-    M2MTimer                    *_pmin_timer;
-    M2MTimer                    *_pmax_timer;        
+    M2MTimer                    _pmin_timer;
+    M2MTimer                    _pmax_timer;
     float                       _high_step;
     float                       _low_step;
     float                       _current_value;

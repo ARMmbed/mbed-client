@@ -3,8 +3,9 @@ include("../includes.txt")
 add_executable(m2mbase 
 	"../../../../source/m2mbase.cpp"
 	"main.cpp"
-        "../stub/m2mreporthandler_stub.cpp"
-        "../stub/m2mstring_stub.cpp"
+    "../stub/m2mreporthandler_stub.cpp"
+    "../stub/m2mstring_stub.cpp"
+    "../stub/m2mtimer_stub.cpp"
 	"m2mbasetest.cpp"
 	"test_m2mbase.cpp"
         "../../../../source/m2mstringbufferbase.cpp"

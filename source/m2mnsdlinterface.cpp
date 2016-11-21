@@ -51,7 +51,7 @@
 
 M2MNsdlInterface::M2MNsdlInterface(M2MNsdlObserver &observer)
 : _observer(observer),
-  _server(NULL),
+  _server(),
   _security(NULL),
   _nsdl_exceution_timer(new M2MTimer(*this)),
   _registration_timer(new M2MTimer(*this)),
@@ -76,7 +76,6 @@ M2MNsdlInterface::M2MNsdlInterface(M2MNsdlObserver &observer)
     _nsdl_handle = sn_nsdl_init(&(__nsdl_c_send_to_server), &(__nsdl_c_received_from_server),
                  &(__nsdl_c_memory_alloc), &(__nsdl_c_memory_free));
 
-    _server = new M2MServer();
     initialize();
 }
 
@@ -98,7 +97,6 @@ M2MNsdlInterface::~M2MNsdlInterface()
     delete _nsdl_exceution_timer;
     delete _registration_timer;
     _object_list.clear();
-    delete _server;
     _security = NULL;
 
     sn_nsdl_destroy(_nsdl_handle);
@@ -387,7 +385,7 @@ uint8_t M2MNsdlInterface::received_from_server_callback(struct nsdl_s *nsdl_hand
         if(coap_header->msg_id == nsdl_handle->register_msg_id) {
             if(coap_header->msg_code == COAP_MSG_CODE_RESPONSE_CREATED) {
                 tr_debug("M2MNsdlInterface::received_from_server_callback - registration callback");
-                _observer.client_registered(_server);
+                _observer.client_registered(&_server);
                 // If lifetime is less than zero then leave the field empty
                 if(coap_header->options_list_ptr) {
                     memory_free(_endpoint->lifetime_ptr);
@@ -441,7 +439,7 @@ uint8_t M2MNsdlInterface::received_from_server_callback(struct nsdl_s *nsdl_hand
         } else if(coap_header->msg_id == nsdl_handle->update_register_msg_id) {
             if(coap_header->msg_code == COAP_MSG_CODE_RESPONSE_CHANGED) {
                 tr_debug("M2MNsdlInterface::received_from_server_callback - registration_updated successfully");
-                _observer.registration_updated(*_server);
+                _observer.registration_updated(_server);
             } else {
                 tr_error("M2MNsdlInterface::received_from_server_callback - registration_updated failed %d", coap_header->msg_code);
                 _registration_timer->stop_timer();
@@ -1633,7 +1631,7 @@ bool M2MNsdlInterface::parse_bootstrap_message(sn_coap_hdr_s *coap_header, bool 
                 else {
                     error = deserializer.deserialise_object_instances(coap_header->payload_ptr,
                                                                coap_header->payload_len,
-                                                               *_server,
+                                                               _server,
                                                                M2MTLVDeserializer::Put);
                 }
             }
@@ -1649,7 +1647,7 @@ bool M2MNsdlInterface::parse_bootstrap_message(sn_coap_hdr_s *coap_header, bool 
                     instance_id = deserializer.instance_id(coap_header->payload_ptr);
                     error = deserializer.deserialize_resources(coap_header->payload_ptr,
                                                                coap_header->payload_len,
-                                                               *_server->object_instance(instance_id),
+                                                               *(_server.object_instance(instance_id)),
                                                                M2MTLVDeserializer::Post);
                 }
             }
@@ -1684,7 +1682,7 @@ void M2MNsdlInterface::handle_bootstrap_finished(sn_coap_hdr_s *coap_header,sn_n
         msg_code = COAP_MSG_CODE_RESPONSE_BAD_REQUEST;
     } else {
         // Add short server id to server object
-        _server->set_resource_value(M2MServer::ShortServerID,
+        _server.set_resource_value(M2MServer::ShortServerID,
                                     _security->resource_value_int(M2MSecurity::ShortServerID));
     }
 

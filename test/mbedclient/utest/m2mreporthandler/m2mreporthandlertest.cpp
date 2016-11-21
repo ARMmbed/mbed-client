@@ -15,6 +15,7 @@
  */
 //CppUTest includes should be after your and system includes
 #include "CppUTest/TestHarness.h"
+#include "CppUTestExt/MockSupport.h"
 #include "test_m2mreporthandler.h"
 
 
@@ -29,6 +30,7 @@ TEST_GROUP(M2MReportHandler)
   void teardown()
   {
     delete m2m_reporthandler;
+    mock().clear();
   }
 };
 

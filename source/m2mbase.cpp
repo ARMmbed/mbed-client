@@ -27,38 +27,6 @@
 
 #define TRACE_GROUP "mClt"
 
-
-M2MBase::M2MBase(const M2MBase& other) :
-    _report_handler(NULL),
-    _observation_handler(other._observation_handler),
-    _name(other._name),
-    _resource_type(other._resource_type),
-    _interface_description(other._interface_description),
-    _uri_path(other._uri_path),
-    _max_age(other._max_age),
-    _instance_id(other._instance_id),
-    _observation_number(other._observation_number),
-    _token(NULL),
-    _token_length(other._token_length),
-    _coap_content_type(other._coap_content_type),
-    _operation(other._operation),
-    _mode(other._mode),
-    _observation_level(other._observation_level),
-    _observable(other._observable),
-    _register_uri(other._register_uri),
-    _is_under_observation(other._is_under_observation),
-    _function_pointer(NULL)
-{
-
-    if(other._token) {
-        _token = alloc_string_copy((uint8_t *)other._token, other._token_length);
-    }
-
-    if(other._report_handler) {
-        _report_handler = new M2MReportHandler(*other._report_handler);
-    }
-}
-
 M2MBase::M2MBase(const String & resource_name,
                  M2MBase::Mode mde)
 : _report_handler(NULL),
