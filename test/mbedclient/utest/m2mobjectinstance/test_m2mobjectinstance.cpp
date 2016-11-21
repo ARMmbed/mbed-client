@@ -73,19 +73,6 @@ Test_M2MObjectInstance::Test_M2MObjectInstance()
     max_length = new String("65656565656565656565656565656565656565656565656565656565656565656");
 }
 
-void Test_M2MObjectInstance::test_copy_constructor()
-{
-    M2MResource *res = new M2MResource(*object,"name","type",M2MResourceInstance::STRING,M2MBase::Static);
-    m2mbase_stub::string_value = new String("name");
-    object->_resource_list.push_back(res);
-
-    M2MObjectInstance* copy = new M2MObjectInstance(*object);
-
-    CHECK(1 == copy->_resource_list.size());
-    delete copy;
-}
-
-
 Test_M2MObjectInstance::~Test_M2MObjectInstance()
 {
     delete object;

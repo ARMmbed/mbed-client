@@ -29,10 +29,6 @@ public:
 
     ~Test_M2MResourceInstance();
 
-    void test_copy_constructor();
-
-    void test_assignment_constructor();
-
     void test_static_resource_instance();
 
     void test_base_type();

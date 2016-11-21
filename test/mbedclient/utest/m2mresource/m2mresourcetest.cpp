@@ -36,11 +36,6 @@ TEST(M2MResource, Create)
     CHECK(m2m_resource != NULL);
 }
 
-TEST(M2MResource, copy_constructor)
-{
-    m2m_resource->test_copy_constructor();
-}
-
 TEST(M2MResource, static_resource)
 {
     m2m_resource->test_static_resource();

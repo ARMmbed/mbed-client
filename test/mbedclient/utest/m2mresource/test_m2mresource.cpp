@@ -77,36 +77,6 @@ Test_M2MResource::Test_M2MResource()
                                false,false);
 }
 
-void Test_M2MResource::test_copy_constructor()
-{
-    u_int8_t value[] = {"value"};
-    resource->set_value(value,(u_int32_t)sizeof(value));
-    resource->_delayed_token = (u_int8_t*)malloc(sizeof(value));
-    resource->_delayed_token_len = sizeof(value);
-
-    M2MResourceInstance *res = new M2MResourceInstance("name","type",M2MResourceInstance::STRING,*callback);
-    resource->add_resource_instance(res);
-
-    M2MResource* copy = new M2MResource(*resource);
-    u_int8_t* out_value = (u_int8_t*)malloc(sizeof(u_int8_t));
-    u_int32_t out_size;
-
-    uint8_t* ptr = (uint8_t*)malloc((uint32_t)sizeof(value));
-    m2mresourceinstance_stub::value = ptr;
-    memset(m2mresourceinstance_stub::value,0,(uint32_t)sizeof(value));
-    memcpy(m2mresourceinstance_stub::value,value,sizeof(value));
-    m2mresourceinstance_stub::int_value = (uint32_t)sizeof(value);
-
-    copy->get_value(out_value,out_size);
-
-    CHECK(out_size == sizeof(value));
-
-    free(out_value);
-    free(ptr);
-
-    delete copy;
-}
-
 Test_M2MResource::~Test_M2MResource()
 {
     delete resource;
