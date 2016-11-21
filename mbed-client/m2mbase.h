@@ -105,10 +105,13 @@ public:
     }Operation;
 
     enum{
-        MAX_PAHTH_SIZE = 142,
-        MAX_PAHTH_SIZE_2 = 136,
-        MAX_PAHTH_SIZE_3 = 77,
-        MAX_PAHTH_SIZE_4 = 72,
+        MAX_NAME_SIZE = 64,
+        MAX_INSTANCE_SIZE = 5,
+
+        MAX_PATH_SIZE = ((MAX_NAME_SIZE * 2) + (MAX_INSTANCE_SIZE * 2) + 3 + 1),
+        MAX_PATH_SIZE_2 = ((MAX_NAME_SIZE * 2) + MAX_INSTANCE_SIZE + 2 + 1),
+        MAX_PATH_SIZE_3 = (MAX_NAME_SIZE + (MAX_INSTANCE_SIZE * 2) + 2 + 1),
+        MAX_PATH_SIZE_4 = (MAX_NAME_SIZE + MAX_INSTANCE_SIZE + 1 + 1),
     }MaxPathSize;
 
 protected:
@@ -470,13 +473,13 @@ protected:
     */
     M2MObservationHandler* observation_handler();
 
-    static bool build_path(StringBuffer<MAX_PAHTH_SIZE> &buffer, const char *s1, uint16_t i1, const char *s2, uint16_t i2);
+    static bool build_path(StringBuffer<MAX_PATH_SIZE> &buffer, const char *s1, uint16_t i1, const char *s2, uint16_t i2);
 
-    static bool build_path(StringBuffer<MAX_PAHTH_SIZE_2> &buffer, const char *s1, uint16_t i1, const char *s2);
+    static bool build_path(StringBuffer<MAX_PATH_SIZE_2> &buffer, const char *s1, uint16_t i1, const char *s2);
 
-    static bool build_path(StringBuffer<MAX_PAHTH_SIZE_3> &buffer, const char *s1, uint16_t i1, uint16_t i2);
+    static bool build_path(StringBuffer<MAX_PATH_SIZE_3> &buffer, const char *s1, uint16_t i1, uint16_t i2);
 
-    static bool build_path(StringBuffer<MAX_PAHTH_SIZE_4> &buffer, const char *s1, uint16_t i1);
+    static bool build_path(StringBuffer<MAX_PATH_SIZE_4> &buffer, const char *s1, uint16_t i1);
 
 private:
 

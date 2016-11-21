@@ -589,7 +589,7 @@ void M2MInterfaceImpl::state_bootstrap_address_resolved( EventData *data)
         _connection_handler->start_listening_for_data();
 
         // Include domain id to be part of endpoint name
-        StringBuffer<M2MBase::MAX_PAHTH_SIZE> new_ep_name;
+        StringBuffer<M2MBase::MAX_PATH_SIZE> new_ep_name;
 
         if(!new_ep_name.ensure_space(_nsdl_interface->endpoint_name().size() + 1))
         {

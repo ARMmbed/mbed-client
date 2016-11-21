@@ -73,7 +73,7 @@ M2MObjectInstance::~M2MObjectInstance()
         for (; it!=_resource_list.end(); it++ ) {
             //Free allocated memory for resources.
             res = *it;
-            StringBuffer<MAX_PAHTH_SIZE_2> obj_name;
+            StringBuffer<MAX_PATH_SIZE_2> obj_name;
             build_path(obj_name, name().c_str(), instance_id(), (*it)->name().c_str());
             (*it)->remove_resource_from_coap(obj_name.c_str());
             delete res;
@@ -216,7 +216,7 @@ bool M2MObjectInstance::remove_resource(const String &resource_name)
              if(((*it)->name() == resource_name)) {
                 // Resource found and deleted.
                 res = *it;
-                StringBuffer<MAX_PAHTH_SIZE_2> obj_name;
+                StringBuffer<MAX_PATH_SIZE_2> obj_name;
                 build_path(obj_name, name().c_str(), instance_id(), res->name().c_str());
                 res->remove_resource_from_coap(obj_name.c_str());
                 delete res;
@@ -243,7 +243,7 @@ bool M2MObjectInstance::remove_resource_instance(const String &resource_name,
         it = list.begin();
         for ( ; it != list.end(); it++) {
             if((*it)->instance_id() == inst_id) {
-                StringBuffer<MAX_PAHTH_SIZE> obj_name;
+                StringBuffer<MAX_PATH_SIZE> obj_name;
                 build_path(obj_name, name().c_str(), instance_id(), resource_name.c_str(), inst_id);
                 remove_resource_from_coap(obj_name.c_str());
                 success = res->remove_resource_instance(inst_id);
@@ -594,7 +594,7 @@ sn_coap_hdr_s* M2MObjectInstance::handle_post_request(nsdl_s *nsdl,
 
                         if (coap_response->options_list_ptr) {
 
-                              StringBuffer<MAX_PAHTH_SIZE_3> obj_name;
+                              StringBuffer<MAX_PATH_SIZE_3> obj_name;
                               if(!build_path(obj_name, M2MBase::name().c_str(), M2MBase::instance_id(), instance_id))
                               {
                                   msg_code = COAP_MSG_CODE_RESPONSE_INTERNAL_SERVER_ERROR;

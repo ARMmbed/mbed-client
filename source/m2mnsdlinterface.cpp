@@ -871,7 +871,7 @@ bool M2MNsdlInterface::create_nsdl_object_instance_structure(M2MObjectInstance *
 
         // Append object instance id to the object name.
 
-        StringBuffer<M2MBase::MAX_PAHTH_SIZE_4> obj_name;
+        StringBuffer<M2MBase::MAX_PATH_SIZE_4> obj_name;
         M2MBase::build_path(obj_name, object_instance->name().c_str(), object_instance->instance_id());
 
         M2MResourceList res_list = object_instance->resources();
@@ -902,7 +902,7 @@ bool M2MNsdlInterface::create_nsdl_resource_structure(M2MResource *res,
         // Append object name to the resource.
         // Take out the instance Id and append to the
         // resource name like "object/0/+ resource + / + 0"
-        StringBuffer<M2MBase::MAX_PAHTH_SIZE> res_name;
+        StringBuffer<M2MBase::MAX_PATH_SIZE> res_name;
         if(!res_name.ensure_space(object_name.size()))
         {
             tr_error("M2MNsdlInterface::create_nsdl_resource_structure - object creation failed");
@@ -911,7 +911,7 @@ bool M2MNsdlInterface::create_nsdl_resource_structure(M2MResource *res,
         res_name.append(object_name.c_str());
         if (strcmp(res_name.c_str(), res->uri_path().c_str()) != 0) {
 
-            if(!res_name.ensure_space(object_name.size() + 1 + res->name().length() + 1))
+            if(!res_name.ensure_space(1 + res->name().length() + 1))
             {
                 tr_error("M2MNsdlInterface::create_nsdl_resource_structure - object creation failed");
                 return false;
@@ -931,7 +931,7 @@ bool M2MNsdlInterface::create_nsdl_resource_structure(M2MResource *res,
                 M2MResourceInstanceList::const_iterator it;
                 it = res_list.begin();
                 for ( ; it != res_list.end(); it++ ) {
-                    StringBuffer<M2MBase::MAX_PAHTH_SIZE> inst_name;
+                    StringBuffer<M2MBase::MAX_PATH_SIZE> inst_name;
 
                     // Create NSDL structure for all resources inside
 
@@ -1169,7 +1169,7 @@ M2MBase* M2MNsdlInterface::find_resource(const M2MObject *object,
             M2MObjectInstanceList::const_iterator it;
             it = list.begin();
             for ( ; it != list.end(); it++ ) {
-                StringBuffer<M2MObject::MAX_PAHTH_SIZE_4> obj_name;
+                StringBuffer<M2MObject::MAX_PATH_SIZE_4> obj_name;
 
                 // Append object instance id to the object name.
 
@@ -1198,7 +1198,7 @@ M2MBase* M2MNsdlInterface::find_resource(const M2MObjectInstance *object_instanc
             M2MResourceList::const_iterator it;
             it = list.begin();
             for ( ; it != list.end(); it++ ) {
-                StringBuffer<M2MObject::MAX_PAHTH_SIZE_2> obj_name;
+                StringBuffer<M2MObject::MAX_PATH_SIZE_2> obj_name;
 
                 // Append object instance id to the object name.
 
@@ -1231,7 +1231,7 @@ M2MBase* M2MNsdlInterface::find_resource(const M2MResource *resource,
                 M2MResourceInstanceList::const_iterator it;
                 it = list.begin();
                 for ( ; it != list.end(); it++ ) {
-                    StringBuffer<M2MObject::MAX_PAHTH_SIZE_4> obj_name;
+                    StringBuffer<M2MObject::MAX_PATH_SIZE_4> obj_name;
 
                     // if there are multiple instances supported
                     // then add instance Id into creating resource path
