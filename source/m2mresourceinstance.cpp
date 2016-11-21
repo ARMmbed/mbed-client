@@ -48,7 +48,8 @@ M2MResourceInstance::M2MResourceInstance(const M2MResourceInstance& other)
   _value_length(0),
   _resource_callback(NULL),
   _object_name(other._object_name),
-  _function_pointer(NULL),
+  _execute_function_pointer(NULL),
+  _notification_sent_function_pointer(NULL),
   _object_instance_id(other._object_instance_id),
   _resource_type(M2MResourceInstance::STRING),
   _block_message_data(NULL),
@@ -71,7 +72,8 @@ M2MResourceInstance::M2MResourceInstance(const String &res_name,
  _value_length(0),
  _resource_callback(NULL),
  _object_name(object_name),
- _function_pointer(NULL),
+ _execute_function_pointer(NULL),
+ _notification_sent_function_pointer(NULL),
  _object_instance_id(object_instance_id),
  _resource_type(type),
  _block_message_data(NULL),
@@ -97,7 +99,8 @@ M2MResourceInstance::M2MResourceInstance(const String &res_name,
  _value_length(0),
  _resource_callback(NULL),
  _object_name(object_name),
- _function_pointer(NULL),
+ _execute_function_pointer(NULL),
+ _notification_sent_function_pointer(NULL),
  _object_instance_id(object_instance_id),
  _resource_type(type),
  _block_message_data(NULL),
@@ -116,7 +119,8 @@ M2MResourceInstance::M2MResourceInstance(const String &res_name,
 M2MResourceInstance::~M2MResourceInstance()
 {
     free(_value);
-    delete _function_pointer;
+    delete _execute_function_pointer;
+    delete _notification_sent_function_pointer;
     delete _block_message_data;
 }
 
@@ -156,10 +160,10 @@ void M2MResourceInstance::set_execute_function(execute_callback callback)
 
 void M2MResourceInstance::set_execute_function(execute_callback_2 callback)
 {
-    delete _function_pointer;
+    delete _execute_function_pointer;
 
-    _function_pointer = new FP1<void, void*>(callback);
-    set_execute_function(execute_callback(_function_pointer, &FP1<void, void*>::call));
+    _execute_function_pointer = new FP1<void, void*>(callback);
+    set_execute_function(execute_callback(_execute_function_pointer, &FP1<void, void*>::call));
 }
 
 void M2MResourceInstance::clear_value()
@@ -549,6 +553,15 @@ void M2MResourceInstance::set_outgoing_block_message_callback(outgoing_block_mes
 void M2MResourceInstance::set_notification_sent_callback(notification_sent_callback callback)
 {
     _notification_sent_callback = callback;
+}
+
+void M2MResourceInstance::set_notification_sent_callback(notification_sent_callback_2 callback)
+{
+    delete _notification_sent_function_pointer;
+
+    _notification_sent_function_pointer = new FP0<void>(callback);
+    set_notification_sent_callback(
+                notification_sent_callback(_notification_sent_function_pointer, &FP0<void>::call));
 }
 
 void M2MResourceInstance::notification_sent()

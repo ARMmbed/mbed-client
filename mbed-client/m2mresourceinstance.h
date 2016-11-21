@@ -30,9 +30,13 @@ public:
  *  LWM2M resource models can be created based on it.
  */
 class M2MBlockMessage;
+
 typedef FP1<void,void*> execute_callback;
 typedef void(*execute_callback_2) (void *arguments);
-typedef void(*notification_sent_callback) (void);
+
+typedef FP0<void> notification_sent_callback;
+typedef void(*notification_sent_callback_2) (void);
+
 typedef FP1<void, M2MBlockMessage *> incoming_block_message_callback;
 typedef FP3<void, const String &, uint8_t *&, uint32_t &> outgoing_block_message_callback;
 
@@ -272,6 +276,13 @@ public:
     void set_notification_sent_callback(notification_sent_callback callback);
 
     /**
+     * @brief Sets the function that is executed when this object receives
+     * response(Empty ACK) for notification message.
+     * @param callback The function pointer that is called.
+     */
+    void set_notification_sent_callback(notification_sent_callback_2 callback);
+
+    /**
      * \brief Executes the function that is set in "set_notification_sent_callback".
      */
     void notification_sent();
@@ -298,7 +309,8 @@ private:
     uint32_t                                _value_length;
     M2MResourceCallback                     *_resource_callback; // Not owned
     String                                  _object_name;
-    FP1<void, void*>                        *_function_pointer;
+    FP1<void, void*>                        *_execute_function_pointer;
+    FP0<void>                               *_notification_sent_function_pointer;
     uint16_t                                _object_instance_id;
     ResourceType                            _resource_type;
     incoming_block_message_callback         _incoming_block_message_cb;
