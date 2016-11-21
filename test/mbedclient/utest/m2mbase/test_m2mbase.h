@@ -116,6 +116,9 @@ public:
     void test_is_under_observation();
 
     void test_value_updated_function();
+
+    void test_build_path();
+
 };
 
 

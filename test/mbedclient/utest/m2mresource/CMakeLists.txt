@@ -13,6 +13,7 @@ add_executable(m2mresource
         "../stub/common_stub.cpp"
 	"m2mresourcetest.cpp"
         "test_m2mresource.cpp"
+        "../../../../source/m2mstringbufferbase.cpp"
 )
 target_link_libraries(m2mresource
     CppUTest

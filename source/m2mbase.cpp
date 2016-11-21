@@ -433,6 +433,7 @@ void M2MBase::set_value_updated_function(value_updated_callback2 callback)
     set_value_updated_function(value_updated_callback(_function_pointer,
                                                       &FP1<void, const char*>::call));
 }
+
 bool M2MBase::is_value_updated_function_set()
 {
     return (_value_updated_callback) ? true : false;
@@ -444,3 +445,73 @@ void M2MBase::execute_value_updated(const String& name)
         _value_updated_callback(name.c_str());
     }
 }
+
+bool M2MBase::build_path(StringBuffer<MAX_PATH_SIZE> &buffer, const char *s1, uint16_t i1, const char *s2, uint16_t i2)
+{
+
+    if(!buffer.ensure_space(strlen(s1) + strlen(s2) + (MAX_INSTANCE_SIZE * 2) + 3 + 1)){
+        return false;
+    }
+
+    buffer.append(s1);
+    buffer.append('/');
+    buffer.append_int(i1);
+    buffer.append('/');
+    buffer.append(s2);
+    buffer.append('/');
+    buffer.append_int(i2);
+
+    return true;
+
+}
+
+bool M2MBase::build_path(StringBuffer<MAX_PATH_SIZE_2> &buffer, const char *s1, uint16_t i1, const char *s2)
+{
+
+    if(!buffer.ensure_space(strlen(s1) + strlen(s2) + MAX_INSTANCE_SIZE + 2 + 1)){
+        return false;
+    }
+
+    buffer.append(s1);
+    buffer.append('/');
+    buffer.append_int(i1);
+    buffer.append('/');
+    buffer.append(s2);
+
+    return true;
+
+}
+
+bool M2MBase::build_path(StringBuffer<MAX_PATH_SIZE_3> &buffer, const char *s1, uint16_t i1, uint16_t i2)
+{
+
+    if(!buffer.ensure_space(strlen(s1) + (MAX_INSTANCE_SIZE * 2) + 2 + 1)){
+        return false;
+    }
+
+    buffer.append(s1);
+    buffer.append('/');
+    buffer.append_int(i1);
+    buffer.append('/');
+    buffer.append_int(i2);
+
+    return true;
+
+}
+
+bool M2MBase::build_path(StringBuffer<MAX_PATH_SIZE_4> &buffer, const char *s1, uint16_t i1)
+{
+
+    if(!buffer.ensure_space(strlen(s1) + MAX_INSTANCE_SIZE + 1 + 1)){
+        return false;
+    }
+
+    buffer.append(s1);
+    buffer.append('/');
+    buffer.append_int(i1);
+
+    return true;
+
+}
+
+

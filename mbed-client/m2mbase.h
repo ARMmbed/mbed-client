@@ -21,6 +21,7 @@
 #include "mbed-client/m2mconfig.h"
 #include "mbed-client/m2mreportobserver.h"
 #include "mbed-client/functionpointer.h"
+#include "mbed-client/m2mstringbuffer.h"
 
 //FORWARD DECLARATION
 struct sn_coap_hdr_;
@@ -102,6 +103,16 @@ public:
         GET_PUT_POST_DELETE_ALLOWED = 0x0F,
 
     }Operation;
+
+    enum{
+        MAX_NAME_SIZE = 64,
+        MAX_INSTANCE_SIZE = 5,
+
+        MAX_PATH_SIZE = ((MAX_NAME_SIZE * 2) + (MAX_INSTANCE_SIZE * 2) + 3 + 1),
+        MAX_PATH_SIZE_2 = ((MAX_NAME_SIZE * 2) + MAX_INSTANCE_SIZE + 2 + 1),
+        MAX_PATH_SIZE_3 = (MAX_NAME_SIZE + (MAX_INSTANCE_SIZE * 2) + 2 + 1),
+        MAX_PATH_SIZE_4 = (MAX_NAME_SIZE + MAX_INSTANCE_SIZE + 1 + 1),
+    }MaxPathSize;
 
 protected:
 
@@ -461,6 +472,14 @@ protected:
      * \return M2MObservationHandler object.
     */
     M2MObservationHandler* observation_handler();
+
+    static bool build_path(StringBuffer<MAX_PATH_SIZE> &buffer, const char *s1, uint16_t i1, const char *s2, uint16_t i2);
+
+    static bool build_path(StringBuffer<MAX_PATH_SIZE_2> &buffer, const char *s1, uint16_t i1, const char *s2);
+
+    static bool build_path(StringBuffer<MAX_PATH_SIZE_3> &buffer, const char *s1, uint16_t i1, uint16_t i2);
+
+    static bool build_path(StringBuffer<MAX_PATH_SIZE_4> &buffer, const char *s1, uint16_t i1);
 
 private:
 

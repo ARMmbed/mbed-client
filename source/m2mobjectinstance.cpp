@@ -73,12 +73,9 @@ M2MObjectInstance::~M2MObjectInstance()
         for (; it!=_resource_list.end(); it++ ) {
             //Free allocated memory for resources.
             res = *it;
-            String obj_name = name();
-            obj_name.push_back('/');
-            obj_name.append_int(instance_id());
-            obj_name.push_back('/');
-            obj_name += (*it)->name();
-            (*it)->remove_resource_from_coap(obj_name);
+            StringBuffer<MAX_PATH_SIZE_2> obj_name;
+            build_path(obj_name, name().c_str(), instance_id(), (*it)->name().c_str());
+            (*it)->remove_resource_from_coap(obj_name.c_str());
             delete res;
         }
         _resource_list.clear();
@@ -219,13 +216,9 @@ bool M2MObjectInstance::remove_resource(const String &resource_name)
              if(((*it)->name() == resource_name)) {
                 // Resource found and deleted.
                 res = *it;
-
-                String obj_name = name();
-                obj_name.push_back('/');
-                obj_name.append_int(instance_id());
-                obj_name.push_back('/');
-                obj_name += res->name();
-                res->remove_resource_from_coap(obj_name);
+                StringBuffer<MAX_PATH_SIZE_2> obj_name;
+                build_path(obj_name, name().c_str(), instance_id(), res->name().c_str());
+                res->remove_resource_from_coap(obj_name.c_str());
                 delete res;
                 res = NULL;
                 _resource_list.erase(pos);
@@ -250,14 +243,9 @@ bool M2MObjectInstance::remove_resource_instance(const String &resource_name,
         it = list.begin();
         for ( ; it != list.end(); it++) {
             if((*it)->instance_id() == inst_id) {
-                String obj_name = name();
-                obj_name.push_back('/');
-                obj_name.append_int(instance_id());
-                obj_name.push_back('/');
-                obj_name += resource_name;
-                obj_name.push_back('/');
-                obj_name.append_int(inst_id);
-                remove_resource_from_coap(obj_name);
+                StringBuffer<MAX_PATH_SIZE> obj_name;
+                build_path(obj_name, name().c_str(), instance_id(), resource_name.c_str(), inst_id);
+                remove_resource_from_coap(obj_name.c_str());
                 success = res->remove_resource_instance(inst_id);
                 if(res->resource_instance_count() == 0) {
                     M2MResourceList::const_iterator itr;
@@ -605,23 +593,19 @@ sn_coap_hdr_s* M2MObjectInstance::handle_post_request(nsdl_s *nsdl,
                         coap_response->options_list_ptr = sn_nsdl_alloc_options_list(nsdl, coap_response);
 
                         if (coap_response->options_list_ptr) {
-                            StringBuffer<MAX_OBJECT_PATH_NAME> obj_name;
 
-                            size_t needed_space = M2MBase::name().length() + (1 + 5 + 1 + 5 + 1);
-                            if (obj_name.ensure_space(needed_space)) {
-                                obj_name.append(M2MBase::name().c_str());
-                                obj_name.append('/');
-                                obj_name.append_int(M2MBase::instance_id());
-                                obj_name.append('/');
-                                obj_name.append_int(instance_id);
+                              StringBuffer<MAX_PATH_SIZE_3> obj_name;
+                              if(!build_path(obj_name, M2MBase::name().c_str(), M2MBase::instance_id(), instance_id))
+                              {
+                                  msg_code = COAP_MSG_CODE_RESPONSE_INTERNAL_SERVER_ERROR;
+                                  break;
+                              }
 
-                                coap_response->options_list_ptr->location_path_len = obj_name.get_size();
-                                coap_response->options_list_ptr->location_path_ptr =
-                                    alloc_string_copy((uint8_t*)obj_name.c_str(),
-                                           coap_response->options_list_ptr->location_path_len);
-
-                                // todo: handle allocation error
-                            }
+                              coap_response->options_list_ptr->location_path_len = obj_name.get_size();
+                              coap_response->options_list_ptr->location_path_ptr =
+                                  alloc_string_copy((uint8_t*)obj_name.c_str(),
+                                                    coap_response->options_list_ptr->location_path_len);
+                              // todo: handle allocation error
                         }
                         msg_code = COAP_MSG_CODE_RESPONSE_CREATED;
                         break;

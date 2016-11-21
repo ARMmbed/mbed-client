@@ -265,3 +265,9 @@ TEST(M2MBase, test_value_updated_function)
 {
     m2m_base->test_value_updated_function();
 }
+
+TEST(M2MBase, test_build_path)
+{
+    m2m_base->test_build_path();
+}
+
