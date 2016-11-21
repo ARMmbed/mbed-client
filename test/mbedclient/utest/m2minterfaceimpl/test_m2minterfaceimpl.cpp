@@ -85,6 +85,9 @@ Test_M2MInterfaceImpl::Test_M2MInterfaceImpl()
 
 Test_M2MInterfaceImpl:: ~Test_M2MInterfaceImpl()
 {
+    if (impl->_security_connection) {
+        delete impl->_security_connection;
+    }
     delete observer;
     delete impl;
 }
@@ -102,6 +105,8 @@ void Test_M2MInterfaceImpl::test_constructor()
                                             M2MInterface::TCP);
     CHECK(obj->_current_state == 0);
     //TODO: Check rest of variables
+    if (obj->_security_connection)
+        delete obj->_security_connection;
     delete obj;
 
     obj = new M2MInterfaceImpl(obs,
@@ -112,6 +117,8 @@ void Test_M2MInterfaceImpl::test_constructor()
                                             "domain",
                                             M2MInterface::TCP_QUEUE);
 
+    if (obj->_security_connection)
+        delete obj->_security_connection;
     delete obj;
 }
 
