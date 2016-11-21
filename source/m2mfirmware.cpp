@@ -89,8 +89,8 @@ void M2MFirmware::create_mandatory_resources()
                                                     OMA_RESOURCE_TYPE,
                                                     M2MResourceInstance::INTEGER,
                                                     true);
-    set_zero_value(res);
     if(res) {
+        set_zero_value(*res);
         res->set_operation(M2MBase::GET_ALLOWED);
         res->set_register_uri(false);
     }
@@ -98,8 +98,9 @@ void M2MFirmware::create_mandatory_resources()
                                                     OMA_RESOURCE_TYPE,
                                                     M2MResourceInstance::INTEGER,
                                                     true);
-    set_zero_value(res);
+
     if(res) {
+        set_zero_value(*res);
         res->set_operation(M2MBase::GET_ALLOWED);
         res->set_register_uri(false);
     }
@@ -428,9 +429,7 @@ bool M2MFirmware::check_value_range(FirmwareResource resource, int64_t value) co
     return success;
 }
 
-void M2MFirmware::set_zero_value(M2MResource *resource)
+void M2MFirmware::set_zero_value(M2MResource &resource)
 {
-    if(resource) {
-        resource->set_value((const uint8_t*)"0", 1);
-    }
+    resource.set_value((const uint8_t*)"0", 1);
 }
