@@ -353,21 +353,21 @@ private:
 
 private:
 
-    M2MNsdlObserver                   &_observer;
-    M2MObjectList                      _object_list;
-    M2MServer                         _server;
-    M2MSecurity                       *_security; // Not owned
-    M2MTimer                          *_nsdl_exceution_timer;
-    M2MTimer                          *_registration_timer;
-    sn_nsdl_ep_parameters_s           *_endpoint;
-    sn_nsdl_dynamic_resource_parameters_s           *_resource;
-    sn_nsdl_addr_s                     _sn_nsdl_address;
-    nsdl_s                            *_nsdl_handle;
-    uint32_t                           _counter_for_nsdl;
-    uint16_t                           _bootstrap_id;
-    bool                               _unregister_ongoing;
-    String                             _endpoint_name;
-    bool                               _identity_accepted;
+    M2MNsdlObserver                         &_observer;
+    M2MObjectList                            _object_list;
+    sn_nsdl_ep_parameters_s                 *_endpoint;
+    sn_nsdl_dynamic_resource_parameters_s   *_resource;
+    nsdl_s                                  *_nsdl_handle;
+    M2MSecurity                             *_security; // Not owned
+    M2MServer                               _server;
+    M2MTimer                                *_nsdl_exceution_timer;
+    M2MTimer                                *_registration_timer;
+    sn_nsdl_addr_s                          _sn_nsdl_address;
+    String                                  _endpoint_name;
+    uint32_t                                _counter_for_nsdl;
+    uint16_t                                _bootstrap_id;
+    bool                                    _unregister_ongoing;
+    bool                                    _identity_accepted;
 
 friend class Test_M2MNsdlInterface;
 
