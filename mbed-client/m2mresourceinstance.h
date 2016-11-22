@@ -279,18 +279,18 @@ private:
 
 private:
 
-    M2MObjectInstanceCallback               &_object_instance_callback;
-    execute_callback                        _execute_callback;
     uint8_t                                 *_value;
     uint32_t                                _value_length;
+    M2MBlockMessage                         *_block_message_data;
+    FP1<void, void*>                        *_function_pointer;
+    execute_callback                        _execute_callback;
     M2MResourceCallback                     *_resource_callback; // Not owned
     String                                  _object_name;
-    FP1<void, void*>                        *_function_pointer;
-    uint16_t                                _object_instance_id;
-    ResourceType                            _resource_type;
     incoming_block_message_callback         _incoming_block_message_cb;
     outgoing_block_message_callback         _outgoing_block_message_cb;
-    M2MBlockMessage                         *_block_message_data;
+    M2MObjectInstanceCallback               &_object_instance_callback;
+    uint16_t                                _object_instance_id;
+    ResourceType                            _resource_type;
 
     friend class Test_M2MResourceInstance;
     friend class Test_M2MResource;

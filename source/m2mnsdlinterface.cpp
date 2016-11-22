@@ -51,13 +51,13 @@
 
 M2MNsdlInterface::M2MNsdlInterface(M2MNsdlObserver &observer)
 : _observer(observer),
-  _server(),
-  _security(NULL),
-  _nsdl_exceution_timer(new M2MTimer(*this)),
-  _registration_timer(new M2MTimer(*this)),
   _endpoint(NULL),
   _resource(NULL),
   _nsdl_handle(NULL),
+  _security(NULL),
+  _server(),
+  _nsdl_exceution_timer(new M2MTimer(*this)),
+  _registration_timer(new M2MTimer(*this)),
   _counter_for_nsdl(0),
   _bootstrap_id(0),
   _unregister_ongoing(false),
