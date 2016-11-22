@@ -63,9 +63,9 @@ M2MInterfaceImpl::M2MInterfaceImpl(M2MInterfaceObserver& observer,
   _retry_count(0),
   _binding_mode(mode),
   _observer(observer),
+  _security_connection( new M2MConnectionSecurity( RESOLVE_SEC_MODE(mode) )),
   _connection_handler(*this, _security_connection, mode, stack),
   _nsdl_interface(*this),
-  _security_connection( new M2MConnectionSecurity( RESOLVE_SEC_MODE(mode) )),
   _security(NULL)
 {
     tr_debug("M2MInterfaceImpl::M2MInterfaceImpl() -IN");

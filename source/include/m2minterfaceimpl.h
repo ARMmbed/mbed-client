@@ -409,9 +409,9 @@ private:
     uint8_t                     _retry_count;
     BindingMode                 _binding_mode;
     M2MInterfaceObserver        &_observer;
+    M2MConnectionSecurity       *_security_connection; // Doesn't own
     M2MConnectionHandler        _connection_handler;
     M2MNsdlInterface            _nsdl_interface;
-    M2MConnectionSecurity       *_security_connection; // Doesn't own
     M2MSecurity                 *_security;
 
     friend class Test_M2MInterfaceImpl;
