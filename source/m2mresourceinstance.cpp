@@ -440,12 +440,10 @@ sn_coap_hdr_s* M2MResourceInstance::handle_put_request(nsdl_s *nsdl,
                                                                received_coap_header,
                                                                msg_code);
         // process the PUT if we have registered a callback for it
-        if(received_coap_header) {
+        if(received_coap_header && coap_response) {
             uint16_t coap_content_type = 0;
             if(received_coap_header->content_format != COAP_CT_NONE) {
-                if(coap_response) {
-                    coap_content_type = received_coap_header->content_format;
-                }
+                coap_content_type = received_coap_header->content_format;
             }
             if(received_coap_header->options_list_ptr &&
                received_coap_header->options_list_ptr->uri_query_ptr) {
@@ -497,7 +495,6 @@ sn_coap_hdr_s* M2MResourceInstance::handle_put_request(nsdl_s *nsdl,
                                 received_coap_header->uri_path_len > 0) {
                                 value.append_raw((char*)received_coap_header->uri_path_ptr, received_coap_header->uri_path_len);
                             }
-
                             execute_value_updated = true;
                         }
                     }

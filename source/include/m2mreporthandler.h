@@ -158,19 +158,19 @@ private:
 
 private:
     M2MReportObserver           &_observer;
-    int                         _pmax;
-    int                         _pmin;
+    int32_t                     _pmax;
+    int32_t                     _pmin;
     float                       _gt;
     float                       _lt;
     float                       _st;
     bool                        _pmin_exceeded;
     bool                        _pmax_exceeded;
     M2MTimer                    *_pmin_timer;
-    M2MTimer                    *_pmax_timer;        
+    M2MTimer                    *_pmax_timer;
     float                       _high_step;
     float                       _low_step;
     float                       _current_value;
-    float                       _last_value;    
+    float                       _last_value;
     uint8_t                     _attribute_state;
     bool                        _notify;
     m2m::Vector<uint16_t>       _changed_instance_ids;

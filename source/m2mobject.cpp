@@ -402,8 +402,8 @@ sn_coap_hdr_s* M2MObject::handle_post_request(nsdl_s *nsdl,
                                                                                received_coap_header->payload_len,
                                                                                *this,
                                                                                M2MTLVDeserializer::Post);
-                                } else if(deserializer->is_resource(received_coap_header->payload_ptr) ||
-                                          deserializer->is_multiple_resource(received_coap_header->payload_ptr)) {
+                                } else if(obj_instance && (deserializer->is_resource(received_coap_header->payload_ptr) ||
+                                          deserializer->is_multiple_resource(received_coap_header->payload_ptr))) {
                                     tr_debug("M2MObject::handle_post_request() - TLV data contains Resources");
                                     error = deserializer->deserialize_resources(received_coap_header->payload_ptr,
                                                                                 received_coap_header->payload_len,

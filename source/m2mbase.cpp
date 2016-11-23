@@ -32,6 +32,7 @@ M2MBase& M2MBase::operator=(const M2MBase& other)
     if (this != &other) { // protect against invalid self-assignment
         _operation = other._operation;
         _mode = other._mode;
+        _base_type = other._base_type;
         _name = other._name;
         _resource_type = other._resource_type;
         _interface_description = other._interface_description;
@@ -43,6 +44,7 @@ M2MBase& M2MBase::operator=(const M2MBase& other)
         _observation_handler = other._observation_handler;
         _register_uri = other._register_uri;
         _uri_path = other._uri_path;
+        _name_id = other._name_id;
         _max_age = other._max_age;
         _is_under_observation = other._is_under_observation;
 
@@ -71,6 +73,7 @@ M2MBase::M2MBase(const M2MBase& other) :
     _resource_type(other._resource_type),
     _interface_description(other._interface_description),
     _uri_path(other._uri_path),
+    _name_id(other._name_id),
     _max_age(other._max_age),
     _instance_id(other._instance_id),
     _observation_number(other._observation_number),
@@ -79,6 +82,7 @@ M2MBase::M2MBase(const M2MBase& other) :
     _coap_content_type(other._coap_content_type),
     _operation(other._operation),
     _mode(other._mode),
+    _base_type(other._base_type),
     _observation_level(other._observation_level),
     _observable(other._observable),
     _register_uri(other._register_uri),
@@ -101,6 +105,7 @@ M2MBase::M2MBase(const String & resource_name,
   _observation_handler(NULL),
   _name(resource_name),
   _uri_path(""),
+  _name_id(0),
   _max_age(0),
   _instance_id(0),
   _observation_number(0),
@@ -109,6 +114,7 @@ M2MBase::M2MBase(const String & resource_name,
   _coap_content_type(0),
   _operation(M2MBase::NOT_ALLOWED),
   _mode(mde),
+  _base_type(M2MBase::Object),
   _observation_level(M2MBase::None),
   _observable(false),
   _register_uri(true),
