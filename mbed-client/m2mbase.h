@@ -104,7 +104,7 @@ public:
 
     }Operation;
 
-    enum{
+    enum MaxPathSize {
         MAX_NAME_SIZE = 64,
         MAX_INSTANCE_SIZE = 5,
 
@@ -112,7 +112,7 @@ public:
         MAX_PATH_SIZE_2 = ((MAX_NAME_SIZE * 2) + MAX_INSTANCE_SIZE + 2 + 1),
         MAX_PATH_SIZE_3 = (MAX_NAME_SIZE + (MAX_INSTANCE_SIZE * 2) + 2 + 1),
         MAX_PATH_SIZE_4 = (MAX_NAME_SIZE + MAX_INSTANCE_SIZE + 1 + 1),
-    }MaxPathSize;
+    };
 
 protected:
 
