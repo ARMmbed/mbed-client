@@ -68,6 +68,7 @@ M2MNsdlInterface::M2MNsdlInterface(M2MNsdlObserver &observer)
     _sn_nsdl_address.addr_len = 0;
     _sn_nsdl_address.addr_ptr = NULL;
     _sn_nsdl_address.port = 0;
+    _sn_nsdl_address.type = SN_NSDL_ADDRESS_TYPE_NONE;
 
     // This initializes libCoap and libNsdl
     // Parameters are function pointers to used memory allocation
@@ -190,7 +191,7 @@ void M2MNsdlInterface::set_endpoint_lifetime_buffer(int lifetime)
 
     uint32_t size = m2m::itoa_c(lifetime, buffer);
 
-    if (size <= sizeof(buffer)) {
+    if (_endpoint && size <= sizeof(buffer)) {
         _endpoint->lifetime_ptr = alloc_string_copy((uint8_t*)buffer, size);
         if(_endpoint->lifetime_ptr) {
             _endpoint->lifetime_len =  size;
@@ -293,7 +294,7 @@ bool M2MNsdlInterface::send_update_registration(const uint32_t lifetime)
 
     //If Lifetime value is 0, then don't change the existing lifetime value
     if(lifetime != 0) {
-        if(_endpoint->lifetime_ptr) {
+        if(_endpoint && _endpoint->lifetime_ptr) {
             memory_free(_endpoint->lifetime_ptr);
             _endpoint->lifetime_ptr = NULL;
             _endpoint->lifetime_len = 0;
@@ -376,13 +377,13 @@ uint8_t M2MNsdlInterface::received_from_server_callback(struct nsdl_s *nsdl_hand
                                                         sn_coap_hdr_s *coap_header,
                                                         sn_nsdl_addr_s *address)
 {
-    tr_debug("M2MNsdlInterface::received_from_server_callback - incoming msg id:%" PRIu16, coap_header->msg_id);
-    tr_debug("M2MNsdlInterface::received_from_server_callback - registration id:%" PRIu16, nsdl_handle->register_msg_id);
-    tr_debug("M2MNsdlInterface::received_from_server_callback - unregistration id:%" PRIu16, nsdl_handle->unregister_msg_id);
-    tr_debug("M2MNsdlInterface::received_from_server_callback - update registration id:%" PRIu16, nsdl_handle->update_register_msg_id);
     _observer.coap_data_processed();
     uint8_t value = 0;
     if(nsdl_handle && coap_header) {
+        tr_debug("M2MNsdlInterface::received_from_server_callback - incoming msg id:%" PRIu16, coap_header->msg_id);
+        tr_debug("M2MNsdlInterface::received_from_server_callback - registration id:%" PRIu16, nsdl_handle->register_msg_id);
+        tr_debug("M2MNsdlInterface::received_from_server_callback - unregistration id:%" PRIu16, nsdl_handle->unregister_msg_id);
+        tr_debug("M2MNsdlInterface::received_from_server_callback - update registration id:%" PRIu16, nsdl_handle->update_register_msg_id);
         bool is_bootstrap_msg = address && (nsdl_handle->oma_bs_address_len == address->addr_len) &&
                                    (nsdl_handle->oma_bs_port == address->port) &&
                                    !memcmp(nsdl_handle->oma_bs_address_ptr, address->addr_ptr, nsdl_handle->oma_bs_address_len);
@@ -721,8 +722,8 @@ void M2MNsdlInterface::observation_to_be_sent(M2MBase *object,
                                               bool send_object)
 {
     __mutex_claim();
-    tr_debug("M2MNsdlInterface::observation_to_be_sent(), %s", object->uri_path().c_str());
     if(object) {
+        tr_debug("M2MNsdlInterface::observation_to_be_sent(), %s", object->uri_path().c_str());
         M2MBase::BaseType type = object->base_type();
         if(type == M2MBase::Object) {
             send_object_observation(static_cast<M2MObject*> (object),
@@ -811,7 +812,7 @@ void M2MNsdlInterface::value_updated(M2MBase *base,
         }
     }
 
-    if (base->is_value_updated_function_set()) {
+    if (base && base->is_value_updated_function_set()) {
         base->execute_value_updated(base->name());
     }
     else {
@@ -923,7 +924,7 @@ bool M2MNsdlInterface::create_nsdl_resource_structure(M2MResource *res,
                     inst_name.push_back('/');
                     inst_name.append_int((*it)->instance_id());
 
-                    success = create_nsdl_resource((*it),inst_name,(*it)->register_uri());
+                    create_nsdl_resource((*it),inst_name,(*it)->register_uri());
                 }
                 // Register the main Resource as well along with ResourceInstances
                 success = create_nsdl_resource(res,res_name,res->register_uri());
@@ -1093,7 +1094,7 @@ String M2MNsdlInterface::coap_to_string(uint8_t *coap_data,int coap_data_length)
 uint64_t M2MNsdlInterface::registration_time()
 {
     uint64_t value = 0;
-    if(_endpoint->lifetime_ptr) {
+    if(_endpoint && _endpoint->lifetime_ptr) {
         value = atol((const char*)_endpoint->lifetime_ptr);
     }
 
