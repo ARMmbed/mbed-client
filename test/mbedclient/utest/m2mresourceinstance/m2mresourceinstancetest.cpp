@@ -125,3 +125,13 @@ TEST(M2MResourceInstance, test_get_object_name)
 {
     m2m_resourceinstance->test_get_object_name();
 }
+
+TEST(M2MResourceInstance, test_set_notification_sent_function)
+{
+    m2m_resourceinstance->test_set_notification_sent_function();
+}
+
+TEST(M2MResourceInstance, test_notification_sent)
+{
+    m2m_resourceinstance->test_notification_sent();
+}
