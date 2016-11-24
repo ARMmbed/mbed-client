@@ -349,7 +349,7 @@ M2MObject * object = M2MInterfaceFactory::create_object("Test");
 M2MObjectInstance * object_instance = object->create_object_instance(0);
 
 uint8_t value[] ={"value"};
-M2MResource* resource = object_instance->create_dynamic_resource_instance("Resource", "sensor",M2MResourceInstance::INTEGER,value,sizeof(value), true, 0);
+M2MResource* resource_instance = object_instance->create_dynamic_resource_instance("Resource", "sensor",M2MResourceInstance::INTEGER,value,sizeof(value), true, 0);
 ```
 
 #### Configuring the Resource and Resource Instance
