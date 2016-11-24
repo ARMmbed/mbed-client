@@ -62,6 +62,7 @@ public:
 private: // Constructor and destructor are private
          // which means that these objects can be created or
          // deleted only through a function provided by the M2MObjectInstance.
+#ifdef M2M_OLD_API
     /**
      * \brief A constructor for creating a resource.
      * \param resource_name The name of the resource.
@@ -76,7 +77,16 @@ private: // Constructor and destructor are private
                         M2MObjectInstanceCallback &object_instance_callback,
                         const uint16_t object_instance_id = 0,
                         const String &object_name = "");
+#else
+    M2MResourceInstance(const char *resource_name,
+                        const char *resource_type,
+                        M2MResourceInstance::ResourceType type,
+                        M2MObjectInstanceCallback &object_instance_callback,
+                        const uint16_t object_instance_id = 0,
+                        const char *object_name = "");
+#endif
 
+#ifdef M2M_OLD_API
     /**
      * \brief A Constructor for creating a resource.
      * \param resource_name The name of the resource.
@@ -96,6 +106,16 @@ private: // Constructor and destructor are private
                         M2MObjectInstanceCallback &object_instance_callback,
                         const uint16_t object_instance_id = 0,
                         const String &object_name = "");
+#else
+    M2MResourceInstance(const char *resource_name,
+                        const char *resource_type,
+                        M2MResourceInstance::ResourceType type,
+                        const uint8_t *value,
+                        const uint8_t value_length,
+                        M2MObjectInstanceCallback &object_instance_callback,
+                        const uint16_t object_instance_id = 0,
+                        const char *object_name = "");
+#endif
 
     // Prevents the use of default constructor.
     M2MResourceInstance();

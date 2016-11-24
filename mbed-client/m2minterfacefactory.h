@@ -102,6 +102,7 @@ public:
      */
     static M2MFirmware *create_firmware();
 
+#ifdef M2M_OLD_API
     /**
      * \brief Creates a generic object for the mbed Client Inteface. With this, the
      * client can manage its own customized resources used for registering
@@ -112,7 +113,9 @@ public:
      * \return M2MObject An object for managing other mbed Client operations.
      */
     static M2MObject *create_object(const String &name);
-
+#else
+    static M2MObject *create_object(const char *name);
+#endif
 
     friend class Test_M2MInterfaceFactory;
 };

@@ -114,6 +114,7 @@ protected:
     // Prevents the use of copy constructor
     M2MBase( const M2MBase& /*other*/ );
 
+#ifdef M2M_OLD_API
     /**
      * \brief Constructor
      * \param baseType The type of the object created.
@@ -122,6 +123,12 @@ protected:
      */
     M2MBase(const String &name,
             M2MBase::Mode mode);
+#else
+#endif
+
+    M2MBase(const char *name, M2MBase::Mode mode);
+
+
 public:
 
     /**
@@ -134,7 +141,7 @@ public:
      * \param operation The operation to be set.
      */
     virtual void set_operation(M2MBase::Operation operation);
-
+//#ifdef M2M_OLD_API
     /**
      * \brief Sets the interface description of the object.
      * \param description The description to be set.
@@ -146,7 +153,7 @@ public:
      * \param resource_type The resource type to be set.
      */
     virtual void set_resource_type(const String &resource_type);
-
+//#endif
     /**
      * \brief Sets the CoAP content type of the object.
      * \param content_type The content type to be set based on
@@ -221,11 +228,20 @@ public:
      */
     virtual M2MBase::Operation operation() const;
 
+#ifdef M2M_OLD_API
     /**
      * \brief Returns the object name.
      * \return The name of the object.
      */
     virtual const String &name() const;
+#else
+    // XXX: if this is not overridden anywhere, why keep it virtual?
+    virtual const char* name() const;
+#endif
+
+    // helper to allow getting the _name length in a universal way, without knowing
+    // if it is stored as a String or "const char*"
+    size_t name_length() const;
 
     /**
      * \brief Returns the object name in integer.
@@ -450,6 +466,10 @@ protected:
     */
     static uint8_t* alloc_copy(const uint8_t* source, uint32_t size);
 
+    // validate string length to be [min_length..max_length]
+    static bool validate_string_length(const String &string, size_t min_length, size_t max_length);
+    static bool validate_string_length(const char* string, size_t min_length, size_t max_length);
+
     /**
      * \brief Returns the Report Handler object.
      * \return M2MReportHandler object.
@@ -465,12 +485,17 @@ protected:
 private:
 
     static bool is_integer(const String &value);
+    static bool is_integer(const char *value);
 
 private:
 
     M2MReportHandler           *_report_handler;
     M2MObservationHandler      *_observation_handler;
+#if M2M_OLD_API
     String                      _name;
+#else
+    const char                  *_name;
+#endif
     String                      _resource_type;
     String                      _interface_description;
     String                      _uri_path;
@@ -482,12 +507,15 @@ private:
     uint8_t                     _token_length;
     uint8_t                     _coap_content_type;
     M2MBase::Operation          _operation;
-    M2MBase::Mode               _mode;
-    M2MBase::BaseType           _base_type;
-    M2MBase::Observation        _observation_level;
-    bool                        _observable;
-    bool                        _register_uri;
-    bool                        _is_under_observation;
+
+    M2MBase::Mode               _mode : 8;
+    M2MBase::BaseType           _base_type : 8;
+    M2MBase::Observation        _observation_level : 8;
+
+    bool                        _observable : 1;
+    bool                        _register_uri : 1;
+    bool                        _is_under_observation : 1;
+
     value_updated_callback      _value_updated_callback;
     FP1<void, const char*>      *_function_pointer;
 

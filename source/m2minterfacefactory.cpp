@@ -110,6 +110,7 @@ M2MFirmware* M2MInterfaceFactory::create_firmware()
     return firmware;
 }
 
+#ifdef M2M_OLD_API
 M2MObject* M2MInterfaceFactory::create_object(const String &name)
 {
     tr_debug("M2MInterfaceFactory::create_object : Name : %s", name.c_str());
@@ -121,3 +122,16 @@ M2MObject* M2MInterfaceFactory::create_object(const String &name)
     object = new M2MObject(name);
     return object;
 }
+#else
+M2MObject* M2MInterfaceFactory::create_object(const char* name)
+{
+    tr_debug("M2MInterfaceFactory::create_object : Name : %s", name);
+    const size_t name_len = strlen(name);
+    if(name_len > MAX_ALLOWED_STRING_LENGTH || name_len == 0){
+        return NULL;
+    }
+
+    M2MObject *object = new M2MObject(name);
+    return object;
+}
+#endif

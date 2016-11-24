@@ -49,6 +49,7 @@ M2MResourceInstance::M2MResourceInstance(const M2MResourceInstance& other)
     this->operator=(other);
 }
 
+#ifdef M2M_OLD_API
 M2MResourceInstance::M2MResourceInstance(const String &res_name,
                                          const String &,
                                          M2MResourceInstance::ResourceType,
@@ -63,6 +64,22 @@ _object_name(object_name)*/
 {
     m2mresourceinstance_stub::base_type = M2MBase::ResourceInstance;
 }
+#else
+M2MResourceInstance::M2MResourceInstance(const char *res_name,
+                                         const char */*res_type*/,
+                                         M2MResourceInstance::ResourceType,
+                                         M2MObjectInstanceCallback &object_instance_callback,
+                                         const uint16_t /*object_instance_id*/,
+                                         const String &/*object_name*/)
+: M2MBase(res_name,
+          M2MBase::Dynamic),
+  _object_instance_callback(object_instance_callback)/*,
+_object_instance_id(object_instance_id),
+_object_name(object_name)*/
+{
+    m2mresourceinstance_stub::base_type = M2MBase::ResourceInstance;
+}
+#endif
 
 M2MResourceInstance::M2MResourceInstance(const String &res_name,
                                          const String &,

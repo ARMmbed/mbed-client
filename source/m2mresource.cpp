@@ -58,6 +58,7 @@ M2MResource::M2MResource(const M2MResource& other)
     this->operator=(other);
 }
 
+#ifdef M2M_OLD_API
 M2MResource::M2MResource(M2MObjectInstanceCallback &object_instance_callback,
                          const String &resource_name,
                          const String &resource_type,
@@ -78,7 +79,30 @@ M2MResource::M2MResource(M2MObjectInstanceCallback &object_instance_callback,
     M2MBase::set_operation(M2MBase::GET_ALLOWED);
     M2MBase::set_observable(false);
 }
+#else
+M2MResource::M2MResource(M2MObjectInstanceCallback &object_instance_callback,
+                         const char *resource_name,
+                         const char *resource_type,
+                         M2MResourceInstance::ResourceType type,
+                         const uint8_t *value,
+                         const uint8_t value_length,
+                         const uint16_t object_instance_id,
+                         const char *object_name,
+                         bool multiple_instance)
+: M2MResourceInstance(resource_name, resource_type, type, value, value_length,
+                      object_instance_callback, object_instance_id, object_name),
+  _delayed_token(NULL),
+  _delayed_token_len(0),
+  _has_multiple_instances(multiple_instance),
+  _delayed_response(false)
+{
+    M2MBase::set_base_type(M2MBase::Resource);
+    M2MBase::set_operation(M2MBase::GET_ALLOWED);
+    M2MBase::set_observable(false);
+}
+#endif
 
+#ifdef M2M_OLD_API
 M2MResource::M2MResource(M2MObjectInstanceCallback &object_instance_callback,
                          const String &resource_name,
                          const String &resource_type,
@@ -98,6 +122,27 @@ M2MResource::M2MResource(M2MObjectInstanceCallback &object_instance_callback,
     M2MBase::set_operation(M2MBase::GET_PUT_ALLOWED);
     M2MBase::set_observable(observable);
 }
+#else
+M2MResource::M2MResource(M2MObjectInstanceCallback &object_instance_callback,
+                         const char *resource_name,
+                         const char *resource_type,
+                         M2MResourceInstance::ResourceType type,
+                         bool observable,
+                         const uint16_t object_instance_id,
+                         const char *object_name,
+                         bool multiple_instance)
+: M2MResourceInstance(resource_name, resource_type, type,
+                      object_instance_callback, object_instance_id, object_name),
+  _delayed_token(NULL),
+  _delayed_token_len(0),
+  _has_multiple_instances(multiple_instance),
+  _delayed_response(false)
+{
+    M2MBase::set_base_type(M2MBase::Resource);
+    M2MBase::set_operation(M2MBase::GET_PUT_ALLOWED);
+    M2MBase::set_observable(observable);
+}
+#endif
 
 M2MResource::~M2MResource()
 {

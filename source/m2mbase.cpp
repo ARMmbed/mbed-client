@@ -28,37 +28,9 @@
 #define TRACE_GROUP "mClt"
 
 
-M2MBase::M2MBase(const M2MBase& other) :
-    _report_handler(NULL),
-    _observation_handler(other._observation_handler),
-    _name(other._name),
-    _resource_type(other._resource_type),
-    _interface_description(other._interface_description),
-    _uri_path(other._uri_path),
-    _max_age(other._max_age),
-    _instance_id(other._instance_id),
-    _observation_number(other._observation_number),
-    _token(NULL),
-    _token_length(other._token_length),
-    _coap_content_type(other._coap_content_type),
-    _operation(other._operation),
-    _mode(other._mode),
-    _observation_level(other._observation_level),
-    _observable(other._observable),
-    _register_uri(other._register_uri),
-    _is_under_observation(other._is_under_observation),
-    _function_pointer(NULL)
-{
 
-    if(other._token) {
-        _token = alloc_string_copy((uint8_t *)other._token, other._token_length);
-    }
 
-    if(other._report_handler) {
-        _report_handler = new M2MReportHandler(*other._report_handler);
-    }
-}
-
+#ifdef M2M_OLD_API
 M2MBase::M2MBase(const String & resource_name,
                  M2MBase::Mode mde)
 : _report_handler(NULL),
@@ -88,6 +60,41 @@ M2MBase::M2MBase(const String & resource_name,
         _name_id = -1;
     }
 }
+
+#else
+// Since the delegating constructors are part of C++11 only, we need to duplicate the code
+M2MBase::M2MBase(const char *name, M2MBase::Mode mode)
+: _report_handler(NULL),
+  _observation_handler(NULL),
+  _name(name),
+  _uri_path(""),
+  _max_age(0),
+  _instance_id(0),
+  _observation_number(0),
+  _token(NULL),
+  _token_length(0),
+  _coap_content_type(0),
+  _operation(M2MBase::NOT_ALLOWED),
+  _mode(mode),
+  _observation_level(M2MBase::None),
+  _observable(false),
+  _register_uri(true),
+  _is_under_observation(false),
+  _function_pointer(NULL)
+{
+    // Checking the name length properly, i.e returning error is impossible from constructor without exceptions
+    assert(strlen(_name) <= MAX_ALLOWED_STRING_LENGTH);
+
+    if(is_integer(_name) && (strlen(_name) <= MAX_ALLOWED_STRING_LENGTH)) {
+        _name_id = strtoul(_name, NULL, 10);
+        if(_name_id > 65535){
+            _name_id = -1;
+        }
+    } else {
+        _name_id = -1;
+    }
+}
+#endif
 
 M2MBase::~M2MBase()
 {
@@ -197,10 +204,31 @@ M2MBase::Operation M2MBase::operation() const
     return _operation;
 }
 
+#ifdef M2M_OLD_API
 const String& M2MBase::name() const
 {
     return _name;
 }
+#else
+const char* M2MBase::name() const
+{
+    return _name;
+}
+#endif
+
+#ifdef M2M_OLD_API
+size_t M2MBase::name_length() const
+{
+    return _name.length();
+}
+#else
+size_t M2MBase::name_length() const
+{
+    assert(_name != NULL);
+    return strlen(_name);
+}
+#endif
+
 
 int32_t M2MBase::name_id() const
 {
@@ -374,6 +402,33 @@ uint8_t* M2MBase::alloc_copy(const uint8_t* source, uint32_t size)
     return result;
 }
 
+bool M2MBase::validate_string_length(const String &string, size_t min_length, size_t max_length)
+{
+    bool valid = false;
+
+    const size_t len = string.length();
+    if ((len >= min_length) && (len <= max_length)) {
+        valid = true;
+    }
+
+    return valid;
+}
+
+bool M2MBase::validate_string_length(const char* string, size_t min_length, size_t max_length)
+{
+    bool valid = false;
+
+    if (string != NULL) {
+        const size_t len = strlen(string);
+        if ((len >= min_length) && (len <= max_length)) {
+            valid = true;
+        }
+    }
+
+    return valid;
+}
+
+
 M2MReportHandler* M2MBase::report_handler()
 {
     return _report_handler;
@@ -400,8 +455,20 @@ bool M2MBase::is_integer(const String &value)
     if(value.empty() || ((!isdigit(s[0])) && (s[0] != '-') && (s[0] != '+'))) {
         return false;
     }
-    char * p ;
+    char * p;
     strtol(value.c_str(), &p, 10);
+    return (*p == 0);
+}
+
+bool M2MBase::is_integer(const char *value)
+{
+    assert(value != NULL);
+
+    if((strlen(value) < 1) || ((!isdigit(value[0])) && (value[0] != '-') && (value[0] != '+'))) {
+        return false;
+    }
+    char * p;
+    strtol(value, &p, 10);
     return (*p == 0);
 }
 

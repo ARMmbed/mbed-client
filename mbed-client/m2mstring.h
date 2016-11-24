@@ -100,6 +100,8 @@ namespace m2m
     /// Append n characters of a string
     String& append(const char* str, size_type n);
 
+    String& append(const char* str);
+
     // Append n characters of a non-zero-terminated string
     // (in contrast with other append(), which performs strlen() for the given string).
     String& append_raw(const char*, size_type);
@@ -109,6 +111,9 @@ namespace m2m
 
     int compare( size_type pos, size_type len, const String& str ) const;
     int compare( size_type pos, size_type len, const char*   str ) const;
+
+    int compare(const char* str) const;
+    int compare(const String& str) const;
 
     int find_last_of(char c) const;
 

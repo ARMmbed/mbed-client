@@ -80,25 +80,24 @@ M2MServer::~M2MServer()
 M2MResource* M2MServer::create_resource(ServerResource resource, uint32_t value)
 {
     M2MResource* res = NULL;
-    const char* server_id_ptr = "";
+    const char* server_id = NULL;
     if(!is_resource_present(resource)) {
         switch(resource) {
         case DefaultMinPeriod:
-            server_id_ptr = SERVER_DEFAULT_MIN_PERIOD;
+            server_id = SERVER_DEFAULT_MIN_PERIOD;
             break;
         case DefaultMaxPeriod:
-            server_id_ptr = SERVER_DEFAULT_MAX_PERIOD;
+            server_id = SERVER_DEFAULT_MAX_PERIOD;
             break;
         case DisableTimeout:
-            server_id_ptr = SERVER_DISABLE_TIMEOUT;
+            server_id = SERVER_DISABLE_TIMEOUT;
             break;
         default:
             break;
         }
     }
-    String server_id(server_id_ptr);
     
-    if(!server_id.empty()) {
+    if (server_id != NULL) {
         if(_server_instance) {
             res = _server_instance->create_dynamic_resource(server_id,
                                                             OMA_RESOURCE_TYPE,

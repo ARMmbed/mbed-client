@@ -38,11 +38,16 @@ friend class M2MInterfaceFactory;
 
 protected :
 
+#ifdef M2M_OLD_API
     /**
      * \brief Constructor
      * \param name The name of the object.
      */
     M2MObject(const String &object_name);
+#endif
+
+    M2MObject(const char *object_name);
+
 
     // Prevents the use of default constructor.
     M2MObject();

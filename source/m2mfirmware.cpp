@@ -108,23 +108,22 @@ void M2MFirmware::create_mandatory_resources()
 M2MResource* M2MFirmware::create_resource(FirmwareResource resource, const String &value)
 {
     M2MResource* res = NULL;
-    const char* firmware_id_ptr = "";
+    const char* firmware_id = NULL;
     M2MBase::Operation operation = M2MBase::GET_ALLOWED;
     if(!is_resource_present(resource)) {
         switch(resource) {
             case PackageName:
-                firmware_id_ptr = FIRMWARE_PACKAGE_NAME;
+                firmware_id = FIRMWARE_PACKAGE_NAME;
                 break;
             case PackageVersion:
-                firmware_id_ptr = FIRMWARE_PACKAGE_VERSION;
+                firmware_id = FIRMWARE_PACKAGE_VERSION;
                 break;
             default:
                 break;
         }
     }
-    String firmware_id(firmware_id_ptr);
 
-    if(!firmware_id.empty() && value.size() < 256) {
+    if(firmware_id != NULL && value.size() < 256) {
         if(_firmware_instance) {
             res = _firmware_instance->create_dynamic_resource(firmware_id,
                                                             OMA_RESOURCE_TYPE,
@@ -149,13 +148,13 @@ M2MResource* M2MFirmware::create_resource(FirmwareResource resource, const Strin
 M2MResource* M2MFirmware::create_resource(FirmwareResource resource, int64_t value)
 {
     M2MResource* res = NULL;
-    const char* firmware_id_ptr = "";
+    const char* firmware_id = NULL;
     M2MBase::Operation operation = M2MBase::GET_ALLOWED;
     if(!is_resource_present(resource)) {
         switch(resource) {
         case UpdateSupportedObjects:
             if(check_value_range(resource, value)) {
-                firmware_id_ptr = FIRMWARE_UPDATE_SUPPORTED_OBJECTS;
+                firmware_id = FIRMWARE_UPDATE_SUPPORTED_OBJECTS;
                 operation = M2MBase::GET_PUT_ALLOWED;
             }
             break;
@@ -164,9 +163,7 @@ M2MResource* M2MFirmware::create_resource(FirmwareResource resource, int64_t val
         }
     }
 
-    const String firmware_id(firmware_id_ptr);
-    
-    if(!firmware_id.empty()) {
+    if (firmware_id != NULL) {
         if(_firmware_instance) {
             res = _firmware_instance->create_dynamic_resource(firmware_id,
                                                             OMA_RESOURCE_TYPE,

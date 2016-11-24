@@ -45,13 +45,17 @@ private: // Constructor and destructor are private which means
          // that these objects can be created or
          // deleted only through function provided by M2MObject.
 
+#ifdef M2M_OLD_API
     /**
      * \brief Constructor
      * \param name Name of the object
      */
     M2MObjectInstance(const String &object_name,
                       M2MObjectCallback &object_callback);
-
+#else
+    M2MObjectInstance(const char *object_name,
+                      M2MObjectCallback &object_callback);
+#endif
 
     // Prevents the use of default constructor.
     M2MObjectInstance();
@@ -80,12 +84,21 @@ public:
      *        multiple instances, default is false.
      * \return M2MResource The resource for managing other client operations.
      */
+#ifdef M2M_OLD_API
     M2MResource* create_static_resource(const String &resource_name,
                                         const String &resource_type,
                                         M2MResourceInstance::ResourceType type,
                                         const uint8_t *value,
                                         const uint8_t value_length,
                                         bool multiple_instance = false);
+#else
+    M2MResource* create_static_resource(const char *resource_name,
+                                        const char *resource_type,
+                                        M2MResourceInstance::ResourceType type,
+                                        const uint8_t *value,
+                                        const uint8_t value_length,
+                                        bool multiple_instance = false);
+#endif
 
     /**
      * \brief Creates a dynamic resource for a given mbed Client Inteface object. With this,
@@ -98,12 +111,19 @@ public:
      *        multiple instances, default is false.
      * \return M2MResource The resource for managing other client operations.
      */
+#ifdef M2M_OLD_API
     M2MResource* create_dynamic_resource(const String &resource_name,
                                          const String &resource_type,
                                          M2MResourceInstance::ResourceType type,
                                          bool observable,
                                          bool multiple_instance = false);
-
+#else
+    M2MResource* create_dynamic_resource(const char *resource_name,
+                                         const char *resource_type,
+                                         M2MResourceInstance::ResourceType type,
+                                         bool observable,
+                                         bool multiple_instance = false);
+#endif
 
     /**
      * \brief Creates a static resource instance for a given mbed Client Inteface object. With this,
@@ -115,12 +135,21 @@ public:
      * \param instance_id The instance ID of the resource.
      * \return M2MResourceInstance The resource instance for managing other client operations.
      */
+#ifdef M2M_OLD_API
     M2MResourceInstance* create_static_resource_instance(const String &resource_name,
                                                          const String &resource_type,
                                                          M2MResourceInstance::ResourceType type,
                                                          const uint8_t *value,
                                                          const uint8_t value_length,
                                                          uint16_t instance_id);
+#else
+    M2MResourceInstance* create_static_resource_instance(const char *resource_name,
+                                                         const char *resource_type,
+                                                         M2MResourceInstance::ResourceType type,
+                                                         const uint8_t *value,
+                                                         const uint8_t value_length,
+                                                         uint16_t instance_id);
+#endif
 
     /**
      * \brief Creates a dynamic resource instance for a given mbed Client Inteface object. With this,
@@ -132,12 +161,19 @@ public:
      * \param instance_id The instance ID of the resource.
      * \return M2MResourceInstance The resource instance for managing other client operations.
      */
+#ifdef M2M_OLD_API
     M2MResourceInstance* create_dynamic_resource_instance(const String &resource_name,
                                                           const String &resource_type,
                                                           M2MResourceInstance::ResourceType type,
                                                           bool observable,
                                                           uint16_t instance_id);
-
+#else
+    M2MResourceInstance* create_dynamic_resource_instance(const char *resource_name,
+                                                          const char *resource_type,
+                                                          M2MResourceInstance::ResourceType type,
+                                                          bool observable,
+                                                          uint16_t instance_id);
+#endif
     /**
      * \brief Removes the resource with the given name.
      * \param name The name of the resource to be removed.

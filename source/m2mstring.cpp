@@ -233,6 +233,16 @@ String& String::append( const char* str, size_type n) {
     return *this;
 }
 
+String& String::append(const char* str) {
+
+    if (str) {
+
+        append(str, strlen(str));
+    }
+    return *this;
+}
+
+
 String& String::append_raw( const char* str, size_type n) {
     if (str && n > 0) {
         size_t newlen = size_ + n;
@@ -283,6 +293,17 @@ int String::compare( size_type pos, size_type len, const char* str ) const {
     }
     return r;
 }
+/*
+int compare(const char* str) const {
+
+    return strcmp(p, str);
+}
+
+int compare(const String& str) const {
+
+    return strcmp(p, str.p);
+}
+*/
 
 int String::find_last_of(char c) const {
     int r = -1;

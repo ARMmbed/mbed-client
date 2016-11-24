@@ -905,7 +905,7 @@ bool M2MNsdlInterface::create_nsdl_resource_structure(M2MResource *res,
         String res_name = object_name;
         if (strcmp(res_name.c_str(), res->uri_path().c_str()) != 0) {
             res_name.push_back('/');
-            res_name.append(res->name().c_str(),res->name().length());
+            res_name.append(res->name());
         }
 
         // if there are multiple instances supported
@@ -1113,7 +1113,7 @@ M2MBase* M2MNsdlInterface::find_resource(const String &object_name)
         M2MObjectList::const_iterator it;
         it = _object_list.begin();
         for ( ; it != _object_list.end(); it++ ) {
-            if((*it)->name() == object_name) {
+            if(object_name == (*it)->name()) {
                 object = (*it);
                 tr_debug("M2MNsdlInterface::find_resource(%s) found", object_name.c_str());
                 break;

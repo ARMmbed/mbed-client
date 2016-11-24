@@ -28,6 +28,7 @@
 #define BUFFER_SIZE 10
 #define TRACE_GROUP "mClt"
 
+#ifdef M2M_OLD_API
 M2MObject::M2MObject(const String &object_name)
 : M2MBase(object_name,M2MBase::Dynamic),
   _max_instance_count(MAX_UNINT_16_COUNT)
@@ -37,6 +38,18 @@ M2MObject::M2MObject(const String &object_name)
         M2MBase::set_coap_content_type(COAP_CONTENT_OMA_TLV_TYPE);
     }
 }
+#endif
+
+M2MObject::M2MObject(const char *object_name)
+: M2MBase(object_name, M2MBase::Dynamic),
+  _max_instance_count(MAX_UNINT_16_COUNT)
+{
+    M2MBase::set_base_type(M2MBase::Object);
+    if(M2MBase::name_id() != -1) {
+        M2MBase::set_coap_content_type(COAP_CONTENT_OMA_TLV_TYPE);
+    }
+}
+
 
 M2MObject::~M2MObject()
 {
@@ -419,8 +432,8 @@ sn_coap_hdr_s* M2MObject::handle_post_request(nsdl_s *nsdl,
 
                                         StringBuffer<MAX_OBJECT_PATH_NAME> obj_name;
 
-                                        if (obj_name.ensure_space(M2MBase::name().length() + (1 + 5 + 1))) {
-                                            obj_name.append(M2MBase::name().c_str());
+                                        if (obj_name.ensure_space(M2MBase::name_length() + (1 + 5 + 1))) {
+                                            obj_name.append(M2MBase::name());
                                             obj_name.append('/');
                                             obj_name.append_int(instance_id);
 

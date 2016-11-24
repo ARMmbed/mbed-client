@@ -32,29 +32,8 @@
 #define BUFFER_SIZE 10
 #define TRACE_GROUP "mClt"
 
-M2MObjectInstance& M2MObjectInstance::operator=(const M2MObjectInstance& other)
-{
-    if (this != &other) { // protect against invalid self-assignment
-        if(!other._resource_list.empty()){
-            M2MResource* ins = NULL;
-            M2MResourceList::const_iterator it;
-            it = other._resource_list.begin();
-            for (; it!=other._resource_list.end(); it++ ) {
-                ins = *it;
-                _resource_list.push_back(new M2MResource(*ins));
-            }
-        }
-    }
-    return *this;
-}
 
-M2MObjectInstance::M2MObjectInstance(const M2MObjectInstance& other)
-: M2MBase(other),
-  _object_callback(other._object_callback)
-{
-    this->operator=(other);
-}
-
+#ifdef M2M_OLD_API
 M2MObjectInstance::M2MObjectInstance(const String &object_name,
                                      M2MObjectCallback &object_callback)
 : M2MBase(object_name,M2MBase::Dynamic),
@@ -63,6 +42,16 @@ M2MObjectInstance::M2MObjectInstance(const String &object_name,
     M2MBase::set_base_type(M2MBase::ObjectInstance);
     M2MBase::set_coap_content_type(COAP_CONTENT_OMA_TLV_TYPE);
 }
+#else
+M2MObjectInstance::M2MObjectInstance(const char *object_name,
+                                     M2MObjectCallback &object_callback)
+: M2MBase(object_name,M2MBase::Dynamic),
+  _object_callback(object_callback)
+{
+    M2MBase::set_base_type(M2MBase::ObjectInstance);
+    M2MBase::set_coap_content_type(COAP_CONTENT_OMA_TLV_TYPE);
+}
+#endif
 
 M2MObjectInstance::~M2MObjectInstance()
 {
@@ -85,6 +74,7 @@ M2MObjectInstance::~M2MObjectInstance()
     }
 }
 
+#ifdef M2M_OLD_API
 M2MResource* M2MObjectInstance::create_static_resource(const String &resource_name,
                                                        const String &resource_type,
                                                        M2MResourceInstance::ResourceType type,
@@ -111,7 +101,11 @@ M2MResource* M2MObjectInstance::create_static_resource(const String &resource_na
     }
     return res;
 }
+#else
 
+#endif
+
+#ifdef M2M_OLD_API
 M2MResource* M2MObjectInstance::create_dynamic_resource(const String &resource_name,
                                                 const String &resource_type,
                                                 M2MResourceInstance::ResourceType type,
@@ -120,7 +114,7 @@ M2MResource* M2MObjectInstance::create_dynamic_resource(const String &resource_n
 {
     tr_debug("M2MObjectInstance::create_dynamic_resource(resource_name %s)",resource_name.c_str());
     M2MResource *res = NULL;
-    if( resource_name.empty() || resource_name.size() > MAX_ALLOWED_STRING_LENGTH){
+    if(validate_string_length(resource_name, 1, MAX_ALLOWED_STRING_LENGTH) {
         return res;
     }
     if(!resource(resource_name)) {
@@ -137,7 +131,35 @@ M2MResource* M2MObjectInstance::create_dynamic_resource(const String &resource_n
     }
     return res;
 }
+#else
+M2MResource* M2MObjectInstance::create_dynamic_resource(const char *resource_name,
+                                                const char *resource_type,
+                                                M2MResourceInstance::ResourceType type,
+                                                bool observable,
+                                                bool multiple_instance)
+{
+    tr_debug("M2MObjectInstance::create_dynamic_resource(resource_name %s)",resource_name);
+    M2MResource *res = NULL;
+    if(validate_string_length(resource_name, 1, MAX_ALLOWED_STRING_LENGTH)) {
+        return res;
+    }
+    if(!resource(resource_name)) {
+        res = new M2MResource(*this,resource_name, resource_type, type,
+                              observable, M2MBase::instance_id(),
+                              M2MBase::name(), multiple_instance);
+        if(res) {
+            if (multiple_instance) {
+                res->set_coap_content_type(COAP_CONTENT_OMA_TLV_TYPE);
+            }
+            res->add_observation_level(observation_level());
+            _resource_list.push_back(res);
+        }
+    }
+    return res;
+}
+#endif
 
+#ifdef M2M_OLD_API
 M2MResourceInstance* M2MObjectInstance::create_static_resource_instance(const String &resource_name,
                                                                         const String &resource_type,
                                                                         M2MResourceInstance::ResourceType type,
@@ -147,7 +169,42 @@ M2MResourceInstance* M2MObjectInstance::create_static_resource_instance(const St
 {
     tr_debug("M2MObjectInstance::create_static_resource_instance(resource_name %s)",resource_name.c_str());
     M2MResourceInstance *instance = NULL;
-    if(resource_name.empty() || resource_name.size() > MAX_ALLOWED_STRING_LENGTH){
+    if(validate_string_length(resource_name, 1, MAX_ALLOWED_STRING_LENGTH)) {
+        return instance;
+    }
+    M2MResource *res = resource(resource_name);
+    if(!res) {
+        res = new M2MResource(*this,resource_name, resource_type, type,
+                              value, value_length, M2MBase::instance_id(),
+                              M2MBase::name(), true);
+        _resource_list.push_back(res);
+        res->set_operation(M2MBase::GET_ALLOWED);
+        res->set_observable(false);
+        res->set_register_uri(false);
+    }
+    if(res->supports_multiple_instances()&& (res->resource_instance(instance_id) == NULL)) {
+        instance = new M2MResourceInstanllce(resource_name, resource_type, type,
+                                           value, value_length, *this,
+                                           M2MBase::instance_id(), M2MBase::name());
+        if(instance) {
+            instance->set_operation(M2MBase::GET_ALLOWED);
+            instance->set_instance_id(instance_id);
+            res->add_resource_instance(instance);
+        }
+    }
+    return instance;
+}
+#else
+M2MResourceInstance* M2MObjectInstance::create_static_resource_instance(const char *resource_name,
+                                                                        const char *resource_type,
+                                                                        M2MResourceInstance::ResourceType type,
+                                                                        const uint8_t *value,
+                                                                        const uint8_t value_length,
+                                                                        uint16_t instance_id)
+{
+    tr_debug("M2MObjectInstance::create_static_resource_instance(resource_name %s)",resource_name);
+    M2MResourceInstance *instance = NULL;
+    if(validate_string_length(resource_name, 1, MAX_ALLOWED_STRING_LENGTH)) {
         return instance;
     }
     M2MResource *res = resource(resource_name);
@@ -172,7 +229,13 @@ M2MResourceInstance* M2MObjectInstance::create_static_resource_instance(const St
     }
     return instance;
 }
+#endif
 
+
+// XXX: as far as I can see, the create_static_resource_instance and create_dynamic_resource_instance differ only by two params
+// to constructor and one additional set_observable() call, what is the point of this copy-paste?
+
+#ifdef M2M_OLD_API
 M2MResourceInstance* M2MObjectInstance::create_dynamic_resource_instance(const String &resource_name,
                                                                          const String &resource_type,
                                                                          M2MResourceInstance::ResourceType type,
@@ -181,7 +244,7 @@ M2MResourceInstance* M2MObjectInstance::create_dynamic_resource_instance(const S
 {
     tr_debug("M2MObjectInstance::create_dynamic_resource_instance(resource_name %s)",resource_name.c_str());
     M2MResourceInstance *instance = NULL;
-    if(resource_name.empty() || resource_name.size() > MAX_ALLOWED_STRING_LENGTH){
+    if(validate_string_length(resource_name, 1, MAX_ALLOWED_STRING_LENGTH) {
         return instance;
     }
     M2MResource *res = resource(resource_name);
@@ -204,6 +267,39 @@ M2MResourceInstance* M2MObjectInstance::create_dynamic_resource_instance(const S
     }
     return instance;
 }
+#else
+M2MResourceInstance* M2MObjectInstance::create_dynamic_resource_instance(const char *resource_name,
+                                                                         const char *resource_type,
+                                                                         M2MResourceInstance::ResourceType type,
+                                                                         bool observable,
+                                                                         uint16_t instance_id)
+{
+    tr_debug("M2MObjectInstance::create_dynamic_resource_instance(resource_name %s)",resource_name);
+    M2MResourceInstance *instance = NULL;
+    if(validate_string_length(resource_name, 1, MAX_ALLOWED_STRING_LENGTH)) {
+        return instance;
+    }
+    M2MResource *res = resource(resource_name);
+    if(!res) {
+        res = new M2MResource(*this,resource_name, resource_type, type,
+                              false, M2MBase::instance_id(), M2MBase::name(), true);
+        _resource_list.push_back(res);
+        res->set_register_uri(false);
+        res->set_operation(M2MBase::GET_ALLOWED);
+    }
+    if(res->supports_multiple_instances() && (res->resource_instance(instance_id) == NULL)) {
+        instance = new M2MResourceInstance(resource_name, resource_type, type, *this,
+                                           M2MBase::instance_id(), M2MBase::name());
+        if(instance) {
+            instance->set_operation(M2MBase::GET_ALLOWED);
+            instance->set_observable(observable);
+            instance->set_instance_id(instance_id);
+            res->add_resource_instance(instance);
+        }
+    }
+    return instance;
+}
+#endif
 
 bool M2MObjectInstance::remove_resource(const String &resource_name)
 {
@@ -216,7 +312,7 @@ bool M2MObjectInstance::remove_resource(const String &resource_name)
          it = _resource_list.begin();
          int pos = 0;
          for ( ; it != _resource_list.end(); it++, pos++ ) {
-             if(((*it)->name() == resource_name)) {
+             if(resource_name == ((*it)->name())) {
                 // Resource found and deleted.
                 res = *it;
 
@@ -264,7 +360,7 @@ bool M2MObjectInstance::remove_resource_instance(const String &resource_name,
                     itr = _resource_list.begin();
                     int pos = 0;
                     for ( ; itr != _resource_list.end(); itr++, pos++ ) {
-                        if(((*itr)->name() == resource_name)) {
+                        if(resource_name == ((*itr)->name())) {
                             delete res;
                             res = NULL;
                             _resource_list.erase(pos);
@@ -286,7 +382,7 @@ M2MResource* M2MObjectInstance::resource(const String &resource) const
         M2MResourceList::const_iterator it;
         it = _resource_list.begin();
         for (; it!=_resource_list.end(); it++ ) {
-            if((*it)->name() == resource) {
+            if(resource == (*it)->name()) {
                 res = *it;
                 break;
             }
@@ -324,7 +420,7 @@ uint16_t M2MObjectInstance::resource_count(const String& resource) const
         M2MResourceList::const_iterator it;
         it = _resource_list.begin();
         for ( ; it != _resource_list.end(); it++ ) {
-            if((*it)->name() == resource) {
+            if(resource == (*it)->name()) {
                 if((*it)->supports_multiple_instances()) {
                     count += (*it)->resource_instance_count();
                 } else {
@@ -607,9 +703,9 @@ sn_coap_hdr_s* M2MObjectInstance::handle_post_request(nsdl_s *nsdl,
                         if (coap_response->options_list_ptr) {
                             StringBuffer<MAX_OBJECT_PATH_NAME> obj_name;
 
-                            size_t needed_space = M2MBase::name().length() + (1 + 5 + 1 + 5 + 1);
+                            size_t needed_space = M2MBase::name_length() + (1 + 5 + 1 + 5 + 1);
                             if (obj_name.ensure_space(needed_space)) {
-                                obj_name.append(M2MBase::name().c_str());
+                                obj_name.append(M2MBase::name());
                                 obj_name.append('/');
                                 obj_name.append_int(M2MBase::instance_id());
                                 obj_name.append('/');

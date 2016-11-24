@@ -96,29 +96,27 @@ M2MSecurity::~M2MSecurity()
 M2MResource* M2MSecurity::create_resource(SecurityResource resource, uint32_t value)
 {
     M2MResource* res = NULL;
-    const char* security_id_ptr = "";
+    const char* security_id = NULL;
     if(!is_resource_present(resource)) {
         switch(resource) {
             case SMSSecurityMode:
-               security_id_ptr = SECURITY_SMS_SECURITY_MODE;
+               security_id = SECURITY_SMS_SECURITY_MODE;
                break;
             case M2MServerSMSNumber:
-                security_id_ptr = SECURITY_M2M_SERVER_SMS_NUMBER;
+                security_id = SECURITY_M2M_SERVER_SMS_NUMBER;
                 break;
             case ShortServerID:
-                security_id_ptr = SECURITY_SHORT_SERVER_ID;
+                security_id = SECURITY_SHORT_SERVER_ID;
                 break;
             case ClientHoldOffTime:
-                security_id_ptr = SECURITY_CLIENT_HOLD_OFF_TIME;
+                security_id = SECURITY_CLIENT_HOLD_OFF_TIME;
                 break;
             default:
                 break;
         }
     }
 
-    const String security_id(security_id_ptr);
-
-    if(!security_id.empty()) {
+    if (security_id != NULL) {
         if(_server_instance) {
             res = _server_instance->create_dynamic_resource(security_id,OMA_RESOURCE_TYPE,
                                                             M2MResourceInstance::INTEGER,

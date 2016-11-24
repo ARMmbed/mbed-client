@@ -25,6 +25,8 @@
 
 #define TRACE_GROUP "mClt"
 
+// XXX: copies are not needed or supported
+/*
 M2MResourceInstance& M2MResourceInstance::operator=(const M2MResourceInstance& other)
 {
     if (this != &other) { // protect against invalid self-assignment
@@ -39,7 +41,8 @@ M2MResourceInstance& M2MResourceInstance::operator=(const M2MResourceInstance& o
     }
     return *this;
 }
-
+*/
+/*
 M2MResourceInstance::M2MResourceInstance(const M2MResourceInstance& other)
 : M2MBase(other),
   _object_instance_callback(other._object_instance_callback),
@@ -55,7 +58,8 @@ M2MResourceInstance::M2MResourceInstance(const M2MResourceInstance& other)
 {
     this->operator=(other);
 }
-
+*/
+#ifdef M2M_OLD_API
 M2MResourceInstance::M2MResourceInstance(const String &res_name,
                                          const String &resource_type,
                                          M2MResourceInstance::ResourceType type,
@@ -78,7 +82,32 @@ M2MResourceInstance::M2MResourceInstance(const String &res_name,
     M2MBase::set_resource_type(resource_type);
     M2MBase::set_base_type(M2MBase::ResourceInstance);
 }
+#else
+M2MResourceInstance::M2MResourceInstance(const char *res_name,
+                                         const char *resource_type,
+                                         M2MResourceInstance::ResourceType type,
+                                         M2MObjectInstanceCallback &object_instance_callback,
+                                         const uint16_t object_instance_id,
+                                         const char *object_name)
+: M2MBase(res_name,
+          M2MBase::Dynamic),
+ _object_instance_callback(object_instance_callback),
+ _execute_callback(NULL),
+ _value(NULL),
+ _value_length(0),
+ _resource_callback(NULL),
+ _object_name(object_name),
+ _function_pointer(NULL),
+ _object_instance_id(object_instance_id),
+ _resource_type(type),
+ _block_message_data(NULL)
+{
+    M2MBase::set_resource_type(resource_type);
+    M2MBase::set_base_type(M2MBase::ResourceInstance);
+}
+#endif
 
+#ifdef M2M_OLD_API
 M2MResourceInstance::M2MResourceInstance(const String &res_name,
                                          const String &resource_type,
                                          M2MResourceInstance::ResourceType type,
@@ -109,6 +138,38 @@ M2MResourceInstance::M2MResourceInstance(const String &res_name,
         }
     }
 }
+#else
+M2MResourceInstance::M2MResourceInstance(const char *res_name,
+                                         const char *resource_type,
+                                         M2MResourceInstance::ResourceType type,
+                                         const uint8_t *value,
+                                         const uint8_t value_length,
+                                         M2MObjectInstanceCallback &object_instance_callback,
+                                         const uint16_t object_instance_id,
+                                         const char *object_name)
+: M2MBase(res_name,
+          M2MBase::Static),
+ _object_instance_callback(object_instance_callback),
+ _execute_callback(NULL),
+ _value(NULL),
+ _value_length(0),
+ _resource_callback(NULL),
+ _object_name(object_name),
+ _function_pointer(NULL),
+ _object_instance_id(object_instance_id),
+ _resource_type(type),
+ _block_message_data(NULL)
+{
+    M2MBase::set_resource_type(resource_type);
+    M2MBase::set_base_type(M2MBase::Resource);
+    if( value != NULL && value_length > 0 ) {
+        _value = alloc_string_copy(value, value_length);
+        if(_value) {
+            _value_length = value_length;
+        }
+    }
+}
+#endif
 
 M2MResourceInstance::~M2MResourceInstance()
 {

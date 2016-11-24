@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 ARM Limited. All rights reserved.
+ * Copyright (c) 2015-2016 ARM Limited. All rights reserved.
  * SPDX-License-Identifier: Apache-2.0
  * Licensed under the Apache License, Version 2.0 (the License); you may
  * not use this file except in compliance with the License.
@@ -15,8 +15,11 @@
  */
 #include "include/m2mtlvdeserializer.h"
 #include "mbed-client/m2mconstants.h"
+#include "mbed-client/m2mstringbuffer.h"
 #include "include/nsdllinker.h"
 #include "mbed-trace/mbed_trace.h"
+
+#include <string.h>
 
 #define TRACE_GROUP "mClt"
 #define BUFFER_SIZE 10
@@ -190,9 +193,11 @@ M2MTLVDeserializer::Error M2MTLVDeserializer::deserialize_resources(uint8_t *tlv
         if(!found) {
             if(M2MTLVDeserializer::Post == operation) {
                 //Create a new Resource
-                String id;
-                id.append_int(til->_id);
-                M2MResource *resource = object_instance.create_dynamic_resource(id,"",M2MResourceInstance::INTEGER,true,false);
+                StringBuffer<6> id;
+                id.append(til->_id);
+                // XXX: oops, a memory leak!
+                const char* id_copy = strdup(id.c_str());
+                M2MResource *resource = object_instance.create_dynamic_resource(id_copy,"",M2MResourceInstance::INTEGER,true,false);
                 if(resource) {
                     resource->set_operation(M2MBase::GET_PUT_POST_DELETE_ALLOWED);
                 }

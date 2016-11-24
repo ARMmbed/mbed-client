@@ -57,6 +57,7 @@ private: // Constructor and destructor are private,
      * \param object_name The name of the object where the resource exists.
      * \param multiple_instance True if the resource supports instances.
      */
+#ifdef M2M_OLD_API
     M2MResource(M2MObjectInstanceCallback &object_instance_callback,
                 const String &resource_name,
                 const String &resource_type,
@@ -66,7 +67,17 @@ private: // Constructor and destructor are private,
                 const uint16_t object_instance_id = 0,
                 const String &object_name = "",
                 bool multiple_instance = false);
-
+#else
+    M2MResource(M2MObjectInstanceCallback &object_instance_callback,
+                const char *resource_name,
+                const char *resource_type,
+                M2MResourceInstance::ResourceType type,
+                const uint8_t *value,
+                const uint8_t value_length,
+                const uint16_t object_instance_id = 0,
+                const char *object_name = "",
+                bool multiple_instance = false);
+#endif
     /**
      * \brief Constructor
      * \param resource_name The resource name of the object.
@@ -77,6 +88,7 @@ private: // Constructor and destructor are private,
      * \param object_name The name of the object where the resource exists.
      * \param multiple_instance True if the resource supports instances.
      */
+#ifdef M2M_OLD_API
     M2MResource(M2MObjectInstanceCallback &object_instance_callback,
                 const String &resource_name,
                 const String &resource_type,
@@ -85,7 +97,16 @@ private: // Constructor and destructor are private,
                 const uint16_t object_instance_id = 0,
                 const String &object_name = "",
                 bool multiple_instance = false);
-
+#else
+    M2MResource(M2MObjectInstanceCallback &object_instance_callback,
+                const char *resource_name,
+                const char *resource_type,
+                M2MResourceInstance::ResourceType type,
+                bool observable,
+                const uint16_t object_instance_id = 0,
+                const char *object_name = "",
+                bool multiple_instance = false);
+#endif
     // Prevents the use of a default constructor.
     M2MResource();
 
