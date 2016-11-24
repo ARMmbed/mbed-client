@@ -80,7 +80,7 @@ _object->set_operation(M2MBase::GET_PUT_POST_ALLOWED); // This defines the REST 
 
 ##### Setting Observable Mode
 
-To set the Object to be an observing resource:
+To set the Object to be an observable resource:
 
 `virtual void set_observable(bool observable);` 
 
