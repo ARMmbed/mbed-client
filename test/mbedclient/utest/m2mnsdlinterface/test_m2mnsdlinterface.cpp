@@ -1375,6 +1375,7 @@ void Test_M2MNsdlInterface::test_timer_expired()
 void Test_M2MNsdlInterface::test_observation_to_be_sent()
 {
     Vector<uint16_t> instance_list_ids;
+    m2mbase_stub::clear();
     M2MObject *object = new M2MObject("name");
     M2MObjectInstance* instance = new M2MObjectInstance("name",*object);
     M2MResource *res = new M2MResource(*instance,
