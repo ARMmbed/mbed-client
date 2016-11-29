@@ -63,7 +63,6 @@ M2MNsdlInterface::M2MNsdlInterface(M2MNsdlObserver &observer)
   _identity_accepted(false)
 {
     tr_debug("M2MNsdlInterface::M2MNsdlInterface()");
-    __nsdl_interface_list.push_back(this);
     _sn_nsdl_address.addr_len = 0;
     _sn_nsdl_address.addr_ptr = NULL;
     _sn_nsdl_address.port = 0;
@@ -75,6 +74,7 @@ M2MNsdlInterface::M2MNsdlInterface(M2MNsdlObserver &observer)
     // and receiving purposes.
     _nsdl_handle = sn_nsdl_init(&(__nsdl_c_send_to_server), &(__nsdl_c_received_from_server),
                  &(__nsdl_c_memory_alloc), &(__nsdl_c_memory_free));
+    sn_nsdl_set_context(_nsdl_handle, this);
 
     initialize();
 }
@@ -96,16 +96,6 @@ M2MNsdlInterface::~M2MNsdlInterface()
     sn_nsdl_destroy(_nsdl_handle);
     _nsdl_handle = NULL;
 
-    M2MNsdlInterfaceList::const_iterator it;
-    it = __nsdl_interface_list.begin();
-    int index = 0;
-    for (; it!=__nsdl_interface_list.end(); it++) {
-        if ((*it) == this) {
-            __nsdl_interface_list.erase(index);
-            break;
-        }
-        index++;
-    }
     tr_debug("M2MNsdlInterface::~M2MNsdlInterface() - OUT");
 }
 
