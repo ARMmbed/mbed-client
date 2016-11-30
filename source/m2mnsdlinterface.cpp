@@ -839,7 +839,7 @@ void M2MNsdlInterface::remove_object(M2MBase *object)
 
 bool M2MNsdlInterface::create_nsdl_object_structure(M2MObject *object)
 {
-    tr_error("M2MNsdlInterface::create_nsdl_object_structure()");
+    tr_debug("M2MNsdlInterface::create_nsdl_object_structure()");
     bool success = false;
     if(object) {
         M2MObjectInstanceList instance_list = object->instances();
@@ -861,7 +861,7 @@ bool M2MNsdlInterface::create_nsdl_object_structure(M2MObject *object)
 
 bool M2MNsdlInterface::create_nsdl_object_instance_structure(M2MObjectInstance *object_instance)
 {
-    tr_error("M2MNsdlInterface::create_nsdl_object_instance_structure()");
+    tr_debug("M2MNsdlInterface::create_nsdl_object_instance_structure()");
     bool success = false;
     if( object_instance) {
         // Append object instance id to the object name.
@@ -891,7 +891,7 @@ bool M2MNsdlInterface::create_nsdl_resource_structure(M2MResource *res,
                                                       const String &object_name,
                                                       bool multiple_instances)
 {
-    tr_error("M2MNsdlInterface::create_nsdl_resource_structure(object_name %s)", object_name.c_str());
+    tr_debug("M2MNsdlInterface::create_nsdl_resource_structure(object_name %s)", object_name.c_str());
     bool success = false;
     if(res) {
         // Append object name to the resource.
@@ -957,8 +957,7 @@ bool M2MNsdlInterface::create_nsdl_resource(M2MBase *base, const String &name, b
 // TODO! Maybe parameter which holds the static vs. dynamic information
 #ifndef MEMORY_OPTIMIZED_API
     __mutex_claim();
-    tr_error("M2MNsdlInterface::create_nsdl_resource(name %s)", name.c_str());
-    tr_error("M2MNsdlInterface::create_nsdl_resource(publish %d)", publish_uri);
+    tr_debug("M2MNsdlInterface::create_nsdl_resource(name %s)", name.c_str());
     bool success = false;
     uint8_t* buffer = 0;
     uint32_t length = 0;
