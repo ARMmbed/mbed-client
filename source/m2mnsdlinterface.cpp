@@ -557,8 +557,11 @@ uint8_t M2MNsdlInterface::received_from_server_callback(struct nsdl_s *nsdl_hand
                 tr_debug("M2MNsdlInterface::received_from_server_callback - Empty ACK, msg id: %d", coap_header->msg_id);
                 M2MBase *base = find_resource("", coap_header->token_ptr, coap_header->token_len);
                 if (base) {
-                    M2MResource* res = static_cast<M2MResource*> (base);
-                    res->notification_sent();
+                    // Supported only in Resource level
+                    if (M2MBase::Resource == base->base_type()) {
+                        M2MResource *resource = static_cast<M2MResource *> (base);
+                        resource->notification_sent();
+                    }
                 }
             }
 
@@ -1133,7 +1136,10 @@ M2MBase* M2MNsdlInterface::find_resource(const String &object_name,
                             memcmp(token, stored_token, token_len) == 0) {
                         object = (*it);
                         tr_debug("M2MNsdlInterface::find_resource - token found");
+                        free(stored_token);
                         break;
+                    } else {
+                        free(stored_token);
                     }
                 }
             }
@@ -1176,7 +1182,10 @@ M2MBase* M2MNsdlInterface::find_resource(const M2MObject *object,
                         if (stored_token_length == token_len &&
                                 memcmp(token, stored_token, token_len) == 0) {
                             instance = (*it);
+                            free(stored_token);
                             break;
+                        } else {
+                            free(stored_token);
                         }
                     }
                 }
@@ -1228,7 +1237,10 @@ M2MBase* M2MNsdlInterface::find_resource(const M2MObjectInstance *object_instanc
                         if (stored_token_length == token_len &&
                                 memcmp(token, stored_token, token_len) == 0) {
                             instance = *it;
+                            free(stored_token);
                             break;
+                        } else {
+                            free(stored_token);
                         }
                     }
                 }

@@ -564,6 +564,7 @@ void Test_M2MNsdlInterface::test_received_from_server_callback()
     common_stub::coap_header = NULL;
 
     CHECK(0 == nsdl->received_from_server_callback(handle,coap_header,NULL));
+
     m2mobjectinstance_stub::header = NULL;
 
     m2mobjectinstance_stub::header =  (sn_coap_hdr_s *)malloc(sizeof(sn_coap_hdr_s));
@@ -621,6 +622,36 @@ void Test_M2MNsdlInterface::test_received_from_server_callback()
     coap_header->uri_path_len = sizeof(resource);
 
     CHECK(0== nsdl->received_from_server_callback(handle,coap_header,NULL));
+
+    // Test EMPTY ACK
+    coap_header->msg_code = COAP_MSG_CODE_EMPTY;
+    obj = new M2MObject("0");
+    m2mbase_stub::string_value = new String("0");
+    nsdl->_object_list.push_back(obj);
+    m2mobject_stub::inst = new M2MObjectInstance("name",*obj);
+
+    uint8_t *token = (uint8_t*) malloc(4);
+    token[0] = 't';
+    token[1] = 'o';
+    token[2] = 'k';
+    token[3] = 'e';
+    coap_header->token_ptr = token;
+    coap_header->token_len = 4;
+    M2MResource res2(*m2mobject_stub::inst,"test","test",M2MResourceInstance::STRING,M2MBase::Dynamic);
+    m2mbase_stub::token = token;
+    m2mbase_stub::token_len = 4;
+    m2mobject_stub::base_type = M2MBase::Resource;
+    res2.set_observation_token(token, 4);
+
+    m2mobjectinstance_stub::resource_list.push_back(&res2);
+    CHECK(0 == nsdl->received_from_server_callback(handle,coap_header,NULL));
+
+    free(token);
+    delete m2mobject_stub::inst;
+    delete m2mbase_stub::string_value;
+    m2mbase_stub::string_value = NULL;
+    delete obj;
+    nsdl->_object_list.clear();
 
 
     // Bootstrap cases start from here
@@ -1344,6 +1375,7 @@ void Test_M2MNsdlInterface::test_timer_expired()
 void Test_M2MNsdlInterface::test_observation_to_be_sent()
 {
     Vector<uint16_t> instance_list_ids;
+    m2mbase_stub::clear();
     M2MObject *object = new M2MObject("name");
     M2MObjectInstance* instance = new M2MObjectInstance("name",*object);
     M2MResource *res = new M2MResource(*instance,
@@ -1592,6 +1624,14 @@ void Test_M2MNsdlInterface::test_find_resource()
 {
     m2mbase_stub::string_value = new String("name");
     M2MObject *object = new M2MObject("name");
+    uint8_t *token = (uint8_t*) malloc(4);
+    token[0] = 't';
+    token[1] = 'o';
+    token[2] = 'k';
+    token[3] = 'e';
+    m2mbase_stub::token = token;
+    m2mbase_stub::token_len = 4;
+
     M2MObjectInstance *object_instance = new M2MObjectInstance("name",*object);
     M2MResource *resource = new M2MResource(*object_instance,
                                             "resource_name",
@@ -1614,6 +1654,8 @@ void Test_M2MNsdlInterface::test_find_resource()
     nsdl->_object_list.push_back(object);
 
     CHECK(nsdl->find_resource("name") != NULL);
+    CHECK(nsdl->find_resource("name", token, 4) != NULL);
+    CHECK(nsdl->find_resource("name", token, 5) == NULL);
 
     m2mbase_stub::int_value  = 0;
 
@@ -1630,6 +1672,13 @@ void Test_M2MNsdlInterface::test_find_resource()
     CHECK(nsdl->find_resource("name/0/name1") == NULL);
     CHECK(nsdl->find_resource("name/0/name/1") == NULL);
 
+    CHECK(nsdl->find_resource(object,"0", token, 4) != NULL);
+    CHECK(nsdl->find_resource(object,"0", token, 5) == NULL);
+
+    CHECK(nsdl->find_resource(object_instance,"0", token, 4) != NULL);
+    CHECK(nsdl->find_resource(object_instance,"0", token, 5) == NULL);
+
+    free(token);
     delete m2mbase_stub::string_value;
     m2mbase_stub::string_value = NULL;
 
