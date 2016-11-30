@@ -41,6 +41,14 @@ M2MObjectInstance::M2MObjectInstance(const String &object_name,
     M2MBase::set_coap_content_type(COAP_CONTENT_OMA_TLV_TYPE);
 }
 
+M2MObjectInstance::M2MObjectInstance(const lwm2m_parameters_s* static_res,
+                                     M2MObjectCallback &object_callback)
+: M2MBase(static_res),
+  _object_callback(object_callback)
+{
+    M2MBase::set_coap_content_type(COAP_CONTENT_OMA_TLV_TYPE);
+}
+
 M2MObjectInstance::~M2MObjectInstance()
 {
     if(!_resource_list.empty()) {
@@ -51,12 +59,35 @@ M2MObjectInstance::~M2MObjectInstance()
             //Free allocated memory for resources.
             res = *it;
             StringBuffer<MAX_PATH_SIZE_2> obj_name;
-            build_path(obj_name, name().c_str(), instance_id(), (*it)->name().c_str());
+            build_path(obj_name, name(), instance_id(), (*it)->name());
             (*it)->remove_resource_from_coap(obj_name.c_str());
             delete res;
         }
         _resource_list.clear();
     }
+}
+
+// TBD, ResourceType to the base class struct?? TODO!
+M2MResource* M2MObjectInstance::create_static_resource(const lwm2m_parameters_s* static_res,
+                                                       M2MResourceInstance::ResourceType type)
+{
+    tr_debug("M2MObjectInstance::create_static_resource(lwm2m_parameters_s resource_name %s)", (const char*)static_res->name);
+    M2MResource *res = NULL;
+    String resource_name = stringdup((const char*)static_res->name);
+    if( resource_name.empty() || resource_name.size() > MAX_ALLOWED_STRING_LENGTH){
+        return res;
+    }
+    if(!resource(resource_name)) {
+        res = new M2MResource(*this, static_res, type, (const uint16_t) M2MBase::instance_id(), M2MBase::name());
+        if(res) {
+            res->add_observation_level(observation_level());
+            //if (multiple_instance) {
+                //res->set_coap_content_type(COAP_CONTENT_OMA_TLV_TYPE);
+            //}
+            _resource_list.push_back(res);
+        }
+    }
+    return res;
 }
 
 M2MResource* M2MObjectInstance::create_static_resource(const String &resource_name,
@@ -80,6 +111,30 @@ M2MResource* M2MObjectInstance::create_static_resource(const String &resource_na
             if (multiple_instance) {
                 res->set_coap_content_type(COAP_CONTENT_OMA_TLV_TYPE);
             }
+            _resource_list.push_back(res);
+        }
+    }
+    return res;
+}
+
+M2MResource* M2MObjectInstance::create_dynamic_resource(const lwm2m_parameters_s* static_res,
+                                                        M2MResourceInstance::ResourceType type,
+                                                        bool observable)
+{
+    String resource_name = stringdup((const char*)static_res->name);
+    tr_debug("M2MObjectInstance::create_dynamic_resource(resource_name %s)",resource_name.c_str());
+    M2MResource *res = NULL;
+
+    if( resource_name.empty() || resource_name.size() > MAX_ALLOWED_STRING_LENGTH){
+        return res;
+    }
+    if(!resource(resource_name)) {
+        res = new M2MResource(*this, static_res, type, M2MBase::instance_id(), M2MBase::name());
+        if(res) {
+            //if (multiple_instance) { // TODO!
+              //  res->set_coap_content_type(COAP_CONTENT_OMA_TLV_TYPE);
+            //}
+            res->add_observation_level(observation_level());
             _resource_list.push_back(res);
         }
     }
@@ -190,11 +245,11 @@ bool M2MObjectInstance::remove_resource(const String &resource_name)
          it = _resource_list.begin();
          int pos = 0;
          for ( ; it != _resource_list.end(); it++, pos++ ) {
-             if(((*it)->name() == resource_name)) {
+             if(strcmp((*it)->name(), resource_name.c_str()) == 0) {
                 // Resource found and deleted.
                 res = *it;
                 StringBuffer<MAX_PATH_SIZE_2> obj_name;
-                build_path(obj_name, name().c_str(), instance_id(), res->name().c_str());
+                build_path(obj_name, name(), instance_id(), res->name());
                 res->remove_resource_from_coap(obj_name.c_str());
                 delete res;
                 res = NULL;
@@ -221,7 +276,7 @@ bool M2MObjectInstance::remove_resource_instance(const String &resource_name,
         for ( ; it != list.end(); it++) {
             if((*it)->instance_id() == inst_id) {
                 StringBuffer<MAX_PATH_SIZE> obj_name;
-                build_path(obj_name, name().c_str(), instance_id(), resource_name.c_str(), inst_id);
+                build_path(obj_name, name(), instance_id(), resource_name.c_str(), inst_id);
                 remove_resource_from_coap(obj_name.c_str());
                 success = res->remove_resource_instance(inst_id);
                 if(res->resource_instance_count() == 0) {
@@ -229,7 +284,7 @@ bool M2MObjectInstance::remove_resource_instance(const String &resource_name,
                     itr = _resource_list.begin();
                     int pos = 0;
                     for ( ; itr != _resource_list.end(); itr++, pos++ ) {
-                        if(((*itr)->name() == resource_name)) {
+                        if(strcmp((*itr)->name(),resource_name.c_str()) == 0) {
                             delete res;
                             res = NULL;
                             _resource_list.erase(pos);
@@ -251,7 +306,7 @@ M2MResource* M2MObjectInstance::resource(const String &resource) const
         M2MResourceList::const_iterator it;
         it = _resource_list.begin();
         for (; it!=_resource_list.end(); it++ ) {
-            if((*it)->name() == resource) {
+            if(strcmp((*it)->name(), resource.c_str()) == 0) {
                 res = *it;
                 break;
             }
@@ -289,7 +344,7 @@ uint16_t M2MObjectInstance::resource_count(const String& resource) const
         M2MResourceList::const_iterator it;
         it = _resource_list.begin();
         for ( ; it != _resource_list.end(); it++ ) {
-            if((*it)->name() == resource) {
+            if(strcmp((*it)->name(), resource.c_str()) == 0) {
                 if((*it)->supports_multiple_instances()) {
                     count += (*it)->resource_instance_count();
                 } else {
@@ -572,7 +627,7 @@ sn_coap_hdr_s* M2MObjectInstance::handle_post_request(nsdl_s *nsdl,
                         if (coap_response->options_list_ptr) {
 
                               StringBuffer<MAX_PATH_SIZE_3> obj_name;
-                              if(!build_path(obj_name, M2MBase::name().c_str(), M2MBase::instance_id(), instance_id))
+                              if(!build_path(obj_name, M2MBase::name(), M2MBase::instance_id(), instance_id))
                               {
                                   msg_code = COAP_MSG_CODE_RESPONSE_INTERNAL_SERVER_ERROR;
                                   break;

@@ -53,6 +53,12 @@ protected :
     // Prevents the use of copy constructor.
     M2MObject( const M2MObject& /*other*/ );
 
+    /**
+     * \brief Constructor
+     * \param name The name of the object.
+     */
+    M2MObject(const M2MBase::lwm2m_parameters_s* static_res);
+
 public:
 
     /**
@@ -66,6 +72,11 @@ public:
      * \return M2MObjectInstance. An object instance for managing other client operations.
      */
     M2MObjectInstance* create_object_instance(uint16_t instance_id = 0);
+
+    /**
+     * TODO!!
+     */
+    M2MObjectInstance* create_object_instance(const lwm2m_parameters_s* s);
 
     /**
      * \brief Removes the object instance resource with the given instance id.

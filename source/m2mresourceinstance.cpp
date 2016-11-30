@@ -79,6 +79,40 @@ M2MResourceInstance::M2MResourceInstance(const String &res_name,
     }
 }
 
+M2MResourceInstance::M2MResourceInstance(const lwm2m_parameters_s* s,
+                                         M2MObjectInstanceCallback &object_instance_callback,
+                                         M2MResourceInstance::ResourceType type,
+                                         const uint16_t object_instance_id,
+                                         const String &object_name)
+: M2MBase(s),
+  _resource_type(type),
+  _object_instance_id(object_instance_id),
+ _object_instance_callback(object_instance_callback),
+ _execute_callback(NULL),
+ _value(NULL),
+ _value_length(0),
+ _resource_callback(NULL) ,
+ _function_pointer(NULL),
+ _block_message_data(NULL)
+{
+    //TBD: put to flash, or parse from the uri_path!!!!
+    //same for the _object_instance_id.
+    _object_name = M2MBase::stringdup((const char*)object_name.c_str());
+    tr_debug("M2MResourceInstance(object_name %s)", _object_name);
+
+    // TBD: we dont need _value here, because in c-struct there is resource field!!!!
+    if( s->dynamic_resource_params->static_resource_parameters->resource != NULL &&
+            s->dynamic_resource_params->static_resource_parameters->resourcelen > 0 ) {
+        _value = alloc_string_copy(s->dynamic_resource_params->static_resource_parameters->resource,
+                                   s->dynamic_resource_params->static_resource_parameters->resourcelen);
+        if(_value) {
+            _value_length = s->dynamic_resource_params->static_resource_parameters->resourcelen;
+        }
+    }
+    //M2MBase::set_resource_type(resource_type);
+    //M2MBase::set_base_type(M2MBase::ResourceInstance);
+}
+
 M2MResourceInstance::~M2MResourceInstance()
 {
     free(_value);

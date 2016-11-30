@@ -18,7 +18,6 @@
 #include "mbed-client/m2mconstants.h"
 #include "include/m2mtlvserializer.h"
 #include "include/m2mtlvdeserializer.h"
-#include "include/nsdllinker.h"
 #include "include/m2mreporthandler.h"
 #include "mbed-trace/mbed_trace.h"
 #include "mbed-client/m2mstringbuffer.h"
@@ -34,6 +33,16 @@ M2MObject::M2MObject(const String &object_name)
 {
     M2MBase::set_base_type(M2MBase::Object);
     if(M2MBase::name_id() != -1) {
+        M2MBase::set_coap_content_type(COAP_CONTENT_OMA_TLV_TYPE);
+    }
+}
+
+M2MObject::M2MObject(const M2MBase::lwm2m_parameters_s* static_res)
+: M2MBase(static_res),
+  _max_instance_count(MAX_UNINT_16_COUNT)
+{
+    //M2MBase::set_base_type(M2MBase::Object);
+    if(static_res->name_id != -1) {
         M2MBase::set_coap_content_type(COAP_CONTENT_OMA_TLV_TYPE);
     }
 }
@@ -74,6 +83,25 @@ M2MObjectInstance* M2MObject::create_object_instance(uint16_t instance_id)
     return instance;
 }
 
+// KS: is this needed for object instance?? TODO!
+M2MObjectInstance* M2MObject::create_object_instance(const lwm2m_parameters_s* s)
+{
+    tr_debug("M2MObject::create_object_instance - id: %d", s->instance_id);
+    M2MObjectInstance *instance = NULL;
+    if(!object_instance(s->instance_id)) {
+        instance = new M2MObjectInstance(this->name(),*this);
+        if(instance) {
+            instance->add_observation_level(observation_level());
+            //instance->set_instance_id(instance_id);
+            //if(M2MBase::name_id() != -1) {
+              //  instance->set_coap_content_type(COAP_CONTENT_OMA_TLV_TYPE);
+            //}
+            _instance_list.push_back(instance);
+        }
+    }
+    return instance;
+}
+
 bool M2MObject::remove_object_instance(uint16_t inst_id)
 {
     tr_debug("M2MObject::remove_object_instance(inst_id %d)", inst_id);
@@ -88,7 +116,7 @@ bool M2MObject::remove_object_instance(uint16_t inst_id)
                 // Instance found and deleted.
                 obj = *it;
                 StringBuffer<MAX_PATH_SIZE_4> obj_name;
-                build_path(obj_name, name().c_str(), obj->instance_id());
+                build_path(obj_name, name(), obj->instance_id());
                 obj->remove_resource_from_coap(obj_name.c_str());
                 _instance_list.erase(pos);
                 delete obj;
@@ -395,8 +423,8 @@ sn_coap_hdr_s* M2MObject::handle_post_request(nsdl_s *nsdl,
 
                                         StringBuffer<MAX_OBJECT_PATH_NAME> obj_name;
 
-                                        if (obj_name.ensure_space(M2MBase::name().length() + (1 + 5 + 1))) {
-                                            obj_name.append(M2MBase::name().c_str());
+                                        if (obj_name.ensure_space(M2MBase::resource_name_length() + (1 + 5 + 1))) {
+                                            obj_name.append(M2MBase::name());
                                             obj_name.append('/');
                                             obj_name.append_int(instance_id);
 
