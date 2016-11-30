@@ -691,7 +691,7 @@ void M2MInterfaceImpl::state_register(EventData *data)
             _observer.error(error);
         }
     } else {
-        _listen_port = rand() % 64511 + 1024;
+        _listen_port = 0; // Let network stack randomize the port
         _connection_handler->stop_listening();
         if (event) {
             _nsdl_interface->create_nsdl_list_structure(event->_object_list);
