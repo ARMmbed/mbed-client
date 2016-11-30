@@ -557,6 +557,7 @@ uint8_t M2MNsdlInterface::received_from_server_callback(struct nsdl_s *nsdl_hand
                 tr_debug("M2MNsdlInterface::received_from_server_callback - Empty ACK, msg id: %d", coap_header->msg_id);
                 M2MBase *base = find_resource("", coap_header->token_ptr, coap_header->token_len);
                 if (base) {
+                    // Supported only in Resource level
                     if (M2MBase::Resource == base->base_type()) {
                         M2MResource *resource = static_cast<M2MResource *> (base);
                         resource->notification_sent();
