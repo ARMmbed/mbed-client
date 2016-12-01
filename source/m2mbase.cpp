@@ -42,6 +42,9 @@ M2MBase::M2MBase(const String& resource_name,
   _is_static(false),
   _is_under_observation(false)
 {
+    // Checking the name length properly, i.e returning error is impossible from constructor without exceptions
+    assert(resource_name.length() <= MAX_ALLOWED_STRING_LENGTH);
+
     _sn_resource = (lwm2m_parameters_s*)memory_alloc(sizeof(lwm2m_parameters_s));
     if(_sn_resource) {
         memset(_sn_resource, 0, sizeof(lwm2m_parameters_s));
@@ -423,6 +426,33 @@ uint8_t* M2MBase::alloc_copy(const uint8_t* source, uint32_t size)
     return result;
 }
 
+bool M2MBase::validate_string_length(const String &string, size_t min_length, size_t max_length)
+{
+    bool valid = false;
+
+    const size_t len = string.length();
+    if ((len >= min_length) && (len <= max_length)) {
+        valid = true;
+    }
+
+    return valid;
+}
+
+bool M2MBase::validate_string_length(const char* string, size_t min_length, size_t max_length)
+{
+    bool valid = false;
+
+    if (string != NULL) {
+        const size_t len = strlen(string);
+        if ((len >= min_length) && (len <= max_length)) {
+            valid = true;
+        }
+    }
+
+    return valid;
+}
+
+
 M2MReportHandler* M2MBase::report_handler()
 {
     return _report_handler;
@@ -455,7 +485,20 @@ bool M2MBase::is_integer(const String &value)
     return (*p == 0);
 }
 
+bool M2MBase::is_integer(const char *value)
+{
+    assert(value != NULL);
+
+    if((strlen(value) < 1) || ((!isdigit(value[0])) && (value[0] != '-') && (value[0] != '+'))) {
+        return false;
+    }
+    char * p;
+    strtol(value, &p, 10);
+    return (*p == 0);
+}
+
 #ifndef MEMORY_OPTIMIZED_API
+
 void M2MBase::set_uri_path(const String &path)
 {
     assert(!_is_static);
@@ -570,14 +613,18 @@ bool M2MBase::build_path(StringBuffer<MAX_PATH_SIZE_4> &buffer, const char *s1, 
     return true;
 }
 
-char* M2MBase::stringdup(const char* s)
+char* M2MBase::stringdup(const char* src)
 {
-    const size_t len = strlen(s)+1;
-    char *p2 = static_cast<char*>(malloc(len));
-    assert(p2 != NULL);
-    memcpy(p2, s, len);
-    p2[len-1] = '\0';
-    return p2;
+    assert(src != NULL);
+
+    const size_t len = strlen(src) + 1;
+
+    char *dest = (char*)malloc(len);
+
+    if (dest) {
+        memcpy(dest, src, len);
+    }
+    return dest;
 }
 
 void M2MBase::free_resources()

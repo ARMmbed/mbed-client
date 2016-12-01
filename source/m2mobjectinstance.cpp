@@ -72,13 +72,12 @@ M2MObjectInstance::~M2MObjectInstance()
 M2MResource* M2MObjectInstance::create_static_resource(const lwm2m_parameters_s* static_res,
                                                        M2MResourceInstance::ResourceType type)
 {
-    tr_debug("M2MObjectInstance::create_static_resource(lwm2m_parameters_s resource_name %s)", (const char*)static_res->name);
+    tr_debug("M2MObjectInstance::create_static_resource(lwm2m_parameters_s resource_name %s)", static_res->name);
     M2MResource *res = NULL;
-    String resource_name = stringdup((const char*)static_res->name);
-    if( resource_name.empty() || resource_name.size() > MAX_ALLOWED_STRING_LENGTH){
+    if (validate_string_length(static_res->name, 1, MAX_ALLOWED_STRING_LENGTH) == false) {
         return res;
     }
-    if(!resource(resource_name)) {
+    if(!resource(static_res->name)) {
         res = new M2MResource(*this, static_res, type, (const uint16_t) M2MBase::instance_id(), M2MBase::name());
         if(res) {
             res->add_observation_level(observation_level());
@@ -100,7 +99,7 @@ M2MResource* M2MObjectInstance::create_static_resource(const String &resource_na
 {
     tr_debug("M2MObjectInstance::create_static_resource(resource_name %s)",resource_name.c_str());
     M2MResource *res = NULL;
-    if( resource_name.empty() || resource_name.size() > MAX_ALLOWED_STRING_LENGTH){
+    if (validate_string_length(resource_name, 1, MAX_ALLOWED_STRING_LENGTH) == false) {
         return res;
     }
     if(!resource(resource_name)) {
@@ -122,14 +121,13 @@ M2MResource* M2MObjectInstance::create_dynamic_resource(const lwm2m_parameters_s
                                                         M2MResourceInstance::ResourceType type,
                                                         bool observable)
 {
-    String resource_name = stringdup((const char*)static_res->name);
-    tr_debug("M2MObjectInstance::create_dynamic_resource(resource_name %s)",resource_name.c_str());
+    tr_debug("M2MObjectInstance::create_dynamic_resource(resource_name %s)", static_res->name);
     M2MResource *res = NULL;
 
-    if( resource_name.empty() || resource_name.size() > MAX_ALLOWED_STRING_LENGTH){
+    if (validate_string_length(static_res->name, 1, MAX_ALLOWED_STRING_LENGTH) == false) {
         return res;
     }
-    if(!resource(resource_name)) {
+    if(!resource(static_res->name)) {
         res = new M2MResource(*this, static_res, type, M2MBase::instance_id(), M2MBase::name());
         if(res) {
             //if (multiple_instance) { // TODO!
@@ -150,7 +148,7 @@ M2MResource* M2MObjectInstance::create_dynamic_resource(const String &resource_n
 {
     tr_debug("M2MObjectInstance::create_dynamic_resource(resource_name %s)",resource_name.c_str());
     M2MResource *res = NULL;
-    if( resource_name.empty() || resource_name.size() > MAX_ALLOWED_STRING_LENGTH){
+    if (validate_string_length(resource_name, 1, MAX_ALLOWED_STRING_LENGTH) == false) {
         return res;
     }
     if(!resource(resource_name)) {
@@ -177,7 +175,8 @@ M2MResourceInstance* M2MObjectInstance::create_static_resource_instance(const St
 {
     tr_debug("M2MObjectInstance::create_static_resource_instance(resource_name %s)",resource_name.c_str());
     M2MResourceInstance *instance = NULL;
-    if(resource_name.empty() || resource_name.size() > MAX_ALLOWED_STRING_LENGTH){
+    if (validate_string_length(resource_name, 1, MAX_ALLOWED_STRING_LENGTH) == false) {
+
         return instance;
     }
     M2MResource *res = resource(resource_name);
@@ -211,7 +210,7 @@ M2MResourceInstance* M2MObjectInstance::create_dynamic_resource_instance(const S
 {
     tr_debug("M2MObjectInstance::create_dynamic_resource_instance(resource_name %s)",resource_name.c_str());
     M2MResourceInstance *instance = NULL;
-    if(resource_name.empty() || resource_name.size() > MAX_ALLOWED_STRING_LENGTH){
+    if (validate_string_length(resource_name, 1, MAX_ALLOWED_STRING_LENGTH) == false) {
         return instance;
     }
     M2MResource *res = resource(resource_name);
@@ -300,14 +299,19 @@ bool M2MObjectInstance::remove_resource_instance(const String &resource_name,
     return success;
 }
 
-M2MResource* M2MObjectInstance::resource(const String &resource) const
+M2MResource* M2MObjectInstance::resource(const String &resource_name) const
+{
+    return resource(resource_name.c_str());
+}
+
+M2MResource* M2MObjectInstance::resource(const char *resource_name) const
 {
     M2MResource *res = NULL;
     if(!_resource_list.empty()) {
         M2MResourceList::const_iterator it;
         it = _resource_list.begin();
         for (; it!=_resource_list.end(); it++ ) {
-            if(strcmp((*it)->name(), resource.c_str()) == 0) {
+            if(strcmp((*it)->name(), resource_name) == 0) {
                 res = *it;
                 break;
             }
