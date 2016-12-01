@@ -18,7 +18,6 @@
 #include "mbed-client/m2mconstants.h"
 #include "mbed-client/m2mtimer.h"
 #include "include/m2mreporthandler.h"
-#include "include/nsdllinker.h"
 #include "mbed-trace/mbed_trace.h"
 #include <assert.h>
 #include <ctype.h>
@@ -27,72 +26,126 @@
 
 #define TRACE_GROUP "mClt"
 
-M2MBase::M2MBase(const String & resource_name,
-                 M2MBase::Mode mde)
-: _report_handler(NULL),
+M2MBase::M2MBase(const String& resource_name,
+                 M2MBase::Mode mode)
+:
+  _sn_resource(NULL),
+  _report_handler(NULL),
   _observation_handler(NULL),
-  _name(resource_name),
-  _uri_path(""),
-  _max_age(0),
-  _instance_id(0),
-  _observation_number(0),
   _token(NULL),
+  _function_pointer(NULL),
+  _observation_number(0),
   _token_length(0),
-  _coap_content_type(0),
-  _operation(M2MBase::NOT_ALLOWED),
-  _mode(mde),
   _observation_level(M2MBase::None),
-  _observable(false),
-  _register_uri(true),
-  _is_under_observation(false),
-  _function_pointer(NULL)
+  _is_static(false),
+  _is_under_observation(false)
 {
-    if(is_integer(_name) && _name.size() <= MAX_ALLOWED_STRING_LENGTH) {
-        _name_id = strtoul(_name.c_str(), NULL, 10);
-        if(_name_id > 65535){
-            _name_id = -1;
+    _sn_resource = (lwm2m_parameters_s*)memory_alloc(sizeof(lwm2m_parameters_s));
+    if(_sn_resource) {
+        memset(_sn_resource, 0, sizeof(lwm2m_parameters_s));
+        _sn_resource->dynamic_resource_params =
+                (sn_nsdl_dynamic_resource_parameters_s*)memory_alloc(sizeof(sn_nsdl_dynamic_resource_parameters_s));
+        if(_sn_resource->dynamic_resource_params) {
+            memset(_sn_resource->dynamic_resource_params,
+                   0, sizeof(sn_nsdl_dynamic_resource_parameters_s));
+            _sn_resource->dynamic_resource_params->static_resource_parameters =
+                    (sn_nsdl_static_resource_parameters_s*)memory_alloc(sizeof(sn_nsdl_static_resource_parameters_s));
+            if(_sn_resource->dynamic_resource_params->static_resource_parameters) {
+                memset(_sn_resource->dynamic_resource_params->static_resource_parameters,
+                       0, sizeof(sn_nsdl_static_resource_parameters_s));
+            }
+        }
+    }
+    _sn_resource->name = stringdup((char*)resource_name.c_str());
+    _sn_resource->dynamic_resource_params->static_resource_parameters->mode = (const uint8_t)mode;
+
+    if(is_integer(resource_name) && resource_name.size() <= MAX_ALLOWED_STRING_LENGTH) {
+        _sn_resource->name_id = strtoul(resource_name.c_str(), NULL, 10);
+        if(_sn_resource->name_id > 65535){
+            _sn_resource->name_id = -1;
         }
     } else {
-        _name_id = -1;
+        _sn_resource->name_id = -1;
     }
+}
+
+M2MBase::M2MBase(const lwm2m_parameters_s *s):
+    _sn_resource((lwm2m_parameters_s*) s),
+    _report_handler(NULL),
+    _observation_handler(NULL),
+    _token(NULL),
+    _function_pointer(NULL),
+    _observation_number(0),
+    _token_length(0),
+    _observation_level(M2MBase::None),
+    _is_static(false),
+    _is_under_observation(false)
+{
 }
 
 M2MBase::~M2MBase()
 {
     delete _report_handler;
+    free_resources();
     free(_token);
     delete _function_pointer;
+    delete _observation_handler;
 }
 
 void M2MBase::set_operation(M2MBase::Operation opr)
 {
-    // If the mode is Static, there is only GET_ALLOWED
-   // supported.
-    if(M2MBase::Static == _mode) {
-        _operation = M2MBase::GET_ALLOWED;
+    // If the mode is Static, there is only GET_ALLOWED supported.
+    if(M2MBase::Static == mode()) {
+        _sn_resource->dynamic_resource_params->static_resource_parameters->access = M2MBase::GET_ALLOWED;
     } else {
-        _operation = opr;
+        _sn_resource->dynamic_resource_params->static_resource_parameters->access = opr;
     }
+}
+
+void M2MBase::set_interface_description(const char *desc)
+{
+    assert(!_is_static);
+    free(_sn_resource->dynamic_resource_params->static_resource_parameters->interface_description_ptr);
+    _sn_resource->dynamic_resource_params->static_resource_parameters->interface_description_ptr =
+            alloc_string_copy((uint8_t*) desc, strlen(desc));
+    _sn_resource->dynamic_resource_params->static_resource_parameters->interface_description_len =
+            strlen(desc);
 }
 
 void M2MBase::set_interface_description(const String &desc)
 {
-    _interface_description = desc;
+    assert(!_is_static);
+    set_interface_description(desc.c_str());
 }
 
 void M2MBase::set_resource_type(const String &res_type)
 {
-    _resource_type = res_type;
+    assert(!_is_static);
+    set_resource_type(res_type.c_str());
+}
+
+void M2MBase::set_resource_type(const char *res_type)
+{
+    assert(!_is_static);
+    free(_sn_resource->dynamic_resource_params->static_resource_parameters->resource_type_ptr);
+    _sn_resource->dynamic_resource_params->static_resource_parameters->resource_type_ptr =
+            alloc_string_copy((uint8_t*) res_type,strlen(res_type));
+    _sn_resource->dynamic_resource_params->static_resource_parameters->resource_type_len =
+            strlen(res_type);
 }
 
 void M2MBase::set_coap_content_type(const uint8_t con_type)
 {
-    _coap_content_type = con_type;
+    assert(!_is_static);
+    _sn_resource->dynamic_resource_params->static_resource_parameters->coap_content_type =
+            con_type;
 }
 
 void M2MBase::set_observable(bool observable)
 {
-    _observable = observable;
+    assert(!_is_static);
+        _sn_resource->dynamic_resource_params->static_resource_parameters->observable =
+                observable;
 }
 
 void M2MBase::add_observation_level(M2MBase::Observation obs_level)
@@ -110,11 +163,11 @@ void M2MBase::set_under_observation(bool observed,
 {
 
     tr_debug("M2MBase::set_under_observation - observed: %d", observed);
-    tr_debug("M2MBase::set_under_observation - base_type: %d", _base_type);
+    tr_debug("M2MBase::set_under_observation - base_type: %d", base_type());
     _is_under_observation = observed;
     if(handler && observed) {
         _observation_handler = handler;
-        if (_base_type != M2MBase::ResourceInstance) {
+        if (base_type() != M2MBase::ResourceInstance) {
             if(!_report_handler){
                 _report_handler = new M2MReportHandler(*this);
             }
@@ -143,9 +196,8 @@ void M2MBase::set_observation_token(const uint8_t *token, const uint8_t length)
 
 void M2MBase::set_instance_id(const uint16_t inst_id)
 {
-    _instance_id = inst_id;
+    _sn_resource->instance_id = inst_id;
 }
-
 
 void M2MBase::set_observation_number(const uint16_t /*observation_number*/)
 {
@@ -153,52 +205,54 @@ void M2MBase::set_observation_number(const uint16_t /*observation_number*/)
 
 void M2MBase::set_max_age(const uint32_t max_age)
 {
-    _max_age = max_age;
+    _sn_resource->max_age = max_age;
 }
 
 M2MBase::BaseType M2MBase::base_type() const
 {
-    return _base_type;
+    return (M2MBase::BaseType)_sn_resource->base_type;
 }
 
 M2MBase::Operation M2MBase::operation() const
 {
-    return _operation;
+    return (M2MBase::Operation)_sn_resource->dynamic_resource_params->static_resource_parameters->access;
 }
 
-const String& M2MBase::name() const
+const char* M2MBase::name() const
 {
-    return _name;
+    return _sn_resource->name;
 }
 
 int32_t M2MBase::name_id() const
 {
-    return _name_id;
+    return _sn_resource->name_id;
 }
 
 uint16_t M2MBase::instance_id() const
 {
-    return _instance_id;
+    return _sn_resource->instance_id;
 }
 
-const String& M2MBase::interface_description() const
+const char* M2MBase::interface_description() const
 {
-    return _interface_description;
+    return (reinterpret_cast<char*>(
+                _sn_resource->dynamic_resource_params->static_resource_parameters->interface_description_ptr));
 }
 
-const String& M2MBase::resource_type() const
+const char* M2MBase::resource_type() const
 {
-    return _resource_type;
+    return (reinterpret_cast<char*>(
+                _sn_resource->dynamic_resource_params->static_resource_parameters->resource_type_ptr));
 }
 
 uint8_t M2MBase::coap_content_type() const
 {
-    return _coap_content_type;
+    return _sn_resource->dynamic_resource_params->static_resource_parameters->coap_content_type;
 }
 
 bool M2MBase::is_observable() const
 {
-    return _observable;
+    return _sn_resource->dynamic_resource_params->static_resource_parameters->observable;
 }
 
 M2MBase::Observation M2MBase::observation_level() const
@@ -219,7 +273,7 @@ void M2MBase::get_observation_token(uint8_t *&token, uint32_t &token_length)
 
 M2MBase::Mode M2MBase::mode() const
 {
-    return _mode;
+    return (M2MBase::Mode)_sn_resource->dynamic_resource_params->static_resource_parameters->mode;
 }
 
 uint16_t M2MBase::observation_number() const
@@ -229,7 +283,7 @@ uint16_t M2MBase::observation_number() const
 
 uint32_t M2MBase::max_age() const
 {
-    return _max_age;
+    return _sn_resource->max_age;
 }
 
 bool M2MBase::handle_observation_attribute(const char *query)
@@ -237,7 +291,7 @@ bool M2MBase::handle_observation_attribute(const char *query)
     tr_debug("M2MBase::handle_observation_attribute - under observation(%d)", is_under_observation());
     bool success = false;
     if(_report_handler) {
-        success = _report_handler->parse_notification_attribute(query,_base_type);
+        success = _report_handler->parse_notification_attribute(query,base_type());
         if (success) {
             if (is_under_observation()) {
                 _report_handler->set_under_observation(true);
@@ -263,13 +317,15 @@ void M2MBase::observation_to_be_sent(m2m::Vector<uint16_t> changed_instance_ids,
 
 void M2MBase::set_base_type(M2MBase::BaseType type)
 {
-    _base_type = type;
+    assert(!_is_static);
+    _sn_resource->base_type = type;
 }
 
 void M2MBase::remove_resource_from_coap(const String &resource_name)
 {
     if(_observation_handler) {
         _observation_handler->resource_to_be_deleted(resource_name);
+        free_resources();
     }
 }
 
@@ -277,6 +333,7 @@ void M2MBase::remove_object_from_coap()
 {
     if(_observation_handler) {
         _observation_handler->remove_object(this);
+        free_resources();
     }
 }
 
@@ -353,14 +410,15 @@ M2MObservationHandler* M2MBase::observation_handler()
     return _observation_handler;
 }
 
-void M2MBase::set_register_uri( bool register_uri)
+void M2MBase::set_register_uri(bool register_uri)
 {
-    _register_uri = register_uri;
+    assert(!_is_static);
+    _sn_resource->dynamic_resource_params->publish_uri = register_uri;
 }
 
 bool M2MBase::register_uri()
 {
-    return _register_uri;
+    return _sn_resource->dynamic_resource_params->publish_uri;
 }
 
 bool M2MBase::is_integer(const String &value)
@@ -369,19 +427,30 @@ bool M2MBase::is_integer(const String &value)
     if(value.empty() || ((!isdigit(s[0])) && (s[0] != '-') && (s[0] != '+'))) {
         return false;
     }
-    char * p ;
+    char * p;
     strtol(value.c_str(), &p, 10);
     return (*p == 0);
 }
 
 void M2MBase::set_uri_path(const String &path)
 {
-    _uri_path = path;
+    assert(!_is_static);
+    set_uri_path(path.c_str());
 }
 
-const String& M2MBase::uri_path() const
+void M2MBase::set_uri_path(const char *path)
 {
-    return _uri_path;
+    assert(!_is_static);
+    free(_sn_resource->dynamic_resource_params->static_resource_parameters->path);
+    _sn_resource->dynamic_resource_params->static_resource_parameters->path =
+            alloc_string_copy((uint8_t*) path, strlen(path));
+    _sn_resource->dynamic_resource_params->static_resource_parameters->pathlen = strlen(path);
+}
+
+const char* M2MBase::uri_path() const
+{
+    return (reinterpret_cast<char*>(
+                _sn_resource->dynamic_resource_params->static_resource_parameters->path));
 }
 
 bool M2MBase::is_under_observation() const
@@ -435,7 +504,6 @@ bool M2MBase::build_path(StringBuffer<MAX_PATH_SIZE> &buffer, const char *s1, ui
 
 bool M2MBase::build_path(StringBuffer<MAX_PATH_SIZE_2> &buffer, const char *s1, uint16_t i1, const char *s2)
 {
-
     if(!buffer.ensure_space(strlen(s1) + strlen(s2) + MAX_INSTANCE_SIZE + 2 + 1)){
         return false;
     }
@@ -447,12 +515,10 @@ bool M2MBase::build_path(StringBuffer<MAX_PATH_SIZE_2> &buffer, const char *s1, 
     buffer.append(s2);
 
     return true;
-
 }
 
 bool M2MBase::build_path(StringBuffer<MAX_PATH_SIZE_3> &buffer, const char *s1, uint16_t i1, uint16_t i2)
 {
-
     if(!buffer.ensure_space(strlen(s1) + (MAX_INSTANCE_SIZE * 2) + 2 + 1)){
         return false;
     }
@@ -464,12 +530,10 @@ bool M2MBase::build_path(StringBuffer<MAX_PATH_SIZE_3> &buffer, const char *s1, 
     buffer.append_int(i2);
 
     return true;
-
 }
 
 bool M2MBase::build_path(StringBuffer<MAX_PATH_SIZE_4> &buffer, const char *s1, uint16_t i1)
 {
-
     if(!buffer.ensure_space(strlen(s1) + MAX_INSTANCE_SIZE + 1 + 1)){
         return false;
     }
@@ -479,7 +543,38 @@ bool M2MBase::build_path(StringBuffer<MAX_PATH_SIZE_4> &buffer, const char *s1, 
     buffer.append_int(i1);
 
     return true;
-
 }
 
+char* M2MBase::stringdup(const char* s)
+{
+    const size_t len = strlen(s)+1;
+    char *p2 = static_cast<char*>(malloc(len));
+    assert(p2 != NULL);
+    memcpy(p2, s, len);
+    p2[len-1] = '\0';
+    return p2;
+}
 
+void M2MBase::free_resources()
+{
+    if (!_is_static) {
+        free(_sn_resource->dynamic_resource_params->static_resource_parameters->path);
+        free(_sn_resource->dynamic_resource_params->static_resource_parameters->resource);
+        free(_sn_resource->dynamic_resource_params->static_resource_parameters->resource_type_ptr);
+        free(_sn_resource->dynamic_resource_params->static_resource_parameters->interface_description_ptr);
+        free(_sn_resource->dynamic_resource_params->static_resource_parameters);
+        free(_sn_resource->dynamic_resource_params);
+        free(_sn_resource->name);
+        free(_sn_resource);
+    }
+}
+
+bool M2MBase::is_static() const
+{
+    return _is_static;
+}
+
+size_t M2MBase::resource_name_length() const
+{
+    return strlen(_sn_resource->name);
+}

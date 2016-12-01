@@ -62,6 +62,12 @@ public:
 private: // Constructor and destructor are private
          // which means that these objects can be created or
          // deleted only through a function provided by the M2MObjectInstance.
+
+    M2MResourceInstance(const lwm2m_parameters_s* s,
+                        M2MObjectInstanceCallback &object_instance_callback,
+                        M2MResourceInstance::ResourceType type,
+                        const uint16_t object_instance_id,
+                        const String &object_name);
     /**
      * \brief A constructor for creating a resource.
      * \param resource_name The name of the resource.

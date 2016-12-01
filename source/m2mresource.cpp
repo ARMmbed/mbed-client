@@ -19,7 +19,6 @@
 #include "include/m2mreporthandler.h"
 #include "include/m2mtlvserializer.h"
 #include "include/m2mtlvdeserializer.h"
-#include "include/nsdllinker.h"
 #include "mbed-trace/mbed_trace.h"
 
 #include <stdlib.h>
@@ -45,6 +44,21 @@ M2MResource::M2MResource(M2MObjectInstanceCallback &object_instance_callback,
     M2MBase::set_base_type(M2MBase::Resource);
     M2MBase::set_operation(M2MBase::GET_ALLOWED);
     M2MBase::set_observable(false);
+}
+
+
+M2MResource::M2MResource(M2MObjectInstanceCallback &object_instance_callback,
+                         const lwm2m_parameters_s* s,
+                          M2MResourceInstance::ResourceType type,
+                         const uint16_t object_instance_id,
+                         const String &object_name)
+    : M2MResourceInstance(s, object_instance_callback, type, object_instance_id, object_name),
+    _delayed_token_len(0),
+    _has_multiple_instances(false),
+    _delayed_response(false),
+    _delayed_token(NULL)
+{
+    // tbd: _has_multiple_instances could be in flash, but no real benefit, because of current alignment.
 }
 
 M2MResource::M2MResource(M2MObjectInstanceCallback &object_instance_callback,
