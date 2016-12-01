@@ -85,20 +85,21 @@ M2MResourceInstance::M2MResourceInstance(const lwm2m_parameters_s* s,
                                          const uint16_t object_instance_id,
                                          const String &object_name)
 : M2MBase(s),
-  _resource_type(type),
+  _value(NULL),
+  _value_length(0),
+  _block_message_data(NULL),
+  _function_pointer(NULL),
+  _execute_callback(NULL),
+  _resource_callback(NULL),
+  _object_name(object_name),
+  _object_instance_callback(object_instance_callback),
   _object_instance_id(object_instance_id),
- _object_instance_callback(object_instance_callback),
- _execute_callback(NULL),
- _value(NULL),
- _value_length(0),
- _resource_callback(NULL) ,
- _function_pointer(NULL),
- _block_message_data(NULL)
+  _resource_type(type)
 {
     //TBD: put to flash, or parse from the uri_path!!!!
     //same for the _object_instance_id.
     _object_name = M2MBase::stringdup((const char*)object_name.c_str());
-    tr_debug("M2MResourceInstance(object_name %s)", _object_name);
+    tr_debug("M2MResourceInstance(object_name %s)", _object_name.c_str());
 
     // TBD: we dont need _value here, because in c-struct there is resource field!!!!
     if( s->dynamic_resource_params->static_resource_parameters->resource != NULL &&
