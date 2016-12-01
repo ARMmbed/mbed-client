@@ -58,6 +58,15 @@ M2MBase::M2MBase(const String& resource_name,
     }
     _sn_resource->name = stringdup((char*)resource_name.c_str());
     _sn_resource->dynamic_resource_params->static_resource_parameters->mode = (const uint8_t)mode;
+
+    if(is_integer(resource_name) && resource_name.size() <= MAX_ALLOWED_STRING_LENGTH) {
+        _sn_resource->name_id = strtoul(resource_name.c_str(), NULL, 10);
+        if(_sn_resource->name_id > 65535){
+            _sn_resource->name_id = -1;
+        } else {
+            _sn_resource->name_id = -1;
+        }
+    }
 }
 
 M2MBase::M2MBase(const lwm2m_parameters_s *s):
