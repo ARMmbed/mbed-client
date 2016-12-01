@@ -87,9 +87,9 @@ void M2MBase::set_operation(M2MBase::Operation opr)
 {
     // If the mode is Static, there is only GET_ALLOWED supported.
     if(M2MBase::Static == mode()) {
-        _sn_resource->dynamic_resource_params->static_resource_parameters->mode = M2MBase::GET_ALLOWED;
+        _sn_resource->dynamic_resource_params->static_resource_parameters->access = M2MBase::GET_ALLOWED;
     } else {
-        _sn_resource->dynamic_resource_params->static_resource_parameters->mode = opr;
+        _sn_resource->dynamic_resource_params->static_resource_parameters->access = opr;
     }
 }
 
@@ -206,7 +206,7 @@ M2MBase::BaseType M2MBase::base_type() const
 
 M2MBase::Operation M2MBase::operation() const
 {
-    return (M2MBase::Operation)_sn_resource->dynamic_resource_params->static_resource_parameters->mode;
+    return (M2MBase::Operation)_sn_resource->dynamic_resource_params->static_resource_parameters->access;
 }
 
 const char* M2MBase::name() const
