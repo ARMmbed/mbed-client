@@ -63,9 +63,9 @@ M2MBase::M2MBase(const String& resource_name,
         _sn_resource->name_id = strtoul(resource_name.c_str(), NULL, 10);
         if(_sn_resource->name_id > 65535){
             _sn_resource->name_id = -1;
-        } else {
-            _sn_resource->name_id = -1;
         }
+    } else {
+        _sn_resource->name_id = -1;
     }
 }
 
