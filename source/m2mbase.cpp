@@ -90,7 +90,6 @@ M2MBase::~M2MBase()
     free_resources();
     free(_token);
     delete _function_pointer;
-    delete _observation_handler;
 }
 
 void M2MBase::set_operation(M2MBase::Operation opr)
@@ -326,7 +325,6 @@ void M2MBase::remove_resource_from_coap(const String &resource_name)
 {
     if(_observation_handler) {
         _observation_handler->resource_to_be_deleted(resource_name);
-        free_resources();
     }
 }
 
@@ -334,7 +332,6 @@ void M2MBase::remove_object_from_coap()
 {
     if(_observation_handler) {
         _observation_handler->remove_object(this);
-        free_resources();
     }
 }
 

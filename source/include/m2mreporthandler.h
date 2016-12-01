@@ -61,7 +61,7 @@ public:
     /**
      * Destructor
      */
-    ~M2MReportHandler();
+    virtual ~M2MReportHandler();
 
     /**
      * @brief Sets that object is under observation.
@@ -173,7 +173,7 @@ private:
     float                       _st;
     float                       _high_step;
     float                       _low_step;
-    float                       _last_value;    
+    float                       _last_value;
     m2m::Vector<uint16_t>       _changed_instance_ids;
 
 friend class Test_M2MReportHandler;

@@ -531,7 +531,7 @@ private:
 private:
     lwm2m_parameters_s          *_sn_resource;
     M2MReportHandler            *_report_handler;
-    M2MObservationHandler       *_observation_handler;
+    M2MObservationHandler       *_observation_handler; // Not owned
     uint8_t                     *_token;
     FP1<void, const char*>      *_function_pointer;
     value_updated_callback      _value_updated_callback;
