@@ -106,10 +106,14 @@ void M2MBase::set_interface_description(const char *desc)
 {
     assert(!_is_static);
     free(_sn_resource->dynamic_resource_params->static_resource_parameters->interface_description_ptr);
-    _sn_resource->dynamic_resource_params->static_resource_parameters->interface_description_ptr =
-            alloc_string_copy((uint8_t*) desc, strlen(desc));
-    _sn_resource->dynamic_resource_params->static_resource_parameters->interface_description_len =
-            strlen(desc);
+    _sn_resource->dynamic_resource_params->static_resource_parameters->interface_description_ptr = NULL;
+    const size_t len = strlen(desc);
+    if (len > 0 ) {
+        _sn_resource->dynamic_resource_params->static_resource_parameters->interface_description_ptr =
+                alloc_string_copy((uint8_t*) desc, len);
+        _sn_resource->dynamic_resource_params->static_resource_parameters->interface_description_len =
+                len;
+    }
 }
 
 void M2MBase::set_interface_description(const String &desc)
@@ -128,10 +132,14 @@ void M2MBase::set_resource_type(const char *res_type)
 {
     assert(!_is_static);
     free(_sn_resource->dynamic_resource_params->static_resource_parameters->resource_type_ptr);
-    _sn_resource->dynamic_resource_params->static_resource_parameters->resource_type_ptr =
-            alloc_string_copy((uint8_t*) res_type,strlen(res_type));
-    _sn_resource->dynamic_resource_params->static_resource_parameters->resource_type_len =
-            strlen(res_type);
+    _sn_resource->dynamic_resource_params->static_resource_parameters->resource_type_ptr = NULL;
+    const size_t len = strlen(res_type);
+    if (len > 0) {
+        _sn_resource->dynamic_resource_params->static_resource_parameters->resource_type_ptr =
+                alloc_string_copy((uint8_t*) res_type,len);
+        _sn_resource->dynamic_resource_params->static_resource_parameters->resource_type_len =
+                len;
+    }
 }
 
 void M2MBase::set_coap_content_type(const uint8_t con_type)
