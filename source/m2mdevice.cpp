@@ -148,7 +148,7 @@ M2MResource* M2MDevice::create_resource(DeviceResource resource, const String &v
                     res->set_value((const uint8_t*)value.c_str(),
                                    (uint32_t)value.length());
                 }
-                res->set_register_uri(false);
+                res->set_register_uri(true);
             }
         }
     }
