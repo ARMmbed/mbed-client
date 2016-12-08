@@ -111,9 +111,7 @@ void M2MBase::set_interface_description(const char *desc)
     const size_t len = strlen(desc);
     if (len > 0 ) {
         _sn_resource->dynamic_resource_params->static_resource_parameters->interface_description_ptr =
-                alloc_string_copy((uint8_t*) desc, len);
-        _sn_resource->dynamic_resource_params->static_resource_parameters->interface_description_len =
-                len;
+                (char*)alloc_string_copy((uint8_t*) desc, len);
     }
 }
 
