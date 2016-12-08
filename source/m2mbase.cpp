@@ -171,21 +171,20 @@ void M2MBase::set_under_observation(bool observed,
 {
 
     tr_debug("M2MBase::set_under_observation - observed: %d", observed);
-    tr_debug("M2MBase::set_under_observation - base_type: %d", base_type());
-    _is_under_observation = observed;
-    if(handler && observed) {
+        tr_debug("M2MBase::set_under_observation - base_type: %d", base_type());
+        _is_under_observation = observed;
         _observation_handler = handler;
-        if (base_type() != M2MBase::ResourceInstance) {
-            if(!_report_handler){
-                _report_handler = new M2MReportHandler(*this);
+        if(handler) {
+            if (base_type() != M2MBase::ResourceInstance) {
+                if(!_report_handler){
+                    _report_handler = new M2MReportHandler(*this);
+                }
+                _report_handler->set_under_observation(observed);
             }
-            _report_handler->set_under_observation(observed);
+        } else {
+            delete _report_handler;
+            _report_handler = NULL;
         }
-    } else {
-        delete _report_handler;
-        _report_handler = NULL;
-        _observation_handler = NULL;
-    }
 }
 
 void M2MBase::set_observation_token(const uint8_t *token, const uint8_t length)
