@@ -484,6 +484,13 @@ protected:
     static void memory_free(void *ptr);
 
     /**
+     * \brief Allocate and make a copy of given zero terminated string. This
+     * is functionally equivalent with strdup().
+     * \param source The source string to copy, may not be NULL.
+    */
+    static char* alloc_string_copy(const char* source);
+
+    /**
      * \brief Allocate (size + 1) amount of memory, copy size bytes into
      * it and add zero termination.
      * \param source The source string to copy, may not be NULL.
