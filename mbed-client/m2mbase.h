@@ -143,7 +143,8 @@ protected:
      * \param id The ID of the object.
      */
     M2MBase(const String &name,
-            M2MBase::Mode mode);
+            M2MBase::Mode mode,
+            const String &resource_type = "");
 
     M2MBase(const lwm2m_parameters_s* s);
 
@@ -160,6 +161,7 @@ public:
      */
     virtual void set_operation(M2MBase::Operation operation);
 
+#ifndef MEMORY_OPTIMIZED_API
     /**
      * \brief Sets the interface description of the object.
      * \param description The description to be set.
@@ -183,6 +185,7 @@ public:
      * \param resource_type The resource type to be set.
      */
     virtual void set_resource_type(const char *resource_type);
+#endif
 
     /**
      * \brief Sets the CoAP content type of the object.
@@ -391,6 +394,7 @@ public:
      */
     virtual bool register_uri();
 
+#ifndef MEMORY_OPTIMIZED_API
     /**
      * \brief Sets object URI path.
      * \param path The URI path of the object.
@@ -402,6 +406,7 @@ public:
      * \param path The URI path of the object.
      */
     virtual void set_uri_path(const char *path);
+#endif
 
     /**
      * \brief Returns the URI path of the object.

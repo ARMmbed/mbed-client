@@ -587,7 +587,10 @@ uint8_t M2MNsdlInterface::resource_callback(struct nsdl_s */*nsdl_handle*/,
     bool execute_value_updated = false;
     M2MBase* base = find_resource(resource_name);
     if(base) {
+// TODO! Check if this is really needed here? Uri path is part of static nsdl struct so can't be changed dynamically
+#ifndef MEMORY_OPTIMIZED_API
         base->set_uri_path(resource_name);
+#endif
         if(COAP_MSG_CODE_REQUEST_GET == received_coap_header->msg_code) {
             coap_response = base->handle_get_request(_nsdl_handle, received_coap_header,this);
         } else if(COAP_MSG_CODE_REQUEST_PUT == received_coap_header->msg_code) {
@@ -986,9 +989,9 @@ bool M2MNsdlInterface::create_nsdl_resource(M2MBase *base, const String &name, b
                 }
             }
             // Check if the access level for the resource has changed.
-            if(resource->static_resource_parameters->access != (sn_grs_resource_acl_e)base->operation()) {
+            if(resource->access != (sn_grs_resource_acl_e)base->operation()) {
                 changed = true;
-                resource->static_resource_parameters->access = (sn_grs_resource_acl_e)base->operation();
+                resource->access = (sn_grs_resource_acl_e)base->operation();
             }
             if(resource->static_resource_parameters) {
                 // Check if the observation parameter for the resource has changed.
@@ -1004,7 +1007,7 @@ bool M2MNsdlInterface::create_nsdl_resource(M2MBase *base, const String &name, b
             base->set_under_observation(false,this);
             //TODO: implement access control
             // Currently complete access is given
-            _resource->static_resource_parameters->access = (sn_grs_resource_acl_e)base->operation();
+            _resource->access = (sn_grs_resource_acl_e)base->operation();
 
             if((M2MBase::Resource == base->base_type() ||
                 M2MBase::ResourceInstance == base->base_type()) &&

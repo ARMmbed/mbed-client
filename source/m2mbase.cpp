@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 #include "mbed-client/m2mbase.h"
 #include "mbed-client/m2mobservationhandler.h"
 #include "mbed-client/m2mconstants.h"
@@ -27,7 +28,8 @@
 #define TRACE_GROUP "mClt"
 
 M2MBase::M2MBase(const String& resource_name,
-                 M2MBase::Mode mode)
+                 M2MBase::Mode mode,
+                 const String &resource_type)
 :
   _sn_resource(NULL),
   _report_handler(NULL),
@@ -51,13 +53,22 @@ M2MBase::M2MBase(const String& resource_name,
             _sn_resource->dynamic_resource_params->static_resource_parameters =
                     (sn_nsdl_static_resource_parameters_s*)memory_alloc(sizeof(sn_nsdl_static_resource_parameters_s));
             if(_sn_resource->dynamic_resource_params->static_resource_parameters) {
-                memset(_sn_resource->dynamic_resource_params->static_resource_parameters,
-                       0, sizeof(sn_nsdl_static_resource_parameters_s));
+                // Cast const away to able to compile using MEMORY_OPTIMIZED_API flag
+                sn_nsdl_static_resource_parameters_s *params =
+                        const_cast<sn_nsdl_static_resource_parameters_s *>(_sn_resource->dynamic_resource_params->static_resource_parameters);
+                memset(params, 0, sizeof(sn_nsdl_static_resource_parameters_s));
+                const size_t len = strlen(resource_type.c_str());
+                if (len > 0) {
+                    params->resource_type_ptr = (char*)
+                            alloc_string_copy((uint8_t*) resource_type.c_str(), len);
+                }
+                params->mode = (const uint8_t)mode;
+                _sn_resource->dynamic_resource_params->static_resource_parameters = params;
             }
         }
     }
+
     _sn_resource->name = stringdup((char*)resource_name.c_str());
-    _sn_resource->dynamic_resource_params->static_resource_parameters->mode = (const uint8_t)mode;
     _sn_resource->dynamic_resource_params->publish_uri = true;
     _sn_resource->dynamic_resource_params->free_on_delete = true;
 
@@ -97,12 +108,13 @@ void M2MBase::set_operation(M2MBase::Operation opr)
 {
     // If the mode is Static, there is only GET_ALLOWED supported.
     if(M2MBase::Static == mode()) {
-        _sn_resource->dynamic_resource_params->static_resource_parameters->access = M2MBase::GET_ALLOWED;
+        _sn_resource->dynamic_resource_params->access = M2MBase::GET_ALLOWED;
     } else {
-        _sn_resource->dynamic_resource_params->static_resource_parameters->access = opr;
+        _sn_resource->dynamic_resource_params->access = opr;
     }
 }
 
+#ifndef MEMORY_OPTIMIZED_API
 void M2MBase::set_interface_description(const char *desc)
 {
     assert(!_is_static);
@@ -138,6 +150,7 @@ void M2MBase::set_resource_type(const char *res_type)
                 alloc_string_copy((uint8_t*) res_type, len);
     }
 }
+#endif
 
 void M2MBase::set_coap_content_type(const uint8_t con_type)
 {
@@ -216,7 +229,7 @@ M2MBase::BaseType M2MBase::base_type() const
 
 M2MBase::Operation M2MBase::operation() const
 {
-    return (M2MBase::Operation)_sn_resource->dynamic_resource_params->static_resource_parameters->access;
+    return (M2MBase::Operation)_sn_resource->dynamic_resource_params->access;
 }
 
 const char* M2MBase::name() const
@@ -441,6 +454,7 @@ bool M2MBase::is_integer(const String &value)
     return (*p == 0);
 }
 
+#ifndef MEMORY_OPTIMIZED_API
 void M2MBase::set_uri_path(const String &path)
 {
     assert(!_is_static);
@@ -455,6 +469,7 @@ void M2MBase::set_uri_path(const char *path)
             alloc_string_copy((uint8_t*) path, strlen(path));
     _sn_resource->dynamic_resource_params->static_resource_parameters->pathlen = strlen(path);
 }
+#endif
 
 const char* M2MBase::uri_path() const
 {
@@ -567,12 +582,19 @@ char* M2MBase::stringdup(const char* s)
 void M2MBase::free_resources()
 {
     if (!_is_static) {
-        free(_sn_resource->dynamic_resource_params->static_resource_parameters->path);
-        free(_sn_resource->dynamic_resource_params->static_resource_parameters->resource);
-        free(_sn_resource->dynamic_resource_params->static_resource_parameters->resource_type_ptr);
-        free(_sn_resource->dynamic_resource_params->static_resource_parameters->interface_description_ptr);
-        free(_sn_resource->dynamic_resource_params->static_resource_parameters);
-        free(_sn_resource->dynamic_resource_params);
+        if (_sn_resource->dynamic_resource_params->static_resource_parameters->free_on_delete) {
+            sn_nsdl_static_resource_parameters_s *params =
+                    const_cast<sn_nsdl_static_resource_parameters_s *>(_sn_resource->dynamic_resource_params->static_resource_parameters);
+
+            free(params->path);
+            free(params->resource);
+            free(params->resource_type_ptr);
+            free(params->interface_description_ptr);
+            free(params);
+        }
+        if (_sn_resource->dynamic_resource_params->free_on_delete) {
+            free(_sn_resource->dynamic_resource_params);
+        }
         free(_sn_resource->name);
         free(_sn_resource);
     }
