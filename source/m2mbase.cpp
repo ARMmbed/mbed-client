@@ -59,6 +59,7 @@ M2MBase::M2MBase(const String& resource_name,
     _sn_resource->name = stringdup((char*)resource_name.c_str());
     _sn_resource->dynamic_resource_params->static_resource_parameters->mode = (const uint8_t)mode;
     _sn_resource->dynamic_resource_params->publish_uri = true;
+    _sn_resource->dynamic_resource_params->free_on_delete = true;
 
     if(is_integer(resource_name) && resource_name.size() <= MAX_ALLOWED_STRING_LENGTH) {
         _sn_resource->name_id = strtoul(resource_name.c_str(), NULL, 10);
@@ -145,15 +146,13 @@ void M2MBase::set_resource_type(const char *res_type)
 void M2MBase::set_coap_content_type(const uint8_t con_type)
 {
     assert(!_is_static);
-    _sn_resource->dynamic_resource_params->static_resource_parameters->coap_content_type =
-            con_type;
+    _sn_resource->dynamic_resource_params->coap_content_type = con_type;
 }
 
 void M2MBase::set_observable(bool observable)
 {
     assert(!_is_static);
-        _sn_resource->dynamic_resource_params->static_resource_parameters->observable =
-                observable;
+    _sn_resource->dynamic_resource_params->observable = observable;
 }
 
 void M2MBase::add_observation_level(M2MBase::Observation obs_level)
@@ -169,22 +168,21 @@ void M2MBase::remove_observation_level(M2MBase::Observation obs_level)
 void M2MBase::set_under_observation(bool observed,
                                     M2MObservationHandler *handler)
 {
-
     tr_debug("M2MBase::set_under_observation - observed: %d", observed);
-        tr_debug("M2MBase::set_under_observation - base_type: %d", base_type());
-        _is_under_observation = observed;
-        _observation_handler = handler;
-        if(handler) {
-            if (base_type() != M2MBase::ResourceInstance) {
-                if(!_report_handler){
-                    _report_handler = new M2MReportHandler(*this);
-                }
-                _report_handler->set_under_observation(observed);
+    tr_debug("M2MBase::set_under_observation - base_type: %d", base_type());
+    _is_under_observation = observed;
+    _observation_handler = handler;
+    if(handler) {
+        if (base_type() != M2MBase::ResourceInstance) {
+            if(!_report_handler){
+                _report_handler = new M2MReportHandler(*this);
             }
-        } else {
-            delete _report_handler;
-            _report_handler = NULL;
+        _report_handler->set_under_observation(observed);
         }
+    } else {
+        delete _report_handler;
+        _report_handler = NULL;
+    }
 }
 
 void M2MBase::set_observation_token(const uint8_t *token, const uint8_t length)
@@ -243,23 +241,23 @@ uint16_t M2MBase::instance_id() const
 const char* M2MBase::interface_description() const
 {
     return (reinterpret_cast<char*>(
-                _sn_resource->dynamic_resource_params->static_resource_parameters->interface_description_ptr));
+        _sn_resource->dynamic_resource_params->static_resource_parameters->interface_description_ptr));
 }
 
 const char* M2MBase::resource_type() const
 {
     return (reinterpret_cast<char*>(
-                _sn_resource->dynamic_resource_params->static_resource_parameters->resource_type_ptr));
+        _sn_resource->dynamic_resource_params->static_resource_parameters->resource_type_ptr));
 }
 
 uint8_t M2MBase::coap_content_type() const
 {
-    return _sn_resource->dynamic_resource_params->static_resource_parameters->coap_content_type;
+    return _sn_resource->dynamic_resource_params->coap_content_type;
 }
 
 bool M2MBase::is_observable() const
 {
-    return _sn_resource->dynamic_resource_params->static_resource_parameters->observable;
+    return _sn_resource->dynamic_resource_params->observable;
 }
 
 M2MBase::Observation M2MBase::observation_level() const
