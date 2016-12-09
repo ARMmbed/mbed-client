@@ -136,13 +136,13 @@ public:
      * @brief Memory Allocation required for libCoap.
      * @param size, Size of memory to be reserved.
     */
-    void* memory_alloc(uint16_t size);
+    static void* memory_alloc(uint16_t size);
 
     /**
      * @brief Memory free functions required for libCoap
      * @param ptr, Object whose memory needs to be freed.
     */
-    void memory_free(void *ptr);
+    static void memory_free(void *ptr);
 
     /**
     * @brief Callback from nsdl library to inform the data is ready
@@ -302,7 +302,7 @@ private:
      * @param source Source string to copy, may not be NULL.
      * @param size The size of memory to be reserved.
     */
-    uint8_t* alloc_string_copy(const uint8_t* source, uint16_t size);
+    static uint8_t* alloc_string_copy(const uint8_t* source, uint16_t size);
 
     /**
      * @brief Utility method to convert given lifetime int to ascii

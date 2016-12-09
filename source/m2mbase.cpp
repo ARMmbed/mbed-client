@@ -111,9 +111,7 @@ void M2MBase::set_interface_description(const char *desc)
     const size_t len = strlen(desc);
     if (len > 0 ) {
         _sn_resource->dynamic_resource_params->static_resource_parameters->interface_description_ptr =
-                alloc_string_copy((uint8_t*) desc, len);
-        _sn_resource->dynamic_resource_params->static_resource_parameters->interface_description_len =
-                len;
+                (char*)alloc_string_copy((uint8_t*) desc, len);
     }
 }
 
@@ -136,10 +134,8 @@ void M2MBase::set_resource_type(const char *res_type)
     _sn_resource->dynamic_resource_params->static_resource_parameters->resource_type_ptr = NULL;
     const size_t len = strlen(res_type);
     if (len > 0) {
-        _sn_resource->dynamic_resource_params->static_resource_parameters->resource_type_ptr =
-                alloc_string_copy((uint8_t*) res_type,len);
-        _sn_resource->dynamic_resource_params->static_resource_parameters->resource_type_len =
-                len;
+        _sn_resource->dynamic_resource_params->static_resource_parameters->resource_type_ptr = (char*)
+                alloc_string_copy((uint8_t*) res_type, len);
     }
 }
 
@@ -378,6 +374,16 @@ void *M2MBase::memory_alloc(uint32_t size)
 void M2MBase::memory_free(void *ptr)
 {
     free(ptr);
+}
+
+char* M2MBase::alloc_string_copy(const char* source)
+{
+    assert(source != NULL);
+
+    // Note: the armcc's libc does not have strdup, so we need to implement it here
+    const size_t len = strlen(source);
+
+    return (char*)alloc_string_copy((uint8_t*)source, len);
 }
 
 uint8_t* M2MBase::alloc_string_copy(const uint8_t* source, uint32_t size)

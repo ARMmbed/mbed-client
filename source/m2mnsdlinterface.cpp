@@ -1041,22 +1041,15 @@ bool M2MNsdlInterface::create_nsdl_resource(M2MBase *base, const String &name, b
                 }
             }
             if(base->resource_type() && _resource->static_resource_parameters) {
-                const size_t len = strlen(base->resource_type());
-                _resource->static_resource_parameters->resource_type_ptr =
-                        alloc_string_copy((uint8_t*)base->resource_type(),len);
-                if(_resource->static_resource_parameters->resource_type_ptr) {
-                    _resource->static_resource_parameters->resource_type_len =
-                           len;
-                }
+                // Note: this class could/should actually use the allocation helpers from M2MBase.
+                const size_t resource_type_len = strlen(base->resource_type());
+                _resource->static_resource_parameters->resource_type_ptr = (char*)
+                        alloc_string_copy((uint8_t*)base->resource_type(), resource_type_len);
             }
             if(base->interface_description() && _resource->static_resource_parameters) {
                 const size_t len = strlen(base->interface_description());
-                _resource->static_resource_parameters->interface_description_ptr =
-                        alloc_string_copy((uint8_t*)base->interface_description(),len);
-                if(_resource->static_resource_parameters->interface_description_ptr) {
-                    _resource->static_resource_parameters->interface_description_len =
-                            len;
-                 }
+                _resource->static_resource_parameters->interface_description_ptr = (char*)
+                        alloc_string_copy((uint8_t*)base->interface_description(), len);
             }
             if(_resource->static_resource_parameters) {
                 _resource->coap_content_type = base->coap_content_type();
