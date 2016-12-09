@@ -992,9 +992,9 @@ bool M2MNsdlInterface::create_nsdl_resource(M2MBase *base, const String &name, b
             }
             if(resource->static_resource_parameters) {
                 // Check if the observation parameter for the resource has changed.
-                if(resource->static_resource_parameters->observable != (uint8_t)base->is_observable()) {
+                if(resource->observable != (uint8_t)base->is_observable()) {
                     changed = true;
-                    resource->static_resource_parameters->observable = (uint8_t)base->is_observable();
+                    resource->observable = (uint8_t)base->is_observable();
                 }
             }
             if(changed && resource->static_resource_parameters) {
@@ -1059,8 +1059,8 @@ bool M2MNsdlInterface::create_nsdl_resource(M2MBase *base, const String &name, b
                  }
             }
             if(_resource->static_resource_parameters) {
-                _resource->static_resource_parameters->coap_content_type = base->coap_content_type();
-                _resource->static_resource_parameters->observable = (uint8_t)base->is_observable();
+                _resource->coap_content_type = base->coap_content_type();
+                _resource->observable = (uint8_t)base->is_observable();
             }
             _resource->publish_uri = publish_uri;
             int8_t result = sn_nsdl_create_resource(_nsdl_handle,_resource);
