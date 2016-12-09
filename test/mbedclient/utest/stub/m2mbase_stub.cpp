@@ -35,7 +35,8 @@ void *m2mbase_stub::void_value;
 M2MObservationHandler *m2mbase_stub::observe;
 M2MReportHandler *m2mbase_stub::report;
 bool m2mbase_stub::is_value_updated_function_set;
-
+uint8_t *m2mbase_stub::token;
+uint32_t m2mbase_stub::token_len;
 
 void m2mbase_stub::clear()
 {
@@ -54,6 +55,8 @@ void m2mbase_stub::clear()
     observe = NULL;
     report = NULL;
     is_value_updated_function_set = false;
+    token = NULL;
+    token_len = 0;
 }
 
 M2MBase::M2MBase(const String &/*resource_name*/,
@@ -178,9 +181,19 @@ M2MBase::Observation M2MBase::observation_level() const
     return m2mbase_stub::observation_level_value;
 }
 
-void M2MBase::get_observation_token(uint8_t *&/*token*/,
-                                    uint32_t &/*length*/)
+void M2MBase::get_observation_token(uint8_t *&token,
+                                    uint32_t &length)
 {
+    length = 0;
+    if(token) {
+        free(token);
+        token = NULL;
+    }
+    token = (uint8_t *)malloc(m2mbase_stub::token_len);
+    if(token) {
+        length = m2mbase_stub::token_len;
+        memcpy((uint8_t *)token, (uint8_t *)m2mbase_stub::token, length);
+    }
 }
 
 void M2MBase::set_base_type(M2MBase::BaseType /*type*/)

@@ -68,6 +68,7 @@ M2MNsdlInterface::M2MNsdlInterface(M2MNsdlObserver &observer)
     _sn_nsdl_address.addr_len = 0;
     _sn_nsdl_address.addr_ptr = NULL;
     _sn_nsdl_address.port = 0;
+    _sn_nsdl_address.type = SN_NSDL_ADDRESS_TYPE_NONE;
 
     // This initializes libCoap and libNsdl
     // Parameters are function pointers to used memory allocation
@@ -187,7 +188,7 @@ void M2MNsdlInterface::set_endpoint_lifetime_buffer(int lifetime)
 
     uint32_t size = m2m::itoa_c(lifetime, buffer);
 
-    if (size <= sizeof(buffer)) {
+    if (_endpoint && size <= sizeof(buffer)) {
         _endpoint->lifetime_ptr = alloc_string_copy((uint8_t*)buffer, size);
         if(_endpoint->lifetime_ptr) {
             _endpoint->lifetime_len =  size;
@@ -289,7 +290,7 @@ bool M2MNsdlInterface::send_update_registration(const uint32_t lifetime)
 
     //If Lifetime value is 0, then don't change the existing lifetime value
     if(lifetime != 0) {
-        if(_endpoint->lifetime_ptr) {
+        if(_endpoint && _endpoint->lifetime_ptr) {
             memory_free(_endpoint->lifetime_ptr);
             _endpoint->lifetime_ptr = NULL;
             _endpoint->lifetime_len = 0;
@@ -372,13 +373,13 @@ uint8_t M2MNsdlInterface::received_from_server_callback(struct nsdl_s *nsdl_hand
                                                         sn_coap_hdr_s *coap_header,
                                                         sn_nsdl_addr_s *address)
 {
-    tr_debug("M2MNsdlInterface::received_from_server_callback - incoming msg id:%" PRIu16, coap_header->msg_id);
-    tr_debug("M2MNsdlInterface::received_from_server_callback - registration id:%" PRIu16, nsdl_handle->register_msg_id);
-    tr_debug("M2MNsdlInterface::received_from_server_callback - unregistration id:%" PRIu16, nsdl_handle->unregister_msg_id);
-    tr_debug("M2MNsdlInterface::received_from_server_callback - update registration id:%" PRIu16, nsdl_handle->update_register_msg_id);
     _observer.coap_data_processed();
     uint8_t value = 0;
     if(nsdl_handle && coap_header) {
+        tr_debug("M2MNsdlInterface::received_from_server_callback - incoming msg id:%" PRIu16, coap_header->msg_id);
+        tr_debug("M2MNsdlInterface::received_from_server_callback - registration id:%" PRIu16, nsdl_handle->register_msg_id);
+        tr_debug("M2MNsdlInterface::received_from_server_callback - unregistration id:%" PRIu16, nsdl_handle->unregister_msg_id);
+        tr_debug("M2MNsdlInterface::received_from_server_callback - update registration id:%" PRIu16, nsdl_handle->update_register_msg_id);
         bool is_bootstrap_msg = address && (nsdl_handle->oma_bs_address_len == address->addr_len) &&
                                    (nsdl_handle->oma_bs_port == address->port) &&
                                    !memcmp(nsdl_handle->oma_bs_address_ptr, address->addr_ptr, nsdl_handle->oma_bs_address_len);
@@ -548,11 +549,16 @@ uint8_t M2MNsdlInterface::received_from_server_callback(struct nsdl_s *nsdl_hand
 
                 }
             }
-            else if(COAP_MSG_CODE_REQUEST_GET == coap_header->msg_code) {
-                tr_debug("M2MNsdlInterface::received_from_server_callback - Method not allowed (GET).");
-                coap_response = sn_nsdl_build_response(_nsdl_handle,
-                                                       coap_header,
-                                                       COAP_MSG_CODE_RESPONSE_METHOD_NOT_ALLOWED);
+            else if(COAP_MSG_CODE_EMPTY == coap_header->msg_code) {
+                tr_debug("M2MNsdlInterface::received_from_server_callback - Empty ACK, msg id: %d", coap_header->msg_id);
+                M2MBase *base = find_resource("", coap_header->token_ptr, coap_header->token_len);
+                if (base) {
+                    // Supported only in Resource level
+                    if (M2MBase::Resource == base->base_type()) {
+                        M2MResource *resource = static_cast<M2MResource *> (base);
+                        resource->notification_sent();
+                    }
+                }
             }
 
             if(coap_response) {
@@ -569,7 +575,6 @@ uint8_t M2MNsdlInterface::received_from_server_callback(struct nsdl_s *nsdl_hand
     }
     return value;
 }
-
 
 uint8_t M2MNsdlInterface::resource_callback(struct nsdl_s */*nsdl_handle*/,
                                             sn_coap_hdr_s *received_coap_header,
@@ -720,8 +725,8 @@ void M2MNsdlInterface::observation_to_be_sent(M2MBase *object,
                                               bool send_object)
 {
     __mutex_claim();
-    tr_debug("M2MNsdlInterface::observation_to_be_sent(), %s", object->uri_path());
     if(object) {
+        tr_debug("M2MNsdlInterface::observation_to_be_sent(), %s", object->uri_path());
         M2MBase::BaseType type = object->base_type();
         if(type == M2MBase::Object) {
             send_object_observation(static_cast<M2MObject*> (object),
@@ -810,7 +815,7 @@ void M2MNsdlInterface::value_updated(M2MBase *base,
         }
     }
 
-    if (base->is_value_updated_function_set()) {
+    if (base && base->is_value_updated_function_set()) {
         base->execute_value_updated(base->name());
     }
     else {
@@ -1110,7 +1115,7 @@ String M2MNsdlInterface::coap_to_string(uint8_t *coap_data,int coap_data_length)
 uint64_t M2MNsdlInterface::registration_time()
 {
     uint64_t value = 0;
-    if(_endpoint->lifetime_ptr) {
+    if(_endpoint && _endpoint->lifetime_ptr) {
         value = atol((const char*)_endpoint->lifetime_ptr);
     }
 
@@ -1123,21 +1128,40 @@ uint64_t M2MNsdlInterface::registration_time()
     return value;
 }
 
-M2MBase* M2MNsdlInterface::find_resource(const String &object_name)
+M2MBase* M2MNsdlInterface::find_resource(const String &object_name,
+                                         uint8_t *token,
+                                         uint8_t token_len)
 {
+    tr_debug("M2MNsdlInterface::find_resource - name (%s)", object_name.c_str());
     M2MBase *object = NULL;
     if(!_object_list.empty()) {
         M2MObjectList::const_iterator it;
         it = _object_list.begin();
         for ( ; it != _object_list.end(); it++ ) {
-            if (strcmp((*it)->name(), object_name.c_str()) == 0) {
-                object = (*it);
-                tr_debug("M2MNsdlInterface::find_resource(%s) found", object_name.c_str());
-                break;
+            if (token_len == 0) {
+               if (strcmp((*it)->name(), object_name.c_str()) == 0) {
+                    object = (*it);
+                    tr_debug("M2MNsdlInterface::find_resource(%s) found", object_name.c_str());
+                    break;
+                }
+            } else {
+                uint8_t *stored_token = 0;
+                uint32_t stored_token_length = 0;
+                (*it)->get_observation_token(stored_token, stored_token_length);
+                if (stored_token) {
+                    if (stored_token_length == token_len &&
+                            memcmp(token, stored_token, token_len) == 0) {
+                        object = (*it);
+                        tr_debug("M2MNsdlInterface::find_resource - token found");
+                        free(stored_token);
+                        break;
+                    } else {
+                        free(stored_token);
+                    }
+                }
             }
-            object = find_resource((*it),object_name);
+            object = find_resource((*it), object_name, token, token_len);
             if(object != NULL) {
-                tr_debug("M2MNsdlInterface::find_resource(%s) found", object_name.c_str());
                 break;
             }
         }
@@ -1146,7 +1170,9 @@ M2MBase* M2MNsdlInterface::find_resource(const String &object_name)
 }
 
 M2MBase* M2MNsdlInterface::find_resource(const M2MObject *object,
-                                         const String &object_instance)
+                                         const String &object_instance,
+                                         uint8_t *token,
+                                         uint8_t token_len)
 {
     M2MBase *instance = NULL;
     if(object) {
@@ -1155,16 +1181,32 @@ M2MBase* M2MNsdlInterface::find_resource(const M2MObject *object,
             M2MObjectInstanceList::const_iterator it;
             it = list.begin();
             for ( ; it != list.end(); it++ ) {
-                StringBuffer<M2MObject::MAX_PATH_SIZE_4> obj_name;
+                if (!token) {
+                    StringBuffer<M2MObject::MAX_PATH_SIZE_4> obj_name;
 
-                // Append object instance id to the object name.
+                    // Append object instance id to the object name.
 
                 M2MObject::build_path(obj_name, (*it)->name(), (*it)->instance_id());
                 if(!strcmp(obj_name.c_str(), object_instance.c_str())){//do we need some check here for the len? ten memcmp instead?
-                    instance = (*it);
-                    break;
+                        instance = (*it);
+                        break;
+                    }
+                } else {
+                    uint8_t *stored_token = 0;
+                    uint32_t stored_token_length = 0;
+                    (*it)->get_observation_token(stored_token, stored_token_length);
+                    if (stored_token) {
+                        if (stored_token_length == token_len &&
+                                memcmp(token, stored_token, token_len) == 0) {
+                            instance = (*it);
+                            free(stored_token);
+                            break;
+                        } else {
+                            free(stored_token);
+                        }
+                    }
                 }
-                instance = find_resource((*it),object_instance);
+                instance = find_resource((*it),object_instance, token, token_len);
                 if(instance != NULL){
                     break;
                 }
@@ -1175,7 +1217,9 @@ M2MBase* M2MNsdlInterface::find_resource(const M2MObject *object,
 }
 
 M2MBase* M2MNsdlInterface::find_resource(const M2MObjectInstance *object_instance,
-                                         const String &resource_instance)
+                                         const String &resource_instance,
+                                         uint8_t *token,
+                                         uint8_t token_len)
 {
     M2MBase *instance = NULL;
     if(object_instance) {
@@ -1184,20 +1228,36 @@ M2MBase* M2MNsdlInterface::find_resource(const M2MObjectInstance *object_instanc
             M2MResourceList::const_iterator it;
             it = list.begin();
             for ( ; it != list.end(); it++ ) {
-                StringBuffer<M2MObject::MAX_PATH_SIZE_2> obj_name;
+                if (!token) {
+                    StringBuffer<M2MObject::MAX_PATH_SIZE_2> obj_name;
 
-                // Append object instance id to the object name.
+                    // Append object instance id to the object name.
 
-                M2MObject::build_path(obj_name, object_instance->name(),
+                    M2MObject::build_path(obj_name, object_instance->name(),
                                       object_instance->instance_id(), (*it)->name());
 
-                if(!strcmp(obj_name.c_str(), resource_instance.c_str())) {//todo: check name len?
-                    instance = *it;
-                    break;
-                } else if((*it)->supports_multiple_instances()) {
-                    instance = find_resource((*it),obj_name.c_str(), resource_instance);
-                    if(instance != NULL){
+                    if(!strcmp(obj_name.c_str(), resource_instance.c_str())) {//todo: check name len?
+                        instance = *it;
                         break;
+                    } else if((*it)->supports_multiple_instances()) {
+                        instance = find_resource((*it),obj_name.c_str(), resource_instance, token, token_len);
+                        if(instance != NULL){
+                            break;
+                        }
+                    }
+                } else {
+                    uint8_t *stored_token = 0;
+                    uint32_t stored_token_length = 0;
+                    (*it)->get_observation_token(stored_token, stored_token_length);
+                    if (stored_token) {
+                        if (stored_token_length == token_len &&
+                                memcmp(token, stored_token, token_len) == 0) {
+                            instance = *it;
+                            free(stored_token);
+                            break;
+                        } else {
+                            free(stored_token);
+                        }
                     }
                 }
             }
@@ -1208,7 +1268,9 @@ M2MBase* M2MNsdlInterface::find_resource(const M2MObjectInstance *object_instanc
 
 M2MBase* M2MNsdlInterface::find_resource(const M2MResource *resource,
                                          const String &object_name,
-                                         const String &resource_instance)
+                                         const String &resource_instance,
+                                         uint8_t */*token*/,
+                                         uint8_t /*token_len*/)
 {
     M2MBase *res = NULL;
     if(resource) {
@@ -1224,7 +1286,6 @@ M2MBase* M2MNsdlInterface::find_resource(const M2MResource *resource,
                     // then add instance Id into creating resource path
                     // else normal /object_id/object_instance/resource_id format.
                     M2MObject::build_path(obj_name, object_name.c_str(), (*it)->instance_id());
-
                     if(!strcmp(obj_name.c_str(), resource_instance.c_str())){//todo: check name len?
                         res = (*it);
                         break;

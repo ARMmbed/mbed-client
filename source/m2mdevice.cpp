@@ -47,9 +47,9 @@ M2MDevice::M2MDevice()
     M2MBase::set_operation(M2MBase::GET_ALLOWED);
 
     _device_instance = M2MObject::create_object_instance();
-    _device_instance->set_operation(M2MBase::GET_ALLOWED);
-    _device_instance->set_register_uri(true);
     if(_device_instance) {
+        _device_instance->set_operation(M2MBase::GET_ALLOWED);
+        _device_instance->set_register_uri(true);
         _device_instance->set_coap_content_type(COAP_CONTENT_OMA_TLV_TYPE);
         M2MResource* res = _device_instance->create_dynamic_resource(DEVICE_REBOOT,
                                                                      OMA_RESOURCE_TYPE,
