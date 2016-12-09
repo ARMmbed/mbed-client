@@ -50,7 +50,8 @@ private: // Constructor and destructor are private which means
      * \param name Name of the object
      */
     M2MObjectInstance(const String &object_name,
-                      M2MObjectCallback &object_callback);
+                      M2MObjectCallback &object_callback,
+                      const String &resource_type = "");
 
     M2MObjectInstance(const lwm2m_parameters_s* static_res,
                       M2MObjectCallback &object_callback);

@@ -32,7 +32,8 @@ M2MResourceInstance::M2MResourceInstance(const String &res_name,
                                          const uint16_t object_instance_id,
                                          const String &object_name)
 : M2MBase(res_name,
-          M2MBase::Dynamic),
+          M2MBase::Dynamic,
+          resource_type),
  _value(NULL),
  _value_length(0),
  _block_message_data(NULL),
@@ -44,7 +45,6 @@ M2MResourceInstance::M2MResourceInstance(const String &res_name,
  _object_instance_id(object_instance_id),
  _resource_type(type)
 {
-    M2MBase::set_resource_type(resource_type);
     M2MBase::set_base_type(M2MBase::ResourceInstance);
 }
 
@@ -57,7 +57,8 @@ M2MResourceInstance::M2MResourceInstance(const String &res_name,
                                          const uint16_t object_instance_id,
                                          const String &object_name)
 : M2MBase(res_name,
-          M2MBase::Static),
+          M2MBase::Static,
+          resource_type),
  _value(NULL),
  _value_length(0),
  _block_message_data(NULL),
@@ -69,7 +70,6 @@ M2MResourceInstance::M2MResourceInstance(const String &res_name,
  _object_instance_id(object_instance_id),
  _resource_type(type)
 {
-    M2MBase::set_resource_type(resource_type);
     M2MBase::set_base_type(M2MBase::Resource);
     if( value != NULL && value_length > 0 ) {
         _value = alloc_string_copy(value, value_length);
@@ -110,7 +110,6 @@ M2MResourceInstance::M2MResourceInstance(const lwm2m_parameters_s* s,
             _value_length = s->dynamic_resource_params->static_resource_parameters->resourcelen;
         }
     }
-    //M2MBase::set_resource_type(resource_type);
     //M2MBase::set_base_type(M2MBase::ResourceInstance);
 }
 

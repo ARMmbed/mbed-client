@@ -33,8 +33,9 @@
 #define TRACE_GROUP "mClt"
 
 M2MObjectInstance::M2MObjectInstance(const String &object_name,
-                                     M2MObjectCallback &object_callback)
-: M2MBase(object_name,M2MBase::Dynamic),
+                                     M2MObjectCallback &object_callback,
+                                     const String &resource_type)
+: M2MBase(object_name, M2MBase::Dynamic, resource_type),
   _object_callback(object_callback)
 {
     M2MBase::set_base_type(M2MBase::ObjectInstance);
