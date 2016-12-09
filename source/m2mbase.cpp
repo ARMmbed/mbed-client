@@ -582,14 +582,19 @@ char* M2MBase::stringdup(const char* s)
 void M2MBase::free_resources()
 {
     if (!_is_static) {
-#ifndef MEMORY_OPTIMIZED_API
-        free(_sn_resource->dynamic_resource_params->static_resource_parameters->path);
-        free(_sn_resource->dynamic_resource_params->static_resource_parameters->resource);
-        free(_sn_resource->dynamic_resource_params->static_resource_parameters->resource_type_ptr);
-        free(_sn_resource->dynamic_resource_params->static_resource_parameters->interface_description_ptr);
-        free(_sn_resource->dynamic_resource_params->static_resource_parameters);
-#endif
-        free(_sn_resource->dynamic_resource_params);
+        if (_sn_resource->dynamic_resource_params->static_resource_parameters->free_on_delete) {
+            sn_nsdl_static_resource_parameters_s *params =
+                    const_cast<sn_nsdl_static_resource_parameters_s *>(_sn_resource->dynamic_resource_params->static_resource_parameters);
+
+            free(params->path);
+            free(params->resource);
+            free(params->resource_type_ptr);
+            free(params->interface_description_ptr);
+            free(params);
+        }
+        if (_sn_resource->dynamic_resource_params->free_on_delete) {
+            free(_sn_resource->dynamic_resource_params);
+        }
         free(_sn_resource->name);
         free(_sn_resource);
     }
