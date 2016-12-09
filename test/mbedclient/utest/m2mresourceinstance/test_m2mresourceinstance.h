@@ -61,6 +61,10 @@ public:
 
     void test_get_object_instance_id();
 
+    void test_set_notification_sent_function();
+
+    void test_notification_sent();
+
     M2MResourceInstance* resource_instance;
 
     Callback *callback;

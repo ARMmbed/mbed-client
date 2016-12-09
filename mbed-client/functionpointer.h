@@ -31,6 +31,7 @@ public:
      *  \param function The void static function to attach (default is none).
      */
     FP0(R (*function)(void) = 0) {
+        memset(_member,0,sizeof(_member));
         attach(function);
     }
 
@@ -117,6 +118,7 @@ public:
      *  \param function The void static function to attach (default is none).
      */
     FP1(R (*function)(A1) = 0) {
+        memset(_member,0,sizeof(_member));
         attach(function);
     }
 
@@ -201,6 +203,7 @@ public:
      *  \param function The void static function to attach (default is none).
      */
     FP2(R (*function)(A1, A2) = 0) {
+        memset(_member,0,sizeof(_member));
         attach(function);
     }
 
@@ -285,6 +288,7 @@ public:
      *  \param function The void static function to attach (default is none).
      */
     FP3(R (*function)(A1, A2, A3) = 0) {
+        memset(_member,0,sizeof(_member));
         attach(function);
     }
 

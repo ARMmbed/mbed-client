@@ -64,7 +64,7 @@ void M2MReportHandler::set_under_observation(bool observed)
 void M2MReportHandler::set_value(float value)
 {
     tr_debug("M2MReportHandler::set_value() - current %f, last %f", value, _last_value);
-    _current_value = value;    
+    _current_value = value;
     if(_current_value != _last_value) {
         tr_debug("M2MReportHandler::set_value() - UNDER OBSERVATION");
         if (check_threshold_values()) {
@@ -136,7 +136,7 @@ bool M2MReportHandler::parse_notification_attribute(const char *query,
                 len = 19;
             }
             memcpy(query_options[num_options], rest, len);
-            sep_pos++;            
+            sep_pos++;
             rest = sep_pos;
             sep_pos = strchr(rest, '&');
             num_options++;
@@ -182,7 +182,7 @@ bool M2MReportHandler::parse_notification_attribute(const char *query,
 }
 
 void M2MReportHandler::timer_expired(M2MTimerObserver::Type type)
-{    
+{
     switch(type) {
         case M2MTimerObserver::PMinTimer: {
             tr_debug("M2MReportHandler::timer_expired - PMIN");
@@ -191,7 +191,7 @@ void M2MReportHandler::timer_expired(M2MTimerObserver::Type type)
                      (_attribute_state & M2MReportHandler::Pmax) != M2MReportHandler::Pmax)){
                 report();
             }
-            else{                
+            else{
                 _pmin_exceeded = true;
             }
         }
@@ -222,7 +222,7 @@ bool M2MReportHandler::set_notification_attribute(const char* option,
     memset(&value, 0, 20);
 
     const char* pos = strstr(option, EQUAL);
-    if( pos != NULL ){        
+    if( pos != NULL ){
         memcpy(attribute, option, (size_t)(pos-option));
         pos++;
         memcpy(value, pos, strlen(pos));
@@ -324,7 +324,7 @@ void M2MReportHandler::handle_timers()
             _pmin_exceeded = true;
         } else {
             _pmin_exceeded = false;
-            time_interval = (uint64_t)(_pmin * 1000);
+            time_interval = (uint64_t) ((uint64_t)_pmin * 1000);
             tr_debug("M2MReportHandler::handle_timers() - Start PMIN interval: %d", (int)time_interval);
             _pmin_timer.start_timer(time_interval,
                                      M2MTimerObserver::PMinTimer,
@@ -333,7 +333,7 @@ void M2MReportHandler::handle_timers()
     }
     if ((_attribute_state & M2MReportHandler::Pmax) == M2MReportHandler::Pmax) {
         if (_pmax > 0) {
-            time_interval = (uint64_t)(_pmax * 1000);
+            time_interval = (uint64_t) ((uint64_t)_pmax * 1000);
             tr_debug("M2MReportHandler::handle_timers() - Start PMAX interval: %d", (int)time_interval);
             _pmax_timer.start_timer(time_interval,
                                      M2MTimerObserver::PMaxTimer,
@@ -346,7 +346,7 @@ bool M2MReportHandler::check_attribute_validity()
 {
     bool success = true;
     if ((_attribute_state & M2MReportHandler::Pmax) == M2MReportHandler::Pmax &&
-            ((_pmax >= -1.0f) && (_pmin > _pmax))) {
+            ((_pmax >= -1.0) && (_pmin > _pmax))) {
         success = false;
     }
     float low = _lt + 2 * _st;
@@ -373,8 +373,8 @@ void M2MReportHandler::stop_timers()
 void M2MReportHandler::set_default_values()
 {
     tr_debug("M2MReportHandler::set_default_values");
-    _pmax = -1.0f;
-    _pmin = 1.0f;
+    _pmax = -1.0;
+    _pmin = 1.0;
     _gt = 0.0f;
     _lt = 0.0f;
     _st = 0.0f;
@@ -400,10 +400,10 @@ bool M2MReportHandler::check_threshold_values()
     // Check step condition
     if ((_attribute_state & M2MReportHandler::St) == M2MReportHandler::St) {
         if ((_current_value >= _high_step ||
-            _current_value <= _low_step)) {                  
+            _current_value <= _low_step)) {
             can_send = true;
         }
-        else {            
+        else {
             if ((_attribute_state & M2MReportHandler::Lt) == M2MReportHandler::Lt ||
                     (_attribute_state & M2MReportHandler::Gt) == M2MReportHandler::Gt ) {
                 can_send = check_gt_lt_params();
@@ -413,7 +413,7 @@ bool M2MReportHandler::check_threshold_values()
             }
         }
     }
-    else {        
+    else {
         can_send = check_gt_lt_params();
     }
     tr_debug("M2MReportHandler::check_threshold_values - value in range = %d", (int)can_send);
@@ -427,35 +427,35 @@ bool M2MReportHandler::check_gt_lt_params()
     // GT & LT set.
     if ((_attribute_state & (M2MReportHandler::Lt | M2MReportHandler::Gt))
              == (M2MReportHandler::Lt | M2MReportHandler::Gt)) {
-        if (_current_value > _gt || _current_value < _lt) {            
+        if (_current_value > _gt || _current_value < _lt) {
             can_send = true;
         }
-        else {            
+        else {
             can_send = false;
         }
     }
     // Only LT
     else if ((_attribute_state & M2MReportHandler::Lt) == M2MReportHandler::Lt &&
            (_attribute_state & M2MReportHandler::Gt) == 0 ) {
-        if (_current_value < _lt) {            
+        if (_current_value < _lt) {
             can_send = true;
         }
-        else {            
+        else {
             can_send = false;
         }
     }
     // Only GT
     else if ((_attribute_state & M2MReportHandler::Gt) == M2MReportHandler::Gt &&
            (_attribute_state & M2MReportHandler::Lt) == 0 ) {
-        if (_current_value > _gt) {            
+        if (_current_value > _gt) {
             can_send = true;
         }
-        else {            
+        else {
             can_send = false;
         }
     }
     // GT & LT not set.
-    else {        
+    else {
         can_send = true;
     }
     tr_debug("M2MReportHandler::check_gt_lt_params - value in range = %d", (int)can_send);

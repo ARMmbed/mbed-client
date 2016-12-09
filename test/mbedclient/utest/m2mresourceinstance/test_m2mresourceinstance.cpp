@@ -28,6 +28,10 @@ static void callback_function(void *args)
 {
     cb_visited = true;
 }
+static void global_notification_sent_function()
+{
+    cb_visited = true;
+}
 
 class MyTest{
 public:
@@ -40,6 +44,10 @@ public:
     void block_message_requested(const String& /*resource*/, uint8_t *&/*data*/, uint32_t &/*len*/) {
         block_requested = true;
     }
+    void notification_sent() {
+        visited = true;
+    }
+
     bool visited;
     bool block_received;
     bool block_requested;
@@ -574,4 +582,33 @@ void Test_M2MResourceInstance::test_get_object_instance_id()
 {
     resource_instance->_object_instance_id = 100;
     CHECK(resource_instance->object_instance_id() == 100);
+}
+
+void Test_M2MResourceInstance::test_set_notification_sent_function()
+{
+    MyTest test;
+    resource_instance->set_notification_sent_callback(
+                notification_sent_callback(&test,&MyTest::notification_sent));
+    resource_instance->set_notification_sent_callback(global_notification_sent_function);
+}
+
+void Test_M2MResourceInstance::test_notification_sent()
+{
+    MyTest test;
+    void *args = NULL;
+
+    resource_instance->set_notification_sent_callback(
+                notification_sent_callback(&test,&MyTest::notification_sent));
+    resource_instance->notification_sent();
+
+    cb_visited = false;
+    resource_instance->set_notification_sent_callback(global_notification_sent_function);
+    resource_instance->notification_sent();
+    CHECK(true == cb_visited);
+
+    // Check delete
+    cb_visited = false;
+    resource_instance->set_notification_sent_callback(global_notification_sent_function);
+    resource_instance->notification_sent();
+    CHECK(true == cb_visited);
 }

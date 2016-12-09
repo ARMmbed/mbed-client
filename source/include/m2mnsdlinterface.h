@@ -259,17 +259,25 @@ private:
 
     uint64_t registration_time();
 
-    M2MBase* find_resource(const String &object);
+    M2MBase* find_resource(const String &object,
+                           uint8_t *token = NULL,
+                           uint8_t token_len = 0);
 
     M2MBase* find_resource(const M2MObject *object,
-                           const String &object_instance);
+                           const String &object_instance,
+                           uint8_t *token = NULL,
+                           uint8_t token_len = 0);
 
     M2MBase* find_resource(const M2MObjectInstance *object_instance,
-                           const String &resource_instance);
+                           const String &resource_instance,
+                           uint8_t *token = NULL,
+                           uint8_t token_len = 0);
 
     M2MBase* find_resource(const M2MResource *resource,
                            const String &object_name,
-                           const String &resource_instance);
+                           const String &resource_instance,
+                           uint8_t *token = NULL,
+                           uint8_t token_len = 0);
 
     bool object_present(M2MObject * object) const;
 
