@@ -165,8 +165,8 @@ private:
     bool                        _pmax_exceeded;
     M2MTimer                    _pmin_timer;
     M2MTimer                    _pmax_timer;
-    int                         _pmax;
-    int                         _pmin;
+    int32_t                     _pmax;
+    int32_t                     _pmin;
     float                       _current_value;
     float                       _gt;
     float                       _lt;

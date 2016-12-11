@@ -131,7 +131,7 @@ public:
      * \brief Sets a value of a given resource enum.
      * \param resource With this function, a value can be set on the following resources:
      * 'Package', 'PackageUri', 'PackageName','PackageVersion'.
-     * \param value The value to be set on the resource, in string format.     
+     * \param value The value to be set on the resource, in string format.
      * \return True if successfully set, else false.
      */
     bool set_resource_value(FirmwareResource resource,
@@ -170,7 +170,7 @@ public:
     /**
      * \brief Returns a value of a given resource key name, in integer format.
      * \param resource With this function, the following resources can return a value:
-     * 'State','UpdateSupportedObjects','UpdateResult'.     
+     * 'State','UpdateSupportedObjects','UpdateResult'.
      * \return The value associated with that resource. If the resource is not valid -1 is returned.
      */
     int64_t resource_value_int(FirmwareResource resource) const;
@@ -221,7 +221,7 @@ private:
 
     bool check_value_range(FirmwareResource resource, const int64_t value) const;
 
-    void set_zero_value(M2MResource *resource);
+    void set_zero_value(M2MResource &resource);
 
 private :
 

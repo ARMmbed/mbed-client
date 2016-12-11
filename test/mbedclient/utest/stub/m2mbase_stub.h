@@ -37,6 +37,8 @@ namespace m2mbase_stub
     extern M2MBase::Observation observation_level_value;
     extern bool is_value_updated_function_set;
     void clear();
+    extern uint8_t* token;
+    extern uint32_t token_len;
 }
 
 #endif // M2M_BASE_STUB_H
