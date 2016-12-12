@@ -1014,6 +1014,9 @@ bool M2MNsdlInterface::create_nsdl_resource(M2MBase *base, const String &name, b
             // Currently complete access is given
             _resource->access = (sn_grs_resource_acl_e)base->operation();
 
+            // Pointers must be deleted
+            _resource->free_on_delete = true;
+            _resource->static_resource_parameters->free_on_delete = true;
             if((M2MBase::Resource == base->base_type() ||
                 M2MBase::ResourceInstance == base->base_type()) &&
                M2MBase::Static == base->mode()) {
