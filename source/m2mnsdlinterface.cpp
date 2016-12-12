@@ -998,14 +998,14 @@ bool M2MNsdlInterface::create_nsdl_resource(M2MBase *base, const String &name, b
                 changed = true;
                 resource->access = (sn_grs_resource_acl_e)base->operation();
             }
-            if(resource->static_resource_parameters) {
-                // Check if the observation parameter for the resource has changed.
-                if(resource->observable != (uint8_t)base->is_observable()) {
-                    changed = true;
-                    resource->observable = (uint8_t)base->is_observable();
-                }
+
+            // Check if the observation parameter for the resource has changed.
+            if(resource->observable != (uint8_t)base->is_observable()) {
+                changed = true;
+                resource->observable = (uint8_t)base->is_observable();
             }
-            if(changed && resource->static_resource_parameters) {
+
+            if(changed) {
                 resource->registered = SN_NDSL_RESOURCE_NOT_REGISTERED;
             }
         } else if(_resource) {
