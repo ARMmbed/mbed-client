@@ -59,7 +59,7 @@ M2MFirmware::~M2MFirmware()
 static sn_nsdl_static_resource_parameters_s firmware_package_params_static = {
     (char*)OMA_RESOURCE_TYPE,      // resource_type_ptr
     (char*)"",                     // interface_description_ptr
-    (uint8_t*)"0",          // path
+    (uint8_t*)FIRMWARE_PACKAGE,    // path
     (uint8_t*)"",           // resource
     1,                      // strlen("0")
     0,                      // resourcelen
@@ -71,7 +71,7 @@ static sn_nsdl_static_resource_parameters_s firmware_package_params_static = {
 static sn_nsdl_static_resource_parameters_s firmware_package_uri_params_static = {
     (char*)OMA_RESOURCE_TYPE,      // resource_type_ptr
     (char*)"",                     // interface_description_ptr
-    (uint8_t*)"1",          // path
+    (uint8_t*)FIRMWARE_PACKAGE_URI, // path
     (uint8_t*)"",           // resource
     1,                      // strlen("1")
     0,                      // resourcelen
@@ -81,9 +81,9 @@ static sn_nsdl_static_resource_parameters_s firmware_package_uri_params_static =
 };
 
 static sn_nsdl_static_resource_parameters_s firmware_update_params_static = {
-    (char*)OMA_RESOURCE_TYPE,      // resource_type_ptr
-    (char*)"",                     // interface_description_ptr
-    (uint8_t*)"2",          // path
+    (char*)OMA_RESOURCE_TYPE,   // resource_type_ptr
+    (char*)"",                  // interface_description_ptr
+    (uint8_t*)FIRMWARE_UPDATE,  // path
     (uint8_t*)"",           // resource
     1,                      // strlen("2")
     0,                      // resourcelen
@@ -92,12 +92,35 @@ static sn_nsdl_static_resource_parameters_s firmware_update_params_static = {
     false                   // free_on_delete
 };
 
+static sn_nsdl_static_resource_parameters_s firmware_state_params_static = {
+    (char*)OMA_RESOURCE_TYPE,   // resource_type_ptr
+    (char*)"",                  // interface_description_ptr
+    (uint8_t*)FIRMWARE_STATE,   // path
+    (uint8_t*)"0",          // resource
+    1,                      // strlen("3")
+    1,                      // resourcelen
+    false,                  // external_memory_block
+    SN_GRS_DYNAMIC,         // mode
+    false                   // free_on_delete
+};
+
+static sn_nsdl_static_resource_parameters_s firmware_update_result_params_static = {
+    (char*)OMA_RESOURCE_TYPE,      // resource_type_ptr
+    (char*)"",                     // interface_description_ptr
+    (uint8_t*)FIRMWARE_UPDATE_RESULT, // path
+    (uint8_t*)"0",          // resource
+    1,                      // strlen("5")
+    1,                      // resourcelen
+    false,                  // external_memory_block
+    SN_GRS_DYNAMIC,         // mode
+    false                   // free_on_delete
+};
 
 static sn_nsdl_dynamic_resource_parameters_s firmware_package_params_dynamic = {
     NULL,
     &firmware_package_params_static,
     {NULL, NULL},                     // link
-    COAP_CONTENT_OMA_TLV_TYPE,        // coap_content_type
+    COAP_CONTENT_OMA_PLAIN_TEXT_TYPE, // coap_content_type
     M2MBase::PUT_ALLOWED,   // access
     0,                      // registered
     false,                  // publish_uri
@@ -109,7 +132,7 @@ static sn_nsdl_dynamic_resource_parameters_s firmware_package_uri_params_dynamic
     NULL,
     &firmware_package_uri_params_static,
     {NULL, NULL},                     // link
-    COAP_CONTENT_OMA_TLV_TYPE,        // coap_content_type
+    COAP_CONTENT_OMA_PLAIN_TEXT_TYPE, // coap_content_type
     M2MBase::PUT_ALLOWED,   // access
     0,                      // registered
     false,                  // publish_uri
@@ -121,7 +144,7 @@ static sn_nsdl_dynamic_resource_parameters_s firmware_update_params_dynamic = {
     NULL,
     &firmware_update_params_static,
     {NULL, NULL},                     // link
-    COAP_CONTENT_OMA_TLV_TYPE,        // coap_content_type
+    COAP_CONTENT_OMA_PLAIN_TEXT_TYPE, // coap_content_type
     M2MBase::NOT_ALLOWED,   // access
     0,                      // registered
     false,                  // publish_uri
@@ -129,14 +152,37 @@ static sn_nsdl_dynamic_resource_parameters_s firmware_update_params_dynamic = {
     true                    // observable
 };
 
+static sn_nsdl_dynamic_resource_parameters_s firmware_state_params_dynamic = {
+    NULL,
+    &firmware_state_params_static,
+    {NULL, NULL},                     // link
+    COAP_CONTENT_OMA_PLAIN_TEXT_TYPE, // coap_content_type
+    M2MBase::GET_ALLOWED,   // access
+    0,                      // registered
+    false,                  // publish_uri
+    false,                  // free_on_delete
+    true                    // observable
+};
 
+static sn_nsdl_dynamic_resource_parameters_s firmware_update_result_params_dynamic = {
+    NULL,
+    &firmware_update_result_params_static,
+    {NULL, NULL},                     // link
+    COAP_CONTENT_OMA_PLAIN_TEXT_TYPE, // coap_content_type
+    M2MBase::GET_ALLOWED,   // access
+    0,                      // registered
+    false,                  // publish_uri
+    false,                  // free_on_delete
+    true                    // observable
+};
 const static M2MBase::lwm2m_parameters firmware_package_params = {
     0, // max_age
     0, // instance_id
     0, // name_id
     FIRMWARE_PACKAGE, // name
     &firmware_package_params_dynamic,
-    M2MBase::Resource // base_type
+    M2MBase::Resource, // base_type
+    false // free_on_delete
 };
 
 const static M2MBase::lwm2m_parameters firmware_package_uri_params = {
@@ -145,7 +191,8 @@ const static M2MBase::lwm2m_parameters firmware_package_uri_params = {
     0, // name_id
     FIRMWARE_PACKAGE_URI, // name
     &firmware_package_uri_params_dynamic,
-    M2MBase::Resource // base_type
+    M2MBase::Resource, // base_type
+    false // free_on_delete
 };
 
 const static M2MBase::lwm2m_parameters firmware_update_params = {
@@ -154,7 +201,28 @@ const static M2MBase::lwm2m_parameters firmware_update_params = {
     0, // name_id
     FIRMWARE_UPDATE, // name
     &firmware_update_params_dynamic,
-    M2MBase::Resource // base_type
+    M2MBase::Resource, // base_type
+    false // free_on_delete
+};
+
+const static M2MBase::lwm2m_parameters firmware_state_params = {
+    0, // max_age
+    0, // instance_id
+    0, // name_id
+    FIRMWARE_STATE, // name
+    &firmware_state_params_dynamic,
+    M2MBase::Resource, // base_type
+    false // free_on_delete
+};
+
+const static M2MBase::lwm2m_parameters firmware_update_result_params = {
+    0, // max_age
+    0, // instance_id
+    0, // name_id
+    FIRMWARE_UPDATE_RESULT, // name
+    &firmware_update_result_params_dynamic,
+    M2MBase::Resource, // base_type
+    false // free_on_delete
 };
 
 void M2MFirmware::create_mandatory_resources()
@@ -162,6 +230,10 @@ void M2MFirmware::create_mandatory_resources()
     _firmware_instance->set_coap_content_type(COAP_CONTENT_OMA_TLV_TYPE);
 
     M2MResource* res;
+
+    // todo:
+    // perhaps we should have a API for batch creation of objects by using a array
+    // of lwm2m_parameters.
 
     res = _firmware_instance->create_dynamic_resource(&firmware_package_params,
                                                         M2MResourceInstance::OPAQUE,
@@ -175,26 +247,13 @@ void M2MFirmware::create_mandatory_resources()
                                                     M2MResourceInstance::OPAQUE,
                                                     false);
 
-    res = _firmware_instance->create_dynamic_resource(FIRMWARE_STATE,
-                                                    OMA_RESOURCE_TYPE,
-                                                    M2MResourceInstance::INTEGER,
-                                                    true);
-    if(res) {
-        set_zero_value(*res);
-        res->set_operation(M2MBase::GET_ALLOWED);
-        res->set_register_uri(false);
-    }
-    res = _firmware_instance->create_dynamic_resource(FIRMWARE_UPDATE_RESULT,
-                                                    OMA_RESOURCE_TYPE,
+    res = _firmware_instance->create_dynamic_resource(&firmware_state_params,
                                                     M2MResourceInstance::INTEGER,
                                                     true);
 
-    if(res) {
-        set_zero_value(*res);
-        res->set_operation(M2MBase::GET_ALLOWED);
-        res->set_register_uri(false);
-    }
-
+    res = _firmware_instance->create_dynamic_resource(&firmware_update_result_params,
+                                                    M2MResourceInstance::INTEGER,
+                                                    true);
 }
 
 M2MResource* M2MFirmware::create_resource(FirmwareResource resource, const String &value)
