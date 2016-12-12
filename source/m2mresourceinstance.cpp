@@ -96,6 +96,7 @@ M2MResourceInstance::M2MResourceInstance(const lwm2m_parameters_s* s,
   _resource_callback(NULL),
   _object_name(object_name),
   _execute_function_pointer(NULL),
+  _notification_sent_function_pointer(NULL),
   _object_instance_callback(object_instance_callback),
   _object_instance_id(object_instance_id),
   _resource_type(type)

@@ -121,8 +121,13 @@ public:
         uint32_t            instance_id;
         int32_t             name_id;
         char*               name; //for backwards compability
-        BaseType            base_type;
         sn_nsdl_dynamic_resource_parameters_s *dynamic_resource_params;
+        BaseType            base_type;
+        bool                free_on_delete;   /**< true if struct is dynamically allocted and it
+                                                 and its members (name) are to be freed on destructor.
+                                                 Note: the sn_nsdl_dynamic_resource_parameters_s has
+                                                 its own similar, independent flag.
+                                                 Note: this also serves as a read-only flag. */
     } lwm2m_parameters_s;
 
 protected:
@@ -544,8 +549,6 @@ private:
 
     void free_resources();
 
-    bool is_static() const;
-
 private:
     lwm2m_parameters_s          *_sn_resource;
     M2MReportHandler            *_report_handler;
@@ -556,7 +559,6 @@ private:
     uint16_t                    _observation_number;
     uint8_t                     _token_length;
     M2MBase::Observation        _observation_level;
-    bool                        _is_static;
     bool                        _is_under_observation;
 
 friend class Test_M2MBase;

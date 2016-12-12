@@ -39,7 +39,6 @@ M2MBase::M2MBase(const String& resource_name,
   _observation_number(0),
   _token_length(0),
   _observation_level(M2MBase::None),
-  _is_static(false),
   _is_under_observation(false)
 {
     // Checking the name length properly, i.e returning error is impossible from constructor without exceptions
@@ -48,6 +47,7 @@ M2MBase::M2MBase(const String& resource_name,
     _sn_resource = (lwm2m_parameters_s*)memory_alloc(sizeof(lwm2m_parameters_s));
     if(_sn_resource) {
         memset(_sn_resource, 0, sizeof(lwm2m_parameters_s));
+        _sn_resource->free_on_delete = true;
         _sn_resource->dynamic_resource_params =
                 (sn_nsdl_dynamic_resource_parameters_s*)memory_alloc(sizeof(sn_nsdl_dynamic_resource_parameters_s));
         if(_sn_resource->dynamic_resource_params) {
@@ -95,7 +95,6 @@ M2MBase::M2MBase(const lwm2m_parameters_s *s):
     _observation_number(0),
     _token_length(0),
     _observation_level(M2MBase::None),
-    _is_static(false),
     _is_under_observation(false)
 {
 }
@@ -110,6 +109,7 @@ M2MBase::~M2MBase()
 
 void M2MBase::set_operation(M2MBase::Operation opr)
 {
+    assert(_sn_resource->dynamic_resource_params->free_on_delete);
     // If the mode is Static, there is only GET_ALLOWED supported.
     if(M2MBase::Static == mode()) {
         _sn_resource->dynamic_resource_params->access = M2MBase::GET_ALLOWED;
@@ -121,7 +121,7 @@ void M2MBase::set_operation(M2MBase::Operation opr)
 #ifndef MEMORY_OPTIMIZED_API
 void M2MBase::set_interface_description(const char *desc)
 {
-    assert(!_is_static);
+    assert(_sn_resource->dynamic_resource_params->static_resource_parameters->free_on_delete);
     free(_sn_resource->dynamic_resource_params->static_resource_parameters->interface_description_ptr);
     _sn_resource->dynamic_resource_params->static_resource_parameters->interface_description_ptr = NULL;
     const size_t len = strlen(desc);
@@ -133,19 +133,19 @@ void M2MBase::set_interface_description(const char *desc)
 
 void M2MBase::set_interface_description(const String &desc)
 {
-    assert(!_is_static);
+    assert(_sn_resource->dynamic_resource_params->static_resource_parameters->free_on_delete);
     set_interface_description(desc.c_str());
 }
 
 void M2MBase::set_resource_type(const String &res_type)
 {
-    assert(!_is_static);
+    assert(_sn_resource->dynamic_resource_params->static_resource_parameters->free_on_delete);
     set_resource_type(res_type.c_str());
 }
 
 void M2MBase::set_resource_type(const char *res_type)
 {
-    assert(!_is_static);
+    assert(_sn_resource->dynamic_resource_params->static_resource_parameters->free_on_delete);
     free(_sn_resource->dynamic_resource_params->static_resource_parameters->resource_type_ptr);
     _sn_resource->dynamic_resource_params->static_resource_parameters->resource_type_ptr = NULL;
     const size_t len = strlen(res_type);
@@ -158,13 +158,13 @@ void M2MBase::set_resource_type(const char *res_type)
 
 void M2MBase::set_coap_content_type(const uint8_t con_type)
 {
-    assert(!_is_static);
+    assert(_sn_resource->dynamic_resource_params->free_on_delete);
     _sn_resource->dynamic_resource_params->coap_content_type = con_type;
 }
 
 void M2MBase::set_observable(bool observable)
 {
-    assert(!_is_static);
+    assert(_sn_resource->dynamic_resource_params->free_on_delete);
     _sn_resource->dynamic_resource_params->observable = observable;
 }
 
@@ -336,7 +336,7 @@ void M2MBase::observation_to_be_sent(m2m::Vector<uint16_t> changed_instance_ids,
 
 void M2MBase::set_base_type(M2MBase::BaseType type)
 {
-    assert(!_is_static);
+    assert(_sn_resource->free_on_delete);
     _sn_resource->base_type = type;
 }
 
@@ -466,7 +466,7 @@ M2MObservationHandler* M2MBase::observation_handler()
 
 void M2MBase::set_register_uri(bool register_uri)
 {
-    assert(!_is_static);
+    assert(_sn_resource->dynamic_resource_params->free_on_delete);
     _sn_resource->dynamic_resource_params->publish_uri = register_uri;
 }
 
@@ -502,13 +502,13 @@ bool M2MBase::is_integer(const char *value)
 
 void M2MBase::set_uri_path(const String &path)
 {
-    assert(!_is_static);
+    assert(_sn_resource->dynamic_resource_params->static_resource_parameters->free_on_delete);
     set_uri_path(path.c_str());
 }
 
 void M2MBase::set_uri_path(const char *path)
 {
-    assert(!_is_static);
+    assert(_sn_resource->dynamic_resource_params->static_resource_parameters->free_on_delete);
     free(_sn_resource->dynamic_resource_params->static_resource_parameters->path);
     _sn_resource->dynamic_resource_params->static_resource_parameters->path =
             alloc_string_copy((uint8_t*) path, strlen(path));
@@ -643,16 +643,12 @@ void M2MBase::free_resources()
     if (_sn_resource->dynamic_resource_params->free_on_delete) {
         free(_sn_resource->dynamic_resource_params);
     }
-    if (!_is_static) {
+    if (_sn_resource->free_on_delete) {
         free(_sn_resource->name);
         free(_sn_resource);
     }
 }
 
-bool M2MBase::is_static() const
-{
-    return _is_static;
-}
 
 size_t M2MBase::resource_name_length() const
 {
