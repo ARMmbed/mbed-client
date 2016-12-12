@@ -102,9 +102,6 @@ M2MResourceInstance::M2MResourceInstance(const lwm2m_parameters_s* s,
 {
     //TBD: put to flash, or parse from the uri_path!!!!
     //same for the _object_instance_id.
-    _object_name = M2MBase::stringdup((const char*)object_name.c_str());
-    tr_debug("M2MResourceInstance(object_name %s)", _object_name.c_str());
-
     // TBD: we dont need _value here, because in c-struct there is resource field!!!!
     if( s->dynamic_resource_params->static_resource_parameters->resource != NULL &&
             s->dynamic_resource_params->static_resource_parameters->resourcelen > 0 ) {
