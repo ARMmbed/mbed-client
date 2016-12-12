@@ -109,7 +109,6 @@ M2MBase::~M2MBase()
 
 void M2MBase::set_operation(M2MBase::Operation opr)
 {
-    assert(_sn_resource->dynamic_resource_params->free_on_delete);
     // If the mode is Static, there is only GET_ALLOWED supported.
     if(M2MBase::Static == mode()) {
         _sn_resource->dynamic_resource_params->access = M2MBase::GET_ALLOWED;
@@ -158,13 +157,11 @@ void M2MBase::set_resource_type(const char *res_type)
 
 void M2MBase::set_coap_content_type(const uint8_t con_type)
 {
-    assert(_sn_resource->dynamic_resource_params->free_on_delete);
     _sn_resource->dynamic_resource_params->coap_content_type = con_type;
 }
 
 void M2MBase::set_observable(bool observable)
 {
-    assert(_sn_resource->dynamic_resource_params->free_on_delete);
     _sn_resource->dynamic_resource_params->observable = observable;
 }
 
@@ -466,7 +463,6 @@ M2MObservationHandler* M2MBase::observation_handler()
 
 void M2MBase::set_register_uri(bool register_uri)
 {
-    assert(_sn_resource->dynamic_resource_params->free_on_delete);
     _sn_resource->dynamic_resource_params->publish_uri = register_uri;
 }
 
