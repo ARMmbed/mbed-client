@@ -95,7 +95,7 @@ M2MBase::M2MBase(const lwm2m_parameters_s *s):
     _observation_number(0),
     _token_length(0),
     _observation_level(M2MBase::None),
-    _is_static(false),
+    _is_static(true),
     _is_under_observation(false)
 {
 }
@@ -110,6 +110,7 @@ M2MBase::~M2MBase()
 
 void M2MBase::set_operation(M2MBase::Operation opr)
 {
+    assert(!_is_static);
     // If the mode is Static, there is only GET_ALLOWED supported.
     if(M2MBase::Static == mode()) {
         _sn_resource->dynamic_resource_params->access = M2MBase::GET_ALLOWED;
