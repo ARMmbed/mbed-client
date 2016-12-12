@@ -121,8 +121,8 @@ public:
         uint32_t            instance_id;
         int32_t             name_id;
         char*               name; //for backwards compability
-        BaseType            base_type;
         sn_nsdl_dynamic_resource_parameters_s *dynamic_resource_params;
+        BaseType            base_type;
     } lwm2m_parameters_s;
 
 protected:
