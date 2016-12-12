@@ -510,6 +510,10 @@ protected:
     */
     static uint8_t* alloc_copy(const uint8_t* source, uint32_t size);
 
+    // validate string length to be [min_length..max_length]
+    static bool validate_string_length(const String &string, size_t min_length, size_t max_length);
+    static bool validate_string_length(const char* string, size_t min_length, size_t max_length);
+
     /**
      * \brief Returns the Report Handler object.
      * \return M2MReportHandler object.
@@ -530,11 +534,13 @@ protected:
 
     static bool build_path(StringBuffer<MAX_PATH_SIZE_4> &buffer, const char *s1, uint16_t i1);
 
-    char* stringdup(const char* s);
+    static char* stringdup(const char* s);
 
 private:
 
     static bool is_integer(const String &value);
+
+    static bool is_integer(const char *value);
 
     void free_resources();
 

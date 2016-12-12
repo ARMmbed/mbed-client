@@ -178,6 +178,8 @@ public:
      */
     virtual M2MResource* resource(const String &name) const;
 
+    virtual M2MResource* resource(const char *resource) const;
+
     /**
      * \brief Returns a list of M2MResourceBase objects.
      * \return A list of M2MResourceBase objects.
