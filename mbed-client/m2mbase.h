@@ -399,26 +399,6 @@ public:
      */
     virtual bool register_uri();
 
-#ifndef MEMORY_OPTIMIZED_API
-    /**
-     * \brief Sets object URI path.
-     * \param path The URI path of the object.
-     */
-    virtual void set_uri_path(const String &path);
-
-    /**
-     * \brief Sets object URI path.
-     * \param path The URI path of the object.
-     */
-    virtual void set_uri_path(const char *path);
-#endif
-
-    /**
-     * \brief Returns the URI path of the object.
-     * \return The URI path of the object.
-     */
-    virtual const char* uri_path() const;
-
     /**
      * @brief Returns whether this resource is under observation or not.
      * @return True if the resource is under observation, else false,

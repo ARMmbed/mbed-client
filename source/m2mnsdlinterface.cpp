@@ -615,10 +615,6 @@ uint8_t M2MNsdlInterface::resource_callback(struct nsdl_s */*nsdl_handle*/,
     bool execute_value_updated = false;
     M2MBase* base = find_resource(resource_name);
     if(base) {
-// TODO! Check if this is really needed here? Uri path is part of static nsdl struct so can't be changed dynamically
-#ifndef MEMORY_OPTIMIZED_API
-        base->set_uri_path(resource_name);
-#endif
         if(COAP_MSG_CODE_REQUEST_GET == received_coap_header->msg_code) {
             coap_response = base->handle_get_request(_nsdl_handle, received_coap_header,this);
         } else if(COAP_MSG_CODE_REQUEST_PUT == received_coap_header->msg_code) {
@@ -917,15 +913,12 @@ bool M2MNsdlInterface::create_nsdl_resource_structure(M2MResource *res,
             return false;
         }
         res_name.append(object_name.c_str());
-        if (!res->uri_path() || (strcmp(res_name.c_str(), res->uri_path()) != 0)) {
-            if(!res_name.ensure_space(1 + res->resource_name_length() + 1)) {
-                tr_error("M2MNsdlInterface::create_nsdl_resource_structure - object creation failed");
-                return false;
-            }
-
-            res_name.append('/');
-            res_name.append(res->name(),res->resource_name_length());
+        if(!res_name.ensure_space(1 + res->resource_name_length() + 1)) {
+            tr_error("M2MNsdlInterface::create_nsdl_resource_structure - object creation failed");
+            return false;
         }
+        res_name.append('/');
+        res_name.append(res->name(),res->resource_name_length());
 
         // if there are multiple instances supported
         // then add instance Id into creating resource path
