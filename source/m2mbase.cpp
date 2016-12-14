@@ -494,30 +494,6 @@ bool M2MBase::is_integer(const char *value)
     return (*p == 0);
 }
 
-#ifndef MEMORY_OPTIMIZED_API
-
-void M2MBase::set_uri_path(const String &path)
-{
-    assert(_sn_resource->dynamic_resource_params->static_resource_parameters->free_on_delete);
-    set_uri_path(path.c_str());
-}
-
-void M2MBase::set_uri_path(const char *path)
-{
-    assert(_sn_resource->dynamic_resource_params->static_resource_parameters->free_on_delete);
-    free(_sn_resource->dynamic_resource_params->static_resource_parameters->path);
-    _sn_resource->dynamic_resource_params->static_resource_parameters->path =
-            alloc_string_copy((uint8_t*) path, strlen(path));
-    _sn_resource->dynamic_resource_params->static_resource_parameters->pathlen = strlen(path);
-}
-#endif
-
-const char* M2MBase::uri_path() const
-{
-    return (reinterpret_cast<char*>(
-                _sn_resource->dynamic_resource_params->static_resource_parameters->path));
-}
-
 bool M2MBase::is_under_observation() const
 {
     return _is_under_observation;
