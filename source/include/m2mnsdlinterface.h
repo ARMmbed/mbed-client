@@ -301,8 +301,7 @@ private:
                            uint32_t value_length,
                            uint16_t observation,
                            uint32_t max_age,
-                           uint8_t  coap_content_type,
-                           const String  &uri_path);
+                           uint8_t  coap_content_type);
 
     /**
      * @brief Allocate (size + 1) amount of memory, copy size bytes into
