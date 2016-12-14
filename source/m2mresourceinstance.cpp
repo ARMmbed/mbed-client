@@ -365,7 +365,13 @@ sn_coap_hdr_s* M2MResourceInstance::handle_get_request(nsdl_s *nsdl,
                 //If handler exists it means that resource value is stored in application side
                 if (block_message() && block_message()->is_block_message()) {
                     if(_outgoing_block_message_cb) {
-                        _outgoing_block_message_cb(uri_path(), coap_response->payload_ptr, payload_len);
+                        String name = "";
+                        if (received_coap_header->uri_path_ptr != NULL &&
+                                received_coap_header->uri_path_len > 0) {
+                            name.append_raw((char *)received_coap_header->uri_path_ptr,
+                                             received_coap_header->uri_path_len);
+                        }
+                        _outgoing_block_message_cb(name, coap_response->payload_ptr, payload_len);
                     }
                 } else {
                     get_value(coap_response->payload_ptr,payload_len);
