@@ -1726,7 +1726,7 @@ void M2MNsdlInterface::handle_bootstrap_finished(sn_coap_hdr_s *coap_header,sn_n
         }
         _endpoint->endpoint_name_ptr = alloc_string_copy((uint8_t*)_endpoint_name.c_str(), _endpoint_name.length());
         _endpoint->endpoint_name_len = _endpoint_name.length();
-        _observer.bootstrap_done(_security);
+        _observer.bootstrap_wait(_security);
     } else {
         handle_bootstrap_error();
     }

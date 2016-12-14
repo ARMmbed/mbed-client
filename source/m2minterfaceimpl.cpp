@@ -124,6 +124,7 @@ void M2MInterfaceImpl::bootstrap(M2MSecurity *security)
         TRANSITION_MAP_ENTRY (EVENT_IGNORED)                // state_bootstrap
         TRANSITION_MAP_ENTRY (EVENT_IGNORED)                // state__bootstrap_address_resolved
         TRANSITION_MAP_ENTRY (EVENT_IGNORED)                // state_bootstrap_resource_created
+        TRANSITION_MAP_ENTRY (EVENT_IGNORED)                // state_bootstrap_wait
         TRANSITION_MAP_ENTRY (EVENT_IGNORED)                // state_bootstrapped
         TRANSITION_MAP_ENTRY (EVENT_IGNORED)                // state_register
         TRANSITION_MAP_ENTRY (EVENT_IGNORED)                // state_register_address_resolved
@@ -174,6 +175,7 @@ void M2MInterfaceImpl::register_object(M2MSecurity *security, const M2MObjectLis
         TRANSITION_MAP_ENTRY (EVENT_IGNORED)                // state_bootstrap
         TRANSITION_MAP_ENTRY (EVENT_IGNORED)                // state__bootstrap_address_resolved
         TRANSITION_MAP_ENTRY (EVENT_IGNORED)                // state_bootstrap_resource_created
+        TRANSITION_MAP_ENTRY (EVENT_IGNORED)                // state_bootstrap_wait
         TRANSITION_MAP_ENTRY (STATE_REGISTER)               // state_bootstrapped
         TRANSITION_MAP_ENTRY (EVENT_IGNORED)                // state_register
         TRANSITION_MAP_ENTRY (EVENT_IGNORED)                // state_register_address_resolved
@@ -227,6 +229,7 @@ void M2MInterfaceImpl::unregister_object(M2MSecurity* /*security*/)
         TRANSITION_MAP_ENTRY (EVENT_IGNORED)                // state_bootstrap
         TRANSITION_MAP_ENTRY (EVENT_IGNORED)                // state__bootstrap_address_resolved
         TRANSITION_MAP_ENTRY (EVENT_IGNORED)                // state_bootstrap_resource_created
+        TRANSITION_MAP_ENTRY (EVENT_IGNORED)                // state_bootstrap_wait
         TRANSITION_MAP_ENTRY (EVENT_IGNORED)                // state_bootstrapped
         TRANSITION_MAP_ENTRY (EVENT_IGNORED)                // state_register
         TRANSITION_MAP_ENTRY (EVENT_IGNORED)                // state_register_address_resolved
@@ -335,6 +338,15 @@ void M2MInterfaceImpl::bootstrap_done(M2MSecurity *security_object)
     _bootstrap_timer->stop_timer();
     internal_event(STATE_BOOTSTRAPPED);
     _observer.bootstrap_done(security_object);
+#endif //MBED_CLIENT_DISABLE_BOOTSTRAP_FEATURE
+}
+
+void M2MInterfaceImpl::bootstrap_wait(M2MSecurity *security_object)
+{
+#ifndef MBED_CLIENT_DISABLE_BOOTSTRAP_FEATURE
+    tr_debug("M2MInterfaceImpl::bootstrap_wait");
+    _security = security_object;
+    internal_event(STATE_BOOTSTRAP_WAIT);
 #endif //MBED_CLIENT_DISABLE_BOOTSTRAP_FEATURE
 }
 
@@ -483,7 +495,14 @@ void M2MInterfaceImpl::data_sent()
                                             M2MTimerObserver::QueueSleep);
         }
     }
-    internal_event(STATE_COAP_DATA_SENT);
+    if (_current_state == STATE_BOOTSTRAP_WAIT) {
+        M2MSecurity *sec = _security;
+        _security = NULL;
+        bootstrap_done(sec);
+    }
+    else {
+        internal_event(STATE_COAP_DATA_SENT);
+    }
 }
 
 void M2MInterfaceImpl::timer_expired(M2MTimerObserver::Type type)
@@ -911,6 +930,11 @@ void M2MInterfaceImpl::state_function( uint8_t current_state, EventData* data )
             M2MInterfaceImpl::state_bootstrap_resource_created(data);
         #endif //MBED_CLIENT_DISABLE_BOOTSTRAP_FEATURE
             break;
+        case STATE_BOOTSTRAP_WAIT:
+        #ifndef MBED_CLIENT_DISABLE_BOOTSTRAP_FEATURE
+            // Do nothing, we're just waiting for data_sent callback
+        #endif //MBED_CLIENT_DISABLE_BOOTSTRAP_FEATURE
+            break;
         case STATE_BOOTSTRAPPED:
         #ifndef MBED_CLIENT_DISABLE_BOOTSTRAP_FEATURE
             M2MInterfaceImpl::state_bootstrapped(data);
@@ -965,6 +989,7 @@ void M2MInterfaceImpl::start_register_update(M2MUpdateRegisterData *data) {
         TRANSITION_MAP_ENTRY (EVENT_IGNORED)                // state_bootstrap
         TRANSITION_MAP_ENTRY (EVENT_IGNORED)                // state__bootstrap_address_resolved
         TRANSITION_MAP_ENTRY (EVENT_IGNORED)                // state_bootstrap_resource_created
+        TRANSITION_MAP_ENTRY (EVENT_IGNORED)                // state_bootstrap_wait
         TRANSITION_MAP_ENTRY (EVENT_IGNORED)                // state_bootstrapped
         TRANSITION_MAP_ENTRY (EVENT_IGNORED)                // state_register
         TRANSITION_MAP_ENTRY (EVENT_IGNORED)                // state_register_address_resolved
