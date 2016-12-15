@@ -201,7 +201,7 @@ protected: // From M2MNsdlObserver
 
     virtual void coap_data_processed();
 
-    virtual void value_updated(M2MBase *base);
+    virtual void value_updated(M2MBase *base, const char *path);
 
 protected: // From M2MConnectionObserver
 
