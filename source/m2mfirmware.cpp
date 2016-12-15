@@ -56,7 +56,18 @@ M2MFirmware::~M2MFirmware()
 {
 }
 
+// Conditionally put the static part of parameter struct into flash.
+// Unfortunately this can't be done yet by default as there is old API which
+// may be used to modify the values in sn_nsdl_static_resource_parameters_s.
+#ifdef MEMORY_OPTIMIZED_API
+#define STATIC_PARAM_TYPE const
+#else
+#define STATIC_PARAM_TYPE
+#endif
+
 #define PACKAGE_PATH FIRMWARE_PATH_PREFIX FIRMWARE_PACKAGE
+
+STATIC_PARAM_TYPE
 static sn_nsdl_static_resource_parameters_s firmware_package_params_static = {
     (char*)OMA_RESOURCE_TYPE,      // resource_type_ptr
     (char*)"",                     // interface_description_ptr
@@ -70,6 +81,8 @@ static sn_nsdl_static_resource_parameters_s firmware_package_params_static = {
 };
 
 #define PACKAGE_URI_PATH FIRMWARE_PATH_PREFIX FIRMWARE_PACKAGE_URI
+
+STATIC_PARAM_TYPE
 static sn_nsdl_static_resource_parameters_s firmware_package_uri_params_static = {
     (char*)OMA_RESOURCE_TYPE,      // resource_type_ptr
     (char*)"",                     // interface_description_ptr
@@ -83,6 +96,8 @@ static sn_nsdl_static_resource_parameters_s firmware_package_uri_params_static =
 };
 
 #define UPDATE_PATH FIRMWARE_PATH_PREFIX FIRMWARE_UPDATE
+
+STATIC_PARAM_TYPE
 static sn_nsdl_static_resource_parameters_s firmware_update_params_static = {
     (char*)OMA_RESOURCE_TYPE,   // resource_type_ptr
     (char*)"",                  // interface_description_ptr
@@ -96,6 +111,8 @@ static sn_nsdl_static_resource_parameters_s firmware_update_params_static = {
 };
 
 #define STATE_URI_PATH FIRMWARE_PATH_PREFIX FIRMWARE_STATE
+
+STATIC_PARAM_TYPE
 static sn_nsdl_static_resource_parameters_s firmware_state_params_static = {
     (char*)OMA_RESOURCE_TYPE,   // resource_type_ptr
     (char*)"",                  // interface_description_ptr
@@ -109,6 +126,8 @@ static sn_nsdl_static_resource_parameters_s firmware_state_params_static = {
 };
 
 #define UPDATE_RESULT_PATH FIRMWARE_PATH_PREFIX FIRMWARE_UPDATE_RESULT
+
+STATIC_PARAM_TYPE
 static sn_nsdl_static_resource_parameters_s firmware_update_result_params_static = {
     (char*)OMA_RESOURCE_TYPE,      // resource_type_ptr
     (char*)"",                     // interface_description_ptr
