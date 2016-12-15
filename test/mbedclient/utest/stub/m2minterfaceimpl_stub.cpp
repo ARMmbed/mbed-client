@@ -117,6 +117,11 @@ void M2MInterfaceImpl::bootstrap_done(M2MSecurity *)
 
 }
 
+void M2MInterfaceImpl::bootstrap_wait(M2MSecurity *)
+{
+
+}
+
 void M2MInterfaceImpl::bootstrap_error()
 {
 
