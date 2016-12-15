@@ -464,6 +464,7 @@ uint8_t M2MNsdlInterface::received_from_server_callback(struct nsdl_s *nsdl_hand
             sn_coap_hdr_s *coap_response = NULL;
             bool execute_value_updated = false;
             M2MObjectInstance *obj_instance = NULL;
+            String resource_name;
 
             if(COAP_MSG_CODE_REQUEST_PUT == coap_header->msg_code) {
                 if (is_bootstrap_msg) {
@@ -493,7 +494,7 @@ uint8_t M2MNsdlInterface::received_from_server_callback(struct nsdl_s *nsdl_hand
                 }
                 else if(coap_header->uri_path_ptr) {
 
-                    String resource_name = coap_to_string(coap_header->uri_path_ptr,
+                    resource_name = coap_to_string(coap_header->uri_path_ptr,
                                                           coap_header->uri_path_len);
 
                     String object_name;
@@ -591,7 +592,7 @@ uint8_t M2MNsdlInterface::received_from_server_callback(struct nsdl_s *nsdl_hand
             }
 
             if (execute_value_updated) {
-                value_updated(obj_instance, obj_instance->name());
+                value_updated(obj_instance, resource_name);
             }
 
         }
@@ -820,7 +821,7 @@ void M2MNsdlInterface::value_updated(M2MBase *base,
         base->execute_value_updated(base->name());
     }
     else {
-        _observer.value_updated(base);
+        _observer.value_updated(base, object_name.c_str());
     }
 }
 
