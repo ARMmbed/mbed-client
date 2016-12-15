@@ -1097,7 +1097,7 @@ String M2MNsdlInterface::coap_to_string(uint8_t *coap_data,int coap_data_length)
 
 uint64_t M2MNsdlInterface::registration_time()
 {
-    uint64_t value = 0;
+    uint32_t value = 0;
     if(_endpoint && _endpoint->lifetime_ptr) {
         value = atol((const char*)_endpoint->lifetime_ptr);
     }
