@@ -62,6 +62,14 @@ public:
         }
     }
 
+    void bootstrap_wait(M2MSecurity *sec){
+        if(sec) {
+            boot_wait = true;
+            delete sec;
+            sec = NULL;
+        }
+    }
+
     void bootstrap_error(){
         boot_error = true;
     }
@@ -76,6 +84,7 @@ public:
 
     bool register_error;
     bool boot_error;
+    bool boot_wait;
     bool boot_done;
     bool registered;
     bool register_updated;
@@ -839,6 +848,7 @@ void Test_M2MNsdlInterface::test_received_from_server_callback()
     m2msecurity_stub::int_value = true;
     m2msecurity_stub::bool_value = false;
     observer->boot_error = false;
+    observer->boot_wait = false;
     observer->boot_done = false;
     coap_header->uri_path_ptr = (uint8_t*)malloc(2);
     coap_header->uri_path_len = 2;
@@ -847,7 +857,8 @@ void Test_M2MNsdlInterface::test_received_from_server_callback()
     coap_header->msg_code = COAP_MSG_CODE_REQUEST_POST;
     CHECK(0 == nsdl->received_from_server_callback(handle,coap_header,address));
     CHECK(observer->boot_error == false);
-    CHECK(observer->boot_done == true);
+    CHECK(observer->boot_wait == true);
+    CHECK(observer->boot_done == false);
 
     //handle_bootstrap_finished() success certificate
     nsdl->_security = new M2MSecurity(M2MSecurity::M2MServer);
@@ -856,12 +867,14 @@ void Test_M2MNsdlInterface::test_received_from_server_callback()
     m2msecurity_stub::int_value = true;
     m2msecurity_stub::bool_value = false;
     observer->boot_error = false;
+    observer->boot_wait = false;
     observer->boot_done = false;
     coap_header->msg_code = COAP_MSG_CODE_REQUEST_POST;
 
     CHECK(0 == nsdl->received_from_server_callback(handle,coap_header,address));
     CHECK(observer->boot_error == false);
-    CHECK(observer->boot_done == true);
+    CHECK(observer->boot_wait == true);
+    CHECK(observer->boot_done == false);
 
     //handle_bootstrap_finished() fail, Psk not supported
     nsdl->_security = new M2MSecurity(M2MSecurity::M2MServer);

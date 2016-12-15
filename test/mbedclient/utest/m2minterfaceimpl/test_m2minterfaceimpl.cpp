@@ -37,6 +37,7 @@ public:
     void bootstrap_done(M2MSecurity */*server_object*/){
         bootstrapped = true;
     }
+
     void object_registered(M2MSecurity */*security_object*/,
                            const M2MServer &/*server_object*/) {
         registered = true;
@@ -523,6 +524,19 @@ void Test_M2MInterfaceImpl::test_client_unregistered()
     CHECK(impl->_current_state == M2MInterfaceImpl::STATE_IDLE);
     CHECK(observer->unregistered == true);
 }
+
+void Test_M2MInterfaceImpl::test_bootstrap_wait()
+{
+    M2MSecurity *sec = new M2MSecurity(M2MSecurity::M2MServer);
+    impl->bootstrap_wait(sec);
+
+    CHECK(impl->_current_state == M2MInterfaceImpl::STATE_BOOTSTRAP_WAIT);
+    CHECK(impl->_security == sec);
+    CHECK(observer->bootstrapped == false);
+
+    delete sec;
+}
+
 
 void Test_M2MInterfaceImpl::test_bootstrap_done()
 {

@@ -55,6 +55,11 @@ public:
         }
     }
 
+    void bootstrap_wait(M2MSecurity *sec){
+        if(sec) {
+            boot_wait = true;
+        }
+    }
     void bootstrap_error(){
         boot_error = true;
     }
@@ -88,6 +93,7 @@ public:
 
     bool register_error;
     bool boot_error;
+    bool boot_wait;
     bool boot_done;
     bool registered;
     bool data_processed;

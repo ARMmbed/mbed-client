@@ -197,6 +197,8 @@ protected: // From M2MNsdlObserver
 
     virtual void bootstrap_done(M2MSecurity *security_object);
 
+    virtual void bootstrap_wait(M2MSecurity *security_object);
+
     virtual void bootstrap_error();
 
     virtual void coap_data_processed();
@@ -328,18 +330,19 @@ private: // state machine state functions
         STATE_BOOTSTRAP,
         STATE_BOOTSTRAP_ADDRESS_RESOLVED,
         STATE_BOOTSTRAP_RESOURCE_CREATED,
-        STATE_BOOTSTRAPPED,
-        STATE_REGISTER, //5
+        STATE_BOOTSTRAP_WAIT,
+        STATE_BOOTSTRAPPED, //5
+        STATE_REGISTER,
         STATE_REGISTER_ADDRESS_RESOLVED,
         STATE_REGISTERED,
         STATE_UPDATE_REGISTRATION,
-        STATE_UNREGISTER,
-        STATE_UNREGISTERED, //10
+        STATE_UNREGISTER, //10
+        STATE_UNREGISTERED,
         STATE_SENDING_COAP_DATA,
         STATE_COAP_DATA_SENT,
         STATE_COAP_DATA_RECEIVED,
-        STATE_PROCESSING_COAP_DATA,
-        STATE_COAP_DATA_PROCESSED, //15
+        STATE_PROCESSING_COAP_DATA, //15
+        STATE_COAP_DATA_PROCESSED,
         STATE_WAITING,
         STATE_MAX_STATES
     };
