@@ -496,6 +496,8 @@ void M2MInterfaceImpl::data_sent()
         }
     }
     if (_current_state == STATE_BOOTSTRAP_WAIT) {
+        // For bootstrap we need to call bootstrap_done callback ONLY after we have
+        // sent the last ACK and ended in STATE_BOOTSTRAP_WAIT
         M2MSecurity *sec = _security;
         _security = NULL;
         bootstrap_done(sec);
