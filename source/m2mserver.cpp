@@ -26,7 +26,7 @@
 #define BUFFER_SIZE 21
 
 M2MServer::M2MServer()
-: M2MObject(M2M_SERVER_ID)
+: M2MObject(M2M_SERVER_ID, stringdup(M2M_SERVER_ID))
 {
     M2MObject::create_object_instance();
 

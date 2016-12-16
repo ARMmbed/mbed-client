@@ -18,6 +18,11 @@
 #include "mbed-client/m2mobservationhandler.h"
 #include "mbed-client/m2mconstants.h"
 #include "mbed-client/m2mtimer.h"
+
+#include "mbed-client/m2mobject.h"
+#include "mbed-client/m2mobjectinstance.h"
+#include "mbed-client/m2mresource.h"
+
 #include "include/m2mreporthandler.h"
 #include "include/nsdlaccesshelper.h"
 #include "mbed-trace/mbed_trace.h"
@@ -30,7 +35,8 @@
 
 M2MBase::M2MBase(const String& resource_name,
                  M2MBase::Mode mode,
-                 const String &resource_type)
+                 const String &resource_type,
+                 char *path)
 :
   _sn_resource(NULL),
   _report_handler(NULL),
@@ -72,13 +78,9 @@ M2MBase::M2MBase(const String& resource_name,
                     params->resource_type_ptr = (char*)
                             alloc_string_copy((uint8_t*) resource_type.c_str(), len);
                 }
-
-                const size_t pathlen = strlen(resource_name.c_str());
-                if (pathlen > 0) {
-                    params->path = (uint8_t*)
-                            alloc_string_copy((uint8_t*) resource_name.c_str(), pathlen);
-                    params->pathlen = pathlen;
-                }
+                // XXX
+                params->path = (uint8_t*)path;
+                params->pathlen = strlen(path);
 
                 params->mode = (const uint8_t)mode;
                 params->free_on_delete = true;
@@ -121,6 +123,89 @@ M2MBase::~M2MBase()
     free(_token);
     delete _function_pointer;
 }
+
+char* M2MBase::create_path(const M2MObject &parent, uint16_t object_instance)
+{
+    StringBuffer<5> obj_inst_id;
+    obj_inst_id.append_int(object_instance);
+
+    return create_path(parent, obj_inst_id.c_str());
+}
+
+char* M2MBase::create_path(const M2MObject &parent, const char *name)
+{
+    char * result = NULL;
+    StringBuffer<(MAX_NAME_SIZE * 2 + (2 + 1))> path;
+
+    const char* obj_name = parent.name();
+
+    // XXX: ensure space
+    path.append(obj_name);
+    path.append('/');
+    path.append(name);
+
+    result = stringdup(path.c_str());
+    return result;
+}
+
+char* M2MBase::create_path(const M2MResource &parent, uint16_t resource_instance)
+{
+    StringBuffer<5> res_inst;
+    res_inst.append_int(resource_instance);
+
+    return create_path(parent, res_inst.c_str());
+}
+
+char* M2MBase::create_path(const M2MResource &parent, const char *name)
+{
+    char * result = NULL;
+    StringBuffer<(MAX_NAME_SIZE * 4 + (3 + 1))> path;
+    M2MObjectInstance& parent_object_instance = parent.get_parent_object_instance();
+    M2MObject& parent_object = parent_object_instance.get_parent_object();
+
+    const char* obj_name = parent_object.name();
+
+    // Note: the parent_object_instance.name() contains name of its parent object, not the name of instance,
+    // so we need to skip that here
+    const uint16_t obj_inst_id = parent_object_instance.instance_id();
+
+    const char* resource_name = parent.name();
+
+    // XXX: ensure space
+    path.append(obj_name);
+    path.append('/');
+    path.append_int(obj_inst_id);
+    path.append('/');
+    path.append(resource_name);
+    path.append('/');
+    path.append(name);
+
+    result = stringdup(path.c_str());
+    return result;
+}
+
+char* M2MBase::create_path(const M2MObjectInstance &parent, const char *name)
+{
+    char * result = NULL;
+    StringBuffer<(MAX_NAME_SIZE * 3 + (2 + 1))> path;
+    M2MObject& parent_object = parent.get_parent_object();
+
+    const char* obj_name = parent_object.name();
+    // Note: the parent_object_instance.name() contains name of its parent object, not the name of instance,
+    // so we need to skip that here
+    const uint16_t obj_inst_id = parent.instance_id();
+
+    // XXX: ensure space
+    path.append(obj_name);
+    path.append('/');
+    path.append_int(obj_inst_id);
+    path.append('/');
+    path.append(name);
+
+    result = stringdup(path.c_str());
+    return result;
+}
+
 
 void M2MBase::set_operation(M2MBase::Operation opr)
 {
