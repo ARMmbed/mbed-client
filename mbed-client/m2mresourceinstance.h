@@ -73,8 +73,7 @@ private: // Constructor and destructor are private
                         const lwm2m_parameters_s* s,
                         M2MObjectInstanceCallback &object_instance_callback,
                         M2MResourceInstance::ResourceType type,
-                        const uint16_t object_instance_id,
-                        const String &object_name);
+                        const uint16_t object_instance_id);
     /**
      * \brief A constructor for creating a resource.
      * \param resource_name The name of the resource.
@@ -89,7 +88,6 @@ private: // Constructor and destructor are private
                         M2MResourceInstance::ResourceType type,
                         M2MObjectInstanceCallback &object_instance_callback,
                         const uint16_t object_instance_id,
-                        const String &object_name,
                         char* path);
 
     /**
@@ -111,7 +109,6 @@ private: // Constructor and destructor are private
                         const uint8_t value_length,
                         M2MObjectInstanceCallback &object_instance_callback,
                         const uint16_t object_instance_id,
-                        const String &object_name,
                         char* path);
 
     // Prevents the use of default constructor.
@@ -256,7 +253,7 @@ public:
      * \brief Returns the name of the object where the resource exists.
      * \return Object name.
     */
-    const String& object_name() const;
+    virtual const char* object_name() const;
 
     /**
      * @brief Sets the function that is executed when this
@@ -324,7 +321,6 @@ private:
     M2MBlockMessage                         *_block_message_data;
     execute_callback                        _execute_callback;
     M2MResourceCallback                     *_resource_callback; // Not owned
-    String                                  _object_name;
     FP1<void, void*>                        *_execute_function_pointer;
     FP0<void>                               *_notification_sent_function_pointer;
     incoming_block_message_callback         _incoming_block_message_cb;

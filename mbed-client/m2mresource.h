@@ -50,8 +50,7 @@ private: // Constructor and destructor are private,
                  M2MObjectInstanceCallback &object_instance_callback,
                  const lwm2m_parameters_s* s,
                  M2MResourceInstance::ResourceType type,
-                 const uint16_t object_instance_id,
-                 const String &object_name);
+                 const uint16_t object_instance_id);
     /**
      * \brief Constructor
      * \param resource_name The resource name of the object.
@@ -71,7 +70,6 @@ private: // Constructor and destructor are private,
                 const uint8_t *value,
                 const uint8_t value_length,
                 const uint16_t object_instance_id = 0,
-                const String &object_name = "",
                 bool multiple_instance = false);
 
     /**
@@ -91,7 +89,6 @@ private: // Constructor and destructor are private,
                 M2MResourceInstance::ResourceType type,
                 bool observable,
                 const uint16_t object_instance_id = 0,
-                const String &object_name = "",
                 bool multiple_instance = false);
 
     // Prevents the use of a default constructor.
@@ -237,6 +234,12 @@ public:
                                                sn_nsdl_addr_s *address = NULL);
 
     M2MObjectInstance& get_parent_object_instance() const;
+
+    /**
+     * \brief Returns the name of the object where the resource exists.
+     * \return Object name.
+    */
+    virtual const char* object_name() const;
 
 protected:
     virtual void notification_update();

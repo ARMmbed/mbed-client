@@ -79,7 +79,7 @@ M2MResource* M2MObjectInstance::create_static_resource(const lwm2m_parameters_s*
         return res;
     }
     if(!resource(static_res->name)) {
-        res = new M2MResource(*this, *this, static_res, type, (const uint16_t) M2MBase::instance_id(), M2MBase::name());
+        res = new M2MResource(*this, *this, static_res, type, (const uint16_t) M2MBase::instance_id());
         if(res) {
             res->add_observation_level(observation_level());
             //if (multiple_instance) {
@@ -106,7 +106,7 @@ M2MResource* M2MObjectInstance::create_static_resource(const String &resource_na
     if(!resource(resource_name)) {
         res = new M2MResource(*this, *this,resource_name, resource_type, type,
                               value, value_length, M2MBase::instance_id(),
-                              M2MBase::name(), multiple_instance);
+                              multiple_instance);
         if(res) {
             res->add_observation_level(observation_level());
             if (multiple_instance) {
@@ -129,7 +129,7 @@ M2MResource* M2MObjectInstance::create_dynamic_resource(const lwm2m_parameters_s
         return res;
     }
     if(!resource(static_res->name)) {
-        res = new M2MResource(*this, *this, static_res, type, M2MBase::instance_id(), M2MBase::name());
+        res = new M2MResource(*this, *this, static_res, type, M2MBase::instance_id());
         if(res) {
             //if (multiple_instance) { // TODO!
               //  res->set_coap_content_type(COAP_CONTENT_OMA_TLV_TYPE);
@@ -155,7 +155,7 @@ M2MResource* M2MObjectInstance::create_dynamic_resource(const String &resource_n
     if(!resource(resource_name)) {
         res = new M2MResource(*this, *this, resource_name, resource_type, type,
                               observable, M2MBase::instance_id(),
-                              M2MBase::name(), multiple_instance);
+                              multiple_instance);
         if(res) {
             if (multiple_instance) {
                 res->set_coap_content_type(COAP_CONTENT_OMA_TLV_TYPE);
@@ -184,7 +184,7 @@ M2MResourceInstance* M2MObjectInstance::create_static_resource_instance(const St
     if(!res) {
         res = new M2MResource(*this, *this,resource_name, resource_type, type,
                               value, value_length, M2MBase::instance_id(),
-                              M2MBase::name(), true);
+                              true);
         _resource_list.push_back(res);
         res->set_operation(M2MBase::GET_ALLOWED);
         res->set_observable(false);
@@ -194,7 +194,7 @@ M2MResourceInstance* M2MObjectInstance::create_static_resource_instance(const St
         char *path = M2MBase::create_path(*res, instance_id);
         instance = new M2MResourceInstance(*res, resource_name, resource_type, type,
                                            value, value_length, *this,
-                                           M2MBase::instance_id(), M2MBase::name(),
+                                           M2MBase::instance_id(),
                                            path);
         if(instance) {
             instance->set_operation(M2MBase::GET_ALLOWED);
@@ -219,7 +219,7 @@ M2MResourceInstance* M2MObjectInstance::create_dynamic_resource_instance(const S
     M2MResource *res = resource(resource_name);
     if(!res) {
         res = new M2MResource(*this, *this,resource_name, resource_type, type,
-                              false, M2MBase::instance_id(), M2MBase::name(), true);
+                              false, M2MBase::instance_id(), true);
         _resource_list.push_back(res);
         res->set_register_uri(false);
         res->set_operation(M2MBase::GET_ALLOWED);
@@ -227,8 +227,7 @@ M2MResourceInstance* M2MObjectInstance::create_dynamic_resource_instance(const S
     if(res->supports_multiple_instances() && (res->resource_instance(instance_id) == NULL)) {
         char *path = create_path(*res, instance_id);
         instance = new M2MResourceInstance(*res, resource_name, resource_type, type, *this,
-                                           M2MBase::instance_id(), M2MBase::name(),
-                                           path);
+                                           M2MBase::instance_id(), path);
         if(instance) {
             instance->set_operation(M2MBase::GET_ALLOWED);
             instance->set_observable(observable);
