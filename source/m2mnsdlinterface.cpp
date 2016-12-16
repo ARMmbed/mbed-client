@@ -52,7 +52,6 @@
 M2MNsdlInterface::M2MNsdlInterface(M2MNsdlObserver &observer)
 : _observer(observer),
   _endpoint(NULL),
-  _resource(NULL),
   _nsdl_handle(NULL),
   _security(NULL),
   _server(),
@@ -83,12 +82,6 @@ M2MNsdlInterface::M2MNsdlInterface(M2MNsdlObserver &observer)
 M2MNsdlInterface::~M2MNsdlInterface()
 {
     tr_debug("M2MNsdlInterface::~M2MNsdlInterface() - IN");
-    if(_resource) {
-#ifndef MEMORY_OPTIMIZED_API
-        memory_free(_resource->static_resource_parameters);
-#endif
-        memory_free(_resource);
-    }
     if(_endpoint) {
          memory_free(_endpoint->endpoint_name_ptr);
          memory_free(_endpoint->lifetime_ptr);
@@ -125,18 +118,6 @@ bool M2MNsdlInterface::initialize()
     sn_nsdl_set_retransmission_parameters(_nsdl_handle,
                                           MBED_CLIENT_RECONNECTION_COUNT,
                                           MBED_CLIENT_RECONNECTION_INTERVAL);
-
-    // Allocate the memory for resources
-    _resource = (sn_nsdl_dynamic_resource_parameters_s*)memory_alloc(sizeof(sn_nsdl_dynamic_resource_parameters_s));
-    if(_resource) {
-        memset(_resource, 0, sizeof(sn_nsdl_dynamic_resource_parameters_s));
-#ifndef MEMORY_OPTIMIZED_API
-        _resource->static_resource_parameters = (sn_nsdl_static_resource_parameters_s*)memory_alloc(sizeof(sn_nsdl_static_resource_parameters_s));
-        if(_resource->static_resource_parameters) {
-            memset(_resource->static_resource_parameters, 0, sizeof(sn_nsdl_static_resource_parameters_s));
-        }
-#endif
-    }
 
     //Allocate the memory for endpoint
     _endpoint = (sn_nsdl_ep_parameters_s*)memory_alloc(sizeof(sn_nsdl_ep_parameters_s));
@@ -961,147 +942,33 @@ bool M2MNsdlInterface::create_nsdl_resource_structure(M2MResource *res,
 
 bool M2MNsdlInterface::create_nsdl_resource(M2MBase *base, const String &name, bool publish_uri)
 {
-// TODO! Maybe parameter which holds the static vs. dynamic information
-#ifndef MEMORY_OPTIMIZED_API
     __mutex_claim();
     tr_debug("M2MNsdlInterface::create_nsdl_resource(name %s)", name.c_str());
+
     bool success = false;
-    uint8_t* buffer = 0;
-    uint32_t length = 0;
 
     // Create the NSDL Resource Pointer...
     if(base) {
-        sn_nsdl_dynamic_resource_parameters_s* resource = sn_nsdl_get_resource(_nsdl_handle,
-                                                                 name.length(),
-                                                                 (uint8_t*)name.c_str());
 
-        if(resource) {
-            bool changed = false;
+        base->set_under_observation(false,this);
+        sn_nsdl_dynamic_resource_parameters_s* orig_resource = base->get_nsdl_resource();
+
+        int8_t result=0;
+        result = sn_nsdl_put_resource(_nsdl_handle, orig_resource);
+        tr_debug("M2MNsdlInterface::create_nsdl_resource - Creating in NSDL-C result %d", result);
+
+        // Either the resource is created or it already
+        // exists , then result is success.
+        if (result == 0 ||
+           result == -2){
             success = true;
-            if(resource->static_resource_parameters->mode == SN_GRS_STATIC) {
-                if((M2MBase::Resource == base->base_type() ||
-                   M2MBase::ResourceInstance == base->base_type()) &&
-                   M2MBase::Static == base->mode()) {
-                    M2MResourceInstance *res = (M2MResourceInstance*) base;
-                    res->get_value(buffer,length);
-                    if(resource->static_resource_parameters->resource) {
-                        memory_free(resource->static_resource_parameters->resource);
-                    }
-                    resource->static_resource_parameters->resource = buffer;
-                    resource->static_resource_parameters->resourcelen = length;
-                    resource->publish_uri = publish_uri;
-                }
-            }
-            // Check if the access level for the resource has changed.
-            if(resource->access != (sn_grs_resource_acl_e)base->operation()) {
-                changed = true;
-                resource->access = (sn_grs_resource_acl_e)base->operation();
-            }
-
-            // Check if the observation parameter for the resource has changed.
-            if(resource->observable != (uint8_t)base->is_observable()) {
-                changed = true;
-                resource->observable = (uint8_t)base->is_observable();
-            }
-
-            if(changed) {
-                resource->registered = SN_NDSL_RESOURCE_NOT_REGISTERED;
-            }
-        } else if(_resource) {
-            base->set_under_observation(false,this);
-            //TODO: implement access control
-            // Currently complete access is given
-            _resource->access = (sn_grs_resource_acl_e)base->operation();
-
-            // Pointers must be deleted
-            _resource->free_on_delete = true;
-            _resource->static_resource_parameters->free_on_delete = true;
-            if((M2MBase::Resource == base->base_type() ||
-                M2MBase::ResourceInstance == base->base_type()) &&
-               M2MBase::Static == base->mode()) {
-                M2MResourceInstance *res = (M2MResourceInstance*)base;
-                // Static resource is updated
-                _resource->static_resource_parameters->mode = SN_GRS_STATIC;
-
-                res->get_value(buffer,length);
-                _resource->static_resource_parameters->resource = buffer;
-                _resource->static_resource_parameters->resourcelen = length;
-            }
-
-            if(M2MBase::Dynamic == base->mode()){
-                // Dynamic resource is updated
-                _resource->static_resource_parameters->mode = SN_GRS_DYNAMIC;
-                _resource->sn_grs_dyn_res_callback = __nsdl_c_callback;
-                if(M2MBase::Resource == base->base_type()) {
-                    M2MResource *res = (M2MResource*)base;
-                    if (res) {
-                        _resource->static_resource_parameters->external_memory_block = (res->block_message()) ? 1 : 0;
-                    }
-                }
-            }
-
-            if( _resource->static_resource_parameters->path != NULL ){
-                memory_free(_resource->static_resource_parameters->path);
-                _resource->static_resource_parameters->path = NULL;
-            }
-            if(name.length() > 0 ){
-                _resource->static_resource_parameters->path = alloc_string_copy((uint8_t*)name.c_str(), name.length());
-                if(_resource->static_resource_parameters->path) {
-                    _resource->static_resource_parameters->pathlen = name.length();
-                }
-            }
-            if(base->resource_type() && _resource->static_resource_parameters) {
-                // Note: this class could/should actually use the allocation helpers from M2MBase.
-                const size_t resource_type_len = strlen(base->resource_type());
-                _resource->static_resource_parameters->resource_type_ptr = (char*)
-                        alloc_string_copy((uint8_t*)base->resource_type(), resource_type_len);
-            }
-            if(base->interface_description() && _resource->static_resource_parameters) {
-                const size_t len = strlen(base->interface_description());
-                _resource->static_resource_parameters->interface_description_ptr = (char*)
-                        alloc_string_copy((uint8_t*)base->interface_description(), len);
-            }
-            if(_resource->static_resource_parameters) {
-                _resource->coap_content_type = base->coap_content_type();
-                _resource->observable = (uint8_t)base->is_observable();
-            }
-            _resource->publish_uri = publish_uri;
-            int8_t result = sn_nsdl_create_resource(_nsdl_handle,_resource);
-            tr_debug("M2MNsdlInterface::create_nsdl_resource - Creating in NSDL-C result %d", result);
-
-            // Either the resource is created or it already
-            // exists , then result is success.
-            if (result == 0 ||
-               result == -2){
-                success = true;
-            }
-
-            if(_resource->static_resource_parameters->path) {
-                memory_free(_resource->static_resource_parameters->path);
-            }
-            if(_resource->static_resource_parameters->resource_type_ptr){
-                memory_free(_resource->static_resource_parameters->resource_type_ptr);
-            }
-            if(_resource->static_resource_parameters->interface_description_ptr){
-                memory_free(_resource->static_resource_parameters->interface_description_ptr);
-            }
-            if (_resource->static_resource_parameters->resource) {
-                memory_free(_resource->static_resource_parameters->resource);
-            }
-
-            //Clear up the filled resource to fill up new resource.
-            clear_resource(_resource);
-
-            if(success) {
-               base->set_under_observation(false,this);
-            }
+        }
+        if(success) {
+           base->set_under_observation(false,this);
         }
     }
     __mutex_release();
     return success;
-#else
-    return true;
-#endif
 }
 
 // convenience method to get the URI from its buffer field...
@@ -1323,20 +1190,6 @@ bool M2MNsdlInterface::add_object_to_list(M2MObject* object)
         success = true;
     }
     return success;
-}
-
-void M2MNsdlInterface::clear_resource(sn_nsdl_dynamic_resource_parameters_s *&resource)
-{
-// TODO! Maybe parameter which holds the static vs. dynamic information
-#ifndef MEMORY_OPTIMIZED_API
-    //Clear up the filled resource to fill up new resource.
-    if(resource && resource->static_resource_parameters) {
-        sn_nsdl_static_resource_parameters_s *temp_resource_parameter = resource->static_resource_parameters;
-        memset(resource->static_resource_parameters, 0, sizeof(sn_nsdl_static_resource_parameters_s));
-        memset(resource,0, sizeof(sn_nsdl_dynamic_resource_parameters_s));
-        resource->static_resource_parameters = temp_resource_parameter;
-    }
-#endif
 }
 
 M2MInterface::Error M2MNsdlInterface::interface_error(sn_coap_hdr_s *coap_header)

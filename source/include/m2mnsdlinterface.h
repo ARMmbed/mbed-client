@@ -281,8 +281,6 @@ private:
 
     bool object_present(M2MObject * object) const;
 
-    void clear_resource(sn_nsdl_dynamic_resource_parameters_s *&resource);
-
     M2MInterface::Error interface_error(sn_coap_hdr_s *coap_header);
 
     void send_object_observation(M2MObject *object,
@@ -363,7 +361,6 @@ private:
     M2MNsdlObserver                         &_observer;
     M2MObjectList                            _object_list;
     sn_nsdl_ep_parameters_s                 *_endpoint;
-    sn_nsdl_dynamic_resource_parameters_s   *_resource;
     nsdl_s                                  *_nsdl_handle;
     M2MSecurity                             *_security; // Not owned
     M2MServer                               _server;
