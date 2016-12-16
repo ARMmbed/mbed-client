@@ -37,8 +37,21 @@ typedef void(*execute_callback_2) (void *arguments);
 typedef FP0<void> notification_sent_callback;
 typedef void(*notification_sent_callback_2) (void);
 
+// XXX: should there be just one flag for API simplifications? or each one separate?
+// Or even better, allow one to get rid of unused callbacks completely?
+#ifdef MEMORY_OPTIMIZED_API
+#define MEMORY_OPTIMIZED_BLOCKWISE_API
+#endif
+
+// this saves 24 bytes of memory per resource(instance)
+#ifdef MEMORY_OPTIMIZED_BLOCKWISE_API
+typedef void (*incoming_block_message_callback)(M2MBlockMessage *);
+// XXX: get rid of String completely here too
+typedef void (*outgoing_block_message_callback)(const String &, uint8_t *&, uint32_t &);
+#else
 typedef FP1<void, M2MBlockMessage *> incoming_block_message_callback;
 typedef FP3<void, const String &, uint8_t *&, uint32_t &> outgoing_block_message_callback;
+#endif
 
 class M2MResource;
 class M2MResourceCallback;
@@ -323,6 +336,8 @@ private:
     M2MResourceCallback                     *_resource_callback; // Not owned
     FP1<void, void*>                        *_execute_function_pointer;
     FP0<void>                               *_notification_sent_function_pointer;
+
+    // todo: ifdef the blockwise support from here too just as it is optional at C side
     incoming_block_message_callback         _incoming_block_message_cb;
     outgoing_block_message_callback         _outgoing_block_message_cb;
     M2MObjectInstanceCallback               &_object_instance_callback;
