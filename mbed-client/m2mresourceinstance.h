@@ -37,8 +37,21 @@ typedef void(*execute_callback_2) (void *arguments);
 typedef FP0<void> notification_sent_callback;
 typedef void(*notification_sent_callback_2) (void);
 
+// XXX: should there be just one flag for API simplifications? or each one separate?
+// Or even better, allow one to get rid of unused callbacks completely?
+#ifdef MEMORY_OPTIMIZED_API
+#define MEMORY_OPTIMIZED_BLOCKWISE_API
+#endif
+
+// this saves 24 bytes of memory per resource(instance)
+#ifdef MEMORY_OPTIMIZED_BLOCKWISE_API
+typedef void (*incoming_block_message_callback)(M2MBlockMessage *);
+// XXX: get rid of String completely here too
+typedef void (*outgoing_block_message_callback)(const String &, uint8_t *&, uint32_t &);
+#else
 typedef FP1<void, M2MBlockMessage *> incoming_block_message_callback;
 typedef FP3<void, const String &, uint8_t *&, uint32_t &> outgoing_block_message_callback;
+#endif
 
 class M2MResource;
 class M2MResourceCallback;
@@ -73,8 +86,7 @@ private: // Constructor and destructor are private
                         const lwm2m_parameters_s* s,
                         M2MObjectInstanceCallback &object_instance_callback,
                         M2MResourceInstance::ResourceType type,
-                        const uint16_t object_instance_id,
-                        const String &object_name);
+                        const uint16_t object_instance_id);
     /**
      * \brief A constructor for creating a resource.
      * \param resource_name The name of the resource.
@@ -89,7 +101,6 @@ private: // Constructor and destructor are private
                         M2MResourceInstance::ResourceType type,
                         M2MObjectInstanceCallback &object_instance_callback,
                         const uint16_t object_instance_id,
-                        const String &object_name,
                         char* path);
 
     /**
@@ -111,7 +122,6 @@ private: // Constructor and destructor are private
                         const uint8_t value_length,
                         M2MObjectInstanceCallback &object_instance_callback,
                         const uint16_t object_instance_id,
-                        const String &object_name,
                         char* path);
 
     // Prevents the use of default constructor.
@@ -256,7 +266,7 @@ public:
      * \brief Returns the name of the object where the resource exists.
      * \return Object name.
     */
-    const String& object_name() const;
+    virtual const char* object_name() const;
 
     /**
      * @brief Sets the function that is executed when this
@@ -324,9 +334,10 @@ private:
     M2MBlockMessage                         *_block_message_data;
     execute_callback                        _execute_callback;
     M2MResourceCallback                     *_resource_callback; // Not owned
-    String                                  _object_name;
     FP1<void, void*>                        *_execute_function_pointer;
     FP0<void>                               *_notification_sent_function_pointer;
+
+    // todo: ifdef the blockwise support from here too just as it is optional at C side
     incoming_block_message_callback         _incoming_block_message_cb;
     outgoing_block_message_callback         _outgoing_block_message_cb;
     M2MObjectInstanceCallback               &_object_instance_callback;
