@@ -27,8 +27,8 @@
 #define BUFFER_SIZE 10
 #define TRACE_GROUP "mClt"
 
-M2MObject::M2MObject(const String &object_name)
-: M2MBase(object_name,M2MBase::Dynamic),
+M2MObject::M2MObject(const String &object_name, char *path)
+: M2MBase(object_name,M2MBase::Dynamic, "", path),
   _max_instance_count(MAX_UNINT_16_COUNT)
 {
     M2MBase::set_base_type(M2MBase::Object);
@@ -70,7 +70,10 @@ M2MObjectInstance* M2MObject::create_object_instance(uint16_t instance_id)
     tr_debug("M2MObject::create_object_instance - id: %d", instance_id);
     M2MObjectInstance *instance = NULL;
     if(!object_instance(instance_id)) {
-        instance = new M2MObjectInstance(this->name(),*this);
+        char* path = create_path(*this, instance_id);
+        StringBuffer<6> inst_id;
+        inst_id.append_int(instance_id);
+        instance = new M2MObjectInstance(*this, inst_id.c_str(),*this, "", path);
         if(instance) {
             instance->add_observation_level(observation_level());
             instance->set_instance_id(instance_id);
@@ -89,7 +92,8 @@ M2MObjectInstance* M2MObject::create_object_instance(const lwm2m_parameters_s* s
     tr_debug("M2MObject::create_object_instance - id: %d", s->instance_id);
     M2MObjectInstance *instance = NULL;
     if(!object_instance(s->instance_id)) {
-        instance = new M2MObjectInstance(this->name(),*this);
+
+        instance = new M2MObjectInstance(*this, s,*this);
         if(instance) {
             instance->add_observation_level(observation_level());
             //instance->set_instance_id(instance_id);

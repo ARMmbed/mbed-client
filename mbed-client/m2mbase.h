@@ -40,6 +40,11 @@ typedef void(*value_updated_callback2) (const char* object_name);
 class M2MObservationHandler;
 class M2MReportHandler;
 
+class M2MObjectInstance;
+class M2MObject;
+class M2MResource;
+
+
 /*! \file m2mbase.h
  *  \brief M2MBase.
  *  This class is the base class based on which all LWM2M object models
@@ -151,7 +156,8 @@ protected:
      */
     M2MBase(const String &name,
             M2MBase::Mode mode,
-            const String &resource_type = "");
+            const String &resource_type,
+            char *path);
 
     M2MBase(const lwm2m_parameters_s* s);
 
@@ -440,6 +446,12 @@ public:
     size_t resource_name_length() const;
 
     sn_nsdl_dynamic_resource_parameters_s* get_nsdl_resource();
+
+    static char* create_path(const M2MObject &parent, const char *name);
+    static char* create_path(const M2MObject &parent, uint16_t object_instance);
+    static char* create_path(const M2MResource &parent, uint16_t resource_instance);
+    static char* create_path(const M2MResource &parent, const char *name);
+    static char* create_path(const M2MObjectInstance &parent, const char *name);
 
 protected : // from M2MReportObserver
 

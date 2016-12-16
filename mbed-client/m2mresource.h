@@ -46,11 +46,12 @@ private: // Constructor and destructor are private,
          // which means that these objects can be created or
          // deleted only through a function provided by the M2MObjectInstance.
 
-    M2MResource(M2MObjectInstanceCallback &object_instance_callback,
-                             const lwm2m_parameters_s* s,
-                              M2MResourceInstance::ResourceType type,
-                             const uint16_t object_instance_id,
-                             const String &object_name);
+    M2MResource(M2MObjectInstance &_parent,
+                 M2MObjectInstanceCallback &object_instance_callback,
+                 const lwm2m_parameters_s* s,
+                 M2MResourceInstance::ResourceType type,
+                 const uint16_t object_instance_id,
+                 const String &object_name);
     /**
      * \brief Constructor
      * \param resource_name The resource name of the object.
@@ -62,7 +63,8 @@ private: // Constructor and destructor are private,
      * \param object_name The name of the object where the resource exists.
      * \param multiple_instance True if the resource supports instances.
      */
-    M2MResource(M2MObjectInstanceCallback &object_instance_callback,
+    M2MResource(M2MObjectInstance &_parent,
+                M2MObjectInstanceCallback &object_instance_callback,
                 const String &resource_name,
                 const String &resource_type,
                 M2MResourceInstance::ResourceType type,
@@ -82,7 +84,8 @@ private: // Constructor and destructor are private,
      * \param object_name The name of the object where the resource exists.
      * \param multiple_instance True if the resource supports instances.
      */
-    M2MResource(M2MObjectInstanceCallback &object_instance_callback,
+    M2MResource(M2MObjectInstance &_parent,
+                M2MObjectInstanceCallback &object_instance_callback,
                 const String &resource_name,
                 const String &resource_type,
                 M2MResourceInstance::ResourceType type,
@@ -233,10 +236,14 @@ public:
                                                bool &execute_value_updated,
                                                sn_nsdl_addr_s *address = NULL);
 
+    M2MObjectInstance& get_parent_object_instance() const;
+
 protected:
     virtual void notification_update();
 
+
 private:
+    M2MObjectInstance &_parent;
 
     M2MResourceInstanceList     _resource_instance_list; // owned
     uint8_t                     *_delayed_token;

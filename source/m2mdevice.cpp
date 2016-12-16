@@ -41,7 +41,7 @@ void M2MDevice::delete_instance()
 }
 
 M2MDevice::M2MDevice()
-: M2MObject(M2M_DEVICE_ID)
+: M2MObject(M2M_DEVICE_ID, stringdup(M2M_DEVICE_ID))
 {
     M2MBase::set_register_uri(false);
     M2MBase::set_operation(M2MBase::GET_ALLOWED);
