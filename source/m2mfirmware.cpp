@@ -40,7 +40,7 @@ void M2MFirmware::delete_instance()
 }
 
 M2MFirmware::M2MFirmware()
-: M2MObject(M2M_FIRMWARE_ID)
+: M2MObject(M2M_FIRMWARE_ID, stringdup(M2M_FIRMWARE_ID))
 {
     M2MBase::set_register_uri(false);
     M2MBase::set_operation(M2MBase::GET_PUT_ALLOWED);

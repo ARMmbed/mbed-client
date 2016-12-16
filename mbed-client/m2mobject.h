@@ -42,7 +42,7 @@ protected :
      * \brief Constructor
      * \param name The name of the object.
      */
-    M2MObject(const String &object_name);
+    M2MObject(const String &object_name, char *path);
 
     // Prevents the use of default constructor.
     M2MObject();
