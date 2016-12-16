@@ -26,6 +26,8 @@
 #include "nsdl-c/sn_coap_header.h"
 #include "nsdl-c/sn_nsdl_lib.h"
 
+#define MEMORY_OPTIMIZED_API
+
 //FORWARD DECLARATION
 struct sn_coap_hdr_;
 typedef sn_coap_hdr_ sn_coap_hdr_s;
@@ -436,6 +438,8 @@ public:
      * @return Length of the object name.
      */
     size_t resource_name_length() const;
+
+    sn_nsdl_dynamic_resource_parameters_s* get_nsdl_resource();
 
 protected : // from M2MReportObserver
 

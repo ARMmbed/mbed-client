@@ -19,6 +19,7 @@
 #include "mbed-client/m2mconstants.h"
 #include "mbed-client/m2mtimer.h"
 #include "include/m2mreporthandler.h"
+#include "include/nsdlaccesshelper.h"
 #include "mbed-trace/mbed_trace.h"
 #include <assert.h>
 #include <ctype.h>
@@ -55,6 +56,12 @@ M2MBase::M2MBase(const String& resource_name,
                    0, sizeof(sn_nsdl_dynamic_resource_parameters_s));
             _sn_resource->dynamic_resource_params->static_resource_parameters =
                     (sn_nsdl_static_resource_parameters_s*)memory_alloc(sizeof(sn_nsdl_static_resource_parameters_s));
+
+            // Set callback function in case of dynamic resource
+            if (M2MBase::Dynamic == mode) {
+                _sn_resource->dynamic_resource_params->sn_grs_dyn_res_callback = __nsdl_c_callback;
+            }
+
             if(_sn_resource->dynamic_resource_params->static_resource_parameters) {
                 // Cast const away to able to compile using MEMORY_OPTIMIZED_API flag
                 sn_nsdl_static_resource_parameters_s *params =
@@ -65,6 +72,14 @@ M2MBase::M2MBase(const String& resource_name,
                     params->resource_type_ptr = (char*)
                             alloc_string_copy((uint8_t*) resource_type.c_str(), len);
                 }
+
+                const size_t pathlen = strlen(resource_name.c_str());
+                if (pathlen > 0) {
+                    params->path = (uint8_t*)
+                            alloc_string_copy((uint8_t*) resource_name.c_str(), pathlen);
+                    params->pathlen = pathlen;
+                }
+
                 params->mode = (const uint8_t)mode;
                 params->free_on_delete = true;
                 _sn_resource->dynamic_resource_params->static_resource_parameters = params;
@@ -621,8 +636,12 @@ void M2MBase::free_resources()
     }
 }
 
-
 size_t M2MBase::resource_name_length() const
 {
     return strlen(_sn_resource->name);
+}
+
+sn_nsdl_dynamic_resource_parameters_s* M2MBase::get_nsdl_resource()
+{
+    return _sn_resource->dynamic_resource_params;
 }
