@@ -40,6 +40,7 @@ typedef void(*notification_sent_callback_2) (void);
 typedef FP1<void, M2MBlockMessage *> incoming_block_message_callback;
 typedef FP3<void, const String &, uint8_t *&, uint32_t &> outgoing_block_message_callback;
 
+class M2MResource;
 class M2MResourceCallback;
 
 class M2MResourceInstance : public M2MBase {
@@ -68,7 +69,8 @@ private: // Constructor and destructor are private
          // which means that these objects can be created or
          // deleted only through a function provided by the M2MObjectInstance.
 
-    M2MResourceInstance(const lwm2m_parameters_s* s,
+    M2MResourceInstance(M2MResource &parent,
+                        const lwm2m_parameters_s* s,
                         M2MObjectInstanceCallback &object_instance_callback,
                         M2MResourceInstance::ResourceType type,
                         const uint16_t object_instance_id,
@@ -81,12 +83,14 @@ private: // Constructor and destructor are private
      * \param object_instance_id Object instance id where resource exists.
      * \param object_name Object name where resource exists.
      */
-    M2MResourceInstance(const String &resource_name,
+    M2MResourceInstance(M2MResource &parent,
+                        const String &resource_name,
                         const String &resource_type,
                         M2MResourceInstance::ResourceType type,
                         M2MObjectInstanceCallback &object_instance_callback,
-                        const uint16_t object_instance_id = 0,
-                        const String &object_name = "");
+                        const uint16_t object_instance_id,
+                        const String &object_name,
+                        char* path);
 
     /**
      * \brief A Constructor for creating a resource.
@@ -99,14 +103,16 @@ private: // Constructor and destructor are private
      * \param object_instance_id Object instance id where resource exists.
      * \param object_name Object name where resource exists.
      */
-    M2MResourceInstance(const String &resource_name,
+    M2MResourceInstance(M2MResource &parent,
+                        const String &resource_name,
                         const String &resource_type,
                         M2MResourceInstance::ResourceType type,
                         const uint8_t *value,
                         const uint8_t value_length,
                         M2MObjectInstanceCallback &object_instance_callback,
-                        const uint16_t object_instance_id = 0,
-                        const String &object_name = "");
+                        const uint16_t object_instance_id,
+                        const String &object_name,
+                        char* path);
 
     // Prevents the use of default constructor.
     M2MResourceInstance();
@@ -293,6 +299,8 @@ public:
      */
     void notification_sent();
 
+    M2MResource& get_parent_resource() const;
+
 protected:
 
     /**
@@ -308,6 +316,8 @@ private:
     bool is_value_changed(const uint8_t* value, const uint32_t value_len);
 
 private:
+    // XXX
+    M2MResource &_parent_resource;
 
     uint8_t                                 *_value;
     uint32_t                                _value_length;

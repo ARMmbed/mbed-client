@@ -25,7 +25,8 @@
 
 #define TRACE_GROUP "mClt"
 
-M2MResource::M2MResource(M2MObjectInstanceCallback &object_instance_callback,
+M2MResource::M2MResource(M2MObjectInstance &parent,
+                         M2MObjectInstanceCallback &object_instance_callback,
                          const String &resource_name,
                          const String &resource_type,
                          M2MResourceInstance::ResourceType type,
@@ -34,8 +35,10 @@ M2MResource::M2MResource(M2MObjectInstanceCallback &object_instance_callback,
                          const uint16_t object_instance_id,
                          const String &object_name,
                          bool multiple_instance)
-: M2MResourceInstance(resource_name, resource_type, type, value, value_length,
-                      object_instance_callback, object_instance_id, object_name),
+: M2MResourceInstance(*this, resource_name, resource_type, type, value, value_length,
+                      object_instance_callback, object_instance_id, object_name,
+                      create_path(parent, resource_name.c_str())),
+  _parent(parent),
   _delayed_token(NULL),
   _delayed_token_len(0),
   _has_multiple_instances(multiple_instance),
@@ -46,12 +49,14 @@ M2MResource::M2MResource(M2MObjectInstanceCallback &object_instance_callback,
     M2MBase::set_observable(false);
 }
 
-M2MResource::M2MResource(M2MObjectInstanceCallback &object_instance_callback,
+M2MResource::M2MResource(M2MObjectInstance &parent,
+                         M2MObjectInstanceCallback &object_instance_callback,
                          const lwm2m_parameters_s* s,
                           M2MResourceInstance::ResourceType type,
                          const uint16_t object_instance_id,
                          const String &object_name)
-: M2MResourceInstance(s, object_instance_callback, type, object_instance_id, object_name),
+: M2MResourceInstance(*this, s, object_instance_callback, type, object_instance_id, object_name),
+  _parent(parent),
   _delayed_token(NULL),
   _delayed_token_len(0),
   _has_multiple_instances(false),
@@ -60,7 +65,8 @@ M2MResource::M2MResource(M2MObjectInstanceCallback &object_instance_callback,
     // tbd: _has_multiple_instances could be in flash, but no real benefit, because of current alignment.
 }
 
-M2MResource::M2MResource(M2MObjectInstanceCallback &object_instance_callback,
+M2MResource::M2MResource(M2MObjectInstance &parent,
+                         M2MObjectInstanceCallback &object_instance_callback,
                          const String &resource_name,
                          const String &resource_type,
                          M2MResourceInstance::ResourceType type,
@@ -68,8 +74,10 @@ M2MResource::M2MResource(M2MObjectInstanceCallback &object_instance_callback,
                          const uint16_t object_instance_id,
                          const String &object_name,
                          bool multiple_instance)
-: M2MResourceInstance(resource_name, resource_type, type,
-                      object_instance_callback, object_instance_id, object_name),
+: M2MResourceInstance(*this, resource_name, resource_type, type,
+                      object_instance_callback, object_instance_id, object_name,
+                      create_path(parent, resource_name.c_str())),
+  _parent(parent),
   _delayed_token(NULL),
   _delayed_token_len(0),
   _has_multiple_instances(multiple_instance),
@@ -79,6 +87,7 @@ M2MResource::M2MResource(M2MObjectInstanceCallback &object_instance_callback,
     M2MBase::set_operation(M2MBase::GET_PUT_ALLOWED);
     M2MBase::set_observable(observable);
 }
+
 
 M2MResource::~M2MResource()
 {
@@ -550,6 +559,11 @@ void M2MResource::notification_update()
     }
 }
 
+M2MObjectInstance& M2MResource::get_parent_object_instance() const
+{
+    return _parent;
+}
+
 M2MResource::M2MExecuteParameter::M2MExecuteParameter()
 {
     _value = NULL;
@@ -588,3 +602,5 @@ uint16_t M2MResource::M2MExecuteParameter::get_argument_object_instance_id() con
 {
     return _object_instance_id;
 }
+
+
