@@ -33,10 +33,9 @@ M2MResource::M2MResource(M2MObjectInstance &parent,
                          const uint8_t *value,
                          const uint8_t value_length,
                          const uint16_t object_instance_id,
-                         const String &object_name,
                          bool multiple_instance)
 : M2MResourceInstance(*this, resource_name, resource_type, type, value, value_length,
-                      object_instance_callback, object_instance_id, object_name,
+                      object_instance_callback, object_instance_id,
                       create_path(parent, resource_name.c_str())),
   _parent(parent),
   _delayed_token(NULL),
@@ -47,15 +46,15 @@ M2MResource::M2MResource(M2MObjectInstance &parent,
     M2MBase::set_base_type(M2MBase::Resource);
     M2MBase::set_operation(M2MBase::GET_ALLOWED);
     M2MBase::set_observable(false);
+
 }
 
 M2MResource::M2MResource(M2MObjectInstance &parent,
                          M2MObjectInstanceCallback &object_instance_callback,
                          const lwm2m_parameters_s* s,
                           M2MResourceInstance::ResourceType type,
-                         const uint16_t object_instance_id,
-                         const String &object_name)
-: M2MResourceInstance(*this, s, object_instance_callback, type, object_instance_id, object_name),
+                         const uint16_t object_instance_id)
+: M2MResourceInstance(*this, s, object_instance_callback, type, object_instance_id),
   _parent(parent),
   _delayed_token(NULL),
   _delayed_token_len(0),
@@ -72,10 +71,9 @@ M2MResource::M2MResource(M2MObjectInstance &parent,
                          M2MResourceInstance::ResourceType type,
                          bool observable,
                          const uint16_t object_instance_id,
-                         const String &object_name,
                          bool multiple_instance)
 : M2MResourceInstance(*this, resource_name, resource_type, type,
-                      object_instance_callback, object_instance_id, object_name,
+                      object_instance_callback, object_instance_id,
                       create_path(parent, resource_name.c_str())),
   _parent(parent),
   _delayed_token(NULL),
@@ -563,6 +561,15 @@ M2MObjectInstance& M2MResource::get_parent_object_instance() const
 {
     return _parent;
 }
+
+const char* M2MResource::object_name() const
+{
+    const M2MObjectInstance& parent_object_instance = _parent;
+    const M2MObject& parent_object = parent_object_instance.get_parent_object();
+
+    return parent_object.name();
+}
+
 
 M2MResource::M2MExecuteParameter::M2MExecuteParameter()
 {
