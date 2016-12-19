@@ -944,16 +944,13 @@ bool M2MNsdlInterface::create_nsdl_resource(M2MBase *base, const String &name, b
 {
     __mutex_claim();
     tr_debug("M2MNsdlInterface::create_nsdl_resource(name %s)", name.c_str());
-
     bool success = false;
-
     // Create the NSDL Resource Pointer...
     if(base) {
-
         base->set_under_observation(false,this);
         sn_nsdl_dynamic_resource_parameters_s* orig_resource = base->get_nsdl_resource();
 
-        int8_t result=0;
+        int8_t result = 0;
         result = sn_nsdl_put_resource(_nsdl_handle, orig_resource);
         tr_debug("M2MNsdlInterface::create_nsdl_resource - Creating in NSDL-C result %d", result);
 
@@ -1001,7 +998,7 @@ M2MBase* M2MNsdlInterface::find_resource(const String &object_name,
                                          uint8_t *token,
                                          uint8_t token_len)
 {
-    tr_debug("M2MNsdlInterface::find_resource - name (%s)", object_name.c_str());
+    tr_debug("M2MNsdlInterface::find_resource(object level) - name (%s)", object_name.c_str());
     tr_debug("M2MNsdlInterface::find_resource - token (%.*s)", token_len, token);
     M2MBase *object = NULL;
     if(!_object_list.empty()) {
@@ -1009,7 +1006,10 @@ M2MBase* M2MNsdlInterface::find_resource(const String &object_name,
         it = _object_list.begin();
         for ( ; it != _object_list.end(); it++ ) {
             if (token_len == 0) {
-               if (strcmp((*it)->name(), object_name.c_str()) == 0) {
+                sn_nsdl_dynamic_resource_parameters_s* res = (*it)->get_nsdl_resource();
+                tr_debug("M2MNsdlInterface::find_resource(object level) - path (%s)",
+                         (char*)res->static_resource_parameters->path);
+                if (strcmp((char*)res->static_resource_parameters->path, object_name.c_str()) == 0) {
                     object = (*it);
                     tr_debug("M2MNsdlInterface::find_resource(%s) found", object_name.c_str());
                     break;
@@ -1045,6 +1045,7 @@ M2MBase* M2MNsdlInterface::find_resource(const M2MObject *object,
                                          uint8_t *token,
                                          uint8_t token_len)
 {
+    tr_debug("M2MNsdlInterface::find_resource(object instance level) - name (%s)", object_instance.c_str());
     M2MBase *instance = NULL;
     if(object) {
         M2MObjectInstanceList list = object->instances();
@@ -1053,10 +1054,10 @@ M2MBase* M2MNsdlInterface::find_resource(const M2MObject *object,
             it = list.begin();
             for ( ; it != list.end(); it++ ) {
                 if (!token) {
-                    StringBuffer<M2MObject::MAX_PATH_SIZE_4> obj_name;
-                    // Append object instance id to the object name.
-                    M2MObject::build_path(obj_name, (*it)->name(), (*it)->instance_id());
-                    if(!strcmp(obj_name.c_str(), object_instance.c_str())){//do we need some check here for the len? ten memcmp instead?
+                    sn_nsdl_dynamic_resource_parameters_s* res = (*it)->get_nsdl_resource();
+                    tr_debug("M2MNsdlInterface::find_resource(object instance level) - path (%s)",
+                             (char*)res->static_resource_parameters->path);
+                    if(!strcmp((char*)res->static_resource_parameters->path, object_instance.c_str())){
                         instance = (*it);
                         break;
                     }
@@ -1092,6 +1093,7 @@ M2MBase* M2MNsdlInterface::find_resource(const M2MObjectInstance *object_instanc
                                          uint8_t *token,
                                          uint8_t token_len)
 {
+    tr_debug("M2MNsdlInterface::find_resource(resource level) - name (%s)", resource_instance.c_str());
     M2MBase *instance = NULL;
     if(object_instance) {
         M2MResourceList list = object_instance->resources();
@@ -1100,18 +1102,14 @@ M2MBase* M2MNsdlInterface::find_resource(const M2MObjectInstance *object_instanc
             it = list.begin();
             for ( ; it != list.end(); it++ ) {
                 if (!token) {
-                    StringBuffer<M2MObject::MAX_PATH_SIZE_2> obj_name;
-
-                    // Append object instance id to the object name.
-
-                    M2MObject::build_path(obj_name, object_instance->name(),
-                                      object_instance->instance_id(), (*it)->name());
-
-                    if(!strcmp(obj_name.c_str(), resource_instance.c_str())) {//todo: check name len?
+                    sn_nsdl_dynamic_resource_parameters_s* res = (*it)->get_nsdl_resource();
+                    if(!strcmp((char*)res->static_resource_parameters->path, resource_instance.c_str())) {
                         instance = *it;
                         break;
-                    } else if((*it)->supports_multiple_instances()) {
-                        instance = find_resource((*it),obj_name.c_str(), resource_instance, token, token_len);
+                    }
+                    else if((*it)->supports_multiple_instances()) {
+                        instance = find_resource((*it), (char*)res->static_resource_parameters->path,
+                                                 resource_instance, token, token_len);
                         if(instance != NULL){
                             break;
                         }
@@ -1145,6 +1143,7 @@ M2MBase* M2MNsdlInterface::find_resource(const M2MResource *resource,
                                          uint8_t */*token*/,
                                          uint8_t /*token_len*/)
 {
+    tr_debug("M2MNsdlInterface::find_resource(resource instance level)");
     M2MBase *res = NULL;
     if(resource) {
         if(resource->supports_multiple_instances()) {
@@ -1153,13 +1152,8 @@ M2MBase* M2MNsdlInterface::find_resource(const M2MResource *resource,
                 M2MResourceInstanceList::const_iterator it;
                 it = list.begin();
                 for ( ; it != list.end(); it++ ) {
-                    StringBuffer<M2MObject::MAX_PATH_SIZE_4> obj_name;
-
-                    // if there are multiple instances supported
-                    // then add instance Id into creating resource path
-                    // else normal /object_id/object_instance/resource_id format.
-                    M2MObject::build_path(obj_name, object_name.c_str(), (*it)->instance_id());
-                    if(!strcmp(obj_name.c_str(), resource_instance.c_str())){//todo: check name len?
+                    sn_nsdl_dynamic_resource_parameters_s* nsdl_res = (*it)->get_nsdl_resource();
+                    if(!strcmp((char*)nsdl_res->static_resource_parameters->path, resource_instance.c_str())){
                         res = (*it);
                         break;
                     }
