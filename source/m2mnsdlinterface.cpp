@@ -894,13 +894,19 @@ bool M2MNsdlInterface::create_nsdl_resource_structure(M2MResource *res,
             tr_error("M2MNsdlInterface::create_nsdl_resource_structure - object creation failed");
             return false;
         }
+
         res_name.append(object_name.c_str());
-        if(!res_name.ensure_space(1 + res->resource_name_length() + 1)) {
-            tr_error("M2MNsdlInterface::create_nsdl_resource_structure - object creation failed");
-            return false;
+
+        const sn_nsdl_dynamic_resource_parameters_s* nsdl_res = res->get_nsdl_resource();
+
+        if ((strcmp(res_name.c_str(), (char*)nsdl_res->static_resource_parameters->path) != 0)) {
+            if(!res_name.ensure_space(1 + res->resource_name_length() + 1)) {
+                 tr_error("M2MNsdlInterface::create_nsdl_resource_structure - object creation failed");
+                 return false;
+            }
+            res_name.append('/');
+            res_name.append(res->name(),res->resource_name_length());
         }
-        res_name.append('/');
-        res_name.append(res->name(),res->resource_name_length());
 
         // if there are multiple instances supported
         // then add instance Id into creating resource path
