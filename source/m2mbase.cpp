@@ -282,12 +282,18 @@ void M2MBase::set_under_observation(bool observed,
     tr_debug("M2MBase::set_under_observation - base_type: %d", base_type());
     _is_under_observation = observed;
     _observation_handler = handler;
-    if(handler) {
+    if (handler) {
         if (base_type() != M2MBase::ResourceInstance) {
-            if(!_report_handler){
-                _report_handler = new M2MReportHandler(*this);
+            // Create report handler only if it does not exist and one wants observation
+            // This saves 76 bytes of memory on most usual case.
+            if (observed) {
+                if(!_report_handler) {
+                    _report_handler = new M2MReportHandler(*this);
+                }
             }
-        _report_handler->set_under_observation(observed);
+            if (_report_handler) {
+                _report_handler->set_under_observation(observed);
+            }
         }
     } else {
         delete _report_handler;
@@ -415,6 +421,8 @@ bool M2MBase::handle_observation_attribute(const char *query)
          } else {
             _report_handler->set_default_values();
         }
+    } else {
+        tr_debug("M2MBase::handle_observation_attribute - _no report handler enabled");
     }
     return success;
 }
