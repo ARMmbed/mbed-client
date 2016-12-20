@@ -83,11 +83,23 @@ M2MResourceInstance::M2MResourceInstance(M2MResource &parent,
   _resource_type(type)
 {
     M2MBase::set_base_type(M2MBase::Resource);
-    if( value != NULL && value_length > 0 ) {
-        _value = alloc_string_copy(value, value_length);
-        if(_value) {
-            _value_length = value_length;
+    if (mode() == M2MBase::Dynamic) {
+        if( value != NULL && value_length > 0 ) {
+            _value = alloc_string_copy(value, value_length);
+            if(_value) {
+                _value_length = value_length;
+            }
         }
+    }
+    // Copy resource value to struct since static resources are handled in mbed-client-c
+    else if (mode() == M2MBase::Static) {
+       sn_nsdl_dynamic_resource_parameters_s* res = get_nsdl_resource();
+       sn_nsdl_static_resource_parameters_s* params = (sn_nsdl_static_resource_parameters_s*)res->static_resource_parameters;
+       params->resource = alloc_string_copy(value, value_length);
+       params->resourcelen = value_length;
+    }
+    else {
+        // Directory, not supported
     }
 }
 
