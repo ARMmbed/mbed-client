@@ -1135,6 +1135,7 @@ M2MBase* M2MNsdlInterface::find_resource(const String &object_name,
                                          uint8_t token_len)
 {
     tr_debug("M2MNsdlInterface::find_resource - name (%s)", object_name.c_str());
+    tr_debug("M2MNsdlInterface::find_resource - token (%.*s)", token_len, token);
     M2MBase *object = NULL;
     if(!_object_list.empty()) {
         M2MObjectList::const_iterator it;
@@ -1147,7 +1148,6 @@ M2MBase* M2MNsdlInterface::find_resource(const String &object_name,
                     break;
                 }
             } else {
-                tr_debug("M2MNsdlInterface::find_resource(object level) - in token (%.*s)", token_len, token);
                 uint8_t *stored_token = 0;
                 uint32_t stored_token_length = 0;
                 (*it)->get_observation_token(stored_token, stored_token_length);
@@ -1187,11 +1187,9 @@ M2MBase* M2MNsdlInterface::find_resource(const M2MObject *object,
             for ( ; it != list.end(); it++ ) {
                 if (!token) {
                     StringBuffer<M2MObject::MAX_PATH_SIZE_4> obj_name;
-
                     // Append object instance id to the object name.
-
-                M2MObject::build_path(obj_name, (*it)->name(), (*it)->instance_id());
-                if(!strcmp(obj_name.c_str(), object_instance.c_str())){//do we need some check here for the len? ten memcmp instead?
+                    M2MObject::build_path(obj_name, (*it)->name(), (*it)->instance_id());
+                    if(!strcmp(obj_name.c_str(), object_instance.c_str())){//do we need some check here for the len? ten memcmp instead?
                         instance = (*it);
                         break;
                     }
