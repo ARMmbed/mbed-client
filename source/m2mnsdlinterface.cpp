@@ -1147,9 +1147,11 @@ M2MBase* M2MNsdlInterface::find_resource(const String &object_name,
                     break;
                 }
             } else {
+                tr_debug("M2MNsdlInterface::find_resource(object level) - in token (%.*s)", token_len, token);
                 uint8_t *stored_token = 0;
                 uint32_t stored_token_length = 0;
                 (*it)->get_observation_token(stored_token, stored_token_length);
+                tr_debug("M2MNsdlInterface::find_resource(object level) - stored token (%.*s)", stored_token_length, stored_token);
                 if (stored_token) {
                     if (stored_token_length == token_len &&
                             memcmp(token, stored_token, token_len) == 0) {
@@ -1196,7 +1198,9 @@ M2MBase* M2MNsdlInterface::find_resource(const M2MObject *object,
                 } else {
                     uint8_t *stored_token = 0;
                     uint32_t stored_token_length = 0;
+                    tr_debug("M2MNsdlInterface::find_resource(object instance level) - in token (%.*s)", token_len, token);
                     (*it)->get_observation_token(stored_token, stored_token_length);
+                    tr_debug("M2MNsdlInterface::find_resource(object instance level) - stored token (%.*s)", stored_token_length, stored_token);
                     if (stored_token) {
                         if (stored_token_length == token_len &&
                                 memcmp(token, stored_token, token_len) == 0) {
@@ -1250,7 +1254,9 @@ M2MBase* M2MNsdlInterface::find_resource(const M2MObjectInstance *object_instanc
                 } else {
                     uint8_t *stored_token = 0;
                     uint32_t stored_token_length = 0;
+                    tr_debug("M2MNsdlInterface::find_resource(resource level) - in token (%.*s)", token_len, token);
                     (*it)->get_observation_token(stored_token, stored_token_length);
+                    tr_debug("M2MNsdlInterface::find_resource(resource level) - stored token (%.*s)", stored_token_length, stored_token);
                     if (stored_token) {
                         if (stored_token_length == token_len &&
                                 memcmp(token, stored_token, token_len) == 0) {
