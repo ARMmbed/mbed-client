@@ -26,8 +26,6 @@
 #include "nsdl-c/sn_coap_header.h"
 #include "nsdl-c/sn_nsdl_lib.h"
 
-#define MEMORY_OPTIMIZED_API
-
 //FORWARD DECLARATION
 struct sn_coap_hdr_;
 typedef sn_coap_hdr_ sn_coap_hdr_s;
