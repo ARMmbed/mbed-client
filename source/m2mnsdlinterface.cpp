@@ -1116,6 +1116,7 @@ M2MBase* M2MNsdlInterface::find_resource(const String &object_name,
                                          uint8_t token_len)
 {
     tr_debug("M2MNsdlInterface::find_resource - name (%s)", object_name.c_str());
+    tr_debug("M2MNsdlInterface::find_resource - token (%.*s)", token_len, token);
     M2MBase *object = NULL;
     if(!_object_list.empty()) {
         M2MObjectList::const_iterator it;
