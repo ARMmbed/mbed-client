@@ -845,7 +845,7 @@ bool M2MNsdlInterface::create_nsdl_object_structure(M2MObject *object)
         }
     }
     if(object && object->operation() != M2MBase::NOT_ALLOWED) {
-        success = create_nsdl_resource(object,object->name(),object->register_uri());
+        success = create_nsdl_resource(object,object->name());
     }
     return success;
 }
@@ -872,7 +872,7 @@ bool M2MNsdlInterface::create_nsdl_object_instance_structure(M2MObjectInstance *
             }
         }
         if(object_instance->operation() != M2MBase::NOT_ALLOWED) {
-            success = create_nsdl_resource(object_instance,obj_name.c_str(),object_instance->register_uri());
+            success = create_nsdl_resource(object_instance,obj_name.c_str());
         }
     }
     return success;
@@ -929,7 +929,7 @@ bool M2MNsdlInterface::create_nsdl_resource_structure(M2MResource *res,
                     inst_name.append(res_name.c_str());
                     inst_name.append('/');
                     inst_name.append_int((*it)->instance_id());
-                    success = create_nsdl_resource((*it),inst_name.c_str(),(*it)->register_uri());
+                    success = create_nsdl_resource((*it),inst_name.c_str());
 
                     if(!success) {
                         tr_error("M2MNsdlInterface::create_nsdl_resource_structure - instance creation failed");
@@ -937,26 +937,24 @@ bool M2MNsdlInterface::create_nsdl_resource_structure(M2MResource *res,
                     }
                 }
                 // Register the main Resource as well along with ResourceInstances
-                success = create_nsdl_resource(res, res_name.c_str(), res->register_uri());
+                success = create_nsdl_resource(res, res_name.c_str());
             }
         } else {
-            success = create_nsdl_resource(res, res_name.c_str(), res->register_uri());
+            success = create_nsdl_resource(res, res_name.c_str());
         }
     }
     return success;
 }
 
-bool M2MNsdlInterface::create_nsdl_resource(M2MBase *base, const String &name, bool publish_uri)
+bool M2MNsdlInterface::create_nsdl_resource(M2MBase *base, const String &name)
 {
     __mutex_claim();
     tr_debug("M2MNsdlInterface::create_nsdl_resource(name %s)", name.c_str());
     bool success = false;
-    // Create the NSDL Resource Pointer...
     if(base) {
-        base->set_under_observation(false,this);
+        int8_t result = 0;
         sn_nsdl_dynamic_resource_parameters_s* orig_resource = base->get_nsdl_resource();
 
-        int8_t result = 0;
         result = sn_nsdl_put_resource(_nsdl_handle, orig_resource);
         tr_debug("M2MNsdlInterface::create_nsdl_resource - Creating in NSDL-C result %d", result);
 
@@ -965,9 +963,6 @@ bool M2MNsdlInterface::create_nsdl_resource(M2MBase *base, const String &name, b
         if (result == 0 ||
            result == -2){
             success = true;
-        }
-        if(success) {
-           base->set_under_observation(false,this);
         }
     }
     __mutex_release();
