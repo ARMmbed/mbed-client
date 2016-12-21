@@ -412,17 +412,19 @@ bool M2MBase::handle_observation_attribute(const char *query)
 {
     tr_debug("M2MBase::handle_observation_attribute - under observation(%d)", is_under_observation());
     bool success = false;
-    if(_report_handler) {
-        success = _report_handler->parse_notification_attribute(query,base_type());
-        if (success) {
-            if (is_under_observation()) {
-                _report_handler->set_under_observation(true);
-            }
-         } else {
-            _report_handler->set_default_values();
+    // Create handler if not already exists. Client must able to parse write attributes even when
+    // observation is not yet set
+    if (!_report_handler) {
+        _report_handler = new M2MReportHandler(*this);
+    }
+
+    success = _report_handler->parse_notification_attribute(query,base_type());
+    if (success) {
+        if (is_under_observation()) {
+            _report_handler->set_under_observation(true);
         }
-    } else {
-        tr_debug("M2MBase::handle_observation_attribute - _no report handler enabled");
+     } else {
+        _report_handler->set_default_values();
     }
     return success;
 }
