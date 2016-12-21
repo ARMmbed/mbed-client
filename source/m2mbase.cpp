@@ -275,6 +275,13 @@ void M2MBase::remove_observation_level(M2MBase::Observation obs_level)
     _observation_level = (M2MBase::Observation)(_observation_level & ~obs_level);
 }
 
+void M2MBase::set_observation_handler(M2MObservationHandler *handler)
+{
+    tr_debug("M2MBase::set_observation_handler - handler: 0x%x", handler);
+    _observation_handler = handler;
+}
+
+
 void M2MBase::set_under_observation(bool observed,
                                     M2MObservationHandler *handler)
 {
@@ -445,20 +452,6 @@ void M2MBase::set_base_type(M2MBase::BaseType type)
 {
     assert(_sn_resource->free_on_delete);
     _sn_resource->base_type = type;
-}
-
-void M2MBase::remove_resource_from_coap(const String &resource_name)
-{
-    if(_observation_handler) {
-        _observation_handler->resource_to_be_deleted(resource_name);
-    }
-}
-
-void M2MBase::remove_object_from_coap()
-{
-    if(_observation_handler) {
-        _observation_handler->remove_object(this);
-    }
 }
 
 sn_coap_hdr_s* M2MBase::handle_get_request(nsdl_s */*nsdl*/,
@@ -712,6 +705,11 @@ char* M2MBase::stringdup(const char* src)
 
 void M2MBase::free_resources()
 {
+    // remove the nsdl structures from the nsdlinterface's lists.
+    if (_observation_handler) {
+        _observation_handler->resource_to_be_deleted(this);
+    }
+    
     if (_sn_resource->dynamic_resource_params->static_resource_parameters->free_on_delete) {
         sn_nsdl_static_resource_parameters_s *params =
                 const_cast<sn_nsdl_static_resource_parameters_s *>(_sn_resource->dynamic_resource_params->static_resource_parameters);
@@ -725,6 +723,8 @@ void M2MBase::free_resources()
     if (_sn_resource->dynamic_resource_params->free_on_delete) {
         free(_sn_resource->dynamic_resource_params);
     }
+
+
     if (_sn_resource->free_on_delete) {
         free(_sn_resource->name);
         free(_sn_resource);

@@ -60,9 +60,6 @@ M2MObjectInstance::~M2MObjectInstance()
         for (; it!=_resource_list.end(); it++ ) {
             //Free allocated memory for resources.
             res = *it;
-            StringBuffer<MAX_PATH_SIZE_2> obj_name;
-            build_path(obj_name, name(), instance_id(), (*it)->name());
-            (*it)->remove_resource_from_coap(obj_name.c_str());
             delete res;
         }
         _resource_list.clear();
@@ -253,9 +250,6 @@ bool M2MObjectInstance::remove_resource(const String &resource_name)
              if(strcmp((*it)->name(), resource_name.c_str()) == 0) {
                 // Resource found and deleted.
                 res = *it;
-                StringBuffer<MAX_PATH_SIZE_2> obj_name;
-                build_path(obj_name, name(), instance_id(), res->name());
-                res->remove_resource_from_coap(obj_name.c_str());
                 delete res;
                 res = NULL;
                 _resource_list.erase(pos);
@@ -280,9 +274,6 @@ bool M2MObjectInstance::remove_resource_instance(const String &resource_name,
         it = list.begin();
         for ( ; it != list.end(); it++) {
             if((*it)->instance_id() == inst_id) {
-                StringBuffer<MAX_PATH_SIZE> obj_name;
-                build_path(obj_name, name(), instance_id(), resource_name.c_str(), inst_id);
-                remove_resource_from_coap(obj_name.c_str());
                 success = res->remove_resource_instance(inst_id);
                 if(res->resource_instance_count() == 0) {
                     M2MResourceList::const_iterator itr;

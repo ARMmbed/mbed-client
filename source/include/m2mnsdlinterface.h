@@ -93,10 +93,10 @@ public:
 
     /**
      * @brief Removed the NSDL resource for the given resource.
-     * @param resource_name, Resource name to be removed.
+     * @param base, Resource to be removed.
      * @return true if removed successfully else false.
     */
-    bool delete_nsdl_resource(const String &resource_name);
+    bool delete_nsdl_resource(M2MBase *base);
 
     /**
      * @brief Creates the bootstrap object.
@@ -224,7 +224,7 @@ protected: // from M2MObservationHandler
                                         m2m::Vector<uint16_t> changed_instance_ids,
                                         bool send_object = false);
 
-    virtual void resource_to_be_deleted(const String &resource_name);
+    virtual void resource_to_be_deleted(M2MBase* base);
 
     virtual void value_updated(M2MBase *base, const String &object_name);
 

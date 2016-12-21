@@ -231,6 +231,12 @@ public:
      */
     virtual void set_under_observation(bool observed,
                                        M2MObservationHandler *handler);
+    /**
+     * \brief Returns the Observation Handler object.
+     * \return M2MObservationHandler object.
+    */
+    M2MObservationHandler* observation_handler();
+    void set_observation_handler(M2MObservationHandler *handler);
 
     /**
      * \brief Sets the observation token value.
@@ -465,17 +471,6 @@ protected:
     virtual void set_base_type(M2MBase::BaseType type);
 
     /**
-     * \brief Removes a resource from the CoAP structure.
-     * \param resource_name The name of the resource.
-     */
-    virtual void remove_resource_from_coap(const String &resource_name);
-
-    /**
-     * \brief Removes an object from the NSDL list.
-     */
-    virtual void remove_object_from_coap();
-
-    /**
      * \brief Memory allocation required for libCoap.
      * \param size The size of memory to be reserved.
     */
@@ -519,11 +514,6 @@ protected:
     */
     M2MReportHandler* report_handler();
 
-    /**
-     * \brief Returns the Observation Handler object.
-     * \return M2MObservationHandler object.
-    */
-    M2MObservationHandler* observation_handler();
 
     static bool build_path(StringBuffer<MAX_PATH_SIZE> &buffer, const char *s1, uint16_t i1, const char *s2, uint16_t i2);
 

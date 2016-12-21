@@ -208,13 +208,13 @@ bool M2MNsdlInterface::create_nsdl_list_structure(const M2MObjectList &object_li
     return success;
 }
 
-bool M2MNsdlInterface::delete_nsdl_resource(const String &resource_name)
+// Todo: the name does not match with the functionality anymore, some refactoring is needed.
+bool M2MNsdlInterface::delete_nsdl_resource(M2MBase *base)
 {
-    tr_debug("M2MNsdlInterface::delete_nsdl_resource( %s)", resource_name.c_str());
-    return (sn_nsdl_delete_resource(_nsdl_handle,
-                                    resource_name.length(),
-                                    (uint8_t *)resource_name.c_str()) == 0) ? true : false;
+    sn_nsdl_dynamic_resource_parameters_s* orig_resource = base->get_nsdl_resource();
+    sn_nsdl_pop_resource(_nsdl_handle, orig_resource);
 }
+
 
 bool M2MNsdlInterface::create_bootstrap_resource(sn_nsdl_addr_s *address, const String &bootstrap_endpoint_name)
 {
@@ -764,13 +764,14 @@ void M2MNsdlInterface::send_delayed_response(M2MBase *base)
     __mutex_release();
 }
 
-void M2MNsdlInterface::resource_to_be_deleted(const String &resource_name)
+void M2MNsdlInterface::resource_to_be_deleted(M2MBase *base)
 {
     __mutex_claim();
-    tr_debug("M2MNsdlInterface::resource_to_be_deleted(resource_name %s)", resource_name.c_str());
-    delete_nsdl_resource(resource_name);
+    //tr_debug("M2MNsdlInterface::resource_to_be_deleted(resource_name %s)", base..c_str());
+    delete_nsdl_resource(base);
     __mutex_release();
 }
+
 
 void M2MNsdlInterface::value_updated(M2MBase *base,
                                      const String &object_name)
@@ -954,6 +955,11 @@ bool M2MNsdlInterface::create_nsdl_resource(M2MBase *base, const String &name)
     if(base) {
         int8_t result = 0;
         sn_nsdl_dynamic_resource_parameters_s* orig_resource = base->get_nsdl_resource();
+
+        // needed on deletion
+        if (base->observation_handler() == NULL) {
+            base->set_observation_handler(this);
+        }
 
         result = sn_nsdl_put_resource(_nsdl_handle, orig_resource);
         tr_debug("M2MNsdlInterface::create_nsdl_resource - Creating in NSDL-C result %d", result);
