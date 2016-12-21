@@ -50,7 +50,7 @@ M2MObject::M2MObject(const M2MBase::lwm2m_parameters_s* static_res)
 M2MObject::~M2MObject()
 {
     if(!_instance_list.empty()) {
-        remove_resource_from_coap(name());
+
         M2MObjectInstanceList::const_iterator it;
         it = _instance_list.begin();
         M2MObjectInstance* obj = NULL;
@@ -60,7 +60,7 @@ M2MObject::~M2MObject()
             obj = *it;
             delete obj;
         }
-        remove_object_from_coap();
+
         _instance_list.clear();
     }
 }
@@ -118,9 +118,7 @@ bool M2MObject::remove_object_instance(uint16_t inst_id)
             if((*it)->instance_id() == inst_id) {
                 // Instance found and deleted.
                 obj = *it;
-                StringBuffer<MAX_PATH_SIZE_4> obj_name;
-                build_path(obj_name, name(), obj->instance_id());
-                obj->remove_resource_from_coap(obj_name.c_str());
+
                 _instance_list.erase(pos);
                 delete obj;
                 success = true;
