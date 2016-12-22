@@ -114,6 +114,11 @@ TEST(M2MInterfaceImpl, client_unregistered)
     m2m_interface_impl->test_client_unregistered();
 }
 
+TEST(M2MInterfaceImpl, bootstrap_wait)
+{
+    m2m_interface_impl->test_bootstrap_wait();
+}
+
 TEST(M2MInterfaceImpl, bootstrap_done)
 {
     m2m_interface_impl->test_bootstrap_done();
