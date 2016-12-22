@@ -247,10 +247,9 @@ private:
     bool create_nsdl_object_instance_structure(M2MObjectInstance *object_instance);
 
     bool create_nsdl_resource_structure(M2MResource *resource,
-                                        const String &object_name = "",
                                         bool multiple_instances = false);
 
-    bool create_nsdl_resource(M2MBase *base, const String &name = "");
+    bool create_nsdl_resource(M2MBase *base);
 
     String coap_to_string(uint8_t *coap_data_ptr,
                           int coap_data_ptr_length);
