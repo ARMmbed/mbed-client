@@ -509,6 +509,12 @@ protected:
     static bool validate_string_length(const char* string, size_t min_length, size_t max_length);
 
     /**
+     * \brief Create Report Handler object.
+     * \return M2MReportHandler object.
+    */
+    M2MReportHandler* create_report_handler();
+
+    /**
      * \brief Returns the Report Handler object.
      * \return M2MReportHandler object.
     */
