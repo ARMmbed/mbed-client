@@ -86,7 +86,7 @@ STATIC_PARAM_TYPE
 static sn_nsdl_static_resource_parameters_s firmware_package_uri_params_static = {
     (char*)OMA_RESOURCE_TYPE,      // resource_type_ptr
     (char*)"",                     // interface_description_ptr
-    (uint8_t*)FIRMWARE_PACKAGE_URI, // path
+    (uint8_t*)PACKAGE_URI_PATH, // path
     (uint8_t*)"",           // resource
     5,                      // strlen("5/0/1")
     0,                      // resourcelen
