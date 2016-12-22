@@ -553,6 +553,13 @@ bool M2MBase::validate_string_length(const char* string, size_t min_length, size
     return valid;
 }
 
+M2MReportHandler* M2MBase::create_report_handler()
+{
+    if (!_report_handler) {
+        _report_handler = new M2MReportHandler(*this);
+    }
+    return _report_handler;
+}
 
 M2MReportHandler* M2MBase::report_handler()
 {
@@ -709,7 +716,7 @@ void M2MBase::free_resources()
     if (_observation_handler) {
         _observation_handler->resource_to_be_deleted(this);
     }
-    
+
     if (_sn_resource->dynamic_resource_params->static_resource_parameters->free_on_delete) {
         sn_nsdl_static_resource_parameters_s *params =
                 const_cast<sn_nsdl_static_resource_parameters_s *>(_sn_resource->dynamic_resource_params->static_resource_parameters);
