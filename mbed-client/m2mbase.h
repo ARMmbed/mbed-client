@@ -38,6 +38,11 @@ typedef void(*value_updated_callback2) (const char* object_name);
 class M2MObservationHandler;
 class M2MReportHandler;
 
+class M2MObjectInstance;
+class M2MObject;
+class M2MResource;
+
+
 /*! \file m2mbase.h
  *  \brief M2MBase.
  *  This class is the base class based on which all LWM2M object models
@@ -149,7 +154,8 @@ protected:
      */
     M2MBase(const String &name,
             M2MBase::Mode mode,
-            const String &resource_type = "");
+            const String &resource_type,
+            char *path);
 
     M2MBase(const lwm2m_parameters_s* s);
 
@@ -225,6 +231,12 @@ public:
      */
     virtual void set_under_observation(bool observed,
                                        M2MObservationHandler *handler);
+    /**
+     * \brief Returns the Observation Handler object.
+     * \return M2MObservationHandler object.
+    */
+    M2MObservationHandler* observation_handler();
+    void set_observation_handler(M2MObservationHandler *handler);
 
     /**
      * \brief Sets the observation token value.
@@ -437,6 +449,14 @@ public:
      */
     size_t resource_name_length() const;
 
+    sn_nsdl_dynamic_resource_parameters_s* get_nsdl_resource();
+
+    static char* create_path(const M2MObject &parent, const char *name);
+    static char* create_path(const M2MObject &parent, uint16_t object_instance);
+    static char* create_path(const M2MResource &parent, uint16_t resource_instance);
+    static char* create_path(const M2MResource &parent, const char *name);
+    static char* create_path(const M2MObjectInstance &parent, const char *name);
+
 protected : // from M2MReportObserver
 
     virtual void observation_to_be_sent(m2m::Vector<uint16_t> changed_instance_ids,
@@ -449,17 +469,6 @@ protected:
      * \param type The base type of the object.
      */
     virtual void set_base_type(M2MBase::BaseType type);
-
-    /**
-     * \brief Removes a resource from the CoAP structure.
-     * \param resource_name The name of the resource.
-     */
-    virtual void remove_resource_from_coap(const String &resource_name);
-
-    /**
-     * \brief Removes an object from the NSDL list.
-     */
-    virtual void remove_object_from_coap();
 
     /**
      * \brief Memory allocation required for libCoap.
@@ -500,16 +509,17 @@ protected:
     static bool validate_string_length(const char* string, size_t min_length, size_t max_length);
 
     /**
+     * \brief Create Report Handler object.
+     * \return M2MReportHandler object.
+    */
+    M2MReportHandler* create_report_handler();
+
+    /**
      * \brief Returns the Report Handler object.
      * \return M2MReportHandler object.
     */
     M2MReportHandler* report_handler();
 
-    /**
-     * \brief Returns the Observation Handler object.
-     * \return M2MObservationHandler object.
-    */
-    M2MObservationHandler* observation_handler();
 
     static bool build_path(StringBuffer<MAX_PATH_SIZE> &buffer, const char *s1, uint16_t i1, const char *s2, uint16_t i2);
 

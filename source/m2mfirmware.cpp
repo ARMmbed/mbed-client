@@ -19,6 +19,7 @@
 #include "mbed-client/m2mobject.h"
 #include "mbed-client/m2mobjectinstance.h"
 #include "mbed-client/m2mresource.h"
+#include "include/nsdlaccesshelper.h"
 
 #define BUFFER_SIZE 21
 #define TRACE_GROUP "mClt"
@@ -40,7 +41,7 @@ void M2MFirmware::delete_instance()
 }
 
 M2MFirmware::M2MFirmware()
-: M2MObject(M2M_FIRMWARE_ID)
+: M2MObject(M2M_FIRMWARE_ID, stringdup(M2M_FIRMWARE_ID))
 {
     M2MBase::set_register_uri(false);
     M2MBase::set_operation(M2MBase::GET_PUT_ALLOWED);
@@ -55,61 +56,84 @@ M2MFirmware::~M2MFirmware()
 {
 }
 
+// Conditionally put the static part of parameter struct into flash.
+// Unfortunately this can't be done yet by default as there is old API which
+// may be used to modify the values in sn_nsdl_static_resource_parameters_s.
+#ifdef MEMORY_OPTIMIZED_API
+#define STATIC_PARAM_TYPE const
+#else
+#define STATIC_PARAM_TYPE
+#endif
 
+#define PACKAGE_PATH FIRMWARE_PATH_PREFIX FIRMWARE_PACKAGE
+
+STATIC_PARAM_TYPE
 static sn_nsdl_static_resource_parameters_s firmware_package_params_static = {
     (char*)OMA_RESOURCE_TYPE,      // resource_type_ptr
     (char*)"",                     // interface_description_ptr
-    (uint8_t*)FIRMWARE_PACKAGE,    // path
+    (uint8_t*)PACKAGE_PATH,    // path
     (uint8_t*)"",           // resource
-    1,                      // strlen("0")
+    5,                      // strlen("5/0/0")
     0,                      // resourcelen
     false,                  // external_memory_block
     SN_GRS_DYNAMIC,         // mode
     false                   // free_on_delete
 };
 
+#define PACKAGE_URI_PATH FIRMWARE_PATH_PREFIX FIRMWARE_PACKAGE_URI
+
+STATIC_PARAM_TYPE
 static sn_nsdl_static_resource_parameters_s firmware_package_uri_params_static = {
     (char*)OMA_RESOURCE_TYPE,      // resource_type_ptr
     (char*)"",                     // interface_description_ptr
-    (uint8_t*)FIRMWARE_PACKAGE_URI, // path
+    (uint8_t*)PACKAGE_URI_PATH, // path
     (uint8_t*)"",           // resource
-    1,                      // strlen("1")
+    5,                      // strlen("5/0/1")
     0,                      // resourcelen
     false,                  // external_memory_block
     SN_GRS_DYNAMIC,         // mode
     false                   // free_on_delete
 };
 
+#define UPDATE_PATH FIRMWARE_PATH_PREFIX FIRMWARE_UPDATE
+
+STATIC_PARAM_TYPE
 static sn_nsdl_static_resource_parameters_s firmware_update_params_static = {
     (char*)OMA_RESOURCE_TYPE,   // resource_type_ptr
     (char*)"",                  // interface_description_ptr
-    (uint8_t*)FIRMWARE_UPDATE,  // path
+    (uint8_t*)UPDATE_PATH,  // path
     (uint8_t*)"",           // resource
-    1,                      // strlen("2")
+    5,                      // strlen(5/0/2)
     0,                      // resourcelen
     false,                  // external_memory_block
     SN_GRS_DYNAMIC,         // mode
     false                   // free_on_delete
 };
 
+#define STATE_URI_PATH FIRMWARE_PATH_PREFIX FIRMWARE_STATE
+
+STATIC_PARAM_TYPE
 static sn_nsdl_static_resource_parameters_s firmware_state_params_static = {
     (char*)OMA_RESOURCE_TYPE,   // resource_type_ptr
     (char*)"",                  // interface_description_ptr
-    (uint8_t*)FIRMWARE_STATE,   // path
+    (uint8_t*)STATE_URI_PATH,   // path
     (uint8_t*)"0",          // resource
-    1,                      // strlen("3")
+    5,                      // strlen("5/0/3")
     1,                      // resourcelen
     false,                  // external_memory_block
     SN_GRS_DYNAMIC,         // mode
     false                   // free_on_delete
 };
 
+#define UPDATE_RESULT_PATH FIRMWARE_PATH_PREFIX FIRMWARE_UPDATE_RESULT
+
+STATIC_PARAM_TYPE
 static sn_nsdl_static_resource_parameters_s firmware_update_result_params_static = {
     (char*)OMA_RESOURCE_TYPE,      // resource_type_ptr
     (char*)"",                     // interface_description_ptr
-    (uint8_t*)FIRMWARE_UPDATE_RESULT, // path
+    (uint8_t*)UPDATE_RESULT_PATH, // path
     (uint8_t*)"0",          // resource
-    1,                      // strlen("5")
+    5,                      // strlen(5/0/5)
     1,                      // resourcelen
     false,                  // external_memory_block
     SN_GRS_DYNAMIC,         // mode
@@ -117,7 +141,7 @@ static sn_nsdl_static_resource_parameters_s firmware_update_result_params_static
 };
 
 static sn_nsdl_dynamic_resource_parameters_s firmware_package_params_dynamic = {
-    NULL,
+    __nsdl_c_callback,
     &firmware_package_params_static,
     {NULL, NULL},                     // link
     COAP_CONTENT_OMA_PLAIN_TEXT_TYPE, // coap_content_type
@@ -129,7 +153,7 @@ static sn_nsdl_dynamic_resource_parameters_s firmware_package_params_dynamic = {
 };
 
 static sn_nsdl_dynamic_resource_parameters_s firmware_package_uri_params_dynamic = {
-    NULL,
+    __nsdl_c_callback,
     &firmware_package_uri_params_static,
     {NULL, NULL},                     // link
     COAP_CONTENT_OMA_PLAIN_TEXT_TYPE, // coap_content_type
@@ -141,7 +165,7 @@ static sn_nsdl_dynamic_resource_parameters_s firmware_package_uri_params_dynamic
 };
 
 static sn_nsdl_dynamic_resource_parameters_s firmware_update_params_dynamic = {
-    NULL,
+    __nsdl_c_callback,
     &firmware_update_params_static,
     {NULL, NULL},                     // link
     COAP_CONTENT_OMA_PLAIN_TEXT_TYPE, // coap_content_type
@@ -153,7 +177,7 @@ static sn_nsdl_dynamic_resource_parameters_s firmware_update_params_dynamic = {
 };
 
 static sn_nsdl_dynamic_resource_parameters_s firmware_state_params_dynamic = {
-    NULL,
+    __nsdl_c_callback,
     &firmware_state_params_static,
     {NULL, NULL},                     // link
     COAP_CONTENT_OMA_PLAIN_TEXT_TYPE, // coap_content_type
@@ -165,7 +189,7 @@ static sn_nsdl_dynamic_resource_parameters_s firmware_state_params_dynamic = {
 };
 
 static sn_nsdl_dynamic_resource_parameters_s firmware_update_result_params_dynamic = {
-    NULL,
+    __nsdl_c_callback,
     &firmware_update_result_params_static,
     {NULL, NULL},                     // link
     COAP_CONTENT_OMA_PLAIN_TEXT_TYPE, // coap_content_type
@@ -179,7 +203,7 @@ const static M2MBase::lwm2m_parameters firmware_package_params = {
     0, // max_age
     0, // instance_id
     0, // name_id
-    FIRMWARE_PACKAGE, // name
+    (char*)FIRMWARE_PACKAGE, // name
     &firmware_package_params_dynamic,
     M2MBase::Resource, // base_type
     false // free_on_delete
@@ -189,7 +213,7 @@ const static M2MBase::lwm2m_parameters firmware_package_uri_params = {
     0, // max_age
     0, // instance_id
     0, // name_id
-    FIRMWARE_PACKAGE_URI, // name
+    (char*)FIRMWARE_PACKAGE_URI, // name
     &firmware_package_uri_params_dynamic,
     M2MBase::Resource, // base_type
     false // free_on_delete
@@ -199,7 +223,7 @@ const static M2MBase::lwm2m_parameters firmware_update_params = {
     0, // max_age
     0, // instance_id
     0, // name_id
-    FIRMWARE_UPDATE, // name
+    (char*)FIRMWARE_UPDATE, // name
     &firmware_update_params_dynamic,
     M2MBase::Resource, // base_type
     false // free_on_delete
@@ -209,7 +233,7 @@ const static M2MBase::lwm2m_parameters firmware_state_params = {
     0, // max_age
     0, // instance_id
     0, // name_id
-    FIRMWARE_STATE, // name
+    (char*)FIRMWARE_STATE, // name
     &firmware_state_params_dynamic,
     M2MBase::Resource, // base_type
     false // free_on_delete
@@ -219,7 +243,7 @@ const static M2MBase::lwm2m_parameters firmware_update_result_params = {
     0, // max_age
     0, // instance_id
     0, // name_id
-    FIRMWARE_UPDATE_RESULT, // name
+    (char*)FIRMWARE_UPDATE_RESULT, // name
     &firmware_update_result_params_dynamic,
     M2MBase::Resource, // base_type
     false // free_on_delete

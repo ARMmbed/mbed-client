@@ -28,7 +28,7 @@
 #define BUFFER_SIZE 21
 
 M2MSecurity::M2MSecurity(ServerType ser_type)
-: M2MObject(M2M_SECURITY_ID),
+: M2MObject(M2M_SECURITY_ID, stringdup(M2M_SECURITY_ID)),
  _server_instance(NULL),
  _server_type(ser_type)
 {

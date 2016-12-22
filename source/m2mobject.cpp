@@ -27,8 +27,8 @@
 #define BUFFER_SIZE 10
 #define TRACE_GROUP "mClt"
 
-M2MObject::M2MObject(const String &object_name)
-: M2MBase(object_name,M2MBase::Dynamic),
+M2MObject::M2MObject(const String &object_name, char *path)
+: M2MBase(object_name,M2MBase::Dynamic, "", path),
   _max_instance_count(MAX_UNINT_16_COUNT)
 {
     M2MBase::set_base_type(M2MBase::Object);
@@ -50,7 +50,7 @@ M2MObject::M2MObject(const M2MBase::lwm2m_parameters_s* static_res)
 M2MObject::~M2MObject()
 {
     if(!_instance_list.empty()) {
-        remove_resource_from_coap(name());
+
         M2MObjectInstanceList::const_iterator it;
         it = _instance_list.begin();
         M2MObjectInstance* obj = NULL;
@@ -60,7 +60,7 @@ M2MObject::~M2MObject()
             obj = *it;
             delete obj;
         }
-        remove_object_from_coap();
+
         _instance_list.clear();
     }
 }
@@ -70,7 +70,9 @@ M2MObjectInstance* M2MObject::create_object_instance(uint16_t instance_id)
     tr_debug("M2MObject::create_object_instance - id: %d", instance_id);
     M2MObjectInstance *instance = NULL;
     if(!object_instance(instance_id)) {
-        instance = new M2MObjectInstance(this->name(),*this);
+        char* path = create_path(*this, instance_id);
+        // Note: the object instance's name contains actually object's name.
+        instance = new M2MObjectInstance(*this, this->name(),*this, "", path);
         if(instance) {
             instance->add_observation_level(observation_level());
             instance->set_instance_id(instance_id);
@@ -89,7 +91,8 @@ M2MObjectInstance* M2MObject::create_object_instance(const lwm2m_parameters_s* s
     tr_debug("M2MObject::create_object_instance - id: %d", s->instance_id);
     M2MObjectInstance *instance = NULL;
     if(!object_instance(s->instance_id)) {
-        instance = new M2MObjectInstance(this->name(),*this);
+
+        instance = new M2MObjectInstance(*this, s,*this);
         if(instance) {
             instance->add_observation_level(observation_level());
             //instance->set_instance_id(instance_id);
@@ -115,9 +118,7 @@ bool M2MObject::remove_object_instance(uint16_t inst_id)
             if((*it)->instance_id() == inst_id) {
                 // Instance found and deleted.
                 obj = *it;
-                StringBuffer<MAX_PATH_SIZE_4> obj_name;
-                build_path(obj_name, name(), obj->instance_id());
-                obj->remove_resource_from_coap(obj_name.c_str());
+
                 _instance_list.erase(pos);
                 delete obj;
                 success = true;

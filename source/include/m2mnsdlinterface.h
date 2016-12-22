@@ -93,10 +93,10 @@ public:
 
     /**
      * @brief Removed the NSDL resource for the given resource.
-     * @param resource_name, Resource name to be removed.
+     * @param base, Resource to be removed.
      * @return true if removed successfully else false.
     */
-    bool delete_nsdl_resource(const String &resource_name);
+    bool delete_nsdl_resource(M2MBase *base);
 
     /**
      * @brief Creates the bootstrap object.
@@ -224,7 +224,7 @@ protected: // from M2MObservationHandler
                                         m2m::Vector<uint16_t> changed_instance_ids,
                                         bool send_object = false);
 
-    virtual void resource_to_be_deleted(const String &resource_name);
+    virtual void resource_to_be_deleted(M2MBase* base);
 
     virtual void value_updated(M2MBase *base, const String &object_name);
 
@@ -247,10 +247,9 @@ private:
     bool create_nsdl_object_instance_structure(M2MObjectInstance *object_instance);
 
     bool create_nsdl_resource_structure(M2MResource *resource,
-                                        const String &object_name = "",
                                         bool multiple_instances = false);
 
-    bool create_nsdl_resource(M2MBase *base, const String &name = "", bool publish_uri = true);
+    bool create_nsdl_resource(M2MBase *base);
 
     String coap_to_string(uint8_t *coap_data_ptr,
                           int coap_data_ptr_length);
@@ -280,8 +279,6 @@ private:
                            uint8_t token_len = 0);
 
     bool object_present(M2MObject * object) const;
-
-    void clear_resource(sn_nsdl_dynamic_resource_parameters_s *&resource);
 
     M2MInterface::Error interface_error(sn_coap_hdr_s *coap_header);
 
@@ -363,7 +360,6 @@ private:
     M2MNsdlObserver                         &_observer;
     M2MObjectList                            _object_list;
     sn_nsdl_ep_parameters_s                 *_endpoint;
-    sn_nsdl_dynamic_resource_parameters_s   *_resource;
     nsdl_s                                  *_nsdl_handle;
     M2MSecurity                             *_security; // Not owned
     M2MServer                               _server;

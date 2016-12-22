@@ -18,7 +18,13 @@
 #include "mbed-client/m2mobservationhandler.h"
 #include "mbed-client/m2mconstants.h"
 #include "mbed-client/m2mtimer.h"
+
+#include "mbed-client/m2mobject.h"
+#include "mbed-client/m2mobjectinstance.h"
+#include "mbed-client/m2mresource.h"
+
 #include "include/m2mreporthandler.h"
+#include "include/nsdlaccesshelper.h"
 #include "mbed-trace/mbed_trace.h"
 #include <assert.h>
 #include <ctype.h>
@@ -29,7 +35,8 @@
 
 M2MBase::M2MBase(const String& resource_name,
                  M2MBase::Mode mode,
-                 const String &resource_type)
+                 const String &resource_type,
+                 char *path)
 :
   _sn_resource(NULL),
   _report_handler(NULL),
@@ -55,6 +62,12 @@ M2MBase::M2MBase(const String& resource_name,
                    0, sizeof(sn_nsdl_dynamic_resource_parameters_s));
             _sn_resource->dynamic_resource_params->static_resource_parameters =
                     (sn_nsdl_static_resource_parameters_s*)memory_alloc(sizeof(sn_nsdl_static_resource_parameters_s));
+
+            // Set callback function in case of dynamic resource
+            if (M2MBase::Dynamic == mode) {
+                _sn_resource->dynamic_resource_params->sn_grs_dyn_res_callback = __nsdl_c_callback;
+            }
+
             if(_sn_resource->dynamic_resource_params->static_resource_parameters) {
                 // Cast const away to able to compile using MEMORY_OPTIMIZED_API flag
                 sn_nsdl_static_resource_parameters_s *params =
@@ -65,6 +78,10 @@ M2MBase::M2MBase(const String& resource_name,
                     params->resource_type_ptr = (char*)
                             alloc_string_copy((uint8_t*) resource_type.c_str(), len);
                 }
+                // XXX
+                params->path = (uint8_t*)path;
+                params->pathlen = strlen(path);
+
                 params->mode = (const uint8_t)mode;
                 params->free_on_delete = true;
                 _sn_resource->dynamic_resource_params->static_resource_parameters = params;
@@ -106,6 +123,89 @@ M2MBase::~M2MBase()
     free(_token);
     delete _function_pointer;
 }
+
+char* M2MBase::create_path(const M2MObject &parent, uint16_t object_instance)
+{
+    StringBuffer<5> obj_inst_id;
+    obj_inst_id.append_int(object_instance);
+
+    return create_path(parent, obj_inst_id.c_str());
+}
+
+char* M2MBase::create_path(const M2MObject &parent, const char *name)
+{
+    char * result = NULL;
+    StringBuffer<(MAX_NAME_SIZE * 2 + (2 + 1))> path;
+
+    const char* obj_name = parent.name();
+
+    // XXX: ensure space
+    path.append(obj_name);
+    path.append('/');
+    path.append(name);
+
+    result = stringdup(path.c_str());
+    return result;
+}
+
+char* M2MBase::create_path(const M2MResource &parent, uint16_t resource_instance)
+{
+    StringBuffer<5> res_inst;
+    res_inst.append_int(resource_instance);
+
+    return create_path(parent, res_inst.c_str());
+}
+
+char* M2MBase::create_path(const M2MResource &parent, const char *name)
+{
+    char * result = NULL;
+    StringBuffer<(MAX_NAME_SIZE * 4 + (3 + 1))> path;
+    M2MObjectInstance& parent_object_instance = parent.get_parent_object_instance();
+    M2MObject& parent_object = parent_object_instance.get_parent_object();
+
+    const char* obj_name = parent_object.name();
+
+    // Note: the parent_object_instance.name() contains name of its parent object, not the name of instance,
+    // so we need to skip that here
+    const uint16_t obj_inst_id = parent_object_instance.instance_id();
+
+    const char* resource_name = parent.name();
+
+    // XXX: ensure space
+    path.append(obj_name);
+    path.append('/');
+    path.append_int(obj_inst_id);
+    path.append('/');
+    path.append(resource_name);
+    path.append('/');
+    path.append(name);
+
+    result = stringdup(path.c_str());
+    return result;
+}
+
+char* M2MBase::create_path(const M2MObjectInstance &parent, const char *name)
+{
+    char * result = NULL;
+    StringBuffer<(MAX_NAME_SIZE * 3 + (2 + 1))> path;
+    M2MObject& parent_object = parent.get_parent_object();
+
+    const char* obj_name = parent_object.name();
+    // Note: the parent_object_instance.name() contains name of its parent object, not the name of instance,
+    // so we need to skip that here
+    const uint16_t obj_inst_id = parent.instance_id();
+
+    // XXX: ensure space
+    path.append(obj_name);
+    path.append('/');
+    path.append_int(obj_inst_id);
+    path.append('/');
+    path.append(name);
+
+    result = stringdup(path.c_str());
+    return result;
+}
+
 
 void M2MBase::set_operation(M2MBase::Operation opr)
 {
@@ -175,6 +275,13 @@ void M2MBase::remove_observation_level(M2MBase::Observation obs_level)
     _observation_level = (M2MBase::Observation)(_observation_level & ~obs_level);
 }
 
+void M2MBase::set_observation_handler(M2MObservationHandler *handler)
+{
+    tr_debug("M2MBase::set_observation_handler - handler: 0x%x", handler);
+    _observation_handler = handler;
+}
+
+
 void M2MBase::set_under_observation(bool observed,
                                     M2MObservationHandler *handler)
 {
@@ -182,12 +289,18 @@ void M2MBase::set_under_observation(bool observed,
     tr_debug("M2MBase::set_under_observation - base_type: %d", base_type());
     _is_under_observation = observed;
     _observation_handler = handler;
-    if(handler) {
+    if (handler) {
         if (base_type() != M2MBase::ResourceInstance) {
-            if(!_report_handler){
-                _report_handler = new M2MReportHandler(*this);
+            // Create report handler only if it does not exist and one wants observation
+            // This saves 76 bytes of memory on most usual case.
+            if (observed) {
+                if(!_report_handler) {
+                    _report_handler = new M2MReportHandler(*this);
+                }
             }
-        _report_handler->set_under_observation(observed);
+            if (_report_handler) {
+                _report_handler->set_under_observation(observed);
+            }
         }
     } else {
         delete _report_handler;
@@ -306,15 +419,19 @@ bool M2MBase::handle_observation_attribute(const char *query)
 {
     tr_debug("M2MBase::handle_observation_attribute - under observation(%d)", is_under_observation());
     bool success = false;
-    if(_report_handler) {
-        success = _report_handler->parse_notification_attribute(query,base_type());
-        if (success) {
-            if (is_under_observation()) {
-                _report_handler->set_under_observation(true);
-            }
-         } else {
-            _report_handler->set_default_values();
+    // Create handler if not already exists. Client must able to parse write attributes even when
+    // observation is not yet set
+    if (!_report_handler) {
+        _report_handler = new M2MReportHandler(*this);
+    }
+
+    success = _report_handler->parse_notification_attribute(query,base_type());
+    if (success) {
+        if (is_under_observation()) {
+            _report_handler->set_under_observation(true);
         }
+     } else {
+        _report_handler->set_default_values();
     }
     return success;
 }
@@ -335,20 +452,6 @@ void M2MBase::set_base_type(M2MBase::BaseType type)
 {
     assert(_sn_resource->free_on_delete);
     _sn_resource->base_type = type;
-}
-
-void M2MBase::remove_resource_from_coap(const String &resource_name)
-{
-    if(_observation_handler) {
-        _observation_handler->resource_to_be_deleted(resource_name);
-    }
-}
-
-void M2MBase::remove_object_from_coap()
-{
-    if(_observation_handler) {
-        _observation_handler->remove_object(this);
-    }
 }
 
 sn_coap_hdr_s* M2MBase::handle_get_request(nsdl_s */*nsdl*/,
@@ -450,6 +553,13 @@ bool M2MBase::validate_string_length(const char* string, size_t min_length, size
     return valid;
 }
 
+M2MReportHandler* M2MBase::create_report_handler()
+{
+    if (!_report_handler) {
+        _report_handler = new M2MReportHandler(*this);
+    }
+    return _report_handler;
+}
 
 M2MReportHandler* M2MBase::report_handler()
 {
@@ -602,6 +712,11 @@ char* M2MBase::stringdup(const char* src)
 
 void M2MBase::free_resources()
 {
+    // remove the nsdl structures from the nsdlinterface's lists.
+    if (_observation_handler) {
+        _observation_handler->resource_to_be_deleted(this);
+    }
+
     if (_sn_resource->dynamic_resource_params->static_resource_parameters->free_on_delete) {
         sn_nsdl_static_resource_parameters_s *params =
                 const_cast<sn_nsdl_static_resource_parameters_s *>(_sn_resource->dynamic_resource_params->static_resource_parameters);
@@ -615,14 +730,20 @@ void M2MBase::free_resources()
     if (_sn_resource->dynamic_resource_params->free_on_delete) {
         free(_sn_resource->dynamic_resource_params);
     }
+
+
     if (_sn_resource->free_on_delete) {
         free(_sn_resource->name);
         free(_sn_resource);
     }
 }
 
-
 size_t M2MBase::resource_name_length() const
 {
     return strlen(_sn_resource->name);
+}
+
+sn_nsdl_dynamic_resource_parameters_s* M2MBase::get_nsdl_resource()
+{
+    return _sn_resource->dynamic_resource_params;
 }
