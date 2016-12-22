@@ -915,13 +915,6 @@ bool M2MNsdlInterface::create_nsdl_resource(M2MBase *base)
         tr_debug("M2MNsdlInterface::create_nsdl_resource - path (%.*s)", orig_resource->static_resource_parameters->pathlen,
                  orig_resource->static_resource_parameters->path);
 
-        // Check if external block storing is in use
-        if((M2MBase::Resource == base->base_type() ||
-            M2MBase::ResourceInstance == base->base_type())) {
-            M2MResourceInstance *res = (M2MResourceInstance*)base;
-            orig_resource->static_resource_parameters->external_memory_block = (res->block_message()) ? 1 : 0;
-        }
-
         // needed on deletion
         if (base->observation_handler() == NULL) {
             base->set_observation_handler(this);
