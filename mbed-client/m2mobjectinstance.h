@@ -54,7 +54,8 @@ private: // Constructor and destructor are private which means
     M2MObjectInstance(M2MObject& parent, const String &object_name,
                       M2MObjectCallback &object_callback,
                       const String &resource_type,
-                      char *path);
+                      char *path,
+                      bool external_blockwise_store = false);
 
     M2MObjectInstance(M2MObject& parent, const lwm2m_parameters_s* static_res,
                       M2MObjectCallback &object_callback);
@@ -91,6 +92,8 @@ public:
      * \param value_length The length of the value in the pointer.
      * \param multiple_instance A resource can have
      *        multiple instances, default is false.
+     * \param external_blockwise_store If true CoAP blocks are passed to application through callbacks
+     *        otherwise handled in mbed-client-c.
      * \return M2MResource The resource for managing other client operations.
      */
     M2MResource* create_static_resource(const String &resource_name,
@@ -98,7 +101,8 @@ public:
                                         M2MResourceInstance::ResourceType type,
                                         const uint8_t *value,
                                         const uint8_t value_length,
-                                        bool multiple_instance = false);
+                                        bool multiple_instance = false,
+                                        bool external_blockwise_store = false);
 
     /**
      * \brief Creates a dynamic resource for a given mbed Client Inteface object. With this,
@@ -109,13 +113,16 @@ public:
      * \param observable Indicates whether the resource is observable or not.
      * \param multiple_instance The resource can have
      *        multiple instances, default is false.
+     * \param external_blockwise_store If true CoAP blocks are passed to application through callbacks
+     *        otherwise handled in mbed-client-c.
      * \return M2MResource The resource for managing other client operations.
      */
     M2MResource* create_dynamic_resource(const String &resource_name,
                                          const String &resource_type,
                                          M2MResourceInstance::ResourceType type,
                                          bool observable,
-                                         bool multiple_instance = false);
+                                         bool multiple_instance = false,
+                                         bool external_blockwise_store = false);
 
     /**
      * \brief TODO!
@@ -133,6 +140,8 @@ public:
      * \param value A pointer to the value of the resource.
      * \param value_length The length of the value in pointer.
      * \param instance_id The instance ID of the resource.
+     * \param external_blockwise_store If true CoAP blocks are passed to application through callbacks
+     *        otherwise handled in mbed-client-c.
      * \return M2MResourceInstance The resource instance for managing other client operations.
      */
     M2MResourceInstance* create_static_resource_instance(const String &resource_name,
@@ -140,7 +149,8 @@ public:
                                                          M2MResourceInstance::ResourceType type,
                                                          const uint8_t *value,
                                                          const uint8_t value_length,
-                                                         uint16_t instance_id);
+                                                         uint16_t instance_id,
+                                                         bool external_blockwise_store = false);
 
     /**
      * \brief Creates a dynamic resource instance for a given mbed Client Inteface object. With this,
@@ -150,13 +160,16 @@ public:
      * \param resource_type The type of the resource.
      * \param observable Indicates whether the resource is observable or not.
      * \param instance_id The instance ID of the resource.
+     * \param external_blockwise_store If true CoAP blocks are passed to application through callbacks
+     *        otherwise handled in mbed-client-c.
      * \return M2MResourceInstance The resource instance for managing other client operations.
      */
     M2MResourceInstance* create_dynamic_resource_instance(const String &resource_name,
                                                           const String &resource_type,
                                                           M2MResourceInstance::ResourceType type,
                                                           bool observable,
-                                                          uint16_t instance_id);
+                                                          uint16_t instance_id,
+                                                          bool external_blockwise_store = false);
 
     /**
      * \brief Removes the resource with the given name.

@@ -36,7 +36,8 @@
 M2MBase::M2MBase(const String& resource_name,
                  M2MBase::Mode mode,
                  const String &resource_type,
-                 char *path)
+                 char *path,
+                 bool external_blockwise_store)
 :
   _sn_resource(NULL),
   _report_handler(NULL),
@@ -78,12 +79,12 @@ M2MBase::M2MBase(const String& resource_name,
                     params->resource_type_ptr = (char*)
                             alloc_string_copy((uint8_t*) resource_type.c_str(), len);
                 }
-                // XXX
                 params->path = (uint8_t*)path;
                 params->pathlen = strlen(path);
 
                 params->mode = (const uint8_t)mode;
                 params->free_on_delete = true;
+                params->external_memory_block = external_blockwise_store;
                 _sn_resource->dynamic_resource_params->static_resource_parameters = params;
             }
         }

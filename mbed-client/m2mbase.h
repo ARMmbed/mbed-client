@@ -78,8 +78,7 @@ public:
 
 
     /**
-     * \brief Enum defining an operation that can be
-     * supported by a given resource.
+     * \brief Enum defining a resource type.
     */
     typedef enum {
         Static,
@@ -148,14 +147,18 @@ protected:
 
     /**
      * \brief Constructor
-     * \param baseType The type of the object created.
-     * \param name The name of the object.
-     * \param id The ID of the object.
+     * \param name Name of the object created.
+     * \param mode Type of the resource.
+     * \param resource_type Textual information of resource.
+     * \param path Path of the object like 3/0/1
+     * \param external_blockwise_store If true CoAP blocks are passed to application through callbacks
+     *        otherwise handled in mbed-client-c.
      */
     M2MBase(const String &name,
             M2MBase::Mode mode,
             const String &resource_type,
-            char *path);
+            char *path,
+            bool external_blockwise_store);
 
     M2MBase(const lwm2m_parameters_s* s);
 
