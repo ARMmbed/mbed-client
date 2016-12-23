@@ -62,6 +62,8 @@ private: // Constructor and destructor are private,
      * \param object_instance_id The instance ID of the object where the resource exists.
      * \param object_name The name of the object where the resource exists.
      * \param multiple_instance True if the resource supports instances.
+     * \param external_blockwise_store If true CoAP blocks are passed to application through callbacks
+     *        otherwise handled in mbed-client-c.
      */
     M2MResource(M2MObjectInstance &_parent,
                 M2MObjectInstanceCallback &object_instance_callback,
@@ -72,7 +74,8 @@ private: // Constructor and destructor are private,
                 const uint8_t value_length,
                 const uint16_t object_instance_id = 0,
                 const String &object_name = "",
-                bool multiple_instance = false);
+                bool multiple_instance = false,
+                bool external_blockwise_store = false);
 
     /**
      * \brief Constructor
@@ -83,6 +86,8 @@ private: // Constructor and destructor are private,
      * \param object_instance_id The ID of the object instance where the resource exists.
      * \param object_name The name of the object where the resource exists.
      * \param multiple_instance True if the resource supports instances.
+     * \param external_blockwise_store If true CoAP blocks are passed to application through callbacks
+     *        otherwise handled in mbed-client-c.
      */
     M2MResource(M2MObjectInstance &_parent,
                 M2MObjectInstanceCallback &object_instance_callback,
@@ -92,7 +97,8 @@ private: // Constructor and destructor are private,
                 bool observable,
                 const uint16_t object_instance_id = 0,
                 const String &object_name = "",
-                bool multiple_instance = false);
+                bool multiple_instance = false,
+                bool external_blockwise_store = false);
 
     // Prevents the use of a default constructor.
     M2MResource();

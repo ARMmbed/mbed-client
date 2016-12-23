@@ -27,8 +27,12 @@
 #define BUFFER_SIZE 10
 #define TRACE_GROUP "mClt"
 
-M2MObject::M2MObject(const String &object_name, char *path)
-: M2MBase(object_name,M2MBase::Dynamic, "", path),
+M2MObject::M2MObject(const String &object_name, char *path, bool external_blockwise_store)
+: M2MBase(object_name,
+          M2MBase::Dynamic,
+          "",
+          path,
+          external_blockwise_store),
   _max_instance_count(MAX_UNINT_16_COUNT)
 {
     M2MBase::set_base_type(M2MBase::Object);
@@ -41,7 +45,6 @@ M2MObject::M2MObject(const M2MBase::lwm2m_parameters_s* static_res)
 : M2MBase(static_res),
   _max_instance_count(MAX_UNINT_16_COUNT)
 {
-    //M2MBase::set_base_type(M2MBase::Object);
     if(static_res->name_id != -1) {
         M2MBase::set_coap_content_type(COAP_CONTENT_OMA_TLV_TYPE);
     }

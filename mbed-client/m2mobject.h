@@ -41,8 +41,13 @@ protected :
     /**
      * \brief Constructor
      * \param name The name of the object.
+     * \param path Path of the object like 3/0/1
+     * \param external_blockwise_store If true CoAP blocks are passed to application through callbacks
+     *        otherwise handled in mbed-client-c.
      */
-    M2MObject(const String &object_name, char *path);
+    M2MObject(const String &object_name,
+              char *path,
+              bool external_blockwise_store = false);
 
     // Prevents the use of default constructor.
     M2MObject();

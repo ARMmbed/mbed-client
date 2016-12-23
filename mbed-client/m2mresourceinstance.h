@@ -82,6 +82,9 @@ private: // Constructor and destructor are private
      * \param type The resource data type of the object.
      * \param object_instance_id Object instance id where resource exists.
      * \param object_name Object name where resource exists.
+     * \param path Path of the object like 3/0/1
+     * \param external_blockwise_store If true CoAP blocks are passed to application through callbacks
+     *        otherwise handled in mbed-client-c.
      */
     M2MResourceInstance(M2MResource &parent,
                         const String &resource_name,
@@ -90,7 +93,8 @@ private: // Constructor and destructor are private
                         M2MObjectInstanceCallback &object_instance_callback,
                         const uint16_t object_instance_id,
                         const String &object_name,
-                        char* path);
+                        char* path,
+                        bool external_blockwise_store);
 
     /**
      * \brief A Constructor for creating a resource.
@@ -102,6 +106,9 @@ private: // Constructor and destructor are private
      * \param value_length The length of the value pointer.
      * \param object_instance_id Object instance id where resource exists.
      * \param object_name Object name where resource exists.
+     * \param path Path of the object like 3/0/1
+     * \param external_blockwise_store If true CoAP blocks are passed to application through callbacks
+     *        otherwise handled in mbed-client-c.
      */
     M2MResourceInstance(M2MResource &parent,
                         const String &resource_name,
@@ -112,7 +119,8 @@ private: // Constructor and destructor are private
                         M2MObjectInstanceCallback &object_instance_callback,
                         const uint16_t object_instance_id,
                         const String &object_name,
-                        char* path);
+                        char* path,
+                        bool external_blockwise_store);
 
     // Prevents the use of default constructor.
     M2MResourceInstance();
