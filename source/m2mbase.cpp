@@ -79,9 +79,7 @@ M2MBase::M2MBase(const String& resource_name,
                     params->resource_type_ptr = (char*)
                             alloc_string_copy((uint8_t*) resource_type.c_str(), len);
                 }
-                params->path = (uint8_t*)path;
-                params->pathlen = strlen(path);
-
+                params->path = path;
                 params->mode = (const uint8_t)mode;
                 params->free_on_delete = true;
                 params->external_memory_block = external_blockwise_store;
