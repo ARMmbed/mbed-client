@@ -903,16 +903,15 @@ bool M2MNsdlInterface::create_nsdl_resource(M2MBase *base)
     bool success = false;
     if(base) {
         int8_t result = 0;
-        sn_nsdl_dynamic_resource_parameters_s* orig_resource = base->get_nsdl_resource();
-        tr_debug("M2MNsdlInterface::create_nsdl_resource - path (%.*s)", orig_resource->static_resource_parameters->pathlen,
-                 orig_resource->static_resource_parameters->path);
+        sn_nsdl_dynamic_resource_parameters_s* nsdl_resource = base->get_nsdl_resource();
+        tr_debug("M2MNsdlInterface::create_nsdl_resource - path (%s)", nsdl_resource->static_resource_parameters->path);
 
         // needed on deletion
         if (base->observation_handler() == NULL) {
             base->set_observation_handler(this);
         }
 
-        result = sn_nsdl_put_resource(_nsdl_handle, orig_resource);
+        result = sn_nsdl_put_resource(_nsdl_handle, nsdl_resource);
         tr_debug("M2MNsdlInterface::create_nsdl_resource - Creating in NSDL-C result %d", result);
 
         // Either the resource is created or it already
