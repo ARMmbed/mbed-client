@@ -96,8 +96,7 @@ public :
     /**
      * @brief Callback informing that the value of the resource object is updated by server.
      * @param base Object whose value is updated.
-     * @param path The resource path (eg. "0/3/4") of resource being updated.
      */
-    virtual void value_updated(M2MBase *base, const char *path) = 0;
+    virtual void value_updated(M2MBase *base) = 0;
 };
 #endif // M2M_NSDL_OBSERVER_H
