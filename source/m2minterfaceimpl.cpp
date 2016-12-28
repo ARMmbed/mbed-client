@@ -352,12 +352,12 @@ void M2MInterfaceImpl::coap_data_processed()
     internal_event(STATE_COAP_DATA_PROCESSED);
 }
 
-void M2MInterfaceImpl::value_updated(M2MBase *base, const char *path)
+void M2MInterfaceImpl::value_updated(M2MBase *base)
 {
-    tr_debug("M2MInterfaceImpl::value_updated(%s)", path);
+    tr_debug("M2MInterfaceImpl::value_updated");
     if(base) {
         M2MBase::BaseType type = base->base_type();
-        _observer.value_updated(base, type, path);
+        _observer.value_updated(base, type);
     }
 }
 

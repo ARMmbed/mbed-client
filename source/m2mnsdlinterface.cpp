@@ -803,7 +803,7 @@ void M2MNsdlInterface::value_updated(M2MBase *base,
         base->execute_value_updated(base->name());
     }
     else {
-        _observer.value_updated(base, object_name.c_str());
+        _observer.value_updated(base);
     }
 }
 

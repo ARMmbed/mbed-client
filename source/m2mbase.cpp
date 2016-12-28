@@ -374,6 +374,12 @@ const char* M2MBase::resource_type() const
         _sn_resource->dynamic_resource_params->static_resource_parameters->resource_type_ptr));
 }
 
+const char* M2MBase::uri_path() const
+{
+    return (reinterpret_cast<char*>(
+        _sn_resource->dynamic_resource_params->static_resource_parameters->path));
+}
+
 uint8_t M2MBase::coap_content_type() const
 {
     return _sn_resource->dynamic_resource_params->coap_content_type;

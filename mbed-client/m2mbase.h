@@ -312,6 +312,12 @@ public:
     virtual const char* resource_type() const;
 
     /**
+     * \brief Returns the path of the object.
+     * \return The path of the object (eg. 3/0/1).
+     */
+    virtual const char* uri_path() const;
+
+    /**
      * \brief Returns the CoAP content type of the object.
      * \return The CoAP content type of the object.
      */
@@ -452,6 +458,10 @@ public:
      */
     size_t resource_name_length() const;
 
+    /**
+     * @brief Returns the resource information.
+     * @return Resource information.
+     */
     sn_nsdl_dynamic_resource_parameters_s* get_nsdl_resource();
 
     static char* create_path(const M2MObject &parent, const char *name);
