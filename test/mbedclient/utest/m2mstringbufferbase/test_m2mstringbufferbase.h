@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 ARM Limited. All rights reserved.
+ * Copyright (c) 2016 ARM Limited. All rights reserved.
  * SPDX-License-Identifier: Apache-2.0
  * Licensed under the Apache License, Version 2.0 (the License); you may
  * not use this file except in compliance with the License.
@@ -13,19 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef M2M_TIMER_STUB_H
-#define M2M_TIMER_STUB_H
+#ifndef TEST_M2M_STRIGBUFFERBASE_H
+#define TEST_M2M_STRIGBUFFERBASE_H
 
-#include "m2mtimer.h"
+#include "m2mstringbufferbase.h"
 
-//some internal test related stuff
-namespace m2mtimer_stub
+class Test_M2Mstringbufferbase : StringBufferBase
 {
-    extern bool bool_value;
-    extern bool total_bool_value;
-    extern bool enable_mock;
-    void clear();
-}
+public:
+    Test_M2Mstringbufferbase();
 
-#endif // M2M_TIMER_STUB_H
+    virtual ~Test_M2Mstringbufferbase();
 
+    void test_ensure_space();
+    void test_append();
+    void test_append_int();
+    void test_find_last_of();
+
+};
+
+
+#endif // TEST_M2M_STRIGBUFFERBASE_H

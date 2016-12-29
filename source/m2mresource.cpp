@@ -19,44 +19,11 @@
 #include "include/m2mreporthandler.h"
 #include "include/m2mtlvserializer.h"
 #include "include/m2mtlvdeserializer.h"
-#include "include/nsdllinker.h"
 #include "mbed-trace/mbed_trace.h"
 
 #include <stdlib.h>
 
 #define TRACE_GROUP "mClt"
-
-M2MResource& M2MResource::operator=(const M2MResource& other)
-{
-    if (this != &other) { // protect against invalid self-assignment
-        _has_multiple_instances = other._has_multiple_instances;
-        if(!other._resource_instance_list.empty()){
-            M2MResourceInstance* ins = NULL;
-            M2MResourceInstanceList::const_iterator it;
-            it = other._resource_instance_list.begin();
-            for (; it!=other._resource_instance_list.end(); it++ ) {
-                ins = *it;
-                _resource_instance_list.push_back(new M2MResourceInstance(*ins));
-            }
-        }
-        if(other._delayed_token) {
-            _delayed_token = (uint8_t*)alloc_copy(other._delayed_token,other._delayed_token_len);
-            if(_delayed_token) {
-                _delayed_token_len = other._delayed_token_len;
-            }
-        }
-    }
-    return *this;
-}
-
-M2MResource::M2MResource(const M2MResource& other)
-: M2MResourceInstance(other),
-  _delayed_token(NULL),
-  _delayed_token_len(0),
-  _delayed_response(false)
-{
-    this->operator=(other);
-}
 
 M2MResource::M2MResource(M2MObjectInstanceCallback &object_instance_callback,
                          const String &resource_name,
@@ -77,6 +44,20 @@ M2MResource::M2MResource(M2MObjectInstanceCallback &object_instance_callback,
     M2MBase::set_base_type(M2MBase::Resource);
     M2MBase::set_operation(M2MBase::GET_ALLOWED);
     M2MBase::set_observable(false);
+}
+
+M2MResource::M2MResource(M2MObjectInstanceCallback &object_instance_callback,
+                         const lwm2m_parameters_s* s,
+                          M2MResourceInstance::ResourceType type,
+                         const uint16_t object_instance_id,
+                         const String &object_name)
+: M2MResourceInstance(s, object_instance_callback, type, object_instance_id, object_name),
+  _delayed_token(NULL),
+  _delayed_token_len(0),
+  _has_multiple_instances(false),
+  _delayed_response(false)
+{
+    // tbd: _has_multiple_instances could be in flash, but no real benefit, because of current alignment.
 }
 
 M2MResource::M2MResource(M2MObjectInstanceCallback &object_instance_callback,
@@ -206,7 +187,7 @@ bool M2MResource::delayed_response() const
     return _delayed_response;
 }
 
-bool M2MResource::handle_observation_attribute(char *&query)
+bool M2MResource::handle_observation_attribute(const char *query)
 {
     tr_debug("M2MResource::handle_observation_attribute - is_under_observation(%d)", is_under_observation());
     bool success = false;
@@ -309,11 +290,8 @@ sn_coap_hdr_s* M2MResource::handle_get_request(nsdl_s *nsdl,
                     uint32_t data_length = 0;
                     // fill in the CoAP response payload
                     if(COAP_CONTENT_OMA_TLV_TYPE == coap_content_type) {
-                        M2MTLVSerializer *serializer = new M2MTLVSerializer();
-                        if(serializer) {
-                            data = serializer->serialize(this, data_length);
-                            delete serializer;
-                        }
+                        M2MTLVSerializer serializer;
+                        data = serializer.serialize(this, data_length);
                     } else {
                         msg_code = COAP_MSG_CODE_RESPONSE_UNSUPPORTED_CONTENT_FORMAT; // Content format not supported
                     }
@@ -435,37 +413,34 @@ sn_coap_hdr_s* M2MResource::handle_put_request(nsdl_s *nsdl,
                 tr_debug("M2MResource::handle_put_request() - Request Content-Type %d", coap_content_type);
 
                 if(COAP_CONTENT_OMA_TLV_TYPE == coap_content_type) {
-                    M2MTLVDeserializer *deserializer = new M2MTLVDeserializer();
-                    if(deserializer) {
-                        M2MTLVDeserializer::Error error = M2MTLVDeserializer::None;
-                        error = deserializer->deserialize_resource_instances(received_coap_header->payload_ptr,
-                                                                             received_coap_header->payload_len,
-                                                                             *this,
-                                                                             M2MTLVDeserializer::Put);
-                        switch(error) {
-                            case M2MTLVDeserializer::None:
-                                if(observation_handler) {
-                                    String value = "";
-                                    if (received_coap_header->uri_path_ptr != NULL &&
-                                        received_coap_header->uri_path_len > 0) {
+                    M2MTLVDeserializer deserializer;
+                    M2MTLVDeserializer::Error error = M2MTLVDeserializer::None;
+                    error = deserializer.deserialize_resource_instances(received_coap_header->payload_ptr,
+                                                                         received_coap_header->payload_len,
+                                                                         *this,
+                                                                         M2MTLVDeserializer::Put);
+                    switch(error) {
+                        case M2MTLVDeserializer::None:
+                            if(observation_handler) {
+                                String value = "";
+                                if (received_coap_header->uri_path_ptr != NULL &&
+                                    received_coap_header->uri_path_len > 0) {
 
-                                        value.append_raw((char*)received_coap_header->uri_path_ptr,received_coap_header->uri_path_len);
-                                    }
-                                    execute_value_updated = true;
+                                    value.append_raw((char*)received_coap_header->uri_path_ptr,received_coap_header->uri_path_len);
                                 }
-                                msg_code = COAP_MSG_CODE_RESPONSE_CHANGED;
-                                break;
-                            case M2MTLVDeserializer::NotFound:
-                                msg_code = COAP_MSG_CODE_RESPONSE_NOT_FOUND;
-                                break;
-                            case M2MTLVDeserializer::NotAllowed:
-                                msg_code = COAP_MSG_CODE_RESPONSE_METHOD_NOT_ALLOWED;
-                                break;
-                            case M2MTLVDeserializer::NotValid:
-                                msg_code = COAP_MSG_CODE_RESPONSE_BAD_REQUEST;
-                                break;
-                        }
-                        delete deserializer;
+                                execute_value_updated = true;
+                            }
+                            msg_code = COAP_MSG_CODE_RESPONSE_CHANGED;
+                            break;
+                        case M2MTLVDeserializer::NotFound:
+                            msg_code = COAP_MSG_CODE_RESPONSE_NOT_FOUND;
+                            break;
+                        case M2MTLVDeserializer::NotAllowed:
+                            msg_code = COAP_MSG_CODE_RESPONSE_METHOD_NOT_ALLOWED;
+                            break;
+                        case M2MTLVDeserializer::NotValid:
+                            msg_code = COAP_MSG_CODE_RESPONSE_BAD_REQUEST;
+                            break;
                     }
                 } else {
                     msg_code =COAP_MSG_CODE_RESPONSE_UNSUPPORTED_CONTENT_FORMAT;

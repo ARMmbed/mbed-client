@@ -12,6 +12,7 @@ add_executable(m2mresourceinstance
         "../stub/m2mblockmessage_stub.cpp"
         "m2mresourceinstancetest.cpp"
         "test_m2mresourceinstance.cpp"
+        "../../../../source/m2mstringbufferbase.cpp"
 )
 target_link_libraries(m2mresourceinstance
     CppUTest

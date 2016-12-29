@@ -26,8 +26,6 @@ class Test_M2MObjectInstance
 public:
     Test_M2MObjectInstance();
 
-    void test_copy_constructor();
-
     virtual ~Test_M2MObjectInstance();
 
     void test_create_static_resource();

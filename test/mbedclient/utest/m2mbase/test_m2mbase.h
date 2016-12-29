@@ -27,8 +27,6 @@ public:
 
     void test_copy_constructor();
 
-    void test_assignment_operator();
-
     void test_set_operation();
 
     void test_set_base_type();
@@ -118,6 +116,9 @@ public:
     void test_is_under_observation();
 
     void test_value_updated_function();
+
+    void test_build_path();
+
 };
 
 

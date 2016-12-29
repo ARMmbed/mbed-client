@@ -37,7 +37,7 @@ public:
     /**
     * Destructor.
     */
-    virtual ~M2MTLVSerializer();
+    ~M2MTLVSerializer();
 
     /**
      * Serialises given objects instances that contain resources or multiple 

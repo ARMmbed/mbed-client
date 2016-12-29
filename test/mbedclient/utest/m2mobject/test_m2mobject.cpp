@@ -68,26 +68,6 @@ Test_M2MObject::~Test_M2MObject()
     m2mbase_stub::string_value = NULL;
 }
 
-void Test_M2MObject::test_copy_constructor()
-{
-    String *name = new String("name");
-    m2mbase_stub::string_value = name;
-
-    M2MObject* copy = new M2MObject(*name);
-    M2MObjectInstance *ins = new M2MObjectInstance("name",*object);
-    copy->set_instance_id(0);
-    copy->_instance_list.push_back(ins);
-
-    M2MObject* copy1 = new M2MObject(*copy);
-
-    CHECK(1 == copy1->_instance_list.size());
-
-    delete copy;
-    delete copy1;
-    delete name;
-    name = NULL;
-}
-
 void Test_M2MObject::test_create_object_instance()
 {
     m2mbase_stub::name_id_value = 1;

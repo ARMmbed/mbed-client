@@ -203,7 +203,7 @@ void Test_M2MNsdlInterface::test_create_nsdl_list_structure()
 
     CHECK(nsdl->create_nsdl_list_structure(list)== true);
 
-    nsdl->_resource->path = ((uint8_t*)nsdl->memory_alloc(3));
+    nsdl->_resource->static_resource_parameters->path = ((uint8_t*)nsdl->memory_alloc(3));
     m2mbase_stub::mode_value = M2MBase::Directory;
     CHECK(nsdl->create_nsdl_list_structure(list)== true);
 
@@ -1560,18 +1560,19 @@ void Test_M2MNsdlInterface::test_value_updated()
     CHECK(observer->value_update == true);
     observer->value_update = false;
 
-    common_stub::resource = (sn_nsdl_resource_info_s*)malloc(sizeof(sn_nsdl_resource_info_s));
-    memset(common_stub::resource,0, sizeof(sn_nsdl_resource_info_s));
-    common_stub::resource->resource = (uint8_t*)malloc(2);
-    memset(common_stub::resource->resource,0, 2);
+    common_stub::resource = (sn_nsdl_dynamic_resource_parameters_s*)malloc(sizeof(sn_nsdl_dynamic_resource_parameters_s));
+    memset(common_stub::resource,0, sizeof(sn_nsdl_dynamic_resource_parameters_s));
+    common_stub::resource->static_resource_parameters->resource = (uint8_t*)malloc(2);
+    memset(common_stub::resource->static_resource_parameters->resource,0, 2);
 
-    common_stub::resource->mode = SN_GRS_STATIC;
+    common_stub::resource->static_resource_parameters->mode = SN_GRS_STATIC;
     m2mbase_stub::mode_value = M2MBase::Static;
 
-    common_stub::resource->resource_parameters_ptr = (sn_nsdl_resource_parameters_s*)malloc(sizeof(sn_nsdl_resource_parameters_s));
-    memset(common_stub::resource->resource_parameters_ptr,0, sizeof(sn_nsdl_resource_parameters_s));
+    common_stub::resource->static_resource_parameters =
+            (sn_nsdl_static_resource_parameters_s*)malloc(sizeof(sn_nsdl_static_resource_parameters_s));
+    memset(common_stub::resource->static_resource_parameters,0, sizeof(sn_nsdl_static_resource_parameters_s));
 
-    common_stub::resource->resource_parameters_ptr->observable = false;
+    common_stub::resource->static_resource_parameters->observable = false;
     m2mbase_stub::bool_value = true;
 
     m2mresourceinstance_stub::int_value = 2;
@@ -1585,20 +1586,20 @@ void Test_M2MNsdlInterface::test_value_updated()
     observer->value_update = false;
 
     m2mresourceinstance_stub::clear();
-    free(common_stub::resource->resource_parameters_ptr);
-    free(common_stub::resource->resource);
+    free(common_stub::resource->static_resource_parameters->resource);
+    free(common_stub::resource->static_resource_parameters);
     free(common_stub::resource);
     common_stub::resource = NULL;
     common_stub::clear();
 
     m2mresourceinstance_stub::base_type = M2MBase::ResourceInstance;
 
-    common_stub::resource = (sn_nsdl_resource_info_s*)malloc(sizeof(sn_nsdl_resource_info_s));
-    memset(common_stub::resource,0, sizeof(sn_nsdl_resource_info_s));
-    common_stub::resource->resource = (uint8_t*)malloc(2);
-    memset(common_stub::resource->resource,0, 2);
+    common_stub::resource = (sn_nsdl_dynamic_resource_parameters_s*)malloc(sizeof(sn_nsdl_dynamic_resource_parameters_s));
+    memset(common_stub::resource,0, sizeof(sn_nsdl_dynamic_resource_parameters_s));
+    common_stub::resource->static_resource_parameters->resource = (uint8_t*)malloc(2);
+    memset(common_stub::resource->static_resource_parameters->resource,0, 2);
 
-    common_stub::resource->mode = SN_GRS_STATIC;
+    common_stub::resource->static_resource_parameters->mode = SN_GRS_STATIC;
     m2mbase_stub::mode_value = M2MBase::Static;
 
     m2mresourceinstance_stub::int_value = 2;
@@ -1621,7 +1622,8 @@ void Test_M2MNsdlInterface::test_value_updated()
 
     m2mresourceinstance_stub::clear();
 
-    free(common_stub::resource->resource);
+    free(common_stub::resource->static_resource_parameters->resource);
+    free(common_stub::resource->static_resource_parameters);
     free(common_stub::resource);
 
     common_stub::resource = NULL;

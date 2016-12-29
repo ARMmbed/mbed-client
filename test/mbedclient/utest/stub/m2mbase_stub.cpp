@@ -223,7 +223,7 @@ void M2MBase::remove_object_from_coap()
 {
 }
 
-bool M2MBase::handle_observation_attribute(char *&query)
+bool M2MBase::handle_observation_attribute(const char *query)
 {
     return m2mbase_stub::bool_value;
 }
@@ -345,5 +345,72 @@ bool M2MBase::is_value_updated_function_set()
 
 void M2MBase::execute_value_updated(const String& name)
 {
+
+}
+bool M2MBase::build_path(StringBuffer<MAX_PATH_SIZE> &buffer, const char *s1, uint16_t i1, const char *s2, uint16_t i2)
+{
+
+    if(!buffer.ensure_space(strlen(s1) + strlen(s2) + 10 + 3 + 1)){
+        return false;
+    }
+
+    buffer.append(s1);
+    buffer.append('/');
+    buffer.append_int(i1);
+    buffer.append('/');
+    buffer.append(s2);
+    buffer.append('/');
+    buffer.append_int(i2);
+
+    return true;
+
+}
+
+bool M2MBase::build_path(StringBuffer<MAX_PATH_SIZE_2> &buffer, const char *s1, uint16_t i1, const char *s2)
+{
+
+    if(!buffer.ensure_space(strlen(s1) + strlen(s2) + 5 + 2 + 1)){
+        return false;
+    }
+
+    buffer.append(s1);
+    buffer.append('/');
+    buffer.append_int(i1);
+    buffer.append('/');
+    buffer.append(s2);
+
+    return true;
+
+}
+
+bool M2MBase::build_path(StringBuffer<MAX_PATH_SIZE_3> &buffer, const char *s1, uint16_t i1, uint16_t i2)
+{
+
+    if(!buffer.ensure_space(strlen(s1) + 10 + 2 + 1)){
+        return false;
+    }
+
+    buffer.append(s1);
+    buffer.append('/');
+    buffer.append_int(i1);
+    buffer.append('/');
+    buffer.append_int(i2);
+
+    return true;
+
+}
+
+bool M2MBase::build_path(StringBuffer<MAX_PATH_SIZE_4> &buffer, const char *s1, uint16_t i1)
+{
+
+    if(!buffer.ensure_space(strlen(s1) + 5 + 1 + 1)){
+        return false;
+    }
+
+    buffer.append(s1);
+    buffer.append('/');
+    buffer.append_int(i1);
+
+    return true;
 
 }

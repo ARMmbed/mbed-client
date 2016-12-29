@@ -67,6 +67,12 @@ public:
 private: // Constructor and destructor are private
          // which means that these objects can be created or
          // deleted only through a function provided by the M2MObjectInstance.
+
+    M2MResourceInstance(const lwm2m_parameters_s* s,
+                        M2MObjectInstanceCallback &object_instance_callback,
+                        M2MResourceInstance::ResourceType type,
+                        const uint16_t object_instance_id,
+                        const String &object_name);
     /**
      * \brief A constructor for creating a resource.
      * \param resource_name The name of the resource.
@@ -135,7 +141,7 @@ public:
      * attribute.
      * \return True if required attributes are present, else false.
      */
-    virtual bool handle_observation_attribute(char *&query);
+    virtual bool handle_observation_attribute(const char *query);
 
     /**
      * \brief Sets the function that should be executed when this
@@ -303,20 +309,20 @@ private:
 
 private:
 
-    M2MObjectInstanceCallback               &_object_instance_callback;
-    execute_callback                        _execute_callback;
     uint8_t                                 *_value;
     uint32_t                                _value_length;
+    M2MBlockMessage                         *_block_message_data;
+    execute_callback                        _execute_callback;
     M2MResourceCallback                     *_resource_callback; // Not owned
     String                                  _object_name;
     FP1<void, void*>                        *_execute_function_pointer;
     FP0<void>                               *_notification_sent_function_pointer;
-    uint16_t                                _object_instance_id;
-    ResourceType                            _resource_type;
     incoming_block_message_callback         _incoming_block_message_cb;
     outgoing_block_message_callback         _outgoing_block_message_cb;
-    M2MBlockMessage                         *_block_message_data;
+    M2MObjectInstanceCallback               &_object_instance_callback;
     notification_sent_callback              _notification_sent_callback;
+    uint16_t                                _object_instance_id;
+    ResourceType                            _resource_type;
 
     friend class Test_M2MResourceInstance;
     friend class Test_M2MResource;
