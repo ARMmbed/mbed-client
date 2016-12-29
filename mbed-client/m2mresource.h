@@ -46,6 +46,11 @@ private: // Constructor and destructor are private,
          // which means that these objects can be created or
          // deleted only through a function provided by the M2MObjectInstance.
 
+    M2MResource(M2MObjectInstanceCallback &object_instance_callback,
+                             const lwm2m_parameters_s* s,
+                              M2MResourceInstance::ResourceType type,
+                             const uint16_t object_instance_id,
+                             const String &object_name);
     /**
      * \brief Constructor
      * \param resource_name The resource name of the object.
@@ -175,7 +180,7 @@ public:
      * attribute.
      * \return True if required attributes are present, else false.
      */
-    virtual bool handle_observation_attribute(char *&query);
+    virtual bool handle_observation_attribute(const char *query);
 
     /**
      * \brief Adds the observation level for the object.

@@ -21,12 +21,15 @@
 #include "mbed-client/m2mconfig.h"
 #include "mbed-client/m2mreportobserver.h"
 #include "mbed-client/functionpointer.h"
+#include "mbed-client/m2mstringbuffer.h"
+#include "nsdl-c/sn_nsdl.h"
+#include "nsdl-c/sn_coap_header.h"
+#include "nsdl-c/sn_nsdl_lib.h"
 
 //FORWARD DECLARATION
 struct sn_coap_hdr_;
 typedef sn_coap_hdr_ sn_coap_hdr_s;
 struct nsdl_s;
-
 struct sn_nsdl_addr_;
 typedef sn_nsdl_addr_ sn_nsdl_addr_s;
 
@@ -100,8 +103,27 @@ public:
         GET_POST_DELETE_ALLOWED     = 0x0D,
         PUT_POST_DELETE_ALLOWED     = 0x0E,
         GET_PUT_POST_DELETE_ALLOWED = 0x0F,
-
     }Operation;
+
+    enum MaxPathSize {
+        MAX_NAME_SIZE = 64,
+        MAX_INSTANCE_SIZE = 5,
+
+        MAX_PATH_SIZE = ((MAX_NAME_SIZE * 2) + (MAX_INSTANCE_SIZE * 2) + 3 + 1),
+        MAX_PATH_SIZE_2 = ((MAX_NAME_SIZE * 2) + MAX_INSTANCE_SIZE + 2 + 1),
+        MAX_PATH_SIZE_3 = (MAX_NAME_SIZE + (MAX_INSTANCE_SIZE * 2) + 2 + 1),
+        MAX_PATH_SIZE_4 = (MAX_NAME_SIZE + MAX_INSTANCE_SIZE + 1 + 1),
+    };
+
+    typedef struct lwm2m_parameters {
+        //add multiple_instances
+        uint32_t            max_age;
+        uint32_t            instance_id;
+        int32_t             name_id;
+        char*               name; //for backwards compability
+        BaseType            base_type;
+        sn_nsdl_dynamic_resource_parameters_s *dynamic_resource_params;
+    } lwm2m_parameters_s;
 
 protected:
 
@@ -121,7 +143,11 @@ protected:
      * \param id The ID of the object.
      */
     M2MBase(const String &name,
-            M2MBase::Mode mode);
+            M2MBase::Mode mode,
+            const String &resource_type = "");
+
+    M2MBase(const lwm2m_parameters_s* s);
+
 public:
 
     /**
@@ -135,6 +161,7 @@ public:
      */
     virtual void set_operation(M2MBase::Operation operation);
 
+#ifndef MEMORY_OPTIMIZED_API
     /**
      * \brief Sets the interface description of the object.
      * \param description The description to be set.
@@ -142,10 +169,23 @@ public:
     virtual void set_interface_description(const String &description);
 
     /**
+     * \brief Sets the interface description of the object.
+     * \param description The description to be set.
+     */
+    virtual void set_interface_description(const char *description);
+
+    /**
      * \brief Sets the resource type of the object.
      * \param resource_type The resource type to be set.
      */
     virtual void set_resource_type(const String &resource_type);
+
+    /**
+     * \brief Sets the resource type of the object.
+     * \param resource_type The resource type to be set.
+     */
+    virtual void set_resource_type(const char *resource_type);
+#endif
 
     /**
      * \brief Sets the CoAP content type of the object.
@@ -225,11 +265,11 @@ public:
      * \brief Returns the object name.
      * \return The name of the object.
      */
-    virtual const String &name() const;
+    virtual const char* name() const;
 
     /**
      * \brief Returns the object name in integer.
-     * \return The naame of the object in integer.
+     * \return The name of the object in integer.
      */
     virtual int32_t name_id() const;
 
@@ -243,13 +283,13 @@ public:
      * \brief Returns the interface description of the object.
      * \return The interface description of the object.
      */
-    virtual const String& interface_description() const;
+    virtual const char* interface_description() const;
 
     /**
      * \brief Returns the resource type of the object.
      * \return The resource type of the object.
      */
-    virtual const String& resource_type() const;
+    virtual const char* resource_type() const;
 
     /**
      * \brief Returns the CoAP content type of the object.
@@ -294,14 +334,13 @@ public:
      */
     virtual uint32_t max_age() const;
 
-
     /**
      * \brief Parses the received query for the notification
      * attribute.
      * \param query The query that needs to be parsed.
      * \return True if required attributes are present, else false.
      */
-    virtual bool handle_observation_attribute(char *&query);
+    virtual bool handle_observation_attribute(const char *query);
 
     /**
      * \brief Handles GET request for the registered objects.
@@ -347,7 +386,7 @@ public:
      * \brief Sets whether this resource is published to server or not.
      * \param register_uri True sets the resource as part of registration message.
      */
-    virtual void set_register_uri( bool register_uri);
+    virtual void set_register_uri(bool register_uri);
 
     /**
      * \brief Returns whether this resource is published to server or not.
@@ -355,6 +394,7 @@ public:
      */
     virtual bool register_uri();
 
+#ifndef MEMORY_OPTIMIZED_API
     /**
      * \brief Sets object URI path.
      * \param path The URI path of the object.
@@ -362,10 +402,17 @@ public:
     virtual void set_uri_path(const String &path);
 
     /**
+     * \brief Sets object URI path.
+     * \param path The URI path of the object.
+     */
+    virtual void set_uri_path(const char *path);
+#endif
+
+    /**
      * \brief Returns the URI path of the object.
      * \return The URI path of the object.
      */
-    virtual const String &uri_path() const;
+    virtual const char* uri_path() const;
 
     /**
      * @brief Returns whether this resource is under observation or not.
@@ -399,6 +446,12 @@ public:
      */
     virtual void execute_value_updated(const String& name);
 
+    /**
+     * @brief Returns length of the object name.
+     * @return Length of the object name.
+     */
+    size_t resource_name_length() const;
+
 protected : // from M2MReportObserver
 
     virtual void observation_to_be_sent(m2m::Vector<uint16_t> changed_instance_ids,
@@ -427,13 +480,20 @@ protected:
      * \brief Memory allocation required for libCoap.
      * \param size The size of memory to be reserved.
     */
-    virtual void* memory_alloc(uint32_t size);
+    static void* memory_alloc(uint32_t size);
 
     /**
      * \brief Memory free functions required for libCoap.
      * \param ptr The object whose memory needs to be freed.
     */
-    virtual void memory_free(void *ptr);
+    static void memory_free(void *ptr);
+
+    /**
+     * \brief Allocate and make a copy of given zero terminated string. This
+     * is functionally equivalent with strdup().
+     * \param source The source string to copy, may not be NULL.
+    */
+    static char* alloc_string_copy(const char* source);
 
     /**
      * \brief Allocate (size + 1) amount of memory, copy size bytes into
@@ -441,14 +501,14 @@ protected:
      * \param source The source string to copy, may not be NULL.
      * \param size The size of memory to be reserved.
     */
-    virtual uint8_t* alloc_string_copy(const uint8_t* source, uint32_t size);
+    static uint8_t* alloc_string_copy(const uint8_t* source, uint32_t size);
 
     /**
      * \brief Allocate (size) amount of memory, copy size bytes into it.
      * \param source The source buffer to copy, may not be NULL.
      * \param size The size of memory to be reserved.
     */
-    virtual uint8_t* alloc_copy(const uint8_t* source, uint32_t size);
+    static uint8_t* alloc_copy(const uint8_t* source, uint32_t size);
 
     /**
      * \brief Returns the Report Handler object.
@@ -462,34 +522,36 @@ protected:
     */
     M2MObservationHandler* observation_handler();
 
+    static bool build_path(StringBuffer<MAX_PATH_SIZE> &buffer, const char *s1, uint16_t i1, const char *s2, uint16_t i2);
+
+    static bool build_path(StringBuffer<MAX_PATH_SIZE_2> &buffer, const char *s1, uint16_t i1, const char *s2);
+
+    static bool build_path(StringBuffer<MAX_PATH_SIZE_3> &buffer, const char *s1, uint16_t i1, uint16_t i2);
+
+    static bool build_path(StringBuffer<MAX_PATH_SIZE_4> &buffer, const char *s1, uint16_t i1);
+
+    char* stringdup(const char* s);
+
 private:
 
     static bool is_integer(const String &value);
 
-private:
+    void free_resources();
 
-    M2MReportHandler           *_report_handler;
-    M2MObservationHandler      *_observation_handler;
-    String                      _name;
-    String                      _resource_type;
-    String                      _interface_description;
-    String                      _uri_path;
-    int32_t                     _name_id;
-    uint32_t                    _max_age;
-    uint16_t                    _instance_id;
-    uint16_t                    _observation_number;
+    bool is_static() const;
+
+private:
+    lwm2m_parameters_s          *_sn_resource;
+    M2MReportHandler            *_report_handler;
+    M2MObservationHandler       *_observation_handler; // Not owned
     uint8_t                     *_token;
-    uint8_t                     _token_length;
-    uint8_t                     _coap_content_type;
-    M2MBase::Operation          _operation;
-    M2MBase::Mode               _mode;
-    M2MBase::BaseType           _base_type;
-    M2MBase::Observation        _observation_level;
-    bool                        _observable;
-    bool                        _register_uri;
-    bool                        _is_under_observation;
-    value_updated_callback      _value_updated_callback;
     FP1<void, const char*>      *_function_pointer;
+    value_updated_callback      _value_updated_callback;
+    uint16_t                    _observation_number;
+    uint8_t                     _token_length;
+    M2MBase::Observation        _observation_level;
+    bool                        _is_static;
+    bool                        _is_under_observation;
 
 friend class Test_M2MBase;
 

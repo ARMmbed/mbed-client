@@ -35,10 +35,9 @@ namespace common_stub
     extern int int_value;
     extern int int2_value;
     extern uint16_t uint_value;
-    extern omalw_certificate_list_t *cert;
     extern addrinfo* addrinfo;
     extern sn_coap_hdr_s *coap_header;
-    extern sn_nsdl_resource_info_s *resource;
+    extern sn_nsdl_dynamic_resource_parameters_s *resource;
     extern pthread_t thread;
     extern const char *char_value;
     void clear();

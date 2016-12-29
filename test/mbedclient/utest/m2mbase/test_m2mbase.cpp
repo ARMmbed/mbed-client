@@ -69,75 +69,6 @@ Test_M2MBase::~Test_M2MBase()
 {
 }
 
-void Test_M2MBase::test_copy_constructor()
-{
-    String test_string = "test";
-    //Test stack constructor
-    Test_M2MBase b;
-    Test_M2MBase c(b);
-    Test_M2MBase a;
-    a = b;
-
-    //Test heap constructor
-    Test_M2MBase* test = new Test_M2MBase();
-    test->_interface_description = test_string;
-
-    test->_token_length = 3;
-    test->_token = (u_int8_t *)malloc(test->_token_length);
-
-    Observer obs;
-    test->_report_handler = new M2MReportHandler(obs);
-
-    Test_M2MBase* copy = new Test_M2MBase(*test);
-
-    CHECK(copy->_interface_description.compare(0,test_string.size(),test_string) == 0);
-
-    CHECK(copy->_token != NULL);
-
-    CHECK(copy->_report_handler != NULL);
-
-    delete test;
-    delete copy;
-}
-
-void Test_M2MBase::test_assignment_operator()
-{
-    //Test stack
-    M2MBase b("name", M2MBase::Static);
-    Test_M2MBase a;
-    M2MBase c = a;
-    c = b;
-
-    //Test heap
-    Test_M2MBase* test = new Test_M2MBase();
-    Test_M2MBase* test2 = new Test_M2MBase();
-    Test_M2MBase* test3 = new Test_M2MBase();
-
-    test->operator=(*test3);
-    delete test3;
-
-    test->_token_length = 3;
-    test->_token = (u_int8_t *)malloc(test->_token_length);
-
-    Observer obs;
-    test->_report_handler = new M2MReportHandler(obs);
-
-    test2->_token_length = 8;
-    test2->_token = (u_int8_t *)malloc(test2->_token_length);
-
-    Observer obs2;
-    test2->_report_handler = new M2MReportHandler(obs2);
-
-    *test = *test2;
-
-    CHECK(test->_token != NULL);
-
-    CHECK(test->_report_handler != NULL);
-
-    delete test2;
-    delete test;
-}
-
 void Test_M2MBase::test_set_operation()
 {
     M2MBase::Operation test = M2MBase::GET_ALLOWED;
@@ -604,3 +535,23 @@ void Test_M2MBase::test_value_updated_function()
     CHECK(value_update_called == true);
 }
 
+void Test_M2MBase::test_build_path()
+{
+
+    StringBuffer<MAX_PATH_SIZE> buffer;
+    CHECK(build_path(buffer, "0123456789012345678901234567890123456789012345678901234567891234", 10000, "2123456789012345678901234567890123456789012345678901234567891234", 20000));
+    CHECK(!build_path(buffer, "01234567890123456789012345678901234567890123456789012345678912345", 10000, "21234567890123456789012345678901234567890123456789012345678912345", 20000));
+
+    StringBuffer<MAX_PATH_SIZE_2> buffer2;
+    CHECK(build_path(buffer2, "0123456789012345678901234567890123456789012345678901234567891234", 10000, "2123456789012345678901234567890123456789012345678901234567891234"));
+    CHECK(!build_path(buffer2, "01234567890123456789012345678901234567890123456789012345678912345", 10000, "21234567890123456789012345678901234567890123456789012345678912345"));
+
+    StringBuffer<MAX_PATH_SIZE_3> buffer3;
+    CHECK(build_path(buffer3, "0123456789012345678901234567890123456789012345678901234567891234", 10000, 20000));
+    CHECK(!build_path(buffer3, "01234567890123456789012345678901234567890123456789012345678912345", 10000, 20000));
+
+    StringBuffer<MAX_PATH_SIZE_4> buffer4;
+    CHECK(build_path(buffer4, "0123456789012345678901234567890123456789012345678901234567891234", 10000));
+    CHECK(!build_path(buffer4, "01234567890123456789012345678901234567890123456789012345678912345", 10000));
+
+}

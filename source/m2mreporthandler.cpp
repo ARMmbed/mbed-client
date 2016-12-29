@@ -25,21 +25,21 @@
 
 M2MReportHandler::M2MReportHandler(M2MReportObserver &observer)
 : _observer(observer),
-  _pmax(-1.0),
-  _pmin(1.0),
+  _attribute_state(0),
+  _notify(false),
+  _pmin_exceeded(false),
+  _pmax_exceeded(false),
+  _pmin_timer(*this),
+  _pmax_timer(*this),
+  _pmax(-1.0f),
+  _pmin(1.0f),
+  _current_value(0.0f),
   _gt(0.0f),
   _lt(0.0f),
   _st(0.0f),
-  _pmin_exceeded(false),
-  _pmax_exceeded(false),
-  _pmin_timer(NULL),
-  _pmax_timer(NULL),
   _high_step(0.0f),
   _low_step(0.0f),
-  _current_value(0.0f),
-  _last_value(-1.0f),
-  _attribute_state(0),
-  _notify(false)
+  _last_value(-1.0f)
 {
     tr_debug("M2MReportHandler::M2MReportHandler()");
 }
@@ -47,9 +47,6 @@ M2MReportHandler::M2MReportHandler(M2MReportObserver &observer)
 M2MReportHandler::~M2MReportHandler()
 {
     tr_debug("M2MReportHandler::~M2MReportHandler()");
-
-    delete _pmax_timer;
-    delete _pmin_timer;
 }
 
 void M2MReportHandler::set_under_observation(bool observed)
@@ -81,10 +78,8 @@ void M2MReportHandler::set_value(float value)
                     (_attribute_state & M2MReportHandler::Gt) == M2MReportHandler::Gt ||
                     (_attribute_state & M2MReportHandler::St) == M2MReportHandler::St) {
                 tr_debug("M2MReportHandler::set_value - stop pmin timer");
-                if (_pmin_timer) {
-                    _pmin_timer->stop_timer();
-                    _pmin_exceeded = true;
-                }
+                _pmin_timer.stop_timer();
+                _pmin_exceeded = true;
             }
         }
         _high_step = _current_value + _st;
@@ -114,14 +109,14 @@ void M2MReportHandler::set_notification_trigger(uint16_t obj_instance_id)
     schedule_report();
 }
 
-bool M2MReportHandler::parse_notification_attribute(char *&query,
+bool M2MReportHandler::parse_notification_attribute(const char *query,
                                                     M2MBase::BaseType type,
                                                     M2MResourceInstance::ResourceType resource_type)
 {
     tr_debug("M2MReportHandler::parse_notification_attribute(Query %s, Base type %d)", query, (int)type);
     bool success = false;
-    char* sep_pos = strchr(query, '&');
-    char* rest = query;
+    const char* sep_pos = strchr(query, '&');
+    const char* rest = query;
     if( sep_pos != NULL ){
         char query_options[5][20];
         float pmin = _pmin;
@@ -215,7 +210,7 @@ void M2MReportHandler::timer_expired(M2MTimerObserver::Type type)
     }
 }
 
-bool M2MReportHandler::set_notification_attribute(char* option,
+bool M2MReportHandler::set_notification_attribute(const char* option,
                                                   M2MBase::BaseType type,
                                                   M2MResourceInstance::ResourceType resource_type)
 {
@@ -226,7 +221,7 @@ bool M2MReportHandler::set_notification_attribute(char* option,
     memset(&attribute, 0, 20);
     memset(&value, 0, 20);
 
-    char* pos = strstr(option, EQUAL);
+    const char* pos = strstr(option, EQUAL);
     if( pos != NULL ){
         memcpy(attribute, option, (size_t)(pos-option));
         pos++;
@@ -304,9 +299,7 @@ void M2MReportHandler::report()
         _notify = false;
         _observer.observation_to_be_sent(_changed_instance_ids);
         _changed_instance_ids.clear();
-        if (_pmax_timer) {
-            _pmax_timer->stop_timer();
-        }
+        _pmax_timer.stop_timer();
     }
     else {
         if (_pmax_exceeded) {
@@ -333,22 +326,16 @@ void M2MReportHandler::handle_timers()
             _pmin_exceeded = false;
             time_interval = (uint64_t) ((uint64_t)_pmin * 1000);
             tr_debug("M2MReportHandler::handle_timers() - Start PMIN interval: %d", (int)time_interval);
-            if (!_pmin_timer) {
-                _pmin_timer = new M2MTimer(*this);
-            }
-            _pmin_timer->start_timer(time_interval,
+            _pmin_timer.start_timer(time_interval,
                                      M2MTimerObserver::PMinTimer,
                                      true);
         }
     }
     if ((_attribute_state & M2MReportHandler::Pmax) == M2MReportHandler::Pmax) {
         if (_pmax > 0) {
-            if (!_pmax_timer) {
-                _pmax_timer = new M2MTimer(*this);
-            }
             time_interval = (uint64_t) ((uint64_t)_pmax * 1000);
             tr_debug("M2MReportHandler::handle_timers() - Start PMAX interval: %d", (int)time_interval);
-            _pmax_timer->start_timer(time_interval,
+            _pmax_timer.start_timer(time_interval,
                                      M2MTimerObserver::PMaxTimer,
                                      true);
         }
@@ -373,19 +360,13 @@ bool M2MReportHandler::check_attribute_validity()
 void M2MReportHandler::stop_timers()
 {
     tr_debug("M2MReportHandler::stop_timers()");
-    if (_pmin_timer) {
-        _pmin_exceeded = false;
-        _pmin_timer->stop_timer();
 
-        delete _pmin_timer;
-        _pmin_timer = NULL;
-    }
-    if (_pmax_timer) {
-        _pmax_exceeded = false;
-        _pmax_timer->stop_timer();
-        delete _pmax_timer;
-        _pmax_timer = NULL;
-    }
+    _pmin_exceeded = false;
+    _pmin_timer.stop_timer();
+
+    _pmax_exceeded = false;
+    _pmax_timer.stop_timer();
+
     tr_debug("M2MReportHandler::stop_timers() - out");
 }
 

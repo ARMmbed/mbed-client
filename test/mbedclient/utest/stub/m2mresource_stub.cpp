@@ -117,7 +117,7 @@ uint16_t M2MResource::resource_instance_count() const
     return m2mresource_stub::int_value;
 }
 
-bool M2MResource::handle_observation_attribute(char *&query)
+bool M2MResource::handle_observation_attribute(const char *query)
 {
     return m2mresource_stub::bool_value;
 }

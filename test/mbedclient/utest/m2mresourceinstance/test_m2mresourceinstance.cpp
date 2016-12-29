@@ -125,49 +125,6 @@ Test_M2MResourceInstance::~Test_M2MResourceInstance()
     delete callback;
 }
 
-void Test_M2MResourceInstance::test_copy_constructor()
-{
-    u_int8_t value[] = {"value"};
-    resource_instance->set_value(value,(u_int32_t)sizeof(value));
-
-    M2MResourceInstance* copy = new M2MResourceInstance(*resource_instance);
-    u_int8_t* out_value = (u_int8_t*)malloc(sizeof(u_int8_t));
-    u_int32_t out_size;
-
-    copy->get_value(out_value,out_size);
-    CHECK(out_size == sizeof(value));
-    free(out_value);
-
-    delete copy;
-}
-
-void Test_M2MResourceInstance::test_assignment_constructor()
-{
-    u_int8_t value[] = {"value"};
-    resource_instance->set_value(value,(u_int32_t)sizeof(value));
-
-    M2MResourceInstance* res = new M2MResourceInstance("name",
-                                                       "resource_type",
-                                                       M2MResourceInstance::STRING,
-                                                       *callback);
-
-    u_int8_t value1[] = {"value1"};
-    res->set_value(value1,(u_int32_t)sizeof(value1));
-
-    *res = *resource_instance;
-
-    u_int8_t* out_value = (u_int8_t*)malloc(sizeof(u_int8_t));
-    u_int32_t out_size;
-
-    res->get_value(out_value,out_size);
-
-    CHECK(out_size == sizeof(value));
-    free(out_value);
-
-    delete res;
-}
-
-
 void Test_M2MResourceInstance::test_resource_instance_type()
 {
     CHECK(resource_instance->resource_instance_type() == M2MResourceInstance::STRING);

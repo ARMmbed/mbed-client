@@ -94,7 +94,7 @@ M2MResourceInstance::ResourceType M2MResourceInstance::resource_instance_type() 
     return m2mresourceinstance_stub::resource_type;
 }
 
-bool M2MResourceInstance::handle_observation_attribute(char *&)
+bool M2MResourceInstance::handle_observation_attribute(const char *)
 {
     return m2mresourceinstance_stub::bool_value;
 }

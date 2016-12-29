@@ -36,11 +36,6 @@ TEST(M2MObjectInstance, Create)
     CHECK(m2m_object_instance != NULL);
 }
 
-TEST(M2MObjectInstance, copy_constructor)
-{
-    m2m_object_instance->test_copy_constructor();
-}
-
 TEST(M2MObjectInstance, create_static_resource)
 {
     m2m_object_instance->test_create_static_resource();
