@@ -15,6 +15,8 @@ add_executable(m2mobject
         "../stub/m2mstring_stub.cpp"
         "../stub/m2mtlvserializer_stub.cpp"
         "../../../../source/m2mobject.cpp"
+        "../stub/m2mtimer_stub.cpp"
+        "../../../../source/m2mstringbufferbase.cpp"
 )
 target_link_libraries(m2mobject
     CppUTest

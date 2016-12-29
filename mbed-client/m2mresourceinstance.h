@@ -37,9 +37,23 @@ typedef void(*execute_callback_2) (void *arguments);
 typedef FP0<void> notification_sent_callback;
 typedef void(*notification_sent_callback_2) (void);
 
+// XXX: should there be just one flag for API simplifications? or each one separate?
+// Or even better, allow one to get rid of unused callbacks completely?
+#ifdef MEMORY_OPTIMIZED_API
+#define MEMORY_OPTIMIZED_BLOCKWISE_API
+#endif
+
+// this saves 24 bytes of memory per resource(instance)
+#ifdef MEMORY_OPTIMIZED_BLOCKWISE_API
+typedef void (*incoming_block_message_callback)(M2MBlockMessage *);
+// XXX: get rid of String completely here too
+typedef void (*outgoing_block_message_callback)(const String &, uint8_t *&, uint32_t &);
+#else
 typedef FP1<void, M2MBlockMessage *> incoming_block_message_callback;
 typedef FP3<void, const String &, uint8_t *&, uint32_t &> outgoing_block_message_callback;
+#endif
 
+class M2MResource;
 class M2MResourceCallback;
 
 class M2MResourceInstance : public M2MBase {
@@ -67,6 +81,12 @@ public:
 private: // Constructor and destructor are private
          // which means that these objects can be created or
          // deleted only through a function provided by the M2MObjectInstance.
+
+    M2MResourceInstance(M2MResource &parent,
+                        const lwm2m_parameters_s* s,
+                        M2MObjectInstanceCallback &object_instance_callback,
+                        M2MResourceInstance::ResourceType type,
+                        const uint16_t object_instance_id);
     /**
      * \brief A constructor for creating a resource.
      * \param resource_name The name of the resource.
@@ -75,12 +95,13 @@ private: // Constructor and destructor are private
      * \param object_instance_id Object instance id where resource exists.
      * \param object_name Object name where resource exists.
      */
-    M2MResourceInstance(const String &resource_name,
+    M2MResourceInstance(M2MResource &parent,
+                        const String &resource_name,
                         const String &resource_type,
                         M2MResourceInstance::ResourceType type,
                         M2MObjectInstanceCallback &object_instance_callback,
-                        const uint16_t object_instance_id = 0,
-                        const String &object_name = "");
+                        const uint16_t object_instance_id,
+                        char* path);
 
     /**
      * \brief A Constructor for creating a resource.
@@ -93,14 +114,15 @@ private: // Constructor and destructor are private
      * \param object_instance_id Object instance id where resource exists.
      * \param object_name Object name where resource exists.
      */
-    M2MResourceInstance(const String &resource_name,
+    M2MResourceInstance(M2MResource &parent,
+                        const String &resource_name,
                         const String &resource_type,
                         M2MResourceInstance::ResourceType type,
                         const uint8_t *value,
                         const uint8_t value_length,
                         M2MObjectInstanceCallback &object_instance_callback,
-                        const uint16_t object_instance_id = 0,
-                        const String &object_name = "");
+                        const uint16_t object_instance_id,
+                        char* path);
 
     // Prevents the use of default constructor.
     M2MResourceInstance();
@@ -135,7 +157,7 @@ public:
      * attribute.
      * \return True if required attributes are present, else false.
      */
-    virtual bool handle_observation_attribute(char *&query);
+    virtual bool handle_observation_attribute(const char *query);
 
     /**
      * \brief Sets the function that should be executed when this
@@ -244,7 +266,7 @@ public:
      * \brief Returns the name of the object where the resource exists.
      * \return Object name.
     */
-    const String& object_name() const;
+    virtual const char* object_name() const;
 
     /**
      * @brief Sets the function that is executed when this
@@ -287,6 +309,8 @@ public:
      */
     void notification_sent();
 
+    M2MResource& get_parent_resource() const;
+
 protected:
 
     /**
@@ -302,21 +326,24 @@ private:
     bool is_value_changed(const uint8_t* value, const uint32_t value_len);
 
 private:
+    // XXX
+    M2MResource &_parent_resource;
 
-    M2MObjectInstanceCallback               &_object_instance_callback;
-    execute_callback                        _execute_callback;
     uint8_t                                 *_value;
     uint32_t                                _value_length;
+    M2MBlockMessage                         *_block_message_data;
+    execute_callback                        _execute_callback;
     M2MResourceCallback                     *_resource_callback; // Not owned
-    String                                  _object_name;
     FP1<void, void*>                        *_execute_function_pointer;
     FP0<void>                               *_notification_sent_function_pointer;
-    uint16_t                                _object_instance_id;
-    ResourceType                            _resource_type;
+
+    // todo: ifdef the blockwise support from here too just as it is optional at C side
     incoming_block_message_callback         _incoming_block_message_cb;
     outgoing_block_message_callback         _outgoing_block_message_cb;
-    M2MBlockMessage                         *_block_message_data;
+    M2MObjectInstanceCallback               &_object_instance_callback;
     notification_sent_callback              _notification_sent_callback;
+    uint16_t                                _object_instance_id;
+    ResourceType                            _resource_type;
 
     friend class Test_M2MResourceInstance;
     friend class Test_M2MResource;

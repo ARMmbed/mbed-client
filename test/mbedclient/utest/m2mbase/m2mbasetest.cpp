@@ -37,16 +37,6 @@ TEST(M2MBase, Create)
     CHECK(m2m_base != NULL);
 }
 
-TEST(M2MBase, copy_constructor)
-{
-    m2m_base->test_copy_constructor();
-}
-
-TEST(M2MBase, test_assignment_operator)
-{
-    m2m_base->test_assignment_operator();
-}
-
 TEST(M2MBase, set_operation)
 {
     m2m_base->test_set_operation();
@@ -270,3 +260,9 @@ TEST(M2MBase, test_value_updated_function)
 {
     m2m_base->test_value_updated_function();
 }
+
+TEST(M2MBase, test_build_path)
+{
+    m2m_base->test_build_path();
+}
+

@@ -46,6 +46,11 @@ private: // Constructor and destructor are private,
          // which means that these objects can be created or
          // deleted only through a function provided by the M2MObjectInstance.
 
+    M2MResource(M2MObjectInstance &_parent,
+                 M2MObjectInstanceCallback &object_instance_callback,
+                 const lwm2m_parameters_s* s,
+                 M2MResourceInstance::ResourceType type,
+                 const uint16_t object_instance_id);
     /**
      * \brief Constructor
      * \param resource_name The resource name of the object.
@@ -57,14 +62,14 @@ private: // Constructor and destructor are private,
      * \param object_name The name of the object where the resource exists.
      * \param multiple_instance True if the resource supports instances.
      */
-    M2MResource(M2MObjectInstanceCallback &object_instance_callback,
+    M2MResource(M2MObjectInstance &_parent,
+                M2MObjectInstanceCallback &object_instance_callback,
                 const String &resource_name,
                 const String &resource_type,
                 M2MResourceInstance::ResourceType type,
                 const uint8_t *value,
                 const uint8_t value_length,
                 const uint16_t object_instance_id = 0,
-                const String &object_name = "",
                 bool multiple_instance = false);
 
     /**
@@ -77,13 +82,13 @@ private: // Constructor and destructor are private,
      * \param object_name The name of the object where the resource exists.
      * \param multiple_instance True if the resource supports instances.
      */
-    M2MResource(M2MObjectInstanceCallback &object_instance_callback,
+    M2MResource(M2MObjectInstance &_parent,
+                M2MObjectInstanceCallback &object_instance_callback,
                 const String &resource_name,
                 const String &resource_type,
                 M2MResourceInstance::ResourceType type,
                 bool observable,
                 const uint16_t object_instance_id = 0,
-                const String &object_name = "",
                 bool multiple_instance = false);
 
     // Prevents the use of a default constructor.
@@ -175,7 +180,7 @@ public:
      * attribute.
      * \return True if required attributes are present, else false.
      */
-    virtual bool handle_observation_attribute(char *&query);
+    virtual bool handle_observation_attribute(const char *query);
 
     /**
      * \brief Adds the observation level for the object.
@@ -228,10 +233,20 @@ public:
                                                bool &execute_value_updated,
                                                sn_nsdl_addr_s *address = NULL);
 
+    M2MObjectInstance& get_parent_object_instance() const;
+
+    /**
+     * \brief Returns the name of the object where the resource exists.
+     * \return Object name.
+    */
+    virtual const char* object_name() const;
+
 protected:
     virtual void notification_update();
 
+
 private:
+    M2MObjectInstance &_parent;
 
     M2MResourceInstanceList     _resource_instance_list; // owned
     uint8_t                     *_delayed_token;

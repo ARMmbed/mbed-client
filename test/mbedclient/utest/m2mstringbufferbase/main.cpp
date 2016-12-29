@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 ARM Limited. All rights reserved.
+ * Copyright (c) 2016 ARM Limited. All rights reserved.
  * SPDX-License-Identifier: Apache-2.0
  * Licensed under the Apache License, Version 2.0 (the License); you may
  * not use this file except in compliance with the License.
@@ -13,19 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef M2M_TIMER_STUB_H
-#define M2M_TIMER_STUB_H
-
-#include "m2mtimer.h"
-
-//some internal test related stuff
-namespace m2mtimer_stub
+#include "CppUTest/CommandLineTestRunner.h"
+#include "CppUTest/TestPlugin.h"
+#include "CppUTest/TestRegistry.h"
+#include "CppUTestExt/MockSupportPlugin.h"
+int main(int ac, char** av)
 {
-    extern bool bool_value;
-    extern bool total_bool_value;
-    extern bool enable_mock;
-    void clear();
+	return CommandLineTestRunner::RunAllTests(ac, av);
 }
 
-#endif // M2M_TIMER_STUB_H
-
+IMPORT_TEST_GROUP( M2Mstringbufferbase);

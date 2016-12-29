@@ -28,6 +28,8 @@ public:
     virtual void notification_update(uint16_t obj_instance_id) = 0;
 };
 
+class M2MObject;
+
 /*! \file m2mobjectinstance.h
  *  \brief M2MObjectInstance.
  *  This class is the instance class for mbed Client Objects. All defined
@@ -49,9 +51,13 @@ private: // Constructor and destructor are private which means
      * \brief Constructor
      * \param name Name of the object
      */
-    M2MObjectInstance(const String &object_name,
-                      M2MObjectCallback &object_callback);
+    M2MObjectInstance(M2MObject& parent, const String &object_name,
+                      M2MObjectCallback &object_callback,
+                      const String &resource_type,
+                      char *path);
 
+    M2MObjectInstance(M2MObject& parent, const lwm2m_parameters_s* static_res,
+                      M2MObjectCallback &object_callback);
 
     // Prevents the use of default constructor.
     M2MObjectInstance();
@@ -68,6 +74,13 @@ private: // Constructor and destructor are private which means
     virtual ~M2MObjectInstance();
 
 public:
+
+    /**
+     * \brief TODO!
+     * \return M2MResource The resource for managing other client operations.
+     */
+    M2MResource* create_static_resource(const lwm2m_parameters_s* static_res,
+                                        M2MResourceInstance::ResourceType type);
 
     /**
      * \brief Creates a static resource for a given mbed Client Inteface object. With this, the
@@ -104,6 +117,13 @@ public:
                                          bool observable,
                                          bool multiple_instance = false);
 
+    /**
+     * \brief TODO!
+     * \return M2MResource The resource for managing other client operations.
+     */
+    M2MResource* create_dynamic_resource(const lwm2m_parameters_s* static_res,
+                                        M2MResourceInstance::ResourceType type,
+                                        bool observable);
 
     /**
      * \brief Creates a static resource instance for a given mbed Client Inteface object. With this,
@@ -160,6 +180,8 @@ public:
      * \return Resource reference if found, else NULL.
      */
     virtual M2MResource* resource(const String &name) const;
+
+    virtual M2MResource* resource(const char *resource) const;
 
     /**
      * \brief Returns a list of M2MResourceBase objects.
@@ -238,12 +260,15 @@ public:
                                                bool &execute_value_updated,
                                                sn_nsdl_addr_s *address = NULL);
 
+    inline M2MObject& get_parent_object() const;
 
 protected :
 
     virtual void notification_update(M2MBase::Observation observation_level);
 
 private:
+
+    M2MObject      &_parent;
 
     M2MObjectCallback   &_object_callback;
     M2MResourceList     _resource_list; // owned
@@ -258,5 +283,10 @@ private:
     friend class Test_M2MTLVSerializer;
     friend class Test_M2MTLVDeserializer;
 };
+
+inline M2MObject& M2MObjectInstance::get_parent_object() const
+{
+    return _parent;
+}
 
 #endif // M2M_OBJECT_INSTANCE_H

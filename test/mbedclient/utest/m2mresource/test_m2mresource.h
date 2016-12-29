@@ -27,8 +27,6 @@ public:
 
     Test_M2MResource();
 
-    void test_copy_constructor();
-
     virtual ~Test_M2MResource();
 
     void test_static_resource();

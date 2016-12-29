@@ -79,8 +79,9 @@ public:
      * \brief A callback indicating that the value of the resource object is updated by the server.
      * \param base The object whose value is updated.
      * \param type The type of the object.
+     * \param path The resource path (eg. "0/3/4") of resource being updated.
      */
-    virtual void value_updated(M2MBase *base, M2MBase::BaseType type) = 0;
+    virtual void value_updated(M2MBase *base, M2MBase::BaseType type, const char *path) = 0;
 };
 
 #endif // M2M_INTERFACE_OBSERVER_H

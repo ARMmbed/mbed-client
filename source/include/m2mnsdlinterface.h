@@ -22,6 +22,7 @@
 #include "mbed-client/m2mtimerobserver.h"
 #include "mbed-client/m2mobservationhandler.h"
 #include "mbed-client/m2mbase.h"
+#include "mbed-client/m2mserver.h"
 #include "include/nsdllinker.h"
 
 //FORWARD DECLARARTION
@@ -135,13 +136,13 @@ public:
      * @brief Memory Allocation required for libCoap.
      * @param size, Size of memory to be reserved.
     */
-    void* memory_alloc(uint16_t size);
+    static void* memory_alloc(uint16_t size);
 
     /**
      * @brief Memory free functions required for libCoap
      * @param ptr, Object whose memory needs to be freed.
     */
-    void memory_free(void *ptr);
+    static void memory_free(void *ptr);
 
     /**
     * @brief Callback from nsdl library to inform the data is ready
@@ -280,7 +281,7 @@ private:
 
     bool object_present(M2MObject * object) const;
 
-    void clear_resource(sn_nsdl_resource_info_s *&resource);
+    void clear_resource(sn_nsdl_dynamic_resource_parameters_s *&resource);
 
     M2MInterface::Error interface_error(sn_coap_hdr_s *coap_header);
 
@@ -300,8 +301,7 @@ private:
                            uint32_t value_length,
                            uint16_t observation,
                            uint32_t max_age,
-                           uint8_t  coap_content_type,
-                           const String  &uri_path);
+                           uint8_t  coap_content_type);
 
     /**
      * @brief Allocate (size + 1) amount of memory, copy size bytes into
@@ -309,7 +309,7 @@ private:
      * @param source Source string to copy, may not be NULL.
      * @param size The size of memory to be reserved.
     */
-    uint8_t* alloc_string_copy(const uint8_t* source, uint16_t size);
+    static uint8_t* alloc_string_copy(const uint8_t* source, uint16_t size);
 
     /**
      * @brief Utility method to convert given lifetime int to ascii
@@ -360,21 +360,21 @@ private:
 
 private:
 
-    M2MNsdlObserver                   &_observer;
-    M2MObjectList                      _object_list;
-    M2MServer                         *_server; // Not owned
-    M2MSecurity                       *_security; // Not owned
-    M2MTimer                          *_nsdl_exceution_timer;
-    M2MTimer                          *_registration_timer;
-    sn_nsdl_ep_parameters_s           *_endpoint;
-    sn_nsdl_resource_info_s           *_resource;
-    sn_nsdl_addr_s                     _sn_nsdl_address;
-    nsdl_s                            *_nsdl_handle;
-    uint32_t                           _counter_for_nsdl;
-    uint16_t                           _bootstrap_id;
-    bool                               _unregister_ongoing;
-    String                             _endpoint_name;
-    bool                               _identity_accepted;
+    M2MNsdlObserver                         &_observer;
+    M2MObjectList                            _object_list;
+    sn_nsdl_ep_parameters_s                 *_endpoint;
+    sn_nsdl_dynamic_resource_parameters_s   *_resource;
+    nsdl_s                                  *_nsdl_handle;
+    M2MSecurity                             *_security; // Not owned
+    M2MServer                               _server;
+    M2MTimer                                *_nsdl_exceution_timer;
+    M2MTimer                                *_registration_timer;
+    sn_nsdl_addr_s                          _sn_nsdl_address;
+    String                                  _endpoint_name;
+    uint32_t                                _counter_for_nsdl;
+    uint16_t                                _bootstrap_id;
+    bool                                    _unregister_ongoing;
+    bool                                    _identity_accepted;
 
 friend class Test_M2MNsdlInterface;
 

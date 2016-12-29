@@ -41,11 +41,6 @@ TEST(M2MObject, base_type)
     m2m_object->test_base_type();
 }
 
-TEST(M2MObject, copy_constructor)
-{
-    m2m_object->test_copy_constructor();
-}
-
 TEST(M2MObject, create_object_instance)
 {
     m2m_object->test_create_object_instance();
