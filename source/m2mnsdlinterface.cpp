@@ -208,13 +208,11 @@ bool M2MNsdlInterface::create_nsdl_list_structure(const M2MObjectList &object_li
     return success;
 }
 
-// Todo: the name does not match with the functionality anymore, some refactoring is needed.
-bool M2MNsdlInterface::delete_nsdl_resource(M2MBase *base)
+bool M2MNsdlInterface::remove_nsdl_resource(M2MBase *base)
 {
-    sn_nsdl_dynamic_resource_parameters_s* orig_resource = base->get_nsdl_resource();
-    sn_nsdl_pop_resource(_nsdl_handle, orig_resource);
+    sn_nsdl_dynamic_resource_parameters_s* resource = base->get_nsdl_resource();
+    return sn_nsdl_pop_resource(_nsdl_handle, resource);
 }
-
 
 bool M2MNsdlInterface::create_bootstrap_resource(sn_nsdl_addr_s *address, const String &bootstrap_endpoint_name)
 {
@@ -767,11 +765,9 @@ void M2MNsdlInterface::send_delayed_response(M2MBase *base)
 void M2MNsdlInterface::resource_to_be_deleted(M2MBase *base)
 {
     __mutex_claim();
-    //tr_debug("M2MNsdlInterface::resource_to_be_deleted(resource_name %s)", base..c_str());
-    delete_nsdl_resource(base);
+    remove_nsdl_resource(base);
     __mutex_release();
 }
-
 
 void M2MNsdlInterface::value_updated(M2MBase *base,
                                      const String &object_name)
@@ -972,10 +968,9 @@ M2MBase* M2MNsdlInterface::find_resource(const String &object_name,
         it = _object_list.begin();
         for ( ; it != _object_list.end(); it++ ) {
             if (token_len == 0) {
-                sn_nsdl_dynamic_resource_parameters_s* res = (*it)->get_nsdl_resource();
                 tr_debug("M2MNsdlInterface::find_resource(object level) - path (%s)",
-                         (char*)res->static_resource_parameters->path);
-                if (strcmp((char*)res->static_resource_parameters->path, object_name.c_str()) == 0) {
+                         (char*)(*it)->uri_path());
+                if (strcmp((char*)(*it)->uri_path(), object_name.c_str()) == 0) {
                     object = (*it);
                     tr_debug("M2MNsdlInterface::find_resource(%s) found", object_name.c_str());
                     break;
@@ -1020,10 +1015,9 @@ M2MBase* M2MNsdlInterface::find_resource(const M2MObject *object,
             it = list.begin();
             for ( ; it != list.end(); it++ ) {
                 if (!token) {
-                    sn_nsdl_dynamic_resource_parameters_s* res = (*it)->get_nsdl_resource();
                     tr_debug("M2MNsdlInterface::find_resource(object instance level) - path (%s)",
-                             (char*)res->static_resource_parameters->path);
-                    if(!strcmp((char*)res->static_resource_parameters->path, object_instance.c_str())){
+                             (char*)(*it)->uri_path());
+                    if(!strcmp((char*)(*it)->uri_path(), object_instance.c_str())){
                         instance = (*it);
                         break;
                     }
@@ -1068,13 +1062,12 @@ M2MBase* M2MNsdlInterface::find_resource(const M2MObjectInstance *object_instanc
             it = list.begin();
             for ( ; it != list.end(); it++ ) {
                 if (!token) {
-                    sn_nsdl_dynamic_resource_parameters_s* res = (*it)->get_nsdl_resource();
-                    if(!strcmp((char*)res->static_resource_parameters->path, resource_instance.c_str())) {
+                    if(!strcmp((char*)(*it)->uri_path(), resource_instance.c_str())) {
                         instance = *it;
                         break;
                     }
                     else if((*it)->supports_multiple_instances()) {
-                        instance = find_resource((*it), (char*)res->static_resource_parameters->path,
+                        instance = find_resource((*it), (*it)->uri_path(),
                                                  resource_instance, token, token_len);
                         if(instance != NULL){
                             break;
