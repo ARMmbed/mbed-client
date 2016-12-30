@@ -165,20 +165,20 @@ void Test_M2MNsdlInterface::test_create_nsdl_list_structure()
     String *name = new String("name");
     common_stub::int_value = 0;
     m2mbase_stub::int_value = 0;
-    M2MObject *object = new M2MObject(*name);
-    M2MObjectInstance* instance = new M2MObjectInstance(*name,*object);
+    M2MObject *object = new M2MObject(*name, (char*)name->c_str());
+    M2MObjectInstance* instance = new M2MObjectInstance(*object,*name,*object, "", "name/0");
 
     M2MResource* create_resource = new M2MResource(*instance,
+                                                   *instance,
                                                    *name,
                                                    *name,
                                                    M2MResourceInstance::INTEGER,
                                                    M2MResource::Dynamic,
                                                    false);
 
-    M2MResourceInstance* res_instance = new M2MResourceInstance(*name,
-                                                                *name,
-                                                                M2MResourceInstance::INTEGER,
-                                                                *instance);
+    M2MResourceInstance* res_instance = new M2MResourceInstance(*create_resource, *name, *name,
+                                       M2MResourceInstance::INTEGER,
+                                       *instance, 0, *name, "name/0/name/0", false);
 
     m2mobject_stub::instance_list.clear();
     m2mobject_stub::instance_list.push_back(instance);
@@ -189,7 +189,7 @@ void Test_M2MNsdlInterface::test_create_nsdl_list_structure()
     M2MObjectList list;
     list.push_back(object);
 
-    m2mbase_stub::string_value = name;
+    m2mbase_stub::string_value = name->c_str();
     m2mbase_stub::mode_value = M2MBase::Static;
 
 
@@ -203,7 +203,6 @@ void Test_M2MNsdlInterface::test_create_nsdl_list_structure()
 
     CHECK(nsdl->create_nsdl_list_structure(list)== true);
 
-    nsdl->_resource->static_resource_parameters->path = ((uint8_t*)nsdl->memory_alloc(3));
     m2mbase_stub::mode_value = M2MBase::Directory;
     CHECK(nsdl->create_nsdl_list_structure(list)== true);
 
@@ -225,13 +224,15 @@ void Test_M2MNsdlInterface::test_create_nsdl_list_structure()
 
 void Test_M2MNsdlInterface::test_delete_nsdl_resource()
 {
-    common_stub::int_value = -1;
-
-    CHECK(nsdl->delete_nsdl_resource("name") == false);
-
     common_stub::int_value = 0;
+    M2MObject *object = new M2MObject("name", "name");
 
-    CHECK(nsdl->delete_nsdl_resource("name") == true);
+    CHECK(nsdl->remove_nsdl_resource(object) == false);
+
+    common_stub::int_value = 1;
+
+    CHECK(nsdl->remove_nsdl_resource(object) == true);
+    delete object;
 }
 
 void Test_M2MNsdlInterface::test_create_bootstrap_resource()
@@ -246,6 +247,7 @@ void Test_M2MNsdlInterface::test_create_bootstrap_resource()
 void Test_M2MNsdlInterface::test_send_register_message()
 {
     common_stub::uint_value = 12;
+    common_stub::int_value = 0;
     CHECK(nsdl->send_register_message(NULL,4,100,SN_NSDL_ADDRESS_TYPE_IPV6) == true);
 
     common_stub::uint_value = 0;
@@ -258,11 +260,11 @@ void Test_M2MNsdlInterface::test_send_update_registration()
     nsdl->_nsdl_handle = (nsdl_s*)malloc(sizeof(1));
     CHECK(nsdl->send_update_registration(120) == true);
 
-    /* Update lifetime value */
+    // Update lifetime value
     common_stub::uint_value = 1;
     CHECK(nsdl->send_update_registration(100) == true);
 
-    /* Lifetime value is 0, don't change the existing lifetime value */
+    // Lifetime value is 0, don't change the existing lifetime value
     common_stub::uint_value = 1;
     CHECK(nsdl->send_update_registration(0) == true);
 
@@ -274,7 +276,7 @@ void Test_M2MNsdlInterface::test_send_unregister_message()
     common_stub::uint_value = 22;
     CHECK(nsdl->send_unregister_message() == true);
 
-    /* Unreg already in progress */
+    // Unreg already in progress
     common_stub::uint_value = 0;
     CHECK(nsdl->send_unregister_message() == true);
 }
@@ -556,13 +558,24 @@ void Test_M2MNsdlInterface::test_received_from_server_callback()
     m2mobjectinstance_stub::bool_value = true;
     CHECK(0== nsdl->received_from_server_callback(handle,coap_header,NULL));
 
-    M2MObject *obj = new M2MObject("name");
+    M2MObject *obj = new M2MObject("name", "name");
 
-    m2mbase_stub::string_value = new String("name");
+    m2mbase_stub::string_value = "name";
+    m2mbase_stub::nsdl_resource =
+            (sn_nsdl_dynamic_resource_parameters_s*) malloc(sizeof(sn_nsdl_dynamic_resource_parameters_s));
+    m2mbase_stub::nsdl_resource->static_resource_parameters =
+            (sn_nsdl_static_resource_parameters_s*) malloc(sizeof(sn_nsdl_static_resource_parameters_s));
+    m2mbase_stub::nsdl_resource->static_resource_parameters->path = (uint8_t*) malloc(5);
+    m2mbase_stub::nsdl_resource->static_resource_parameters->path[0] = 'n';
+    m2mbase_stub::nsdl_resource->static_resource_parameters->path[1] = 'a';
+    m2mbase_stub::nsdl_resource->static_resource_parameters->path[2] = 'm';
+    m2mbase_stub::nsdl_resource->static_resource_parameters->path[3] = 'e';
+    m2mbase_stub::nsdl_resource->static_resource_parameters->path[4] = '\0';
+    m2mbase_stub::nsdl_resource->static_resource_parameters->pathlen = 5;
 
     nsdl->_object_list.push_back(obj);
 
-    m2mobject_stub::inst = new M2MObjectInstance("name",*obj);
+    m2mobject_stub::inst = new M2MObjectInstance(*obj, "name", *obj, "", "");
 
     m2mobject_stub::header = (sn_coap_hdr_s*) malloc(sizeof(sn_coap_hdr_s));
     memset(m2mobject_stub::header,0,sizeof(sn_coap_hdr_s));
@@ -571,9 +584,9 @@ void Test_M2MNsdlInterface::test_received_from_server_callback()
     memset(m2mobjectinstance_stub::header, 0, sizeof(sn_coap_hdr_s));
     m2mobjectinstance_stub::header->msg_code = COAP_MSG_CODE_RESPONSE_BAD_REQUEST;
     common_stub::coap_header = NULL;
+    m2mobjectinstance_stub::base_type = M2MBase::ObjectInstance;
 
     CHECK(0 == nsdl->received_from_server_callback(handle,coap_header,NULL));
-
     m2mobjectinstance_stub::header = NULL;
 
     m2mobjectinstance_stub::header =  (sn_coap_hdr_s *)malloc(sizeof(sn_coap_hdr_s));
@@ -581,7 +594,6 @@ void Test_M2MNsdlInterface::test_received_from_server_callback()
 
     m2mobjectinstance_stub::header->msg_code = COAP_MSG_CODE_RESPONSE_CREATED;
     CHECK(0 == nsdl->received_from_server_callback(handle,coap_header,NULL));
-
     m2mobjectinstance_stub::header = NULL;
 
     free(coap_header->payload_ptr);
@@ -590,8 +602,6 @@ void Test_M2MNsdlInterface::test_received_from_server_callback()
     CHECK(0== nsdl->received_from_server_callback(handle,coap_header,NULL));
 
     delete m2mobject_stub::inst;
-    delete m2mbase_stub::string_value;
-    m2mbase_stub::string_value = NULL;
     nsdl->_object_list.clear();
     delete obj;
 
@@ -604,13 +614,11 @@ void Test_M2MNsdlInterface::test_received_from_server_callback()
     coap_header->uri_path_ptr = object_instance1;
     coap_header->uri_path_len = sizeof(object_instance1);
 
-    obj = new M2MObject("name");
-
-    m2mbase_stub::string_value = new String("name");
+    obj = new M2MObject("name", "name");
 
     nsdl->_object_list.push_back(obj);
 
-    m2mobject_stub::inst = new M2MObjectInstance("name",*obj);
+    m2mobject_stub::inst = new M2MObjectInstance(*obj, "name", *obj, "", "");
 
     m2mobject_stub::header = (sn_coap_hdr_s*) malloc(sizeof(sn_coap_hdr_s));
     memset(m2mobject_stub::header,0,sizeof(sn_coap_hdr_s));
@@ -618,8 +626,6 @@ void Test_M2MNsdlInterface::test_received_from_server_callback()
     CHECK(0== nsdl->received_from_server_callback(handle,coap_header,NULL));
 
     delete m2mobject_stub::inst;
-    delete m2mbase_stub::string_value;
-    m2mbase_stub::string_value = NULL;
     nsdl->_object_list.clear();
     delete obj;
 
@@ -634,10 +640,10 @@ void Test_M2MNsdlInterface::test_received_from_server_callback()
 
     // Test EMPTY ACK
     coap_header->msg_code = COAP_MSG_CODE_EMPTY;
-    obj = new M2MObject("0");
-    m2mbase_stub::string_value = new String("0");
+    obj = new M2MObject("0", "0");
+    m2mbase_stub::string_value = "0";
     nsdl->_object_list.push_back(obj);
-    m2mobject_stub::inst = new M2MObjectInstance("name",*obj);
+    m2mobject_stub::inst = new M2MObjectInstance(*obj, "name", *obj, "", "");
 
     uint8_t *token = (uint8_t*) malloc(4);
     token[0] = 't';
@@ -646,7 +652,8 @@ void Test_M2MNsdlInterface::test_received_from_server_callback()
     token[3] = 'e';
     coap_header->token_ptr = token;
     coap_header->token_len = 4;
-    M2MResource res2(*m2mobject_stub::inst,"test","test",M2MResourceInstance::STRING,M2MBase::Dynamic);
+
+    M2MResource res2(*m2mobject_stub::inst, *m2mobject_stub::inst, "test","test",M2MResourceInstance::STRING,false);
     m2mbase_stub::token = token;
     m2mbase_stub::token_len = 4;
     m2mobject_stub::base_type = M2MBase::Resource;
@@ -657,8 +664,6 @@ void Test_M2MNsdlInterface::test_received_from_server_callback()
 
     free(token);
     delete m2mobject_stub::inst;
-    delete m2mbase_stub::string_value;
-    m2mbase_stub::string_value = NULL;
     delete obj;
     nsdl->_object_list.clear();
 
@@ -682,17 +687,17 @@ void Test_M2MNsdlInterface::test_received_from_server_callback()
     CHECK(observer->boot_error == true);
 
     // handle_bootstrap_put_message() invalid content type
-    obj = new M2MObject("0");
-    m2mbase_stub::string_value = new String("0");
+    obj = new M2MObject("0", "0");
+    m2mbase_stub::string_value = "0";
     nsdl->_object_list.push_back(obj);
-    m2mobject_stub::inst = new M2MObjectInstance("name",*obj);
+    m2mobject_stub::inst = new M2MObjectInstance(*obj, "name", *obj, "", "");
     uint8_t security[] = {"0"};
     coap_header->uri_path_ptr = security;
     coap_header->uri_path_len = sizeof(security);
-    M2MResource res(*m2mobject_stub::inst,"test","test",M2MResourceInstance::STRING,M2MBase::Dynamic);
+    M2MResource res(*m2mobject_stub::inst,*m2mobject_stub::inst, "test","test",M2MResourceInstance::STRING,false);
     m2mobjectinstance_stub::resource_list.push_back(&res);
     observer->boot_error = false;
-    m2msecurity_stub::resource = new M2MResource(*m2mobject_stub::inst,"1","type",M2MResourceInstance::STRING,M2MBase::Dynamic);
+    m2msecurity_stub::resource = new M2MResource(*m2mobject_stub::inst,*m2mobject_stub::inst,"1","type",M2MResourceInstance::STRING,false);
     CHECK(0 == nsdl->received_from_server_callback(handle,coap_header,address));
     CHECK(observer->boot_error == true);
 
@@ -718,16 +723,14 @@ void Test_M2MNsdlInterface::test_received_from_server_callback()
     CHECK(0 == nsdl->received_from_server_callback(handle,coap_header,address));
     CHECK(observer->boot_error == true);
     delete m2mobject_stub::inst;
-    delete m2mbase_stub::string_value;
-    m2mbase_stub::string_value = NULL;
     nsdl->_object_list.clear();
     delete obj;
 
     // handle_bootstrap_put_message() TLV object instance
-    obj = new M2MObject("1");
-    m2mbase_stub::string_value = new String("1");
+    obj = new M2MObject("1", "1");
+    m2mbase_stub::string_value = "1";
     nsdl->_object_list.push_back(obj);
-    m2mobject_stub::inst = new M2MObjectInstance("name",*obj);
+    m2mobject_stub::inst = new M2MObjectInstance(*obj, "name", *obj, "", "");
     uint8_t server[] = {"1"};
     coap_header->uri_path_ptr = server;
     coap_header->uri_path_len = 1;
@@ -926,13 +929,18 @@ void Test_M2MNsdlInterface::test_received_from_server_callback()
     CHECK(observer->boot_done == false);
 
     delete m2mobject_stub::inst;
-    delete m2mbase_stub::string_value;
-    m2mbase_stub::string_value = NULL;
+    //delete m2mbase_stub::string_value;
+    //m2mbase_stub::string_value = NULL;
     nsdl->_object_list.clear();
     m2mobjectinstance_stub::resource_list.clear();
     delete obj;
     delete m2msecurity_stub::string_value;
     delete m2msecurity_stub::resource;
+
+    free(m2mbase_stub::nsdl_resource->static_resource_parameters->path);
+    free(m2mbase_stub::nsdl_resource->static_resource_parameters);
+    free(m2mbase_stub::nsdl_resource);
+
     free(common_stub::coap_header);
     free(address->addr_ptr);
     free(address);
@@ -967,10 +975,22 @@ void Test_M2MNsdlInterface::test_resource_callback()
     CHECK(nsdl->resource_callback(NULL,coap_header,address,SN_NSDL_PROTOCOL_HTTP) ==0);
 
     common_stub::int_value = 0;
-    m2mbase_stub::string_value = new String("name");
-    M2MObject *object = new M2MObject("name");
+    m2mbase_stub::string_value = "name";
+    M2MObject *object = new M2MObject("name", "name");
     m2mbase_stub::int_value = 0;
     m2mobject_stub::int_value = 1;
+    m2mbase_stub::nsdl_resource =
+            (sn_nsdl_dynamic_resource_parameters_s*) malloc(sizeof(sn_nsdl_dynamic_resource_parameters_s));
+    m2mbase_stub::nsdl_resource->static_resource_parameters =
+            (sn_nsdl_static_resource_parameters_s*) malloc(sizeof(sn_nsdl_static_resource_parameters_s));
+    m2mbase_stub::nsdl_resource->static_resource_parameters->path = (uint8_t*) malloc(5);
+    m2mbase_stub::nsdl_resource->static_resource_parameters->path[0] = 'n';
+    m2mbase_stub::nsdl_resource->static_resource_parameters->path[1] = 'a';
+    m2mbase_stub::nsdl_resource->static_resource_parameters->path[2] = 'm';
+    m2mbase_stub::nsdl_resource->static_resource_parameters->path[3] = 'e';
+    m2mbase_stub::nsdl_resource->static_resource_parameters->path[4] = '\0';
+    m2mbase_stub::nsdl_resource->static_resource_parameters->pathlen = 5;
+
 
     nsdl->_object_list.push_back(object);
 
@@ -984,15 +1004,16 @@ void Test_M2MNsdlInterface::test_resource_callback()
 
     CHECK(nsdl->resource_callback(NULL,coap_header,address,SN_NSDL_PROTOCOL_COAP) ==0);
 
-
     delete object;
-    delete m2mbase_stub::string_value;
-    m2mbase_stub::string_value = NULL;
+    free(m2mbase_stub::nsdl_resource->static_resource_parameters->path);
+    free(m2mbase_stub::nsdl_resource->static_resource_parameters);
+    free(m2mbase_stub::nsdl_resource);
 
     free(common_stub::coap_header);
     free(address);
     free(coap_header);
 }
+
 
 void Test_M2MNsdlInterface::test_resource_callback_get()
 {
@@ -1011,16 +1032,16 @@ void Test_M2MNsdlInterface::test_resource_callback_put()
 
     coap_header->msg_code = COAP_MSG_CODE_REQUEST_PUT;
 
-    String *name = new String("name");
-    String *res_name = new String("res");
     common_stub::int_value = 0;
-    m2mbase_stub::string_value = name;
+    m2mbase_stub::string_value = "name";
 
-    M2MObject *object = new M2MObject(*name);
-    M2MObjectInstance* instance = new M2MObjectInstance(*name,*object);
+    M2MObject *object = new M2MObject("name", "name");
+    M2MObjectInstance* instance = new M2MObjectInstance(*object,"name",*object, "", "");
+
     M2MResource* create_resource = new M2MResource(*instance,
-                                                   *res_name,
-                                                   *res_name,
+                                                   *instance,
+                                                   "res",
+                                                   "res",
                                                    M2MResourceInstance::INTEGER,
                                                    false);
     m2mobject_stub::int_value = 2;
@@ -1079,10 +1100,6 @@ void Test_M2MNsdlInterface::test_resource_callback_put()
     free(coap_header);
     free(address);
 
-    delete name;
-    delete res_name;
-    name = NULL;
-
     m2mbase_stub::clear();
     common_stub::clear();
     m2mobject_stub::clear();
@@ -1102,17 +1119,17 @@ void Test_M2MNsdlInterface::test_resource_callback_post()
 
     coap_header->msg_code = COAP_MSG_CODE_REQUEST_POST;
 
-    String *name = new String("name");
     common_stub::int_value = 0;
-    m2mbase_stub::string_value = name;
+    m2mbase_stub::string_value = "name";
     m2mbase_stub::bool_value = false;
-    M2MObject *object = new M2MObject(*name);
-    M2MObjectInstance* instance = new M2MObjectInstance(*name,*object);
+    M2MObject *object = new M2MObject("name", "name");
+    M2MObjectInstance* instance = new M2MObjectInstance(*object,"name", *object, "","");
     M2MResource* create_resource = new M2MResource(*instance,
-                                                   *name,
-                                                   *name,
+                                                   *instance,
+                                                   "name",
+                                                   "name",
                                                    M2MResourceInstance::INTEGER,
-                                                   M2MResource::Dynamic,false);
+                                                   false);
     m2mobject_stub::int_value = 2;
     m2mobject_stub::instance_list.push_back(instance);
 
@@ -1130,6 +1147,19 @@ void Test_M2MNsdlInterface::test_resource_callback_post()
     coap_header->options_list_ptr->uri_query_len = sizeof(query);
 
     m2mbase_stub::bool_value = true;
+
+    m2mbase_stub::nsdl_resource =
+            (sn_nsdl_dynamic_resource_parameters_s*) malloc(sizeof(sn_nsdl_dynamic_resource_parameters_s));
+    m2mbase_stub::nsdl_resource->static_resource_parameters =
+            (sn_nsdl_static_resource_parameters_s*) malloc(sizeof(sn_nsdl_static_resource_parameters_s));
+    m2mbase_stub::nsdl_resource->static_resource_parameters->path = (uint8_t*) malloc(5);
+    m2mbase_stub::nsdl_resource->static_resource_parameters->path[0] = 'n';
+    m2mbase_stub::nsdl_resource->static_resource_parameters->path[1] = 'a';
+    m2mbase_stub::nsdl_resource->static_resource_parameters->path[2] = 'm';
+    m2mbase_stub::nsdl_resource->static_resource_parameters->path[3] = 'e';
+    m2mbase_stub::nsdl_resource->static_resource_parameters->path[4] = '\0';
+    m2mbase_stub::nsdl_resource->static_resource_parameters->pathlen = 5;
+
 
     common_stub::coap_header = (sn_coap_hdr_ *)malloc(sizeof(sn_coap_hdr_));
     memset(common_stub::coap_header,0,sizeof(sn_coap_hdr_));
@@ -1171,9 +1201,9 @@ void Test_M2MNsdlInterface::test_resource_callback_post()
     }
     free(coap_header);
     free(address);
-
-    delete name;
-    name = NULL;
+    free(m2mbase_stub::nsdl_resource->static_resource_parameters->path);
+    free(m2mbase_stub::nsdl_resource->static_resource_parameters);
+    free(m2mbase_stub::nsdl_resource);
 
     m2mbase_stub::clear();
     common_stub::clear();
@@ -1199,22 +1229,29 @@ void Test_M2MNsdlInterface::test_resource_callback_delete()
     common_stub::coap_header->msg_code = COAP_MSG_CODE_RESPONSE_BAD_REQUEST;
     common_stub::int_value = 0;
 
+    m2mbase_stub::nsdl_resource =
+            (sn_nsdl_dynamic_resource_parameters_s*) malloc(sizeof(sn_nsdl_dynamic_resource_parameters_s));
+    m2mbase_stub::nsdl_resource->static_resource_parameters =
+            (sn_nsdl_static_resource_parameters_s*) malloc(sizeof(sn_nsdl_static_resource_parameters_s));
+
+    uint8_t path[] = {"name/0"};
+    m2mbase_stub::nsdl_resource->static_resource_parameters->path = path;
+    m2mbase_stub::nsdl_resource->static_resource_parameters->pathlen = sizeof(path);
+
     CHECK(nsdl->resource_callback(NULL,coap_header,address,SN_NSDL_PROTOCOL_HTTP) ==0);
 
-    String *name = new String("name");
     common_stub::int_value = 0;
-    m2mbase_stub::string_value = new String("name");
-    M2MObject *object = new M2MObject(*name);
-    M2MObjectInstance* instance = new M2MObjectInstance(*name,*object);
+    m2mbase_stub::string_value = "name";
+    M2MObject *object = new M2MObject("name", "name");
+    M2MObjectInstance* instance = new M2MObjectInstance(*object,"name", *object, "", "name/0");
     m2mbase_stub::int_value = 0;
     m2mobject_stub::int_value = 1;
     m2mobject_stub::bool_value = true;
     m2mobject_stub::instance_list.push_back(instance);
-
+    m2mobject_stub::base_type = M2MBase::ObjectInstance;
     nsdl->_object_list.push_back(object);
 
     m2mbase_stub::operation = M2MBase::DELETE_ALLOWED;
-    m2mobjectinstance_stub::base_type = M2MBase::ObjectInstance;
 
     CHECK(nsdl->resource_callback(NULL,coap_header,address,SN_NSDL_PROTOCOL_HTTP) ==0);
 
@@ -1223,16 +1260,16 @@ void Test_M2MNsdlInterface::test_resource_callback_delete()
 
     delete instance;
     delete object;
-    delete name;
-    delete m2mbase_stub::string_value;
-    m2mbase_stub::string_value = NULL;
 
+    free(m2mbase_stub::nsdl_resource->static_resource_parameters);
+    free(m2mbase_stub::nsdl_resource);
     free(common_stub::coap_header);
     free(address);
     free(coap_header);
     m2mobject_stub::instance_list.clear();
 }
 
+/*
 void Test_M2MNsdlInterface::test_resource_callback_reset()
 {
     uint8_t value[] = {"name"};
@@ -1284,65 +1321,8 @@ void Test_M2MNsdlInterface::test_resource_callback_reset()
     m2mobject_stub::instance_list.clear();
     m2mobjectinstance_stub::resource_list.clear();
     //nsdl->_object_list.clear();
-    /*uint8_t value[] = {"name"};
-    sn_coap_hdr_s *coap_header = (sn_coap_hdr_s *)malloc(sizeof(sn_coap_hdr_s));
-    memset(coap_header,0,sizeof(sn_coap_hdr_s));
-    sn_nsdl_addr_s *address = (sn_nsdl_addr_s *)malloc(sizeof(sn_nsdl_addr_s));
-    memset(address,0,sizeof(sn_nsdl_addr_s));
-    common_stub::coap_header = (sn_coap_hdr_ *)malloc(sizeof(sn_coap_hdr_));
-    memset(common_stub::coap_header,0,sizeof(sn_coap_hdr_));
-    coap_header->uri_path_ptr = value;
-    coap_header->uri_path_len = sizeof(value);
-    coap_header->msg_type = COAP_MSG_TYPE_RESET;
-
-    String *name = new String("name");
-    common_stub::int_value = 0;
-    m2mbase_stub::string_value = new String("name");
-    M2MObject *object = new M2MObject(*name);
-    nsdl->_object_list.push_back(object);
-    CHECK(nsdl->resource_callback(NULL,coap_header,address,SN_NSDL_PROTOCOL_HTTP) == 0);
-
-    uint8_t value2[] = {"name/0"};
-    coap_header->uri_path_ptr = value2;
-    coap_header->uri_path_len = sizeof(value2);
-    M2MObjectInstance* instance = new M2MObjectInstance(*name,*object);
-    m2mbase_stub::int_value = 0;
-    m2mobject_stub::int_value = 1;
-    m2mobject_stub::bool_value = true;
-    m2mobject_stub::instance_list.push_back(instance);
-    m2mobjectinstance_stub::base_type = M2MBase::ObjectInstance;
-    CHECK(nsdl->resource_callback(NULL,coap_header,address,SN_NSDL_PROTOCOL_HTTP) == 0);
-
-    uint8_t value3[] = {"name/0/1"};
-    coap_header->uri_path_ptr = value3;
-    coap_header->uri_path_len = sizeof(value3);
-    M2MResource *res = new M2MResource(*instance,
-                                       "1","1",
-                                       M2MResourceInstance::INTEGER,
-                                       false);
-    nsdl->_object_list.clear();
-    nsdl->_object_list.push_back(object);
-    m2mbase_stub::int_value = 0;
-    m2mobject_stub::int_value = 1;
-    m2mobject_stub::bool_value = true;
-    m2mobjectinstance_stub::resource_list.push_back(res);
-    m2mobjectinstance_stub::int_value = 0;
-    CHECK(nsdl->resource_callback(NULL,coap_header,address,SN_NSDL_PROTOCOL_HTTP) == 0);
-
-    delete instance;
-    delete object;
-    delete name;
-    delete res;
-    delete m2mbase_stub::string_value;
-    m2mbase_stub::string_value = NULL;
-
-    free(common_stub::coap_header);
-    free(address);
-    free(coap_header);*/
 }
-
-
-
+*/
 void Test_M2MNsdlInterface::test_process_received_data()
 {
     uint8_t *data = (uint8_t*)malloc(sizeof(uint8_t));
@@ -1389,24 +1369,20 @@ void Test_M2MNsdlInterface::test_observation_to_be_sent()
 {
     Vector<uint16_t> instance_list_ids;
     m2mbase_stub::clear();
-    M2MObject *object = new M2MObject("name");
-    M2MObjectInstance* instance = new M2MObjectInstance("name",*object);
-    M2MResource *res = new M2MResource(*instance,
-                                       "name","name",
-                                       M2MResourceInstance::INTEGER,
-                                       false,true);
+    M2MObject *object = new M2MObject("name", "name");
+    M2MObjectInstance* instance = new M2MObjectInstance(*object, "name", *object, "", "");
+    M2MResource *res = new M2MResource(*instance,*instance,"res", "res", M2MResourceInstance::INTEGER,false);
+    M2MResource *res2 = new M2MResource(*instance,*instance,"res2", "res2", M2MResourceInstance::INTEGER,false);
 
-    M2MResource *res2 = new M2MResource(*instance,
-                                           "res2","res2",
-                                           M2MResourceInstance::INTEGER,
-                                           false,true);
 
-    M2MResourceInstance* res_instance = new M2MResourceInstance("res2","res2",
+    M2MResourceInstance* res_instance = new M2MResourceInstance(*res,
+                                                                "res", "res",
                                                                 M2MResourceInstance::INTEGER,
-                                                                *instance);
-    M2MResourceInstance* res_instance_1 = new M2MResourceInstance("res2","res2",
+                                                                *instance,0,"","",false);
+    M2MResourceInstance* res_instance_1 = new M2MResourceInstance(*res2,
+                                                                "res2", "res2",
                                                                 M2MResourceInstance::INTEGER,
-                                                                *instance);
+                                                                *instance,0,"","",false);
     m2mresource_stub::list.clear();
     m2mresource_stub::list.push_back(res_instance);
     m2mresource_stub::list.push_back(res_instance_1);
@@ -1420,8 +1396,7 @@ void Test_M2MNsdlInterface::test_observation_to_be_sent()
     m2mresourceinstance_stub::int_value = sizeof(value);
 
     m2mbase_stub::uint16_value = 321;
-    String *owned = new String("token");
-    m2mbase_stub::string_value = owned;
+    m2mbase_stub::string_value = "token";
 
     m2mresourceinstance_stub::base_type = M2MBase::Resource;
 
@@ -1459,7 +1434,7 @@ void Test_M2MNsdlInterface::test_observation_to_be_sent()
     nsdl->observation_to_be_sent(res, 500, instance_list_ids);
     free(common_stub::coap_header);
 
-    M2MObjectInstance *object_instance = new M2MObjectInstance("name",*object);
+    M2MObjectInstance *object_instance = new M2MObjectInstance(*object, "name", *object, "","");
     m2mobject_stub::int_value = 1;
     m2mobject_stub::base_type = M2MBase::Object;
     m2mobject_stub::inst = object_instance;
@@ -1478,6 +1453,7 @@ void Test_M2MNsdlInterface::test_observation_to_be_sent()
     free(common_stub::coap_header);
 
     //CHECK if nothing crashes
+    m2mobjectinstance_stub::base_type = M2MBase::ObjectInstance;
     common_stub::coap_header = (sn_coap_hdr_s *) malloc(sizeof(sn_coap_hdr_s));
     common_stub::coap_header->options_list_ptr = (sn_coap_options_list_s*)malloc(sizeof(sn_coap_options_list_s));
     nsdl->observation_to_be_sent(object_instance, 1, instance_list_ids);
@@ -1487,8 +1463,6 @@ void Test_M2MNsdlInterface::test_observation_to_be_sent()
     common_stub::coap_header->options_list_ptr = (sn_coap_options_list_s*)malloc(sizeof(sn_coap_options_list_s));
     nsdl->observation_to_be_sent(object_instance, 500, instance_list_ids);
     free(common_stub::coap_header);
-    delete owned;
-    owned = NULL;
 
     free(m2mresourceinstance_stub::value);
     m2mresourceinstance_stub::value = NULL;
@@ -1510,7 +1484,6 @@ void Test_M2MNsdlInterface::test_observation_to_be_sent()
     delete res_instance_1;
     res_instance_1 = NULL;
 
-
     delete object_instance;
     object_instance = NULL;
 
@@ -1528,27 +1501,30 @@ void Test_M2MNsdlInterface::test_observation_to_be_sent()
 void Test_M2MNsdlInterface::test_resource_to_be_deleted()
 {
     //Checking coverage for the code
-    nsdl->resource_to_be_deleted("name");
+    M2MObject *object = new M2MObject("name", "name");
+    nsdl->resource_to_be_deleted(object);
+    delete object;
 }
 
 void Test_M2MNsdlInterface::test_value_updated()
 {
-    M2MObject *object = new M2MObject("name");
-    M2MObjectInstance *object_instance = new M2MObjectInstance("name",*object);
+    M2MObject *object = new M2MObject("name", "name");
+    M2MObjectInstance *object_instance = new M2MObjectInstance(*object, "name", *object, "", "");
     M2MResource *resource = new M2MResource(*object_instance,
+                                            *object_instance,
                                             "resource_name",
                                             "resource_type",
                                             M2MResourceInstance::INTEGER,
                                             false);
 
-    M2MResourceInstance *resource_instance = new M2MResourceInstance("resource_name",
+    M2MResourceInstance *resource_instance = new M2MResourceInstance(*resource,
+                                                                     "resource_name",
                                                                      "resource_type",
                                                                      M2MResourceInstance::INTEGER,
-                                                                     *object_instance);
-
+                                                                     *object_instance,0,"","",false);
 
     m2mobject_stub::base_type = M2MBase::Object;
-    m2mbase_stub::string_value = new String("name");
+    m2mbase_stub::string_value = "name";
     m2mbase_stub::operation = M2MBase::GET_ALLOWED;
     nsdl->value_updated(object,"name");
     CHECK(observer->value_update == true);
@@ -1562,17 +1538,18 @@ void Test_M2MNsdlInterface::test_value_updated()
 
     common_stub::resource = (sn_nsdl_dynamic_resource_parameters_s*)malloc(sizeof(sn_nsdl_dynamic_resource_parameters_s));
     memset(common_stub::resource,0, sizeof(sn_nsdl_dynamic_resource_parameters_s));
+
+    common_stub::resource->static_resource_parameters =
+            (sn_nsdl_static_resource_parameters_s*)malloc(sizeof(sn_nsdl_static_resource_parameters_s));
+    memset(common_stub::resource->static_resource_parameters,0, sizeof(sn_nsdl_static_resource_parameters_s));
+
     common_stub::resource->static_resource_parameters->resource = (uint8_t*)malloc(2);
     memset(common_stub::resource->static_resource_parameters->resource,0, 2);
 
     common_stub::resource->static_resource_parameters->mode = SN_GRS_STATIC;
     m2mbase_stub::mode_value = M2MBase::Static;
 
-    common_stub::resource->static_resource_parameters =
-            (sn_nsdl_static_resource_parameters_s*)malloc(sizeof(sn_nsdl_static_resource_parameters_s));
-    memset(common_stub::resource->static_resource_parameters,0, sizeof(sn_nsdl_static_resource_parameters_s));
-
-    common_stub::resource->static_resource_parameters->observable = false;
+    common_stub::resource->observable = false;
     m2mbase_stub::bool_value = true;
 
     m2mresourceinstance_stub::int_value = 2;
@@ -1596,6 +1573,11 @@ void Test_M2MNsdlInterface::test_value_updated()
 
     common_stub::resource = (sn_nsdl_dynamic_resource_parameters_s*)malloc(sizeof(sn_nsdl_dynamic_resource_parameters_s));
     memset(common_stub::resource,0, sizeof(sn_nsdl_dynamic_resource_parameters_s));
+
+    common_stub::resource->static_resource_parameters =
+            (sn_nsdl_static_resource_parameters_s*)malloc(sizeof(sn_nsdl_static_resource_parameters_s));
+    memset(common_stub::resource->static_resource_parameters,0, sizeof(sn_nsdl_static_resource_parameters_s));
+
     common_stub::resource->static_resource_parameters->resource = (uint8_t*)malloc(2);
     memset(common_stub::resource->static_resource_parameters->resource,0, 2);
 
@@ -1613,9 +1595,6 @@ void Test_M2MNsdlInterface::test_value_updated()
     nsdl->value_updated(resource_instance,"name/0/name/0");
     CHECK(observer->value_update == false);
     observer->value_update = false;
-
-    delete m2mbase_stub::string_value;
-    m2mbase_stub::string_value = NULL;
 
     m2mobject_stub::clear();
     m2mobjectinstance_stub::clear();
@@ -1635,10 +1614,12 @@ void Test_M2MNsdlInterface::test_value_updated()
     delete object;
 }
 
+
 void Test_M2MNsdlInterface::test_find_resource()
 {
-    m2mbase_stub::string_value = new String("name");
-    M2MObject *object = new M2MObject("name");
+    m2mbase_stub::string_value = "name";
+    m2mbase_stub::object_instance_name = "name/0";
+    M2MObject *object = new M2MObject("name", "name");
     uint8_t *token = (uint8_t*) malloc(4);
     token[0] = 't';
     token[1] = 'o';
@@ -1647,25 +1628,25 @@ void Test_M2MNsdlInterface::test_find_resource()
     m2mbase_stub::token = token;
     m2mbase_stub::token_len = 4;
 
-    M2MObjectInstance *object_instance = new M2MObjectInstance("name",*object);
+    M2MObjectInstance *object_instance = new M2MObjectInstance(*object,"name/0",*object, "","");
     M2MResource *resource = new M2MResource(*object_instance,
+                                            *object_instance,
                                             "resource_name",
                                             "resource_type",
                                             M2MResourceInstance::INTEGER,
                                             false);
 
-    M2MResourceInstance *resource_instance = new M2MResourceInstance("name",
+    M2MResourceInstance *resource_instance = new M2MResourceInstance(*resource,
+                                                                     "name",
                                                                      "resource_type",
-                                                                      M2MResourceInstance::INTEGER,
-                                                                     *object_instance);
+                                                                     M2MResourceInstance::INTEGER,
+                                                                     *object_instance,0,"","",false);
 
-
+    m2mobjectinstance_stub::base_type = M2MBase::ObjectInstance;
     m2mobject_stub::instance_list.push_back(object_instance);
     m2mobjectinstance_stub::resource_list.push_back(resource);
     m2mresource_stub::list.push_back(resource_instance);
-
     m2mobject_stub::base_type = M2MBase::Object;
-
     nsdl->_object_list.push_back(object);
 
     CHECK(nsdl->find_resource("name") != NULL);
@@ -1673,7 +1654,7 @@ void Test_M2MNsdlInterface::test_find_resource()
     CHECK(nsdl->find_resource("name", token, 5) == NULL);
 
     m2mbase_stub::int_value  = 0;
-
+    m2mobject_stub::base_type = M2MBase::ObjectInstance;
     CHECK(nsdl->find_resource("name/0") != NULL);
 
     CHECK(nsdl->find_resource("name/0/name") != NULL);
@@ -1681,21 +1662,16 @@ void Test_M2MNsdlInterface::test_find_resource()
     m2mresource_stub::bool_value = true;
 
     CHECK(nsdl->find_resource("name/0/name/0") != NULL);
-
     CHECK(nsdl->find_resource("name1") == NULL);
     CHECK(nsdl->find_resource("name/1") == NULL);
     CHECK(nsdl->find_resource("name/0/name1") == NULL);
     CHECK(nsdl->find_resource("name/0/name/1") == NULL);
-
     CHECK(nsdl->find_resource(object,"0", token, 4) != NULL);
     CHECK(nsdl->find_resource(object,"0", token, 5) == NULL);
-
     CHECK(nsdl->find_resource(object_instance,"0", token, 4) != NULL);
     CHECK(nsdl->find_resource(object_instance,"0", token, 5) == NULL);
 
     free(token);
-    delete m2mbase_stub::string_value;
-    m2mbase_stub::string_value = NULL;
 
     m2mobject_stub::clear();
     m2mobjectinstance_stub::clear();
@@ -1713,8 +1689,7 @@ void Test_M2MNsdlInterface::test_find_resource()
 
 void Test_M2MNsdlInterface::test_remove_object()
 {
-    String name = "name";
-    M2MObject *obj = new M2MObject(name);
+    M2MObject *obj = new M2MObject("name", "name");
     nsdl->_object_list.push_back(obj);
 
     nsdl->remove_object((M2MBase*)obj);
@@ -1727,7 +1702,7 @@ void Test_M2MNsdlInterface::test_remove_object()
 
 void Test_M2MNsdlInterface::test_add_object_to_list()
 {
-    M2MObject *obj = new M2MObject("name");
+    M2MObject *obj = new M2MObject("name", "name");
     nsdl->_object_list.push_back(obj);
 
     nsdl->add_object_to_list(obj);
@@ -1739,12 +1714,11 @@ void Test_M2MNsdlInterface::test_add_object_to_list()
 
 void Test_M2MNsdlInterface::test_send_delayed_response()
 {
-    String *name = new String("name");
     common_stub::int_value = 0;
     m2mbase_stub::int_value = 0;
 
-    M2MObject *object = new M2MObject(*name);
-    M2MObjectInstance* instance = new M2MObjectInstance(*name,*object);
+    M2MObject *object = new M2MObject("name", "name");
+    M2MObjectInstance* instance = new M2MObjectInstance(*object, "name", *object, "", "");
     nsdl->_nsdl_handle = (nsdl_s*)malloc(sizeof(nsdl_s));
     memset(nsdl->_nsdl_handle,0,sizeof(nsdl_s));
 
@@ -1754,10 +1728,10 @@ void Test_M2MNsdlInterface::test_send_delayed_response()
     memset(address,0,sizeof(sn_nsdl_addr_s));
 
     M2MResource* resource = new M2MResource(*instance,
-                                            *name,
-                                            *name,
+                                            *instance,
+                                            "name",
+                                            "name",
                                             M2MResourceInstance::INTEGER,
-                                            M2MResource::Dynamic,
                                             false);
 
     uint8_t val[] = {"name"};
@@ -1778,12 +1752,8 @@ void Test_M2MNsdlInterface::test_send_delayed_response()
     free(nsdl->_nsdl_handle);
 
     delete object;
-    delete name;
-    name = NULL;
     delete instance;
-    instance = NULL;
     delete resource;
-    resource = NULL;
     free(m2mresource_stub::delayed_token);
     m2mresource_stub::delayed_token = NULL;
     m2mresource_stub::delayed_token_len = 0;

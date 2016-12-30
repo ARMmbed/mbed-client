@@ -36,18 +36,8 @@ void m2mresource_stub::clear()
     instance = NULL;
 }
 
-M2MResource& M2MResource::operator=(const M2MResource& other)
-{
-    return *this;
-}
-
-M2MResource::M2MResource(const M2MResource& other)
-: M2MResourceInstance(other)
-{
-    *this = other;
-}
-
-M2MResource::M2MResource(M2MObjectInstanceCallback &object_instance_callback,
+M2MResource::M2MResource(M2MObjectInstance &parent,
+                         M2MObjectInstanceCallback &object_instance_callback,
                          const String &resource_name,
                          const String &resource_type,
                          M2MResourceInstance::ResourceType type,
@@ -55,23 +45,56 @@ M2MResource::M2MResource(M2MObjectInstanceCallback &object_instance_callback,
                          const uint8_t value_length,
                          const uint16_t object_instance_id,
                          const String &object_name,
-                         bool)
-: M2MResourceInstance(resource_name, resource_type, type, value, value_length,
-                      object_instance_callback, object_instance_id, object_name)
+                         bool multiple_instance,
+                         bool external_blockwise_store)
+: M2MResourceInstance(*this, resource_name, resource_type, type, value, value_length,
+                      object_instance_callback, object_instance_id, object_name,
+                      create_path(parent, resource_name.c_str()), external_blockwise_store),
+  _parent(parent),
+  _delayed_token(NULL),
+  _delayed_token_len(0),
+  _has_multiple_instances(multiple_instance),
+  _delayed_response(false)
 {
+
 }
 
-M2MResource::M2MResource(M2MObjectInstanceCallback &object_instance_callback,
+M2MResource::M2MResource(M2MObjectInstance &parent,
+                         M2MObjectInstanceCallback &object_instance_callback,
+                         const lwm2m_parameters_s* s,
+                          M2MResourceInstance::ResourceType type,
+                         const uint16_t object_instance_id,
+                         const String &object_name)
+: M2MResourceInstance(*this, s, object_instance_callback, type, object_instance_id, object_name),
+  _parent(parent),
+  _delayed_token(NULL),
+  _delayed_token_len(0),
+  _has_multiple_instances(false),
+  _delayed_response(false)
+{
+    // tbd: _has_multiple_instances could be in flash, but no real benefit, because of current alignment.
+}
+
+M2MResource::M2MResource(M2MObjectInstance &parent,
+                         M2MObjectInstanceCallback &object_instance_callback,
                          const String &resource_name,
                          const String &resource_type,
                          M2MResourceInstance::ResourceType type,
-                         bool,
+                         bool observable,
                          const uint16_t object_instance_id,
                          const String &object_name,
-                         bool)
-: M2MResourceInstance(resource_name, resource_type, type,
-                      object_instance_callback, object_instance_id, object_name)
+                         bool multiple_instance,
+                         bool external_blockwise_store)
+: M2MResourceInstance(*this, resource_name, resource_type, type,
+                      object_instance_callback, object_instance_id, object_name,
+                      create_path(parent, resource_name.c_str()), external_blockwise_store),
+  _parent(parent),
+  _delayed_token(NULL),
+  _delayed_token_len(0),
+  _has_multiple_instances(multiple_instance),
+  _delayed_response(false)
 {
+
 }
 
 M2MResource::~M2MResource()
@@ -159,4 +182,9 @@ sn_coap_hdr_s* M2MResource::handle_post_request(nsdl_s *,
                                                bool &, sn_nsdl_addr_s *)
 {
     return m2mresource_stub::header;
+}
+
+M2MObjectInstance& M2MResource::get_parent_object_instance() const
+{
+
 }

@@ -35,48 +35,88 @@ void m2mresourceinstance_stub::clear()
     string_value = NULL;
 }
 
-M2MResourceInstance& M2MResourceInstance::operator=(const M2MResourceInstance&)
-{
-    return *this;
-}
-
-M2MResourceInstance::M2MResourceInstance(const M2MResourceInstance& other)
-: M2MBase(other),
-  _object_instance_callback(other._object_instance_callback)/*,
-  _object_instance_id(other._object_instance_id),
-  _object_name(other._object_name)*/
-{
-    this->operator=(other);
-}
-
-M2MResourceInstance::M2MResourceInstance(const String &res_name,
-                                         const String &,
-                                         M2MResourceInstance::ResourceType,
+M2MResourceInstance::M2MResourceInstance(M2MResource &parent,
+                                         const String &res_name,
+                                         const String &resource_type,
+                                         M2MResourceInstance::ResourceType type,
                                          M2MObjectInstanceCallback &object_instance_callback,
-                                         const uint16_t /*object_instance_id*/,
-                                         const String &/*object_name*/)
+                                         const uint16_t object_instance_id,
+                                         const String &object_name,
+                                         char* path,
+                                         bool external_blockwise_store)
 : M2MBase(res_name,
-          M2MBase::Dynamic),
-  _object_instance_callback(object_instance_callback)/*,
-_object_instance_id(object_instance_id),
-_object_name(object_name)*/
+          M2MBase::Dynamic,
+          resource_type,
+          path,
+          external_blockwise_store),
+ _parent_resource(parent),
+ _value(NULL),
+ _value_length(0),
+ _block_message_data(NULL),
+ _execute_callback(NULL),
+ _resource_callback(NULL),
+ _object_name(object_name),
+ _execute_function_pointer(NULL),
+ _notification_sent_function_pointer(NULL),
+ _object_instance_callback(object_instance_callback),
+ _notification_sent_callback(NULL),
+ _object_instance_id(object_instance_id),
+ _resource_type(type)
 {
-    m2mresourceinstance_stub::base_type = M2MBase::ResourceInstance;
+
 }
 
-M2MResourceInstance::M2MResourceInstance(const String &res_name,
-                                         const String &,
-                                         M2MResourceInstance::ResourceType,
-                                         const uint8_t *,
-                                         const uint8_t,
+M2MResourceInstance::M2MResourceInstance(M2MResource &parent,
+                                         const String &res_name,
+                                         const String &resource_type,
+                                         M2MResourceInstance::ResourceType type,
+                                         const uint8_t *value,
+                                         const uint8_t value_length,
                                          M2MObjectInstanceCallback &object_instance_callback,
-                                         const uint16_t/* object_instance_id*/,
-                                         const String &/*object_name*/)
+                                         const uint16_t object_instance_id,
+                                         const String &object_name,
+                                         char* path,
+                                         bool external_blockwise_store)
 : M2MBase(res_name,
-          M2MBase::Static),
-_object_instance_callback(object_instance_callback)/*,
+          M2MBase::Static,
+          resource_type,
+          path,
+          external_blockwise_store),
+ _parent_resource(parent),
+ _value(NULL),
+ _value_length(0),
+ _block_message_data(NULL),
+ _execute_callback(NULL),
+ _resource_callback(NULL),
+ _object_name(object_name),
+ _execute_function_pointer(NULL),
+ _notification_sent_function_pointer(NULL),
+ _object_instance_callback(object_instance_callback),
+ _notification_sent_callback(NULL),
+ _object_instance_id(object_instance_id),
+  _resource_type(type)
+{
+}
+
+M2MResourceInstance::M2MResourceInstance(M2MResource &parent,
+                                         const lwm2m_parameters_s* s,
+                                         M2MObjectInstanceCallback &object_instance_callback,
+                                         M2MResourceInstance::ResourceType type,
+                                         const uint16_t object_instance_id,
+                                         const String &object_name)
+: M2MBase(s),
+  _parent_resource(parent),
+  _value(NULL),
+  _value_length(0),
+  _block_message_data(NULL),
+  _execute_callback(NULL),
+  _resource_callback(NULL),
+  _object_name(object_name),
+  _execute_function_pointer(NULL),
+  _notification_sent_function_pointer(NULL),
+  _object_instance_callback(object_instance_callback),
   _object_instance_id(object_instance_id),
-  _object_name(object_name)*/
+  _resource_type(type)
 {
 }
 

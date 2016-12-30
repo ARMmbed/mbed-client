@@ -26,7 +26,8 @@ namespace m2mbase_stub
     extern uint32_t uint32_value;
     extern uint16_t int_value;
     extern int32_t name_id_value;
-    extern String *string_value;
+    extern const char *string_value;
+    extern const char *object_instance_name;
     extern bool bool_value;
     extern M2MBase::BaseType base_type;
     extern M2MBase::Mode mode_value;
@@ -39,6 +40,7 @@ namespace m2mbase_stub
     void clear();
     extern uint8_t* token;
     extern uint32_t token_len;
+    extern sn_nsdl_dynamic_resource_parameters_s *nsdl_resource;
 }
 
 #endif // M2M_BASE_STUB_H

@@ -191,6 +191,16 @@ int8_t sn_nsdl_delete_resource(struct nsdl_s *, uint16_t , uint8_t *)
     return common_stub::int_value;
 }
 
+int8_t sn_nsdl_put_resource(struct nsdl_s *handle, sn_nsdl_dynamic_resource_parameters_s *res)
+{
+    return common_stub::int_value;
+}
+
+int8_t sn_nsdl_pop_resource(struct nsdl_s *handle, sn_nsdl_dynamic_resource_parameters_s *res)
+{
+    return common_stub::int_value;
+}
+
 int8_t sn_nsdl_send_coap_message(struct nsdl_s *, sn_nsdl_addr_s *, sn_coap_hdr_s *)
 {
     return common_stub::int_value;
