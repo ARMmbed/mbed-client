@@ -167,9 +167,18 @@ public:
     /**
      * \brief Removes the resource with the given name.
      * \param name The name of the resource to be removed.
+     * Note: this will be removed in next version, please use the
+     * remove_resource(const char*) version instead.
      * \return True if removed, else false.
      */
     virtual bool remove_resource(const String &name);
+
+    /**
+     * \brief Removes the resource with the given name.
+     * \param name The name of the resource to be removed.
+     * \return True if removed, else false.
+     */
+    virtual bool remove_resource(const char *name);
 
     /**
      * \brief Removes the resource instance with the given name.
@@ -203,10 +212,19 @@ public:
 
     /**
      * \brief Returns the total number of single resource instances.
+     * Note: this will be removed in next version, please use the
+     * resource_count(const char*) version instead.
      * \param resource The name of the resource.
      * \return Total number of the resources.
      */
     virtual uint16_t resource_count(const String& resource) const;
+
+    /**
+     * \brief Returns the total number of single resource instances.
+     * \param resource The name of the resource.
+     * \return Total number of the resources.
+     */
+    virtual uint16_t resource_count(const char *resource) const;
 
     /**
      * \brief Returns the object type.

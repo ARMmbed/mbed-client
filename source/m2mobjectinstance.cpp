@@ -261,8 +261,13 @@ M2MResourceInstance* M2MObjectInstance::create_dynamic_resource_instance(const S
 
 bool M2MObjectInstance::remove_resource(const String &resource_name)
 {
-    tr_debug("M2MObjectInstance::remove_resource(resource_name %s)",
-             resource_name.c_str());
+    return remove_resource(resource_name.c_str());
+}
+
+bool M2MObjectInstance::remove_resource(const char *resource_name)
+{
+    tr_debug("M2MObjectInstance::remove_resource(resource_name %s)", resource_name);
+
     bool success = false;
     if(!_resource_list.empty()) {
          M2MResource* res = NULL;
@@ -270,7 +275,7 @@ bool M2MObjectInstance::remove_resource(const String &resource_name)
          it = _resource_list.begin();
          int pos = 0;
          for ( ; it != _resource_list.end(); it++, pos++ ) {
-             if(strcmp((*it)->name(), resource_name.c_str()) == 0) {
+             if(strcmp((*it)->name(), resource_name) == 0) {
                 // Resource found and deleted.
                 res = *it;
                 delete res;
@@ -363,12 +368,18 @@ uint16_t M2MObjectInstance::resource_count() const
 
 uint16_t M2MObjectInstance::resource_count(const String& resource) const
 {
+
+    return resource_count(resource.c_str());
+}
+
+uint16_t M2MObjectInstance::resource_count(const char *resource) const
+{
     uint16_t count = 0;
     if(!_resource_list.empty()) {
         M2MResourceList::const_iterator it;
         it = _resource_list.begin();
         for ( ; it != _resource_list.end(); it++ ) {
-            if(strcmp((*it)->name(), resource.c_str()) == 0) {
+            if(strcmp((*it)->name(), resource) == 0) {
                 if((*it)->supports_multiple_instances()) {
                     count += (*it)->resource_instance_count();
                 } else {
