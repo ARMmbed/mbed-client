@@ -429,12 +429,12 @@ void Test_M2MFirmware::test_set_resource_value_buffer()
 
 void Test_M2MFirmware::test_resource_name()
 {
-    CHECK(firmware->resource_name(M2MFirmware::Package) == "0");
-    CHECK(firmware->resource_name(M2MFirmware::PackageUri) == "1");
-    CHECK(firmware->resource_name(M2MFirmware::Update) == "2");
-    CHECK(firmware->resource_name(M2MFirmware::State) == "3");
-    CHECK(firmware->resource_name(M2MFirmware::UpdateSupportedObjects) == "4");
-    CHECK(firmware->resource_name(M2MFirmware::UpdateResult) == "5");
-    CHECK(firmware->resource_name(M2MFirmware::PackageName) == "6");
-    CHECK(firmware->resource_name(M2MFirmware::PackageVersion) == "7");
+    STRCMP_EQUAL(firmware->resource_name(M2MFirmware::Package), "0");
+    STRCMP_EQUAL(firmware->resource_name(M2MFirmware::PackageUri), "1");
+    STRCMP_EQUAL(firmware->resource_name(M2MFirmware::Update), "2");
+    STRCMP_EQUAL(firmware->resource_name(M2MFirmware::State), "3");
+    STRCMP_EQUAL(firmware->resource_name(M2MFirmware::UpdateSupportedObjects), "4");
+    STRCMP_EQUAL(firmware->resource_name(M2MFirmware::UpdateResult), "5");
+    STRCMP_EQUAL(firmware->resource_name(M2MFirmware::PackageName), "6");
+    STRCMP_EQUAL(firmware->resource_name(M2MFirmware::PackageVersion), "7");
 }
