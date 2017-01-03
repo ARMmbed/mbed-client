@@ -96,7 +96,7 @@ public:
      * @param base, Resource to be removed.
      * @return true if removed successfully else false.
     */
-    bool delete_nsdl_resource(M2MBase *base);
+    bool remove_nsdl_resource(M2MBase *base);
 
     /**
      * @brief Creates the bootstrap object.
