@@ -30,8 +30,7 @@ typedef Vector<M2MObjectInstance *> M2MObjectInstanceList;
  *  instances associated with the given object.
  */
 
-class M2MObject : public M2MBase,
-                  public M2MObjectCallback
+class M2MObject : public M2MBase
 {
 
 friend class M2MInterfaceFactory;
@@ -168,9 +167,10 @@ public:
                                                bool &execute_value_updated,
                                                sn_nsdl_addr_s *address = NULL);
 
+    virtual void notification_update(uint16_t obj_instance_id);
+
 protected :
 
-     virtual void notification_update(uint16_t obj_instance_id);
 
 private:
 

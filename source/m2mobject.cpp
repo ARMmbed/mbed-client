@@ -75,7 +75,7 @@ M2MObjectInstance* M2MObject::create_object_instance(uint16_t instance_id)
     if(!object_instance(instance_id)) {
         char* path = create_path(*this, instance_id);
         // Note: the object instance's name contains actually object's name.
-        instance = new M2MObjectInstance(*this, this->name(),*this, "", path);
+        instance = new M2MObjectInstance(*this, this->name(), "", path);
         if(instance) {
             instance->add_observation_level(observation_level());
             instance->set_instance_id(instance_id);
@@ -95,7 +95,7 @@ M2MObjectInstance* M2MObject::create_object_instance(const lwm2m_parameters_s* s
     M2MObjectInstance *instance = NULL;
     if(!object_instance(s->instance_id)) {
 
-        instance = new M2MObjectInstance(*this, s,*this);
+        instance = new M2MObjectInstance(*this, s);
         if(instance) {
             instance->add_observation_level(observation_level());
             //instance->set_instance_id(instance_id);

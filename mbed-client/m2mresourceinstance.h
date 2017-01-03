@@ -19,10 +19,6 @@
 #include "mbed-client/m2mbase.h"
 #include "mbed-client/functionpointer.h"
 
-class M2MObjectInstanceCallback {
-public:
-    virtual void notification_update(M2MBase::Observation observation_level) = 0;
-};
 
 /*! \file m2mresourceinstance.h
  *  \brief M2MResourceInstance.
@@ -71,7 +67,6 @@ private: // Constructor and destructor are private
 
     M2MResourceInstance(M2MResource &parent,
                         const lwm2m_parameters_s* s,
-                        M2MObjectInstanceCallback &object_instance_callback,
                         M2MResourceInstance::ResourceType type,
                         const uint16_t object_instance_id);
     /**
@@ -89,7 +84,6 @@ private: // Constructor and destructor are private
                         const String &resource_name,
                         const String &resource_type,
                         M2MResourceInstance::ResourceType type,
-                        M2MObjectInstanceCallback &object_instance_callback,
                         const uint16_t object_instance_id,
                         char* path,
                         bool external_blockwise_store);
@@ -114,7 +108,6 @@ private: // Constructor and destructor are private
                         M2MResourceInstance::ResourceType type,
                         const uint8_t *value,
                         const uint8_t value_length,
-                        M2MObjectInstanceCallback &object_instance_callback,
                         const uint16_t object_instance_id,
                         char* path,
                         bool external_blockwise_store);
@@ -321,7 +314,9 @@ private:
     bool is_value_changed(const uint8_t* value, const uint32_t value_len);
 
 private:
-    // XXX
+
+    // XXX: since the M2MResource is inherited from this class, the resource actually has back
+    // pointer to itself. If this inheritance was broken, we could save some memory.
     M2MResource &_parent_resource;
 
     uint8_t                                 *_value;
@@ -333,7 +328,6 @@ private:
     FP0<void>                               *_notification_sent_function_pointer;
     incoming_block_message_callback         _incoming_block_message_cb;
     outgoing_block_message_callback         _outgoing_block_message_cb;
-    M2MObjectInstanceCallback               &_object_instance_callback;
     notification_sent_callback              _notification_sent_callback;
     uint16_t                                _object_instance_id;
     ResourceType                            _resource_type;

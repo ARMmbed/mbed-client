@@ -23,10 +23,6 @@
 typedef Vector<M2MResource *> M2MResourceList;
 typedef Vector<M2MResourceInstance *> M2MResourceInstanceList;
 
-class M2MObjectCallback {
-public:
-    virtual void notification_update(uint16_t obj_instance_id) = 0;
-};
 
 class M2MObject;
 
@@ -37,8 +33,7 @@ class M2MObject;
  *  instances associated with the given object.
  */
 
-class M2MObjectInstance : public M2MBase,
-                          public M2MObjectInstanceCallback
+class M2MObjectInstance : public M2MBase
 {
 
 friend class M2MObject;
@@ -52,13 +47,11 @@ private: // Constructor and destructor are private which means
      * \param name Name of the object
      */
     M2MObjectInstance(M2MObject& parent, const String &object_name,
-                      M2MObjectCallback &object_callback,
                       const String &resource_type,
                       char *path,
                       bool external_blockwise_store = false);
 
-    M2MObjectInstance(M2MObject& parent, const lwm2m_parameters_s* static_res,
-                      M2MObjectCallback &object_callback);
+    M2MObjectInstance(M2MObject& parent, const lwm2m_parameters_s* static_res);
 
     // Prevents the use of default constructor.
     M2MObjectInstance();
@@ -275,15 +268,13 @@ public:
 
     inline M2MObject& get_parent_object() const;
 
-protected :
-
+    // callback used from M2MResource/M2MResourceInstance
     virtual void notification_update(M2MBase::Observation observation_level);
 
 private:
 
     M2MObject      &_parent;
 
-    M2MObjectCallback   &_object_callback;
     M2MResourceList     _resource_list; // owned
 
     friend class Test_M2MObjectInstance;
