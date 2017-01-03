@@ -47,7 +47,6 @@ private: // Constructor and destructor are private,
          // deleted only through a function provided by the M2MObjectInstance.
 
     M2MResource(M2MObjectInstance &_parent,
-                 M2MObjectInstanceCallback &object_instance_callback,
                  const lwm2m_parameters_s* s,
                  M2MResourceInstance::ResourceType type,
                  const uint16_t object_instance_id);
@@ -65,7 +64,6 @@ private: // Constructor and destructor are private,
      *        otherwise handled in mbed-client-c.
      */
     M2MResource(M2MObjectInstance &_parent,
-                M2MObjectInstanceCallback &object_instance_callback,
                 const String &resource_name,
                 const String &resource_type,
                 M2MResourceInstance::ResourceType type,
@@ -88,7 +86,6 @@ private: // Constructor and destructor are private,
      *        otherwise handled in mbed-client-c.
      */
     M2MResource(M2MObjectInstance &_parent,
-                M2MObjectInstanceCallback &object_instance_callback,
                 const String &resource_name,
                 const String &resource_type,
                 M2MResourceInstance::ResourceType type,

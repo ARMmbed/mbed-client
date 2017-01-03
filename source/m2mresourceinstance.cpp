@@ -30,7 +30,6 @@ M2MResourceInstance::M2MResourceInstance(M2MResource &parent,
                                          const String &res_name,
                                          const String &resource_type,
                                          M2MResourceInstance::ResourceType type,
-                                         M2MObjectInstanceCallback &object_instance_callback,
                                          const uint16_t object_instance_id,
                                          char* path,
                                          bool external_blockwise_store)
@@ -47,7 +46,6 @@ M2MResourceInstance::M2MResourceInstance(M2MResource &parent,
  _resource_callback(NULL),
  _execute_function_pointer(NULL),
  _notification_sent_function_pointer(NULL),
- _object_instance_callback(object_instance_callback),
  _notification_sent_callback(NULL),
  _object_instance_id(object_instance_id),
  _resource_type(type)
@@ -61,7 +59,6 @@ M2MResourceInstance::M2MResourceInstance(M2MResource &parent,
                                          M2MResourceInstance::ResourceType type,
                                          const uint8_t *value,
                                          const uint8_t value_length,
-                                         M2MObjectInstanceCallback &object_instance_callback,
                                          const uint16_t object_instance_id,
                                          char* path,
                                          bool external_blockwise_store)
@@ -78,7 +75,6 @@ M2MResourceInstance::M2MResourceInstance(M2MResource &parent,
  _resource_callback(NULL),
  _execute_function_pointer(NULL),
  _notification_sent_function_pointer(NULL),
- _object_instance_callback(object_instance_callback),
  _notification_sent_callback(NULL),
  _object_instance_id(object_instance_id),
   _resource_type(type)
@@ -106,7 +102,6 @@ M2MResourceInstance::M2MResourceInstance(M2MResource &parent,
 
 M2MResourceInstance::M2MResourceInstance(M2MResource &parent,
                                          const lwm2m_parameters_s* s,
-                                         M2MObjectInstanceCallback &object_instance_callback,
                                          M2MResourceInstance::ResourceType type,
                                          const uint16_t object_instance_id)
 : M2MBase(s),
@@ -118,7 +113,6 @@ M2MResourceInstance::M2MResourceInstance(M2MResource &parent,
   _resource_callback(NULL),
   _execute_function_pointer(NULL),
   _notification_sent_function_pointer(NULL),
-  _object_instance_callback(object_instance_callback),
   _object_instance_id(object_instance_id),
   _resource_type(type)
 {
@@ -256,7 +250,8 @@ void M2MResourceInstance::report()
     if((M2MBase::O_Attribute & observation_level) == M2MBase::O_Attribute ||
        (M2MBase::OI_Attribute & observation_level) == M2MBase::OI_Attribute) {
         tr_debug("M2MResourceInstance::report() -- object/instance level");
-        _object_instance_callback.notification_update(observation_level);
+        M2MObjectInstance& object_instance = get_parent_resource().get_parent_object_instance();
+        object_instance.notification_update(observation_level);
     }
 
     if(M2MBase::Dynamic == mode() &&

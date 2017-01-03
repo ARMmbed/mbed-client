@@ -33,8 +33,7 @@ class M2MObject;
  *  instances associated with the given object.
  */
 
-class M2MObjectInstance : public M2MBase,
-                          public M2MObjectInstanceCallback
+class M2MObjectInstance : public M2MBase
 {
 
 friend class M2MObject;
@@ -269,8 +268,7 @@ public:
 
     inline M2MObject& get_parent_object() const;
 
-protected :
-
+    // callback used from M2MResource/M2MResourceInstance
     virtual void notification_update(M2MBase::Observation observation_level);
 
 private:
