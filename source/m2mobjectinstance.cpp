@@ -33,7 +33,6 @@
 #define TRACE_GROUP "mClt"
 
 M2MObjectInstance::M2MObjectInstance(M2MObject& parent, const String &object_name,
-                                     M2MObjectCallback &object_callback,
                                      const String &resource_type,
                                      char *path,
                                      bool external_blockwise_store)
@@ -42,17 +41,14 @@ M2MObjectInstance::M2MObjectInstance(M2MObject& parent, const String &object_nam
           resource_type,
           path,
           external_blockwise_store),
-  _parent(parent),
-  _object_callback(object_callback)
+  _parent(parent)
 {
     M2MBase::set_base_type(M2MBase::ObjectInstance);
     M2MBase::set_coap_content_type(COAP_CONTENT_OMA_TLV_TYPE);
 }
 
-M2MObjectInstance::M2MObjectInstance(M2MObject& parent, const lwm2m_parameters_s* static_res,
-                                     M2MObjectCallback &object_callback)
-: M2MBase(static_res), _parent(parent),
-  _object_callback(object_callback)
+M2MObjectInstance::M2MObjectInstance(M2MObject& parent, const lwm2m_parameters_s* static_res)
+: M2MBase(static_res), _parent(parent)
 {
     M2MBase::set_coap_content_type(COAP_CONTENT_OMA_TLV_TYPE);
 }
@@ -683,7 +679,7 @@ void M2MObjectInstance::notification_update(M2MBase::Observation observation_lev
     tr_debug("M2MObjectInstance::notification_update() - level(%d)", observation_level);
     if((M2MBase::O_Attribute & observation_level) == M2MBase::O_Attribute) {
         tr_debug("M2MObjectInstance::notification_update() - object callback");
-        _object_callback.notification_update(instance_id());
+        _parent.notification_update(instance_id());
     }
     if((M2MBase::OI_Attribute & observation_level) == M2MBase::OI_Attribute) {
         tr_debug("M2MObjectInstance::notification_update() - object instance callback");
