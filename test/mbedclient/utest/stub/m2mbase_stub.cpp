@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 #include "m2mbase_stub.h"
-
+#include "m2mstringbufferbase_stub.h"
 #include <assert.h>
 
 uint8_t m2mbase_stub::uint8_value;
@@ -77,6 +77,7 @@ M2MBase::M2MBase(const String& resource_name,
   _observation_level(M2MBase::None),
   _is_under_observation(false)
 {
+    //m2mbase_stub::path_value = path;
 }
 
 M2MBase::M2MBase(const lwm2m_parameters_s *s):
@@ -95,6 +96,7 @@ M2MBase::M2MBase(const lwm2m_parameters_s *s):
 
 M2MBase::~M2MBase()
 {
+    //free(m2mbase_stub::path_value);
 }
 
 void M2MBase::set_operation(M2MBase::Operation opr)
@@ -443,6 +445,7 @@ sn_nsdl_dynamic_resource_parameters_s* M2MBase::get_nsdl_resource()
 
 char* M2MBase::stringdup(const char* src)
 {
+
 }
 
 char* M2MBase::create_path(const M2MObject &parent, uint16_t object_instance)
@@ -471,6 +474,26 @@ char* M2MBase::create_path(const M2MObjectInstance &parent, const char *name)
 }
 
 void M2MBase::set_observation_handler(M2MObservationHandler *handler)
+{
+
+}
+
+size_t M2MBase::resource_name_length() const
+{
+
+}
+
+bool M2MBase::validate_string_length(const String &string, size_t min_length, size_t max_length)
+{
+    return m2mbase_stub::bool_value;
+}
+
+bool M2MBase::validate_string_length(const char* string, size_t min_length, size_t max_length)
+{
+    return m2mbase_stub::bool_value;
+}
+
+M2MReportHandler* M2MBase::create_report_handler()
 {
 
 }

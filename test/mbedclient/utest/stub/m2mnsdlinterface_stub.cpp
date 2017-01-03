@@ -63,7 +63,7 @@ bool M2MNsdlInterface::create_nsdl_list_structure(const M2MObjectList &)
     return m2mnsdlinterface_stub::bool_value;
 }
 
-bool M2MNsdlInterface::delete_nsdl_resource(const String &)
+bool M2MNsdlInterface::delete_nsdl_resource(M2MBase* base)
 {
     return m2mnsdlinterface_stub::bool_value;
 }
@@ -151,7 +151,7 @@ void M2MNsdlInterface::send_delayed_response(M2MBase *)
 {
 }
 
-void M2MNsdlInterface::resource_to_be_deleted(const String &)
+void M2MNsdlInterface::resource_to_be_deleted(M2MBase *)
 {
 }
 

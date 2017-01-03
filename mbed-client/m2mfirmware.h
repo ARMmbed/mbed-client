@@ -221,8 +221,6 @@ private:
 
     bool check_value_range(FirmwareResource resource, const int64_t value) const;
 
-    void set_zero_value(M2MResource &resource);
-
 private :
 
     M2MObjectInstance*    _firmware_instance;     //Not owned

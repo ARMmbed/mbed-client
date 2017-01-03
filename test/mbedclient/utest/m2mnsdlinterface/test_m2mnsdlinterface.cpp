@@ -565,7 +565,7 @@ void Test_M2MNsdlInterface::test_received_from_server_callback()
             (sn_nsdl_dynamic_resource_parameters_s*) malloc(sizeof(sn_nsdl_dynamic_resource_parameters_s));
     m2mbase_stub::nsdl_resource->static_resource_parameters =
             (sn_nsdl_static_resource_parameters_s*) malloc(sizeof(sn_nsdl_static_resource_parameters_s));
-    m2mbase_stub::nsdl_resource->static_resource_parameters->path = (uint8_t*) malloc(5);
+    m2mbase_stub::nsdl_resource->static_resource_parameters->path = (char *) malloc(5);
     m2mbase_stub::nsdl_resource->static_resource_parameters->path[0] = 'n';
     m2mbase_stub::nsdl_resource->static_resource_parameters->path[1] = 'a';
     m2mbase_stub::nsdl_resource->static_resource_parameters->path[2] = 'm';

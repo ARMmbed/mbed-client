@@ -29,7 +29,7 @@ void m2mdevice_stub::clear()
 }
 
 M2MDevice::M2MDevice()
-: M2MObject("3")
+: M2MObject("3", "3")
 {
     m2mdevice_stub::string_value = new String("");
 }

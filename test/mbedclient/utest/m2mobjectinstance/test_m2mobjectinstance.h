@@ -58,6 +58,8 @@ public:
 
     void test_notification_update();
 
+    void test_ctor();
+
     M2MObjectInstance* object;
 
     Handler* handler;

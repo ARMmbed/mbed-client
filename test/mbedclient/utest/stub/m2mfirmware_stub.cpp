@@ -30,7 +30,7 @@ void m2mfirmware_stub::clear()
 }
 
 M2MFirmware::M2MFirmware()
-: M2MObject("5")
+: M2MObject("5", "5")
 {
     m2mfirmware_stub::string_value = new String("");
 }

@@ -17,6 +17,39 @@
 #define M2M_BASE_STUB_H
 
 #include "m2mbase.h"
+#include "nsdlaccesshelper_stub.h"
+static sn_nsdl_static_resource_parameters_s params_static = {
+    (char*)"",      // resource_type_ptr
+    (char*)"",                     // interface_description_ptr
+    (char*)"",    // path
+    (uint8_t*)"value",           // resource
+    5,                      // resourcelen
+    false,                  // external_memory_block
+    SN_GRS_DYNAMIC,         // mode
+    false                   // free_on_delete
+};
+
+static sn_nsdl_dynamic_resource_parameters_s params_dynamic = {
+    __nsdl_c_callback,
+    &params_static,
+    {NULL, NULL},                     // link
+    0, // coap_content_type
+    M2MBase::PUT_ALLOWED,   // access
+    0,                      // registered
+    false,                  // publish_uri
+    false,                  // free_on_delete
+    true                    // observable
+};
+
+const static M2MBase::lwm2m_parameters params = {
+    0, // max_age
+    1, // instance_id
+    0, // name_id
+    (char*)"", // name
+    &params_dynamic,
+    M2MBase::Resource, // base_type
+    false // free_on_delete
+};
 
 //some internal test related stuff
 namespace m2mbase_stub

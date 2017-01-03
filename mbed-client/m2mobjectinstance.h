@@ -286,6 +286,8 @@ private:
     friend class Test_M2MFirmware;
     friend class Test_M2MTLVSerializer;
     friend class Test_M2MTLVDeserializer;
+    friend class Test_M2MBase;
+    friend class Test_M2MResource;
 };
 
 inline M2MObject& M2MObjectInstance::get_parent_object() const

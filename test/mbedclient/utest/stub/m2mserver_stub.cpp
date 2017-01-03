@@ -27,7 +27,7 @@ void m2mserver_stub::clear()
 }
 
 M2MServer::M2MServer()
-: M2MObject("1", stringdup("1"))
+: M2MObject("1", "1")
 {
 }
 

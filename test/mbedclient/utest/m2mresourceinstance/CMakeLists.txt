@@ -10,6 +10,8 @@ add_executable(m2mresourceinstance
         "../stub/common_stub.cpp"
         "../stub/m2mtlvdeserializer_stub.cpp"
         "../stub/m2mblockmessage_stub.cpp"
+        "../stub/m2mobjectinstance_stub.cpp"
+        "../stub/nsdlaccesshelper_stub.cpp"
         "m2mresourceinstancetest.cpp"
         "test_m2mresourceinstance.cpp"
         "../../../../source/m2mstringbufferbase.cpp"

@@ -135,3 +135,13 @@ TEST(M2MResource, test_execute_params)
 {
     m2m_resource->test_execute_params();
 }
+
+TEST(M2MResource, test_ctor)
+{
+    m2m_resource->test_ctor();
+}
+
+TEST(M2MResource, test_get_parent_object_instance)
+{
+    m2m_resource->test_get_parent_object_instance();
+}

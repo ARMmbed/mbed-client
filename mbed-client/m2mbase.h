@@ -239,6 +239,11 @@ public:
      * \return M2MObservationHandler object.
     */
     M2MObservationHandler* observation_handler();
+
+    /**
+     * \brief Sets the observation handler
+     * \param handler Observation handler
+    */
     void set_observation_handler(M2MObservationHandler *handler);
 
     /**
@@ -565,6 +570,7 @@ private:
     bool                        _is_under_observation;
 
 friend class Test_M2MBase;
+friend class Test_M2MObject;
 
 };
 
