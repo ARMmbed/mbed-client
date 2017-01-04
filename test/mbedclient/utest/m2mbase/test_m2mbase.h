@@ -21,7 +21,7 @@
 class Test_M2MBase : M2MBase
 {
 public:
-    Test_M2MBase();
+    Test_M2MBase(char* path);
 
     virtual ~Test_M2MBase();
 

@@ -38,18 +38,18 @@ void Test_M2MTLVSerializer::test_serialize_object()
     uint8_t *data = 0;
 
     M2MObject *object = new M2MObject("1", "1");
-    M2MObjectInstance* instance = new M2MObjectInstance(*object,"1",*object, "type", "1");
+    M2MObjectInstance* instance = new M2MObjectInstance(*object,"1", "type", "1");
 
     m2mobject_stub::instance_list.push_back(instance);
 
 
 
     M2MResource* resource = new M2MResource(*instance,
-                                            *instance,
                                             "1",
                                             "type",
                                             M2MResourceInstance::INTEGER,
-                                            false);
+                                            false,
+                                            "1");
 
 
     m2mobjectinstance_stub::resource_list.push_back(resource);
@@ -67,9 +67,7 @@ void Test_M2MTLVSerializer::test_serialize_object()
                                                                  "1",
                                                                  "type",
                                                                  M2MResourceInstance::STRING,
-                                                                 *m2mobject_stub::inst,
                                                                  0,
-                                                                 "1",
                                                                  "1",
                                                                  false);
 
@@ -77,9 +75,7 @@ void Test_M2MTLVSerializer::test_serialize_object()
                                                                    "2",
                                                                    "type",
                                                                    M2MResourceInstance::STRING,
-                                                                   *m2mobject_stub::inst,
                                                                    0,
-                                                                   "2",
                                                                    "2",
                                                                    false);
 
@@ -152,28 +148,25 @@ void Test_M2MTLVSerializer::test_serialize_object()
 void Test_M2MTLVSerializer::test_serialize_object_instance()
 {
     M2MObject *object = new M2MObject("1", "1");
-    M2MObjectInstance* instance = new M2MObjectInstance(*object,"1", *object,"type", "1");
+    M2MObjectInstance* instance = new M2MObjectInstance(*object,"1","type", "1");
 
     uint32_t size = 0;
     uint8_t *data = 0;
     m2mbase_stub::name_id_value = 0;
     M2MResource* resource = new M2MResource(*instance,
-                                            *instance,
                                             "1",
                                             "type",
                                             M2MResourceInstance::STRING,
-                                            false);
+                                            false,
+                                            "1");
 
     M2MResourceInstance* res_instance = new M2MResourceInstance(*resource,
                                                                 "1",
                                                                 "type",
                                                                 M2MResourceInstance::STRING,
-                                                                *instance,
                                                                 0,
                                                                 "1",
-                                                                "1",
                                                                 false);
-
 
     m2mobjectinstance_stub::resource_list.clear();
     m2mobjectinstance_stub::resource_list.push_back(resource);
@@ -209,25 +202,23 @@ void Test_M2MTLVSerializer::test_serialize_object_instance()
 void Test_M2MTLVSerializer::test_serialize_resource()
 {
     M2MObject *object = new M2MObject("1","1");
-    M2MObjectInstance* instance =new M2MObjectInstance(*object,"1", *object,"type", "1");
+    M2MObjectInstance* instance =new M2MObjectInstance(*object,"1","type", "1");
 
     uint32_t size = 0;
     uint8_t *data = 0;
     m2mbase_stub::name_id_value = 0;
     M2MResource* resource = new M2MResource(*instance,
-                                            *instance,
                                             "1",
                                             "type",
                                             M2MResourceInstance::INTEGER,
-                                            false);
+                                            false,
+                                            "1");
 
     M2MResourceInstance* res_instance = new M2MResourceInstance(*resource,
                                                                 "1",
                                                                 "type",
                                                                 M2MResourceInstance::INTEGER,
-                                                                *instance,
                                                                 0,
-                                                                "1",
                                                                 "1",
                                                                 false);
 
@@ -248,7 +239,6 @@ void Test_M2MTLVSerializer::test_serialize_resource()
         data = NULL;
     }
 
-
     m2mbase_stub::name_id_value = -1;
     data = serializer->serialize( m2mobject_stub::instance_list,size);
     CHECK(data == NULL);
@@ -261,31 +251,28 @@ void Test_M2MTLVSerializer::test_serialize_resource()
     m2mresource_stub::clear();
     m2mobjectinstance_stub::clear();
     m2mobject_stub::clear();
-
 }
 
 void Test_M2MTLVSerializer::test_serialize_resource_instance()
 {
     M2MObject *object = new M2MObject("1","1");
-    M2MObjectInstance* instance = new M2MObjectInstance(*object,"1", *object,"type", "1");
+    M2MObjectInstance* instance = new M2MObjectInstance(*object,"1","type", "1");
 
     uint32_t size = 0;
     uint8_t *data = 0;
     m2mbase_stub::name_id_value = 0;
     M2MResource* resource = new M2MResource(*instance,
-                                            *instance,
                                             "1",
                                             "type",
                                             M2MResourceInstance::INTEGER,
-                                            false);
+                                            false,
+                                            "1");
 
     M2MResourceInstance* res_instance = new M2MResourceInstance(*resource,
                                                                 "1",
                                                                 "type",
                                                                 M2MResourceInstance::INTEGER,
-                                                                *instance,
                                                                 0,
-                                                                "1",
                                                                 "1",
                                                                 false);
 

@@ -272,6 +272,7 @@ friend class Test_M2MFirmware;
 friend class Test_M2MTLVSerializer;
 friend class Test_M2MTLVDeserializer;
 friend class Test_M2MBase;
+friend class Test_M2MResourceInstance;
 };
 
 /**

@@ -13,39 +13,35 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef TEST_M2M_SERVER_H
-#define TEST_M2M_SERVER_H
 
-#include "m2mserver.h"
+#include "m2mstringbufferbase_stub.h"
 
-class Callback;
-
-class Test_M2MServer
+bool StringBufferBase::ensure_space(size_t max_size, size_t required_size) const
 {
-public:
-    Test_M2MServer();
-    virtual ~Test_M2MServer();
 
-    void test_create_resource();
+}
 
-    void test_create_resource_int();
+bool StringBufferBase::append(char *buff, size_t max_size, char data)
+{
 
-    void test_delete_resource();
+}
 
-    void test_set_resource_value_int();
+bool StringBufferBase::append(char *buff, size_t max_size, const char *data)
+{
 
-    void test_set_resource_value_string();
+}
 
-    void test_resource_value_int();
+bool StringBufferBase::append(char *buff, size_t max_size, const char *data, size_t data_len)
+{
 
-    void test_resource_value_string();
+}
 
-    void test_is_resource_present();
+bool StringBufferBase::append_int(char *buff, size_t max_size, uint16_t data)
+{
 
-    void test_total_resource_count();
+}
 
-    M2MServer* server;
-};
+int StringBufferBase::find_last_of(const char *buff, char search_char) const
+{
 
-#endif // TEST_M2M_SERVER_H
-
+}

@@ -13,39 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef TEST_M2M_SERVER_H
-#define TEST_M2M_SERVER_H
 
-#include "m2mserver.h"
+#ifndef M2MSTRINGBUFFERBASE_STUB_H
+#define M2MSTRINGBUFFERBASE_STUB_H
 
-class Callback;
+#include "m2mstringbufferbase.h"
 
-class Test_M2MServer
-{
-public:
-    Test_M2MServer();
-    virtual ~Test_M2MServer();
-
-    void test_create_resource();
-
-    void test_create_resource_int();
-
-    void test_delete_resource();
-
-    void test_set_resource_value_int();
-
-    void test_set_resource_value_string();
-
-    void test_resource_value_int();
-
-    void test_resource_value_string();
-
-    void test_is_resource_present();
-
-    void test_total_resource_count();
-
-    M2MServer* server;
-};
-
-#endif // TEST_M2M_SERVER_H
-
+#endif // M2MSTRINGBUFFERBASE_STUB_H

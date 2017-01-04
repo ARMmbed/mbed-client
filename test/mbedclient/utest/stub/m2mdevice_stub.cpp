@@ -28,8 +28,8 @@ void m2mdevice_stub::clear()
     resource = NULL;
 }
 
-M2MDevice::M2MDevice()
-: M2MObject("3", "3")
+M2MDevice::M2MDevice(char *path)
+: M2MObject("3", path)
 {
     m2mdevice_stub::string_value = new String("");
 }
@@ -41,7 +41,7 @@ M2MDevice::~M2MDevice()
 
 M2MDevice* M2MDevice::get_instance()
 {
-    return new M2MDevice();
+    return new M2MDevice("3");
 }
 
 void M2MDevice::delete_instance()

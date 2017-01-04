@@ -73,9 +73,9 @@ public:
 
     void test_get_parent_object_instance();
 
+    M2MObjectInstance* object_instance;
+    M2MObject* object;
     M2MResource* resource;
-    Callback *callback;
-
     Handler* handler;
 };
 

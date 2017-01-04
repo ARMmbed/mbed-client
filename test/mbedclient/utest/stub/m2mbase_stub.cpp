@@ -335,15 +335,7 @@ bool M2MBase::register_uri()
 
 const char* M2MBase::uri_path() const
 {
-    if (m2mbase_stub::base_type == M2MBase::ObjectInstance) {
-        return m2mbase_stub::object_instance_name;
-    } else if (m2mbase_stub::base_type == M2MBase::Object) {
-        return m2mbase_stub::string_value;
-    } else if (m2mbase_stub::base_type == M2MBase::Resource) {
-        return m2mbase_stub::string_value;
-    } else if (m2mbase_stub::base_type == M2MBase::ResourceInstance) {
-        return m2mbase_stub::string_value;
-    }
+    return m2mbase_stub::string_value;
 }
 
 bool M2MBase::is_under_observation() const

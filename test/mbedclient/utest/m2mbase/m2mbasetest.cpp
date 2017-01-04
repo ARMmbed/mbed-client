@@ -17,19 +17,19 @@
 #include "CppUTest/TestHarness.h"
 #include "test_m2mbase.h"
 
-
 TEST_GROUP(M2MBase)
 {
-  Test_M2MBase* m2m_base;
+    Test_M2MBase* m2m_base;
+    void setup() {
+        // Path ownership moved to m2mbase
+        char* path = (char*)malloc(5);
+        strcpy(path, "test");
+        m2m_base = new Test_M2MBase(path);
+    }
 
-  void setup()
-  {
-    m2m_base = new Test_M2MBase();
-  }
-  void teardown()
-  {
-    delete m2m_base;
-  }
+    void teardown() {
+        delete m2m_base;
+    }
 };
 
 TEST(M2MBase, Create)
@@ -261,5 +261,4 @@ TEST(M2MBase, test_ctor)
 {
     m2m_base->test_ctor();
 }
-
 

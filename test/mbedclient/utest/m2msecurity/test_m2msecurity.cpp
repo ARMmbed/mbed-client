@@ -22,32 +22,17 @@
 #include "m2mbase_stub.h"
 #include "nsdlaccesshelper_stub.h"
 
-class Callback : public M2MObjectCallback {
-
-public:
-
-    Callback(){}
-    ~Callback(){}
-    void notification_update(uint16_t obj_instance_id) {
-        visited = true;
-    }
-
-    void clear() {visited = false;}
-    bool visited;
-};
-
 Test_M2MSecurity::Test_M2MSecurity()
 {
-    callback = new Callback();
     M2MObject* obj = new M2MObject("name", "name");
-    m2mobject_stub::inst = new M2MObjectInstance(*obj,"name", *callback,"type", "name");
+    m2mobject_stub::inst = new M2MObjectInstance(*obj,"name","type", "name");
     m2mresource_stub::bool_value = true;
     m2mobjectinstance_stub::create_resource = new M2MResource(*m2mobject_stub::inst,
-                                                              *m2mobject_stub::inst,
                                                               "name",
                                                               "type",
                                                               M2MResourceInstance::STRING,
-                                                              false);
+                                                              false,
+                                                              "name");
     security = new M2MSecurity(M2MSecurity::Bootstrap);
 
     delete m2mobjectinstance_stub::create_resource;
@@ -65,17 +50,16 @@ Test_M2MSecurity::~Test_M2MSecurity()
     m2mresource_stub::clear();
     m2mbase_stub::clear();
     delete security;
-    delete callback;
 }
 
 void Test_M2MSecurity::test_create_resource_int()
 {
     m2mobjectinstance_stub::create_resource = new M2MResource(*m2mobject_stub::inst,
-                                                              *m2mobject_stub::inst,
                                                               "name",
                                                               "type",
                                                               M2MResourceInstance::STRING,
-                                                              false);
+                                                              false,
+                                                              "name");
 
     CHECK(security->create_resource(M2MSecurity::M2MServerUri,10) == NULL);
     CHECK(security->create_resource(M2MSecurity::BootstrapServer,10) == NULL);
@@ -99,11 +83,11 @@ void Test_M2MSecurity::test_delete_resource()
 {
     m2mresourceinstance_stub::bool_value = true;
     m2mobjectinstance_stub::resource = new M2MResource(*m2mobject_stub::inst,
-                                                       *m2mobject_stub::inst,
-                                                       "name",
-                                                       "type",
-                                                       M2MResourceInstance::STRING,
-                                                       false);
+                                                      "name",
+                                                      "type",
+                                                      M2MResourceInstance::STRING,
+                                                      false,
+                                                      "name");
 
     CHECK(security->delete_resource(M2MSecurity::SMSBindingSecretKey) == false);
     CHECK(security->delete_resource(M2MSecurity::SMSBindingKey) == false);
@@ -129,11 +113,11 @@ void Test_M2MSecurity::test_set_resource_value_string()
 {
     m2mresourceinstance_stub::bool_value = true;
     m2mobjectinstance_stub::resource = new M2MResource(*m2mobject_stub::inst,
-                                                       *m2mobject_stub::inst,
                                                        "name",
                                                        "type",
                                                        M2MResourceInstance::STRING,
-                                                       false);
+                                                       false,
+                                                       "name");
 
     CHECK(security->set_resource_value(M2MSecurity::M2MServerUri,"test") == true);
 
@@ -157,11 +141,11 @@ void Test_M2MSecurity::test_set_resource_value_int()
 {
     m2mresourceinstance_stub::bool_value = true;
     m2mobjectinstance_stub::resource = new M2MResource(*m2mobject_stub::inst,
-                                                       *m2mobject_stub::inst,
                                                        "name",
                                                        "type",
                                                        M2MResourceInstance::STRING,
-                                                       false);
+                                                       false,
+                                                       "name");
 
     CHECK(security->set_resource_value(M2MSecurity::M2MServerUri,10) == false);
     CHECK(security->set_resource_value(M2MSecurity::SMSBindingKey,10) == false);
@@ -189,11 +173,11 @@ void Test_M2MSecurity::test_set_resource_value_buffer()
     uint16_t length = (uint16_t)sizeof(value);
 
     m2mobjectinstance_stub::resource = new M2MResource(*m2mobject_stub::inst,
-                                                       *m2mobject_stub::inst,
                                                        "name",
                                                        "type",
                                                        M2MResourceInstance::STRING,
-                                                       false);
+                                                       false,
+                                                       "name");
 
     CHECK(security->set_resource_value(M2MSecurity::Secretkey,value,length) == true);
     CHECK(security->set_resource_value(M2MSecurity::ServerPublicKey,value,length) == true);
@@ -227,11 +211,11 @@ void Test_M2MSecurity::test_resource_value_int()
     m2mresourceinstance_stub::int_value = (uint16_t)size;
 
     m2mobjectinstance_stub::resource = new M2MResource(*m2mobject_stub::inst,
-                                                       *m2mobject_stub::inst,
                                                        "name",
                                                        "type",
                                                        M2MResourceInstance::STRING,
-                                                       false);
+                                                       false,
+                                                       "name");
 
     CHECK(security->resource_value_int(M2MSecurity::SecurityMode) == 10);
     CHECK(security->resource_value_int(M2MSecurity::SMSSecurityMode) == 10);
@@ -278,11 +262,11 @@ void Test_M2MSecurity::test_resource_value_string()
     m2mresourceinstance_stub::int_value = (uint16_t)sizeof(value);
 
     m2mobjectinstance_stub::resource = new M2MResource(*m2mobject_stub::inst,
-                                                       *m2mobject_stub::inst,
                                                        "name",
                                                        "type",
                                                        M2MResourceInstance::STRING,
-                                                       false);
+                                                       false,
+                                                       "name");
 
     CHECK(security->resource_value_string(M2MSecurity::M2MServerUri) == test);
 
@@ -318,11 +302,11 @@ void Test_M2MSecurity::test_resource_value_buffer()
     m2mresourceinstance_stub::int_value = (uint16_t)sizeof(value);
 
     m2mobjectinstance_stub::resource = new M2MResource(*m2mobject_stub::inst,
-                                                       *m2mobject_stub::inst,
                                                        "name",
                                                        "type",
                                                        M2MResourceInstance::STRING,
-                                                       false);
+                                                       false,
+                                                       "name");
 
     CHECK(security->resource_value_buffer(M2MSecurity::Secretkey,out_value) != 0);
     CHECK(security->resource_value_buffer(M2MSecurity::ServerPublicKey,out_value) != 0);
@@ -357,11 +341,11 @@ void Test_M2MSecurity::test_resource_value_buffer()
 void Test_M2MSecurity::test_is_resource_present()
 {
     m2mobjectinstance_stub::resource = new M2MResource(*m2mobject_stub::inst,
-                                                       *m2mobject_stub::inst,
                                                        "name",
                                                        "type",
                                                        M2MResourceInstance::STRING,
-                                                       false);
+                                                       false,
+                                                       "name");
 
     CHECK(security->is_resource_present(M2MSecurity::M2MServerUri) == true);
 
@@ -374,19 +358,19 @@ void Test_M2MSecurity::test_is_resource_present()
 void Test_M2MSecurity::test_total_resource_count()
 {
     M2MResource *res = new M2MResource(*m2mobject_stub::inst,
-                                       *m2mobject_stub::inst,
                                        "name",
                                        "type",
                                        M2MResourceInstance::STRING,
-                                       false);
+                                       false,
+                                       "name");
 
     m2mobjectinstance_stub::resource_list.push_back(res);
     M2MResource *res2 = new M2MResource(*m2mobject_stub::inst,
-                                        *m2mobject_stub::inst,
                                         "name",
                                         "type",
                                         M2MResourceInstance::STRING,
-                                        false);
+                                        false,
+                                        "name");
 
     m2mobjectinstance_stub::resource_list.push_back(res2);
 
@@ -401,11 +385,11 @@ void Test_M2MSecurity::test_total_resource_count()
 void Test_M2MSecurity::test_m2m_server_constructor()
 {
     m2mobjectinstance_stub::create_resource = new M2MResource(*m2mobject_stub::inst,
-                                                              *m2mobject_stub::inst,
                                                               "name",
                                                               "type",
                                                               M2MResourceInstance::STRING,
-                                                              false);
+                                                              false,
+                                                              "name");
 
     M2MSecurity* sec = new M2MSecurity(M2MSecurity::M2MServer);
     CHECK(M2MSecurity::M2MServer == sec->server_type());

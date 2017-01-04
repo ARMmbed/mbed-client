@@ -65,10 +65,10 @@ public:
     void observation_to_be_sent(m2m::Vector<uint16_t>,bool){}
 };
 
-Test_M2MBase::Test_M2MBase()
-    :M2MBase("name",M2MBase::Dynamic, "type", "name", false)
-{
+Test_M2MBase::Test_M2MBase(char* path)
+    : M2MBase("name",M2MBase::Dynamic, "type", path, false)
 
+{
 }
 
 Test_M2MBase::~Test_M2MBase()
@@ -107,7 +107,7 @@ void Test_M2MBase::test_set_interface_description()
 void Test_M2MBase::test_uri_path()
 {
     // Default value in ctor
-    String test = "name";
+    String test = "test";
     CHECK(test == uri_path());
 }
 
@@ -342,9 +342,16 @@ void Test_M2MBase::test_observation_handler()
 
 void Test_M2MBase::test_id_number()
 {
-    M2MBase b("10", M2MBase::Static, "", "10", false);
-    CHECK(b.name_id() == 10);
-    M2MBase * test1 = new M2MBase("66567",M2MBase::Static, "", "66567", false);
+    char* path = (char*)malloc(3);
+    strcpy(path, "10");
+    M2MBase* b = new M2MBase("10", M2MBase::Static, "", path, false);
+    CHECK(b->name_id() == 10);
+    delete b;
+
+    char* path1 = (char*)malloc(6);
+    strcpy(path1, "66567");
+
+    M2MBase * test1 = new M2MBase("66567",M2MBase::Static, "", path1, false);
     CHECK(test1->name_id() == -1);
     delete test1;
 }
@@ -440,9 +447,14 @@ void Test_M2MBase::test_get_nsdl_resource()
 
 void Test_M2MBase::test_create_path()
 {
-    M2MObject* object = new M2MObject("name", "name");
+    char* path1 = (char*)malloc(5);
+    strcpy(path1, "name");
+    M2MObject* object = new M2MObject("name", path1);
+
+    char* path2 = (char*)malloc(7);
+    strcpy(path2, "name/0");
     M2MObjectInstance* object_instance =
-            new M2MObjectInstance(*object, "name",*object,"", "name/0");
+            new M2MObjectInstance(*object, "name","", path2);
 
     String path = "name/1";
     String res_path = "name/0/resource";
@@ -459,12 +471,18 @@ void Test_M2MBase::test_create_path()
     CHECK(res_path == result);
     free(result);
 
-    /*M2MResource* res = new M2MResource(*object_instance,
-                                       *object_instance,
+    /*char* path3 = (char*)malloc(9);
+    strcpy(path3, "resource");
+    M2MResource* res = new M2MResource(*object_instance,
                                        "resource",
                                        "type",
                                        M2MResourceInstance::INTEGER,
-                                       false);*/
+                                       false,
+                                       path3);*/
+
+    //result = create_path(*res, "resource");
+    //CHECK(res_path == result);
+    //free(result);
 
     delete object_instance;
     delete object;

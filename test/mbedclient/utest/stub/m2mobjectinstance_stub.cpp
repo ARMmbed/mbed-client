@@ -42,7 +42,6 @@ void m2mobjectinstance_stub::clear()
 }
 
 M2MObjectInstance::M2MObjectInstance(M2MObject& parent, const String &object_name,
-                                     M2MObjectCallback &object_callback,
                                      const String &resource_type,
                                      char *path,
                                      bool external_blockwise_store)
@@ -51,15 +50,12 @@ M2MObjectInstance::M2MObjectInstance(M2MObject& parent, const String &object_nam
           resource_type,
           path,
           external_blockwise_store),
-  _parent(parent),
-  _object_callback(object_callback)
+  _parent(parent)
 {
 }
 
-M2MObjectInstance::M2MObjectInstance(M2MObject& parent, const lwm2m_parameters_s* static_res,
-                                     M2MObjectCallback &object_callback)
-: M2MBase(static_res), _parent(parent),
-  _object_callback(object_callback)
+M2MObjectInstance::M2MObjectInstance(M2MObject& parent, const lwm2m_parameters_s* static_res)
+: M2MBase(static_res), _parent(parent)
 {
 
 }

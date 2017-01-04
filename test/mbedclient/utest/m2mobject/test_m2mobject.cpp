@@ -84,7 +84,7 @@ void Test_M2MObject::test_remove_object_instance()
 {
     m2mbase_stub::string_value = "name";
 
-    M2MObjectInstance *ins = new M2MObjectInstance(*object,"name",*object, "type", "");
+    M2MObjectInstance *ins = new M2MObjectInstance(*object,"name","type", "");
     object->set_instance_id(0);
     object->_instance_list.push_back(ins);
 
@@ -95,7 +95,7 @@ void Test_M2MObject::test_remove_object_instance()
 
 void Test_M2MObject::test_object_instance()
 {
-    M2MObjectInstance *ins = new M2MObjectInstance(*object, "name", *object, "type", "");
+    M2MObjectInstance *ins = new M2MObjectInstance(*object, "name", "type", "");
     object->set_instance_id(0);
     object->_instance_list.push_back(ins);
 
@@ -111,11 +111,11 @@ void Test_M2MObject::test_object_instance()
 void Test_M2MObject::test_instances()
 {
 
-    M2MObjectInstance *ins = new M2MObjectInstance(*object, "name", *object, "type", "");
+    M2MObjectInstance *ins = new M2MObjectInstance(*object, "name", "type", "");
     ins->set_instance_id(0);
     object->_instance_list.push_back(ins);
 
-    M2MObjectInstance *ins1 = new M2MObjectInstance(*object, "name", *object, "type", "");
+    M2MObjectInstance *ins1 = new M2MObjectInstance(*object, "name","type", "");
     ins1->set_instance_id(1);
     object->_instance_list.push_back(ins1);
 
@@ -131,11 +131,11 @@ void Test_M2MObject::test_instances()
 
 void Test_M2MObject::test_instance_count()
 {
-    M2MObjectInstance *ins = new M2MObjectInstance(*object, "name", *object, "type", "");
+    M2MObjectInstance *ins = new M2MObjectInstance(*object, "name", "type", "");
     object->set_instance_id(0);
     object->_instance_list.push_back(ins);
 
-    M2MObjectInstance *ins1 = new M2MObjectInstance(*object, "name", *object, "type", "");
+    M2MObjectInstance *ins1 = new M2MObjectInstance(*object, "name", "type", "");
     object->set_instance_id(1);
     object->_instance_list.push_back(ins1);
 
@@ -153,7 +153,7 @@ void Test_M2MObject::test_base_type()
 
 void Test_M2MObject::test_handle_get_request()
 {
-    M2MObjectInstance *ins = new M2MObjectInstance(*object, "name", *object, "type", "");
+    M2MObjectInstance *ins = new M2MObjectInstance(*object, "name", "type", "");
     object->set_instance_id(0);
     object->_instance_list.push_back(ins);
 
@@ -403,7 +403,7 @@ void Test_M2MObject::test_handle_post_request()
 
     object->_max_instance_count = 0;
 
-    M2MObjectInstance *ins = new M2MObjectInstance(*object, "name", *object, "type", "");
+    M2MObjectInstance *ins = new M2MObjectInstance(*object, "name", "type", "");
     ins->set_instance_id(0);
     object->_instance_list.push_back(ins);
     coap_header->content_format = sn_coap_content_format_e(-1);
