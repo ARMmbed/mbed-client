@@ -453,11 +453,12 @@ void Test_M2MBase::test_create_path()
 
     char* path2 = (char*)malloc(7);
     strcpy(path2, "name/0");
-    M2MObjectInstance* object_instance =
+    m2mresource_stub::object_instance =
             new M2MObjectInstance(*object, "name","", path2);
 
     String path = "name/1";
     String res_path = "name/0/resource";
+    String res_path_instance = "name/0/resource/1";
 
     char* result = create_path(*object, "1");
     CHECK(path == result);
@@ -467,26 +468,27 @@ void Test_M2MBase::test_create_path()
     CHECK(path == result);
     free(result);
 
-    result = create_path(*object_instance, "resource");
+    result = create_path(*m2mresource_stub::object_instance, "resource");
     CHECK(res_path == result);
     free(result);
 
-    /*char* path3 = (char*)malloc(9);
+    char* path3 = (char*)malloc(9);
     strcpy(path3, "resource");
-    M2MResource* res = new M2MResource(*object_instance,
+
+    M2MResource* res = new M2MResource(*m2mresource_stub::object_instance,
                                        "resource",
                                        "type",
                                        M2MResourceInstance::INTEGER,
                                        false,
-                                       path3);*/
+                                       path3);
 
-    //result = create_path(*res, "resource");
-    //CHECK(res_path == result);
-    //free(result);
+    result = create_path(*res, 1);
+    CHECK(res_path_instance == result);
+    free(result);
 
-    delete object_instance;
+    delete m2mresource_stub::object_instance;
     delete object;
-    //delete res;
+    delete res;
 }
 
 void Test_M2MBase::test_create_report_handler()

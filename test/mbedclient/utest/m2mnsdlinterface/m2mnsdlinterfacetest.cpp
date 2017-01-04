@@ -32,7 +32,6 @@ TEST_GROUP(M2MNsdlInterface)
   }
 };
 
-
 TEST(M2MNsdlInterface, create)
 {
     CHECK(m2m_nsdl_interface->nsdl != NULL);
@@ -108,7 +107,6 @@ TEST(M2MNsdlInterface, resource_callback_get)
     m2m_nsdl_interface->test_resource_callback_get();
 }
 
-
 TEST(M2MNsdlInterface, resource_callback_post)
 {
     m2m_nsdl_interface->test_resource_callback_post();
@@ -183,4 +181,3 @@ TEST(M2MNsdlInterface, endpoint_name)
 {
     m2m_nsdl_interface->test_endpoint_name();
 }
-

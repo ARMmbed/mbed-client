@@ -61,6 +61,8 @@ namespace m2mbase_stub
     extern int32_t name_id_value;
     extern const char *string_value;
     extern const char *object_instance_name;
+    extern const char *resource_name;
+    extern const char *resource_name_inst;
     extern bool bool_value;
     extern M2MBase::BaseType base_type;
     extern M2MBase::Mode mode_value;
@@ -71,9 +73,15 @@ namespace m2mbase_stub
     extern M2MBase::Observation observation_level_value;
     extern bool is_value_updated_function_set;
     void clear();
-    extern uint8_t* token;
-    extern uint32_t token_len;
+    extern uint8_t* object_token;
+    extern uint32_t object_token_len;
+    extern uint8_t* resource_token;
+    extern uint32_t resource_token_len;
+    extern uint8_t* object_inst_token;
+    extern uint32_t object_inst_token_len;
     extern sn_nsdl_dynamic_resource_parameters_s *nsdl_resource;
+    extern bool find_resource;
+    extern int32_t ret_counter;
 }
 
 #endif // M2M_BASE_STUB_H

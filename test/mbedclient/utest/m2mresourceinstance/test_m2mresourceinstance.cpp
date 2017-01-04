@@ -99,7 +99,7 @@ public:
 Test_M2MResourceInstance::Test_M2MResourceInstance()
 {
     handler = new Handler();
-    M2MObject* obj = new M2MObject("name", "name");
+    obj = new M2MObject("name", "name");
     m2mresource_stub::object_instance = new M2MObjectInstance(*obj, "name", "", "");
     m2mobjectinstance_stub::resource = new M2MResource(*m2mresource_stub::object_instance,
                                                        "name",
@@ -115,8 +115,6 @@ Test_M2MResourceInstance::Test_M2MResourceInstance()
                           0,
                           "name",
                           false);
-
-    delete obj;
 }
 
 Test_M2MResourceInstance::~Test_M2MResourceInstance()
@@ -124,6 +122,7 @@ Test_M2MResourceInstance::~Test_M2MResourceInstance()
     delete m2mresource_stub::object_instance;
     delete m2mobjectinstance_stub::resource;
     delete resource_instance;
+    delete obj;
     delete handler;
 }
 
@@ -602,8 +601,8 @@ void Test_M2MResourceInstance::test_set_resource_observer()
 
 void Test_M2MResourceInstance::test_get_object_name()
 {
-    //resource_instance->_object_name = "object";
-    //CHECK(resource_instance->object_name() == "object");
+    m2mbase_stub::string_value = "name";
+    CHECK(resource_instance->object_name() == "name");
 }
 
 void Test_M2MResourceInstance::test_get_object_instance_id()

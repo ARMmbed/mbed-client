@@ -261,4 +261,3 @@ TEST(M2MBase, test_ctor)
 {
     m2m_base->test_ctor();
 }
-

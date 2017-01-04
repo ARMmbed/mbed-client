@@ -26,6 +26,8 @@ int32_t m2mbase_stub::name_id_value;
 bool m2mbase_stub::bool_value;
 const char *m2mbase_stub::string_value;
 const char *m2mbase_stub::object_instance_name;
+const char *m2mbase_stub::resource_name;
+const char *m2mbase_stub::resource_name_inst;
 M2MBase::BaseType m2mbase_stub::base_type;
 M2MBase::Operation m2mbase_stub::operation;
 M2MBase::Mode m2mbase_stub::mode_value;
@@ -35,9 +37,15 @@ void *m2mbase_stub::void_value;
 M2MObservationHandler *m2mbase_stub::observe;
 M2MReportHandler *m2mbase_stub::report;
 bool m2mbase_stub::is_value_updated_function_set;
-uint8_t *m2mbase_stub::token;
-uint32_t m2mbase_stub::token_len;
+uint8_t *m2mbase_stub::object_inst_token;
+uint32_t m2mbase_stub::object_inst_token_len;
+uint8_t *m2mbase_stub::object_token;
+uint32_t m2mbase_stub::object_token_len;
+uint8_t *m2mbase_stub::resource_token;
+uint32_t m2mbase_stub::resource_token_len;
 sn_nsdl_dynamic_resource_parameters_s *m2mbase_stub::nsdl_resource;
+bool m2mbase_stub::find_resource;
+int32_t m2mbase_stub::ret_counter;
 
 void m2mbase_stub::clear()
 {
@@ -47,6 +55,8 @@ void m2mbase_stub::clear()
     uint32_value = 0;
     string_value = NULL;
     object_instance_name = NULL;
+    resource_name = NULL;
+    resource_name_inst = NULL;
     name_id_value = -1;
     mode_value = M2MBase::Static;
     base_type = M2MBase::Object;
@@ -57,8 +67,14 @@ void m2mbase_stub::clear()
     observe = NULL;
     report = NULL;
     is_value_updated_function_set = false;
-    token = NULL;
-    token_len = 0;
+    object_token = NULL;
+    object_token_len = 0;
+    resource_token = NULL;
+    resource_token_len = 0;
+    object_inst_token = NULL;
+    object_inst_token_len = 0;
+    find_resource = false;
+    ret_counter = 0;
 }
 
 M2MBase::M2MBase(const String& resource_name,
@@ -77,7 +93,7 @@ M2MBase::M2MBase(const String& resource_name,
   _observation_level(M2MBase::None),
   _is_under_observation(false)
 {
-    //m2mbase_stub::path_value = path;
+
 }
 
 M2MBase::M2MBase(const lwm2m_parameters_s *s):
@@ -93,10 +109,8 @@ M2MBase::M2MBase(const lwm2m_parameters_s *s):
 {
 }
 
-
 M2MBase::~M2MBase()
 {
-    //free(m2mbase_stub::path_value);
 }
 
 void M2MBase::set_operation(M2MBase::Operation opr)
@@ -216,10 +230,34 @@ void M2MBase::get_observation_token(uint8_t *&token,
         free(token);
         token = NULL;
     }
-    token = (uint8_t *)malloc(m2mbase_stub::token_len);
-    if(token) {
-        length = m2mbase_stub::token_len;
-        memcpy((uint8_t *)token, (uint8_t *)m2mbase_stub::token, length);
+
+    if (m2mbase_stub::find_resource) {
+        if (m2mbase_stub::ret_counter == 1) {
+            token = (uint8_t *)malloc(m2mbase_stub::object_inst_token_len);
+            if(token) {
+                length = m2mbase_stub::object_inst_token_len;
+                memcpy((uint8_t *)token, (uint8_t *)m2mbase_stub::object_inst_token, length);
+            }
+        } else if (m2mbase_stub::ret_counter == 2) {
+            token = (uint8_t *)malloc(m2mbase_stub::resource_token_len);
+            if(token) {
+                length = m2mbase_stub::resource_token_len;
+                memcpy((uint8_t *)token, (uint8_t *)m2mbase_stub::resource_token, length);
+            }
+        } else {
+            token = (uint8_t *)malloc(m2mbase_stub::object_token_len);
+            if(token) {
+                length = m2mbase_stub::object_token_len;
+                memcpy((uint8_t *)token, (uint8_t *)m2mbase_stub::object_token, length);
+            }
+        }
+        m2mbase_stub::ret_counter++;
+    } else {
+        token = (uint8_t *)malloc(m2mbase_stub::object_token_len);
+        if(token) {
+            length = m2mbase_stub::object_token_len;
+            memcpy((uint8_t *)token, (uint8_t *)m2mbase_stub::object_token, length);
+        }
     }
 }
 
@@ -335,7 +373,20 @@ bool M2MBase::register_uri()
 
 const char* M2MBase::uri_path() const
 {
-    return m2mbase_stub::string_value;
+    if (m2mbase_stub::find_resource) {
+        m2mbase_stub::ret_counter++;
+        if (m2mbase_stub::ret_counter == 2) {
+            return m2mbase_stub::object_instance_name;
+        } else if (m2mbase_stub::ret_counter == 3) {
+            return m2mbase_stub::resource_name;
+        } else if (m2mbase_stub::ret_counter == 4 || m2mbase_stub::ret_counter == 5) {
+            return m2mbase_stub::resource_name_inst;
+        } else {
+            return m2mbase_stub::string_value;
+        }
+    } else {
+        return m2mbase_stub::string_value;
+    }
 }
 
 bool M2MBase::is_under_observation() const

@@ -71,6 +71,7 @@ public:
 
     M2MResourceInstance* resource_instance;
 
+    M2MObject* obj;
     Callback *callback;
 
     Handler* handler;

@@ -648,14 +648,23 @@ void Test_M2MNsdlInterface::test_received_from_server_callback()
     coap_header->token_len = 4;
 
     M2MResource res2(*m2mobject_stub::inst, "test","test",M2MResourceInstance::STRING,false, "test");
-    m2mbase_stub::token = token;
-    m2mbase_stub::token_len = 4;
+    m2mbase_stub::object_token = token;
+    m2mbase_stub::object_token_len = 4;
     m2mobject_stub::base_type = M2MBase::Resource;
     res2.set_observation_token(token, 4);
 
     m2mobjectinstance_stub::resource_list.push_back(&res2);
     CHECK(0 == nsdl->received_from_server_callback(handle,coap_header,NULL));
 
+    // Test RESET message
+    coap_header->msg_type = COAP_MSG_TYPE_RESET;
+    CHECK(0 == nsdl->received_from_server_callback(handle,coap_header,NULL));
+    m2mobject_stub::base_type = M2MBase::Object;
+    CHECK(0 == nsdl->received_from_server_callback(handle,coap_header,NULL));
+    m2mobject_stub::base_type = M2MBase::ObjectInstance;
+    CHECK(0 == nsdl->received_from_server_callback(handle,coap_header,NULL));
+    m2mobject_stub::base_type = M2MBase::ResourceInstance;
+    CHECK(0 == nsdl->received_from_server_callback(handle,coap_header,NULL));
     free(token);
     delete m2mobject_stub::inst;
     delete obj;
@@ -991,6 +1000,8 @@ void Test_M2MNsdlInterface::test_resource_callback()
     coap_header->msg_code = COAP_MSG_CODE_REQUEST_POST;
 
     CHECK(nsdl->resource_callback(NULL,coap_header,address,SN_NSDL_PROTOCOL_COAP) ==0);
+    m2mobject_stub::base_type = M2MBase::ResourceInstance;
+    CHECK(nsdl->resource_callback(NULL,coap_header,address,SN_NSDL_PROTOCOL_COAP) ==0);
 
     delete object;
     free(m2mbase_stub::nsdl_resource->static_resource_parameters->path);
@@ -1222,7 +1233,7 @@ void Test_M2MNsdlInterface::test_resource_callback_delete()
     CHECK(nsdl->resource_callback(NULL,coap_header,address,SN_NSDL_PROTOCOL_HTTP) ==0);
 
     common_stub::int_value = 0;
-    m2mbase_stub::string_value = "name";
+    m2mbase_stub::string_value = "name/0";
     M2MObject *object = new M2MObject("name", "name");
     M2MObjectInstance* instance = new M2MObjectInstance(*object,"name", "", "name/0");
     m2mbase_stub::int_value = 0;
@@ -1236,7 +1247,7 @@ void Test_M2MNsdlInterface::test_resource_callback_delete()
 
     CHECK(nsdl->resource_callback(NULL,coap_header,address,SN_NSDL_PROTOCOL_HTTP) ==0);
 
-    m2mobjectinstance_stub::base_type = M2MBase::Object;
+    m2mobject_stub::base_type = M2MBase::Object;
     CHECK(nsdl->resource_callback(NULL,coap_header,address,SN_NSDL_PROTOCOL_HTTP) ==0);
 
     delete instance;
@@ -1598,16 +1609,35 @@ void Test_M2MNsdlInterface::test_find_resource()
 {
     m2mbase_stub::string_value = "name";
     m2mbase_stub::object_instance_name = "name/0";
-    M2MObject *object = new M2MObject("name", "name");
+    m2mbase_stub::resource_name_inst = "name/0/resource_name/0";
+    m2mbase_stub::resource_name = "name/0/resource_name";
+    m2mbase_stub::find_resource = true;
     uint8_t *token = (uint8_t*) malloc(4);
     token[0] = 't';
     token[1] = 'o';
     token[2] = 'k';
     token[3] = 'e';
-    m2mbase_stub::token = token;
-    m2mbase_stub::token_len = 4;
+    m2mbase_stub::object_token = token;
+    m2mbase_stub::object_token_len = 4;
 
-    M2MObjectInstance *object_instance = new M2MObjectInstance(*object,"name/0", "","");
+    uint8_t *inst_token = (uint8_t*) malloc(4);
+    inst_token[0] = 't';
+    inst_token[1] = 'o';
+    inst_token[2] = 'k';
+    inst_token[3] = 'k';
+    m2mbase_stub::object_inst_token = inst_token;
+    m2mbase_stub::object_inst_token_len = 4;
+
+    uint8_t *resource_token = (uint8_t*) malloc(4);
+    resource_token[0] = 't';
+    resource_token[1] = 'k';
+    resource_token[2] = 'k';
+    resource_token[3] = 'k';
+    m2mbase_stub::resource_token = resource_token;
+    m2mbase_stub::resource_token_len = 4;
+
+    M2MObject *object = new M2MObject("name", "name");
+    M2MObjectInstance *object_instance = new M2MObjectInstance(*object,"name/0", "","name/0");
     M2MResource *resource = new M2MResource(*object_instance,
                                             "resource_name",
                                             "resource_type",
@@ -1616,9 +1646,9 @@ void Test_M2MNsdlInterface::test_find_resource()
                                             "resource_name");
 
     M2MResourceInstance *resource_instance = new M2MResourceInstance(*resource,
-                                                                     "name",
+                                                                     "0",
                                                                      "resource_type",
-                                                                     M2MResourceInstance::INTEGER,0,"",false);
+                                                                     M2MResourceInstance::INTEGER,0,"0",false);
 
     m2mobjectinstance_stub::base_type = M2MBase::ObjectInstance;
     m2mobject_stub::instance_list.push_back(object_instance);
@@ -1626,30 +1656,28 @@ void Test_M2MNsdlInterface::test_find_resource()
     m2mresource_stub::list.push_back(resource_instance);
     m2mobject_stub::base_type = M2MBase::Object;
     nsdl->_object_list.push_back(object);
-
+    m2mresource_stub::bool_value = true;
     CHECK(nsdl->find_resource("name") != NULL);
+    CHECK(nsdl->find_resource("name1") == NULL);
     CHECK(nsdl->find_resource("name", token, 4) != NULL);
     CHECK(nsdl->find_resource("name", token, 5) == NULL);
 
-    m2mbase_stub::int_value  = 0;
-    m2mobject_stub::base_type = M2MBase::ObjectInstance;
+    m2mbase_stub::ret_counter = 0;
     CHECK(nsdl->find_resource("name/0") != NULL);
+    m2mbase_stub::ret_counter = 0;
+    CHECK(nsdl->find_resource("name/0", inst_token, 4) != NULL);
+    m2mbase_stub::ret_counter = 0;
 
-    CHECK(nsdl->find_resource("name/0/name") != NULL);
+    CHECK(nsdl->find_resource("name/0/resource_name") != NULL);
+    m2mbase_stub::ret_counter = 0;
+    CHECK(nsdl->find_resource("name/0/resource_name", resource_token, 4) != NULL);
 
-    m2mresource_stub::bool_value = true;
-
-    CHECK(nsdl->find_resource("name/0/name/0") != NULL);
-    CHECK(nsdl->find_resource("name1") == NULL);
-    CHECK(nsdl->find_resource("name/1") == NULL);
-    CHECK(nsdl->find_resource("name/0/name1") == NULL);
-    CHECK(nsdl->find_resource("name/0/name/1") == NULL);
-    CHECK(nsdl->find_resource(object,"0", token, 4) != NULL);
-    CHECK(nsdl->find_resource(object,"0", token, 5) == NULL);
-    CHECK(nsdl->find_resource(object_instance,"0", token, 4) != NULL);
-    CHECK(nsdl->find_resource(object_instance,"0", token, 5) == NULL);
+    m2mbase_stub::ret_counter = 0;
+    CHECK(nsdl->find_resource("name/0/resource_name/0") != NULL);
 
     free(token);
+    free(inst_token);
+    free(resource_token);
 
     m2mobject_stub::clear();
     m2mobjectinstance_stub::clear();
