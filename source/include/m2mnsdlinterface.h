@@ -33,6 +33,7 @@ class M2MResourceInstance;
 class M2MNsdlObserver;
 class M2MServer;
 class M2MTimer;
+class M2MConnectionHandler;
 
 typedef Vector<M2MObject *> M2MObjectList;
 
@@ -212,6 +213,11 @@ public:
      */
     const String& endpoint_name() const;
 
+    /**
+     * @brief Set the connection handler
+     */
+    void set_connection_handler(M2MConnectionHandler *connection_handler);
+
 protected: // from M2MTimerObserver
 
     virtual void timer_expired(M2MTimerObserver::Type type);
@@ -358,6 +364,16 @@ private:
     */
     void handle_bootstrap_error();
 
+    /**
+     * @brief Claim
+     */
+    void claim_mutex();
+
+    /**
+     * @brief Release
+     */
+    void release_mutex();
+
 private:
 
     M2MNsdlObserver                   &_observer;
@@ -366,6 +382,7 @@ private:
     M2MSecurity                       *_security; // Not owned
     M2MTimer                          *_nsdl_exceution_timer;
     M2MTimer                          *_registration_timer;
+    M2MConnectionHandler              *_connection_handler;
     sn_nsdl_ep_parameters_s           *_endpoint;
     sn_nsdl_resource_info_s           *_resource;
     sn_nsdl_addr_s                     _sn_nsdl_address;

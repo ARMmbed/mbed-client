@@ -20,12 +20,15 @@
 int m2mconnectionhandler_stub::int_value;
 uint16_t m2mconnectionhandler_stub::uint_value;
 bool m2mconnectionhandler_stub::bool_value;
+int m2mconnectionhandler_stub::mutex_count;
 
 void m2mconnectionhandler_stub::clear()
 {
     int_value = -1;
     uint_value = 0;
     bool_value = false;
+    mutex_count = 0;
+
 }
 
 M2MConnectionHandler::M2MConnectionHandler(M2MConnectionObserver &observer,
@@ -87,8 +90,12 @@ void M2MConnectionHandler::set_platform_network_handler(void *)
 
 void M2MConnectionHandler::claim_mutex()
 {
+    printf("XXXXXXXXXXXXXXXXX");
+    m2mconnectionhandler_stub::mutex_count++;
 }
 
 void M2MConnectionHandler::release_mutex()
 {
+    printf("YYYYYYYYYYYYYYYYY");
+    m2mconnectionhandler_stub::mutex_count--;
 }

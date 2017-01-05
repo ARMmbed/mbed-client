@@ -84,7 +84,7 @@ M2MInterfaceImpl::M2MInterfaceImpl(M2MInterfaceObserver& observer,
     _security_connection = new M2MConnectionSecurity(sec_mode);
     //Here we must use TCP still
     _connection_handler = new M2MConnectionHandler(*this, _security_connection, mode, stack);
-    __connection_handler = _connection_handler;
+    _nsdl_interface->set_connection_handler(_connection_handler);
     _connection_handler->bind_connection(_listen_port);
 #ifndef MBED_CLIENT_DISABLE_BOOTSTRAP_FEATURE
     _bootstrap_timer = new M2MTimer(*this);
@@ -99,7 +99,6 @@ M2MInterfaceImpl::~M2MInterfaceImpl()
     delete _queue_sleep_timer;
     delete _nsdl_interface;
     _connection_handler->stop_listening();
-    __connection_handler = NULL;
     delete _connection_handler;
     delete _retry_timer;
     delete _bootstrap_timer;

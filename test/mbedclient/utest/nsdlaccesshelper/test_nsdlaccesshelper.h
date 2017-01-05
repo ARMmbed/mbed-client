@@ -42,10 +42,6 @@ public:
 
     void test_socket_free();
 
-    void test_mutex_claim();
-
-    void test_mutex_release();
-
     TestObserver *observer;
 private:
     void clear_list();

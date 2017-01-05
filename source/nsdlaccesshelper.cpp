@@ -19,9 +19,6 @@
 #include <stdlib.h>
 
 // callback function for NSDL library to call into
-M2MConnectionHandler *__connection_handler = NULL;
-
-
 uint8_t __nsdl_c_callback(struct nsdl_s *nsdl_handle,
                           sn_coap_hdr_s *received_coap_ptr,
                           sn_nsdl_addr_s *address,
@@ -104,16 +101,3 @@ void __socket_free(void * context, void * ptr)
     free(ptr);
 }
 
-void __mutex_claim()
-{
-    if(__connection_handler) {
-        __connection_handler->claim_mutex();
-    }
-}
-
-void __mutex_release()
-{
-    if(__connection_handler) {
-        __connection_handler->release_mutex();
-    }
-}
