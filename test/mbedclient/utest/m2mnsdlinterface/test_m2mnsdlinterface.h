@@ -88,6 +88,10 @@ public:
 
     void test_get_nsdl_handle();
 
+    void test_set_connection_handler();
+
+    void test_claim_release_mutex();
+
     void test_endpoint_name();
 
     M2MNsdlInterface* nsdl;
