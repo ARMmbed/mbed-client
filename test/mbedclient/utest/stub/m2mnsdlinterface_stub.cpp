@@ -197,6 +197,17 @@ void M2MNsdlInterface::handle_bootstrap_error()
 {
 
 }
+void M2MNsdlInterface::claim_mutex()
+{
+}
+
+void M2MNsdlInterface::release_mutex()
+{
+}
+
+void M2MNsdlInterface::set_connection_handler(M2MConnectionHandler *connection_handler)
+{
+}
 
 const String& M2MNsdlInterface::endpoint_name() const
 {

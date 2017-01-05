@@ -78,7 +78,7 @@ M2MInterfaceImpl::M2MInterfaceImpl(M2MInterfaceObserver& observer,
                                      _context_address);
 
     //Here we must use TCP still
-    __connection_handler = &_connection_handler;
+    _nsdl_interface.set_connection_handler(&_connection_handler);
     _connection_handler.bind_connection(_listen_port);
 #ifndef MBED_CLIENT_DISABLE_BOOTSTRAP_FEATURE
     _bootstrap_timer = new M2MTimer(*this);

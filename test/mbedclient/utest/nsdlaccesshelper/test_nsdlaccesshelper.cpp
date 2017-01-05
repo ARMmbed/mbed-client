@@ -208,28 +208,6 @@ void Test_NsdlAccessHelper::test_socket_free()
     //No need to check anything, since memory leak is the test
 }
 
-void Test_NsdlAccessHelper::test_mutex_claim()
-{
-    __connection_handler = new M2MConnectionHandler(*observer,
-                                                    NULL,
-                                                    M2MInterface::UDP,
-                                                    M2MInterface::LwIP_IPv4);
-    __mutex_claim();
-
-    delete __connection_handler;
-}
-
-void Test_NsdlAccessHelper::test_mutex_release()
-{
-    __connection_handler = new M2MConnectionHandler(*observer,
-                                                    NULL,
-                                                    M2MInterface::UDP,
-                                                    M2MInterface::LwIP_IPv4);
-    __mutex_release();
-
-    delete __connection_handler;
-}
-
 void Test_NsdlAccessHelper::clear_list()
 {
     M2MNsdlInterfaceList::const_iterator it;
