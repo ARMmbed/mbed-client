@@ -1657,23 +1657,23 @@ void Test_M2MNsdlInterface::test_find_resource()
     m2mobject_stub::base_type = M2MBase::Object;
     nsdl->_object_list.push_back(object);
     m2mresource_stub::bool_value = true;
-    CHECK(nsdl->find_resource("name") != NULL);
+    CHECK(nsdl->find_resource("name") == object);
     CHECK(nsdl->find_resource("name1") == NULL);
-    CHECK(nsdl->find_resource("name", token, 4) != NULL);
+    CHECK(nsdl->find_resource("name", token, 4) == object);
     CHECK(nsdl->find_resource("name", token, 5) == NULL);
 
     m2mbase_stub::ret_counter = 0;
-    CHECK(nsdl->find_resource("name/0") != NULL);
+    CHECK(nsdl->find_resource("name/0") == object_instance);
     m2mbase_stub::ret_counter = 0;
-    CHECK(nsdl->find_resource("name/0", inst_token, 4) != NULL);
+    CHECK(nsdl->find_resource("name/0", inst_token, 4) == object_instance);
     m2mbase_stub::ret_counter = 0;
 
-    CHECK(nsdl->find_resource("name/0/resource_name") != NULL);
+    CHECK(nsdl->find_resource("name/0/resource_name") == resource);
     m2mbase_stub::ret_counter = 0;
-    CHECK(nsdl->find_resource("name/0/resource_name", resource_token, 4) != NULL);
+    CHECK(nsdl->find_resource("name/0/resource_name", resource_token, 4) == resource);
 
     m2mbase_stub::ret_counter = 0;
-    CHECK(nsdl->find_resource("name/0/resource_name/0") != NULL);
+    CHECK(nsdl->find_resource("name/0/resource_name/0") == resource_instance);
 
     free(token);
     free(inst_token);
