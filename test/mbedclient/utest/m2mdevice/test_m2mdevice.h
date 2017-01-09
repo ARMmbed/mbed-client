@@ -54,7 +54,6 @@ public:
     void test_total_resource_count();
 
     M2MDevice* device;
-    Callback *callback;
 };
 
 #endif // TEST_M2M_DEVICE_H

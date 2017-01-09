@@ -163,3 +163,4 @@ TEST(M2MInterfaceImpl, timer_expired)
 {
     m2m_interface_impl->test_timer_expired();
 }
+

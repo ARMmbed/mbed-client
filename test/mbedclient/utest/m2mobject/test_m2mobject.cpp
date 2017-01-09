@@ -22,6 +22,7 @@
 #include "m2mtlvdeserializer_stub.h"
 #include "m2mtlvserializer_stub.h"
 #include "m2mreporthandler_stub.h"
+#include "nsdlaccesshelper_stub.h"
 
 class TestReportObserver :  public M2MReportObserver{
 public :
@@ -40,7 +41,7 @@ public:
         visited = true;
     }
     void send_delayed_response(M2MBase *){}
-    void resource_to_be_deleted(const String &){visited=true;}
+    void resource_to_be_deleted(M2MBase *){visited=true;}
     void remove_object(M2MBase *){visited = true;}
     void value_updated(M2MBase *,const String&){visited = true;}
 
@@ -51,7 +52,7 @@ public:
 Test_M2MObject::Test_M2MObject()
 {
     handler = new Handler();
-    object = new M2MObject("name");
+    object = new M2MObject("name", "name");
 }
 
 Test_M2MObject::~Test_M2MObject()
@@ -59,85 +60,82 @@ Test_M2MObject::~Test_M2MObject()
     m2mobjectinstance_stub::clear();
     m2mresource_stub::clear();
     m2mbase_stub::clear();
-    m2mbase_stub::string_value = new String("name");
     m2mtlvdeserializer_stub::clear();
     m2mtlvserializer_stub::clear();
     delete object;
     delete handler;
-    delete m2mbase_stub::string_value;
-    m2mbase_stub::string_value = NULL;
+}
+
+void Test_M2MObject::test_ctor()
+{
+    M2MObject *object = new M2MObject(&params);
+    delete object;
 }
 
 void Test_M2MObject::test_create_object_instance()
 {
     m2mbase_stub::name_id_value = 1;
+    m2mbase_stub::string_value = "name";
     CHECK(object->create_object_instance() != NULL);
+    CHECK(object->create_object_instance(&params) != NULL);
 }
 
 void Test_M2MObject::test_remove_object_instance()
 {
-    m2mbase_stub::string_value = new String("name");
+    m2mbase_stub::string_value = "name";
 
-    M2MObjectInstance *ins = new M2MObjectInstance("name",*object);
+    M2MObjectInstance *ins = new M2MObjectInstance(*object,"name","type", "");
     object->set_instance_id(0);
     object->_instance_list.push_back(ins);
 
     CHECK(true == object->remove_object_instance(0));
 
     CHECK(false == object->remove_object_instance(0));
-
-    delete m2mbase_stub::string_value;
 }
 
 void Test_M2MObject::test_object_instance()
 {
-    String *test = new String("name");
-    M2MObjectInstance *ins = new M2MObjectInstance(*test,*object);
+    M2MObjectInstance *ins = new M2MObjectInstance(*object, "name", "type", "");
     object->set_instance_id(0);
     object->_instance_list.push_back(ins);
 
-    m2mbase_stub::string_value = test;
+    m2mbase_stub::string_value = "name";
 
     M2MObjectInstance *obj = object->object_instance(0);
 
     CHECK(obj != NULL);
-    CHECK(0 == obj->name().compare(0,test->size(),*test));
-
-    delete test;
-    test = NULL;
+    STRCMP_EQUAL(obj->name(), "name");
+    //CHECK(0 == obj->name().compare(0,test->size(),*test));
 }
 
 void Test_M2MObject::test_instances()
 {
-    String *test = new String("name");
-    M2MObjectInstance *ins = new M2MObjectInstance(*test,*object);
+
+    M2MObjectInstance *ins = new M2MObjectInstance(*object, "name", "type", "");
     ins->set_instance_id(0);
     object->_instance_list.push_back(ins);
 
-    M2MObjectInstance *ins1 = new M2MObjectInstance(*test,*object);
+    M2MObjectInstance *ins1 = new M2MObjectInstance(*object, "name","type", "");
     ins1->set_instance_id(1);
     object->_instance_list.push_back(ins1);
 
-    m2mbase_stub::string_value = test;
+    m2mbase_stub::string_value = "name";
 
     M2MObjectInstanceList list = object->instances();
 
     M2MObjectInstance *obj = list[0];
     CHECK(2 == list.size());
-    CHECK(0 == obj->name().compare(0,test->size(),*test));
-
-    delete test;
-    test = NULL;
+    STRCMP_EQUAL(obj->name(), "name");
+    //CHECK(0 == obj->name().compare(0,test->size(),*test));
 }
 
 void Test_M2MObject::test_instance_count()
 {
-    String test = "name";
-    M2MObjectInstance *ins = new M2MObjectInstance(test,*object);
+    M2MObjectInstance *ins = new M2MObjectInstance(*object, "name", "type", "");
     object->set_instance_id(0);
     object->_instance_list.push_back(ins);
 
-    M2MObjectInstance *ins1 = new M2MObjectInstance(test,*object);
+    M2MObjectInstance *ins1 = new M2MObjectInstance(*object, "name", "type", "");
     object->set_instance_id(1);
     object->_instance_list.push_back(ins1);
 
@@ -155,7 +153,7 @@ void Test_M2MObject::test_base_type()
 
 void Test_M2MObject::test_handle_get_request()
 {
-    M2MObjectInstance *ins = new M2MObjectInstance("name",*object);
+    M2MObjectInstance *ins = new M2MObjectInstance(*object, "name", "type", "");
     object->set_instance_id(0);
     object->_instance_list.push_back(ins);
 
@@ -168,9 +166,8 @@ void Test_M2MObject::test_handle_get_request()
 
     coap_header->msg_code = COAP_MSG_CODE_REQUEST_GET;
 
-    String *name = new String("name");
     common_stub::int_value = 0;
-    m2mbase_stub::string_value = name;
+    m2mbase_stub::string_value = "name";
 
     m2mbase_stub::operation = M2MBase::GET_ALLOWED;
     m2mbase_stub::uint8_value = 200;
@@ -262,9 +259,6 @@ void Test_M2MObject::test_handle_get_request()
     free(coap_header);
     coap_header = NULL;
 
-    delete name;
-    name = NULL;
-
     if(m2mtlvserializer_stub::uint8_value) {
         free(m2mtlvserializer_stub::uint8_value);
     }
@@ -290,9 +284,8 @@ void Test_M2MObject::test_handle_put_request()
 
     coap_header->msg_code = COAP_MSG_CODE_REQUEST_PUT;
 
-    String *name = new String("name");
     common_stub::int_value = 0;
-    m2mbase_stub::string_value = name;
+    m2mbase_stub::string_value = "name";
 
     m2mbase_stub::operation = M2MBase::PUT_ALLOWED;
     m2mbase_stub::uint8_value = 200;
@@ -339,9 +332,6 @@ void Test_M2MObject::test_handle_put_request()
 
     m2mbase_stub::operation = M2MBase::PUT_ALLOWED;
 
-
-
-
     free(coap_header->payload_ptr);
     coap_header->payload_ptr = NULL;
     coap_response = object->handle_put_request(NULL,coap_header,handler,execute_value_updated);
@@ -361,7 +351,6 @@ void Test_M2MObject::test_handle_put_request()
 
     free(coap_header->options_list_ptr);
     free(common_stub::coap_header);
-    delete name;
     free(coap_header);
 
     m2mtlvdeserializer_stub::clear();
@@ -381,9 +370,8 @@ void Test_M2MObject::test_handle_post_request()
 
     coap_header->msg_code = COAP_MSG_CODE_REQUEST_POST;
 
-    String *name = new String("name");
     common_stub::int_value = 0;
-    m2mbase_stub::string_value = name;
+    m2mbase_stub::string_value = "name";
 
     m2mbase_stub::operation = M2MBase::POST_ALLOWED;
     m2mbase_stub::uint8_value = 200;
@@ -415,8 +403,7 @@ void Test_M2MObject::test_handle_post_request()
 
     object->_max_instance_count = 0;
 
-    String *test = new String("name");
-    M2MObjectInstance *ins = new M2MObjectInstance(*test,*object);
+    M2MObjectInstance *ins = new M2MObjectInstance(*object, "name", "type", "");
     ins->set_instance_id(0);
     object->_instance_list.push_back(ins);
     coap_header->content_format = sn_coap_content_format_e(-1);
@@ -424,7 +411,7 @@ void Test_M2MObject::test_handle_post_request()
     CHECK( coap_response != NULL);
 
     object->remove_object_instance(0);
-    delete test;
+
 
     object->_max_instance_count = 65535;
 
@@ -610,7 +597,6 @@ void Test_M2MObject::test_handle_post_request()
     free(coap_header->payload_ptr);
     free(common_stub::coap_header->options_list_ptr);
     free(common_stub::coap_header);
-    delete name;
     free(coap_header);
 
     m2mtlvdeserializer_stub::clear();

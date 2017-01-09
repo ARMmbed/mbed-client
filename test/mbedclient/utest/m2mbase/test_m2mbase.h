@@ -21,7 +21,7 @@
 class Test_M2MBase : M2MBase
 {
 public:
-    Test_M2MBase();
+    Test_M2MBase(char* path);
 
     virtual ~Test_M2MBase();
 
@@ -32,8 +32,6 @@ public:
     void test_set_base_type();
 
     void test_set_interface_description();
-
-    void test_set_uri_path();
 
     void test_uri_path();
 
@@ -53,8 +51,6 @@ public:
 
     void test_set_observation_token();
 
-    void test_is_observable();
-
     void test_observation_level();
 
     void test_get_observation_token();
@@ -63,17 +59,9 @@ public:
 
     void test_observation_number();
 
-    void test_operation();
-
     void test_name();
 
     void test_name_id();
-
-    void test_instance_id();
-
-    void test_interface_description();
-
-    void test_resource_type();
 
     void test_coap_content_type();
 
@@ -82,10 +70,6 @@ public:
     void test_handle_observation_attribute();
 
     void test_observation_to_be_sent();
-
-    void test_remove_resource_from_coap();
-
-    void test_remove_object_from_coap();
 
     void test_handle_get_request();
 
@@ -105,13 +89,9 @@ public:
 
     void test_set_register_uri();
 
-    void test_register_uri();
-
     void test_set_observation_number();
 
     void test_set_max_age();
-
-    void test_max_age();
 
     void test_is_under_observation();
 
@@ -119,6 +99,27 @@ public:
 
     void test_build_path();
 
+    void test_set_observation_handler();
+
+    void test_resource_type();
+
+    void test_resource_name_length();
+
+    void test_get_nsdl_resource();
+
+    void test_create_path();
+
+    void test_create_report_handler();
+
+    void test_validate_string_length();
+
+    void test_is_integer();
+
+    void test_alloc_copy();
+
+    void test_alloc_string_copy();
+
+    void test_ctor();
 };
 
 

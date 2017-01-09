@@ -14,6 +14,7 @@ add_executable(m2mobject
         "../stub/common_stub.cpp"
         "../stub/m2mstring_stub.cpp"
         "../stub/m2mtlvserializer_stub.cpp"
+        "../stub/nsdlaccesshelper_stub.cpp"
         "../../../../source/m2mobject.cpp"
         "../stub/m2mtimer_stub.cpp"
         "../../../../source/m2mstringbufferbase.cpp"

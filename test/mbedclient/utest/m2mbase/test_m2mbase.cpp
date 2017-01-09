@@ -19,6 +19,12 @@
 #include "m2mreportobserver.h"
 #include "m2mreporthandler.h"
 #include "m2mreporthandler_stub.h"
+#include "nsdlaccesshelper_stub.h"
+#include "m2mresource_stub.h"
+#include "m2mobject_stub.h"
+#include "m2mobjectinstance_stub.h"
+#include "m2mresource_stub.h"
+
 static bool value_update_called = false;
 static void value_updated_function(const char* name) {
     value_update_called = true;
@@ -43,7 +49,7 @@ public:
         visited = true;
     }
     void send_delayed_response(M2MBase *){}
-    void resource_to_be_deleted(const String &){visited=true;}
+    void resource_to_be_deleted(M2MBase *){visited=true;}
     void remove_object(M2MBase *){visited = true;}
     void value_updated(M2MBase *,const String&){visited = true;}
 
@@ -59,10 +65,10 @@ public:
     void observation_to_be_sent(m2m::Vector<uint16_t>,bool){}
 };
 
-Test_M2MBase::Test_M2MBase()
-    :M2MBase("name",M2MBase::Static)
-{
+Test_M2MBase::Test_M2MBase(char* path)
+    : M2MBase("name",M2MBase::Dynamic, "type", path, false)
 
+{
 }
 
 Test_M2MBase::~Test_M2MBase()
@@ -71,23 +77,23 @@ Test_M2MBase::~Test_M2MBase()
 
 void Test_M2MBase::test_set_operation()
 {
+    this->_sn_resource->dynamic_resource_params->static_resource_parameters->mode = M2MBase::Static;
     M2MBase::Operation test = M2MBase::GET_ALLOWED;
     set_operation(test);
 
-    CHECK(test == this->_operation);
+    CHECK(test == this->operation());
 
-    this->_mode = M2MBase::Dynamic;
+    this->_sn_resource->dynamic_resource_params->static_resource_parameters->mode = M2MBase::Dynamic;
     test = M2MBase::PUT_ALLOWED;
     set_operation(test);
 
-    CHECK(test == this->_operation);
+    CHECK(test == this->operation());
 }
 
 void Test_M2MBase::test_set_base_type()
 {
     set_base_type(M2MBase::ObjectInstance);
-
-    CHECK(M2MBase::ObjectInstance == this->_base_type);
+    CHECK(M2MBase::ObjectInstance == this->base_type());
 }
 
 void Test_M2MBase::test_set_interface_description()
@@ -95,21 +101,13 @@ void Test_M2MBase::test_set_interface_description()
     String test = "interface_description";
     set_interface_description(test);
 
-    CHECK(test == this->_interface_description);
-}
-
-void Test_M2MBase::test_set_uri_path()
-{
-    String test = "10/0/1";
-    set_uri_path(test);
-    CHECK(test == this->_uri_path);
+    CHECK(test == this->interface_description());
 }
 
 void Test_M2MBase::test_uri_path()
 {
-    String test = "interface_description";
-    this->_uri_path = test;
-
+    // Default value in ctor
+    String test = "test";
     CHECK(test == uri_path());
 }
 
@@ -118,7 +116,7 @@ void Test_M2MBase::test_set_resource_type()
     String test = "resource_type";
     set_resource_type(test);
 
-    CHECK(test == this->_resource_type);
+    CHECK(test == this->_sn_resource->dynamic_resource_params->static_resource_parameters->resource_type_ptr);
 }
 
 void Test_M2MBase::test_set_coap_content_type()
@@ -126,7 +124,7 @@ void Test_M2MBase::test_set_coap_content_type()
     u_int8_t test = 1;
     set_coap_content_type(test);
 
-    CHECK(test == this->_coap_content_type);
+    CHECK(test == this->coap_content_type());
 }
 
 void Test_M2MBase::test_set_instance_id()
@@ -134,7 +132,7 @@ void Test_M2MBase::test_set_instance_id()
     u_int16_t test = 1;
     set_instance_id(test);
 
-    CHECK(test == this->_instance_id);
+    CHECK(test == this->instance_id());
 }
 
 void Test_M2MBase::test_set_observable()
@@ -142,7 +140,7 @@ void Test_M2MBase::test_set_observable()
     bool test = true;
     set_observable(test);
 
-    CHECK(test == this->_observable);
+    CHECK(test == this->is_observable());
 }
 
 void Test_M2MBase::test_add_observation_level()
@@ -177,7 +175,7 @@ void Test_M2MBase::test_set_under_observation()
 {
     Handler handler;
 
-    this->_base_type = M2MBase::ObjectInstance;
+    this->set_base_type(M2MBase::ObjectInstance);
 
     bool test = true;
     set_under_observation(test,NULL);
@@ -204,14 +202,6 @@ void Test_M2MBase::test_set_observation_token()
     set_observation_token((const u_int8_t*)test.c_str(), (u_int8_t)test.size());
 
     CHECK(this->_token_length == 5);
-}
-
-void Test_M2MBase::test_is_observable()
-{
-    bool test = false;
-    this->_observable = test;
-
-    CHECK(test == is_observable());
 }
 
 void Test_M2MBase::test_observation_level()
@@ -243,7 +233,7 @@ void Test_M2MBase::test_get_observation_token()
 
 void Test_M2MBase::test_mode()
 {
-    CHECK(M2MBase::Static == mode());
+    CHECK(M2MBase::Dynamic == mode());
 }
 
 void Test_M2MBase::test_observation_number()
@@ -254,110 +244,26 @@ void Test_M2MBase::test_observation_number()
     CHECK(test == observation_number());
 }
 
-void Test_M2MBase::test_operation()
-{
-    M2MBase::Operation test = M2MBase::DELETE_ALLOWED;
-    this->_operation = test;
-
-    CHECK(test == operation());
-}
-
 void Test_M2MBase::test_name()
 {
+    // Default value in ctor
     String test = "name";
-    this->_name = test;
-
     CHECK(test == name());
 }
 
 void Test_M2MBase::test_name_id()
 {
     int id = 10;
-    this->_name_id = id;
-
+    this->_sn_resource->name_id = id;
     CHECK(id == name_id());
 }
 
-void Test_M2MBase::test_instance_id()
-{
-    u_int16_t test = 1;
-    this->_instance_id = test;
-
-    CHECK(test == instance_id());
-}
-
-void Test_M2MBase::test_interface_description()
-{
-    String test = "interface_description";
-    this->_interface_description = test;
-
-    CHECK(test == interface_description());
-}
-
-void Test_M2MBase::test_resource_type()
-{
-    String test = "resource_type";
-    this->_resource_type = test;
-
-    CHECK(test == resource_type());
-}
-
-void Test_M2MBase::test_coap_content_type()
-{
-    u_int8_t test = 1;
-    this->_coap_content_type = test;
-
-    CHECK(test == coap_content_type());
-}
-
-void Test_M2MBase::test_base_type()
-{
-    this->_base_type = M2MBase::ObjectInstance;
-
-    CHECK(M2MBase::ObjectInstance == base_type());
-}
-
-//void Test_M2MBase::test_set_value()
-//{
-//    u_int8_t value[] = {"value2"};
-//    this->_value = (u_int8_t*)malloc(sizeof(u_int8_t));
-
-//    CHECK(set_value(value,(u_int32_t)sizeof(value)) == true);
-//    CHECK( this->_value_length == sizeof(value));
-//    CHECK( *this->_value == *value);
-
-//    Observer obs;
-//    this->_report_handler = new M2MReportHandler(obs);
-
-//    u_int8_t value2[] = {"12"};
-//    CHECK(set_value(value2,(u_int32_t)sizeof(value2), true) == true);
-//}
-
-//void Test_M2MBase::test_get_value()
-//{
-//    u_int8_t test_value[] = {"value3"};
-//    u_int32_t value_length((u_int32_t)sizeof(test_value));
-
-//    u_int8_t* out_value = (u_int8_t *)malloc(1);
-//    u_int32_t out_size = 1;
-
-//    this->_value = (u_int8_t *)malloc(value_length);
-//    this->_value_length = value_length;
-//    memcpy((u_int8_t *)this->_value, (u_int8_t *)test_value, value_length);
-
-//    get_value(out_value,out_size);
-
-//    CHECK(out_size == value_length);
-
-//    free(out_value);
-//}
-
 void Test_M2MBase::test_handle_observation_attribute()
 {
-    char query[] = "wrong";
-    char* s = query;
+    char *s = "wrong";
     bool ret = handle_observation_attribute(s);
     CHECK(ret == false);
+    delete this->_report_handler;
 
     Observer obs;
     this->_report_handler = new M2MReportHandler(obs);
@@ -374,57 +280,21 @@ void Test_M2MBase::test_handle_observation_attribute()
     m2mreporthandler_stub::bool_return = false;
     ret = handle_observation_attribute(s);
     CHECK(ret == false);
-
 }
 
 void Test_M2MBase::test_observation_to_be_sent()
 {
-    Handler handler;
+    Handler *handler = new Handler();
     Vector<uint16_t> list;
     observation_to_be_sent(list);
-    CHECK(handler.visited == false);
-
-    this->_base_type = M2MBase::ObjectInstance;
+    CHECK(handler->visited == false);
+    this->set_base_type(M2MBase::ObjectInstance);
 
     bool test = true;
-    set_under_observation(test,&handler);
-
+    set_under_observation(test,handler);
     observation_to_be_sent(list);
-
-    CHECK(handler.visited == true);
-}
-
-void Test_M2MBase::test_remove_resource_from_coap()
-{
-    Handler handler;
-
-    this->_base_type = M2MBase::ObjectInstance;
-
-    const String s = "test";
-    remove_resource_from_coap(s);
-    CHECK(handler.visited == false);
-
-    bool test = true;
-    set_under_observation(test,&handler);
-    remove_resource_from_coap(s);
-
-    CHECK(handler.visited == true);
-}
-
-void Test_M2MBase::test_remove_object_from_coap()
-{
-    Handler handler;
-
-    this->_base_type = M2MBase::ObjectInstance;
-
-    remove_object_from_coap();
-    CHECK(handler.visited == false);
-
-    bool test = true;
-    set_under_observation(test,&handler);
-    remove_object_from_coap();
-
-    CHECK(handler.visited == true);
+    CHECK(handler->visited == true);
+    delete handler;
 }
 
 void Test_M2MBase::test_handle_get_request()
@@ -472,23 +342,23 @@ void Test_M2MBase::test_observation_handler()
 
 void Test_M2MBase::test_id_number()
 {
-    M2MBase b("10", M2MBase::Static);
-    CHECK(b.name_id() == 10);
-    M2MBase * test1 = new M2MBase("66567",M2MBase::Static);
+    char* path = (char*)malloc(3);
+    strcpy(path, "10");
+    M2MBase* b = new M2MBase("10", M2MBase::Static, "", path, false);
+    CHECK(b->name_id() == 10);
+    delete b;
+
+    char* path1 = (char*)malloc(6);
+    strcpy(path1, "66567");
+
+    M2MBase * test1 = new M2MBase("66567",M2MBase::Static, "", path1, false);
     CHECK(test1->name_id() == -1);
     delete test1;
-
 }
 
 void Test_M2MBase::test_set_register_uri()
 {
     this->set_register_uri(false);
-    CHECK(this->_register_uri == false);
-}
-
-void Test_M2MBase::test_register_uri()
-{
-    this->_register_uri = false;
     CHECK(this->register_uri() == false);
 }
 
@@ -501,12 +371,6 @@ void Test_M2MBase::test_set_observation_number()
 void Test_M2MBase::test_set_max_age()
 {
     this->set_max_age(10000);
-    CHECK(this->_max_age == 10000);
-}
-
-void Test_M2MBase::test_max_age()
-{
-    this->_max_age = 10000;
     CHECK(this->max_age() == 10000);
 }
 
@@ -537,7 +401,6 @@ void Test_M2MBase::test_value_updated_function()
 
 void Test_M2MBase::test_build_path()
 {
-
     StringBuffer<MAX_PATH_SIZE> buffer;
     CHECK(build_path(buffer, "0123456789012345678901234567890123456789012345678901234567891234", 10000, "2123456789012345678901234567890123456789012345678901234567891234", 20000));
     CHECK(!build_path(buffer, "01234567890123456789012345678901234567890123456789012345678912345", 10000, "21234567890123456789012345678901234567890123456789012345678912345", 20000));
@@ -553,5 +416,159 @@ void Test_M2MBase::test_build_path()
     StringBuffer<MAX_PATH_SIZE_4> buffer4;
     CHECK(build_path(buffer4, "0123456789012345678901234567890123456789012345678901234567891234", 10000));
     CHECK(!build_path(buffer4, "01234567890123456789012345678901234567890123456789012345678912345", 10000));
+}
 
+void Test_M2MBase::test_set_observation_handler()
+{
+    Handler *observer = new Handler();
+    set_observation_handler(observer);
+    CHECK(observation_handler() != NULL);
+    delete observer;
+}
+
+void Test_M2MBase::test_resource_type()
+{
+    // Default value in ctor
+    String test = "type";
+    CHECK(test == resource_type());
+}
+
+void Test_M2MBase::test_resource_name_length()
+{
+    CHECK(4 == resource_name_length());
+}
+
+void Test_M2MBase::test_get_nsdl_resource()
+{
+    sn_nsdl_dynamic_resource_parameters_s *res = get_nsdl_resource();
+    CHECK(res != NULL);
+    CHECK(res->static_resource_parameters != NULL);
+}
+
+void Test_M2MBase::test_create_path()
+{
+    char* path1 = (char*)malloc(5);
+    strcpy(path1, "name");
+    M2MObject* object = new M2MObject("name", path1);
+
+    char* path2 = (char*)malloc(7);
+    strcpy(path2, "name/0");
+    m2mresource_stub::object_instance =
+            new M2MObjectInstance(*object, "name","", path2);
+
+    String path = "name/1";
+    String res_path = "name/0/resource";
+    String res_path_instance = "name/0/resource/1";
+
+    char* result = create_path(*object, "1");
+    CHECK(path == result);
+    free(result);
+
+    result = create_path(*object, 1);
+    CHECK(path == result);
+    free(result);
+
+    result = create_path(*m2mresource_stub::object_instance, "resource");
+    CHECK(res_path == result);
+    free(result);
+
+    char* path3 = (char*)malloc(9);
+    strcpy(path3, "resource");
+
+    M2MResource* res = new M2MResource(*m2mresource_stub::object_instance,
+                                       "resource",
+                                       "type",
+                                       M2MResourceInstance::INTEGER,
+                                       false,
+                                       path3);
+
+    result = create_path(*res, 1);
+    CHECK(res_path_instance == result);
+    free(result);
+
+    delete m2mresource_stub::object_instance;
+    delete object;
+    delete res;
+}
+
+void Test_M2MBase::test_create_report_handler()
+{
+    M2MReportHandler* report_handler = create_report_handler();
+    CHECK(report_handler != NULL);
+}
+
+void Test_M2MBase::test_validate_string_length()
+{
+    String test = "stringlengthabc";
+    CHECK(validate_string_length(test, 1, 20) == true);
+    CHECK(validate_string_length(test, 1, 2) == false);
+    CHECK(validate_string_length(test, 15, 15) == true);
+    CHECK(validate_string_length(test, 16, 15) == false);
+
+    CHECK(validate_string_length(test.c_str(), 15, 15) == true);
+    CHECK(validate_string_length(test.c_str(), 16, 15) == false);
+}
+
+void Test_M2MBase::test_is_integer()
+{
+    CHECK(is_integer("") == false);
+    CHECK(is_integer("-1a") == false);
+    CHECK(is_integer("10") == true);
+    CHECK(is_integer("+10") == true);
+    CHECK(is_integer("-10") == true);
+}
+
+void Test_M2MBase::test_alloc_copy()
+{
+    uint8_t* test_ptr = (uint8_t *)malloc(10);
+    uint8_t* result = alloc_copy(test_ptr, 10);
+    MEMCMP_EQUAL(result,test_ptr,10);
+    free(test_ptr);
+    free(result);
+}
+
+void Test_M2MBase::test_alloc_string_copy()
+{
+    char* test = "testi";
+    char* result = alloc_string_copy(test);
+    STRCMP_EQUAL(test,result);
+    free(result);
+}
+
+void Test_M2MBase::test_ctor()
+{
+    static sn_nsdl_static_resource_parameters_s params_static = {
+        (char*)"",      // resource_type_ptr
+        (char*)"",                     // interface_description_ptr
+        (char*)"",    // path
+        (uint8_t*)"",           // resource
+        0,                      // resourcelen
+        false,                  // external_memory_block
+        SN_GRS_DYNAMIC,         // mode
+        false                   // free_on_delete
+    };
+
+    static sn_nsdl_dynamic_resource_parameters_s params_dynamic = {
+        __nsdl_c_callback,
+        &params_static,
+        {NULL, NULL},                     // link
+        0, // coap_content_type
+        M2MBase::PUT_ALLOWED,   // access
+        0,                      // registered
+        false,                  // publish_uri
+        false,                  // free_on_delete
+        true                    // observable
+    };
+
+    const static M2MBase::lwm2m_parameters params = {
+        0, // max_age
+        0, // instance_id
+        0, // name_id
+        (char*)"", // name
+        &params_dynamic,
+        M2MBase::Resource, // base_type
+        false // free_on_delete
+    };
+    M2MBase* base = new M2MBase(&params);
+    delete base;
 }

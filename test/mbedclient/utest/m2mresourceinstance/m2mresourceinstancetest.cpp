@@ -125,3 +125,13 @@ TEST(M2MResourceInstance, test_notification_sent)
 {
     m2m_resourceinstance->test_notification_sent();
 }
+
+TEST(M2MResourceInstance, test_ctor)
+{
+    m2m_resourceinstance->test_ctor();
+}
+
+TEST(M2MResourceInstance, test_get_parent_resource)
+{
+    m2m_resourceinstance->test_get_parent_resource();
+}

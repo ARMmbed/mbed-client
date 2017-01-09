@@ -65,8 +65,13 @@ public:
 
     void test_notification_sent();
 
+    void test_ctor();
+
+    void test_get_parent_resource();
+
     M2MResourceInstance* resource_instance;
 
+    M2MObject* obj;
     Callback *callback;
 
     Handler* handler;

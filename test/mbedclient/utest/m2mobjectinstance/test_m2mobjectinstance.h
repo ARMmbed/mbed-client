@@ -58,11 +58,13 @@ public:
 
     void test_notification_update();
 
-    M2MObjectInstance* object;
+    void test_ctor();
+
+    M2MObjectInstance* object_instance;
 
     Handler* handler;
 
-    Callback* callback;
+    M2MObject* object;
 };
 
 #endif // TEST_M2M_OBJECT_INSTANCE_H

@@ -86,3 +86,10 @@ TEST(M2MObject, notification_update)
     m2m_object->test_notification_update();
 }
 
+TEST(M2MObject, test_ctor)
+{
+    m2m_object->test_ctor();
+}
+
+
+

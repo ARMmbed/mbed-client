@@ -597,7 +597,3 @@ bool M2MFirmware::check_value_range(FirmwareResource resource, int64_t value) co
     return success;
 }
 
-void M2MFirmware::set_zero_value(M2MResource &resource)
-{
-    resource.set_value((const uint8_t*)"0", 1);
-}

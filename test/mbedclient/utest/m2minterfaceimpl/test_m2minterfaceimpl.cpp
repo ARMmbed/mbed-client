@@ -70,7 +70,7 @@ public:
 class M2MBaseTest : public M2MBase
 {
 public:
-    M2MBaseTest() : M2MBase("a", M2MBase::Static){}
+    M2MBaseTest() : M2MBase("a", M2MBase::Static, "type","a",false){}
 };
 
 Test_M2MInterfaceImpl::Test_M2MInterfaceImpl()
@@ -86,9 +86,6 @@ Test_M2MInterfaceImpl::Test_M2MInterfaceImpl()
 
 Test_M2MInterfaceImpl:: ~Test_M2MInterfaceImpl()
 {
-    if (impl->_security_connection) {
-        delete impl->_security_connection;
-    }
     delete observer;
     delete impl;
 }
@@ -106,10 +103,7 @@ void Test_M2MInterfaceImpl::test_constructor()
                                             M2MInterface::TCP);
     CHECK(obj->_current_state == 0);
     //TODO: Check rest of variables
-    if (obj->_security_connection)
-        delete obj->_security_connection;
     delete obj;
-
     obj = new M2MInterfaceImpl(obs,
                                             "endpoint_name",
                                             "endpoint_type",
@@ -117,9 +111,6 @@ void Test_M2MInterfaceImpl::test_constructor()
                                             8000,
                                             "domain",
                                             M2MInterface::TCP_QUEUE);
-
-    if (obj->_security_connection)
-        delete obj->_security_connection;
     delete obj;
 }
 
@@ -228,7 +219,7 @@ void Test_M2MInterfaceImpl::test_register_object()
     M2MSecurity *sec = new M2MSecurity(M2MSecurity::M2MServer);
     m2msecurity_stub::int_value = 2;
 
-    M2MObject *object = new M2MObject("test");
+    M2MObject *object = new M2MObject("test", "test");
     M2MObjectInstance *ins = object->create_object_instance();
     ins->create_dynamic_resource("test","type",M2MResourceInstance::STRING,false,false);
 
@@ -393,7 +384,7 @@ void Test_M2MInterfaceImpl::test_update_registration()
     CHECK(observer->error_occured == true);
 
 
-    M2MObject *object = new M2MObject("test");
+    M2MObject *object = new M2MObject("test", "test");
     M2MObjectInstance *ins = object->create_object_instance();
     ins->create_dynamic_resource("test","type",M2MResourceInstance::STRING,false,false);
 
@@ -681,6 +672,8 @@ void Test_M2MInterfaceImpl::test_address_ready()
     impl->address_ready(*address,server_type,server_port);
     CHECK(impl->_current_state == M2MInterfaceImpl::STATE_REGISTER_ADDRESS_RESOLVED);
 
+    impl->address_ready(*address,server_type,server_port);
+    CHECK(impl->_current_state == M2MInterfaceImpl::STATE_REGISTER_ADDRESS_RESOLVED);
 
     address->_stack = M2MInterface::LwIP_IPv6;
     m2mnsdlinterface_stub::bool_value = false;

@@ -1110,8 +1110,7 @@ M2MBase* M2MNsdlInterface::find_resource(const M2MResource *resource,
                 M2MResourceInstanceList::const_iterator it;
                 it = list.begin();
                 for ( ; it != list.end(); it++ ) {
-                    sn_nsdl_dynamic_resource_parameters_s* nsdl_res = (*it)->get_nsdl_resource();
-                    if(!strcmp((char*)nsdl_res->static_resource_parameters->path, resource_instance.c_str())){
+                    if(!strcmp((char*)(*it)->uri_path(), resource_instance.c_str())){
                         res = (*it);
                         break;
                     }

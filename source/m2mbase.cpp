@@ -122,6 +122,7 @@ M2MBase::M2MBase(const lwm2m_parameters_s *s):
 
 M2MBase::~M2MBase()
 {
+    _observation_handler = NULL;
     delete _report_handler;
     free_resources();
     free(_token);
@@ -740,7 +741,6 @@ void M2MBase::free_resources()
     if (_sn_resource->dynamic_resource_params->free_on_delete) {
         free(_sn_resource->dynamic_resource_params);
     }
-
 
     if (_sn_resource->free_on_delete) {
         free(_sn_resource->name);

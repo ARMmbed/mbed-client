@@ -69,9 +69,13 @@ public:
 
     void test_execute_params();
 
-    M2MResource* resource;
-    Callback *callback;
+    void test_ctor();
 
+    void test_get_parent_object_instance();
+
+    M2MObjectInstance* object_instance;
+    M2MObject* object;
+    M2MResource* resource;
     Handler* handler;
 };
 

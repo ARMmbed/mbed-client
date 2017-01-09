@@ -54,7 +54,6 @@ public:
     void test_resource_name();
 
     M2MFirmware* firmware;
-    Callback *callback;
 };
 
 #endif // TEST_M2M_FIRMWARE_H
