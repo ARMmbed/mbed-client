@@ -13,5 +13,8 @@
         "sn-coap-max-incoming-message-size": null,
         "sn-coap-resending-queue-size-msgs": null,
         "sn-coap-resending-queue-size-bytes": null
-    }
+    },
+    "macros" : [
+        "MBED_CLIENT_C_NEW_API"
+    ]
 }
