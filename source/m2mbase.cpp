@@ -122,7 +122,6 @@ M2MBase::M2MBase(const lwm2m_parameters_s *s):
 
 M2MBase::~M2MBase()
 {
-    _observation_handler = NULL;
     delete _report_handler;
     free_resources();
     free(_token);
