@@ -62,7 +62,7 @@ M2MInterfaceImpl::M2MInterfaceImpl(M2MInterfaceObserver& observer,
   _retry_count(0),
   _reconnecting(false),
   _retry_timer_expired(false),
-  _bootstrapped(true)
+  _bootstrapped(true) // True as default to get it working with connector only configuration
 {
     M2MConnectionSecurity::SecurityMode sec_mode = M2MConnectionSecurity::DTLS;
     //Hack for now
