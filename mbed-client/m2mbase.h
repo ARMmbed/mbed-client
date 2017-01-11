@@ -563,7 +563,7 @@ private:
     M2MObservationHandler       *_observation_handler; // Not owned
     uint8_t                     *_token;
     FP1<void, const char*>      *_function_pointer;
-    value_updated_callback      _value_updated_callback;
+    value_updated_callback      *_value_updated_callback;
     uint16_t                    _observation_number;
     uint8_t                     _token_length;
     M2MBase::Observation        _observation_level;
