@@ -124,6 +124,14 @@ public:
      */
     void set_entropy_callback(entropy_cb callback);
 
+    /**
+     * \brief Set socket information for this secure connection.
+     * \param socket Socket used with this TLS session.
+     * \param address Pointer to the address of the server.
+     * \return Indicates whether the data is read successfully or not.
+     */
+    void set_socket(void *socket, void *address);
+
 private:
 
     M2MConnectionSecurityPimpl* _private_impl;
