@@ -20,15 +20,19 @@
 TEST_GROUP(M2MBase)
 {
     Test_M2MBase* m2m_base;
+    Handler *obsHandler;
     void setup() {
         // Path ownership moved to m2mbase
         char* path = (char*)malloc(5);
         strcpy(path, "test");
-        m2m_base = new Test_M2MBase(path);
+
+        obsHandler = new Handler();
+        m2m_base = new Test_M2MBase(path, obsHandler);
     }
 
     void teardown() {
         delete m2m_base;
+        delete obsHandler;
     }
 };
 

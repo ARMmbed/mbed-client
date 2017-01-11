@@ -15,7 +15,7 @@
  */
 #include "CppUTest/TestHarness.h"
 #include "test_m2mbase.h"
-#include "m2mobservationhandler.h"
+
 #include "m2mreportobserver.h"
 #include "m2mreporthandler.h"
 #include "m2mreporthandler_stub.h"
@@ -39,23 +39,6 @@ public:
     bool visited;
 };
 
-class Handler : public M2MObservationHandler {
-
-public:
-
-    Handler() : visited(false) {}
-    ~Handler(){}
-    void observation_to_be_sent(M2MBase *, uint16_t, m2m::Vector<uint16_t>, bool){
-        visited = true;
-    }
-    void send_delayed_response(M2MBase *){}
-    void resource_to_be_deleted(M2MBase *){visited=true;}
-    void remove_object(M2MBase *){visited = true;}
-    void value_updated(M2MBase *,const String&){visited = true;}
-
-    void clear() {visited = false;}
-    bool visited;
-};
 
 class Observer : public M2MReportObserver {
 public:
@@ -65,10 +48,11 @@ public:
     void observation_to_be_sent(m2m::Vector<uint16_t>,bool){}
 };
 
-Test_M2MBase::Test_M2MBase(char* path)
+Test_M2MBase::Test_M2MBase(char* path, Handler *handler)
     : M2MBase("name",M2MBase::Dynamic, "type", path, false)
 
 {
+    obsHandler = handler;
 }
 
 Test_M2MBase::~Test_M2MBase()
@@ -173,15 +157,13 @@ void Test_M2MBase::test_remove_observation_level()
 
 void Test_M2MBase::test_set_under_observation()
 {
-    Handler handler;
-
     this->set_base_type(M2MBase::ObjectInstance);
 
     bool test = true;
     set_under_observation(test,NULL);
-    set_under_observation(test,&handler);
+    set_under_observation(test,obsHandler);
 
-    CHECK(&handler == this->_observation_handler);
+    CHECK(obsHandler == this->_observation_handler);
 
     set_under_observation(test,NULL);
 
@@ -189,9 +171,9 @@ void Test_M2MBase::test_set_under_observation()
     set_under_observation(test,NULL);
 
     test = false;
-    set_under_observation(test,&handler);
+    set_under_observation(test,obsHandler);
 
-    set_under_observation(test,&handler);
+    set_under_observation(test,obsHandler);
 }
 
 void Test_M2MBase::test_set_observation_token()
@@ -284,17 +266,15 @@ void Test_M2MBase::test_handle_observation_attribute()
 
 void Test_M2MBase::test_observation_to_be_sent()
 {
-    Handler *handler = new Handler();
     Vector<uint16_t> list;
     observation_to_be_sent(list);
-    CHECK(handler->visited == false);
+    CHECK(obsHandler->visited == false);
     this->set_base_type(M2MBase::ObjectInstance);
 
     bool test = true;
-    set_under_observation(test,handler);
+    set_under_observation(test,obsHandler);
     observation_to_be_sent(list);
-    CHECK(handler->visited == true);
-    delete handler;
+    CHECK(obsHandler->visited == true);
 }
 
 void Test_M2MBase::test_handle_get_request()
@@ -420,10 +400,8 @@ void Test_M2MBase::test_build_path()
 
 void Test_M2MBase::test_set_observation_handler()
 {
-    Handler *observer = new Handler();
-    set_observation_handler(observer);
-    CHECK(observation_handler() != NULL);
-    delete observer;
+    set_observation_handler(obsHandler);
+    CHECK(observation_handler() == obsHandler);
 }
 
 void Test_M2MBase::test_resource_type()
