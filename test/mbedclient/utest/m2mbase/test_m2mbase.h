@@ -15,13 +15,31 @@
  */
 #ifndef TEST_M2M_BASE_H
 #define TEST_M2M_BASE_H
-
 #include "m2mbase.h"
+#include "m2mobservationhandler.h"
+
+class Handler : public M2MObservationHandler {
+
+public:
+
+    Handler() : visited(false) {}
+    ~Handler(){}
+    void observation_to_be_sent(M2MBase *, uint16_t, m2m::Vector<uint16_t>, bool){
+        visited = true;
+    }
+    void send_delayed_response(M2MBase *){}
+    void resource_to_be_deleted(M2MBase *){visited=true;}
+    void remove_object(M2MBase *){visited = true;}
+    void value_updated(M2MBase *,const String&){visited = true;}
+
+    void clear() {visited = false;}
+    bool visited;
+};
 
 class Test_M2MBase : M2MBase
 {
 public:
-    Test_M2MBase(char* path);
+    Test_M2MBase(char* path, Handler *handler);
 
     virtual ~Test_M2MBase();
 
@@ -120,6 +138,8 @@ public:
     void test_alloc_string_copy();
 
     void test_ctor();
+
+    Handler *obsHandler;
 };
 
 
