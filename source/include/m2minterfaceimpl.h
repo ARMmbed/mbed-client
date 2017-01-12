@@ -416,6 +416,7 @@ private:
     uint8_t                     _retry_count;
     bool                        _reconnecting;
     bool                        _retry_timer_expired;
+    bool                        _bootstrapped;
 
    friend class Test_M2MInterfaceImpl;
 
