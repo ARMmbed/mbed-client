@@ -322,7 +322,7 @@ private:
     uint8_t                                 *_value;
     uint32_t                                _value_length;
     M2MBlockMessage                         *_block_message_data;
-    execute_callback                        _execute_callback;
+    execute_callback                        *_execute_callback;
     M2MResourceCallback                     *_resource_callback; // Not owned
     FP1<void, void*>                        *_execute_function_pointer;
     FP0<void>                               *_notification_sent_function_pointer;

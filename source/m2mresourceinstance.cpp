@@ -134,6 +134,7 @@ M2MResourceInstance::~M2MResourceInstance()
 {
     free(_value);
     delete _execute_function_pointer;
+    delete _execute_callback;
     delete _notification_sent_function_pointer;
     delete _block_message_data;
 }
@@ -174,7 +175,8 @@ bool M2MResourceInstance::handle_observation_attribute(const char *query)
 
 void M2MResourceInstance::set_execute_function(execute_callback callback)
 {
-    _execute_callback = callback;
+    delete _execute_callback;
+    _execute_callback = new execute_callback(callback);
 }
 
 void M2MResourceInstance::set_execute_function(execute_callback_2 callback)
@@ -306,7 +308,7 @@ void M2MResourceInstance::execute(void *arguments)
 {
     tr_debug("M2MResourceInstance::execute");
     if(_execute_callback) {
-        _execute_callback(arguments);
+        (*_execute_callback)(arguments);
     }
 }
 
