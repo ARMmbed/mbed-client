@@ -564,10 +564,10 @@ private:
     uint8_t                     *_token;
     FP1<void, const char*>      *_function_pointer;
     value_updated_callback      *_value_updated_callback;
-    uint16_t                    _observation_number;
-    uint8_t                     _token_length;
-    M2MBase::Observation        _observation_level;
-    bool                        _is_under_observation;
+    unsigned                    _observation_number : 16;
+    unsigned                    _token_length : 8;
+    M2MBase::Observation        _observation_level : 4;
+    bool                        _is_under_observation : 1;
 
 friend class Test_M2MBase;
 friend class Test_M2MObject;
