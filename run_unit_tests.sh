@@ -28,6 +28,7 @@ rm -rf coverage
 mkdir results
 mkdir coverage
 
+
 find ./build -name '*.xml' | xargs cp -t ./results/
 find ./build/x86-linux-native-coverage/test -name '*.gcno' | xargs cp -t ./coverage/
 find ./build/x86-linux-native-coverage/test -name '*.gcda' | xargs cp -t ./coverage/
