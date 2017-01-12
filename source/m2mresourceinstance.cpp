@@ -46,6 +46,8 @@ M2MResourceInstance::M2MResourceInstance(M2MResource &parent,
  _resource_callback(NULL),
  _execute_function_pointer(NULL),
  _notification_sent_function_pointer(NULL),
+ _incoming_block_message_cb(NULL),
+ _outgoing_block_message_cb(NULL),
  _notification_sent_callback(NULL),
  _object_instance_id(object_instance_id),
  _resource_type(type)
@@ -75,6 +77,8 @@ M2MResourceInstance::M2MResourceInstance(M2MResource &parent,
  _resource_callback(NULL),
  _execute_function_pointer(NULL),
  _notification_sent_function_pointer(NULL),
+ _incoming_block_message_cb(NULL),
+ _outgoing_block_message_cb(NULL),
  _notification_sent_callback(NULL),
  _object_instance_id(object_instance_id),
   _resource_type(type)
@@ -113,6 +117,8 @@ M2MResourceInstance::M2MResourceInstance(M2MResource &parent,
   _resource_callback(NULL),
   _execute_function_pointer(NULL),
   _notification_sent_function_pointer(NULL),
+  _incoming_block_message_cb(NULL),
+  _outgoing_block_message_cb(NULL),
   _object_instance_id(object_instance_id),
   _resource_type(type)
 {
@@ -136,6 +142,8 @@ M2MResourceInstance::~M2MResourceInstance()
     delete _execute_function_pointer;
     delete _execute_callback;
     delete _notification_sent_function_pointer;
+    delete _incoming_block_message_cb;
+    delete _outgoing_block_message_cb;
     delete _block_message_data;
 }
 
@@ -394,7 +402,7 @@ sn_coap_hdr_s* M2MResourceInstance::handle_get_request(nsdl_s *nsdl,
                             name.append_raw((char *)received_coap_header->uri_path_ptr,
                                              received_coap_header->uri_path_len);
                         }
-                        _outgoing_block_message_cb(name, coap_response->payload_ptr, payload_len);
+                        (*_outgoing_block_message_cb)(name, coap_response->payload_ptr, payload_len);
                     }
                 } else {
                     get_value(coap_response->payload_ptr,payload_len);
@@ -499,7 +507,7 @@ sn_coap_hdr_s* M2MResourceInstance::handle_put_request(nsdl_s *nsdl,
                         if (block_message()->is_block_message()) {
                             external_block_store = true;
                             if(_incoming_block_message_cb) {
-                                _incoming_block_message_cb(_block_message_data);
+                                (*_incoming_block_message_cb)(_block_message_data);
                             }
                             if (block_message()->is_last_block()) {
                                 block_message()->clear_values();
@@ -559,7 +567,11 @@ M2MBlockMessage* M2MResourceInstance::block_message() const
 
 void M2MResourceInstance::set_incoming_block_message_callback(incoming_block_message_callback callback)
 {
-    _incoming_block_message_cb = callback;
+    // copy the callback object. This will change on next version to be a direct pointer to a interface class,
+    // this FPn<> is just too heavy for this usage.
+    delete _incoming_block_message_cb;
+    _incoming_block_message_cb = new incoming_block_message_callback(callback);
+
     delete _block_message_data;
     _block_message_data = NULL;
     _block_message_data = new M2MBlockMessage();
@@ -567,7 +579,8 @@ void M2MResourceInstance::set_incoming_block_message_callback(incoming_block_mes
 
 void M2MResourceInstance::set_outgoing_block_message_callback(outgoing_block_message_callback callback)
 {
-    _outgoing_block_message_cb = callback;
+    delete _outgoing_block_message_cb;
+    _outgoing_block_message_cb = new outgoing_block_message_callback(callback);
 }
 
 void M2MResourceInstance::set_notification_sent_callback(notification_sent_callback callback)
