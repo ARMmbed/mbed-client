@@ -331,7 +331,7 @@ private:
     incoming_block_message_callback         *_incoming_block_message_cb;
     outgoing_block_message_callback         *_outgoing_block_message_cb;
 
-    notification_sent_callback              _notification_sent_callback;
+    notification_sent_callback              *_notification_sent_callback;
     uint16_t                                _object_instance_id;
     ResourceType                            _resource_type;
 

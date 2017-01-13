@@ -119,6 +119,7 @@ M2MResourceInstance::M2MResourceInstance(M2MResource &parent,
   _notification_sent_function_pointer(NULL),
   _incoming_block_message_cb(NULL),
   _outgoing_block_message_cb(NULL),
+  _notification_sent_callback(NULL),
   _object_instance_id(object_instance_id),
   _resource_type(type)
 {
@@ -144,6 +145,7 @@ M2MResourceInstance::~M2MResourceInstance()
     delete _notification_sent_function_pointer;
     delete _incoming_block_message_cb;
     delete _outgoing_block_message_cb;
+    delete _notification_sent_callback;
     delete _block_message_data;
 }
 
@@ -585,7 +587,8 @@ void M2MResourceInstance::set_outgoing_block_message_callback(outgoing_block_mes
 
 void M2MResourceInstance::set_notification_sent_callback(notification_sent_callback callback)
 {
-    _notification_sent_callback = callback;
+    delete _notification_sent_callback;
+    _notification_sent_callback = new notification_sent_callback(callback);
 }
 
 void M2MResourceInstance::set_notification_sent_callback(notification_sent_callback_2 callback)
@@ -600,7 +603,7 @@ void M2MResourceInstance::set_notification_sent_callback(notification_sent_callb
 void M2MResourceInstance::notification_sent()
 {
     if (_notification_sent_callback) {
-        _notification_sent_callback();
+        (*_notification_sent_callback)();
     }
 }
 
