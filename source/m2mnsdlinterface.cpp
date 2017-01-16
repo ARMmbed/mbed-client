@@ -91,7 +91,6 @@ M2MNsdlInterface::~M2MNsdlInterface()
     if(_endpoint) {
          memory_free(_endpoint->endpoint_name_ptr);
          memory_free(_endpoint->lifetime_ptr);
-         memory_free(_endpoint->location_ptr);
          memory_free(_endpoint);
     }
     delete _nsdl_exceution_timer;
@@ -403,14 +402,9 @@ uint8_t M2MNsdlInterface::received_from_server_callback(struct nsdl_s *nsdl_hand
                         set_endpoint_lifetime_buffer(max_time);
                     }
                     if(coap_header->options_list_ptr->location_path_ptr) {
-
-                        memory_free(_endpoint->location_ptr);
-
-                        _endpoint->location_ptr = alloc_string_copy(coap_header->options_list_ptr->location_path_ptr, coap_header->options_list_ptr->location_path_len);
-                        if (_endpoint->location_ptr != NULL) {
-                            _endpoint->location_len = coap_header->options_list_ptr->location_path_len;
-                        }
-                        sn_nsdl_set_endpoint_location(_nsdl_handle,_endpoint->location_ptr,_endpoint->location_len);
+                        sn_nsdl_set_endpoint_location(_nsdl_handle,
+                                                      coap_header->options_list_ptr->location_path_ptr,
+                                                      coap_header->options_list_ptr->location_path_len);
                     }
                 }
                 if(_endpoint->lifetime_ptr) {
