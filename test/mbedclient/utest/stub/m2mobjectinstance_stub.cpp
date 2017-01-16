@@ -125,6 +125,11 @@ bool M2MObjectInstance::remove_resource(const String &)
     return m2mobjectinstance_stub::bool_value;
 }
 
+bool M2MObjectInstance::remove_resource(const char *resource_name)
+{
+    return m2mobjectinstance_stub::bool_value;
+}
+
 bool M2MObjectInstance::remove_resource_instance(const String &, uint16_t)
 {
     return m2mobjectinstance_stub::bool_value;
@@ -151,6 +156,11 @@ uint16_t M2MObjectInstance::resource_count() const
 }
 
 uint16_t M2MObjectInstance::resource_count(const String& ) const
+{
+    return m2mobjectinstance_stub::int_value;
+}
+
+uint16_t M2MObjectInstance::resource_count(const char* ) const
 {
     return m2mobjectinstance_stub::int_value;
 }

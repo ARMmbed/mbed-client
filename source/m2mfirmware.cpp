@@ -420,7 +420,7 @@ bool M2MFirmware::is_resource_present(FirmwareResource resource) const
     return success;
 }
 
-const String M2MFirmware::resource_name(FirmwareResource resource)
+const char* M2MFirmware::resource_name(FirmwareResource resource)
 {
     const char* res_name = "";
     switch(resource) {
@@ -449,7 +449,7 @@ const String M2MFirmware::resource_name(FirmwareResource resource)
             res_name = FIRMWARE_PACKAGE_VERSION;
             break;
     }
-    return String(res_name);
+    return res_name;
 }
 
 uint16_t M2MFirmware::per_resource_count(FirmwareResource res) const

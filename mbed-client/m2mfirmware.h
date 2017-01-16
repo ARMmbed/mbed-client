@@ -215,7 +215,7 @@ private:
 
     M2MResource* get_resource(FirmwareResource resource) const;
 
-    static const String resource_name(FirmwareResource resource);
+    static const char* resource_name(FirmwareResource resource);
 
     void create_mandatory_resources();
 
