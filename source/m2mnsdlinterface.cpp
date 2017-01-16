@@ -557,8 +557,11 @@ uint8_t M2MNsdlInterface::received_from_server_callback(struct nsdl_s *nsdl_hand
                 tr_debug("M2MNsdlInterface::received_from_server_callback - Empty ACK, msg id: %d", coap_header->msg_id);
                 M2MBase *base = find_resource("", coap_header->token_ptr, coap_header->token_len);
                 if (base) {
-                    M2MResource* res = static_cast<M2MResource*> (base);
-                    res->notification_sent();
+                    // Supported only in Resource level
+                    if (M2MBase::Resource == base->base_type()) {
+                        M2MResource *resource = static_cast<M2MResource *> (base);
+                        resource->notification_sent();
+                    }
                 }
             }
 
@@ -1113,6 +1116,7 @@ M2MBase* M2MNsdlInterface::find_resource(const String &object_name,
                                          uint8_t token_len)
 {
     tr_debug("M2MNsdlInterface::find_resource - name (%s)", object_name.c_str());
+    tr_debug("M2MNsdlInterface::find_resource - token (%.*s)", token_len, token);
     M2MBase *object = NULL;
     if(!_object_list.empty()) {
         M2MObjectList::const_iterator it;
@@ -1133,7 +1137,10 @@ M2MBase* M2MNsdlInterface::find_resource(const String &object_name,
                             memcmp(token, stored_token, token_len) == 0) {
                         object = (*it);
                         tr_debug("M2MNsdlInterface::find_resource - token found");
+                        free(stored_token);
                         break;
+                    } else {
+                        free(stored_token);
                     }
                 }
             }
@@ -1176,7 +1183,10 @@ M2MBase* M2MNsdlInterface::find_resource(const M2MObject *object,
                         if (stored_token_length == token_len &&
                                 memcmp(token, stored_token, token_len) == 0) {
                             instance = (*it);
+                            free(stored_token);
                             break;
+                        } else {
+                            free(stored_token);
                         }
                     }
                 }
@@ -1228,7 +1238,10 @@ M2MBase* M2MNsdlInterface::find_resource(const M2MObjectInstance *object_instanc
                         if (stored_token_length == token_len &&
                                 memcmp(token, stored_token, token_len) == 0) {
                             instance = *it;
+                            free(stored_token);
                             break;
+                        } else {
+                            free(stored_token);
                         }
                     }
                 }
@@ -1714,7 +1727,9 @@ void M2MNsdlInterface::handle_bootstrap_finished(sn_coap_hdr_s *coap_header,sn_n
         }
         _endpoint->endpoint_name_ptr = alloc_string_copy((uint8_t*)_endpoint_name.c_str(), _endpoint_name.length());
         _endpoint->endpoint_name_len = _endpoint_name.length();
-        _observer.bootstrap_done(_security);
+        // Inform observer that bootstrap is finished but it should wait until nsdl has sent data.
+        // The final bootstrap_done callback is called in the observers data_sent callback.
+        _observer.bootstrap_wait(_security);
     } else {
         handle_bootstrap_error();
     }
