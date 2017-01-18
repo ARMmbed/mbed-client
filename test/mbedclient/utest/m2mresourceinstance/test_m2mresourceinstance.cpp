@@ -23,6 +23,10 @@
 #include "common_stub.h"
 #include "m2mtlvdeserializer_stub.h"
 #include "m2mblockmessage_stub.h"
+#include "m2mobjectinstance_stub.h"
+#include "m2mobject_stub.h"
+#include "m2mresource_stub.h"
+
 static bool cb_visited = false;
 static void callback_function(void *args)
 {
@@ -53,13 +57,6 @@ public:
     bool block_requested;
 };
 
-class TestReportObserver :  public M2MReportObserver{
-public :
-    TestReportObserver() {}
-    ~TestReportObserver() {}
-    void observation_to_be_sent(m2m::Vector<uint16_t>,bool){ }
-};
-
 class ResourceCallback : public M2MResourceCallback {
 
 public:
@@ -74,6 +71,13 @@ public:
     bool visited;
 };
 
+class TestReportObserver :  public M2MReportObserver{
+public :
+    TestReportObserver() {}
+    ~TestReportObserver() {}
+    void observation_to_be_sent(m2m::Vector<uint16_t>,bool){ }
+};
+
 class Handler : public M2MObservationHandler {
 
 public:
@@ -84,7 +88,7 @@ public:
         visited = true;
     }
     void send_delayed_response(M2MBase *){}
-    void resource_to_be_deleted(const String &){visited=true;}
+    void resource_to_be_deleted(M2MBase *){visited=true;}
     void remove_object(M2MBase *){visited = true;}
     void value_updated(M2MBase *,const String&){visited = true;}
 
@@ -92,81 +96,35 @@ public:
     bool visited;
 };
 
-class Callback : public M2MObjectInstanceCallback {
-
-public:
-
-    Callback(){}
-    ~Callback(){}
-    void notification_update(M2MBase::Observation) {
-        visited = true;
-    }
-
-    void clear() {visited = false;}
-    bool visited;
-};
-
-
 Test_M2MResourceInstance::Test_M2MResourceInstance()
 {
-    callback = new Callback();
     handler = new Handler();
-    resource_instance = new M2MResourceInstance("name",
-                                                "resource_type",
-                                                 M2MResourceInstance::STRING,
-                                                *callback);
-    //resource_instance->_resource_callback = new ResourceCallback();
+    obj = new M2MObject("name", "name");
+    m2mresource_stub::object_instance = new M2MObjectInstance(*obj, "name", "", "");
+    m2mobjectinstance_stub::resource = new M2MResource(*m2mresource_stub::object_instance,
+                                                       "name",
+                                                       "type",
+                                                       M2MResourceInstance::STRING,
+                                                       false,
+                                                       "name");
+
+    resource_instance = new M2MResourceInstance(*m2mobjectinstance_stub::resource,
+                          "name",
+                          "resource_type",
+                          M2MResourceInstance::STRING,
+                          0,
+                          "name",
+                          false);
 }
 
 Test_M2MResourceInstance::~Test_M2MResourceInstance()
 {
+    delete m2mresource_stub::object_instance;
+    delete m2mobjectinstance_stub::resource;
     delete resource_instance;
+    delete obj;
     delete handler;
-    delete callback;
 }
-
-void Test_M2MResourceInstance::test_copy_constructor()
-{
-    u_int8_t value[] = {"value"};
-    resource_instance->set_value(value,(u_int32_t)sizeof(value));
-
-    M2MResourceInstance* copy = new M2MResourceInstance(*resource_instance);
-    u_int8_t* out_value = (u_int8_t*)malloc(sizeof(u_int8_t));
-    u_int32_t out_size;
-
-    copy->get_value(out_value,out_size);
-    CHECK(out_size == sizeof(value));
-    free(out_value);
-
-    delete copy;
-}
-
-void Test_M2MResourceInstance::test_assignment_constructor()
-{
-    u_int8_t value[] = {"value"};
-    resource_instance->set_value(value,(u_int32_t)sizeof(value));
-
-    M2MResourceInstance* res = new M2MResourceInstance("name",
-                                                       "resource_type",
-                                                       M2MResourceInstance::STRING,
-                                                       *callback);
-
-    u_int8_t value1[] = {"value1"};
-    res->set_value(value1,(u_int32_t)sizeof(value1));
-
-    *res = *resource_instance;
-
-    u_int8_t* out_value = (u_int8_t*)malloc(sizeof(u_int8_t));
-    u_int32_t out_size;
-
-    res->get_value(out_value,out_size);
-
-    CHECK(out_size == sizeof(value));
-    free(out_value);
-
-    delete res;
-}
-
 
 void Test_M2MResourceInstance::test_resource_instance_type()
 {
@@ -176,11 +134,37 @@ void Test_M2MResourceInstance::test_resource_instance_type()
 void Test_M2MResourceInstance::test_static_resource_instance()
 {
     u_int8_t value[] = {"value"};
-    M2MResourceInstance *res = new M2MResourceInstance("name1", "type1",
+    m2mbase_stub::mode_value = M2MBase::Dynamic;
+    M2MResourceInstance *res = new M2MResourceInstance(*m2mobjectinstance_stub::resource,
+                                                       "name1",
+                                                       "type1",
                                                        M2MResourceInstance::INTEGER,
                                                        value, (uint32_t)sizeof(value),
-                                                       *callback);
+                                                       0,
+                                                       "name1",
+                                                       false);
 
+    CHECK(res != NULL);
+    delete res;
+    res = NULL;
+
+    m2mbase_stub::mode_value = M2MBase::Static;
+    m2mbase_stub::nsdl_resource = (sn_nsdl_dynamic_resource_parameters_s*)malloc(sizeof(sn_nsdl_dynamic_resource_parameters_s));
+    m2mbase_stub::nsdl_resource->static_resource_parameters =
+            (sn_nsdl_static_resource_parameters_s*)malloc(sizeof(sn_nsdl_static_resource_parameters_s));
+
+    res = new M2MResourceInstance(*m2mobjectinstance_stub::resource,
+                                                       "name1",
+                                                       "type1",
+                                                       M2MResourceInstance::INTEGER,
+                                                       value, (uint32_t)sizeof(value),
+                                                       0,
+                                                       "name1",
+                                                       false);
+
+    free(m2mbase_stub::nsdl_resource->static_resource_parameters->resource);
+    free(m2mbase_stub::nsdl_resource->static_resource_parameters);
+    free(m2mbase_stub::nsdl_resource);
     CHECK(res != NULL);
     delete res;
 }
@@ -374,9 +358,15 @@ void Test_M2MResourceInstance::test_get_value()
     resource_instance->_value_length = value_length;
     memcpy((u_int8_t *)resource_instance->_value, (u_int8_t *)test_value, value_length);
 
-    resource_instance->clear_value();
+    uint8_t* buffer = (uint8_t*)malloc(5);
+    uint32_t val_size = 0;
+    resource_instance->get_value(buffer, val_size);
+    CHECK(val_size == value_length);
+    free(buffer);
 
+    resource_instance->clear_value();
     CHECK(resource_instance->_value == NULL);
+
 
 }
 
@@ -401,9 +391,8 @@ void Test_M2MResourceInstance::test_handle_get_request()
 
     coap_header->msg_code = COAP_MSG_CODE_REQUEST_GET;
 
-    String *name = new String("name");
     common_stub::int_value = 0;
-    m2mbase_stub::string_value = name;
+    m2mbase_stub::string_value = "name";
 
     m2mbase_stub::operation = M2MBase::GET_ALLOWED;
     m2mbase_stub::uint8_value = 200;
@@ -492,9 +481,6 @@ void Test_M2MResourceInstance::test_handle_get_request()
     free(coap_header);
     coap_header = NULL;
 
-    delete name;
-    name = NULL;
-
     m2mbase_stub::clear();
     common_stub::clear();
 }
@@ -511,9 +497,8 @@ void Test_M2MResourceInstance::test_handle_put_request()
 
     coap_header->msg_code = COAP_MSG_CODE_REQUEST_PUT;
 
-    String *name = new String("name");
     common_stub::int_value = 0;
-    m2mbase_stub::string_value = name;
+    m2mbase_stub::string_value = "name";
 
     m2mbase_stub::operation = M2MBase::PUT_ALLOWED;
     m2mbase_stub::uint8_value = 200;
@@ -598,7 +583,6 @@ void Test_M2MResourceInstance::test_handle_put_request()
     free(coap_header->options_list_ptr);
     free(coap_header->payload_ptr);
     free(common_stub::coap_header);
-    delete name;
     free(coap_header);
 
     m2mtlvdeserializer_stub::clear();
@@ -617,8 +601,8 @@ void Test_M2MResourceInstance::test_set_resource_observer()
 
 void Test_M2MResourceInstance::test_get_object_name()
 {
-    resource_instance->_object_name = "object";
-    CHECK(resource_instance->object_name() == "object");
+    m2mbase_stub::string_value = "name";
+    CHECK(resource_instance->object_name() == "name");
 }
 
 void Test_M2MResourceInstance::test_get_object_instance_id()
@@ -654,4 +638,21 @@ void Test_M2MResourceInstance::test_notification_sent()
     resource_instance->set_notification_sent_callback(global_notification_sent_function);
     resource_instance->notification_sent();
     CHECK(true == cb_visited);
+}
+
+void Test_M2MResourceInstance::test_ctor()
+{
+    M2MResourceInstance* instance = new M2MResourceInstance(*m2mobjectinstance_stub::resource, &params,
+                                                            M2MResourceInstance::STRING, 0);
+    CHECK(instance != NULL);
+    delete instance;
+}
+
+void Test_M2MResourceInstance::test_get_parent_resource()
+{
+    M2MResourceInstance* instance = new M2MResourceInstance(*m2mobjectinstance_stub::resource, &params,
+                                                            M2MResourceInstance::STRING, 0);
+    // Only for the code coverage
+    instance->get_parent_resource();
+    delete instance;
 }

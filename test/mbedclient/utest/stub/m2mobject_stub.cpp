@@ -35,24 +35,26 @@ void m2mobject_stub::clear()
     header = NULL;
 }
 
-M2MObject::M2MObject(const String &object_name)
-: M2MBase(object_name,M2MBase::Dynamic)
+M2MObject::M2MObject(const String &object_name, char *path, bool external_blockwise_store)
+: M2MBase(object_name,
+          M2MBase::Dynamic,
+          "",
+          path,
+          external_blockwise_store),
+  _max_instance_count(65535)
 {
+
+}
+
+M2MObject::M2MObject(const M2MBase::lwm2m_parameters_s* static_res)
+: M2MBase(static_res),
+  _max_instance_count(65535)
+{
+
 }
 
 M2MObject::~M2MObject()
 {
-}
-
-M2MObject& M2MObject::operator=(const M2MObject& )
-{
-    return *this;
-}
-
-M2MObject::M2MObject(const M2MObject& other)
-: M2MBase(other)
-{
-    *this = other;
 }
 
 M2MObjectInstance* M2MObject::create_object_instance(uint16_t instance_id)

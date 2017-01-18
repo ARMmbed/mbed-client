@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 #include "m2mreporthandler_stub.h"
+#include "m2mtimer_stub.h"
 
 bool m2mreporthandler_stub::bool_return;
 u_int8_t m2mreporthandler_stub::int_value;
@@ -25,7 +26,9 @@ void m2mreporthandler_stub::clear()
 }
 
 M2MReportHandler::M2MReportHandler(M2MReportObserver &observer)
-: _observer(observer)
+: _observer(observer),
+  _pmin_timer(*this),
+  _pmax_timer(*this)
 {
 }
 
@@ -41,7 +44,7 @@ void M2MReportHandler::set_value(float)
 {
 }
 
-bool M2MReportHandler::parse_notification_attribute(char *&,
+bool M2MReportHandler::parse_notification_attribute(const char *,
                                                     M2MBase::BaseType,
                                                     M2MResourceInstance::ResourceType resource_type)
 {

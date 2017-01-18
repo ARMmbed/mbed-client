@@ -69,7 +69,7 @@ private:
     /**
      * Constructor
      */
-    M2MDevice();
+    M2MDevice(char *path);
 
     // Prevents the use of assignment operator.
     M2MDevice& operator=( const M2MDevice& /*other*/ );

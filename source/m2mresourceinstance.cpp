@@ -17,6 +17,7 @@
 #include "mbed-client/m2mresource.h"
 #include "mbed-client/m2mconstants.h"
 #include "mbed-client/m2mobservationhandler.h"
+#include "mbed-client/m2mobject.h"
 #include "mbed-client/m2mobjectinstance.h"
 #include "include/m2mreporthandler.h"
 #include "include/nsdllinker.h"
@@ -25,95 +26,108 @@
 
 #define TRACE_GROUP "mClt"
 
-M2MResourceInstance& M2MResourceInstance::operator=(const M2MResourceInstance& other)
-{
-    if (this != &other) { // protect against invalid self-assignment
-
-        free(_value);
-        _value = NULL;
-
-        _value_length = other._value_length;
-        if(other._value) {
-            _value = (uint8_t *)alloc_string_copy(other._value, other._value_length);
-        }
-    }
-    return *this;
-}
-
-M2MResourceInstance::M2MResourceInstance(const M2MResourceInstance& other)
-: M2MBase(other),
-  _object_instance_callback(other._object_instance_callback),
-  _execute_callback(NULL),
-  _value(NULL),
-  _value_length(0),
-  _resource_callback(NULL),
-  _object_name(other._object_name),
-  _execute_function_pointer(NULL),
-  _notification_sent_function_pointer(NULL),
-  _object_instance_id(other._object_instance_id),
-  _resource_type(M2MResourceInstance::STRING),
-  _block_message_data(NULL),
-  _notification_sent_callback(NULL)
-{
-    this->operator=(other);
-}
-
-M2MResourceInstance::M2MResourceInstance(const String &res_name,
+M2MResourceInstance::M2MResourceInstance(M2MResource &parent,
+                                         const String &res_name,
                                          const String &resource_type,
                                          M2MResourceInstance::ResourceType type,
-                                         M2MObjectInstanceCallback &object_instance_callback,
                                          const uint16_t object_instance_id,
-                                         const String &object_name)
+                                         char* path,
+                                         bool external_blockwise_store)
 : M2MBase(res_name,
-          M2MBase::Dynamic),
- _object_instance_callback(object_instance_callback),
- _execute_callback(NULL),
+          M2MBase::Dynamic,
+          resource_type,
+          path,
+          external_blockwise_store),
+ _parent_resource(parent),
  _value(NULL),
  _value_length(0),
+ _block_message_data(NULL),
+ _execute_callback(NULL),
  _resource_callback(NULL),
- _object_name(object_name),
  _execute_function_pointer(NULL),
  _notification_sent_function_pointer(NULL),
+ _notification_sent_callback(NULL),
  _object_instance_id(object_instance_id),
- _resource_type(type),
- _block_message_data(NULL),
- _notification_sent_callback(NULL)
+ _resource_type(type)
 {
-    M2MBase::set_resource_type(resource_type);
     M2MBase::set_base_type(M2MBase::ResourceInstance);
 }
 
-M2MResourceInstance::M2MResourceInstance(const String &res_name,
+M2MResourceInstance::M2MResourceInstance(M2MResource &parent,
+                                         const String &res_name,
                                          const String &resource_type,
                                          M2MResourceInstance::ResourceType type,
                                          const uint8_t *value,
                                          const uint8_t value_length,
-                                         M2MObjectInstanceCallback &object_instance_callback,
                                          const uint16_t object_instance_id,
-                                         const String &object_name)
+                                         char* path,
+                                         bool external_blockwise_store)
 : M2MBase(res_name,
-          M2MBase::Static),
- _object_instance_callback(object_instance_callback),
- _execute_callback(NULL),
+          M2MBase::Static,
+          resource_type,
+          path,
+          external_blockwise_store),
+ _parent_resource(parent),
  _value(NULL),
  _value_length(0),
+ _block_message_data(NULL),
+ _execute_callback(NULL),
  _resource_callback(NULL),
- _object_name(object_name),
  _execute_function_pointer(NULL),
  _notification_sent_function_pointer(NULL),
+ _notification_sent_callback(NULL),
  _object_instance_id(object_instance_id),
- _resource_type(type),
- _block_message_data(NULL),
- _notification_sent_callback(NULL)
+  _resource_type(type)
 {
-    M2MBase::set_resource_type(resource_type);
     M2MBase::set_base_type(M2MBase::Resource);
-    if( value != NULL && value_length > 0 ) {
-        _value = alloc_string_copy(value, value_length);
-        if(_value) {
-            _value_length = value_length;
+    if (mode() == M2MBase::Dynamic) {
+        if( value != NULL && value_length > 0 ) {
+            _value = alloc_string_copy(value, value_length);
+            if(_value) {
+                _value_length = value_length;
+            }
         }
     }
+    // Copy resource value to struct since static resources are handled in mbed-client-c
+    else if (mode() == M2MBase::Static) {
+       sn_nsdl_dynamic_resource_parameters_s* res = get_nsdl_resource();
+       sn_nsdl_static_resource_parameters_s* params = (sn_nsdl_static_resource_parameters_s*)res->static_resource_parameters;
+       params->resource = alloc_string_copy(value, value_length);
+       params->resourcelen = value_length;
+    }
+    else {
+        // Directory, not supported
+    }
+}
+
+M2MResourceInstance::M2MResourceInstance(M2MResource &parent,
+                                         const lwm2m_parameters_s* s,
+                                         M2MResourceInstance::ResourceType type,
+                                         const uint16_t object_instance_id)
+: M2MBase(s),
+  _parent_resource(parent),
+  _value(NULL),
+  _value_length(0),
+  _block_message_data(NULL),
+  _execute_callback(NULL),
+  _resource_callback(NULL),
+  _execute_function_pointer(NULL),
+  _notification_sent_function_pointer(NULL),
+  _object_instance_id(object_instance_id),
+  _resource_type(type)
+{
+    //TBD: put to flash, or parse from the uri_path!!!!
+    //same for the _object_instance_id.
+    // TBD: we dont need _value here, because in c-struct there is resource field!!!!
+    if( s->dynamic_resource_params->static_resource_parameters->resource != NULL &&
+            s->dynamic_resource_params->static_resource_parameters->resourcelen > 0 ) {
+        _value = alloc_string_copy(s->dynamic_resource_params->static_resource_parameters->resource,
+                                   s->dynamic_resource_params->static_resource_parameters->resourcelen);
+        if(_value) {
+            _value_length = s->dynamic_resource_params->static_resource_parameters->resourcelen;
+        }
+    }
+    //M2MBase::set_base_type(M2MBase::ResourceInstance);
 }
 
 M2MResourceInstance::~M2MResourceInstance()
@@ -134,11 +148,16 @@ M2MResourceInstance::ResourceType M2MResourceInstance::resource_instance_type() 
     return _resource_type;
 }
 
-bool M2MResourceInstance::handle_observation_attribute(char *&query)
+bool M2MResourceInstance::handle_observation_attribute(const char *query)
 {
     tr_debug("M2MResourceInstance::handle_observation_attribute - is_under_observation(%d)", is_under_observation());
     bool success = false;
+
     M2MReportHandler *handler = M2MBase::report_handler();
+    if (!handler) {
+        handler = M2MBase::create_report_handler();
+    }
+
     if (handler) {
         success = handler->parse_notification_attribute(query,
                 M2MBase::base_type(), _resource_type);
@@ -231,7 +250,8 @@ void M2MResourceInstance::report()
     if((M2MBase::O_Attribute & observation_level) == M2MBase::O_Attribute ||
        (M2MBase::OI_Attribute & observation_level) == M2MBase::OI_Attribute) {
         tr_debug("M2MResourceInstance::report() -- object/instance level");
-        _object_instance_callback.notification_update(observation_level);
+        M2MObjectInstance& object_instance = get_parent_resource().get_parent_object_instance();
+        object_instance.notification_update(observation_level);
     }
 
     if(M2MBase::Dynamic == mode() &&
@@ -366,7 +386,13 @@ sn_coap_hdr_s* M2MResourceInstance::handle_get_request(nsdl_s *nsdl,
                 //If handler exists it means that resource value is stored in application side
                 if (block_message() && block_message()->is_block_message()) {
                     if(_outgoing_block_message_cb) {
-                        _outgoing_block_message_cb(uri_path(), coap_response->payload_ptr, payload_len);
+                        String name = "";
+                        if (received_coap_header->uri_path_ptr != NULL &&
+                                received_coap_header->uri_path_len > 0) {
+                            name.append_raw((char *)received_coap_header->uri_path_ptr,
+                                             received_coap_header->uri_path_len);
+                        }
+                        _outgoing_block_message_cb(name, coap_response->payload_ptr, payload_len);
                     }
                 } else {
                     get_value(coap_response->payload_ptr,payload_len);
@@ -519,11 +545,6 @@ void M2MResourceInstance::set_resource_observer(M2MResourceCallback *resource)
     _resource_callback = resource;
 }
 
-const String& M2MResourceInstance::object_name() const
-{
-    return _object_name;
-}
-
 uint16_t M2MResourceInstance::object_instance_id() const
 {
     return _object_instance_id;
@@ -566,4 +587,17 @@ void M2MResourceInstance::notification_sent()
     if (_notification_sent_callback) {
         _notification_sent_callback();
     }
+}
+
+M2MResource& M2MResourceInstance::get_parent_resource() const
+{
+    return _parent_resource;
+}
+
+const char* M2MResourceInstance::object_name() const
+{
+    const M2MObjectInstance& parent_object_instance = _parent_resource.get_parent_object_instance();
+    const M2MObject& parent_object = parent_object_instance.get_parent_object();
+
+    return parent_object.name();
 }
