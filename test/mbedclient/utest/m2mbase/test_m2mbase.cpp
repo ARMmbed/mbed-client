@@ -501,7 +501,7 @@ void Test_M2MBase::test_alloc_copy()
     uint8_t* test_ptr = (uint8_t *)malloc(10);
     memset(test_ptr,'a', 10);
     uint8_t* result = alloc_copy(test_ptr, 10);
-    STRCMP_EQUAL((char*)test_ptr,(char*)result);
+    CHECK(memcmp(test_ptr, result, 10) == 0);
     free(test_ptr);
     free(result);
 }
