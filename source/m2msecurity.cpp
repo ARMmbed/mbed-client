@@ -136,7 +136,7 @@ M2MResource* M2MSecurity::create_resource(SecurityResource resource, uint32_t va
 bool M2MSecurity::delete_resource(SecurityResource resource)
 {
     bool success = false;
-    const char* security_id_ptr = "";
+    const char* security_id_ptr;
     switch(resource) {
         case SMSSecurityMode:
            security_id_ptr = SECURITY_SMS_SECURITY_MODE;
@@ -154,14 +154,13 @@ bool M2MSecurity::delete_resource(SecurityResource resource)
             break;
         default:
             // Others are mandatory resources hence cannot be deleted.
+            security_id_ptr = NULL;
             break;
     }
 
-    const String security_id(security_id_ptr);
-
-    if(!security_id.empty()) {
+    if(security_id_ptr) {
         if(_server_instance) {
-            success = _server_instance->remove_resource(security_id);
+            success = _server_instance->remove_resource(security_id_ptr);
         }
     }
     return success;
@@ -314,7 +313,7 @@ M2MResource* M2MSecurity::get_resource(SecurityResource res) const
 {
     M2MResource* res_object = NULL;
     if(_server_instance) {
-        const char* res_name_ptr = "";
+        const char* res_name_ptr = NULL;
         switch(res) {
             case M2MServerUri:
                 res_name_ptr = SECURITY_M2M_SERVER_URI;
@@ -353,9 +352,10 @@ M2MResource* M2MSecurity::get_resource(SecurityResource res) const
                 res_name_ptr = SECURITY_CLIENT_HOLD_OFF_TIME;
                 break;
         }
-        const String res_name(res_name_ptr);
 
-        res_object = _server_instance->resource(res_name);
+        if (res_name_ptr) {
+            res_object = _server_instance->resource(res_name_ptr);
+        }
     }
     return res_object;
 }

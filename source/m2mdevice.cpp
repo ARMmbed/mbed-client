@@ -461,7 +461,7 @@ M2MResourceInstance* M2MDevice::get_resource_instance(DeviceResource dev_res,
     return inst;
 }
 
-const String M2MDevice::resource_name(DeviceResource resource)
+const char* M2MDevice::resource_name(DeviceResource resource)
 {
     const char* res_name = "";
     switch(resource) {
@@ -532,7 +532,7 @@ const String M2MDevice::resource_name(DeviceResource resource)
             res_name = DEVICE_SUPPORTED_BINDING_MODE;
             break;
     }
-    return String(res_name);
+    return res_name;
 }
 
 bool M2MDevice::check_value_range(DeviceResource resource, int64_t value) const
