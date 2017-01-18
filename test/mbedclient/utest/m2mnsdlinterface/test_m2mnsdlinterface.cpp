@@ -563,9 +563,13 @@ void Test_M2MNsdlInterface::test_received_from_server_callback()
             (sn_nsdl_dynamic_resource_parameters_s*) malloc(sizeof(sn_nsdl_dynamic_resource_parameters_s));
     m2mbase_stub::nsdl_resource->static_resource_parameters =
             (sn_nsdl_static_resource_parameters_s*) malloc(sizeof(sn_nsdl_static_resource_parameters_s));
-    m2mbase_stub::nsdl_resource->static_resource_parameters->path = (char *) malloc(5);
-    strcpy(m2mbase_stub::nsdl_resource->static_resource_parameters->path, m2mbase_stub::string_value);
-
+    m2mbase_stub::nsdl_resource->static_resource_parameters->path = (uint8_t*)malloc(5);
+    m2mbase_stub::nsdl_resource->static_resource_parameters->path[0] = 'n';
+    m2mbase_stub::nsdl_resource->static_resource_parameters->path[1] = 'a';
+    m2mbase_stub::nsdl_resource->static_resource_parameters->path[2] = 'm';
+    m2mbase_stub::nsdl_resource->static_resource_parameters->path[3] = 'e';
+    m2mbase_stub::nsdl_resource->static_resource_parameters->path[4] = '\0';
+    m2mbase_stub::nsdl_resource->static_resource_parameters->pathlen = 5;
 
     nsdl->_object_list.push_back(obj);
 
@@ -986,8 +990,13 @@ void Test_M2MNsdlInterface::test_resource_callback()
             (sn_nsdl_dynamic_resource_parameters_s*) malloc(sizeof(sn_nsdl_dynamic_resource_parameters_s));
     m2mbase_stub::nsdl_resource->static_resource_parameters =
             (sn_nsdl_static_resource_parameters_s*) malloc(sizeof(sn_nsdl_static_resource_parameters_s));
-    m2mbase_stub::nsdl_resource->static_resource_parameters->path = (char*) malloc(5);
-    strcpy(m2mbase_stub::nsdl_resource->static_resource_parameters->path, m2mbase_stub::string_value);
+    m2mbase_stub::nsdl_resource->static_resource_parameters->path = (uint8_t*)malloc(5);
+    m2mbase_stub::nsdl_resource->static_resource_parameters->path[0] = 'n';
+    m2mbase_stub::nsdl_resource->static_resource_parameters->path[1] = 'a';
+    m2mbase_stub::nsdl_resource->static_resource_parameters->path[2] = 'm';
+    m2mbase_stub::nsdl_resource->static_resource_parameters->path[3] = 'e';
+    m2mbase_stub::nsdl_resource->static_resource_parameters->path[4] = '\0';
+    m2mbase_stub::nsdl_resource->static_resource_parameters->pathlen = 5;
 
     nsdl->_object_list.push_back(object);
 
@@ -1151,8 +1160,13 @@ void Test_M2MNsdlInterface::test_resource_callback_post()
             (sn_nsdl_dynamic_resource_parameters_s*) malloc(sizeof(sn_nsdl_dynamic_resource_parameters_s));
     m2mbase_stub::nsdl_resource->static_resource_parameters =
             (sn_nsdl_static_resource_parameters_s*) malloc(sizeof(sn_nsdl_static_resource_parameters_s));
-    m2mbase_stub::nsdl_resource->static_resource_parameters->path = (char*) malloc(5);
-    strcpy(m2mbase_stub::nsdl_resource->static_resource_parameters->path, m2mbase_stub::string_value);
+    m2mbase_stub::nsdl_resource->static_resource_parameters->path = (uint8_t*)malloc(5);
+    m2mbase_stub::nsdl_resource->static_resource_parameters->path[0] = 'n';
+    m2mbase_stub::nsdl_resource->static_resource_parameters->path[1] = 'a';
+    m2mbase_stub::nsdl_resource->static_resource_parameters->path[2] = 'm';
+    m2mbase_stub::nsdl_resource->static_resource_parameters->path[3] = 'e';
+    m2mbase_stub::nsdl_resource->static_resource_parameters->path[4] = '\0';
+    m2mbase_stub::nsdl_resource->static_resource_parameters->pathlen = 5;
 
     common_stub::coap_header = (sn_coap_hdr_ *)malloc(sizeof(sn_coap_hdr_));
     memset(common_stub::coap_header,0,sizeof(sn_coap_hdr_));
@@ -1227,8 +1241,15 @@ void Test_M2MNsdlInterface::test_resource_callback_delete()
     m2mbase_stub::nsdl_resource->static_resource_parameters =
             (sn_nsdl_static_resource_parameters_s*) malloc(sizeof(sn_nsdl_static_resource_parameters_s));
 
-    m2mbase_stub::nsdl_resource->static_resource_parameters->path = (char*)malloc(7);
-    strcpy(m2mbase_stub::nsdl_resource->static_resource_parameters->path, "name/0");
+    m2mbase_stub::nsdl_resource->static_resource_parameters->path = (uint8_t*)malloc(7);
+    m2mbase_stub::nsdl_resource->static_resource_parameters->path[0] = 'n';
+    m2mbase_stub::nsdl_resource->static_resource_parameters->path[1] = 'a';
+    m2mbase_stub::nsdl_resource->static_resource_parameters->path[2] = 'm';
+    m2mbase_stub::nsdl_resource->static_resource_parameters->path[3] = 'e';
+    m2mbase_stub::nsdl_resource->static_resource_parameters->path[4] = '/';
+    m2mbase_stub::nsdl_resource->static_resource_parameters->path[5] = '0';
+    m2mbase_stub::nsdl_resource->static_resource_parameters->path[6] = '\0';
+    m2mbase_stub::nsdl_resource->static_resource_parameters->pathlen = 7;
 
     CHECK(nsdl->resource_callback(NULL,coap_header,address,SN_NSDL_PROTOCOL_HTTP) ==0);
 
