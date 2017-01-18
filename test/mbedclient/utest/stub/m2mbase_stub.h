@@ -21,8 +21,9 @@
 static sn_nsdl_static_resource_parameters_s params_static = {
     (char*)"",      // resource_type_ptr
     (char*)"",                     // interface_description_ptr
-    (char*)"",    // path
+    (uint8_t*)"",    // path
     (uint8_t*)"value",           // resource
+    0,                      // pathlen
     5,                      // resourcelen
     false,                  // external_memory_block
     SN_GRS_DYNAMIC,         // mode
