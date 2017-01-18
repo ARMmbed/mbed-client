@@ -26,7 +26,7 @@ TEST_GROUP(M2MObjectInstance)
     m2m_object_instance = new Test_M2MObjectInstance();
   }
   void teardown()
-  {    
+  {
     delete m2m_object_instance;
   }
 };
@@ -34,11 +34,6 @@ TEST_GROUP(M2MObjectInstance)
 TEST(M2MObjectInstance, Create)
 {
     CHECK(m2m_object_instance != NULL);
-}
-
-TEST(M2MObjectInstance, copy_constructor)
-{
-    m2m_object_instance->test_copy_constructor();
 }
 
 TEST(M2MObjectInstance, create_static_resource)
@@ -116,3 +111,7 @@ TEST(M2MObjectInstance, notification_update)
     m2m_object_instance->test_notification_update();
 }
 
+TEST(M2MObjectInstance, test_ctor)
+{
+    m2m_object_instance->test_ctor();
+}

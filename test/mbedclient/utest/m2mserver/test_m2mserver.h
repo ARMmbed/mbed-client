@@ -45,7 +45,6 @@ public:
     void test_total_resource_count();
 
     M2MServer* server;
-    Callback*   callback;
 };
 
 #endif // TEST_M2M_SERVER_H

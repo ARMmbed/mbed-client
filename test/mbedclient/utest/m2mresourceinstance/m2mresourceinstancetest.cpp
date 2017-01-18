@@ -41,16 +41,6 @@ TEST(M2MResourceInstance, test_static_resource_instance)
     m2m_resourceinstance->test_static_resource_instance();
 }
 
-TEST(M2MResourceInstance, copy_constructor)
-{
-    m2m_resourceinstance->test_copy_constructor();
-}
-
-TEST(M2MResourceInstance, assignment_constructor)
-{
-    m2m_resourceinstance->test_assignment_constructor();
-}
-
 TEST(M2MResourceInstance, base_type)
 {
     m2m_resourceinstance->test_base_type();
@@ -134,4 +124,14 @@ TEST(M2MResourceInstance, test_set_notification_sent_function)
 TEST(M2MResourceInstance, test_notification_sent)
 {
     m2m_resourceinstance->test_notification_sent();
+}
+
+TEST(M2MResourceInstance, test_ctor)
+{
+    m2m_resourceinstance->test_ctor();
+}
+
+TEST(M2MResourceInstance, test_get_parent_resource)
+{
+    m2m_resourceinstance->test_get_parent_resource();
 }

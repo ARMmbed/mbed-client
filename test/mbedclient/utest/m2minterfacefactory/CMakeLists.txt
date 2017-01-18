@@ -14,8 +14,14 @@ add_executable(m2minterfacefactorytest
         "../stub/m2mfirmware_stub.cpp"
         "../stub/m2msecurity_stub.cpp"
         "../stub/m2mserver_stub.cpp"
+        "../stub/m2mtimer_stub.cpp"
+        "../stub/m2mnsdlinterface_stub.cpp"
         "../stub/m2minterfaceimpl_stub.cpp"
+        "../stub/m2mconnectionhandler_stub.cpp"
+        "../stub/m2mconnectionsecurity_stub.cpp"
+        "../stub/nsdlaccesshelper_stub.cpp"
         "../../../../source/m2minterfacefactory.cpp"
+        "../../../../source/m2mstringbufferbase.cpp"
 )
 target_link_libraries(m2minterfacefactorytest
     CppUTest

@@ -20,6 +20,7 @@ add_executable(m2mnsdlinterface
         "../stub/m2mtlvserializer_stub.cpp"
         "../stub/m2mtlvdeserializer_stub.cpp"
         "../../../../source/m2mnsdlinterface.cpp"
+        "../../../../source/m2mstringbufferbase.cpp"
 )
 target_link_libraries(m2mnsdlinterface
     CppUTest
