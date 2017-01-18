@@ -408,6 +408,7 @@ private:
     bool                        _event_generated;
     bool                        _reconnecting;
     bool                        _retry_timer_expired;
+    bool                        _bootstrapped;
     uint8_t                     _current_state;
     uint8_t                     _retry_count;
     BindingMode                 _binding_mode;
