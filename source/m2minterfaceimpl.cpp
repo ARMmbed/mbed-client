@@ -271,12 +271,14 @@ void M2MInterfaceImpl::coap_message_ready(uint8_t *data_ptr,
                                           sn_nsdl_addr_s *address_ptr)
 {
     tr_debug("M2MInterfaceImpl::coap_message_ready");
-    internal_event(STATE_SENDING_COAP_DATA);
-    if(!_connection_handler.send_data(data_ptr,data_len,address_ptr)) {
-        internal_event( STATE_IDLE);
-        tr_error("M2MInterfaceImpl::coap_message_ready() - M2MInterface::NetworkError");
-        if (!_reconnecting) {
-            _observer.error(M2MInterface::NetworkError);
+    if (_current_state != STATE_IDLE) {
+        internal_event(STATE_SENDING_COAP_DATA);
+        if(!_connection_handler.send_data(data_ptr,data_len,address_ptr)) {
+            internal_event( STATE_IDLE);
+            tr_error("M2MInterfaceImpl::coap_message_ready() - M2MInterface::NetworkError");
+            if (!_reconnecting) {
+                _observer.error(M2MInterface::NetworkError);
+            }
         }
     }
 }
