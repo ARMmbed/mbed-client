@@ -645,21 +645,35 @@ void Test_M2MResource::test_delayed_response()
 
 void Test_M2MResource::test_execute_params()
 {
-    M2MResource::M2MExecuteParameter *params = new M2MResource::M2MExecuteParameter();
+    // Note: we need to use const name&objname here as the params is just storing references
+    // so passing dummy "" or "object" there will cause segfault when the value is being verified.
+    const String empty_name("");
+    const String empty_object_name("");
+    
+    M2MResource::M2MExecuteParameter *params = new M2MResource::M2MExecuteParameter(empty_name, empty_object_name, 0);
+
     CHECK(params->get_argument_value() == NULL);
     CHECK(params->get_argument_value_length() == 0);
     CHECK(params->get_argument_object_name() == "");
     CHECK(params->get_argument_resource_name() == "");
     CHECK(params->get_argument_object_instance_id() == 0);
 
-    uint8_t value[] = {"test"};
+    const uint8_t value[] = {"testvalue"};
     int length = sizeof(value);
-    params->_value = (uint8_t*)malloc(length);
-    memcpy(params->_value,value,length);
+    uint8_t* temp_value = (uint8_t*)malloc(length);
+    memcpy(temp_value, value, length);
+
+    delete params;
+
+    // then test with something more than just empty values
+    const String param_name("object");
+    const String param_object_name("resource");
+    
+    params = new M2MResource::M2MExecuteParameter(param_name, param_object_name, 1);
+    params->_value = temp_value;
     params->_value_length = length;
-    params->_object_name = "object";
-    params->_resource_name = "resource";
-    params->_object_instance_id = 0;
+    params->_object_instance_id = 7;
+    
     CHECK(params->_value == params->get_argument_value());
     CHECK(params->_value_length == params->get_argument_value_length());
     CHECK(params->_resource_name == params->get_argument_resource_name());
@@ -667,6 +681,8 @@ void Test_M2MResource::test_execute_params()
     CHECK(params->_object_instance_id == params->get_argument_object_instance_id());
 
     delete params;
+
+    free(temp_value);
 }
 
 void Test_M2MResource::test_ctor()
