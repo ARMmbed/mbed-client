@@ -118,6 +118,10 @@ M2MBase::M2MBase(const lwm2m_parameters_s *s):
     _observation_level(M2MBase::None),
     _is_under_observation(false)
 {
+    // Set callback function in case of dynamic resource
+    if (M2MBase::Dynamic == _sn_resource->dynamic_resource_params->static_resource_parameters->mode) {
+        _sn_resource->dynamic_resource_params->sn_grs_dyn_res_callback = __nsdl_c_callback;
+    }
 }
 
 M2MBase::~M2MBase()
