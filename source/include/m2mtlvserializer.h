@@ -102,7 +102,7 @@ private :
     
     void serialize_TILV (uint8_t type, uint16_t id, uint8_t *value, uint32_t value_length, uint8_t *&data, uint32_t &size);
 
-    uint8_t* serialize_id(uint16_t id, uint32_t &size);
+    void serialize_id(uint16_t id, uint32_t &size, uint8_t* id_ptr);
 
-    uint8_t* serialize_length(uint32_t length, uint32_t &size);
+    void serialize_length(uint32_t length, uint32_t &size, uint8_t* length_ptr);
 };

@@ -16,7 +16,6 @@
 #include "include/m2mtlvserializer.h"
 #include "include/nsdllinker.h"
 #include "mbed-client/m2mconstants.h"
-
 #include <stdlib.h>
 
 #define TRACE_GROUP "mClt"
@@ -157,40 +156,34 @@ void M2MTLVSerializer::serialize_TILV(uint8_t type, uint16_t id, uint8_t *value,
     type += value_length < 8 ? value_length :
             value_length < 256 ? LENGTH8 :
             value_length < 65536 ? LENGTH16 : LENGTH24;
-    uint8_t *tlv_type = (uint8_t*)malloc(type_length+1);
-    memset(tlv_type,0,type_length+1);
-    *tlv_type = type & 0xFF;
+    uint8_t tlv_type;
+    tlv_type = type & 0xFF;
 
     uint32_t id_size = 0;
-    uint8_t* id_ptr = serialize_id(id, id_size);
+    uint8_t id_tmp[2];
+    serialize_id(id, id_size, id_tmp);
 
     uint32_t length_size = 0;
-    uint8_t* length_ptr = serialize_length(value_length, length_size);
+    uint8_t length_tmp[4];
+    serialize_length(value_length, length_size, length_tmp);
 
     tlv = (uint8_t*)malloc(size + type_length + id_size + length_size + value_length+1);
-    memset(tlv,0,size + type_length + id_size + length_size + value_length+1);
     if(data) {
         memcpy(tlv, data, size);
     }
-    memcpy(tlv+size, tlv_type, type_length);
-    memcpy(tlv+size+type_length, id_ptr, id_size);
-    memcpy(tlv+size+type_length+id_size, length_ptr, length_size);
+    memcpy(tlv+size, &tlv_type, type_length);
+    memcpy(tlv+size+type_length, id_tmp, id_size); 
+    memcpy(tlv+size+type_length+id_size, length_tmp, length_size);
     memcpy(tlv+size+type_length+id_size+length_size, value, value_length);
-
-    free(tlv_type) ;
-    free(length_ptr);
-    free(id_ptr);
     free(data);
 
     data = tlv;
     size += type_length + id_size + length_size + value_length;
 }
 
-uint8_t* M2MTLVSerializer::serialize_id(uint16_t id, uint32_t &size)
+void M2MTLVSerializer::serialize_id(uint16_t id, uint32_t &size, uint8_t *id_ptr)
 {
     uint32_t id_size = id > 255 ? 2 : 1;
-    uint8_t *id_ptr = (uint8_t*)malloc(id_size);
-    memset(id_ptr, 0 , id_size);
     size += id_size;
     if(id > 255) {
         *id_ptr = (id & 0xFF00) >> 8;
@@ -200,17 +193,14 @@ uint8_t* M2MTLVSerializer::serialize_id(uint16_t id, uint32_t &size)
     } else {
         *id_ptr = id & 0xFF;
     }
-    return id_ptr;
+    return;
 }
 
-uint8_t* M2MTLVSerializer::serialize_length(uint32_t length, uint32_t &size)
+void M2MTLVSerializer::serialize_length(uint32_t length, uint32_t &size, uint8_t *length_ptr)
 {
-    uint8_t *length_ptr = 0;
     uint32_t length_size = 0;
     if (length > 65535) {
         length_size = 3;
-        length_ptr = (uint8_t*)malloc(length_size+1);
-        memset(length_ptr,0,length_size+1);
         *length_ptr = (length & 0xFF0000) >> 16;
         length_ptr++;
         *length_ptr = (length & 0xFF00) >> 8;
@@ -220,19 +210,15 @@ uint8_t* M2MTLVSerializer::serialize_length(uint32_t length, uint32_t &size)
         length_ptr--;
     } else if (length > 255) {
         length_size = 2;
-        length_ptr = (uint8_t*)malloc(length_size+1);
-        memset(length_ptr,0,length_size+1);
         *length_ptr = (length & 0xFF00) >> 8;
         length_ptr++;
         *length_ptr = length & 0xFF;
         length_ptr--;
     } else if (length > 7) {
         length_size = 1;
-        length_ptr = (uint8_t*)malloc(length_size+1);
-        memset(length_ptr,0,length_size+1);
         *length_ptr = length & 0xFF;
     }
     size += length_size;
-    return length_ptr;
+    return;
 }
 
