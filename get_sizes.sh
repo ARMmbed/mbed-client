@@ -13,6 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+
 echo
 echo "Build mbed Client API for executable size collection"
 echo
