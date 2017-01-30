@@ -199,11 +199,11 @@ void M2MTLVSerializer::serialize_TILV(uint8_t type, uint16_t id, uint8_t *value,
 void M2MTLVSerializer::serialize_id(uint16_t id, uint32_t &size, uint8_t *id_ptr)
 {
     if(id > 255) {
-	size=2;
+        size=2;
         id_ptr[0] = (id & 0xFF00) >> 8;
         id_ptr[1] = id & 0xFF;
     } else {
-	size=1;
+        size=1;
         id_ptr[0] = id & 0xFF;
     }
 }
@@ -223,8 +223,7 @@ void M2MTLVSerializer::serialize_length(uint32_t length, uint32_t &size, uint8_t
         size = 1;
         length_ptr[0] = length & 0xFF;
     } else {
-	size=0;
+        size=0;
     }
-    return;
 }
 
