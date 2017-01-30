@@ -26,12 +26,17 @@
 #include "nsdynmemLIB.h"
 #include "mbed-trace/mbed_trace.h"
 #include "ns_cmdline.h"
-
+#include "mbed-client-mbedtls/m2mplatformabstract.h"
 
 //application
 #include "cmd_commands.h"
 
 #define APP_DEV_HEAP_SIZE 30000
+
+uint32_t get_random_number(void)
+{
+    return time(NULL);
+}
 
 void eventOS_scheduler_idle(void)
 {
@@ -47,28 +52,28 @@ void app_heap_error_handler(heap_fail_t event)
     switch (event)
     {
         case NS_DYN_MEM_NULL_FREE:
-            tracef(TRACE_LEVEL_ERROR, "mem", "Dyn mem error:NULL_FREE");
+            mbed_tracef(TRACE_LEVEL_ERROR, "mem", "Dyn mem error:NULL_FREE");
             break;
         case NS_DYN_MEM_DOUBLE_FREE:
-            tracef(TRACE_LEVEL_ERROR, "mem", "Dyn mem error:DOUBLE_FREE");
+            mbed_tracef(TRACE_LEVEL_ERROR, "mem", "Dyn mem error:DOUBLE_FREE");
             break;
 
         case NS_DYN_MEM_ALLOCATE_SIZE_NOT_VALID:
-            tracef(TRACE_LEVEL_ERROR, "mem", "Dyn mem error:SIZE_NOT_VALID");
+            mbed_tracef(TRACE_LEVEL_ERROR, "mem", "Dyn mem error:SIZE_NOT_VALID");
             break;
         case NS_DYN_MEM_POINTER_NOT_VALID:
-            tracef(TRACE_LEVEL_ERROR, "mem", "Dyn mem error:POINTER_NOT_VALID");
+            mbed_tracef(TRACE_LEVEL_ERROR, "mem", "Dyn mem error:POINTER_NOT_VALID");
             break;
 
         case NS_DYN_MEM_HEAP_SECTOR_CORRUPTED:
-            tracef(TRACE_LEVEL_ERROR, "mem", "Dyn mem error:SECTOR_CORRUPTED");
+            mbed_tracef(TRACE_LEVEL_ERROR, "mem", "Dyn mem error:SECTOR_CORRUPTED");
             break;
 
         case NS_DYN_MEM_HEAP_SECTOR_UNITIALIZED:
-            tracef(TRACE_LEVEL_ERROR, "mem", "Dyn mem error:SECTOR_UNITIALIZED");
+            mbed_tracef(TRACE_LEVEL_ERROR, "mem", "Dyn mem error:SECTOR_UNITIALIZED");
             break;
         default:
-      tracef(TRACE_LEVEL_ERROR, "mem", "Dyn mem error:UNKNOWN!");
+            mbed_tracef(TRACE_LEVEL_ERROR, "mem", "Dyn mem error:UNKNOWN!");
             break;
     }
     while(1);

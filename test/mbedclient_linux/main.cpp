@@ -25,8 +25,8 @@
 #include "mbed-client/m2minterface.h"
 #include "mbed-client/m2mobjectinstance.h"
 #include "mbed-client/m2mresource.h"
-
 #include "mbed-trace/mbed_trace.h"
+#include "mbed-client-mbedtls/m2mplatformabstract.h"
 
 const String &BOOTSTRAP_SERVER_ADDRESS = "coap://10.45.3.10:5693";
 const String &M2M_SERVER_ADDRESS = "coap://10.45.3.10:5683";
@@ -41,6 +41,11 @@ static void ctrl_c_handle_function(void);
 void close_function();
 typedef void (*signalhandler_t)(int); /* Function pointer type for ctrl-c */
 
+uint32_t get_random_number(void)
+{
+    return time(NULL);
+}
+
 class MbedClient: public M2MInterfaceObserver {
 public:
     MbedClient(){
@@ -54,7 +59,7 @@ public:
         _registered = false;
         _unregistered = false;
         _registration_updated = false;
-        _value = 0;
+        _value = 1;
     }
 
     ~MbedClient() {
@@ -200,17 +205,16 @@ public:
                                              STATIC_VALUE,
                                              sizeof(STATIC_VALUE)-1);
 
-                M2MResourceInstance* instance = inst->create_dynamic_resource_instance("1",
-                                                                         "ResourceTest",
-                                                                         M2MResourceInstance::INTEGER,
-                                                                         true,0);
+                M2MResource* instance = inst->create_dynamic_resource("1",
+                                                                      "ResourceTest",
+                                                                      M2MResourceInstance::INTEGER,
+                                                                      true,0);
 
                 if(instance) {
                     instance->set_operation(M2MBase::GET_PUT_POST_ALLOWED);
                     instance->set_value((const uint8_t*)buffer,
                                  (const uint32_t)size);
-                    instance->set_execute_function(execute_callback(this,&MbedClient::execute_function));
-                    _value++;
+                    instance->set_execute_function(execute_callback(this,&MbedClient::execute_function));                    
                 }
             }
         }
@@ -222,16 +226,12 @@ public:
             M2MObjectInstance* inst = _object->object_instance();
             if(inst) {
                 M2MResource* res = inst->resource("1");
-                res = inst->resource("1");
+                _value == 0 ? _value = 1 : _value = 0;
                 if(res) {
-                    M2MResourceInstance *res_inst = res->resource_instance(0);
-                    if(res_inst) {
-                        char buffer1[20];
-                        int size1 = sprintf(buffer1,"%d",_value);
-                        res_inst->set_value((const uint8_t*)buffer1,
-                                       (const uint32_t)size1);
-                        _value++;
-                    }
+                    char buffer1[20];
+                    int size1 = sprintf(buffer1,"%d",_value);
+                    res->set_value((const uint8_t*)buffer1,
+                                   (const uint32_t)size1);                    
                 }
             }
         }
@@ -286,7 +286,7 @@ public:
         _error = true;
         close_function();
         printf("\nError occured Error Code : %d\n", (int8_t)error);
-
+        exit(1);
     }
 
     void value_updated(M2MBase *base, M2MBase::BaseType type) {
@@ -369,7 +369,7 @@ static pthread_t observation_thread;
 void close_function() {
     pthread_cancel(bootstrap_thread);
     pthread_cancel(unregister_thread);
-    pthread_cancel(observation_thread);
+    pthread_cancel(observation_thread);    
 }
 
 int main() {
