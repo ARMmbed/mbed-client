@@ -63,7 +63,7 @@ M2MDevice::M2MDevice(char *path)
                                                                      false);
         if(res) {
             res->set_operation(M2MBase::POST_ALLOWED);
-            res->set_register_uri(false);
+            res->set_register_uri(true);
         }
 
         M2MResourceInstance* instance = _device_instance->create_dynamic_resource_instance(DEVICE_ERROR_CODE,
@@ -73,7 +73,7 @@ M2MDevice::M2MDevice(char *path)
         if(instance) {
             M2MResource * dev_res = _device_instance->resource(DEVICE_ERROR_CODE);
             if(dev_res) {
-                dev_res->set_register_uri(false);
+                dev_res->set_register_uri(true);
             }
             instance->set_operation(M2MBase::GET_ALLOWED);
 
@@ -88,7 +88,7 @@ M2MDevice::M2MDevice(char *path)
         if(res) {
             res->set_operation(M2MBase::GET_ALLOWED);
             res->set_value((const uint8_t*)BINDING_MODE_UDP,sizeof(BINDING_MODE_UDP)-1);
-            res->set_register_uri(false);
+            res->set_register_uri(true);
         }
     }
 }
@@ -154,7 +154,7 @@ M2MResource* M2MDevice::create_resource(DeviceResource resource, const String &v
                     res->set_value((const uint8_t*)value.c_str(),
                                    (uint32_t)value.length());
                 }
-                res->set_register_uri(false);
+                res->set_register_uri(true);
             }
         }
     }
@@ -208,7 +208,7 @@ M2MResource* M2MDevice::create_resource(DeviceResource resource, int64_t value)
                 res->set_operation(operation);
                 res->set_value(value);
 
-                res->set_register_uri(false);
+                res->set_register_uri(true);
             }
         }
     }
@@ -245,14 +245,14 @@ M2MResourceInstance* M2MDevice::create_resource_instance(DeviceResource resource
 
             M2MResource *resource = _device_instance->resource(device_id);
             if(resource) {
-                resource->set_register_uri(false);
+                resource->set_register_uri(true);
             }
             if(res) {
                 res->set_value(value);
                 // Only read operation is allowed for above resources
                 res->set_operation(M2MBase::GET_ALLOWED);
 
-                res->set_register_uri(false);
+                res->set_register_uri(true);
             }
         }
     }
@@ -281,7 +281,7 @@ M2MResource* M2MDevice::create_resource(DeviceResource resource)
             }
             if(res) {
                 res->set_operation(M2MBase::POST_ALLOWED);
-                res->set_register_uri(false);
+                res->set_register_uri(true);
             }
         }
     }
