@@ -58,6 +58,11 @@ M2MResource* M2MDevice::create_resource(DeviceResource)
     return m2mdevice_stub::resource;
 }
 
+M2MResource* M2MDevice::create_resource(DeviceResource, int64_t)
+{
+    return m2mdevice_stub::resource;
+}
+
 bool M2MDevice::delete_resource(DeviceResource)
 {
     return m2mdevice_stub::bool_value;

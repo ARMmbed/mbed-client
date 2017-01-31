@@ -794,6 +794,26 @@ void Test_M2MNsdlInterface::test_received_from_server_callback()
     m2mtlvdeserializer_stub::error = M2MTLVDeserializer::None;
     CHECK(0 == nsdl->received_from_server_callback(handle,coap_header,address));
     CHECK(observer->boot_error == false);
+    delete obj;
+    delete m2mobject_stub::inst;
+    nsdl->_object_list.clear();
+
+    // handle_bootstrap_put_message() TLV device object
+    obj = new M2MObject("3", "3");
+    m2mbase_stub::string_value = "3";
+    nsdl->_object_list.push_back(obj);
+    m2mobject_stub::inst = new M2MObjectInstance(*obj, "name","", "");
+    uint8_t device[] = {"3"};
+    coap_header->uri_path_ptr = device;
+    coap_header->uri_path_len = 1;
+
+    observer->boot_error = false;
+    observer->boot_done = false;
+    m2mtlvdeserializer_stub::is_object_bool_value = true;
+    m2mtlvdeserializer_stub::bool_value = false;
+    m2mtlvdeserializer_stub::error = M2MTLVDeserializer::None;
+    CHECK(0 == nsdl->received_from_server_callback(handle,coap_header,address));
+    CHECK(observer->boot_error == false);
 
     // handle_bootstrap_put_message() TLV not resource
     observer->boot_error = false;
@@ -972,8 +992,6 @@ void Test_M2MNsdlInterface::test_received_from_server_callback()
     CHECK(observer->boot_done == false);
 
     delete m2mobject_stub::inst;
-    //delete m2mbase_stub::string_value;
-    //m2mbase_stub::string_value = NULL;
     nsdl->_object_list.clear();
     m2mobjectinstance_stub::resource_list.clear();
     delete obj;
