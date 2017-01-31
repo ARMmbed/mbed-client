@@ -235,6 +235,15 @@ protected: // from M2MObservationHandler
 private:
 
     /**
+     * Enum defining an LWM2M object type.
+    */
+    typedef enum {
+        SECURITY = 0x00,
+        SERVER   = 0x01,
+        DEVICE   = 0x02,
+    }ObjectType;
+
+    /**
     * @brief Initializes all the nsdl library component to be usable.
     * @return true if initialization is successful else false.
     */
@@ -341,7 +350,7 @@ private:
      * @param coap_header, Received CoAP message
      * @return True if parsing was succesful else false
     */
-    bool parse_bootstrap_message(sn_coap_hdr_s *coap_header, bool is_security_object);
+    bool parse_bootstrap_message(sn_coap_hdr_s *coap_header, M2MNsdlInterface::ObjectType lwm2m_object_type);
 
     /**
      * @brief Parse bootstrap TLV message.
@@ -354,6 +363,13 @@ private:
      * @brief Handle bootstrap errors.
     */
     void handle_bootstrap_error();
+
+    /**
+     * @brief Change operation mode of every resource.
+     * @param object, Object to be updated.
+     * @return operation, New operation mode.
+    */
+    void change_operation_mode(M2MObject *object, M2MBase::Operation operation);
 
 private:
 
@@ -377,4 +393,3 @@ friend class Test_M2MNsdlInterface;
 };
 
 #endif // M2MNSDLINTERFACE_H
-
