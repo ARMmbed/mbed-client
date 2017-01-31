@@ -41,6 +41,8 @@
 #include "mbed-trace/mbed_trace.h"
 #include "mbed-client/m2mtimer.h"
 #include "sn_grs.h"
+#include "mbed-client/m2minterfacefactory.h"
+#include "mbed-client/m2mdevice.h"
 
 #include <assert.h>
 #include <inttypes.h>
@@ -1341,36 +1343,37 @@ void M2MNsdlInterface::handle_bootstrap_put_message(sn_coap_hdr_s *coap_header,
     uint8_t response_code = COAP_MSG_CODE_RESPONSE_CHANGED;
     sn_coap_hdr_s *coap_response = NULL;
     bool success = false;
-    bool security_object = false;
     uint16_t content_type = 0;
-
+    M2MNsdlInterface::ObjectType object_type = M2MNsdlInterface::SECURITY;
     if (!_security) {
         _security = new M2MSecurity(M2MSecurity::M2MServer);
     }
 
     String resource_name = coap_to_string(coap_header->uri_path_ptr,
                                           coap_header->uri_path_len);
-    tr_debug("M2MNsdlInterface::handle_bootstrap_message - uri %s", resource_name.c_str());
+    tr_debug("M2MNsdlInterface::handle_bootstrap_message - object path %s", resource_name.c_str());
 
-    // Check incoming object
+    // Security object
     if (resource_name.compare(0,1,"0") == 0) {
-        security_object = true;
+        object_type = M2MNsdlInterface::SECURITY;
         if(_security) {
             success = true;
-            // Not mandatory resource that's why it must be created first
+            // Not mandatory resource, that's why it must be created first
             _security->create_resource(M2MSecurity::ShortServerID, 1);
-            // Change operation mode
-            const M2MResourceList &list = _security->object_instance()->resources();
-            if(!list.empty()) {
-                M2MResourceList::const_iterator it;
-                it = list.begin();
-                for ( ; it != list.end(); it++ ) {
-                    (*it)->set_operation(M2MBase::PUT_ALLOWED);
-                }
-            }
+            change_operation_mode(_security, M2MBase::PUT_ALLOWED);
         }
     }
+    // Server object
     else if (resource_name.compare(0,1,"1") == 0) {
+        object_type = M2MNsdlInterface::SERVER;
+        success = true;
+    }
+    // Device object
+    else if (resource_name.compare(0,1,"3") == 0) {
+        M2MDevice* dev = M2MInterfaceFactory::create_device();
+        // Not mandatory resource, that's why it must be created first
+        dev->create_resource(M2MDevice::CurrentTime, 0);
+        object_type = M2MNsdlInterface::DEVICE;
         success = true;
     }
 
@@ -1392,30 +1395,23 @@ void M2MNsdlInterface::handle_bootstrap_put_message(sn_coap_hdr_s *coap_header,
             content_type = coap_header->content_format;
         }
 
-        tr_debug("M2MNsdlInterface::handle_bootstrap_message - content_type %d", content_type);
         if (content_type != COAP_CONTENT_OMA_TLV_TYPE) {
+            tr_error("M2MNsdlInterface::handle_bootstrap_message - content_type %d", content_type);
             success = false;
         }
         if (success) {
-            success = parse_bootstrap_message(coap_header, security_object);
+            success = parse_bootstrap_message(coap_header, object_type);
             // Set operation back to default ones
             if (_security) {
-                const M2MResourceList &list = _security->object_instance()->resources();
-                if(!list.empty()) {
-                    M2MResourceList::const_iterator it;
-                    it = list.begin();
-                    for ( ; it != list.end(); it++ ) {
-                        (*it)->set_operation(M2MBase::NOT_ALLOWED);
-                    }
-                }
+                change_operation_mode(_security, M2MBase::NOT_ALLOWED);
             }
         }
     }
 
     if (!success) {
         response_code = COAP_MSG_CODE_RESPONSE_BAD_REQUEST;
-        handle_bootstrap_error();
     }
+
     coap_response = sn_nsdl_build_response(_nsdl_handle,
                                            coap_header,
                                            response_code);
@@ -1429,7 +1425,8 @@ void M2MNsdlInterface::handle_bootstrap_put_message(sn_coap_hdr_s *coap_header,
 #endif
 }
 
-bool M2MNsdlInterface::parse_bootstrap_message(sn_coap_hdr_s *coap_header, bool is_security_object)
+bool M2MNsdlInterface::parse_bootstrap_message(sn_coap_hdr_s *coap_header,
+                                               M2MNsdlInterface::ObjectType lwm2m_object_type)
 {
 #ifndef M2M_CLIENT_DISABLE_BOOTSTRAP_FEATURE
     tr_debug("M2MNsdlInterface::parse_bootstrap_put_message");
@@ -1446,33 +1443,50 @@ bool M2MNsdlInterface::parse_bootstrap_message(sn_coap_hdr_s *coap_header, bool 
         if (ret) {
             M2MTLVDeserializer::Error error = M2MTLVDeserializer::None;
             if (is_obj_instance) {
-                if (is_security_object) {
-                    error = M2MTLVDeserializer::deserialise_object_instances(coap_header->payload_ptr,
-                                                               coap_header->payload_len,
-                                                               *_security,
-                                                               M2MTLVDeserializer::Put);
-                    }
-                else {
-                    error = M2MTLVDeserializer::deserialise_object_instances(coap_header->payload_ptr,
-                                                               coap_header->payload_len,
-                                                               _server,
-                                                               M2MTLVDeserializer::Put);
+                M2MObject* dev_object = static_cast<M2MObject*> (M2MInterfaceFactory::create_device());
+                switch (lwm2m_object_type) {
+                    case M2MNsdlInterface::SECURITY:
+                        error = M2MTLVDeserializer::deserialise_object_instances(coap_header->payload_ptr,
+                                                                   coap_header->payload_len,
+                                                                   *_security,
+                                                                   M2MTLVDeserializer::Put);
+                        break;
+                    case M2MNsdlInterface::SERVER:
+                        error = M2MTLVDeserializer::deserialise_object_instances(coap_header->payload_ptr,
+                                                                   coap_header->payload_len,
+                                                                   _server,
+                                                                   M2MTLVDeserializer::Put);
+                        break;
+                    case M2MNsdlInterface::DEVICE:
+                       error = M2MTLVDeserializer::deserialise_object_instances(coap_header->payload_ptr,
+                                                                   coap_header->payload_len,
+                                                                   *dev_object,
+                                                                   M2MTLVDeserializer::Put);
+                        break;
+                    default:
+                        break;
                 }
             }
             else {
-                if (is_security_object) {
-                    instance_id = M2MTLVDeserializer::instance_id(coap_header->payload_ptr);
-                    error = M2MTLVDeserializer::deserialize_resources(coap_header->payload_ptr,
-                                                               coap_header->payload_len,
-                                                               *_security->object_instance(instance_id),
-                                                               M2MTLVDeserializer::Put);
-                }
-                else {
-                    instance_id = M2MTLVDeserializer::instance_id(coap_header->payload_ptr);
-                    error = M2MTLVDeserializer::deserialize_resources(coap_header->payload_ptr,
-                                                               coap_header->payload_len,
-                                                               *(_server.object_instance(instance_id)),
-                                                               M2MTLVDeserializer::Post);
+                instance_id = M2MTLVDeserializer::instance_id(coap_header->payload_ptr);
+                switch (lwm2m_object_type) {
+                    case M2MNsdlInterface::SECURITY:
+                        error = M2MTLVDeserializer::deserialize_resources(coap_header->payload_ptr,
+                                                                   coap_header->payload_len,
+                                                                   *_security->object_instance(instance_id),
+                                                                   M2MTLVDeserializer::Put);
+
+                        break;
+                    case M2MNsdlInterface::SERVER:
+                        error = M2MTLVDeserializer::deserialize_resources(coap_header->payload_ptr,
+                                                                   coap_header->payload_len,
+                                                                   *(_server.object_instance(instance_id)),
+                                                                   M2MTLVDeserializer::Post);
+
+                        break;
+                    case M2MNsdlInterface::DEVICE:
+                    default:
+                        break;
                 }
             }
 
@@ -1627,6 +1641,23 @@ void M2MNsdlInterface::handle_bootstrap_error()
     _observer.bootstrap_error();
 }
 
+const String& M2MNsdlInterface::endpoint_name() const
+{
+    return _endpoint_name;
+}
+
+void M2MNsdlInterface::change_operation_mode(M2MObject *object, M2MBase::Operation operation)
+{
+    M2MResourceList list = object->object_instance()->resources();
+    if(!list.empty()) {
+        M2MResourceList::const_iterator it;
+        it = list.begin();
+        for ( ; it != list.end(); it++ ) {
+            (*it)->set_operation(operation);
+        }
+    }
+}
+
 void M2MNsdlInterface::claim_mutex()
 {
     _connection_handler.claim_mutex();
@@ -1635,9 +1666,4 @@ void M2MNsdlInterface::claim_mutex()
 void M2MNsdlInterface::release_mutex()
 {
     _connection_handler.release_mutex();
-}
-
-const String& M2MNsdlInterface::endpoint_name() const
-{
-    return _endpoint_name;
 }
