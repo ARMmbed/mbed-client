@@ -81,24 +81,42 @@ uint8_t* M2MTLVSerializer::serialize_resources(M2MResourceList resource_list, ui
         if(valid) {
             it = resource_list.begin();
             for (; it!=resource_list.end(); it++) {
-                serialize(*it, data, size);
+                if(!serialize(*it, data, size)) {
+                        /* serializing has failed */
+                        /* free data so far */
+                        free(data);
+                        /* invalidate */
+                        valid = false;
+                        /* return NULL immediately */
+                        return NULL;
+                }
             }
         }
     }
     return data;
 }
 
-void M2MTLVSerializer::serialize(uint16_t id, M2MObjectInstance *object_instance, uint8_t *&data, uint32_t &size)
+bool M2MTLVSerializer::serialize(uint16_t id, M2MObjectInstance *object_instance, uint8_t *&data, uint32_t &size)
 {
     uint8_t *resource_data = NULL;
     uint32_t resource_size = 0;
+    bool success;
 
     bool valid = true;
     resource_data = serialize_resources(object_instance->resources(),resource_size,valid);
     if(valid) {
-        serialize_TILV(TYPE_OBJECT_INSTANCE, id, resource_data, resource_size, data, size);
+        if(serialize_TILV(TYPE_OBJECT_INSTANCE, id, resource_data, resource_size, data, size)) {
+            success = true;
+        } else {
+            /* serializing object instance failed */
+            success = false;
+        }
+        free(resource_data);
+    } else {
+        /* serializing resources failed */
+        success = false;
     }
-    free(resource_data);
+    return success;
 }
 
 bool M2MTLVSerializer::serialize(M2MResource *resource, uint8_t *&data, uint32_t &size)
@@ -116,8 +134,8 @@ bool M2MTLVSerializer::serialize_resource(M2MResource *resource, uint8_t *&data,
 {
     bool success = false;
     if(resource->name_id() != -1) {
-        success = true;
-        serialize_TILV(TYPE_RESOURCE, resource->name_id(), resource->value(), resource->value_length(), data, size);
+        success = serialize_TILV(TYPE_RESOURCE, resource->name_id(),
+                      resource->value(), resource->value_length(), data, size);
     }
     return success;
 }
@@ -134,12 +152,19 @@ bool M2MTLVSerializer::serialize_multiple_resource(M2MResource *resource, uint8_
         it = instance_list.begin();
         for (; it!=instance_list.end(); it++) {
             uint16_t id = (*it)->instance_id();
-            serialize_resource_instance(id, (*it), nested_data, nested_data_size);            
+            if(!serialize_resource_instance(id, (*it), nested_data, nested_data_size)) {
+                /* serializing instance has failed */
+                /* free data so far allocated */
+                free(nested_data);
+                /* return fail immediately*/
+                success = false;
+                return success;
+            }
         }
     }
     if(resource->name_id() != -1) {
-        success = true;
-        serialize_TILV(TYPE_MULTIPLE_RESOURCE, resource->name_id(), nested_data, nested_data_size, data, size);
+        success = serialize_TILV(TYPE_MULTIPLE_RESOURCE, resource->name_id(),
+                                    nested_data, nested_data_size, data, size);
     }
 
     free(nested_data);
@@ -147,12 +172,12 @@ bool M2MTLVSerializer::serialize_multiple_resource(M2MResource *resource, uint8_
     return success;
 }
 
-void M2MTLVSerializer::serialize_resource_instance(uint16_t id, M2MResourceInstance *resource, uint8_t *&data, uint32_t &size)
+bool M2MTLVSerializer::serialize_resource_instance(uint16_t id, M2MResourceInstance *resource, uint8_t *&data, uint32_t &size)
 {
-    serialize_TILV(TYPE_RESOURCE_INSTANCE, id, resource->value(), resource->value_length(), data, size);
+    return serialize_TILV(TYPE_RESOURCE_INSTANCE, id, resource->value(), resource->value_length(), data, size);
 }
 
-void M2MTLVSerializer::serialize_TILV(uint8_t type, uint16_t id, uint8_t *value, uint32_t value_length, uint8_t *&data, uint32_t &size)
+bool M2MTLVSerializer::serialize_TILV(uint8_t type, uint16_t id, uint8_t *value, uint32_t value_length, uint8_t *&data, uint32_t &size)
 {
     uint8_t *tlv = 0;
     const uint32_t type_length = TLV_TYPE_SIZE;
@@ -172,6 +197,12 @@ void M2MTLVSerializer::serialize_TILV(uint8_t type, uint16_t id, uint8_t *value,
     serialize_length(value_length, length_size, length_array);
 
     tlv = (uint8_t*)malloc(size + type_length + id_size + length_size + value_length);
+    if (!tlv) {
+        /* memory allocation has failed */
+        /* return failure immediately */
+        return false;
+        /* eventually NULL will be returned to serializer public method caller */
+    }
     if(data) {
         memcpy(tlv, data, size);
         free(data);
@@ -183,6 +214,7 @@ void M2MTLVSerializer::serialize_TILV(uint8_t type, uint16_t id, uint8_t *value,
 
     data = tlv;
     size += type_length + id_size + length_size + value_length;
+    return true;
 }
 
 void M2MTLVSerializer::serialize_id(uint16_t id, uint32_t &size, uint8_t *id_ptr)
