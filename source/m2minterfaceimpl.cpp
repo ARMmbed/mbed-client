@@ -579,7 +579,7 @@ void M2MInterfaceImpl::state_bootstrap(EventData *data)
             _observer.error(error);
         }
     } else {
-        _listen_port = (rand() % (65535-49152)) + 49152;
+        _listen_port = 0;
         _connection_handler.stop_listening();
         _connection_handler.bind_connection(_listen_port);
         _connection_handler.resolve_server_address(_server_ip_address,
@@ -713,7 +713,7 @@ void M2MInterfaceImpl::state_register(EventData *data)
             _observer.error(error);
         }
     } else {
-        _listen_port = (rand() % (65535-49152)) + 49152;
+        _listen_port = 0;
         _connection_handler.stop_listening();
         if (event) {
             _nsdl_interface.create_nsdl_list_structure(event->_object_list);
