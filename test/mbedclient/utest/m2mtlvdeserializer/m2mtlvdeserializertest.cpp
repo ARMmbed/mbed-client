@@ -56,6 +56,13 @@ TEST(M2MTLVSerializer, serialize_object)
     m2m_serializer->test_serialize_object();
 }
 
+TEST(M2MTLVSerializer, serialize_object_out_of_memory)
+{
+    MemoryLeakWarningPlugin::turnOffNewDeleteOverloads();
+    m2m_serializer->test_serialize_object_out_of_memory();
+    MemoryLeakWarningPlugin::turnOnNewDeleteOverloads();
+}
+
 TEST(M2MTLVSerializer, serialize_object_instance)
 {
     m2m_serializer->test_serialize_object_instance();
@@ -69,6 +76,13 @@ TEST(M2MTLVSerializer, serialize_resource)
 TEST(M2MTLVSerializer, serialize_resource_instance)
 {
     m2m_serializer->test_serialize_resource_instance();
+}
+
+TEST(M2MTLVSerializer, serialize_resource_instance_out_of_memory)
+{
+    MemoryLeakWarningPlugin::turnOffNewDeleteOverloads();
+    m2m_serializer->test_serialize_resource_instance_out_of_memory();
+    MemoryLeakWarningPlugin::turnOnNewDeleteOverloads();
 }
 
 TEST(M2MTLVDeserializer, Create)

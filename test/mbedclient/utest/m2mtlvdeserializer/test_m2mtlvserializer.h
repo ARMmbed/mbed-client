@@ -27,11 +27,15 @@ public:
 
     void test_serialize_object();
 
+    void test_serialize_object_out_of_memory();
+
     void test_serialize_object_instance();
 
     void test_serialize_resource();
 
     void test_serialize_resource_instance();
+
+    void test_serialize_resource_instance_out_of_memory();
 
     M2MTLVSerializer *serializer;
 };

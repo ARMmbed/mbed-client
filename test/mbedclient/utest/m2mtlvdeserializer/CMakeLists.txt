@@ -23,7 +23,7 @@ target_link_libraries(m2mtlv
 )
 set_target_properties(m2mtlv
 PROPERTIES COMPILE_FLAGS "${CMAKE_CXX_FLAGS}"
-           LINK_FLAGS "${UTEST_LINK_FLAGS}")
+           LINK_FLAGS "${UTEST_LINK_FLAGS} -Wl,-wrap,malloc")
 
 set(binary "m2mtlv")
 add_test(m2mtlv ${binary})
