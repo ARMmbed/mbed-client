@@ -111,18 +111,16 @@ Test_NsdlAccessHelper::~Test_NsdlAccessHelper()
 {
     delete observer;
     observer = NULL;
-
-    clear_list();
 }
 
 void Test_NsdlAccessHelper::test_nsdl_c_callback()
 {
+    common_stub::void_value = NULL;
     CHECK(__nsdl_c_callback(NULL,NULL,NULL,SN_NSDL_PROTOCOL_HTTP) == 0 );
 
     m2mnsdlinterface_stub::int_value = 1;
     m2mnsdlinterface_stub::void_value = malloc(1);
-    __nsdl_interface_list.clear();
-    __nsdl_interface_list.push_back(new M2MNsdlInterface(*observer));
+    common_stub::void_value = new M2MNsdlInterface(*observer);
     common_stub::coap_header = (sn_coap_hdr_s *) malloc(sizeof(sn_coap_hdr_s));
     memset(common_stub::coap_header, 0, sizeof(sn_coap_hdr_s));
     common_stub::coap_header->options_list_ptr = (sn_coap_options_list_s *) malloc(sizeof(sn_coap_options_list_s));
@@ -132,8 +130,8 @@ void Test_NsdlAccessHelper::test_nsdl_c_callback()
                             common_stub::coap_header,NULL,SN_NSDL_PROTOCOL_HTTP) == 1 );
     free(common_stub::coap_header->options_list_ptr);
     free(common_stub::coap_header);
+    delete (M2MNsdlInterface*)common_stub::void_value;
     free(m2mnsdlinterface_stub::void_value);
-    clear_list();
 }
 
 void Test_NsdlAccessHelper::test_nsdl_c_memory_alloc()
@@ -160,26 +158,30 @@ void Test_NsdlAccessHelper::test_nsdl_c_memory_free()
 
 void Test_NsdlAccessHelper::test_nsdl_c_send_to_server()
 {
+    common_stub::void_value = NULL;
     CHECK(__nsdl_c_send_to_server(NULL, SN_NSDL_PROTOCOL_HTTP, NULL, 0, NULL) == 0);
+
+    common_stub::void_value = new M2MNsdlInterface(*observer);
+    CHECK(__nsdl_c_send_to_server(NULL, SN_NSDL_PROTOCOL_HTTP, NULL, 0, NULL) == 1);
 
     m2mnsdlinterface_stub::int_value = 1;
     m2mnsdlinterface_stub::void_value = malloc(1);
-    __nsdl_interface_list.clear();
-    __nsdl_interface_list.push_back(new M2MNsdlInterface(*observer));
 
     CHECK(__nsdl_c_send_to_server((nsdl_s*)m2mnsdlinterface_stub::void_value, SN_NSDL_PROTOCOL_HTTP, NULL, 0, NULL) == 1);
     free(m2mnsdlinterface_stub::void_value);
-    clear_list();
+    delete (M2MNsdlInterface*)common_stub::void_value;
 }
 
 void Test_NsdlAccessHelper::test_nsdl_c_received_from_server()
 {
+    common_stub::void_value = NULL;
+    CHECK( 0 == __nsdl_c_received_from_server(NULL, NULL, NULL));
+
+    common_stub::void_value = new M2MNsdlInterface(*observer);
     CHECK( 0 == __nsdl_c_received_from_server(NULL, NULL, NULL));
 
     m2mnsdlinterface_stub::int_value = 1;
     m2mnsdlinterface_stub::void_value = malloc(1);
-    __nsdl_interface_list.clear();
-    __nsdl_interface_list.push_back(new M2MNsdlInterface(*observer));
     common_stub::coap_header = (sn_coap_hdr_s *) malloc(sizeof(sn_coap_hdr_s));
     memset(common_stub::coap_header, 0, sizeof(sn_coap_hdr_s));
     common_stub::coap_header->options_list_ptr = (sn_coap_options_list_s *) malloc(sizeof(sn_coap_options_list_s));
@@ -187,8 +189,8 @@ void Test_NsdlAccessHelper::test_nsdl_c_received_from_server()
     CHECK( 1 == __nsdl_c_received_from_server((nsdl_s*)m2mnsdlinterface_stub::void_value, common_stub::coap_header, NULL));
     free(common_stub::coap_header->options_list_ptr);
     free(common_stub::coap_header);
+    delete (M2MNsdlInterface*)common_stub::void_value;
     free(m2mnsdlinterface_stub::void_value);
-    clear_list();
 }
 
 void Test_NsdlAccessHelper::test_socket_malloc()
@@ -208,16 +210,3 @@ void Test_NsdlAccessHelper::test_socket_free()
     //No need to check anything, since memory leak is the test
 }
 
-void Test_NsdlAccessHelper::clear_list()
-{
-    M2MNsdlInterfaceList::const_iterator it;
-    it = __nsdl_interface_list.begin();
-    int size = __nsdl_interface_list.size();
-    if (!__nsdl_interface_list.empty()) {
-        for (int i = 0; i < size; i++) {
-                delete __nsdl_interface_list[i];
-                __nsdl_interface_list.erase(i);
-            }
-        __nsdl_interface_list.clear();
-    }
-}

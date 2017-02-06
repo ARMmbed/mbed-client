@@ -95,6 +95,16 @@ struct nsdl_s *sn_nsdl_init	(uint8_t (*sn_nsdl_tx_cb)(struct nsdl_s *, sn_nsdl_c
     return NULL;
 }
 
+int8_t sn_nsdl_set_context(struct nsdl_s * const handle, void * const context)
+{
+    return common_stub::int_value;
+}
+
+void *sn_nsdl_get_context(const struct nsdl_s * const handle)
+{
+    return common_stub::void_value;
+}
+
 uint16_t sn_nsdl_register_endpoint(struct nsdl_s *, sn_nsdl_ep_parameters_s *)
 {
     return common_stub::uint_value;
