@@ -40,7 +40,7 @@
 #include "mbed-client/m2mconstants.h"
 #include "mbed-trace/mbed_trace.h"
 #include "mbed-client/m2mtimer.h"
-#include "source/libNsdl/src/include/sn_grs.h"
+#include "sn_grs.h"
 
 #include <assert.h>
 #include <inttypes.h>
