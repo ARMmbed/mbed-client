@@ -22,9 +22,9 @@
 #include "mbed-client/m2mreportobserver.h"
 #include "mbed-client/functionpointer.h"
 #include "mbed-client/m2mstringbuffer.h"
-#include "sn_nsdl.h"
-#include "sn_coap_header.h"
-#include "sn_nsdl_lib.h"
+#include "nsdl-c/sn_nsdl.h"
+#include "libcoap/sn_coap_header.h"
+#include "nsdl-c/sn_nsdl_lib.h"
 
 //FORWARD DECLARATION
 struct sn_coap_hdr_;
