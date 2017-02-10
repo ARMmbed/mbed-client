@@ -21,6 +21,7 @@ add_executable(m2mnsdlinterface
         "../stub/m2mtlvdeserializer_stub.cpp"
         "../stub/m2mdevice_stub.cpp"
         "../stub/m2minterfacefactory_stub.cpp"
+        "../stub/uriqueryparser_stub.cpp"
         "../../../../source/m2mnsdlinterface.cpp"
         "../../../../source/m2mstringbufferbase.cpp"
 )
