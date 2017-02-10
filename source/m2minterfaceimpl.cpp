@@ -554,6 +554,7 @@ void M2MInterfaceImpl::state_bootstrap(EventData *data)
                 if(M2MSecurity::Bootstrap == _security->server_type()) {
                     tr_debug("M2MInterfaceImpl::state_bootstrap - server_type : M2MSecurity::Bootstrap");
                     String server_address = _security->resource_value_string(M2MSecurity::M2MServerUri);
+                    _nsdl_interface.set_server_address(server_address.c_str());
                     tr_debug("M2MInterfaceImpl::state_bootstrap - server_address %s", server_address.c_str());
                     String coap;
                     if(server_address.compare(0,sizeof(COAP)-1,COAP) == 0) {
@@ -700,6 +701,7 @@ void M2MInterfaceImpl::state_register(EventData *data)
                         tr_debug("M2MInterfaceImpl::state_register - create_nsdl_list_structure - success");
                         // If the nsdl resource structure is created successfully
                         String server_address = _security->resource_value_string(M2MSecurity::M2MServerUri);
+                        _nsdl_interface.set_server_address(server_address.c_str());
                         tr_debug("M2MInterfaceImpl::state_register - server_address %s", server_address.c_str());
                         String  coap;
                         if(server_address.compare(0,sizeof(COAP)-1,COAP) == 0) {

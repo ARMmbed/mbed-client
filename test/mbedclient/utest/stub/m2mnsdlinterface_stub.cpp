@@ -209,3 +209,8 @@ const String& M2MNsdlInterface::endpoint_name() const
 {
     return *m2mnsdlinterface_stub::string_value;
 }
+
+void M2MNsdlInterface::set_server_address(const char* server_address)
+{
+
+}
