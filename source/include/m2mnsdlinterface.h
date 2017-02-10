@@ -252,14 +252,6 @@ private:
     }ObjectType;
 
     /**
-     * Enum defining an LWM2M object type.
-    */
-    typedef enum {
-        REGISTER  = 0x00,
-        BOOTSTRAP = 0x01
-    }MessageType;
-
-    /**
     * @brief Initializes all the nsdl library component to be usable.
     * @return true if initialization is successful else false.
     */
@@ -397,6 +389,10 @@ private:
     */
     void change_operation_mode(M2MObject *object, M2MBase::Operation operation);
 
+    /**
+     * @brief Parse URI query parameters and pass those to nsdl-c.
+     * @return True if parsing success otherwise False
+    */
     bool parse_and_send_uri_query_parameters();
 
 private:
