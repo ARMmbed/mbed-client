@@ -105,7 +105,7 @@ void *sn_nsdl_get_context(const struct nsdl_s * const handle)
     return common_stub::void_value;
 }
 
-uint16_t sn_nsdl_register_endpoint(struct nsdl_s *, sn_nsdl_ep_parameters_s *)
+uint16_t sn_nsdl_register_endpoint(struct nsdl_s *, sn_nsdl_ep_parameters_s *, char *uri_queries[], uint32_t query_count)
 {
     return common_stub::uint_value;
 }
@@ -228,7 +228,9 @@ int8_t set_NSP_address(struct nsdl_s *, uint8_t *, uint8_t, uint16_t, sn_nsdl_ad
 
 uint16_t sn_nsdl_oma_bootstrap(struct nsdl_s *, sn_nsdl_addr_s *,
                              sn_nsdl_ep_parameters_s *,
-                             sn_nsdl_bs_ep_info_t *)
+                             sn_nsdl_bs_ep_info_t *,
+                             char *uri_queries[],
+                             uint32_t query_count)
 {
     return common_stub::uint_value;
 }
