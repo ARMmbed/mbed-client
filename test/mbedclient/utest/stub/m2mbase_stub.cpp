@@ -308,6 +308,16 @@ void M2MBase::memory_free(void *ptr)
         free(ptr);
 }
 
+char* M2MBase::alloc_string_copy(const char* source)
+{
+    assert(source != NULL);
+
+    // Note: the armcc's libc does not have strdup, so we need to implement it here
+    const size_t len = strlen(source);
+
+    return (char*)alloc_string_copy((uint8_t*)source, len);
+}
+
 uint8_t* M2MBase::alloc_string_copy(const uint8_t* source, uint32_t size)
 {
     assert(source != NULL);
