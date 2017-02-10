@@ -27,6 +27,7 @@
 #include "m2mserver.h"
 #include "m2msecurity.h"
 #include "m2mtlvdeserializer_stub.h"
+#include "uriqueryparser_stub.h"
 
 class TestObserver : public M2MNsdlObserver {
 
@@ -239,6 +240,13 @@ void Test_M2MNsdlInterface::test_create_bootstrap_resource()
     common_stub::uint_value = 11;
     CHECK(nsdl->create_bootstrap_resource(NULL, "") == true);
 
+    const char address[] = "coap://127.0.0.1:5683?param=1&param2=2&param3=3";
+    nsdl->_bootstrap_id = 0;
+    uriqueryparser_stub::bool_value = true;
+    nsdl->set_server_address(address);
+    CHECK(nsdl->create_bootstrap_resource(NULL, "") == true);
+
+
     common_stub::uint_value = 0;
     CHECK(nsdl->create_bootstrap_resource(NULL, "") == false);
 }
@@ -250,6 +258,10 @@ void Test_M2MNsdlInterface::test_send_register_message()
     CHECK(nsdl->send_register_message(NULL,4,100,SN_NSDL_ADDRESS_TYPE_IPV6) == true);
 
     common_stub::uint_value = 0;
+    CHECK(nsdl->send_register_message(NULL,4,100,SN_NSDL_ADDRESS_TYPE_IPV6) == false);
+
+    const char address[] = "coap://127.0.0.1:5683?param=1&param2=2&param3=3";
+    nsdl->set_server_address(address);
     CHECK(nsdl->send_register_message(NULL,4,100,SN_NSDL_ADDRESS_TYPE_IPV6) == false);
 }
 
@@ -513,9 +525,17 @@ void Test_M2MNsdlInterface::test_received_from_server_callback()
     nsdl->received_from_server_callback(handle,coap_header,NULL);
     CHECK(observer->register_updated == true);
 
+    const char server_address[] = "coap://127.0.0.1:5683?param=1&param2=2&param3=3";
+    nsdl->set_server_address(server_address);
+    uriqueryparser_stub::bool_value = true;
     coap_header->msg_id = 10;
     coap_header->msg_code = COAP_MSG_CODE_RESPONSE_FORBIDDEN;
     coap_header->coap_status = COAP_STATUS_OK;
+    nsdl->received_from_server_callback(handle,coap_header,NULL);
+    CHECK(observer->register_error == true);
+
+
+    uriqueryparser_stub::bool_value = false;
     nsdl->received_from_server_callback(handle,coap_header,NULL);
     CHECK(observer->register_error == true);
 

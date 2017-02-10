@@ -31,6 +31,7 @@
 #include "include/m2mtlvdeserializer.h"
 #include "include/m2mtlvserializer.h"
 #include "include/m2mnsdlinterface.h"
+#include "include/uriqueryparser.h"
 #include "mbed-client/m2mstring.h"
 #include "mbed-client/m2msecurity.h"
 #include "mbed-client/m2mserver.h"
@@ -61,6 +62,7 @@ M2MNsdlInterface::M2MNsdlInterface(M2MNsdlObserver &observer)
   _registration_timer(new M2MTimer(*this)),
   _counter_for_nsdl(0),
   _bootstrap_id(0),
+  _server_address(NULL),
   _unregister_ongoing(false),
   _identity_accepted(false)
 {
@@ -97,6 +99,7 @@ M2MNsdlInterface::~M2MNsdlInterface()
 
     sn_nsdl_destroy(_nsdl_handle);
     _nsdl_handle = NULL;
+    free(_server_address);
 
     M2MNsdlInterfaceList::const_iterator it;
     it = __nsdl_interface_list.begin();
@@ -216,7 +219,8 @@ bool M2MNsdlInterface::remove_nsdl_resource(M2MBase *base)
     return sn_nsdl_pop_resource(_nsdl_handle, resource);
 }
 
-bool M2MNsdlInterface::create_bootstrap_resource(sn_nsdl_addr_s *address, const String &bootstrap_endpoint_name)
+bool M2MNsdlInterface::create_bootstrap_resource(sn_nsdl_addr_s *address,
+                                                 const String &bootstrap_endpoint_name)
 {
 #ifndef MBED_CLIENT_DISABLE_BOOTSTRAP_FEATURE
     tr_debug("M2MNsdlInterface::create_bootstrap_resource()");
@@ -228,15 +232,43 @@ bool M2MNsdlInterface::create_bootstrap_resource(sn_nsdl_addr_s *address, const 
         memory_free(_endpoint->endpoint_name_ptr);
     }
 
-    _endpoint->endpoint_name_ptr = alloc_string_copy((uint8_t*)bootstrap_endpoint_name.c_str(), bootstrap_endpoint_name.length());
+    _endpoint->endpoint_name_ptr = alloc_string_copy((uint8_t*)bootstrap_endpoint_name.c_str(),
+                                                     bootstrap_endpoint_name.length());
     _endpoint->endpoint_name_len = bootstrap_endpoint_name.length();
     if(_bootstrap_id == 0) {
-        _bootstrap_id = sn_nsdl_oma_bootstrap(_nsdl_handle,
-                                               address,
-                                               _endpoint,
-                                               &bootstrap_endpoint);
-        tr_debug("M2MNsdlInterface::create_bootstrap_resource - _bootstrap_id %d", _bootstrap_id);
+        // Take copy of the address, uri_query_parameters() will modify the source buffer
+        bool msg_sent = false;
+        if (_server_address) {
+            char *address_copy = M2MBase::alloc_string_copy(_server_address);
+            char* query = query_string(_server_address);
+            if (query != NULL) {
+                int param_count = query_param_count(query);
+                char* uri_query_params[param_count];
+                if (uri_query_parameters(query, uri_query_params)) {
+                    msg_sent = true;
+                    _bootstrap_id = sn_nsdl_oma_bootstrap(_nsdl_handle,
+                                                          address,
+                                                          _endpoint,
+                                                          &bootstrap_endpoint,
+                                                          uri_query_params,
+                                                          param_count);
+                }
+                free(_server_address);
+                _server_address = M2MBase::alloc_string_copy(address_copy);
+            }
+            free(address_copy);
+        }
+        if (!msg_sent) {
+            _bootstrap_id = sn_nsdl_oma_bootstrap(_nsdl_handle,
+                                                  address,
+                                                  _endpoint,
+                                                  &bootstrap_endpoint,
+                                                  NULL,
+                                                  0);
+        }
+
         success = _bootstrap_id != 0;
+        tr_debug("M2MNsdlInterface::create_bootstrap_resource - _bootstrap_id %d", _bootstrap_id);
     }
     return success;
 #else
@@ -258,7 +290,13 @@ bool M2MNsdlInterface::send_register_message(uint8_t* address,
                                        false);
     bool success = false;
     if(set_NSP_address(_nsdl_handle, address, address_length, port, address_type) == 0) {
-        success = sn_nsdl_register_endpoint(_nsdl_handle,_endpoint) != 0;
+        bool msg_sent = false;
+        if (_server_address) {
+            msg_sent = parse_and_send_uri_query_parameters();
+        }
+        if (!msg_sent) {
+            success = sn_nsdl_register_endpoint(_nsdl_handle,_endpoint, NULL, 0) != 0;
+        }
     }
     return success;
 }
@@ -425,7 +463,13 @@ uint8_t M2MNsdlInterface::received_from_server_callback(struct nsdl_s *nsdl_hand
             } else {
                 tr_error("M2MNsdlInterface::received_from_server_callback - registration_updated failed %d", coap_header->msg_code);
                 _registration_timer->stop_timer();
-                sn_nsdl_register_endpoint(_nsdl_handle,_endpoint);
+                bool msg_sent = false;
+                if (_server_address) {
+                    msg_sent = parse_and_send_uri_query_parameters();
+                }
+                if (!msg_sent) {
+                    sn_nsdl_register_endpoint(_nsdl_handle,_endpoint, NULL, 0);
+                }
             }
         }
 #ifndef MBED_CLIENT_DISABLE_BOOTSTRAP_FEATURE
@@ -1682,4 +1726,29 @@ void M2MNsdlInterface::change_operation_mode(M2MObject *object, M2MBase::Operati
             (*it)->set_operation(operation);
         }
     }
+}
+
+void M2MNsdlInterface::set_server_address(const char* server_address)
+{
+    free(_server_address);
+    _server_address = M2MBase::alloc_string_copy(server_address);
+}
+
+bool M2MNsdlInterface::parse_and_send_uri_query_parameters()
+{
+    char *address_copy = M2MBase::alloc_string_copy(_server_address);
+    char* query = query_string((const char*)_server_address);
+    bool msg_sent = false;
+    if (query != NULL) {
+        int param_count = query_param_count(query);
+        char* uri_query_params[param_count];
+        if (uri_query_parameters(query, uri_query_params)) {
+            msg_sent = true;
+            sn_nsdl_register_endpoint(_nsdl_handle,_endpoint,uri_query_params, param_count);
+        }
+        free(_server_address);
+        _server_address = M2MBase::alloc_string_copy(address_copy);
+    }
+    free(address_copy);
+    return msg_sent;
 }
