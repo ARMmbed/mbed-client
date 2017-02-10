@@ -110,6 +110,7 @@ public:
      * @return true if created and sent successfully else false.
     */
     bool create_bootstrap_resource(sn_nsdl_addr_s *address);
+                                   const String &bootstrap_endpoint_name);
 
     /**
      * @brief Sets the register message to the server.
@@ -266,6 +267,14 @@ private:
         SERVER   = 0x01,
         DEVICE   = 0x02,
     }ObjectType;
+
+    /**
+     * Enum defining an LWM2M object type.
+    */
+    typedef enum {
+        REGISTER  = 0x00,
+        BOOTSTRAP = 0x01
+    }MessageType;
 
     /**
     * @brief Initializes all the nsdl library component to be usable.

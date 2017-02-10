@@ -236,3 +236,8 @@ M2MTimer &M2MNsdlInterface::get_nsdl_execution_timer()
 {
     return _nsdl_exceution_timer;
 }
+
+void M2MNsdlInterface::set_server_address(const char* server_address)
+{
+
+}
