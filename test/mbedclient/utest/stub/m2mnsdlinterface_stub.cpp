@@ -183,7 +183,7 @@ void M2MNsdlInterface::handle_bootstrap_delete(sn_coap_hdr_s *coap_header,sn_nsd
 
 }
 
-bool M2MNsdlInterface::parse_bootstrap_message(sn_coap_hdr_s *coap_header, bool is_security_object)
+bool M2MNsdlInterface::parse_bootstrap_message(sn_coap_hdr_s *coap_header, M2MNsdlInterface::ObjectType lwm2m_object_type)
 {
 
 }
