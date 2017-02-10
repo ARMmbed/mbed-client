@@ -292,7 +292,7 @@ bool M2MNsdlInterface::send_register_message(uint8_t* address,
     if(set_NSP_address(_nsdl_handle, address, address_length, port, address_type) == 0) {
         bool msg_sent = false;
         if (_server_address) {
-            msg_sent = parse_and_send_uri_query_parameters();
+            success = msg_sent = parse_and_send_uri_query_parameters();
         }
         if (!msg_sent) {
             success = sn_nsdl_register_endpoint(_nsdl_handle,_endpoint, NULL, 0) != 0;
