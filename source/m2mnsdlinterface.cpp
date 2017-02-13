@@ -277,11 +277,11 @@ bool M2MNsdlInterface::send_register_message(uint8_t* address,
                                        false);
     bool success = false;
     if(set_NSP_address(_nsdl_handle, address, address_length, port, address_type) == 0) {
-        bool msg_sent = false;
         if (_server_address) {
-            success = msg_sent = parse_and_send_uri_query_parameters();
+            success = parse_and_send_uri_query_parameters();
         }
-        if (!msg_sent) {
+        // If URI parsing fails or there is no parameters, try again without parameters
+        if (!success) {
             success = sn_nsdl_register_endpoint(_nsdl_handle,_endpoint, NULL, 0) != 0;
         }
     }
@@ -1727,8 +1727,7 @@ bool M2MNsdlInterface::parse_and_send_uri_query_parameters()
         int param_count = query_param_count(query);
         char* uri_query_params[param_count];
         if (uri_query_parameters(query, uri_query_params)) {
-            msg_sent = true;
-            sn_nsdl_register_endpoint(_nsdl_handle,_endpoint,uri_query_params, param_count);
+            msg_sent = sn_nsdl_register_endpoint(_nsdl_handle,_endpoint,uri_query_params, param_count) != 0;
         }
         free(_server_address);
         _server_address = M2MBase::alloc_string_copy(address_copy);
