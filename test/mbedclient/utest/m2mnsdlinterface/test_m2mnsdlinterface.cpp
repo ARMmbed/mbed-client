@@ -292,9 +292,14 @@ void Test_M2MNsdlInterface::test_send_register_message()
     common_stub::uint_value = 0;
     nsdl->set_server_address(NULL,4,100,SN_NSDL_ADDRESS_TYPE_IPV6);
 
+
     const char address[] = "coap://127.0.0.1:5683?param=1&param2=2&param3=3";
     nsdl->set_server_address(address);
+
     CHECK(nsdl->send_register_message(NULL,4,100,SN_NSDL_ADDRESS_TYPE_IPV6) == false);
+
+    common_stub::uint_value = 10;
+    CHECK(nsdl->send_register_message(NULL,4,100,SN_NSDL_ADDRESS_TYPE_IPV6) == true);
 }
 
 void Test_M2MNsdlInterface::test_send_update_registration()
