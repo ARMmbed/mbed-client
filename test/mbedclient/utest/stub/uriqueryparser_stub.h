@@ -26,6 +26,7 @@ extern "C" {
 namespace uriqueryparser_stub
 {
     extern bool bool_value;
+    extern uint32_t int_value;
 }
 
 #ifdef __cplusplus
