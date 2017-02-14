@@ -16,15 +16,16 @@
 #include "uriqueryparser_stub.h"
 
 bool uriqueryparser_stub::bool_value;
+uint32_t uriqueryparser_stub::int_value;
 
-char* query_string(const char* uri)
+char* query_string(char* uri)
 {
 
 }
 
 int8_t query_param_count(char* query)
 {
-
+    return uriqueryparser_stub::int_value;
 }
 
 bool uri_query_parameters(char* query, char *uri_query_parameters[])
