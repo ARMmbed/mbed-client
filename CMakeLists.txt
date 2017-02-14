@@ -5,7 +5,7 @@ SET(CMAKE_SYSTEM_NAME Generic)
 
 project(mbedClient)
 
-set(LINUX_PORT_LIBS_PATH ${CMAKE_CURRENT_SOURCE_DIR}/../Linux_port_libs/)
+set(Port_libs_PATH ${CMAKE_CURRENT_SOURCE_DIR}/../Port_libs/)
 #own include dirs
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/source)
@@ -23,12 +23,12 @@ include_directories(${PAL_SOURCE_DIR}/Port/Reference-Impl/Linux/CFStore)
 include_directories(${PAL_SOURCE_DIR}/Port/Platform-API/)
 
 #porting libs
-include_directories(${LINUX_PORT_LIBS_PATH}/nanostack-libservice/mbed-client-libservice)
-include_directories(${LINUX_PORT_LIBS_PATH}/nanostack-libservice/)    
-include_directories(${LINUX_PORT_LIBS_PATH}/sal-stack-nanostack-eventloop/nanostack-event-loop)  
-include_directories(${LINUX_PORT_LIBS_PATH}/ns-hal-pal/)
-include_directories(${LINUX_PORT_LIBS_PATH}/mbed-client-c/)
-include_directories(${LINUX_PORT_LIBS_PATH}/mbed-trace/)       
+include_directories(${Port_libs_PATH}/nanostack-libservice/mbed-client-libservice)
+include_directories(${Port_libs_PATH}/nanostack-libservice/)    
+include_directories(${Port_libs_PATH}/sal-stack-nanostack-eventloop/nanostack-event-loop)  
+include_directories(${Port_libs_PATH}/ns-hal-pal/)
+include_directories(${Port_libs_PATH}/mbed-client-c/)
+include_directories(${Port_libs_PATH}/mbed-trace/)       
 
 # add the binary tree to the search path for include files
 # so that we will find TutorialConfig.h????????????????????????????????????????????????????????????????????????????
