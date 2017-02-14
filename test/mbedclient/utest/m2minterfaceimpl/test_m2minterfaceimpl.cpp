@@ -472,7 +472,10 @@ void Test_M2MInterfaceImpl::test_coap_message_ready()
     sn_nsdl_addr_s *address_ptr = (sn_nsdl_addr_s*)malloc(sizeof(sn_nsdl_addr_s));
 
     impl->coap_message_ready(data_ptr,data_len,address_ptr);
+    CHECK(impl->_current_state == M2MInterfaceImpl::STATE_IDLE);
 
+    impl->_current_state = M2MInterfaceImpl::STATE_WAITING;
+    impl->coap_message_ready(data_ptr,data_len,address_ptr);
     CHECK(impl->_current_state == M2MInterfaceImpl::STATE_WAITING);
 
     m2mconnectionhandler_stub::bool_value = false;
