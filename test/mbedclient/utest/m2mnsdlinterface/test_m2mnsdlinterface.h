@@ -93,6 +93,8 @@ public:
     M2MNsdlInterface* nsdl;
 
     TestObserver *observer;
+
+    M2MConnectionHandler *connection_handler;
 };
 
 #endif // TEST_M2M_NSDL_INTERFACE_H

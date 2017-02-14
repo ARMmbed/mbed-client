@@ -149,14 +149,16 @@ struct nsdl_s {
 Test_M2MNsdlInterface::Test_M2MNsdlInterface()
 {
     observer = new TestObserver();
-    nsdl = new M2MNsdlInterface(*observer);
-    //nsdl->_server = new M2MServer();
+    connection_handler = new M2MConnectionHandler(*observer, NULL, M2MInterface::NOT_SET, M2MInterface::Uninitialized);
+    nsdl = new M2MNsdlInterface(*observer, *connection_handler);
 }
 
 Test_M2MNsdlInterface:: ~Test_M2MNsdlInterface()
 {
     delete nsdl;
     nsdl = NULL;
+    delete connection_handler;
+    connection_handler = NULL;
     delete observer;
     observer = NULL;
 }
@@ -1815,20 +1817,8 @@ void Test_M2MNsdlInterface::test_get_nsdl_handle()
     CHECK(nsdl->get_nsdl_handle() == nsdl->_nsdl_handle);
 }
 
-void Test_M2MNsdlInterface::test_set_connection_handler()
-{
-    CHECK(nsdl->_connection_handler == NULL);
-    M2MConnectionSecurity *sec = new M2MConnectionSecurity(M2MConnectionSecurity::NO_SECURITY);
-    M2MConnectionHandler *connhandler = new M2MConnectionHandler(*observer, sec, M2MInterface::UDP, M2MInterface::LwIP_IPv4);
-    nsdl->set_connection_handler(connhandler);
-    CHECK(nsdl->_connection_handler == connhandler);
-}
-
 void Test_M2MNsdlInterface::test_claim_release_mutex()
 {
-    M2MConnectionSecurity *sec = new M2MConnectionSecurity(M2MConnectionSecurity::NO_SECURITY);
-    M2MConnectionHandler *connhandler = new M2MConnectionHandler(*observer, sec, M2MInterface::UDP, M2MInterface::LwIP_IPv4);
-    nsdl->set_connection_handler(connhandler);
     CHECK(m2mconnectionhandler_stub::mutex_count == 0);
     nsdl->claim_mutex();
     CHECK(m2mconnectionhandler_stub::mutex_count == 1);

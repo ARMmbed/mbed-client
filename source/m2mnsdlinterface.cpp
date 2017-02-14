@@ -49,7 +49,7 @@
 #define BUFFER_SIZE 21
 #define TRACE_GROUP "mClt"
 
-M2MNsdlInterface::M2MNsdlInterface(M2MNsdlObserver &observer)
+M2MNsdlInterface::M2MNsdlInterface(M2MNsdlObserver &observer, M2MConnectionHandler &connection_handler)
 : _observer(observer),
   _endpoint(NULL),
   _nsdl_handle(NULL),
@@ -57,7 +57,7 @@ M2MNsdlInterface::M2MNsdlInterface(M2MNsdlObserver &observer)
   _server(),
   _nsdl_exceution_timer(new M2MTimer(*this)),
   _registration_timer(new M2MTimer(*this)),
-  _connection_handler(NULL),
+  _connection_handler(connection_handler),
   _counter_for_nsdl(0),
   _bootstrap_id(0),
   _unregister_ongoing(false),
@@ -97,7 +97,6 @@ M2MNsdlInterface::~M2MNsdlInterface()
     sn_nsdl_destroy(_nsdl_handle);
     _nsdl_handle = NULL;
 
-    _connection_handler = NULL;
     tr_debug("M2MNsdlInterface::~M2MNsdlInterface() - OUT");
 }
 
@@ -1641,23 +1640,14 @@ void M2MNsdlInterface::handle_bootstrap_error()
     _observer.bootstrap_error();
 }
 
-void M2MNsdlInterface::set_connection_handler(M2MConnectionHandler *connection_handler)
-{
-    _connection_handler = connection_handler;
-}
-
 void M2MNsdlInterface::claim_mutex()
 {
-    if (_connection_handler) {
-        _connection_handler->claim_mutex();
-    }
+    _connection_handler.claim_mutex();
 }
 
 void M2MNsdlInterface::release_mutex()
 {
-    if (_connection_handler) {
-        _connection_handler->release_mutex();
-    }
+    _connection_handler.release_mutex();
 }
 
 const String& M2MNsdlInterface::endpoint_name() const

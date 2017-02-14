@@ -105,10 +105,13 @@ public:
 Test_NsdlAccessHelper::Test_NsdlAccessHelper()
 {
     observer = new TestObserver();
+    connection_handler = new M2MConnectionHandler(*observer, NULL, M2MInterface::NOT_SET, M2MInterface::Uninitialized);
 }
 
 Test_NsdlAccessHelper::~Test_NsdlAccessHelper()
 {
+    delete connection_handler;
+    connection_handler = NULL;
     delete observer;
     observer = NULL;
 }
@@ -120,7 +123,7 @@ void Test_NsdlAccessHelper::test_nsdl_c_callback()
 
     m2mnsdlinterface_stub::int_value = 1;
     m2mnsdlinterface_stub::void_value = malloc(1);
-    common_stub::void_value = new M2MNsdlInterface(*observer);
+    common_stub::void_value = new M2MNsdlInterface(*observer, *connection_handler);
     common_stub::coap_header = (sn_coap_hdr_s *) malloc(sizeof(sn_coap_hdr_s));
     memset(common_stub::coap_header, 0, sizeof(sn_coap_hdr_s));
     common_stub::coap_header->options_list_ptr = (sn_coap_options_list_s *) malloc(sizeof(sn_coap_options_list_s));
@@ -161,7 +164,7 @@ void Test_NsdlAccessHelper::test_nsdl_c_send_to_server()
     common_stub::void_value = NULL;
     CHECK(__nsdl_c_send_to_server(NULL, SN_NSDL_PROTOCOL_HTTP, NULL, 0, NULL) == 0);
 
-    common_stub::void_value = new M2MNsdlInterface(*observer);
+    common_stub::void_value = new M2MNsdlInterface(*observer, *connection_handler);
     CHECK(__nsdl_c_send_to_server(NULL, SN_NSDL_PROTOCOL_HTTP, NULL, 0, NULL) == 1);
 
     m2mnsdlinterface_stub::int_value = 1;
@@ -177,7 +180,7 @@ void Test_NsdlAccessHelper::test_nsdl_c_received_from_server()
     common_stub::void_value = NULL;
     CHECK( 0 == __nsdl_c_received_from_server(NULL, NULL, NULL));
 
-    common_stub::void_value = new M2MNsdlInterface(*observer);
+    common_stub::void_value = new M2MNsdlInterface(*observer, *connection_handler);
     CHECK( 0 == __nsdl_c_received_from_server(NULL, NULL, NULL));
 
     m2mnsdlinterface_stub::int_value = 1;

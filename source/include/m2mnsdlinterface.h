@@ -57,7 +57,7 @@ public:
     * @brief Constructor
     * @param observer, Observer to pass the event callbacks from nsdl library.
     */
-    M2MNsdlInterface(M2MNsdlObserver &observer);
+    M2MNsdlInterface(M2MNsdlObserver &observer, M2MConnectionHandler &connection_handler);
 
     /**
      * @brief Destructor
@@ -213,11 +213,6 @@ public:
      * @return endpoint name
      */
     const String& endpoint_name() const;
-
-    /**
-     * @brief Set the connection handler
-     */
-    void set_connection_handler(M2MConnectionHandler *connection_handler);
 
 protected: // from M2MTimerObserver
 
@@ -381,7 +376,7 @@ private:
     M2MServer                               _server;
     M2MTimer                                *_nsdl_exceution_timer;
     M2MTimer                                *_registration_timer;
-    M2MConnectionHandler                    *_connection_handler;
+    M2MConnectionHandler                    &_connection_handler;
     sn_nsdl_addr_s                          _sn_nsdl_address;
     String                                  _endpoint_name;
     uint32_t                                _counter_for_nsdl;

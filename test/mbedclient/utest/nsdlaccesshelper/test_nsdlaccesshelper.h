@@ -43,6 +43,7 @@ public:
     void test_socket_free();
 
     TestObserver *observer;
+    M2MConnectionHandler *connection_handler;
 private:
     void clear_list();
 };
