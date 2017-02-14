@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 #include "m2mnsdlinterface_stub.h"
-
+#include "m2mconnectionhandler_stub.h"
 
 bool m2mnsdlinterface_stub::bool_value;
 uint32_t m2mnsdlinterface_stub::int_value;
@@ -29,8 +29,8 @@ void m2mnsdlinterface_stub::clear()
     void_value = NULL;
 }
 
-M2MNsdlInterface::M2MNsdlInterface(M2MNsdlObserver &observer)
-: _observer(observer)
+M2MNsdlInterface::M2MNsdlInterface(M2MNsdlObserver &observer, M2MConnectionHandler &connection_handler)
+: _observer(observer), _connection_handler(connection_handler)
 {
     //m2mnsdlinterface_stub::string_value = new String("");
 }
@@ -196,6 +196,13 @@ bool M2MNsdlInterface::validate_security_object()
 void M2MNsdlInterface::handle_bootstrap_error()
 {
 
+}
+void M2MNsdlInterface::claim_mutex()
+{
+}
+
+void M2MNsdlInterface::release_mutex()
+{
 }
 
 const String& M2MNsdlInterface::endpoint_name() const

@@ -39,10 +39,10 @@ M2MInterfaceImpl::M2MInterfaceImpl(M2MInterfaceObserver& observer,
   _max_states( STATE_MAX_STATES ),
   _event_generated(false),
   _event_data(NULL),
-  _nsdl_interface(*this),
   _queue_sleep_timer(*this),
   _retry_timer(*this),
-  _connection_handler(*this, NULL, mode, stack)
+  _connection_handler(*this, NULL, mode, stack),
+  _nsdl_interface(*this, _connection_handler)
 {
 }
 
