@@ -26,7 +26,7 @@ extern "C" {
  * \param uri URL
  * \return Query parameters or NULL if there is no parameters.
  */
-char *query_string(const char* uri);
+char *query_string(char *uri);
 
 /**
  * \brief Return count of query parameters.
