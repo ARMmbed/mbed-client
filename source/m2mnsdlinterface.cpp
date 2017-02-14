@@ -49,7 +49,7 @@
 #define BUFFER_SIZE 21
 #define TRACE_GROUP "mClt"
 
-M2MNsdlInterface::M2MNsdlInterface(M2MNsdlObserver &observer)
+M2MNsdlInterface::M2MNsdlInterface(M2MNsdlObserver &observer, M2MConnectionHandler &connection_handler)
 : _observer(observer),
   _endpoint(NULL),
   _nsdl_handle(NULL),
@@ -57,13 +57,13 @@ M2MNsdlInterface::M2MNsdlInterface(M2MNsdlObserver &observer)
   _server(),
   _nsdl_exceution_timer(new M2MTimer(*this)),
   _registration_timer(new M2MTimer(*this)),
+  _connection_handler(connection_handler),
   _counter_for_nsdl(0),
   _bootstrap_id(0),
   _unregister_ongoing(false),
   _identity_accepted(false)
 {
     tr_debug("M2MNsdlInterface::M2MNsdlInterface()");
-    __nsdl_interface_list.push_back(this);
     _sn_nsdl_address.addr_len = 0;
     _sn_nsdl_address.addr_ptr = NULL;
     _sn_nsdl_address.port = 0;
@@ -75,6 +75,7 @@ M2MNsdlInterface::M2MNsdlInterface(M2MNsdlObserver &observer)
     // and receiving purposes.
     _nsdl_handle = sn_nsdl_init(&(__nsdl_c_send_to_server), &(__nsdl_c_received_from_server),
                  &(__nsdl_c_memory_alloc), &(__nsdl_c_memory_free));
+    sn_nsdl_set_context(_nsdl_handle, this);
 
     initialize();
 }
@@ -95,16 +96,6 @@ M2MNsdlInterface::~M2MNsdlInterface()
     sn_nsdl_destroy(_nsdl_handle);
     _nsdl_handle = NULL;
 
-    M2MNsdlInterfaceList::const_iterator it;
-    it = __nsdl_interface_list.begin();
-    int index = 0;
-    for (; it!=__nsdl_interface_list.end(); it++) {
-        if ((*it) == this) {
-            __nsdl_interface_list.erase(index);
-            break;
-        }
-        index++;
-    }
     tr_debug("M2MNsdlInterface::~M2MNsdlInterface() - OUT");
 }
 
@@ -707,7 +698,7 @@ void M2MNsdlInterface::observation_to_be_sent(M2MBase *object,
                                               m2m::Vector<uint16_t> changed_instance_ids,
                                               bool send_object)
 {
-    __mutex_claim();
+    claim_mutex();
     if(object) {
         tr_debug("M2MNsdlInterface::observation_to_be_sent()");
         M2MBase::BaseType type = object->base_type();
@@ -722,12 +713,12 @@ void M2MNsdlInterface::observation_to_be_sent(M2MBase *object,
             send_resource_observation(static_cast<M2MResource*> (object), obs_number);
         }
     }
-    __mutex_release();
+    release_mutex();
 }
 
 void M2MNsdlInterface::send_delayed_response(M2MBase *base)
 {
-    __mutex_claim();
+    claim_mutex();
     tr_debug("M2MNsdlInterface::send_delayed_response()");
     M2MResource *resource = NULL;
     if(base) {
@@ -761,14 +752,14 @@ void M2MNsdlInterface::send_delayed_response(M2MBase *base)
             }
         }
     }
-    __mutex_release();
+    release_mutex();
 }
 
 void M2MNsdlInterface::resource_to_be_deleted(M2MBase *base)
 {
-    __mutex_claim();
+    claim_mutex();
     remove_nsdl_resource(base);
-    __mutex_release();
+    release_mutex();
 }
 
 void M2MNsdlInterface::value_updated(M2MBase *base,
@@ -807,7 +798,7 @@ void M2MNsdlInterface::value_updated(M2MBase *base,
 
 void M2MNsdlInterface::remove_object(M2MBase *object)
 {
-    __mutex_claim();
+    claim_mutex();
     tr_debug("M2MNsdlInterface::remove_object()");
     M2MObject* rem_object = static_cast<M2MObject*> (object);
     if(rem_object && !_object_list.empty()) {
@@ -824,7 +815,7 @@ void M2MNsdlInterface::remove_object(M2MBase *object)
     if(_object_list.empty()) {
         _object_list.clear();
     }
-    __mutex_release();
+    release_mutex();
 }
 
 bool M2MNsdlInterface::create_nsdl_object_structure(M2MObject *object)
@@ -904,7 +895,7 @@ bool M2MNsdlInterface::create_nsdl_resource_structure(M2MResource *res,
 
 bool M2MNsdlInterface::create_nsdl_resource(M2MBase *base)
 {
-    __mutex_claim();
+    claim_mutex();
     tr_debug("M2MNsdlInterface::create_nsdl_resource");
     bool success = false;
     if(base) {
@@ -928,7 +919,7 @@ bool M2MNsdlInterface::create_nsdl_resource(M2MBase *base)
             success = true;
         }
     }
-    __mutex_release();
+    release_mutex();
     return success;
 }
 
@@ -1649,6 +1640,16 @@ void M2MNsdlInterface::handle_bootstrap_error()
         _security = NULL;
     }
     _observer.bootstrap_error();
+}
+
+void M2MNsdlInterface::claim_mutex()
+{
+    _connection_handler.claim_mutex();
+}
+
+void M2MNsdlInterface::release_mutex()
+{
+    _connection_handler.release_mutex();
 }
 
 const String& M2MNsdlInterface::endpoint_name() const

@@ -73,12 +73,3 @@ TEST(NsdlAccessHelper, test_socket_free)
     nsdl->test_socket_free();
 }
 
-TEST(NsdlAccessHelper, test_mutex_claim)
-{
-    nsdl->test_mutex_claim();
-}
-
-TEST(NsdlAccessHelper, test_mutex_release)
-{
-    nsdl->test_mutex_release();
-}

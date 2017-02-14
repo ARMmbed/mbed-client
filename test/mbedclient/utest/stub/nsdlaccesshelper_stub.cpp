@@ -74,10 +74,3 @@ void __socket_free(void *, void *)
 {
 }
 
-void __mutex_claim()
-{
-}
-
-void __mutex_release()
-{
-}
