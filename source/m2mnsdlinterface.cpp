@@ -227,23 +227,27 @@ bool M2MNsdlInterface::create_bootstrap_resource(sn_nsdl_addr_s *address,
         bool msg_sent = false;
         if (_server_address) {
             char *address_copy = M2MBase::alloc_string_copy(_server_address);
-            char* query = query_string(_server_address);
-            if (query != NULL) {
-                int param_count = query_param_count(query);
-                char* uri_query_params[param_count];
-                if (uri_query_parameters(query, uri_query_params)) {
-                    msg_sent = true;
-                    _bootstrap_id = sn_nsdl_oma_bootstrap(_nsdl_handle,
-                                                          address,
-                                                          _endpoint,
-                                                          &bootstrap_endpoint,
-                                                          uri_query_params,
-                                                          param_count);
+            if (address_copy) {
+                char* query = query_string(_server_address);
+                if (query != NULL) {
+                    int param_count = query_param_count(query);
+                    if (param_count) {
+                        char* uri_query_params[param_count];
+                        if (uri_query_parameters(query, uri_query_params)) {
+                            msg_sent = true;
+                            _bootstrap_id = sn_nsdl_oma_bootstrap(_nsdl_handle,
+                                                                  address,
+                                                                  _endpoint,
+                                                                  &bootstrap_endpoint,
+                                                                  uri_query_params,
+                                                                  param_count);
+                        }
+                        free(_server_address);
+                        _server_address = M2MBase::alloc_string_copy(address_copy);
+                    }
                 }
-                free(_server_address);
-                _server_address = M2MBase::alloc_string_copy(address_copy);
+                free(address_copy);
             }
-            free(address_copy);
         }
         if (!msg_sent) {
             _bootstrap_id = sn_nsdl_oma_bootstrap(_nsdl_handle,
@@ -1724,19 +1728,23 @@ void M2MNsdlInterface::set_server_address(const char* server_address)
 
 bool M2MNsdlInterface::parse_and_send_uri_query_parameters()
 {
-    char *address_copy = M2MBase::alloc_string_copy(_server_address);
-    char* query = query_string((const char*)_server_address);
     bool msg_sent = false;
-    if (query != NULL) {
-        int param_count = query_param_count(query);
-        char* uri_query_params[param_count];
-        if (uri_query_parameters(query, uri_query_params)) {
-            msg_sent = sn_nsdl_register_endpoint(_nsdl_handle,_endpoint,uri_query_params, param_count) != 0;
+    char *address_copy = M2MBase::alloc_string_copy(_server_address);
+    if (address_copy) {
+        char* query = query_string(_server_address);
+        if (query != NULL) {
+            int param_count = query_param_count(query);
+            if (param_count) {
+                char* uri_query_params[param_count];
+                if (uri_query_parameters(query, uri_query_params)) {
+                    msg_sent = sn_nsdl_register_endpoint(_nsdl_handle,_endpoint,uri_query_params, param_count) != 0;
+                }
+                free(_server_address);
+                _server_address = M2MBase::alloc_string_copy(address_copy);
+            }
         }
-        free(_server_address);
-        _server_address = M2MBase::alloc_string_copy(address_copy);
+        free(address_copy);
     }
-    free(address_copy);
     return msg_sent;
 }
 
