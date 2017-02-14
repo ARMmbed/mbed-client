@@ -19,8 +19,6 @@
 #include "include/m2mnsdlinterface.h"
 
 typedef Vector<M2MNsdlInterface  *> M2MNsdlInterfaceList;
-extern M2MNsdlInterfaceList __nsdl_interface_list;
-extern M2MConnectionHandler *__connection_handler;
 
 #ifdef __cplusplus
 extern "C" {
@@ -45,9 +43,6 @@ void *__socket_malloc( void * context, size_t size);
 void __socket_free(void * context, void * ptr);
 
 M2MNsdlInterface* get_interface(struct nsdl_s* nsdl_handle);
-
-void __mutex_claim();
-void __mutex_release();
 
 #ifdef __cplusplus
 }
