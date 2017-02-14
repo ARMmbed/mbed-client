@@ -183,7 +183,7 @@ void Test_M2MSecurity::test_set_resource_value_buffer()
     CHECK(security->set_resource_value(M2MSecurity::ServerPublicKey,value,length) == true);
     CHECK(security->set_resource_value(M2MSecurity::PublicKey,value,length) == true);
 
-    CHECK(security->set_resource_value(M2MSecurity::M2MServerUri,value,length) == false);
+    CHECK(security->set_resource_value(M2MSecurity::M2MServerUri,value,length) == true);
     CHECK(security->set_resource_value(M2MSecurity::SMSBindingKey,value,length) == false);
     CHECK(security->set_resource_value(M2MSecurity::SMSBindingSecretKey,value,length) == false);
     CHECK(security->set_resource_value(M2MSecurity::BootstrapServer,value,length) == false);
