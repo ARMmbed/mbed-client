@@ -69,7 +69,7 @@ private:
     /**
      * Constructor
      */
-    M2MDevice();
+    M2MDevice(char *path);
 
     // Prevents the use of assignment operator.
     M2MDevice& operator=( const M2MDevice& /*other*/ );
@@ -230,7 +230,7 @@ private:
     M2MResourceInstance* get_resource_instance(DeviceResource dev_res,
                                                uint16_t instance_id) const;
 
-    static const String resource_name(DeviceResource resource);
+    static const char* resource_name(DeviceResource resource);
 
     bool check_value_range(DeviceResource resource, const int64_t value) const;
 

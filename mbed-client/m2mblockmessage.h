@@ -101,12 +101,12 @@ public:
     Error error_code() const;
 
 private:
-    uint16_t    _block_number;
-    uint32_t    _total_message_size;
-    bool        _is_last_block;
     uint8_t     *_block_data_ptr;
+    uint32_t    _total_message_size;
     uint16_t    _block_data_len;
+    uint16_t    _block_number;
     Error       _error_code;
+    bool        _is_last_block;
     bool        _is_block_message;
 };
 

@@ -20,6 +20,7 @@
 int m2mconnectionhandler_stub::int_value;
 uint16_t m2mconnectionhandler_stub::uint_value;
 bool m2mconnectionhandler_stub::bool_value;
+M2MConnectionSecurity* secu = NULL;
 
 void m2mconnectionhandler_stub::clear()
 {
@@ -34,14 +35,19 @@ M2MConnectionHandler::M2MConnectionHandler(M2MConnectionObserver &observer,
                                            M2MInterface::NetworkStack)
 :_observer(observer)
 {
-    if( sec ){
-        delete sec;
-        sec = NULL;
+    if (secu) {
+        delete secu;
+        secu = NULL;
     }
+    secu = sec;
 }
 
 M2MConnectionHandler::~M2MConnectionHandler()
 {
+    if( secu ){
+        delete secu;
+        secu = NULL;
+    }
 }
 
 bool M2MConnectionHandler::bind_connection(const uint16_t)

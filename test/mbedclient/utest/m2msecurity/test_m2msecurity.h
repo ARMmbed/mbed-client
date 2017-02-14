@@ -53,7 +53,6 @@ public:
     void test_server_type();
 
     M2MSecurity* security;
-    Callback*   callback;
 };
 
 #endif // TEST_M2M_SECURITY_H

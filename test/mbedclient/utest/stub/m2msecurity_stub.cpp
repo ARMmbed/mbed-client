@@ -32,7 +32,7 @@ void m2msecurity_stub::clear()
 }
 
 M2MSecurity::M2MSecurity(ServerType ser_type)
-: M2MObject("0"),
+: M2MObject("0", stringdup("0")),
  _server_type(ser_type),
  _server_instance(NULL)
 {

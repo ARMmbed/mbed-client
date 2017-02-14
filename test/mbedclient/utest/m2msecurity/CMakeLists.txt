@@ -10,7 +10,9 @@ add_executable(m2msecurity
         "../stub/m2mresource_stub.cpp"
         "../stub/m2mresourceinstance_stub.cpp"
         "../stub/m2mbase_stub.cpp"
+        "../stub/nsdlaccesshelper_stub.cpp"
         "../../../../source/m2msecurity.cpp"
+        "../../../../source/m2mstringbufferbase.cpp"
 )
 target_link_libraries(m2msecurity
     CppUTest

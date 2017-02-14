@@ -19,12 +19,12 @@
 #include <string.h>
 
 M2MBlockMessage::M2MBlockMessage() :
-    _block_number(0),
-    _total_message_size(0),
-    _is_last_block(false),
     _block_data_ptr(NULL),
+    _total_message_size(0),
     _block_data_len(0),
+    _block_number(0),
     _error_code(M2MBlockMessage::ErrorNone),
+    _is_last_block(false),
     _is_block_message(false)
 {
 }

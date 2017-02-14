@@ -26,8 +26,6 @@ public:
     Test_M2MObject();
     virtual ~Test_M2MObject();
 
-    void test_copy_constructor();
-
     void test_create_object_instance();
 
     void test_remove_object_instance();
@@ -47,6 +45,8 @@ public:
     void test_handle_post_request();
 
     void test_notification_update();
+
+    void test_ctor();
 
     M2MObject* object;
 

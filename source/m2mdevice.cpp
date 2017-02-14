@@ -29,7 +29,13 @@ M2MDevice* M2MDevice::_instance = NULL;
 M2MDevice* M2MDevice::get_instance()
 {
     if(_instance == NULL) {
-        _instance = new M2MDevice();
+        // ownership of this path is transferred to M2MBase.
+        // Since this object is a singleton, we could use the C-structs to avoid heap
+        // allocation on a lot of M2MDevice -objects data.
+        char *path = stringdup(M2M_DEVICE_ID);
+        if (path) {
+            _instance = new M2MDevice(path);
+        }
     }
     return _instance;
 }
@@ -40,8 +46,8 @@ void M2MDevice::delete_instance()
     _instance = NULL;
 }
 
-M2MDevice::M2MDevice()
-: M2MObject(M2M_DEVICE_ID)
+M2MDevice::M2MDevice(char *path)
+: M2MObject(M2M_DEVICE_ID, path)
 {
     M2MBase::set_register_uri(false);
     M2MBase::set_operation(M2MBase::GET_ALLOWED);
@@ -455,7 +461,7 @@ M2MResourceInstance* M2MDevice::get_resource_instance(DeviceResource dev_res,
     return inst;
 }
 
-const String M2MDevice::resource_name(DeviceResource resource)
+const char* M2MDevice::resource_name(DeviceResource resource)
 {
     const char* res_name = "";
     switch(resource) {
@@ -526,7 +532,7 @@ const String M2MDevice::resource_name(DeviceResource resource)
             res_name = DEVICE_SUPPORTED_BINDING_MODE;
             break;
     }
-    return String(res_name);
+    return res_name;
 }
 
 bool M2MDevice::check_value_range(DeviceResource resource, int64_t value) const
