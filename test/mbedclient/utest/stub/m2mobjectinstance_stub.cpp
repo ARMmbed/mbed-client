@@ -41,67 +41,91 @@ void m2mobjectinstance_stub::clear()
     resource_list.clear();
 }
 
-M2MObjectInstance& M2MObjectInstance::operator=(const M2MObjectInstance& )
+M2MObjectInstance::M2MObjectInstance(M2MObject& parent, const String &object_name,
+                                     const String &resource_type,
+                                     char *path,
+                                     bool external_blockwise_store)
+: M2MBase(object_name,
+          M2MBase::Dynamic,
+          resource_type,
+          path,
+          external_blockwise_store),
+  _parent(parent)
 {
-    return *this;
 }
 
-M2MObjectInstance::M2MObjectInstance(const M2MObjectInstance& other)
-: M2MBase(other),
-  _object_callback(other._object_callback)
+M2MObjectInstance::M2MObjectInstance(M2MObject& parent, const lwm2m_parameters_s* static_res)
+: M2MBase(static_res), _parent(parent)
 {
-    *this = other;
-}
 
-M2MObjectInstance::M2MObjectInstance(const String &object_name, M2MObjectCallback &object_callback)
-: M2MBase(object_name,M2MBase::Dynamic),
-  _object_callback(object_callback)
-{
 }
 
 M2MObjectInstance::~M2MObjectInstance()
 {
 }
 
-M2MResource* M2MObjectInstance::create_static_resource(const String &,
-                                               const String &,
-                                               M2MResourceInstance::ResourceType,
-                                               const uint8_t *,
-                                               const uint8_t,
-                                               bool)
+M2MResource* M2MObjectInstance::create_static_resource(const lwm2m_parameters_s* static_res,
+                                                       M2MResourceInstance::ResourceType type)
 {
     return m2mobjectinstance_stub::create_resource;
 }
 
-M2MResource* M2MObjectInstance::create_dynamic_resource(const String &,
-                                                const String &,
-                                                M2MResourceInstance::ResourceType,
-                                                bool,
-                                                bool)
+M2MResource* M2MObjectInstance::create_static_resource(const String &resource_name,
+                                                       const String &resource_type,
+                                                       M2MResourceInstance::ResourceType type,
+                                                       const uint8_t *value,
+                                                       const uint8_t value_length,
+                                                       bool multiple_instance,
+                                                       bool external_blockwise_store)
 {
     return m2mobjectinstance_stub::create_resource;
 }
 
-M2MResourceInstance* M2MObjectInstance::create_static_resource_instance(const String &,
-                                               const String &,
-                                               M2MResourceInstance::ResourceType,
-                                               const uint8_t *,
-                                               const uint8_t,
-                                               uint16_t)
+M2MResource* M2MObjectInstance::create_dynamic_resource(const lwm2m_parameters_s* static_res,
+                                                        M2MResourceInstance::ResourceType type,
+                                                        bool observable)
+{
+    return m2mobjectinstance_stub::create_resource;
+}
+
+M2MResource* M2MObjectInstance::create_dynamic_resource(const String &resource_name,
+                                                const String &resource_type,
+                                                M2MResourceInstance::ResourceType type,
+                                                bool observable,
+                                                bool multiple_instance,
+                                                bool external_blockwise_store)
+{
+    return m2mobjectinstance_stub::create_resource;
+}
+
+M2MResourceInstance* M2MObjectInstance::create_static_resource_instance(const String &resource_name,
+                                                                        const String &resource_type,
+                                                                        M2MResourceInstance::ResourceType type,
+                                                                        const uint8_t *value,
+                                                                        const uint8_t value_length,
+                                                                        uint16_t instance_id,
+                                                                        bool external_blockwise_store)
 {
     return m2mobjectinstance_stub::create_resource_instance;
 }
 
-M2MResourceInstance* M2MObjectInstance::create_dynamic_resource_instance(const String &,
-                                                const String &,
-                                                M2MResourceInstance::ResourceType,
-                                                bool,
-                                                uint16_t)
+
+M2MResourceInstance* M2MObjectInstance::create_dynamic_resource_instance(const String &resource_name,
+                                                                         const String &resource_type,
+                                                                         M2MResourceInstance::ResourceType type,
+                                                                         bool observable,
+                                                                         uint16_t instance_id,
+                                                                         bool external_blockwise_store)
 {
     return m2mobjectinstance_stub::create_resource_instance;
 }
 
 bool M2MObjectInstance::remove_resource(const String &)
+{
+    return m2mobjectinstance_stub::bool_value;
+}
+
+bool M2MObjectInstance::remove_resource(const char *resource_name)
 {
     return m2mobjectinstance_stub::bool_value;
 }
@@ -112,6 +136,11 @@ bool M2MObjectInstance::remove_resource_instance(const String &, uint16_t)
 }
 
 M2MResource* M2MObjectInstance::resource(const String &) const
+{
+    return m2mobjectinstance_stub::resource;
+}
+
+M2MResource* M2MObjectInstance::resource(const char *resource_name) const
 {
     return m2mobjectinstance_stub::resource;
 }
@@ -127,6 +156,11 @@ uint16_t M2MObjectInstance::resource_count() const
 }
 
 uint16_t M2MObjectInstance::resource_count(const String& ) const
+{
+    return m2mobjectinstance_stub::int_value;
+}
+
+uint16_t M2MObjectInstance::resource_count(const char* ) const
 {
     return m2mobjectinstance_stub::int_value;
 }

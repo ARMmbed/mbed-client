@@ -70,7 +70,7 @@ public:
 class M2MBaseTest : public M2MBase
 {
 public:
-    M2MBaseTest() : M2MBase("a", M2MBase::Static){}
+    M2MBaseTest() : M2MBase("a", M2MBase::Static, "type","a",false){}
 };
 
 Test_M2MInterfaceImpl::Test_M2MInterfaceImpl()
@@ -104,7 +104,6 @@ void Test_M2MInterfaceImpl::test_constructor()
     CHECK(obj->_current_state == 0);
     //TODO: Check rest of variables
     delete obj;
-
     obj = new M2MInterfaceImpl(obs,
                                             "endpoint_name",
                                             "endpoint_type",
@@ -112,7 +111,6 @@ void Test_M2MInterfaceImpl::test_constructor()
                                             8000,
                                             "domain",
                                             M2MInterface::TCP_QUEUE);
-
     delete obj;
 }
 
@@ -143,7 +141,7 @@ void Test_M2MInterfaceImpl::test_bootstrap()
     m2msecurity_stub::string_value = val;
     m2mnsdlinterface_stub::bool_value = true;
     m2mconnectionhandler_stub::bool_value = true;
-
+    impl->_security = NULL;
     impl->bootstrap(sec);
     CHECK(impl->_current_state == M2MInterfaceImpl::STATE_IDLE);
 
@@ -156,21 +154,31 @@ void Test_M2MInterfaceImpl::test_bootstrap()
     m2msecurity_stub::string_value = val;
     m2mnsdlinterface_stub::bool_value = true;
     m2mconnectionhandler_stub::bool_value = true;
-
+    impl->_security = NULL;
     impl->bootstrap(sec);
 
     CHECK(impl->_current_state == M2MInterfaceImpl::STATE_IDLE);
 
     delete val;
 
-    val = new String("coaps://10.45.3.83:5685");
+    val = new String("coap://10.45.3.83:5685");
 
     impl->_current_state = M2MInterfaceImpl::STATE_IDLE;
-
+    impl->_security = NULL;
     m2msecurity_stub::string_value = val;
     m2mnsdlinterface_stub::bool_value = true;
     m2mconnectionhandler_stub::bool_value = true;
+    impl->bootstrap(sec);
 
+    CHECK(impl->_current_state == M2MInterfaceImpl::STATE_BOOTSTRAP);
+
+    delete val;
+
+    val = new String("coap://10.45.3.83:5685");
+    impl->_current_state = M2MInterfaceImpl::STATE_IDLE;
+    m2msecurity_stub::string_value = val;
+    m2mnsdlinterface_stub::bool_value = true;
+    m2mconnectionhandler_stub::bool_value = true;
     impl->bootstrap(sec);
 
     CHECK(impl->_current_state == M2MInterfaceImpl::STATE_BOOTSTRAP);
@@ -187,11 +195,6 @@ void Test_M2MInterfaceImpl::test_bootstrap()
 
     impl->_current_state =  M2MInterfaceImpl::STATE_IDLE;
     m2mconnectionhandler_stub::bool_value = false;
-
-    impl->bootstrap(sec);
-
-    CHECK(impl->_current_state == M2MInterfaceImpl::STATE_IDLE);
-    CHECK(observer->error_occured == true);
 
     // Ignore the event.
     impl->_current_state =  M2MInterfaceImpl::STATE_WAITING;
@@ -221,7 +224,7 @@ void Test_M2MInterfaceImpl::test_register_object()
     M2MSecurity *sec = new M2MSecurity(M2MSecurity::M2MServer);
     m2msecurity_stub::int_value = 2;
 
-    M2MObject *object = new M2MObject("test");
+    M2MObject *object = new M2MObject("test", "test");
     M2MObjectInstance *ins = object->create_object_instance();
     ins->create_dynamic_resource("test","type",M2MResourceInstance::STRING,false,false);
 
@@ -386,7 +389,7 @@ void Test_M2MInterfaceImpl::test_update_registration()
     CHECK(observer->error_occured == true);
 
 
-    M2MObject *object = new M2MObject("test");
+    M2MObject *object = new M2MObject("test", "test");
     M2MObjectInstance *ins = object->create_object_instance();
     ins->create_dynamic_resource("test","type",M2MResourceInstance::STRING,false,false);
 
@@ -469,7 +472,10 @@ void Test_M2MInterfaceImpl::test_coap_message_ready()
     sn_nsdl_addr_s *address_ptr = (sn_nsdl_addr_s*)malloc(sizeof(sn_nsdl_addr_s));
 
     impl->coap_message_ready(data_ptr,data_len,address_ptr);
+    CHECK(impl->_current_state == M2MInterfaceImpl::STATE_IDLE);
 
+    impl->_current_state = M2MInterfaceImpl::STATE_WAITING;
+    impl->coap_message_ready(data_ptr,data_len,address_ptr);
     CHECK(impl->_current_state == M2MInterfaceImpl::STATE_WAITING);
 
     m2mconnectionhandler_stub::bool_value = false;
@@ -674,6 +680,8 @@ void Test_M2MInterfaceImpl::test_address_ready()
     impl->address_ready(*address,server_type,server_port);
     CHECK(impl->_current_state == M2MInterfaceImpl::STATE_REGISTER_ADDRESS_RESOLVED);
 
+    impl->address_ready(*address,server_type,server_port);
+    CHECK(impl->_current_state == M2MInterfaceImpl::STATE_REGISTER_ADDRESS_RESOLVED);
 
     address->_stack = M2MInterface::LwIP_IPv6;
     m2mnsdlinterface_stub::bool_value = false;
@@ -733,9 +741,15 @@ void Test_M2MInterfaceImpl::test_timer_expired()
     visited = false;
     impl->timer_expired(M2MTimerObserver::QueueSleep);
     CHECK(visited == true);
+    visited = false;
 
+    impl->_bootstrapped = true;
     impl->timer_expired(M2MTimerObserver::RetryTimer);
-    CHECK(visited == true);
+    CHECK(impl->_retry_timer_expired == true);
+
+    impl->_bootstrapped = false;
+    impl->timer_expired(M2MTimerObserver::RetryTimer);
+    CHECK(impl->_retry_timer_expired == true);
 
     observer->error_occured = false;
     impl->timer_expired(M2MTimerObserver::BootstrapTimer);

@@ -47,7 +47,7 @@ M2MInterface* M2MInterfaceFactory::create_interface(M2MInterfaceObserver &observ
     tr_debug("M2MInterfaceFactory::create_interface - IN");
     tr_debug("M2MInterfaceFactory::create_interface - parameters endpoint name : %s",endpoint_name.c_str());
     tr_debug("M2MInterfaceFactory::create_interface - parameters endpoint type : %s",endpoint_type.c_str());
-    tr_debug("M2MInterfaceFactory::create_interface - parameters life time(in secs): %" PRIu32,life_time);
+    tr_debug("M2MInterfaceFactory::create_interface - parameters life time(in secs): %" PRId32,life_time);
     tr_debug("M2MInterfaceFactory::create_interface - parameters Listen Port : %d",listen_port);
     tr_debug("M2MInterfaceFactory::create_interface - parameters Binding Mode : %d",(int)mode);
     tr_debug("M2MInterfaceFactory::create_interface - parameters NetworkStack : %d",(int)stack);
@@ -118,6 +118,6 @@ M2MObject* M2MInterfaceFactory::create_object(const String &name)
     }
 
     M2MObject *object = NULL;
-    object = new M2MObject(name);
+    object = new M2MObject(name, M2MBase::stringdup(name.c_str()));
     return object;
 }

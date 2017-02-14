@@ -19,10 +19,6 @@
 #include "mbed-client/m2mbase.h"
 #include "mbed-client/functionpointer.h"
 
-class M2MObjectInstanceCallback {
-public:
-    virtual void notification_update(M2MBase::Observation observation_level) = 0;
-};
 
 /*! \file m2mresourceinstance.h
  *  \brief M2MResourceInstance.
@@ -40,6 +36,7 @@ typedef void(*notification_sent_callback_2) (void);
 typedef FP1<void, M2MBlockMessage *> incoming_block_message_callback;
 typedef FP3<void, const String &, uint8_t *&, uint32_t &> outgoing_block_message_callback;
 
+class M2MResource;
 class M2MResourceCallback;
 
 class M2MResourceInstance : public M2MBase {
@@ -67,6 +64,11 @@ public:
 private: // Constructor and destructor are private
          // which means that these objects can be created or
          // deleted only through a function provided by the M2MObjectInstance.
+
+    M2MResourceInstance(M2MResource &parent,
+                        const lwm2m_parameters_s* s,
+                        M2MResourceInstance::ResourceType type,
+                        const uint16_t object_instance_id);
     /**
      * \brief A constructor for creating a resource.
      * \param resource_name The name of the resource.
@@ -74,13 +76,17 @@ private: // Constructor and destructor are private
      * \param type The resource data type of the object.
      * \param object_instance_id Object instance id where resource exists.
      * \param object_name Object name where resource exists.
+     * \param path Path of the object like 3/0/1
+     * \param external_blockwise_store If true CoAP blocks are passed to application through callbacks
+     *        otherwise handled in mbed-client-c.
      */
-    M2MResourceInstance(const String &resource_name,
+    M2MResourceInstance(M2MResource &parent,
+                        const String &resource_name,
                         const String &resource_type,
                         M2MResourceInstance::ResourceType type,
-                        M2MObjectInstanceCallback &object_instance_callback,
-                        const uint16_t object_instance_id = 0,
-                        const String &object_name = "");
+                        const uint16_t object_instance_id,
+                        char* path,
+                        bool external_blockwise_store);
 
     /**
      * \brief A Constructor for creating a resource.
@@ -92,15 +98,19 @@ private: // Constructor and destructor are private
      * \param value_length The length of the value pointer.
      * \param object_instance_id Object instance id where resource exists.
      * \param object_name Object name where resource exists.
+     * \param path Path of the object like 3/0/1
+     * \param external_blockwise_store If true CoAP blocks are passed to application through callbacks
+     *        otherwise handled in mbed-client-c.
      */
-    M2MResourceInstance(const String &resource_name,
+    M2MResourceInstance(M2MResource &parent,
+                        const String &resource_name,
                         const String &resource_type,
                         M2MResourceInstance::ResourceType type,
                         const uint8_t *value,
                         const uint8_t value_length,
-                        M2MObjectInstanceCallback &object_instance_callback,
-                        const uint16_t object_instance_id = 0,
-                        const String &object_name = "");
+                        const uint16_t object_instance_id,
+                        char* path,
+                        bool external_blockwise_store);
 
     // Prevents the use of default constructor.
     M2MResourceInstance();
@@ -135,7 +145,7 @@ public:
      * attribute.
      * \return True if required attributes are present, else false.
      */
-    virtual bool handle_observation_attribute(char *&query);
+    virtual bool handle_observation_attribute(const char *query);
 
     /**
      * \brief Sets the function that should be executed when this
@@ -244,7 +254,7 @@ public:
      * \brief Returns the name of the object where the resource exists.
      * \return Object name.
     */
-    const String& object_name() const;
+    virtual const char* object_name() const;
 
     /**
      * @brief Sets the function that is executed when this
@@ -287,6 +297,8 @@ public:
      */
     void notification_sent();
 
+    M2MResource& get_parent_resource() const;
+
 protected:
 
     /**
@@ -303,20 +315,25 @@ private:
 
 private:
 
-    M2MObjectInstanceCallback               &_object_instance_callback;
-    execute_callback                        _execute_callback;
+    // XXX: since the M2MResource is inherited from this class, the resource actually has back
+    // pointer to itself. If this inheritance was broken, we could save some memory.
+    M2MResource &_parent_resource;
+
     uint8_t                                 *_value;
     uint32_t                                _value_length;
+    M2MBlockMessage                         *_block_message_data;
+    execute_callback                        *_execute_callback;
     M2MResourceCallback                     *_resource_callback; // Not owned
-    String                                  _object_name;
     FP1<void, void*>                        *_execute_function_pointer;
     FP0<void>                               *_notification_sent_function_pointer;
+
+    // Note: these two callbacks should be moved behind ifdef, as they are not needed by all/most apps.
+    incoming_block_message_callback         *_incoming_block_message_cb;
+    outgoing_block_message_callback         *_outgoing_block_message_cb;
+
+    notification_sent_callback              *_notification_sent_callback;
     uint16_t                                _object_instance_id;
     ResourceType                            _resource_type;
-    incoming_block_message_callback         _incoming_block_message_cb;
-    outgoing_block_message_callback         _outgoing_block_message_cb;
-    M2MBlockMessage                         *_block_message_data;
-    notification_sent_callback              _notification_sent_callback;
 
     friend class Test_M2MResourceInstance;
     friend class Test_M2MResource;

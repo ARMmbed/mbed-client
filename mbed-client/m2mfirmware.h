@@ -215,13 +215,11 @@ private:
 
     M2MResource* get_resource(FirmwareResource resource) const;
 
-    static const String resource_name(FirmwareResource resource);
+    static const char* resource_name(FirmwareResource resource);
 
     void create_mandatory_resources();
 
     bool check_value_range(FirmwareResource resource, const int64_t value) const;
-
-    void set_zero_value(M2MResource &resource);
 
 private :
 
