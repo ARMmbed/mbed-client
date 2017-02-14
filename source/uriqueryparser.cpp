@@ -15,7 +15,7 @@
 #include <string.h>
 #include "include/uriqueryparser.h"
 
-char* query_string(const char* uri)
+char* query_string(char* uri)
 {
     char* query = strchr((char*)uri, '?');
     if (query != NULL) {
