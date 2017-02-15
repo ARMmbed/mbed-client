@@ -62,7 +62,7 @@ _interface->set_random_number_callback(&get_random_number);
 
 ### Setting up own entropy function for additional secure connectivity 
 
-mbed Client provides an API to add your own entropy source into the underlying SSL library. There is a default entropy source provided by mbed Client. It uses PRNG seeded with RTC for the security but some platforms do not have RTC, and for some, this level of security may not be strong enough. 
+mbed Client provides an API to add your own entropy source into the underlying SSL library.
 
 Now, an application can pass its own entropy source to mbed Client as function pointer callback through an API  `set_entropy_callback(entropy_cb callback)`.
 
@@ -77,12 +77,7 @@ entropy_cb ent_cb;
 int ent_poll( void *, unsigned char *output, size_t len,
                            size_t *olen )
 {
-    for(uint16_t i=0; i < len; i++){
-        srand(time(NULL));
-        output[i] = rand() % 256;
-    }
-    *olen = len;
-
+    // Customer provided entropy implementation
     return( 0 );
 }
 
