@@ -37,7 +37,13 @@ public:
         M2MBaseValueUpdatedCallback,
 
         // typedef void(*value_updated_callback2) (const char* object_name);
-        M2MBaseValueUpdatedCallback2
+        M2MBaseValueUpdatedCallback2,
+
+        // typedef FP1<void,void*> execute_callback;
+        M2MResourceInstanceExecuteCallback,
+
+        //typedef void(*execute_callback_2) (void *arguments);
+        M2MResourceInstanceExecuteCallback2,
     };
 
     /**
