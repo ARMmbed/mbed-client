@@ -151,15 +151,17 @@ public:
      * \brief Sets the function that should be executed when this
      * resource receives a POST command.
      * \param callback The function pointer that needs to be executed.
+     * \return True, if callback could be set, false otherwise.
      */
-    virtual void set_execute_function(execute_callback callback);
+    virtual bool set_execute_function(execute_callback callback);
 
     /**
      * \brief Sets the function that should be executed when this
      * resource receives a POST command.
      * \param callback The function pointer that needs to be executed.
+     * \return True, if callback could be set, false otherwise.
      */
-    virtual void set_execute_function(execute_callback_2 callback);
+    virtual bool set_execute_function(execute_callback_2 callback);
 
     /**
      * \brief Sets a value of a given resource.
@@ -322,9 +324,7 @@ private:
     uint8_t                                 *_value;
     uint32_t                                _value_length;
     M2MBlockMessage                         *_block_message_data;
-    execute_callback                        *_execute_callback;
     M2MResourceCallback                     *_resource_callback; // Not owned
-    FP1<void, void*>                        *_execute_function_pointer;
     FP0<void>                               *_notification_sent_function_pointer;
 
     // Note: these two callbacks should be moved behind ifdef, as they are not needed by all/most apps.

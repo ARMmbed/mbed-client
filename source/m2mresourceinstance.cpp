@@ -19,6 +19,7 @@
 #include "mbed-client/m2mobservationhandler.h"
 #include "mbed-client/m2mobject.h"
 #include "mbed-client/m2mobjectinstance.h"
+#include "include/m2mcallbackstorage.h"
 #include "include/m2mreporthandler.h"
 #include "include/nsdllinker.h"
 #include "mbed-client/m2mblockmessage.h"
@@ -42,9 +43,7 @@ M2MResourceInstance::M2MResourceInstance(M2MResource &parent,
  _value(NULL),
  _value_length(0),
  _block_message_data(NULL),
- _execute_callback(NULL),
  _resource_callback(NULL),
- _execute_function_pointer(NULL),
  _notification_sent_function_pointer(NULL),
  _incoming_block_message_cb(NULL),
  _outgoing_block_message_cb(NULL),
@@ -73,9 +72,7 @@ M2MResourceInstance::M2MResourceInstance(M2MResource &parent,
  _value(NULL),
  _value_length(0),
  _block_message_data(NULL),
- _execute_callback(NULL),
  _resource_callback(NULL),
- _execute_function_pointer(NULL),
  _notification_sent_function_pointer(NULL),
  _incoming_block_message_cb(NULL),
  _outgoing_block_message_cb(NULL),
@@ -113,9 +110,7 @@ M2MResourceInstance::M2MResourceInstance(M2MResource &parent,
   _value(NULL),
   _value_length(0),
   _block_message_data(NULL),
-  _execute_callback(NULL),
   _resource_callback(NULL),
-  _execute_function_pointer(NULL),
   _notification_sent_function_pointer(NULL),
   _incoming_block_message_cb(NULL),
   _outgoing_block_message_cb(NULL),
@@ -140,8 +135,12 @@ M2MResourceInstance::M2MResourceInstance(M2MResource &parent,
 M2MResourceInstance::~M2MResourceInstance()
 {
     free(_value);
-    delete _execute_function_pointer;
-    delete _execute_callback;
+
+    execute_callback* callback = (execute_callback*)M2MCallbackStorage::remove_callback(*this, M2MCallbackAssociation::M2MResourceInstanceExecuteCallback);
+    delete callback;
+
+    M2MCallbackStorage::remove_callback(*this, M2MCallbackAssociation::M2MResourceInstanceExecuteCallback2);
+
     delete _notification_sent_function_pointer;
     delete _incoming_block_message_cb;
     delete _outgoing_block_message_cb;
@@ -183,18 +182,22 @@ bool M2MResourceInstance::handle_observation_attribute(const char *query)
     return success;
 }
 
-void M2MResourceInstance::set_execute_function(execute_callback callback)
+bool M2MResourceInstance::set_execute_function(execute_callback callback)
 {
-    delete _execute_callback;
-    _execute_callback = new execute_callback(callback);
+    execute_callback* old_callback = (execute_callback*)M2MCallbackStorage::remove_callback(*this, M2MCallbackAssociation::M2MResourceInstanceExecuteCallback);
+    delete old_callback;
+    // XXX: create a copy of the copy of callback object. Perhaps it would better to
+    // give a reference as parameter and just store that, as it would save some memory.
+    execute_callback* new_callback = new execute_callback(callback);
+
+    return M2MCallbackStorage::add_callback(*this, new_callback, M2MCallbackAssociation::M2MResourceInstanceExecuteCallback);
 }
 
-void M2MResourceInstance::set_execute_function(execute_callback_2 callback)
+bool M2MResourceInstance::set_execute_function(execute_callback_2 callback)
 {
-    delete _execute_function_pointer;
+    M2MCallbackStorage::remove_callback(*this, M2MCallbackAssociation::M2MResourceInstanceExecuteCallback2);
 
-    _execute_function_pointer = new FP1<void, void*>(callback);
-    set_execute_function(execute_callback(_execute_function_pointer, &FP1<void, void*>::call));
+    return M2MCallbackStorage::add_callback(*this, (void*)callback, M2MCallbackAssociation::M2MResourceInstanceExecuteCallback2);
 }
 
 void M2MResourceInstance::clear_value()
@@ -317,8 +320,15 @@ bool M2MResourceInstance::is_value_changed(const uint8_t* value, const uint32_t 
 void M2MResourceInstance::execute(void *arguments)
 {
     tr_debug("M2MResourceInstance::execute");
-    if(_execute_callback) {
-        (*_execute_callback)(arguments);
+    execute_callback* callback = (execute_callback*)M2MCallbackStorage::get_callback(*this, M2MCallbackAssociation::M2MResourceInstanceExecuteCallback);
+
+    if (callback) {
+        (*callback)(arguments);
+    }
+
+    execute_callback_2 callback2 = (execute_callback_2)M2MCallbackStorage::get_callback(*this, M2MCallbackAssociation::M2MResourceInstanceExecuteCallback2);
+    if (callback2) {
+        (*callback2)(arguments);
     }
 }
 
