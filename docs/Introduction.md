@@ -201,7 +201,7 @@ The documentation for this API is [available here](https://docs.mbed.com/docs/mb
 
 We have an example application for
 
-1. [mbed OS](https://github.com/ARMmbed/mbed-client-examples).
+1. [mbed OS](https://github.com/ARMmbed/mbed-os-example-client).
 
 2. [Ubuntu](https://github.com/ARMmbed/mbed-client-linux-example).
 
