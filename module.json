@@ -7,7 +7,7 @@
   "homepage": "https://github.com/ARMmbed/mbed-client",
   "license": "Apache-2.0",
   "dependencies": {
-    "mbed-client-c": "^4.0.0",
+    "mbed-client-c": "^5.0.0",
     "mbed-trace": ">=0.2.0,<2.0.0"
   },
   "targetDependencies": {
