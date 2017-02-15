@@ -87,7 +87,6 @@ M2MBase::M2MBase(const String& resource_name,
   _report_handler(NULL),
   _observation_handler(NULL),
   _token(NULL),
-  _function_pointer(NULL),
   _observation_number(0),
   _token_length(0),
   _observation_level(M2MBase::None),
@@ -101,7 +100,6 @@ M2MBase::M2MBase(const lwm2m_parameters_s *s):
     _report_handler(NULL),
     _observation_handler(NULL),
     _token(NULL),
-    _function_pointer(NULL),
     _observation_number(0),
     _token_length(0),
     _observation_level(M2MBase::None),
@@ -394,17 +392,17 @@ bool M2MBase::is_under_observation() const
     return m2mbase_stub::bool_value;
 }
 
-void M2MBase::set_value_updated_function(value_updated_callback callback)
+bool M2MBase::set_value_updated_function(value_updated_callback callback)
 {
 
 }
 
-void M2MBase::set_value_updated_function(value_updated_callback2 callback)
+bool M2MBase::set_value_updated_function(value_updated_callback2 callback)
 {
 
 }
 
-bool M2MBase::is_value_updated_function_set()
+bool M2MBase::is_value_updated_function_set() const
 {
     return m2mbase_stub::is_value_updated_function_set;
 }
