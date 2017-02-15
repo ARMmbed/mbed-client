@@ -210,7 +210,8 @@ bool M2MSecurity::set_resource_value(SecurityResource resource,
     if(res) {
         if(M2MSecurity::PublicKey == resource           ||
            M2MSecurity::ServerPublicKey == resource     ||
-           M2MSecurity::Secretkey == resource) {
+           M2MSecurity::Secretkey == resource           ||
+           M2MSecurity::M2MServerUri == resource) {
             success = res->set_value(value,length);
         }
     }

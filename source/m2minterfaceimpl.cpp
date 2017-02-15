@@ -66,7 +66,7 @@ M2MInterfaceImpl::M2MInterfaceImpl(M2MInterfaceObserver& observer,
   _observer(observer),
   _security_connection( new M2MConnectionSecurity( RESOLVE_SEC_MODE(mode) )),
   _connection_handler(*this, _security_connection, mode, stack),
-  _nsdl_interface(*this),
+  _nsdl_interface(*this, _connection_handler),
   _security(NULL)
 {
     tr_debug("M2MInterfaceImpl::M2MInterfaceImpl() -IN");
@@ -78,7 +78,6 @@ M2MInterfaceImpl::M2MInterfaceImpl(M2MInterfaceObserver& observer,
                                      _context_address);
 
     //Here we must use TCP still
-    __connection_handler = &_connection_handler;
     _connection_handler.bind_connection(_listen_port);
 #ifndef MBED_CLIENT_DISABLE_BOOTSTRAP_FEATURE
     _bootstrap_timer = new M2MTimer(*this);
@@ -579,7 +578,7 @@ void M2MInterfaceImpl::state_bootstrap(EventData *data)
             _observer.error(error);
         }
     } else {
-        _listen_port = rand() % 64511 + 1024;
+        _listen_port = 0;
         _connection_handler.stop_listening();
         _connection_handler.bind_connection(_listen_port);
         _connection_handler.resolve_server_address(_server_ip_address,
@@ -713,7 +712,7 @@ void M2MInterfaceImpl::state_register(EventData *data)
             _observer.error(error);
         }
     } else {
-        _listen_port = rand() % 64511 + 1024;
+        _listen_port = 0;
         _connection_handler.stop_listening();
         if (event) {
             _nsdl_interface.create_nsdl_list_structure(event->_object_list);

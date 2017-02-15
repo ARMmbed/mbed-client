@@ -34,6 +34,7 @@ class M2MResourceInstance;
 class M2MNsdlObserver;
 class M2MServer;
 class M2MTimer;
+class M2MConnectionHandler;
 
 typedef Vector<M2MObject *> M2MObjectList;
 
@@ -56,7 +57,7 @@ public:
     * @brief Constructor
     * @param observer, Observer to pass the event callbacks from nsdl library.
     */
-    M2MNsdlInterface(M2MNsdlObserver &observer);
+    M2MNsdlInterface(M2MNsdlObserver &observer, M2MConnectionHandler &connection_handler);
 
     /**
      * @brief Destructor
@@ -355,6 +356,16 @@ private:
     */
     void handle_bootstrap_error();
 
+    /**
+     * @brief Claim
+     */
+    void claim_mutex();
+
+    /**
+     * @brief Release
+     */
+    void release_mutex();
+
 private:
 
     M2MNsdlObserver                         &_observer;
@@ -365,6 +376,7 @@ private:
     M2MServer                               _server;
     M2MTimer                                *_nsdl_exceution_timer;
     M2MTimer                                *_registration_timer;
+    M2MConnectionHandler                    &_connection_handler;
     sn_nsdl_addr_s                          _sn_nsdl_address;
     String                                  _endpoint_name;
     uint32_t                                _counter_for_nsdl;

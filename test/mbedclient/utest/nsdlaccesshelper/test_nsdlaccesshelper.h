@@ -42,11 +42,8 @@ public:
 
     void test_socket_free();
 
-    void test_mutex_claim();
-
-    void test_mutex_release();
-
     TestObserver *observer;
+    M2MConnectionHandler *connection_handler;
 private:
     void clear_list();
 };

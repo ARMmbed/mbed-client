@@ -26,8 +26,12 @@
 #include "m2mbase_stub.h"
 #include "m2mserver.h"
 #include "m2msecurity.h"
+#include "m2mconnectionsecurity.h"
 #include "m2mtlvdeserializer_stub.h"
-class TestObserver : public M2MNsdlObserver {
+#include "m2mconnectionhandler_stub.h"
+#include "m2mconnectionsecurity_stub.h"
+class TestObserver : public M2MNsdlObserver,
+                     public M2MConnectionObserver {
 
 public:
     TestObserver(){}
@@ -82,6 +86,26 @@ public:
         value_update = true;
     }
 
+    void data_available(uint8_t* data,
+                        uint16_t data_size,
+                        const M2MConnectionObserver::SocketAddress &address){
+
+    }
+
+    void socket_error(uint8_t error_code, bool retry = true){
+
+    }
+
+    void address_ready(const M2MConnectionObserver::SocketAddress &address,
+                                   M2MConnectionObserver::ServerType server_type,
+                                   const uint16_t server_port){
+
+    }
+
+    void data_sent(){
+
+    }
+
     bool register_error;
     bool boot_error;
     bool boot_wait;
@@ -125,14 +149,16 @@ struct nsdl_s {
 Test_M2MNsdlInterface::Test_M2MNsdlInterface()
 {
     observer = new TestObserver();
-    nsdl = new M2MNsdlInterface(*observer);
-    //nsdl->_server = new M2MServer();
+    connection_handler = new M2MConnectionHandler(*observer, NULL, M2MInterface::NOT_SET, M2MInterface::Uninitialized);
+    nsdl = new M2MNsdlInterface(*observer, *connection_handler);
 }
 
 Test_M2MNsdlInterface:: ~Test_M2MNsdlInterface()
 {
     delete nsdl;
     nsdl = NULL;
+    delete connection_handler;
+    connection_handler = NULL;
     delete observer;
     observer = NULL;
 }
@@ -1790,6 +1816,16 @@ void Test_M2MNsdlInterface::test_get_nsdl_handle()
 {
     CHECK(nsdl->get_nsdl_handle() == nsdl->_nsdl_handle);
 }
+
+void Test_M2MNsdlInterface::test_claim_release_mutex()
+{
+    CHECK(m2mconnectionhandler_stub::mutex_count == 0);
+    nsdl->claim_mutex();
+    CHECK(m2mconnectionhandler_stub::mutex_count == 1);
+    nsdl->release_mutex();
+    CHECK(m2mconnectionhandler_stub::mutex_count == 0);
+}
+
 
 void Test_M2MNsdlInterface::test_endpoint_name()
 {
