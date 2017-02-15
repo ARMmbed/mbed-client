@@ -435,21 +435,23 @@ public:
      * @brief Sets the function that is executed when this
      * object receives a PUT or POST command.
      * @param callback The function pointer that is called.
+     * @return True, if callback could be set, false otherwise.
      */
-    virtual void set_value_updated_function(value_updated_callback callback);
+    virtual bool set_value_updated_function(value_updated_callback callback);
 
     /**
      * @brief Sets the function that is executed when this
      * object receives a PUT or POST command.
      * @param callback The function pointer that is called.
+     * @return True, if callback could be set, false otherwise.
      */
-    virtual void set_value_updated_function(value_updated_callback2 callback);
+    virtual bool set_value_updated_function(value_updated_callback2 callback);
 
     /**
      * @brief Returns whether a callback function is set or not.
      * @return True if the callback function is set, else false.
      */
-    virtual bool is_value_updated_function_set();
+    virtual bool is_value_updated_function_set() const;
 
     /**
      * @brief Calls the function that is set in the "set_value_updated_function".
@@ -562,8 +564,6 @@ private:
     M2MReportHandler            *_report_handler;
     M2MObservationHandler       *_observation_handler; // Not owned
     uint8_t                     *_token;
-    FP1<void, const char*>      *_function_pointer;
-    value_updated_callback      *_value_updated_callback;
     unsigned                    _observation_number : 16;
     unsigned                    _token_length : 8;
     M2MBase::Observation        _observation_level : 4;

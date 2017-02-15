@@ -26,7 +26,7 @@
 #include "m2mresource_stub.h"
 
 static bool value_update_called = false;
-static void value_updated_function(const char* name) {
+static void value_updated_function2(const char* name) {
     value_update_called = true;
 }
 
@@ -374,7 +374,7 @@ void Test_M2MBase::test_value_updated_function()
     CHECK(test.visited == true);
 
     value_update_called = false;
-    this->set_value_updated_function(value_updated_callback2(value_updated_function));
+    this->set_value_updated_function(&value_updated_function2);
     this->execute_value_updated("test");
     CHECK(value_update_called == true);
 }
