@@ -1,8 +1,8 @@
 if(TARGET_LIKE_LINUX)
 include("../includes.txt")
 add_executable(m2mbase 
-	"../../../../source/m2mbase.cpp"
-	"main.cpp"
+    "../../../../source/m2mbase.cpp"
+    "main.cpp"
     "../stub/m2mreporthandler_stub.cpp"
     "../stub/nsdlaccesshelper_stub.cpp"
     "../stub/m2mresource_stub.cpp"
@@ -12,9 +12,10 @@ add_executable(m2mbase
     "../stub/m2mobject_stub.cpp"
     "../stub/m2mobjectinstance_stub.cpp"
     "../stub/m2mresource_stub.cpp"
-	"m2mbasetest.cpp"
-	"test_m2mbase.cpp"
-        "../../../../source/m2mstringbufferbase.cpp"
+    "m2mbasetest.cpp"
+    "test_m2mbase.cpp"
+    "../../../../source/m2mstringbufferbase.cpp"
+    "../../../../source/m2mcallbackstorage.cpp"
 )
 target_link_libraries(m2mbase
     CppUTest
