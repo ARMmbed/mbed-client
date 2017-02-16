@@ -285,14 +285,14 @@ public:
      * response(Empty ACK) for notification message.
      * @param callback The function pointer that is called.
      */
-    void set_notification_sent_callback(notification_sent_callback callback);
+    bool set_notification_sent_callback(notification_sent_callback callback);
 
     /**
      * @brief Sets the function that is executed when this object receives
      * response(Empty ACK) for notification message.
      * @param callback The function pointer that is called.
      */
-    void set_notification_sent_callback(notification_sent_callback_2 callback);
+    bool set_notification_sent_callback(notification_sent_callback_2 callback);
 
     /**
      * \brief Executes the function that is set in "set_notification_sent_callback".
@@ -324,10 +324,10 @@ private:
     uint8_t                                 *_value;
     uint32_t                                _value_length;
     M2MBlockMessage                         *_block_message_data;
-    M2MResourceCallback                     *_resource_callback; // Not owned
-    FP0<void>                               *_notification_sent_function_pointer;
 
-    notification_sent_callback              *_notification_sent_callback;
+    // Note: this is not converted yet to the callback storage framework as this pointer could be removed.
+    M2MResourceCallback                     *_resource_callback; // Not owned
+
     uint16_t                                _object_instance_id;
     ResourceType                            _resource_type;
 
