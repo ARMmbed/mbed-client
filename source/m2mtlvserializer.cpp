@@ -16,10 +16,13 @@
 #include "include/m2mtlvserializer.h"
 #include "include/nsdllinker.h"
 #include "mbed-client/m2mconstants.h"
-
 #include <stdlib.h>
 
 #define TRACE_GROUP "mClt"
+
+#define MAX_TLV_LENGTH_SIZE 3
+#define MAX_TLV_ID_SIZE 2
+#define TLV_TYPE_SIZE 1
 
 M2MTLVSerializer::M2MTLVSerializer()
 {
@@ -78,24 +81,42 @@ uint8_t* M2MTLVSerializer::serialize_resources(M2MResourceList resource_list, ui
         if(valid) {
             it = resource_list.begin();
             for (; it!=resource_list.end(); it++) {
-                serialize(*it, data, size);
+                if(!serialize(*it, data, size)) {
+                        /* serializing has failed */
+                        /* free data so far */
+                        free(data);
+                        /* invalidate */
+                        valid = false;
+                        /* return NULL immediately */
+                        return NULL;
+                }
             }
         }
     }
     return data;
 }
 
-void M2MTLVSerializer::serialize(uint16_t id, M2MObjectInstance *object_instance, uint8_t *&data, uint32_t &size)
+bool M2MTLVSerializer::serialize(uint16_t id, M2MObjectInstance *object_instance, uint8_t *&data, uint32_t &size)
 {
     uint8_t *resource_data = NULL;
     uint32_t resource_size = 0;
+    bool success;
 
     bool valid = true;
     resource_data = serialize_resources(object_instance->resources(),resource_size,valid);
     if(valid) {
-        serialize_TILV(TYPE_OBJECT_INSTANCE, id, resource_data, resource_size, data, size);
+        if(serialize_TILV(TYPE_OBJECT_INSTANCE, id, resource_data, resource_size, data, size)) {
+            success = true;
+        } else {
+            /* serializing object instance failed */
+            success = false;
+        }
+        free(resource_data);
+    } else {
+        /* serializing resources failed */
+        success = false;
     }
-    free(resource_data);
+    return success;
 }
 
 bool M2MTLVSerializer::serialize(M2MResource *resource, uint8_t *&data, uint32_t &size)
@@ -113,8 +134,8 @@ bool M2MTLVSerializer::serialize_resource(M2MResource *resource, uint8_t *&data,
 {
     bool success = false;
     if(resource->name_id() != -1) {
-        success = true;
-        serialize_TILV(TYPE_RESOURCE, resource->name_id(), resource->value(), resource->value_length(), data, size);
+        success = serialize_TILV(TYPE_RESOURCE, resource->name_id(),
+                      resource->value(), resource->value_length(), data, size);
     }
     return success;
 }
@@ -131,12 +152,19 @@ bool M2MTLVSerializer::serialize_multiple_resource(M2MResource *resource, uint8_
         it = instance_list.begin();
         for (; it!=instance_list.end(); it++) {
             uint16_t id = (*it)->instance_id();
-            serialize_resource_instance(id, (*it), nested_data, nested_data_size);            
+            if(!serialize_resource_instance(id, (*it), nested_data, nested_data_size)) {
+                /* serializing instance has failed */
+                /* free data so far allocated */
+                free(nested_data);
+                /* return fail immediately*/
+                success = false;
+                return success;
+            }
         }
     }
     if(resource->name_id() != -1) {
-        success = true;
-        serialize_TILV(TYPE_MULTIPLE_RESOURCE, resource->name_id(), nested_data, nested_data_size, data, size);
+        success = serialize_TILV(TYPE_MULTIPLE_RESOURCE, resource->name_id(),
+                                    nested_data, nested_data_size, data, size);
     }
 
     free(nested_data);
@@ -144,95 +172,79 @@ bool M2MTLVSerializer::serialize_multiple_resource(M2MResource *resource, uint8_
     return success;
 }
 
-void M2MTLVSerializer::serialize_resource_instance(uint16_t id, M2MResourceInstance *resource, uint8_t *&data, uint32_t &size)
+bool M2MTLVSerializer::serialize_resource_instance(uint16_t id, M2MResourceInstance *resource, uint8_t *&data, uint32_t &size)
 {
-    serialize_TILV(TYPE_RESOURCE_INSTANCE, id, resource->value(), resource->value_length(), data, size);
+    return serialize_TILV(TYPE_RESOURCE_INSTANCE, id, resource->value(), resource->value_length(), data, size);
 }
 
-void M2MTLVSerializer::serialize_TILV(uint8_t type, uint16_t id, uint8_t *value, uint32_t value_length, uint8_t *&data, uint32_t &size)
+bool M2MTLVSerializer::serialize_TILV(uint8_t type, uint16_t id, uint8_t *value, uint32_t value_length, uint8_t *&data, uint32_t &size)
 {
     uint8_t *tlv = 0;
-    uint32_t type_length = 1;
+    const uint32_t type_length = TLV_TYPE_SIZE;
     type += id < 256 ? 0 : ID16;
     type += value_length < 8 ? value_length :
             value_length < 256 ? LENGTH8 :
             value_length < 65536 ? LENGTH16 : LENGTH24;
-    uint8_t *tlv_type = (uint8_t*)malloc(type_length+1);
-    memset(tlv_type,0,type_length+1);
-    *tlv_type = type & 0xFF;
+    uint8_t tlv_type;
+    tlv_type = type & 0xFF;
 
-    uint32_t id_size = 0;
-    uint8_t* id_ptr = serialize_id(id, id_size);
+    uint32_t id_size;
+    uint8_t id_array[MAX_TLV_ID_SIZE];
+    serialize_id(id, id_size, id_array);
 
-    uint32_t length_size = 0;
-    uint8_t* length_ptr = serialize_length(value_length, length_size);
+    uint32_t length_size;
+    uint8_t length_array[MAX_TLV_LENGTH_SIZE];
+    serialize_length(value_length, length_size, length_array);
 
-    tlv = (uint8_t*)malloc(size + type_length + id_size + length_size + value_length+1);
-    memset(tlv,0,size + type_length + id_size + length_size + value_length+1);
+    tlv = (uint8_t*)malloc(size + type_length + id_size + length_size + value_length);
+    if (!tlv) {
+        /* memory allocation has failed */
+        /* return failure immediately */
+        return false;
+        /* eventually NULL will be returned to serializer public method caller */
+    }
     if(data) {
         memcpy(tlv, data, size);
+        free(data);
     }
-    memcpy(tlv+size, tlv_type, type_length);
-    memcpy(tlv+size+type_length, id_ptr, id_size);
-    memcpy(tlv+size+type_length+id_size, length_ptr, length_size);
+    memcpy(tlv+size, &tlv_type, type_length);
+    memcpy(tlv+size+type_length, id_array, id_size);
+    memcpy(tlv+size+type_length+id_size, length_array, length_size);
     memcpy(tlv+size+type_length+id_size+length_size, value, value_length);
-
-    free(tlv_type) ;
-    free(length_ptr);
-    free(id_ptr);
-    free(data);
 
     data = tlv;
     size += type_length + id_size + length_size + value_length;
+    return true;
 }
 
-uint8_t* M2MTLVSerializer::serialize_id(uint16_t id, uint32_t &size)
+void M2MTLVSerializer::serialize_id(uint16_t id, uint32_t &size, uint8_t *id_ptr)
 {
-    uint32_t id_size = id > 255 ? 2 : 1;
-    uint8_t *id_ptr = (uint8_t*)malloc(id_size);
-    memset(id_ptr, 0 , id_size);
-    size += id_size;
     if(id > 255) {
-        *id_ptr = (id & 0xFF00) >> 8;
-        id_ptr++;
-        *id_ptr = id & 0xFF;
-        id_ptr--;
+        size=2;
+        id_ptr[0] = (id & 0xFF00) >> 8;
+        id_ptr[1] = id & 0xFF;
     } else {
-        *id_ptr = id & 0xFF;
+        size=1;
+        id_ptr[0] = id & 0xFF;
     }
-    return id_ptr;
 }
 
-uint8_t* M2MTLVSerializer::serialize_length(uint32_t length, uint32_t &size)
+void M2MTLVSerializer::serialize_length(uint32_t length, uint32_t &size, uint8_t *length_ptr)
 {
-    uint8_t *length_ptr = 0;
-    uint32_t length_size = 0;
     if (length > 65535) {
-        length_size = 3;
-        length_ptr = (uint8_t*)malloc(length_size+1);
-        memset(length_ptr,0,length_size+1);
-        *length_ptr = (length & 0xFF0000) >> 16;
-        length_ptr++;
-        *length_ptr = (length & 0xFF00) >> 8;
-        length_ptr++;
-        *length_ptr = length & 0xFF;
-        length_ptr--;
-        length_ptr--;
+        size = 3;
+        length_ptr[0] = (length & 0xFF0000) >> 16;
+        length_ptr[1] = (length & 0xFF00) >> 8;
+        length_ptr[2] = length & 0xFF;
     } else if (length > 255) {
-        length_size = 2;
-        length_ptr = (uint8_t*)malloc(length_size+1);
-        memset(length_ptr,0,length_size+1);
-        *length_ptr = (length & 0xFF00) >> 8;
-        length_ptr++;
-        *length_ptr = length & 0xFF;
-        length_ptr--;
+        size = 2;
+        length_ptr[0] = (length & 0xFF00) >> 8;
+        length_ptr[1] = length & 0xFF;
     } else if (length > 7) {
-        length_size = 1;
-        length_ptr = (uint8_t*)malloc(length_size+1);
-        memset(length_ptr,0,length_size+1);
-        *length_ptr = length & 0xFF;
+        size = 1;
+        length_ptr[0] = length & 0xFF;
+    } else {
+        size=0;
     }
-    size += length_size;
-    return length_ptr;
 }
 

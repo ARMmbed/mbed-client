@@ -90,7 +90,7 @@ private :
 
     uint8_t* serialize_resources(M2MResourceList resource_list, uint32_t &size, bool &valid);
 
-    void serialize(uint16_t id, M2MObjectInstance *object_instance, uint8_t *&data, uint32_t &size);
+    bool serialize(uint16_t id, M2MObjectInstance *object_instance, uint8_t *&data, uint32_t &size);
     
     bool serialize (M2MResource *resource, uint8_t *&data, uint32_t &size);
 
@@ -98,11 +98,11 @@ private :
 
     bool serialize_multiple_resource(M2MResource *resource, uint8_t *&data, uint32_t &size);
 
-    void serialize_resource_instance(uint16_t id, M2MResourceInstance *resource, uint8_t *&data, uint32_t &size);
+    bool serialize_resource_instance(uint16_t id, M2MResourceInstance *resource, uint8_t *&data, uint32_t &size);
     
-    void serialize_TILV (uint8_t type, uint16_t id, uint8_t *value, uint32_t value_length, uint8_t *&data, uint32_t &size);
+    bool serialize_TILV (uint8_t type, uint16_t id, uint8_t *value, uint32_t value_length, uint8_t *&data, uint32_t &size);
 
-    uint8_t* serialize_id(uint16_t id, uint32_t &size);
+    void serialize_id(uint16_t id, uint32_t &size, uint8_t* id_ptr);
 
-    uint8_t* serialize_length(uint32_t length, uint32_t &size);
+    void serialize_length(uint32_t length, uint32_t &size, uint8_t* length_ptr);
 };
