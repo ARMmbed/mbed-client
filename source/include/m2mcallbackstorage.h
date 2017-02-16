@@ -51,6 +51,15 @@ public:
         // typedef FP3<void, const String &, uint8_t *&, uint32_t &> outgoing_block_message_callback;
         M2MResourceInstanceOutgoingBlockMessageCallback,
 
+        // class M2MResourceCallback
+        M2MResourceInstanceM2MResourceCallback,
+
+        // typedef FP0<void> notification_sent_callback;
+        M2MResourceInstanceNotificationSentCallback,
+
+        // typedef void(*notification_sent_callback_2) (void);
+        M2MResourceInstanceNotificationSentCallback2,
+
     };
 
     /**
