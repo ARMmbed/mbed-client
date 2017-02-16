@@ -30,46 +30,16 @@ include_directories(${Port_libs_PATH}/ns-hal-pal/)
 include_directories(${Port_libs_PATH}/mbed-client-c/)
 include_directories(${Port_libs_PATH}/mbed-trace/)       
 
-# add the binary tree to the search path for include files
-# so that we will find TutorialConfig.h????????????????????????????????????????????????????????????????????????????
-
-
-FILE(GLOB MBED_CLIENT_SRC
-	"${CMAKE_CURRENT_SOURCE_DIR}/mbed-client/*.h"
-	
-	"${CMAKE_CURRENT_SOURCE_DIR}/mbed-client-classic/mbed-client-classic/*.h"
-	"${CMAKE_CURRENT_SOURCE_DIR}/mbed-client-classic/source/*.cpp"
-
-	"${CMAKE_CURRENT_SOURCE_DIR}/mbed-client-mbed-tls/mbed-client-mbed-tls/*.h"
-	"${CMAKE_CURRENT_SOURCE_DIR}/mbed-client-mbed-tls/source/*.cpp"
-	
-	"${CMAKE_CURRENT_SOURCE_DIR}/source/*.cpp"
-	"${CMAKE_CURRENT_SOURCE_DIR}/source/include/*.h"
-	)
-
-CREATE_LIBRARY(mbedClient "${MBED_CLIENT_SRC}" "")
-	
-	
-	
-
-INCLUDE(CMakeForceCompiler)
-# CROSS COMPILER SETTING
-cmake_minimum_required (VERSION 2.8)
-SET(CMAKE_SYSTEM_NAME Generic)
-
-project(linuxPortLibs)
-
-# add the binary tree to the search path for include files
-# so that we will find TutorialConfig.h????????????????????????????????????????????????????????????????????????????
 
 set(MBED_CLIENT_C_PATH ${CMAKE_CURRENT_SOURCE_DIR}/Port_libs/mbed-client-c)
 set(SAL_NANOSTACK_EVENT_LOOP_PATH ${CMAKE_CURRENT_SOURCE_DIR}/Port_libs/sal-stack-nanostack-eventloop)
 set(RANDLIB_C_PATH ${CMAKE_CURRENT_SOURCE_DIR}/Port_libs/mbed-client-randlib)
 set(NANOSTACK_LIBSERVICE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/Port_libs/nanostack-libservice)
 set(NS_HAL_PAL_PATH ${CMAKE_CURRENT_SOURCE_DIR}/Port_libs/ns-hal-pal)
+set(MBED_COAP_PATH ${CMAKE_CURRENT_SOURCE_DIR}/Port_libs/mbed-coap)
 
-set(PORT_LIBS ${CMAKE_CURRENT_SOURCE_DIR})
-
+include_directories(${MBED_COAP_PATH})
+include_directories(${MBED_COAP_PATH}/source/include/)
 
 
 
@@ -80,12 +50,11 @@ include_directories(${SAL_NANOSTACK_EVENT_LOOP_PATH}/source/libNsdl/src/include/
 include_directories(${SAL_NANOSTACK_EVENT_LOOP_PATH}/source/libCoap/src/)
 include_directories(${SAL_NANOSTACK_EVENT_LOOP_PATH}/source/libCoap/src/include/)
 
+
+message(STATUS 1111111111111111111111111111111111111111${MBED_CLIENT_C_PATH})
 include_directories(${MBED_CLIENT_C_PATH})
 include_directories(${MBED_CLIENT_C_PATH}/nsdl-c/)
-include_directories(${MBED_CLIENT_C_PATH}/mbed-client-c/source/libNsdl/src/)
-include_directories(${MBED_CLIENT_C_PATH}/source/libNsdl/src/include/)
-include_directories(${MBED_CLIENT_C_PATH}/source/libCoap/src/)
-include_directories(${MBED_CLIENT_C_PATH}/source/libCoap/src/include/)
+include_directories(${MBED_CLIENT_C_PATH}/source/include/)
 
 include_directories(${RANDLIB_C_PATH}/mbed-client-randlib)
 include_directories(${RANDLIB_C_PATH}/mbed-client-randlib/platform/)
@@ -94,9 +63,6 @@ include_directories(${NANOSTACK_LIBSERVICE_PATH}/)
 include_directories(${NANOSTACK_LIBSERVICE_PATH}/mbed-client-libservice/)
 include_directories(${NANOSTACK_LIBSERVICE_PATH}/mbed-client-libservice/platform/)
 
-
-include_directories(${PORT_LIBS}/)
-include_directories(${PORT_LIBS}/mbed-trace/)
 
 include_directories(${NS_HAL_PAL_PATH})
 
@@ -115,12 +81,35 @@ add_definitions(-DMBED_CONF_NANOSTACK_EVENTLOOP_EXCLUDE_HIGHRES_TIMER)
 add_definitions(-DMBED_CONF_NANOSTACK_EVENTLOOP_USE_PLATFORM_TICK_TIMER)
 
 
-FILE(GLOB MBED_CLIENT_C_SRC  
-        "${MBED_CLIENT_C_PATH}/source/libNsdl/src/*.c"
-        "${MBED_CLIENT_C_PATH}/source/libNsdl/src/include/*.h"
+
+
+FILE(GLOB MBED_CLIENT_SRC
+        "${CMAKE_CURRENT_SOURCE_DIR}/mbed-client/*.h"
         
-        "${MBED_CLIENT_C_PATH}/source/libCoap/src/*.c"
-        "${MBED_CLIENT_C_PATH}/source/libCoap/src/include/*.h"
+        "${CMAKE_CURRENT_SOURCE_DIR}/mbed-client-classic/mbed-client-classic/*.h"
+        "${CMAKE_CURRENT_SOURCE_DIR}/mbed-client-classic/source/*.cpp"
+
+        "${CMAKE_CURRENT_SOURCE_DIR}/mbed-client-mbed-tls/mbed-client-mbed-tls/*.h"
+        "${CMAKE_CURRENT_SOURCE_DIR}/mbed-client-mbed-tls/source/*.cpp"
+        
+        "${CMAKE_CURRENT_SOURCE_DIR}/source/*.cpp"
+        "${CMAKE_CURRENT_SOURCE_DIR}/source/include/*.h"
+        )
+
+CREATE_LIBRARY(mbedClient "${MBED_CLIENT_SRC}" "")
+
+
+FILE(GLOB MBED_COAP_SRC
+        "${MBED_COAP_PATH}/source/*.c"
+        )
+
+CREATE_LIBRARY(mbedCoap "${MBED_COAP_SRC}" "")
+
+
+
+
+FILE(GLOB MBED_CLIENT_C_SRC  
+        "${MBED_CLIENT_C_PATH}/source/*.c"
         )
         
 CREATE_LIBRARY(mbedClientC "${MBED_CLIENT_C_SRC}" "") 
