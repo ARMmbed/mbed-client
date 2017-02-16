@@ -263,7 +263,7 @@ public:
      * object receives a block-wise message.
      * @param callback The function pointer that is called.
      */
-    virtual void set_incoming_block_message_callback(incoming_block_message_callback callback);
+    virtual bool set_incoming_block_message_callback(incoming_block_message_callback callback);
 
     /**
      * @brief Sets the function that is executed when this
@@ -272,7 +272,7 @@ public:
      * NOTE! Due to a limitation in the mbed-client-c library, a GET request can only contain data size up to 65KB.
      * @param callback The function pointer that is called.
      */
-    virtual void set_outgoing_block_message_callback(outgoing_block_message_callback callback);
+    virtual bool set_outgoing_block_message_callback(outgoing_block_message_callback callback);
 
     /**
      * \brief Returns the block message object.
@@ -326,10 +326,6 @@ private:
     M2MBlockMessage                         *_block_message_data;
     M2MResourceCallback                     *_resource_callback; // Not owned
     FP0<void>                               *_notification_sent_function_pointer;
-
-    // Note: these two callbacks should be moved behind ifdef, as they are not needed by all/most apps.
-    incoming_block_message_callback         *_incoming_block_message_cb;
-    outgoing_block_message_callback         *_outgoing_block_message_cb;
 
     notification_sent_callback              *_notification_sent_callback;
     uint16_t                                _object_instance_id;

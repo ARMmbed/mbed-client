@@ -44,6 +44,13 @@ public:
 
         //typedef void(*execute_callback_2) (void *arguments);
         M2MResourceInstanceExecuteCallback2,
+
+        // typedef FP1<void, M2MBlockMessage *> incoming_block_message_callback;
+        M2MResourceInstanceIncomingBlockMessageCallback,
+
+        // typedef FP3<void, const String &, uint8_t *&, uint32_t &> outgoing_block_message_callback;
+        M2MResourceInstanceOutgoingBlockMessageCallback,
+
     };
 
     /**
