@@ -8,3 +8,4 @@ results/*
 
 # ignore for PAL tools
 /CMakeLists.txt
+Port_libs/*
