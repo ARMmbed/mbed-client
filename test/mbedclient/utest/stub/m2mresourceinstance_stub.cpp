@@ -237,11 +237,11 @@ M2MBlockMessage* M2MResourceInstance::block_message() const
 
 }
 
-void M2MResourceInstance::set_incoming_block_message_callback(incoming_block_message_callback callback)
+bool M2MResourceInstance::set_incoming_block_message_callback(incoming_block_message_callback callback)
 {
 }
 
-void M2MResourceInstance::set_outgoing_block_message_callback(outgoing_block_message_callback callback)
+bool M2MResourceInstance::set_outgoing_block_message_callback(outgoing_block_message_callback callback)
 {
 
 }
