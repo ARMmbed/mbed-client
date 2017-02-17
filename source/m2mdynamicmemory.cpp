@@ -39,7 +39,8 @@ void * M2MDynamicMemory::operator new (size_t size) {
 //	allocatedSize=((size-1) / 8 + 1) * 8; /* "worst case" 64-bit alignment assumption */
 //	heapPtr+=allocatedSize;
     memTotal+=size; memCount++;
-    printf("cn:%lu:%lu:%d:%d:", size, /*allocatedSize*/ (long int)0, memTotal, memCount);
+//    printf("cn:%lu:%lu:%d:%d:", size, /*allocatedSize*/ (long int)0, memTotal, memCount);
+    print_heap_statistics();
     return tmp;
 }
 
@@ -141,13 +142,34 @@ void M2MDynamicMemory::operator delete[] (void * ptr) {
 #endif
 
 void M2MDynamicMemory::init(void) {
-    printf("Init allocated %d bytes for cloud client heap\n",
-        M2M_DYNAMIC_MEMORY_HEAP_SIZE);
-    heap=malloc( M2M_DYNAMIC_MEMORY_HEAP_SIZE);
-    heapPtr=heap;
-    m2m_dyn_mem_init((uint8_t *)heap, M2M_DYNAMIC_MEMORY_HEAP_SIZE, 0, &memInfo);
+//    printf("Init allocated %d bytes for cloud client heap\n",
+//        );
+//    heap=malloc( M2M_DYNAMIC_MEMORY_HEAP_SIZE);
+//    heapPtr=heap;
+//    m2m_dyn_mem_init((uint8_t *)heap, M2M_DYNAMIC_MEMORY_HEAP_SIZE, 0, &memInfo);
+    init(M2M_DYNAMIC_MEMORY_HEAP_SIZE);
 }
 
+void M2MDynamicMemory::init(size_t heapSize) {
+    heap=malloc( heapSize );
+    printf("Init allocated %lu bytes for cloud client heap at %p\n", heapSize, heap);
+//    heapPtr=heap;
+//    m2m_dyn_mem_init((uint8_t *)heap, (uint16_t)heapSize, 0, &memInfo);
+    init(heap, heapSize);
+}
+
+void M2MDynamicMemory::init(void *heapAllocation, size_t heapSize) {
+//    heap=malloc( M2M_DYNAMIC_MEMORY_HEAP_SIZE)i;
+  //  printf("Init allocated %d bytes for cloud client heap at %p\n", heapSize, heap);
+    heapSize=heapSize;
+    heapPtr=heapAllocation;
+    m2m_dyn_mem_init((uint8_t *)heapAllocation, (uint16_t)heapSize, 0, &memInfo);
+}
+
+void M2MDynamicMemory::print_heap_statistics() {
+    printf("M2MDynmemLIB stats: %d:%d:%d:%d:%u:%u", memInfo.heap_sector_size, memInfo.heap_sector_alloc_cnt, memInfo.heap_sector_allocated_bytes,
+        memInfo.heap_sector_allocated_bytes_max, memInfo.heap_alloc_total_bytes, memInfo.heap_alloc_fail_cnt);
+}
 M2MDynamicMemory::M2MDynamicMemory(void) {
 #if 0
     if (heap == 0) {
