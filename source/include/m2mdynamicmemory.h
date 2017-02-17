@@ -34,12 +34,16 @@ public:
     ~M2MDynamicMemory(void);
 
     static void init(void);
+    static void init(size_t size);
+    static void init(void *heapAllocation, size_t size);
+    static void print_heap_statistics();
     //static deinit();
 
 private:
 
     static void * heap;
     static void * heapPtr;
+    static size_t heapSize;
     static int referenceCount;
     //static mem_stat_t memInfo;
 };
