@@ -26,8 +26,8 @@ void * M2MDynamicMemory::heapPtr = 0;
 int M2MDynamicMemory::referenceCount = 0;
 mem_stat_t /*M2MDynamicMemory::*/memInfo;
 
-#define M2M_DYNMEM_LIB
-//#define M2M_PASSTHROUGH
+//#define M2M_DYNMEM_LIB
+#define M2M_PASSTHROUGH
 #define M2M_TRACE_PRINTS
 
 #ifdef M2M_DYNMEM_LIB
@@ -189,7 +189,7 @@ void M2MDynamicMemory::print_heap_running_statistics() {
 #ifdef M2M_DYNMEM_LIB
     printf(":%d:%d:", memInfo.heap_sector_allocated_bytes, memInfo.heap_sector_alloc_cnt);
 #else
-    printf(":%lu:%lu:%d:%d:", size, allocatedSize, memTotal, memCount);
+    printf(":%d:%d:", memTotal, memCount);
 #endif
 }
 void M2MDynamicMemory::print_heap_overall_statistics() {
@@ -224,4 +224,39 @@ M2MDynamicMemory::~M2MDynamicMemory(void) {
         heap=0;
     }
 #endif
+}
+    /**
+     * \brief Memory allocation required for libCoap.
+     * \param size The size of memory to be reserved.
+    */
+void* M2MDynamicMemory::memory_alloc(short int size){
+    #ifdef M2M_TRACE_PRINTS
+    printf("ma");
+    print_heap_running_statistics();
+    #endif
+    #ifdef M2M_DYNMEM_LIB
+    return m2m_dyn_mem_alloc(size);
+    #endif
+    #ifdef M2M_PASSTHROUGH
+    memTotal+=size; memCount++;
+    return malloc(size);
+    #endif
+
+}
+
+    /**
+     * \brief Memory free functions required for libCoap.
+     * \param ptr The object whose memory needs to be freed.
+    */
+void M2MDynamicMemory::memory_free(void *ptr) {
+    #ifdef M2M_TRACE_PRINTS
+    printf("mf");
+    print_heap_overall_statistics();
+    #endif
+    #ifdef M2M_DYNMEM_LIB
+    m2m_dyn_mem_free(ptr);
+    #endif
+    #ifdef M2M_PASSTHROUGH
+    free(ptr);
+    #endif
 }
