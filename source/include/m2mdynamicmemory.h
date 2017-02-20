@@ -36,7 +36,8 @@ public:
     static void init(void);
     static void init(size_t size);
     static void init(void *heapAllocation, size_t size);
-    static void print_heap_statistics();
+    static void print_heap_running_statistics();
+    static void print_heap_overall_statistics();
     //static deinit();
 
 private:
