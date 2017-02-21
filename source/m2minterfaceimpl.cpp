@@ -357,8 +357,7 @@ void M2MInterfaceImpl::bootstrap_error()
     if (_registration_flow_timer) {
         _registration_flow_timer->stop_timer();
     }
-    internal_event(STATE_IDLE);
-    _observer.error(M2MInterface::BootstrapFailed);
+    socket_error(M2MInterface::BootstrapFailed, true);
 #endif //MBED_CLIENT_DISABLE_BOOTSTRAP_FEATURE
 }
 
@@ -529,7 +528,7 @@ void M2MInterfaceImpl::timer_expired(M2MTimerObserver::Type type)
         bootstrap_error();
     }
     else if (M2MTimerObserver::RegistrationFlowTimer == type) {
-        registration_error(M2MInterface::NetworkError, false);
+        registration_error(M2MInterface::Timeout, true);
     }
 }
 
