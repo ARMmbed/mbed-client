@@ -81,7 +81,8 @@ Test_M2MInterfaceImpl::Test_M2MInterfaceImpl()
                                 "endpoint_type",
                                 120,
                                 8000,
-                                "domain");
+                                "domain",
+                                M2MInterface::TCP);
 }
 
 Test_M2MInterfaceImpl:: ~Test_M2MInterfaceImpl()
@@ -548,14 +549,6 @@ void Test_M2MInterfaceImpl::test_bootstrap_done()
     delete sec;
 }
 
-void Test_M2MInterfaceImpl::test_bootstrap_error()
-{
-    impl->bootstrap_error();
-
-    CHECK(impl->_current_state == M2MInterfaceImpl::STATE_IDLE);
-    CHECK(observer->error_occured == true);
-}
-
 void Test_M2MInterfaceImpl::test_coap_data_processed()
 {
     impl->coap_data_processed();
@@ -751,9 +744,11 @@ void Test_M2MInterfaceImpl::test_timer_expired()
     impl->timer_expired(M2MTimerObserver::RetryTimer);
     CHECK(impl->_retry_timer_expired == true);
 
-    observer->error_occured = false;
-    impl->timer_expired(M2MTimerObserver::BootstrapTimer);
-    CHECK(observer->error_occured == true);
+    impl->timer_expired(M2MTimerObserver::BootstrapFlowTimer);
+    CHECK(impl->_reconnecting == true);
+
+    impl->timer_expired(M2MTimerObserver::RegistrationFlowTimer);
+    CHECK(impl->_reconnecting == true);
 }
 
 void Test_M2MInterfaceImpl::test_callback_handler()
