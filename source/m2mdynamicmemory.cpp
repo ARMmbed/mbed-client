@@ -26,8 +26,8 @@ void * M2MDynamicMemory::heapPtr = 0;
 int M2MDynamicMemory::referenceCount = 0;
 mem_stat_t /*M2MDynamicMemory::*/memInfo;
 
-//#define M2M_DYNMEM_LIB
-#define M2M_PASSTHROUGH
+#define M2M_DYNMEM_LIB
+//#define M2M_PASSTHROUGH
 #define M2M_TRACE_PRINTS
 
 #ifdef M2M_DYNMEM_LIB
@@ -126,7 +126,7 @@ void * M2MDynamicMemory::operator new (size_t size) {
     tmp=malloc(size);
     allocatedSize=malloc_usable_size(tmp);
     memTotal+=allocatedSize; memCount++;
-    printf("cn:%lu:%lu:%d:%d:", size, allocatedSize, memTotal, memCount);
+    printf("mn:%lu:%lu:%d:%d:", size, allocatedSize, memTotal, memCount);
     return tmp;
 }
 
@@ -135,7 +135,7 @@ void M2MDynamicMemory::operator delete (void * ptr) {
     allocatedSize=malloc_usable_size(ptr);
     memCount--;
     memTotal-=allocatedSize;
-    printf("cd:%lu:%d:%d:", allocatedSize, memTotal, memCount);
+    printf("md:%lu:%d:%d:", allocatedSize, memTotal, memCount);
     free(ptr);
 }
 
@@ -145,7 +145,7 @@ void * M2MDynamicMemory::operator new[] (size_t size) {
     tmp=malloc(size);
     allocatedSize=malloc_usable_size(tmp);
     memTotal+=allocatedSize; memCount++;
-    printf("cn[]:%lu:%lu:%d:%d:", size, allocatedSize, memTotal, memCount);
+    printf("mn[]:%lu:%lu:%d:%d:", size, allocatedSize, memTotal, memCount);
     return tmp;
 }
 void M2MDynamicMemory::operator delete[] (void * ptr) {
@@ -153,7 +153,7 @@ void M2MDynamicMemory::operator delete[] (void * ptr) {
     allocatedSize=malloc_usable_size(ptr);
     memCount--;
     memTotal-=allocatedSize;
-    printf("cd[]:%lu:%d:%d:", allocatedSize, memTotal, memCount);
+    printf("md[]:%lu:%d:%d:", allocatedSize, memTotal, memCount);
     free(ptr);
 }
 #endif
@@ -165,6 +165,16 @@ void M2MDynamicMemory::init(void) {
 //    heapPtr=heap;
 //    m2m_dyn_mem_init((uint8_t *)heap, M2M_DYNAMIC_MEMORY_HEAP_SIZE, 0, &memInfo);
     init(M2M_DYNAMIC_MEMORY_HEAP_SIZE);
+/* sanity check */
+#if 0
+    void * tmp;
+    tmp = memory_alloc(2000);
+    memory_free(tmp);
+    tmp = memory_alloc(200);
+    memory_free(tmp);
+    tmp = memory_alloc(10000);
+    memory_free(tmp);
+#endif
 }
 
 void M2MDynamicMemory::init(size_t heapSize) {
@@ -229,19 +239,20 @@ M2MDynamicMemory::~M2MDynamicMemory(void) {
      * \brief Memory allocation required for libCoap.
      * \param size The size of memory to be reserved.
     */
-void* M2MDynamicMemory::memory_alloc(short int size){
-    #ifdef M2M_TRACE_PRINTS
-    printf("ma");
-    print_heap_running_statistics();
-    #endif
+void* M2MDynamicMemory::memory_alloc(uint16_t size){
+    void *tmp;
     #ifdef M2M_DYNMEM_LIB
-    return m2m_dyn_mem_alloc(size);
+    tmp = m2m_dyn_mem_alloc(size);
     #endif
     #ifdef M2M_PASSTHROUGH
     memTotal+=size; memCount++;
-    return malloc(size);
+    tmp = malloc(size);
     #endif
-
+    #ifdef M2M_TRACE_PRINTS
+    printf(":ma:%p", tmp);
+    print_heap_running_statistics();
+    #endif
+    return tmp;
 }
 
     /**
@@ -249,14 +260,14 @@ void* M2MDynamicMemory::memory_alloc(short int size){
      * \param ptr The object whose memory needs to be freed.
     */
 void M2MDynamicMemory::memory_free(void *ptr) {
-    #ifdef M2M_TRACE_PRINTS
-    printf("mf");
-    print_heap_overall_statistics();
-    #endif
     #ifdef M2M_DYNMEM_LIB
     m2m_dyn_mem_free(ptr);
     #endif
     #ifdef M2M_PASSTHROUGH
     free(ptr);
     #endif
-}
+    #ifdef M2M_TRACE_PRINTS
+    printf(":mf:%p", ptr);
+    print_heap_overall_statistics();
+    #endif
+ }

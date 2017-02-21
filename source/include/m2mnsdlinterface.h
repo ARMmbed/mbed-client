@@ -24,6 +24,7 @@
 #include "mbed-client/m2mbase.h"
 #include "mbed-client/m2mserver.h"
 #include "include/nsdllinker.h"
+#include "include/m2mdynamicmemory.h"
 
 //FORWARD DECLARARTION
 class M2MSecurity;
@@ -43,7 +44,8 @@ typedef Vector<M2MObject *> M2MObjectList;
  * Class which interacts between mbed Client C++ Library and mbed-client-c library.
  */
 class M2MNsdlInterface : public M2MTimerObserver,
-                         public M2MObservationHandler
+                         public M2MObservationHandler,
+                         public M2MDynamicMemory
 {
 private:
     // Prevents the use of assignment operator by accident.

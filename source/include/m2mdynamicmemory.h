@@ -17,6 +17,7 @@
 #ifndef M2M_DYNAMIC_MEMORY_H
 #define M2M_DYNAMIC_MEMORY_H
 
+#include <inttypes.h>
 //#include "m2mdynmemLIB.h"
 
 #define M2M_DYNAMIC_MEMORY_HEAP_SIZE 20000
@@ -42,7 +43,7 @@ public:
      * \brief Memory allocation required for libCoap.
      * \param size The size of memory to be reserved.
     */
-    static void *memory_alloc(short int/*uint32_t*/ size);
+    static void *memory_alloc(uint16_t size);
 
     /**
      * \brief Memory free functions required for libCoap.
