@@ -13,6 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+// fixup the compilation on ARMCC for PRId32
+#define __STDC_FORMAT_MACROS
+#include <inttypes.h>
+
 #include "mbed-client/m2mreportobserver.h"
 #include "mbed-client/m2mconstants.h"
 #include "mbed-client/m2mtimer.h"
@@ -235,13 +240,13 @@ bool M2MReportHandler::set_notification_attribute(const char* option,
            _pmin = atoi(value);
             success = true;
             _attribute_state |= M2MReportHandler::Pmin;
-            tr_debug("M2MReportHandler::set_notification_attribute %s to %d", attribute, _pmin);
+            tr_debug("M2MReportHandler::set_notification_attribute %s to %" PRId32, attribute, _pmin);
         }
         else if(strcmp(attribute, PMAX) == 0) {
             _pmax = atoi(value);
             success = true;
             _attribute_state |= M2MReportHandler::Pmax;
-            tr_debug("M2MReportHandler::set_notification_attribute %s to %d", attribute, _pmax);
+            tr_debug("M2MReportHandler::set_notification_attribute %s to %" PRId32, attribute, _pmax);
         }
         else if(strcmp(attribute, GT) == 0 &&
                 (M2MBase::Resource == type)){
