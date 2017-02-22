@@ -206,22 +206,16 @@ bool M2MNsdlInterface::remove_nsdl_resource(M2MBase *base)
     return sn_nsdl_pop_resource(_nsdl_handle, resource);
 }
 
-bool M2MNsdlInterface::create_bootstrap_resource(sn_nsdl_addr_s *address,
-                                                 const String &bootstrap_endpoint_name)
+bool M2MNsdlInterface::create_bootstrap_resource(sn_nsdl_addr_s *address)
 {
 #ifndef MBED_CLIENT_DISABLE_BOOTSTRAP_FEATURE
     tr_debug("M2MNsdlInterface::create_bootstrap_resource()");
     _identity_accepted = false;
     bool success = false;
     sn_nsdl_bs_ep_info_t bootstrap_endpoint;
-    tr_debug("M2MNsdlInterface::create_bootstrap_resource() - endpoint name: %s", bootstrap_endpoint_name.c_str());
-    if (_endpoint->endpoint_name_ptr) {
-        memory_free(_endpoint->endpoint_name_ptr);
-    }
+    tr_debug("M2MNsdlInterface::create_bootstrap_resource() - endpoint name: %.*s", _endpoint->endpoint_name_len,
+             _endpoint->endpoint_name_ptr);
 
-    _endpoint->endpoint_name_ptr = alloc_string_copy((uint8_t*)bootstrap_endpoint_name.c_str(),
-                                                     bootstrap_endpoint_name.length());
-    _endpoint->endpoint_name_len = bootstrap_endpoint_name.length();
     if(_bootstrap_id == 0) {
         // Take copy of the address, uri_query_parameters() will modify the source buffer
         bool msg_sent = false;
