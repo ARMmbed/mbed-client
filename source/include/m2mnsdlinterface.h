@@ -104,8 +104,7 @@ public:
      * @param address Bootstrap address.
      * @return true if created and sent successfully else false.
     */
-    bool create_bootstrap_resource(sn_nsdl_addr_s *address,
-                                   const String &bootstrap_endpoint_name);
+    bool create_bootstrap_resource(sn_nsdl_addr_s *address);
 
     /**
      * @brief Sends the register message to the server.
