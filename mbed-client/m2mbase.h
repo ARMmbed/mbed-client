@@ -23,7 +23,7 @@
 #include "mbed-client/functionpointer.h"
 #include "mbed-client/m2mstringbuffer.h"
 #include "nsdl-c/sn_nsdl.h"
-#include "mbed-coap/sn_coap_header.h"
+#include "nsdl-c/sn_coap_header.h"
 #include "nsdl-c/sn_nsdl_lib.h"
 
 //FORWARD DECLARATION

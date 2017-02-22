@@ -17,7 +17,7 @@
 #define M2MBLOCKMESSAGE_H
 
 #include "ns_types.h"
-#include "mbed-coap/sn_coap_header.h"
+#include "nsdl-c/sn_coap_header.h"
 
 /*! \file m2mblockmessage.h
  *  \brief M2MBlockMessage.
