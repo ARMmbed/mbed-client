@@ -286,7 +286,7 @@ void M2MBase::remove_observation_level(M2MBase::Observation obs_level)
 
 void M2MBase::set_observation_handler(M2MObservationHandler *handler)
 {
-    tr_debug("M2MBase::set_observation_handler - handler: 0x%x", handler);
+    tr_debug("M2MBase::set_observation_handler - handler: 0x%p", (void*)handler);
     _observation_handler = handler;
 }
 
