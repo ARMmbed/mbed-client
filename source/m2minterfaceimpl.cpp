@@ -638,32 +638,7 @@ void M2MInterfaceImpl::state_bootstrap_address_resolved( EventData *data)
         address.addr_len = event->_address->_length;
         _connection_handler.start_listening_for_data();
 
-        // Include domain id to be part of endpoint name
-        StringBuffer<M2MBase::MAX_PATH_SIZE> new_ep_name;
-
-        if(!new_ep_name.ensure_space(_nsdl_interface.endpoint_name().size() + 1))
-        {
-            tr_error("MM2MInterfaceImpl::state_bootstrap_address_resolved : name too long");
-            _observer.error(M2MInterface::InvalidParameters);
-            return;
-        }
-
-        new_ep_name.append(_nsdl_interface.endpoint_name().c_str());
-
-        if (!_domain.empty()) {
-
-            if(!new_ep_name.ensure_space(_nsdl_interface.endpoint_name().size() + 1 + _domain.size() + 1))
-            {
-                tr_error("MM2MInterfaceImpl::state_bootstrap_address_resolved : name + domain too long");
-                _observer.error(M2MInterface::InvalidParameters);
-                return;
-            }
-
-            new_ep_name.append('@');
-            new_ep_name.append(_domain.c_str());
-
-        }
-        if(_nsdl_interface.create_bootstrap_resource(&address, new_ep_name.c_str())) {
+        if(_nsdl_interface.create_bootstrap_resource(&address)) {
            tr_debug("M2MInterfaceImpl::state_bootstrap_address_resolved : create_bootstrap_resource - success");
            internal_event(STATE_BOOTSTRAP_RESOURCE_CREATED);
         } else{
