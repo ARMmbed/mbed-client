@@ -74,7 +74,7 @@ M2MNsdlInterface::M2MNsdlInterface(M2MNsdlObserver &observer, M2MConnectionHandl
     // and free functions in structure and used functions for sending
     // and receiving purposes.
     _nsdl_handle = sn_nsdl_init(&(__nsdl_c_send_to_server), &(__nsdl_c_received_from_server),
-                 &(/*__nsdl_c_*/M2MDynamicMemory::memory_alloc), &(/*__nsdl_c_*/M2MDynamicMemory::memory_free));
+                 &(/*__nsdl_c_M2MDynamicMemory::*/memory_alloc), &(/*__nsdl_c_M2MDynamicMemory::*/memory_free));
     sn_nsdl_set_context(_nsdl_handle, this);
 
     initialize();
@@ -173,7 +173,7 @@ void M2MNsdlInterface::delete_endpoint()
 {
     tr_debug("M2MNsdlInterface::delete_endpoint()");
     if(_endpoint) {
-        free(_endpoint->lifetime_ptr);
+        memory_free(_endpoint->lifetime_ptr);
 
         memory_free(_endpoint);
         _endpoint = NULL;
@@ -302,6 +302,7 @@ bool M2MNsdlInterface::send_unregister_message()
     return success;
 }
 
+#if 0
 // XXX: move these to common place, no need to copy these wrappers to multiple places:
 void *M2MNsdlInterface::memory_alloc(uint16_t size)
 {
@@ -316,6 +317,7 @@ void M2MNsdlInterface::memory_free(void *ptr)
     if(ptr)
         free(ptr);
 }
+#endif
 
 uint8_t* M2MNsdlInterface::alloc_string_copy(const uint8_t* source, uint16_t size)
 {
@@ -645,7 +647,7 @@ uint8_t M2MNsdlInterface::resource_callback(struct nsdl_s */*nsdl_handle*/,
         tr_debug("M2MNsdlInterface::resource_callback() - send CoAP response");
         (sn_nsdl_send_coap_message(_nsdl_handle, address, coap_response) == 0) ? result = 0 : result = 1;
         if(coap_response->payload_ptr) {
-            free(coap_response->payload_ptr);
+            memory_free(coap_response->payload_ptr);
             coap_response->payload_ptr = NULL;
         }
     }
@@ -743,9 +745,9 @@ void M2MNsdlInterface::send_delayed_response(M2MBase *base)
 
             sn_nsdl_send_coap_message(_nsdl_handle, _nsdl_handle->nsp_address_ptr->omalw_address_ptr, &coap_response);
 
-            free(coap_response.payload_ptr);
-            free(coap_response.token_ptr);
-        }
+            memory_free(coap_response.payload_ptr);
+            memory_free(coap_response.token_ptr);
+       }
     }
     release_mutex();
 }
