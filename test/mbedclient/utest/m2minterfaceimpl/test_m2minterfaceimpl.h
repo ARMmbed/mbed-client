@@ -63,8 +63,6 @@ public:
 
     void test_bootstrap_wait();
 
-    void test_bootstrap_error();
-
     void test_coap_data_processed();
 
     void test_value_updated();

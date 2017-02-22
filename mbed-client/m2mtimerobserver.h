@@ -36,7 +36,8 @@ public:
         Dtls,
         QueueSleep,
         RetryTimer,
-        BootstrapTimer
+        BootstrapFlowTimer,
+        RegistrationFlowTimer
     }Type;
 
     /**

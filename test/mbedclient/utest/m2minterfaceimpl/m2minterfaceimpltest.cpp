@@ -124,11 +124,6 @@ TEST(M2MInterfaceImpl, bootstrap_done)
     m2m_interface_impl->test_bootstrap_done();
 }
 
-TEST(M2MInterfaceImpl, bootstrap_error)
-{
-    m2m_interface_impl->test_bootstrap_error();
-}
-
 TEST(M2MInterfaceImpl, coap_data_processed)
 {
     m2m_interface_impl->test_coap_data_processed();
