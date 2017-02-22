@@ -391,7 +391,7 @@ private: // state machine state functions
 private:
 
     EventData                   *_event_data;
-    M2MTimer                    *_bootstrap_timer;
+    M2MTimer                    *_registration_flow_timer;
     uint16_t                    _server_port;
     uint16_t                    _listen_port;
     String                      _endpoint_type;
