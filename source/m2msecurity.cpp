@@ -197,7 +197,7 @@ bool M2MSecurity::set_resource_value(SecurityResource resource,
             uint8_t size = 0;
             uint8_t *buffer = String::convert_integer_to_array(value, size);
             success = res->set_value(buffer,size);
-            free(buffer);
+            memory_free(buffer);
         }
     }
     return success;
@@ -281,7 +281,7 @@ uint32_t M2MSecurity::resource_value_int(SecurityResource resource) const
             res->get_value(buffer,length);
             if(buffer) {
                 value = String::convert_array_to_integer(buffer,length);
-                free(buffer);
+                memory_free(buffer);
             }
         }
     }

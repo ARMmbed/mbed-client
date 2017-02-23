@@ -219,7 +219,7 @@ void M2MBase::set_operation(M2MBase::Operation opr)
 void M2MBase::set_interface_description(const char *desc)
 {
     assert(_sn_resource->dynamic_resource_params->static_resource_parameters->free_on_delete);
-    free(_sn_resource->dynamic_resource_params->static_resource_parameters->interface_description_ptr);
+    memory_free(_sn_resource->dynamic_resource_params->static_resource_parameters->interface_description_ptr);
     _sn_resource->dynamic_resource_params->static_resource_parameters->interface_description_ptr = NULL;
     const size_t len = strlen(desc);
     if (len > 0 ) {
@@ -245,7 +245,7 @@ void M2MBase::set_resource_type(const String &res_type)
 void M2MBase::set_resource_type(const char *res_type)
 {
     assert(_sn_resource->dynamic_resource_params->static_resource_parameters->free_on_delete);
-    free(_sn_resource->dynamic_resource_params->static_resource_parameters->resource_type_ptr);
+    memory_free(_sn_resource->dynamic_resource_params->static_resource_parameters->resource_type_ptr);
     _sn_resource->dynamic_resource_params->static_resource_parameters->resource_type_ptr = NULL;
     const size_t len = strlen(res_type);
     if (len > 0) {
@@ -507,6 +507,7 @@ sn_coap_hdr_s* M2MBase::handle_post_request(nsdl_s */*nsdl*/,
     return NULL;
 }
 
+#if 0
 void *M2MBase::memory_alloc(uint32_t size)
 {
     if(size)
@@ -519,6 +520,7 @@ void M2MBase::memory_free(void *ptr)
 {
     free(ptr);
 }
+#endif
 
 char* M2MBase::alloc_string_copy(const char* source)
 {
@@ -745,7 +747,7 @@ char* M2MBase::stringdup(const char* src)
 
     const size_t len = strlen(src) + 1;
 
-    char *dest = (char*)malloc(len);
+    char *dest = (char*)memory_alloc(len);
 
     if (dest) {
         memcpy(dest, src, len);
@@ -766,27 +768,27 @@ void M2MBase::free_resources()
         sn_nsdl_static_resource_parameters_s *params =
                 const_cast<sn_nsdl_static_resource_parameters_s *>(_sn_resource->dynamic_resource_params->static_resource_parameters);
 
-        free(params->path);
+        memory_free(params->path);
         //free(params->resource);
 #ifndef DISABLE_RESOURCE_TYPE
-        free(params->resource_type_ptr);
+        memory_free(params->resource_type_ptr);
 #endif
 #ifndef DISABLE_INTERFACE_DESCRIPTION
-        free(params->interface_description_ptr);
+        memory_free(params->interface_description_ptr);
 #endif
-        free(params);
+        memory_free(params);
     }
     if (_sn_resource->dynamic_resource_params->free_on_delete) {
-        free(_sn_resource->dynamic_resource_params->resource);
-        free(_sn_resource->dynamic_resource_params);
+        memory_free(_sn_resource->dynamic_resource_params->resource);
+        memory_free(_sn_resource->dynamic_resource_params);
     }
 
     if(_sn_resource->free_on_delete && _sn_resource->identifier_int_type == false) {
         tr_debug("M2MBase::free_resources()");
-        free(_sn_resource->identifier.name);
+        memory_free(_sn_resource->identifier.name);
     }
     if(_sn_resource->free_on_delete) {
-        free(_sn_resource);
+        memory_free(_sn_resource);
     }
 }
 

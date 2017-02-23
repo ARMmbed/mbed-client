@@ -333,7 +333,7 @@ sn_coap_hdr_s* M2MObject::handle_put_request(nsdl_s *nsdl,
                     tr_debug("M2MObject::handle_put_request() - Invalid query");
                     msg_code = COAP_MSG_CODE_RESPONSE_BAD_REQUEST; // 4.00
                 }
-                free(query);
+                memory_free(query);
             }
         } else {
             tr_error("M2MObject::handle_put_request() - COAP_MSG_CODE_RESPONSE_BAD_REQUEST - Empty URI_QUERY");
