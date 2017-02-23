@@ -29,6 +29,11 @@ mem_stat_t /*M2MDynamicMemory::*/memInfo;
 #define M2M_DYNMEM_LIB
 //#define M2M_PASSTHROUGH
 #define M2M_TRACE_PRINTS
+static void memory_fail_callback(heap_fail_t fail) {
+#ifdef M2M_TRACE_PRINTS
+    printf("\nM2M memory failure: %u\n", fail);
+#endif
+}
 
 #ifdef M2M_DYNMEM_LIB
 
@@ -191,7 +196,7 @@ void M2MDynamicMemory::init(void *heapAllocation, size_t heapSize) {
     heapSize=heapSize;
     heapPtr=heapAllocation;
 #ifdef M2M_DYNMEM_LIB
-    m2m_dyn_mem_init((uint8_t *)heapAllocation, (uint16_t)heapSize, 0, &memInfo);
+    m2m_dyn_mem_init((uint8_t *)heapAllocation, (uint16_t)heapSize, &memory_fail_callback, &memInfo);
 #endif
 }
 
@@ -235,10 +240,7 @@ M2MDynamicMemory::~M2MDynamicMemory(void) {
     }
 #endif
 }
-    /**
-     * \brief Memory allocation required for libCoap.
-     * \param size The size of memory to be reserved.
-    */
+
 void* M2MDynamicMemory::memory_alloc(uint16_t size){
     void *tmp;
     #ifdef M2M_DYNMEM_LIB
@@ -255,10 +257,6 @@ void* M2MDynamicMemory::memory_alloc(uint16_t size){
     return tmp;
 }
 
-    /**
-     * \brief Memory free functions required for libCoap.
-     * \param ptr The object whose memory needs to be freed.
-    */
 void M2MDynamicMemory::memory_free(void *ptr) {
     #ifdef M2M_DYNMEM_LIB
     m2m_dyn_mem_free(ptr);
