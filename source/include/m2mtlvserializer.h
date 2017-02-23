@@ -25,7 +25,7 @@
  * for resource model) as OMA-TLV according described in chapter 6.3.3. 
  * 
  */
-class M2MTLVSerializer {
+class M2MTLVSerializer : public M2MDynamicMemory {
 
 public:
 
