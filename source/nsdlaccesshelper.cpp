@@ -16,27 +16,21 @@
 #include "include/nsdlaccesshelper.h"
 #include "include/m2mnsdlinterface.h"
 
-M2MNsdlInterfaceList __nsdl_interface_list;
+#include <stdlib.h>
 
 // callback function for NSDL library to call into
-
-M2MConnectionHandler *__connection_handler = NULL;
-
-
 uint8_t __nsdl_c_callback(struct nsdl_s *nsdl_handle,
                           sn_coap_hdr_s *received_coap_ptr,
                           sn_nsdl_addr_s *address,
                           sn_nsdl_capab_e nsdl_capab)
 {
     uint8_t status = 0;
-    M2MNsdlInterface  *interface = get_interface(nsdl_handle);
+    M2MNsdlInterface *interface = (M2MNsdlInterface*)sn_nsdl_get_context(nsdl_handle);
     if(interface) {
         status = interface->resource_callback(nsdl_handle,received_coap_ptr,
                                                      address, nsdl_capab);
         // Payload freeing must be done in app level if blockwise message
-        if (received_coap_ptr &&
-                received_coap_ptr->options_list_ptr &&
-                received_coap_ptr->options_list_ptr->block1_len > 0) {
+        if (received_coap_ptr->coap_status == COAP_STATUS_PARSER_BLOCKWISE_MSG_RECEIVED) {
             free(received_coap_ptr->payload_ptr);
             received_coap_ptr->payload_ptr = NULL;
         }
@@ -65,7 +59,7 @@ uint8_t __nsdl_c_send_to_server(struct nsdl_s * nsdl_handle,
                                 sn_nsdl_addr_s *address_ptr)
 {
     uint8_t status = 0;
-    M2MNsdlInterface  *interface = get_interface(nsdl_handle);
+    M2MNsdlInterface *interface = (M2MNsdlInterface*)sn_nsdl_get_context(nsdl_handle);
     if(interface) {
         status = interface->send_to_server_callback(nsdl_handle,
                                                            protocol, data_ptr,
@@ -79,7 +73,7 @@ uint8_t __nsdl_c_received_from_server(struct nsdl_s * nsdl_handle,
                                       sn_nsdl_addr_s *address_ptr)
 {
     uint8_t status = 0;
-    M2MNsdlInterface  *interface = get_interface(nsdl_handle);
+    M2MNsdlInterface *interface = (M2MNsdlInterface*)sn_nsdl_get_context(nsdl_handle);
     if(interface) {
         status = interface->received_from_server_callback(nsdl_handle,
                                                                  coap_header,
@@ -87,7 +81,7 @@ uint8_t __nsdl_c_received_from_server(struct nsdl_s * nsdl_handle,
         // Payload freeing must be done in app level if blockwise message
         if (coap_header &&
                 coap_header->options_list_ptr &&
-                coap_header->options_list_ptr->block1_len > 0) {
+                coap_header->options_list_ptr->block1 != -1) {
             free(coap_header->payload_ptr);
             coap_header->payload_ptr = NULL;
         }
@@ -107,32 +101,3 @@ void __socket_free(void * context, void * ptr)
     free(ptr);
 }
 
-M2MNsdlInterface* get_interface(struct nsdl_s* nsdl_handle)
-{
-    M2MNsdlInterfaceList::const_iterator it;
-    it = __nsdl_interface_list.begin();
-    M2MNsdlInterface* obj = NULL;
-    if (nsdl_handle) {
-        for (; it!=__nsdl_interface_list.end(); it++) {
-            if ((*it)->get_nsdl_handle() == nsdl_handle) {
-                obj = *it;
-                break;
-            }
-        }
-    }
-    return obj;
-}
-
-void __mutex_claim()
-{
-    if(__connection_handler) {
-        __connection_handler->claim_mutex();
-    }
-}
-
-void __mutex_release()
-{
-    if(__connection_handler) {
-        __connection_handler->release_mutex();
-    }
-}

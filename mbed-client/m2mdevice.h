@@ -22,7 +22,7 @@
 class M2MResource;
 class M2MResourceInstance;
 
-/**
+/*! \file m2mdevice.h
  *  \brief M2MDevice.
  *  This class represents the Device Object model of the LWM2M framework.
  *  It provides an interface for handling the device object
@@ -36,7 +36,7 @@ friend class M2MInterfaceFactory;
 public:
 
      /**
-      * \brief Enum defining all the resources associated with the
+      * \brief An enum defining all the resources associated with the
       * Device Object in the LWM2M framework.
       */
     typedef enum {
@@ -69,7 +69,7 @@ private:
     /**
      * Constructor
      */
-    M2MDevice();
+    M2MDevice(char *path);
 
     // Prevents the use of assignment operator.
     M2MDevice& operator=( const M2MDevice& /*other*/ );
@@ -87,7 +87,7 @@ private:
 public:
 
     /**
-     * \brief Deletes the M2MDevice instance.
+     * \brief Deletes an M2MDevice instance.
      */
     static void delete_instance();
 
@@ -97,7 +97,7 @@ public:
      * 'Manufacturer', 'DeviceType','ModelNumber','SerialNumber',
      * 'HardwareVersion', 'FirmwareVersion', 'SoftwareVersion',
      *  'UTCOffset', 'Timezone', 'SupportedBindingMode'.
-     * \param value The value to be set on the resource, in String format.
+     * \param value The value to be set on the resource, in string format.
      * \return M2MResource if created successfully, else NULL.
      */
     M2MResource* create_resource(DeviceResource resource, const String &value);
@@ -109,7 +109,7 @@ public:
      * 'BatteryLevel', 'BatteryStatus', 'MemoryFree', 'MemoryTotal',
      * 'ErrorCode', 'CurrentTime'. For 'CurrentTime', pass the time value in EPOCH format, for example
      * 1438944683.
-     * \param value The value to be set on the resource, in Integer format.
+     * \param value The value to be set on the resource, in integer format.
      * \return M2MResource if created successfully, else NULL.
      */
     M2MResource* create_resource(DeviceResource resource, int64_t value);
@@ -119,7 +119,7 @@ public:
      * \param resource With this function, the following resources can be created:
      * 'AvailablePowerSources','PowerSourceVoltage','PowerSourceCurrent',
      * 'ErrorCode'.
-     * \param value The value to be set on the resource, in Integer format.
+     * \param value The value to be set on the resource, in integer format.
      * \return M2MResourceInstance if created successfully, else NULL.
      */
     M2MResourceInstance* create_resource_instance(DeviceResource resource, int64_t value,
@@ -157,7 +157,7 @@ public:
      * 'Manufacturer', 'DeviceType','ModelNumber','SerialNumber',
      * 'HardwareVersion', 'FirmwareVersion', 'SoftwareVersion',
      *  'UTCOffset', 'Timezone', 'SupportedBindingMode'.
-     * \param value The value to be set on the resource, in String format.
+     * \param value The value to be set on the resource, in string format.
      * \param instance_id The instance ID of the resource, default is 0.
      * \return True if successfully set, else false.
      */
@@ -171,7 +171,7 @@ public:
      * 'AvailablePowerSources','PowerSourceVoltage','PowerSourceCurrent',
      * 'BatteryLevel', 'BatteryStatus', 'MemoryFree', 'MemoryTotal',
      * 'ErrorCode', 'CurrentTime'.
-     * \param value The value to be set on the resource, in Integer format.
+     * \param value The value to be set on the resource, in integer format.
      * \param instance_id The instance ID of the resource, default is 0.
      * \return True if successfully set, else false.
      */
@@ -180,7 +180,7 @@ public:
                             uint16_t instance_id = 0);
 
     /**
-     * \brief Returns the value of the given resource enum, in String.
+     * \brief Returns the value of the given resource enum, in string format.
      * \param resource With this function, the following resources can return a value:
      * 'Manufacturer', 'DeviceType','ModelNumber','SerialNumber',
      * 'HardwareVersion', 'FirmwareVersion', 'SoftwareVersion',
@@ -192,7 +192,7 @@ public:
                                  uint16_t instance_id = 0) const;
 
     /**
-     * \brief Returns the value of the given resource key name, in Integer.
+     * \brief Returns the value of the given resource key name, in integer format.
      * \param resource With this function, the following resources can return a value:
      * 'AvailablePowerSources','PowerSourceVoltage','PowerSourceCurrent',
      * 'BatteryLevel', 'BatteryStatus', 'MemoryFree', 'MemoryTotal',
@@ -204,8 +204,8 @@ public:
                                uint16_t instance_id = 0) const;
 
     /**
-     * \brief Indicates whether the resource instance with given resource enum exists or not.
-     * \param resource Resource enum.
+     * \brief Indicates whether the resource instance with the given resource enum exists or not.
+     * \param resource The resource enum.
      * \return True if at least one instance exists, else false.
      */
     bool is_resource_present(DeviceResource resource)const;
@@ -218,7 +218,7 @@ public:
 
     /**
      * \brief Returns the number of resources for a given resource enum.
-     * \param resource Resource enum.
+     * \param resource The resource enum.
      * \return The number of resources for a given resource enum. Returns 1 for the
      * mandatory resources. Can be 0 as well if no instances exist for an
      * optional resource.
@@ -230,7 +230,7 @@ private:
     M2MResourceInstance* get_resource_instance(DeviceResource dev_res,
                                                uint16_t instance_id) const;
 
-    static const String resource_name(DeviceResource resource);
+    static const char* resource_name(DeviceResource resource);
 
     bool check_value_range(DeviceResource resource, const int64_t value) const;
 

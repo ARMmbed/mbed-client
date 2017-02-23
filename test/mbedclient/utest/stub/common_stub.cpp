@@ -27,9 +27,8 @@ int common_stub::int_value;
 int common_stub::int2_value;
 addrinfo* common_stub::addrinfo;
 uint16_t common_stub::uint_value;
-omalw_certificate_list_t *common_stub::cert;
 sn_coap_hdr_s *common_stub::coap_header;
-sn_nsdl_resource_info_s *common_stub::resource;
+sn_nsdl_dynamic_resource_parameters_s *common_stub::resource;
 pthread_t common_stub::thread;
 const char* common_stub::char_value;
 
@@ -45,7 +44,6 @@ void common_stub::clear()
     event = NULL;
     addr = NULL;
     void_value = NULL;
-    cert = NULL;
     visited = false;
     bool_value= false;
     coap_header = NULL;
@@ -97,6 +95,16 @@ struct nsdl_s *sn_nsdl_init	(uint8_t (*sn_nsdl_tx_cb)(struct nsdl_s *, sn_nsdl_c
     return NULL;
 }
 
+int8_t sn_nsdl_set_context(struct nsdl_s * const handle, void * const context)
+{
+    return common_stub::int_value;
+}
+
+void *sn_nsdl_get_context(const struct nsdl_s * const handle)
+{
+    return common_stub::void_value;
+}
+
 uint16_t sn_nsdl_register_endpoint(struct nsdl_s *, sn_nsdl_ep_parameters_s *)
 {
     return common_stub::uint_value;
@@ -143,7 +151,7 @@ sn_coap_hdr_s *sn_nsdl_build_response(struct nsdl_s *, sn_coap_hdr_s *, uint8_t 
     return common_stub::coap_header;
 }
 
-sn_nsdl_resource_info_s *sn_nsdl_get_resource(struct nsdl_s *, uint16_t, uint8_t *)
+sn_nsdl_dynamic_resource_parameters_s *sn_nsdl_get_resource(struct nsdl_s *, uint16_t, uint8_t *)
 {
     return common_stub::resource;
 }
@@ -166,10 +174,6 @@ int8_t sn_nsdl_set_retransmission_parameters(struct nsdl_s *, uint8_t, uint8_t)
 void sn_nsdl_release_allocated_coap_msg_mem(struct nsdl_s *, sn_coap_hdr_s *header)
 {
     if(header && header != common_stub::coap_header){
-        if( header->content_type_ptr ){
-            free(header->content_type_ptr);
-            header->content_type_ptr = NULL;
-        }
         if( header->options_list_ptr){
             free(header->options_list_ptr);
             header->options_list_ptr = NULL;
@@ -179,7 +183,15 @@ void sn_nsdl_release_allocated_coap_msg_mem(struct nsdl_s *, sn_coap_hdr_s *head
     }
 }
 
-int8_t sn_nsdl_create_resource(struct nsdl_s *, sn_nsdl_resource_info_s *)
+sn_coap_options_list_s *sn_nsdl_alloc_options_list(struct nsdl_s *handle, sn_coap_hdr_s *coap_msg_ptr)
+{
+    if( common_stub::coap_header ) {
+        return common_stub::coap_header->options_list_ptr;
+    }
+    return NULL;
+}
+
+int8_t sn_nsdl_create_resource(struct nsdl_s *, sn_nsdl_dynamic_resource_parameters_s *)
 {
     return common_stub::int_value;
 }
@@ -189,17 +201,27 @@ int8_t sn_nsdl_delete_resource(struct nsdl_s *, uint16_t , uint8_t *)
     return common_stub::int_value;
 }
 
+int8_t sn_nsdl_put_resource(struct nsdl_s *handle, sn_nsdl_dynamic_resource_parameters_s *res)
+{
+    return common_stub::int_value;
+}
+
+int8_t sn_nsdl_pop_resource(struct nsdl_s *handle, sn_nsdl_dynamic_resource_parameters_s *res)
+{
+    return common_stub::int_value;
+}
+
 int8_t sn_nsdl_send_coap_message(struct nsdl_s *, sn_nsdl_addr_s *, sn_coap_hdr_s *)
 {
     return common_stub::int_value;
 }
 
-int8_t sn_nsdl_update_resource(struct nsdl_s *, sn_nsdl_resource_info_s *)
+int8_t sn_nsdl_update_resource(struct nsdl_s *, sn_nsdl_dynamic_resource_parameters_s *)
 {
     return common_stub::int_value;
 }
 
-int8_t set_NSP_address(struct nsdl_s *, uint8_t *, uint16_t, sn_nsdl_addr_type_e)
+int8_t set_NSP_address(struct nsdl_s *, uint8_t *, uint8_t, uint16_t, sn_nsdl_addr_type_e)
 {
     return common_stub::int_value;
 }
@@ -209,21 +231,6 @@ uint16_t sn_nsdl_oma_bootstrap(struct nsdl_s *, sn_nsdl_addr_s *,
                              sn_nsdl_bs_ep_info_t *)
 {
     return common_stub::uint_value;
-}
-
-omalw_certificate_list_t *sn_nsdl_get_certificates(struct nsdl_s *)
-{
-    return common_stub::cert;
-}
-
-int8_t sn_nsdl_update_certificates(struct nsdl_s *, omalw_certificate_list_t*, uint8_t)
-{
-    return common_stub::int_value;
-}
-
-int8_t sn_nsdl_create_oma_device_object(struct nsdl_s *, sn_nsdl_oma_device_t *)
-{
-    return common_stub::int_value;
 }
 
 //Coap Headers

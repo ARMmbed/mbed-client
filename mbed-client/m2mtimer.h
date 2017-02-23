@@ -21,7 +21,7 @@
 
 class M2MTimerPimpl;
 
-/**
+/*! \file m2mtimer.h
 * \brief M2MTimer.
 * Timer class for mbed client.
 */
@@ -44,7 +44,7 @@ public:
     /**
     * Destructor.
     */
-    virtual ~M2MTimer();
+    ~M2MTimer();
 
     /**
     * \brief Starts the timer.

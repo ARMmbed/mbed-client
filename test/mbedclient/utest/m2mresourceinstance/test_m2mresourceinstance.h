@@ -29,10 +29,6 @@ public:
 
     ~Test_M2MResourceInstance();
 
-    void test_copy_constructor();
-
-    void test_assignment_constructor();
-
     void test_static_resource_instance();
 
     void test_base_type();
@@ -65,8 +61,17 @@ public:
 
     void test_get_object_instance_id();
 
+    void test_set_notification_sent_function();
+
+    void test_notification_sent();
+
+    void test_ctor();
+
+    void test_get_parent_resource();
+
     M2MResourceInstance* resource_instance;
 
+    M2MObject* obj;
     Callback *callback;
 
     Handler* handler;

@@ -50,7 +50,7 @@ public :
     /**
     * Destructor.
     */
-    virtual ~M2MTLVDeserializer();
+    ~M2MTLVDeserializer();
 
     /**
      * This method checks whether the given binary encodes an object instance

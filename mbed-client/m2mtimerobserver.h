@@ -16,8 +16,8 @@
 #ifndef M2M_TIMER_OBSERVER_H
 #define M2M_TIMER_OBSERVER_H
 
-/**
- *  \brief M2MTimerObserver
+/*! \file m2mtimerobserver.h
+ *  \brief M2MTimerObserver.
  *  Observer class for indicating the timer expiry to the parent class.
  */
 class M2MTimerObserver
@@ -36,7 +36,8 @@ public:
         Dtls,
         QueueSleep,
         RetryTimer,
-        BootstrapTimer
+        BootstrapFlowTimer,
+        RegistrationFlowTimer
     }Type;
 
     /**

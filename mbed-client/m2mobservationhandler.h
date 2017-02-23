@@ -20,8 +20,8 @@
 class M2MBase;
 class M2MResourceInstance;
 
-/**
- * \brief M2MObservationHandler
+/*! \file m2mobservationhandler.h
+ * \brief M2MObservationHandler.
  * An interface for handling observation
  * callbacks from different objects.
  *
@@ -44,11 +44,11 @@ class M2MObservationHandler
                                         bool send_object = false) = 0;
 
     /**
-     * \brief A callback for deleting an NSDL resource.
-     * \param resource_name The name of the observed object whose information
-     * needs to be deleted.
+     * \brief A callback for removing an NSDL resource from the data structures.
+     * \param The M2MBase derived observed object whose information
+     * needs to be removed.
      */
-    virtual void resource_to_be_deleted(const String &resource_name) = 0;
+    virtual void resource_to_be_deleted(M2MBase *base) = 0;
 
     /**
      * \brief A callback indicating that the value of the resource object is updated by server.

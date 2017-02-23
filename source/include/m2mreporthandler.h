@@ -23,6 +23,7 @@
 #include "mbed-client/m2mtimerobserver.h"
 #include "mbed-client/m2mresourceinstance.h"
 #include "mbed-client/m2mvector.h"
+#include "mbed-client/m2mtimer.h"
 
 //FORWARD DECLARATION
 class M2MReportObserver;
@@ -68,13 +69,13 @@ public:
      * @param handler, Handler object for sending
      * observation callbacks.
      */
-    virtual void set_under_observation(bool observed);
+    void set_under_observation(bool observed);
 
     /**
      * @brief Sets the value of the given resource.
      * @param value, Value of the observed resource.
      */
-    virtual void set_value(float value);
+    void set_value(float value);
 
     /**
      * @brief Sets notification trigger.
@@ -90,7 +91,7 @@ public:
      * @param resource_type Type of the Resource.
      * @return true if required attributes are present else false.
      */
-    virtual bool parse_notification_attribute(char *&query,
+    bool parse_notification_attribute(const char *query,
                                               M2MBase::BaseType type,
                                               M2MResourceInstance::ResourceType resource_type = M2MResourceInstance::OPAQUE);
 
@@ -113,7 +114,7 @@ private:
 
 
 
-    bool set_notification_attribute(char* option,
+    bool set_notification_attribute(const char* option,
             M2MBase::BaseType type,
             M2MResourceInstance::ResourceType resource_type);
 
@@ -158,21 +159,21 @@ private:
 
 private:
     M2MReportObserver           &_observer;
-    int                         _pmax;
-    int                         _pmin;
+    uint8_t                     _attribute_state;
+    bool                        _notify;
+    bool                        _pmin_exceeded;
+    bool                        _pmax_exceeded;
+    M2MTimer                    _pmin_timer;
+    M2MTimer                    _pmax_timer;
+    int32_t                     _pmax;
+    int32_t                     _pmin;
+    float                       _current_value;
     float                       _gt;
     float                       _lt;
     float                       _st;
-    bool                        _pmin_exceeded;
-    bool                        _pmax_exceeded;
-    M2MTimer                    *_pmin_timer;
-    M2MTimer                    *_pmax_timer;        
     float                       _high_step;
     float                       _low_step;
-    float                       _current_value;
-    float                       _last_value;    
-    uint8_t                     _attribute_state;
-    bool                        _notify;
+    float                       _last_value;
     m2m::Vector<uint16_t>       _changed_instance_ids;
 
 friend class Test_M2MReportHandler;

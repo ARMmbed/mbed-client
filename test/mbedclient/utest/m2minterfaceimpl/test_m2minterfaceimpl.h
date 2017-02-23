@@ -61,7 +61,7 @@ public:
 
     void test_bootstrap_done();
 
-    void test_bootstrap_error();
+    void test_bootstrap_wait();
 
     void test_coap_data_processed();
 

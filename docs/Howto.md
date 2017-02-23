@@ -12,6 +12,7 @@ As per the OMA LWM2M specification:
 - The client must have created Resources under Object Instance. You can create M2MResource from the M2MObjectInstance class.
 - The client must have created Resource Instances under Resources. You can create M2MResourceInstance from the M2MObjectInstance class.
 
+Read the API doxygen documentation [here](https://docs.mbed.com/docs/mbed-client-guide/en/latest/api/index.html).
 
 ## How to create and configure Objects
 
@@ -35,7 +36,7 @@ Because there can be only one instance of M2MDevice, it is a static class and yo
 
 `M2MDevice::delete_instance();`
 
-Check the [M2MDevice class documentation](https://docs.mbed.com/docs/mbed-client-guide/en/latest/api/classM2MDevice.html) to see how to configure the Device Object. 
+Check the [M2MDevice class documentation](https://docs.mbed.com/docs/mbed-client-guide/en/latest/api/m2mdevice_8h.html) to see how to configure the Device Object. 
 
 #### Security Object
 
@@ -45,7 +46,7 @@ To create a Security Object:
 
 You can create a Bootstrap or normal mbed Device Server by passing the appropriate `enum` value.
 
-Check the [M2MSecurity class documentation](https://docs.mbed.com/docs/mbed-client-guide/en/latest/api/classM2MSecurity.html) to see how to configure the Security Object, as well as how to create appropriate Resources and assign values to them.
+Check the [M2MSecurity class documentation](https://docs.mbed.com/docs/mbed-client-guide/en/latest/api/m2msecurity_8h.html) to see how to configure the Security Object, as well as how to create appropriate Resources and assign values to them.
 
 #### Custom Object
 
@@ -79,7 +80,7 @@ _object->set_operation(M2MBase::GET_PUT_POST_ALLOWED); // This defines the REST 
 
 ##### Setting Observable Mode
 
-To set the Object to be an observing resource:
+To set the Object to be an observable resource:
 
 `virtual void set_observable(bool observable);` 
 
@@ -308,7 +309,7 @@ For each of these types, the Resource and Resource Instances can be either stati
 
 **Creating dynamic and static single-instance Resources**
 
-- To create a single-instance Resource with a static value (`/Test/0/Resource`): [see parameters here](https://docs.mbed.com/docs/mbed-client-guide/en/latest/api/classM2MObjectInstance.html#aaa596f731688730d7a883b7f1251a662) 
+- To create a single-instance Resource with a static value (`/Test/0/Resource`): 
 
 ```
 M2MObject * object = M2MInterfaceFactory::create_object("Test");
@@ -318,19 +319,20 @@ uint8_t value[] ={"value"};
 M2MResource* resource = object_instance->create_static_resource("Resource", "sensor",M2MResourceInstance::INTEGER,value,sizeof(value),false);
 ```
 
-- To create an observable single-instance Resource (`/Test/0/Resource`) with a dynamic value that can be set later on: [see parameters here](https://docs.mbed.com/docs/mbed-client-guide/en/latest/api/classM2MObjectInstance.html#a9b3f88dc2d28512ea6c3db6f74168c3f)  
+- To create an observable single-instance Resource (`/Test/0/Resource`) with a dynamic value that can be set later on:  
 
 ```
 M2MObject * object = M2MInterfaceFactory::create_object("Test");
 M2MObjectInstance * object_instance = object->create_object_instance(0);
 
-uint8_t value[] ={"value"};
-M2MResource* resource = object_instance->create_dynamic_resource("Resource", "sensor",M2MResourceInstance::INTEGER,value,sizeof(value), true, false);
+M2MResource* resource = object_instance->create_dynamic_resource("Resource", "sensor",M2MResourceInstance::INTEGER, true, false);
+int64_t value = 1000;
+resource->set_value(value);
 ```
 
 **Creating dynamic and static Resource Instances**
 
-- To create a Resource Instance (`/Test/0/Resource/0`) with a static value: [see parameters here](https://docs.mbed.com/docs/mbed-client-guide/en/latest/api/classM2MObjectInstance.html#a6acac6e65bfbc8b731ab4afcc805c41b)
+- To create a Resource Instance (`/Test/0/Resource/0`) with a static value:
 
 ```
 M2MObject * object = M2MInterfaceFactory::create_object("Test");
@@ -341,14 +343,17 @@ M2MResourceInstance* resource_instance = object_instance->create_static_resource
 ```
 
 
-- To create an observable Resource Instance (`/Test/0/Resource/0`) with a dynamic value that can be set later on: [see parameters here](https://docs.mbed.com/docs/mbed-client-guide/en/latest/api/classM2MObjectInstance.html#adcaba046a484282983380edf8a370cfa)  
+- To create an observable Resource Instance (`/Test/0/Resource/0`) with a dynamic value that can be set later on: 
 
 ```
 M2MObject * object = M2MInterfaceFactory::create_object("Test");
 M2MObjectInstance * object_instance = object->create_object_instance(0);
 
 uint8_t value[] ={"value"};
-M2MResource* resource = object_instance->create_dynamic_resource_instance("Resource", "sensor",M2MResourceInstance::INTEGER,value,sizeof(value), true, 0);
+M2MResourceInstance* resource_instance = object_instance->create_dynamic_resource_instance("Resource", "sensor",M2MResourceInstance::INTEGER, true, 0);
+int64_t value = 1000;
+resource_instance->set_value(value);
+
 ```
 
 #### Configuring the Resource and Resource Instance
@@ -368,6 +373,7 @@ virtual void set_operation(M2MBase::Operation operation);
 resource->set_operation(M2MBase::GET_PUT_POST_ALLOWED); // This defines the REST operations that can be performed on this Resource.
 resource_instance->set_operation(M2MBase::GET_PUT_POST_ALLOWED); // This defines the REST operations that can be performed on this Resource Instance.
 ```
+
 ##### Setting Observable Mode
 
 To set the Resource or Resource Instance to be an observable resource:
@@ -406,6 +412,7 @@ void execute_function_example(void *) {
 };
 resource->set_execute_function(execute_callback(this,&execute_function_example));
 ```
+
 In case execute callback function is defined as a global function and it's outside of your class scope you can use overloaded set_execute_function:
 ```
 virtual void set_execute_function(execute_callback_2 callback);
@@ -414,4 +421,48 @@ static void c_style_function(void *) {
 }
 resource->set_execute_function(&c_style_function);
 ```
-There are additional APIs that provide getter and remove functions for Resource and Resource Instances in the `M2MResource` and `M2MResourceInstance` classes. Check [the API documentation](https://docs.mbed.com/docs/mbed-client-guide/en/latest/api/annotated.html) for their usage. 
+There are additional APIs that provide getter and remove functions for Resource and Resource Instances in the `M2MResource` and `M2MResourceInstance` classes. Check [the API documentation](https://docs.mbed.com/docs/mbed-client-guide/en/latest/api/annotated.html) for their usage.
+
+##### Setting an external handler for block-wise messages
+
+For dynamic Resources, you can pass a function pointer to the Resource Instance. It will be executed when mbed Device Server calls a `PUT` method on that resource with large payload using block-wise operation. The Resource must support the `PUT` operation mode for this feature to work. If the callback is set, the application will be notified for every incoming block-wise message and the message is not stored in mbed Client side anymore. In such case, it is application's responsibility to store each block-wise message and combine them when the last block has arrived. 
+
+<span class="notes">**Note:** Due to a limitation in the mbed-client-c library, GET request can only contain data up to 65KB.</span>
+
+To pass the function pointer for an incoming block-wise message:
+
+```
+virtual void set_incoming_block_message_callback(incoming_block_message_callback callback);
+void block_message_received(M2MBlockMessage *argument) {
+// Code
+}
+resource->set_incoming_block_message_callback(incoming_block_message_callback(this, &block_message_received));
+```
+
+To pass the function pointer for an outgoing block-wise message:
+
+```
+virtual void set_outgoing_block_message_callback(outgoing_block_message_callback callback);
+void block_message_requested(const String& resource, uint8_t *&data, uint32_t &len) {
+// Code
+}
+resource->set_outgoing_block_message_callback(outgoing_block_message_callback(this, &block_message_requested));
+```
+
+Applications can define their own maximum incoming message size in bytes at build time. For mbed OS, create a `mbed_app.json` file in the application level and overwrite the value as described below:
+
+```
+"target_overrides": {
+        "*": {
+            "mbed-client.sn-coap-max-incoming-message-size": 100000
+        }
+
+```
+
+For yotta based builds, you need to create a `config.json` file in the application level:
+
+```
+{
+"coap_max_incoming_block_message_size": 100000
+}
+```

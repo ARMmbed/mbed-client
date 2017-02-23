@@ -27,7 +27,7 @@ class M2MServer;
 class M2MInterfaceImpl;
 class M2MFirmware;
 
-/**
+/*! \file m2minterfacefactory.h
  *  \brief M2MInterfaceFactory.
  *  This is a factory class that provides an interface for creating an mbed Client Interface
  *  object for an application to utilize the LWM2M features provided by the client.
@@ -35,10 +35,10 @@ class M2MFirmware;
 
 class  M2MInterfaceFactory {
 private:
-    // Prevents the use of assignment operator by accident.
+    // Prevents the use of an assignment operator by accident.
     M2MInterfaceFactory& operator=( const M2MInterfaceFactory& /*other*/ );
 
-    // Prevents the use of copy constructor by accident
+    // Prevents the use of a copy constructor by accident.
     M2MInterfaceFactory( const M2MInterfaceFactory& /*other*/ );
 
 public:
@@ -47,8 +47,8 @@ public:
      * \brief Creates an interface object for the mbed Client Inteface. With this, the
      * client can handle client operations like Bootstrapping, Client
      * Registration, Device Management and Information Reporting.
-     * \param endpoint_name The endpoint name of the mbed client.
-     * \param endpoint_type The endpoint type of the mbed client, default is empty.
+     * \param endpoint_name The endpoint name of mbed Client.
+     * \param endpoint_type The endpoint type of mbed Client, default is empty.
      * \param life_time The lifetime of the endpoint in seconds,
      *        if -1 it is optional.
      * \param listen_port The listening port for the endpoint, default is 5683.
@@ -80,7 +80,7 @@ public:
     /**
      * \brief Creates a server object for the mbed Client Inteface. With this, the 
      * client can manage the server resources used for client operations
-     * such as Client Registration, server lifetime etc.
+     * such as Client Registration, server lifetime.
      * \return M2MServer An object for managing server client operations.
      */
     static M2MServer *create_server();

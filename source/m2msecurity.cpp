@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include <cstdio>
 #include "mbed-client/m2msecurity.h"
 #include "mbed-client/m2mconstants.h"
 #include "mbed-client/m2mobject.h"
@@ -21,12 +20,15 @@
 #include "mbed-client/m2mresource.h"
 #include "mbed-client/m2mstring.h"
 #include "mbed-trace/mbed_trace.h"
+
+#include <stdlib.h>
+
 #define TRACE_GROUP "mClt"
 
 #define BUFFER_SIZE 21
 
 M2MSecurity::M2MSecurity(ServerType ser_type)
-: M2MObject(M2M_SECURITY_ID),
+: M2MObject(M2M_SECURITY_ID, stringdup(M2M_SECURITY_ID)),
  _server_instance(NULL),
  _server_type(ser_type)
 {
@@ -134,7 +136,7 @@ M2MResource* M2MSecurity::create_resource(SecurityResource resource, uint32_t va
 bool M2MSecurity::delete_resource(SecurityResource resource)
 {
     bool success = false;
-    const char* security_id_ptr = "";
+    const char* security_id_ptr;
     switch(resource) {
         case SMSSecurityMode:
            security_id_ptr = SECURITY_SMS_SECURITY_MODE;
@@ -152,14 +154,13 @@ bool M2MSecurity::delete_resource(SecurityResource resource)
             break;
         default:
             // Others are mandatory resources hence cannot be deleted.
+            security_id_ptr = NULL;
             break;
     }
 
-    const String security_id(security_id_ptr);
-
-    if(!security_id.empty()) {
+    if(security_id_ptr) {
         if(_server_instance) {
-            success = _server_instance->remove_resource(security_id);
+            success = _server_instance->remove_resource(security_id_ptr);
         }
     }
     return success;
@@ -209,7 +210,8 @@ bool M2MSecurity::set_resource_value(SecurityResource resource,
     if(res) {
         if(M2MSecurity::PublicKey == resource           ||
            M2MSecurity::ServerPublicKey == resource     ||
-           M2MSecurity::Secretkey == resource) {
+           M2MSecurity::Secretkey == resource           ||
+           M2MSecurity::M2MServerUri == resource) {
             success = res->set_value(value,length);
         }
     }
@@ -312,7 +314,7 @@ M2MResource* M2MSecurity::get_resource(SecurityResource res) const
 {
     M2MResource* res_object = NULL;
     if(_server_instance) {
-        const char* res_name_ptr = "";
+        const char* res_name_ptr = NULL;
         switch(res) {
             case M2MServerUri:
                 res_name_ptr = SECURITY_M2M_SERVER_URI;
@@ -351,9 +353,10 @@ M2MResource* M2MSecurity::get_resource(SecurityResource res) const
                 res_name_ptr = SECURITY_CLIENT_HOLD_OFF_TIME;
                 break;
         }
-        const String res_name(res_name_ptr);
 
-        res_object = _server_instance->resource(res_name);
+        if (res_name_ptr) {
+            res_object = _server_instance->resource(res_name_ptr);
+        }
     }
     return res_object;
 }

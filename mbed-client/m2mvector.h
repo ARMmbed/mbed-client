@@ -17,7 +17,10 @@
 #ifndef M2M_VECTOR_H
 #define M2M_VECTOR_H
 
-#include <stdio.h>
+/*! \file m2mvector.h
+* \brief A simple C++ Vector class, used as replacement for std::vector.
+*/
+
 
 namespace m2m
 {

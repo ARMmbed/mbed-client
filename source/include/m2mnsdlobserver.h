@@ -76,6 +76,13 @@ public :
     virtual void bootstrap_done(M2MSecurity *security_object) = 0;
 
     /**
+    * @brief Informs that client bootstrapping is waiting for message to be sent.
+    * @param security_object, M2MSecurity Object which contains information about
+    * LWM2M server fetched from bootstrap server.
+    */
+    virtual void bootstrap_wait(M2MSecurity *security_object) = 0;
+
+    /**
     * @brief Informs that some error occured during
     * bootstrapping.
     */

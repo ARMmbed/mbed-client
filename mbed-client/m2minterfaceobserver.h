@@ -22,7 +22,7 @@
 //FORWARD DECLARATION
 class M2MServer;
 
-/**
+/*! \file m2minterfaceobserver.h
  * \brief M2MInterfaceObserver
  * This is an observer class that updates the calling application about
  * various events associated with various Interface operations.

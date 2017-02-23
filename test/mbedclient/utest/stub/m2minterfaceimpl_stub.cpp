@@ -17,14 +17,12 @@
 #include "common_stub.h"
 
 u_int8_t m2minterfaceimpl_stub::int_value;
-String m2minterfaceimpl_stub::string_value;
 bool m2minterfaceimpl_stub::bool_value;
 
 void m2minterfaceimpl_stub::clear()
 {
     int_value = 0;
     bool_value = false;
-    string_value = "";
 }
 
 M2MInterfaceImpl::M2MInterfaceImpl(M2MInterfaceObserver& observer,
@@ -33,14 +31,18 @@ M2MInterfaceImpl::M2MInterfaceImpl(M2MInterfaceObserver& observer,
                                    const int32_t,
                                    const uint16_t,
                                    const String &,
-                                   M2MInterface::BindingMode,
-                                   M2MInterface::NetworkStack,
+                                   M2MInterface::BindingMode mode,
+                                   M2MInterface::NetworkStack stack,
                                    const String &)
 : _observer(observer),
   _current_state(0),
   _max_states( STATE_MAX_STATES ),
   _event_generated(false),
-  _event_data(NULL)
+  _event_data(NULL),
+  _queue_sleep_timer(*this),
+  _retry_timer(*this),
+  _connection_handler(*this, NULL, mode, stack),
+  _nsdl_interface(*this, _connection_handler)
 {
 }
 
@@ -60,6 +62,11 @@ void M2MInterfaceImpl::register_object(M2MSecurity *, const M2MObjectList &)
 }
 
 void M2MInterfaceImpl::update_registration(M2MSecurity *, const uint32_t)
+{
+}
+void M2MInterfaceImpl::update_registration(M2MSecurity *,
+                                           const M2MObjectList &,
+                                           const uint32_t)
 {
 }
 
@@ -110,6 +117,11 @@ void M2MInterfaceImpl::client_unregistered()
 }
 
 void M2MInterfaceImpl::bootstrap_done(M2MSecurity *)
+{
+
+}
+
+void M2MInterfaceImpl::bootstrap_wait(M2MSecurity *)
 {
 
 }

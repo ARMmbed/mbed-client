@@ -24,6 +24,7 @@ namespace m2mconnectionhandler_stub
     extern int int_value;
     extern uint16_t uint_value;
     extern bool bool_value;
+    extern int mutex_count;
     void clear();
 }
 

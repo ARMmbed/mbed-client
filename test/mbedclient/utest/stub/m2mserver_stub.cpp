@@ -17,19 +17,17 @@
 
 uint32_t m2mserver_stub::int_value;
 bool m2mserver_stub::bool_value;
-String m2mserver_stub::string_value;
 M2MResource* m2mserver_stub::resource;
 
 void m2mserver_stub::clear()
 {
     int_value = 0;
     bool_value = false;
-    string_value = "";
     resource = NULL;
 }
 
 M2MServer::M2MServer()
-: M2MObject("2")
+: M2MObject("1", "1")
 {
 }
 
@@ -66,7 +64,7 @@ bool M2MServer::set_resource_value(ServerResource,
 
 String M2MServer::resource_value_string(ServerResource) const
 {
-    return m2mserver_stub::string_value;
+    return String("");
 }
 
 

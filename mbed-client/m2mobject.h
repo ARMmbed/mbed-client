@@ -23,15 +23,14 @@
 //FORWARD DECLARATION
 typedef Vector<M2MObjectInstance *> M2MObjectInstanceList;
 
-/**
+/*! \file m2mobject.h
  *  \brief M2MObject.
  *  This class is the base class for the mbed Client Objects. All defined
  *  LWM2M object models can be created based on it. This class also holds all object
  *  instances associated with the given object.
  */
 
-class M2MObject : public M2MBase,
-                  public M2MObjectCallback
+class M2MObject : public M2MBase
 {
 
 friend class M2MInterfaceFactory;
@@ -41,8 +40,13 @@ protected :
     /**
      * \brief Constructor
      * \param name The name of the object.
+     * \param path Path of the object like 3/0/1
+     * \param external_blockwise_store If true CoAP blocks are passed to application through callbacks
+     *        otherwise handled in mbed-client-c.
      */
-    M2MObject(const String &object_name);
+    M2MObject(const String &object_name,
+              char *path,
+              bool external_blockwise_store = false);
 
     // Prevents the use of default constructor.
     M2MObject();
@@ -52,6 +56,12 @@ protected :
 
     // Prevents the use of copy constructor.
     M2MObject( const M2MObject& /*other*/ );
+
+    /**
+     * \brief Constructor
+     * \param name The name of the object.
+     */
+    M2MObject(const M2MBase::lwm2m_parameters_s* static_res);
 
 public:
 
@@ -66,6 +76,11 @@ public:
      * \return M2MObjectInstance. An object instance for managing other client operations.
      */
     M2MObjectInstance* create_object_instance(uint16_t instance_id = 0);
+
+    /**
+     * TODO!!
+     */
+    M2MObjectInstance* create_object_instance(const lwm2m_parameters_s* s);
 
     /**
      * \brief Removes the object instance resource with the given instance id.
@@ -149,15 +164,17 @@ public:
     virtual sn_coap_hdr_s* handle_post_request(nsdl_s *nsdl,
                                                sn_coap_hdr_s *received_coap_header,
                                                M2MObservationHandler *observation_handler,
-                                               bool &execute_value_updated);
+                                               bool &execute_value_updated,
+                                               sn_nsdl_addr_s *address = NULL);
+
+    virtual void notification_update(uint16_t obj_instance_id);
 
 protected :
 
-     virtual void notification_update(uint16_t obj_instance_id);
 
 private:
 
-    M2MObjectInstanceList     _instance_list; // owned    
+    M2MObjectInstanceList     _instance_list; // owned
     uint16_t                  _max_instance_count;
 
 friend class Test_M2MObject;
@@ -165,7 +182,14 @@ friend class Test_M2MInterfaceImpl;
 friend class Test_M2MNsdlInterface;
 friend class Test_M2MTLVSerializer;
 friend class Test_M2MTLVDeserializer;
-
+friend class Test_M2MDevice;
+friend class Test_M2MFirmware;
+friend class Test_M2MBase;
+friend class Test_M2MObjectInstance;
+friend class Test_M2MResource;
+friend class Test_M2MSecurity;
+friend class Test_M2MServer;
+friend class Test_M2MResourceInstance;
 };
 
 #endif // M2M_OBJECT_H

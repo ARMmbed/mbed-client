@@ -5,3 +5,7 @@ test/lwm2mtestapplication/*
 test/lwm2m/*
 coverage/*
 results/*
+
+# ignore for PAL tools
+/CMakeLists.txt
+port_libs/*

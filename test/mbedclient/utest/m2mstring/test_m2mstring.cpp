@@ -28,11 +28,20 @@ Test_M2MString::~Test_M2MString()
     delete str;
 }
 
+void Test_M2MString::test_string_and_len_constructor()
+{
+    // make sure the len parameter works as expected
+    String s("hello_world", 5);
+    CHECK(s == "hello");
+    CHECK(s.size() == 5);
+}
+
 void Test_M2MString::test_copy_constructor()
 {
     String s("name");
     String s1(s);
     CHECK(s1.p[1] == 'a');
+    CHECK(s.size() == s1.size());
 }
 
 void Test_M2MString::test_operator_assign()

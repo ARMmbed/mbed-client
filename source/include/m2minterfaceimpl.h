@@ -21,15 +21,15 @@
 #include "mbed-client/m2mconnectionobserver.h"
 #include "mbed-client/m2mconnectionsecurity.h"
 #include "include/m2mnsdlobserver.h"
+#include "include/m2mnsdlinterface.h"
 #include "mbed-client/m2mtimerobserver.h"
+#include "mbed-client/m2mtimer.h"
+#include "mbed-client/m2mconnectionhandler.h"
 
 //FORWARD DECLARATION
-class M2MNsdlInterface;
-class M2MConnectionHandler;
 class M2MConnectionSecurity;
 class EventData;
-class M2MTimer;
-
+class M2MUpdateRegisterData;
 /**
  *  @brief M2MInterfaceImpl.
  *  This class implements handling of all mbed Client Interface operations
@@ -58,14 +58,14 @@ private:
      * @brief Constructor
      * @param observer, Observer to pass the event callbacks for various
      * interface operations.
-     * @param endpoint_name, Endpoint name of the client.
-     * @param endpoint_type, Endpoint type of the client.
-     * @param life_time, Life time of the client in seconds
-     * @param listen_port, Listening port for the endpoint, default is 8000.
-     * @param domain, Domain of the client.
-     * @param mode, Binding mode of the client, default is UDP
-     * @param stack, Network Stack to be used for connection, default is LwIP_IPv4
-     * @param context_address, Context address default is empty.
+     * @param endpoint_name Endpoint name of the client.
+     * @param endpoint_type Endpoint type of the client.
+     * @param life_time Life time of the client in seconds
+     * @param listen_port Listening port for the endpoint, default is 8000.
+     * @param domain Domain of the client.
+     * @param mode Binding mode of the client, default is UDP
+     * @param stack Network stack to be used for connection, default is LwIP_IPv4.
+     * @param context_address Context address, default is empty.
      */
     M2MInterfaceImpl(M2MInterfaceObserver& observer,
                      const String &endpoint_name,
@@ -87,7 +87,7 @@ public:
     /**
      * @brief Initiates bootstrapping of the client with the provided Bootstrap
      * server information.
-     * @param security_object, Security object which contains information
+     * @param security_object Security object which contains information
      * required for successful bootstrapping of the client.
      */
     virtual void bootstrap(M2MSecurity *security);
@@ -102,11 +102,11 @@ public:
     /**
      * @brief Initiates registration of the provided Security object to the
      * corresponding LWM2M server.
-     * @param security_object, Security object which contains information
+     * @param security_object Security object which contains information
      * required for registering to the LWM2M server.
      * If client wants to register to multiple LWM2M servers then it has call
      * this function once for each of LWM2M server object separately.
-     * @param object_list, Objects which contains information
+     * @param object_list Objects which contains information
      * which the client want to register to the LWM2M server.
      */
     virtual void register_object(M2MSecurity *security_object, const M2MObjectList &object_list);
@@ -114,39 +114,53 @@ public:
     /**
      * @brief Updates or refreshes the client's registration on the LWM2M
      * server.
-     * @param security_object, Security object from which the device object
+     * @param security_object Security object from which the device object
      * needs to update registration, if there is only one LWM2M server registered
      * then this parameter can be NULL.
-     * @param lifetime, Lifetime for the endpoint client in seconds.
+     * @param lifetime Lifetime for the endpoint client in seconds.
      */
     virtual void update_registration(M2MSecurity *security_object, const uint32_t lifetime = 0);
 
     /**
+     * @brief Updates or refreshes the client's registration on the LWM2M
+     * server. Use this function to publish new objects to LWM2M server.
+     * @param security_object The security object from which the device object
+     * needs to update the registration. If there is only one LWM2M server registered,
+     * this parameter can be NULL.
+     * @param object_list Objects that contain information about the
+     * client attempting to register to the LWM2M server.
+     * @param lifetime The lifetime of the endpoint client in seconds. If the same value
+     * has to be passed, set the default value to 0.
+     */
+    virtual void update_registration(M2MSecurity *security_object, const M2MObjectList &object_list,
+                                     const uint32_t lifetime = 0);
+
+    /**
      * @brief Unregisters the registered object from the LWM2M server
-     * @param security_object, Security object from which the device object
-     * needs to be unregistered, if there is only one LWM2M server registered
-     * then this parameter can be NULL.
+     * @param security_object Security object from which the device object
+     * needs to be unregistered. If there is only one LWM2M server registered
+     * this parameter can be NULL.
      */
     virtual void unregister_object(M2MSecurity* security = NULL);
 
     /**
      * @brief Sets the function which will be called indicating client
      * is going to sleep when the Binding mode is selected with Queue mode.
-     * @param callback, Function pointer which will be called when client
-     * goes to seleep.
+     * @param callback A function pointer that will be called when client
+     * goes to sleep.
      */
     virtual void set_queue_sleep_handler(callback_handler handler);
 
     /**
      * @brief Sets the network interface handler that is used by client to connect
-     * to a network over IP..
+     * to a network over IP.
      * @param handler A network interface handler that is used by client to connect.
      *  This API is optional but provides a mechanism for different platforms to
      * manage usage of underlying network interface by client.
      */
     virtual void set_platform_network_handler(void *handler = NULL);
 
-/**
+    /**
      * \brief Sets the function callback that will be called by mbed-client for
      * fetching random number from application for ensuring strong entropy.
      * \param random_callback A function pointer that will be called by mbed-client
@@ -182,6 +196,8 @@ protected: // From M2MNsdlObserver
     virtual void client_unregistered();
 
     virtual void bootstrap_done(M2MSecurity *security_object);
+
+    virtual void bootstrap_wait(M2MSecurity *security_object);
 
     virtual void bootstrap_error();
 
@@ -246,11 +262,6 @@ private: // state machine state functions
     void state_register_address_resolved( EventData *data);
 
     /**
-    * When the register resource is created.
-    */
-    void state_register_resource_created( EventData *data);
-
-    /**
     * When the client is registered.
     */
     void state_registered( EventData *data);
@@ -306,6 +317,11 @@ private: // state machine state functions
     void state_waiting( EventData *data);
 
     /**
+     * Start registration update.
+     */
+    void start_register_update(M2MUpdateRegisterData *data);
+
+    /**
     * State enumeration order must match the order of state
     * method entries in the state map
     */
@@ -314,10 +330,10 @@ private: // state machine state functions
         STATE_BOOTSTRAP,
         STATE_BOOTSTRAP_ADDRESS_RESOLVED,
         STATE_BOOTSTRAP_RESOURCE_CREATED,
-        STATE_BOOTSTRAPPED,
-        STATE_REGISTER, //5
+        STATE_BOOTSTRAP_WAIT,
+        STATE_BOOTSTRAPPED, //5
+        STATE_REGISTER,
         STATE_REGISTER_ADDRESS_RESOLVED,
-        STATE_REGISTER_RESOURCE_CREATED,
         STATE_REGISTERED,
         STATE_UPDATE_REGISTRATION,
         STATE_UNREGISTER, //10
@@ -334,7 +350,7 @@ private: // state machine state functions
     /**
      * @brief Redirects the state machine to right function.
      * @param current_state Current state to be set.
-     * @param data, Data to be passed to the state function.
+     * @param data Data to be passed to the state function.
      */
     void state_function( uint8_t current_state, EventData* data  );
 
@@ -345,15 +361,15 @@ private: // state machine state functions
 
     /**
     * External event which can trigger the state machine.
-    * @param New State which the state machine should go to.
-    * @param data to be passed to the state machine.
+    * @param New The state to which the state machine should go.
+    * @param data The data to be passed to the state machine.
     */
     void external_event(uint8_t, EventData* = NULL);
 
     /**
     * Internal event generated by state machine.
     * @param New State which the state machine should go to.
-    * @param data to be passed to the state machine.
+    * @param data The data to be passed to the state machine.
     */
     void internal_event(uint8_t, EventData* = NULL);
 
@@ -366,44 +382,43 @@ private: // state machine state functions
     /**
      * Helper method for extracting the IP address part and port from the
      * given server address.
-     * @param server_address source url (without "coap" or "coaps" prefix)
-     * @param ip_address extracted IP
-     * @param port extracted port
+     * @param server_address Source URL (without "coap" or "coaps" prefix).
+     * @param ip_address The extracted IP.
+     * @param port The extracted port.
      */
     static void process_address(const String& server_address, String& ip_address, uint16_t& port);
 
 private:
 
-    M2MInterfaceObserver        &_observer;
-    M2MConnectionHandler        *_connection_handler;
-    M2MConnectionSecurity       *_security_connection; // Doesn't own
-    M2MNsdlInterface            *_nsdl_interface;
-    uint8_t                     _current_state;
-    const int                   _max_states;
-    bool                        _event_generated;
     EventData                   *_event_data;
+    M2MTimer                    *_registration_flow_timer;
+    uint16_t                    _server_port;
+    uint16_t                    _listen_port;
     String                      _endpoint_type;
     String                      _domain;
     int32_t                     _life_time;
-    BindingMode                 _binding_mode;
     String                      _context_address;
-    uint16_t                    _listen_port;
-    uint16_t                    _server_port;
     String                      _server_ip_address;
     M2MSecurity                 *_register_server; //TODO: to be the list not owned
-    bool                        _event_ignored;
-    bool                        _register_ongoing;
-    bool                        _update_register_ongoing;
-    M2MTimer                    *_queue_sleep_timer;
-    M2MTimer                    *_retry_timer;
-    M2MTimer                    *_bootstrap_timer;
+    M2MTimer                    _queue_sleep_timer;
+    M2MTimer                    _retry_timer;
     callback_handler            _callback_handler;
-    M2MSecurity                 *_security;
-    uint8_t                     _retry_count;
+    const uint8_t               _max_states;
+    bool                        _event_ignored;
+    bool                        _event_generated;
     bool                        _reconnecting;
     bool                        _retry_timer_expired;
+    bool                        _bootstrapped;
+    uint8_t                     _current_state;
+    uint8_t                     _retry_count;
+    BindingMode                 _binding_mode;
+    M2MInterfaceObserver        &_observer;
+    M2MConnectionSecurity       *_security_connection; // Doesn't own
+    M2MConnectionHandler        _connection_handler;
+    M2MNsdlInterface            _nsdl_interface;
+    M2MSecurity                 *_security;
 
-   friend class Test_M2MInterfaceImpl;
+    friend class Test_M2MInterfaceImpl;
 
 };
 

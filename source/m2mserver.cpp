@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include <cstdio>
+
 #include "mbed-client/m2mserver.h"
 #include "mbed-client/m2mconstants.h"
 #include "mbed-client/m2mobject.h"
@@ -26,7 +26,7 @@
 #define BUFFER_SIZE 21
 
 M2MServer::M2MServer()
-: M2MObject(M2M_SERVER_ID)
+: M2MObject(M2M_SERVER_ID, stringdup(M2M_SERVER_ID))
 {
     M2MObject::create_object_instance();
 
@@ -151,14 +151,13 @@ bool M2MServer::delete_resource(ServerResource resource)
             server_id_ptr = SERVER_DISABLE_TIMEOUT;
             break;
         default:
-            server_id_ptr = "";
+            server_id_ptr = NULL;
             break;
     }
-    String server_id(server_id_ptr);
-    
-    if(!server_id.empty()) {
+
+    if(server_id_ptr) {
         if(_server_instance) {
-            success = _server_instance->remove_resource(server_id);
+            success = _server_instance->remove_resource(server_id_ptr);
         }
     }
     return success;
@@ -248,7 +247,7 @@ uint16_t M2MServer::total_resource_count() const
 M2MResource* M2MServer::get_resource(ServerResource res) const
 {
     M2MResource* res_object = NULL;
-    const char* res_name_ptr = "";
+    const char* res_name_ptr = NULL;
     switch(res) {
     case ShortServerID:
         res_name_ptr = SERVER_SHORT_SERVER_ID;
@@ -279,11 +278,9 @@ M2MResource* M2MServer::get_resource(ServerResource res) const
         break;
     }
 
-    const String res_name(res_name_ptr);
-
-    if(!res_name.empty()) {
+    if(res_name_ptr) {
         if(_server_instance) {
-        res_object = _server_instance->resource(res_name);
+            res_object = _server_instance->resource(res_name_ptr);
         }
     }
     return res_object;

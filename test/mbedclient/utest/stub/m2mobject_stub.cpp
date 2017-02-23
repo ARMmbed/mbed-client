@@ -19,7 +19,7 @@ u_int16_t m2mobject_stub::int_value;
 bool m2mobject_stub::bool_value;
 M2MObjectInstance* m2mobject_stub::inst;
 
-// The statically initialized object list must be bigh enough to cater 
+// The statically initialized object list must be bigh enough to cater
 // for all the tests, or the utest framework will complain for memory leak.
 M2MObjectInstanceList m2mobject_stub::instance_list(12);
 
@@ -35,24 +35,26 @@ void m2mobject_stub::clear()
     header = NULL;
 }
 
-M2MObject::M2MObject(const String &object_name)
-: M2MBase(object_name,M2MBase::Dynamic)
+M2MObject::M2MObject(const String &object_name, char *path, bool external_blockwise_store)
+: M2MBase(object_name,
+          M2MBase::Dynamic,
+          "",
+          path,
+          external_blockwise_store),
+  _max_instance_count(65535)
 {
+
+}
+
+M2MObject::M2MObject(const M2MBase::lwm2m_parameters_s* static_res)
+: M2MBase(static_res),
+  _max_instance_count(65535)
+{
+
 }
 
 M2MObject::~M2MObject()
 {
-}
-
-M2MObject& M2MObject::operator=(const M2MObject& )
-{
-    return *this;
-}
-
-M2MObject::M2MObject(const M2MObject& other)
-: M2MBase(other)
-{
-    *this = other;
 }
 
 M2MObjectInstance* M2MObject::create_object_instance(uint16_t instance_id)
@@ -114,7 +116,8 @@ sn_coap_hdr_s* M2MObject::handle_put_request(nsdl_s *,
 sn_coap_hdr_s* M2MObject::handle_post_request(nsdl_s *,
                                    sn_coap_hdr_s *,
                                    M2MObservationHandler *,
-                                   bool &)
+                                   bool &,
+                                   sn_nsdl_addr_s *)
 {
     return m2mobject_stub::header;
 }

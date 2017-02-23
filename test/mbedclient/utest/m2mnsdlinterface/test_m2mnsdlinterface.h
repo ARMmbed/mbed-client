@@ -62,10 +62,6 @@ public:
 
     void test_resource_callback_delete();
 
-    void test_resource_callback_reset();
-
-    void test_bootstrap_done_callback();
-
     void test_process_received_data();
 
     void test_stop_timers();
@@ -88,11 +84,17 @@ public:
 
     void test_get_nsdl_handle();
 
+    void test_set_connection_handler();
+
+    void test_claim_release_mutex();
+
     void test_endpoint_name();
 
     M2MNsdlInterface* nsdl;
 
     TestObserver *observer;
+
+    M2MConnectionHandler *connection_handler;
 };
 
 #endif // TEST_M2M_NSDL_INTERFACE_H

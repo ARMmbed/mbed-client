@@ -16,19 +16,22 @@
 //CppUTest includes should be after your and system includes
 #include "CppUTest/TestHarness.h"
 #include "test_m2minterfaceimpl.h"
+#include "m2mnsdlinterface_stub.h"
 
 TEST_GROUP(M2MInterfaceImpl)
 {
-  Test_M2MInterfaceImpl* m2m_interface_impl;
+    Test_M2MInterfaceImpl* m2m_interface_impl;
 
-  void setup()
-  {
-    m2m_interface_impl = new Test_M2MInterfaceImpl();
-  }
-  void teardown()
-  {
-    delete m2m_interface_impl;
-  }
+    void setup()
+    {
+        m2mnsdlinterface_stub::string_value = new String();
+        m2m_interface_impl = new Test_M2MInterfaceImpl();
+    }
+    void teardown()
+    {
+        delete m2mnsdlinterface_stub::string_value;
+        delete m2m_interface_impl;
+    }
 };
 
 TEST(M2MInterfaceImpl, create)
@@ -111,14 +114,14 @@ TEST(M2MInterfaceImpl, client_unregistered)
     m2m_interface_impl->test_client_unregistered();
 }
 
+TEST(M2MInterfaceImpl, bootstrap_wait)
+{
+    m2m_interface_impl->test_bootstrap_wait();
+}
+
 TEST(M2MInterfaceImpl, bootstrap_done)
 {
     m2m_interface_impl->test_bootstrap_done();
-}
-
-TEST(M2MInterfaceImpl, bootstrap_error)
-{
-    m2m_interface_impl->test_bootstrap_error();
 }
 
 TEST(M2MInterfaceImpl, coap_data_processed)
@@ -155,3 +158,4 @@ TEST(M2MInterfaceImpl, timer_expired)
 {
     m2m_interface_impl->test_timer_expired();
 }
+

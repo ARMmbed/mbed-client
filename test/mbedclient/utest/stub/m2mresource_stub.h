@@ -21,12 +21,13 @@
 //some internal test related stuff
 namespace m2mresource_stub
 {
-    extern uint32_t int_value;    
+    extern uint32_t int_value;
     extern uint8_t* delayed_token;
     extern uint8_t delayed_token_len;
     extern bool bool_value;
     extern M2MResourceInstanceList list;
     extern M2MResourceInstance *instance;
+    extern M2MObjectInstance *object_instance;
     void clear();
     extern sn_coap_hdr_s *header;
 }

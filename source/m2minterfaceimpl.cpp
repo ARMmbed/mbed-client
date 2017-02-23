@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 #include <assert.h>
+#include <stdlib.h>
 #include "include/m2minterfaceimpl.h"
 #include "include/eventdata.h"
 #include "mbed-client/m2minterfaceobserver.h"
@@ -26,7 +27,11 @@
 #include "mbed-client/m2mtimer.h"
 #include "mbed-trace/mbed_trace.h"
 
+#include <stdlib.h>
+
 #define TRACE_GROUP "mClt"
+
+#define RESOLVE_SEC_MODE(mode)  ((mode == M2MInterface::TCP || mode == M2MInterface::TCP_QUEUE) ? M2MConnectionSecurity::TLS : M2MConnectionSecurity::DTLS)
 
 M2MInterfaceImpl::M2MInterfaceImpl(M2MInterfaceObserver& observer,
                                    const String &ep_name,
@@ -37,58 +42,49 @@ M2MInterfaceImpl::M2MInterfaceImpl(M2MInterfaceObserver& observer,
                                    M2MInterface::BindingMode mode,
                                    M2MInterface::NetworkStack stack,
                                    const String &con_addr)
-: _observer(observer),
-  _nsdl_interface(new M2MNsdlInterface(*this)),
-  _current_state(0),
-  _max_states( STATE_MAX_STATES ),
-  _event_generated(false),
-  _event_data(NULL),
+: _event_data(NULL),
+  _registration_flow_timer(NULL),
+  _server_port(0),
+  _listen_port(listen_port),
   _endpoint_type(ep_type),
   _domain( dmn),
   _life_time(l_time),
-  _binding_mode(mode),
   _context_address(con_addr),
-  _listen_port(listen_port),
-  _server_port(0),
   _register_server(NULL),
-  _event_ignored(false),
-  _register_ongoing(false),
-  _update_register_ongoing(false),
-  _queue_sleep_timer(new M2MTimer(*this)),
-  _retry_timer(new M2MTimer(*this)),
-  _bootstrap_timer(NULL),
+  _queue_sleep_timer(*this),
+  _retry_timer(*this),
   _callback_handler(NULL),
-  _security(NULL),
-  _retry_count(0),
+  _max_states( STATE_MAX_STATES ),
+  _event_ignored(false),
+  _event_generated(false),
   _reconnecting(false),
-  _retry_timer_expired(false)
+  _retry_timer_expired(false),
+  _bootstrapped(true), // True as default to get it working with connector only configuration
+  _current_state(0),
+  _retry_count(0),
+  _binding_mode(mode),
+  _observer(observer),
+  _security_connection( new M2MConnectionSecurity( RESOLVE_SEC_MODE(mode) )),
+  _connection_handler(*this, _security_connection, mode, stack),
+  _nsdl_interface(*this, _connection_handler),
+  _security(NULL)
 {
-    M2MConnectionSecurity::SecurityMode sec_mode = M2MConnectionSecurity::DTLS;
-    //Hack for now
-    if( _binding_mode == M2MInterface::TCP ){
-        _binding_mode = M2MInterface::UDP;
-        sec_mode = M2MConnectionSecurity::TLS;
-    }else if( _binding_mode == M2MInterface::TCP_QUEUE ){
-        _binding_mode = M2MInterface::UDP_QUEUE;
-        sec_mode = M2MConnectionSecurity::TLS;
-    }
     tr_debug("M2MInterfaceImpl::M2MInterfaceImpl() -IN");
-    _nsdl_interface->create_endpoint(ep_name,
+    _nsdl_interface.create_endpoint(ep_name,
                                      _endpoint_type,
                                      _life_time,
                                      _domain,
-                                     (uint8_t)_binding_mode,
+                                     (uint8_t)_binding_mode & 0x07, // nsdl binding mode is only 3 least significant bits
                                      _context_address);
 
-    //Doesn't own, ownership is passed to ConnectionHandler class
-    _security_connection = new M2MConnectionSecurity(sec_mode);
     //Here we must use TCP still
-    _connection_handler = new M2MConnectionHandler(*this, _security_connection, mode, stack);
-    __connection_handler = _connection_handler;
-    _connection_handler->bind_connection(_listen_port);
-#ifndef MBED_CLIENT_DISABLE_BOOTSTRAP_FEATURE
-    _bootstrap_timer = new M2MTimer(*this);
-#endif
+    _connection_handler.bind_connection(_listen_port);
+
+    // We need this timer only in case of TCP
+    if (_binding_mode == M2MInterface::TCP ||
+        _binding_mode == M2MInterface::TCP_QUEUE ) {
+        _registration_flow_timer = new M2MTimer(*this);
+    }
     tr_debug("M2MInterfaceImpl::M2MInterfaceImpl() -OUT");
 }
 
@@ -96,13 +92,8 @@ M2MInterfaceImpl::M2MInterfaceImpl(M2MInterfaceObserver& observer,
 M2MInterfaceImpl::~M2MInterfaceImpl()
 {
     tr_debug("M2MInterfaceImpl::~M2MInterfaceImpl() - IN");
-    delete _queue_sleep_timer;
-    delete _nsdl_interface;
-    _connection_handler->stop_listening();
-    __connection_handler = NULL;
-    delete _connection_handler;
-    delete _retry_timer;
-    delete _bootstrap_timer;
+    _connection_handler.stop_listening();
+    delete _registration_flow_timer;
     _security_connection = NULL;
     tr_debug("M2MInterfaceImpl::~M2MInterfaceImpl() - OUT");
 }
@@ -111,6 +102,10 @@ void M2MInterfaceImpl::bootstrap(M2MSecurity *security)
 {
 #ifndef MBED_CLIENT_DISABLE_BOOTSTRAP_FEATURE
     tr_debug("M2MInterfaceImpl::bootstrap(M2MSecurity *security) - IN");
+    if(!security) {
+        _observer.error(M2MInterface::InvalidParameters);
+        return;
+    }
     // Transition to a new state based upon
     // the current state of the state machine
     M2MSecurityData* data = new M2MSecurityData();
@@ -120,10 +115,10 @@ void M2MInterfaceImpl::bootstrap(M2MSecurity *security)
         TRANSITION_MAP_ENTRY (EVENT_IGNORED)                // state_bootstrap
         TRANSITION_MAP_ENTRY (EVENT_IGNORED)                // state__bootstrap_address_resolved
         TRANSITION_MAP_ENTRY (EVENT_IGNORED)                // state_bootstrap_resource_created
+        TRANSITION_MAP_ENTRY (EVENT_IGNORED)                // state_bootstrap_wait
         TRANSITION_MAP_ENTRY (EVENT_IGNORED)                // state_bootstrapped
         TRANSITION_MAP_ENTRY (EVENT_IGNORED)                // state_register
         TRANSITION_MAP_ENTRY (EVENT_IGNORED)                // state_register_address_resolved
-        TRANSITION_MAP_ENTRY (EVENT_IGNORED)                // state_register_resource_created
         TRANSITION_MAP_ENTRY (EVENT_IGNORED)                // state_registered
         TRANSITION_MAP_ENTRY (EVENT_IGNORED)                // state_update_registration
         TRANSITION_MAP_ENTRY (EVENT_IGNORED)                // state_unregister
@@ -155,41 +150,39 @@ void M2MInterfaceImpl::cancel_bootstrap()
 void M2MInterfaceImpl::register_object(M2MSecurity *security, const M2MObjectList &object_list)
 {
     tr_debug("M2MInterfaceImpl::register_object - IN");
+    if(!security) {
+        _observer.error(M2MInterface::InvalidParameters);
+        return;
+    }
     // Transition to a new state based upon
     // the current state of the state machine
     //TODO: manage register object in a list.
-    if(!_register_ongoing) {
-       _register_ongoing = true;
-        _register_server = security;
-        M2MRegisterData *data = new M2MRegisterData();
-        data->_object = security;
-        data->_object_list = object_list;
-        BEGIN_TRANSITION_MAP                                    // - Current State -
-            TRANSITION_MAP_ENTRY (STATE_REGISTER)               // state_idle
-            TRANSITION_MAP_ENTRY (EVENT_IGNORED)                // state_bootstrap
-            TRANSITION_MAP_ENTRY (EVENT_IGNORED)                // state__bootstrap_address_resolved
-            TRANSITION_MAP_ENTRY (EVENT_IGNORED)                // state_bootstrap_resource_created
-            TRANSITION_MAP_ENTRY (STATE_REGISTER)               // state_bootstrapped
-            TRANSITION_MAP_ENTRY (EVENT_IGNORED)                // state_register
-            TRANSITION_MAP_ENTRY (EVENT_IGNORED)                // state_register_address_resolved
-            TRANSITION_MAP_ENTRY (EVENT_IGNORED)                // state_register_resource_created
-            TRANSITION_MAP_ENTRY (STATE_REGISTER)               // state_registered
-            TRANSITION_MAP_ENTRY (EVENT_IGNORED)                // state_update_registration
-            TRANSITION_MAP_ENTRY (EVENT_IGNORED)                // state_unregister
-            TRANSITION_MAP_ENTRY (EVENT_IGNORED)                // state_unregistered
-            TRANSITION_MAP_ENTRY (EVENT_IGNORED)                // state_sending_coap_data
-            TRANSITION_MAP_ENTRY (EVENT_IGNORED)                // state_coap_data_sent
-            TRANSITION_MAP_ENTRY (EVENT_IGNORED)                // state_coap_data_received
-            TRANSITION_MAP_ENTRY (EVENT_IGNORED)                // state_processing_coap_data
-            TRANSITION_MAP_ENTRY (EVENT_IGNORED)                // state_coap_data_processed
-            TRANSITION_MAP_ENTRY (STATE_REGISTER)               // state_waiting
-        END_TRANSITION_MAP(data)
-        if(_event_ignored) {
-            _event_ignored = false;
-            _observer.error(M2MInterface::NotAllowed);
-        }
-    } else {
-        tr_debug("M2MInterfaceImpl::register_object - NOT ALLOWED");
+    _register_server = security;
+    M2MRegisterData *data = new M2MRegisterData();
+    data->_object = security;
+    data->_object_list = object_list;
+    BEGIN_TRANSITION_MAP                                    // - Current State -
+        TRANSITION_MAP_ENTRY (STATE_REGISTER)               // state_idle
+        TRANSITION_MAP_ENTRY (EVENT_IGNORED)                // state_bootstrap
+        TRANSITION_MAP_ENTRY (EVENT_IGNORED)                // state__bootstrap_address_resolved
+        TRANSITION_MAP_ENTRY (EVENT_IGNORED)                // state_bootstrap_resource_created
+        TRANSITION_MAP_ENTRY (EVENT_IGNORED)                // state_bootstrap_wait
+        TRANSITION_MAP_ENTRY (STATE_REGISTER)               // state_bootstrapped
+        TRANSITION_MAP_ENTRY (EVENT_IGNORED)                // state_register
+        TRANSITION_MAP_ENTRY (EVENT_IGNORED)                // state_register_address_resolved
+        TRANSITION_MAP_ENTRY (STATE_REGISTER)               // state_registered
+        TRANSITION_MAP_ENTRY (EVENT_IGNORED)                // state_update_registration
+        TRANSITION_MAP_ENTRY (EVENT_IGNORED)                // state_unregister
+        TRANSITION_MAP_ENTRY (EVENT_IGNORED)                // state_unregistered
+        TRANSITION_MAP_ENTRY (EVENT_IGNORED)                // state_sending_coap_data
+        TRANSITION_MAP_ENTRY (EVENT_IGNORED)                // state_coap_data_sent
+        TRANSITION_MAP_ENTRY (EVENT_IGNORED)                // state_coap_data_received
+        TRANSITION_MAP_ENTRY (EVENT_IGNORED)                // state_processing_coap_data
+        TRANSITION_MAP_ENTRY (EVENT_IGNORED)                // state_coap_data_processed
+        TRANSITION_MAP_ENTRY (STATE_REGISTER)               // state_waiting
+    END_TRANSITION_MAP(data)
+    if(_event_ignored) {
+        _event_ignored = false;
         _observer.error(M2MInterface::NotAllowed);
     }
     tr_debug("M2MInterfaceImpl::register_object - OUT");
@@ -197,54 +190,29 @@ void M2MInterfaceImpl::register_object(M2MSecurity *security, const M2MObjectLis
 
 void M2MInterfaceImpl::update_registration(M2MSecurity *security_object, const uint32_t lifetime)
 {
-    tr_debug("M2MInterfaceImpl::update_registration - IN");
-    // Transition to a new state based upon
-    // the current state of the state machine
-    if(lifetime != 0 && (lifetime < MINIMUM_REGISTRATION_TIME)) {
-        _observer.error(M2MInterface::InvalidParameters);
-    } else if(!_update_register_ongoing){
-        tr_debug("M2MInterfaceImpl::update_registration - already ongoing");
-        _update_register_ongoing = true;
-        M2MUpdateRegisterData *data = new M2MUpdateRegisterData();
-        data->_object = security_object;
-        data->_lifetime = lifetime;
-        BEGIN_TRANSITION_MAP                                    // - Current State -
-            TRANSITION_MAP_ENTRY (EVENT_IGNORED)                // state_idle
-            TRANSITION_MAP_ENTRY (EVENT_IGNORED)                // state_bootstrap
-            TRANSITION_MAP_ENTRY (EVENT_IGNORED)                // state__bootstrap_address_resolved
-            TRANSITION_MAP_ENTRY (EVENT_IGNORED)                // state_bootstrap_resource_created
-            TRANSITION_MAP_ENTRY (EVENT_IGNORED)                // state_bootstrapped
-            TRANSITION_MAP_ENTRY (EVENT_IGNORED)                // state_register
-            TRANSITION_MAP_ENTRY (EVENT_IGNORED)                // state_register_address_resolved
-            TRANSITION_MAP_ENTRY (EVENT_IGNORED)                // state_register_resource_created
-            TRANSITION_MAP_ENTRY (STATE_UPDATE_REGISTRATION)    // state_registered
-            TRANSITION_MAP_ENTRY (EVENT_IGNORED)                // state_update_registration
-            TRANSITION_MAP_ENTRY (EVENT_IGNORED)                // state_unregister
-            TRANSITION_MAP_ENTRY (EVENT_IGNORED)                // state_unregistered
-            TRANSITION_MAP_ENTRY (EVENT_IGNORED)                // state_sending_coap_data
-            TRANSITION_MAP_ENTRY (EVENT_IGNORED)                // state_coap_data_sent
-            TRANSITION_MAP_ENTRY (EVENT_IGNORED)                // state_coap_data_received
-            TRANSITION_MAP_ENTRY (EVENT_IGNORED)                // state_processing_coap_data
-            TRANSITION_MAP_ENTRY (EVENT_IGNORED)                // state_coap_data_processed
-            TRANSITION_MAP_ENTRY (STATE_UPDATE_REGISTRATION)    // state_waiting
-        END_TRANSITION_MAP(data)
-        if(_event_ignored) {
-            _event_ignored = false;
-            if (!_reconnecting)
-                _observer.error(M2MInterface::NotAllowed);
-        }
-    } else if(!_reconnecting) {
-        tr_debug("M2MInterfaceImpl::update_registration - NOT ALLOWED");
-        _observer.error(M2MInterface::NotAllowed);
-    } else {
-        tr_debug("M2MInterfaceImpl::update_registration - reconnecting");
-    }
-    tr_debug("M2MInterfaceImpl::update_registration - OUT");
+    tr_debug("M2MInterfaceImpl::update_registration(M2MSecurity *security_object, const uint32_t lifetime)");
+    M2MUpdateRegisterData *data = new M2MUpdateRegisterData();
+    data->_object = security_object;
+    data->_lifetime = lifetime;
+    start_register_update(data);
+}
+
+void M2MInterfaceImpl::update_registration(M2MSecurity *security_object,
+                                           const M2MObjectList &object_list,
+                                           const uint32_t lifetime)
+{
+    tr_debug("M2MInterfaceImpl::update_registration(M2MSecurity *security_object, const M2MObjectList &object_list, const uint32_t lifetime)");
+    M2MUpdateRegisterData *data = new M2MUpdateRegisterData();
+    data->_object = security_object;
+    data->_lifetime = lifetime;
+    data->_object_list = object_list;
+    start_register_update(data);
 }
 
 void M2MInterfaceImpl::unregister_object(M2MSecurity* /*security*/)
 {
     tr_debug("M2MInterfaceImpl::unregister_object - IN");
+    tr_debug("M2MInterfaceImpl::unregister_object - current state %d", _current_state);
     // Transition to a new state based upon
     // the current state of the state machine
     BEGIN_TRANSITION_MAP                                // - Current State -
@@ -252,10 +220,10 @@ void M2MInterfaceImpl::unregister_object(M2MSecurity* /*security*/)
         TRANSITION_MAP_ENTRY (EVENT_IGNORED)                // state_bootstrap
         TRANSITION_MAP_ENTRY (EVENT_IGNORED)                // state__bootstrap_address_resolved
         TRANSITION_MAP_ENTRY (EVENT_IGNORED)                // state_bootstrap_resource_created
+        TRANSITION_MAP_ENTRY (EVENT_IGNORED)                // state_bootstrap_wait
         TRANSITION_MAP_ENTRY (EVENT_IGNORED)                // state_bootstrapped
         TRANSITION_MAP_ENTRY (EVENT_IGNORED)                // state_register
         TRANSITION_MAP_ENTRY (EVENT_IGNORED)                // state_register_address_resolved
-        TRANSITION_MAP_ENTRY (EVENT_IGNORED)                // state_register_resource_created
         TRANSITION_MAP_ENTRY (STATE_UNREGISTER)             // state_registered
         TRANSITION_MAP_ENTRY (STATE_UNREGISTER)             // state_update_registration
         TRANSITION_MAP_ENTRY (EVENT_IGNORED)                // state_unregister
@@ -297,9 +265,7 @@ void M2MInterfaceImpl::set_entropy_callback(entropy_cb callback)
 void M2MInterfaceImpl::set_platform_network_handler(void *handler)
 {
     tr_debug("M2MInterfaceImpl::set_platform_network_handler()");
-    if(_connection_handler) {
-        _connection_handler->set_platform_network_handler(handler);
-    }
+    _connection_handler.set_platform_network_handler(handler);
 }
 
 void M2MInterfaceImpl::coap_message_ready(uint8_t *data_ptr,
@@ -307,12 +273,14 @@ void M2MInterfaceImpl::coap_message_ready(uint8_t *data_ptr,
                                           sn_nsdl_addr_s *address_ptr)
 {
     tr_debug("M2MInterfaceImpl::coap_message_ready");
-    internal_event(STATE_SENDING_COAP_DATA);
-    if(!_connection_handler->send_data(data_ptr,data_len,address_ptr)) {
-        internal_event( STATE_IDLE);
-        tr_error("M2MInterfaceImpl::coap_message_ready() - M2MInterface::NetworkError");
-        if (!_reconnecting) {
-            _observer.error(M2MInterface::NetworkError);
+    if (_current_state != STATE_IDLE) {
+        internal_event(STATE_SENDING_COAP_DATA);
+        if(!_connection_handler.send_data(data_ptr,data_len,address_ptr)) {
+            internal_event( STATE_IDLE);
+            tr_error("M2MInterfaceImpl::coap_message_ready() - M2MInterface::NetworkError");
+            if (!_reconnecting) {
+                _observer.error(M2MInterface::NetworkError);
+            }
         }
     }
 }
@@ -321,6 +289,9 @@ void M2MInterfaceImpl::client_registered(M2MServer *server_object)
 {
     tr_debug("M2MInterfaceImpl::client_registered");
     _retry_count = 0;
+    if (_registration_flow_timer) {
+        _registration_flow_timer->stop_timer();
+    }
     internal_event(STATE_REGISTERED);
     //Inform client is registered.
     //TODO: manage register object in a list.
@@ -358,9 +329,23 @@ void M2MInterfaceImpl::bootstrap_done(M2MSecurity *security_object)
 {
 #ifndef MBED_CLIENT_DISABLE_BOOTSTRAP_FEATURE
     tr_debug("M2MInterfaceImpl::bootstrap_done");
-    _bootstrap_timer->stop_timer();
+    _retry_count = 0;
+    _reconnecting = false;
+    _bootstrapped = true;
+    if (_registration_flow_timer) {
+        _registration_flow_timer->stop_timer();
+    }
     internal_event(STATE_BOOTSTRAPPED);
     _observer.bootstrap_done(security_object);
+#endif //MBED_CLIENT_DISABLE_BOOTSTRAP_FEATURE
+}
+
+void M2MInterfaceImpl::bootstrap_wait(M2MSecurity *security_object)
+{
+#ifndef MBED_CLIENT_DISABLE_BOOTSTRAP_FEATURE
+    tr_debug("M2MInterfaceImpl::bootstrap_wait");
+    _security = security_object;
+    internal_event(STATE_BOOTSTRAP_WAIT);
 #endif //MBED_CLIENT_DISABLE_BOOTSTRAP_FEATURE
 }
 
@@ -368,9 +353,11 @@ void M2MInterfaceImpl::bootstrap_error()
 {
 #ifndef MBED_CLIENT_DISABLE_BOOTSTRAP_FEATURE
     tr_debug("M2MInterfaceImpl::bootstrap_error()");
-    _bootstrap_timer->stop_timer();
-    internal_event(STATE_IDLE);
-    _observer.error(M2MInterface::BootstrapFailed);
+    _bootstrapped = false;
+    if (_registration_flow_timer) {
+        _registration_flow_timer->stop_timer();
+    }
+    socket_error(M2MInterface::BootstrapFailed, true);
 #endif //MBED_CLIENT_DISABLE_BOOTSTRAP_FEATURE
 }
 
@@ -382,7 +369,7 @@ void M2MInterfaceImpl::coap_data_processed()
 
 void M2MInterfaceImpl::value_updated(M2MBase *base)
 {
-    tr_debug("M2MInterfaceImpl::value_updated(M2MBase *base)");
+    tr_debug("M2MInterfaceImpl::value_updated");
     if(base) {
         M2MBase::BaseType type = base->base_type();
         _observer.value_updated(base, type);
@@ -404,10 +391,13 @@ void M2MInterfaceImpl::data_available(uint8_t* data,
 void M2MInterfaceImpl::socket_error(uint8_t error_code, bool retry)
 {
     tr_debug("M2MInterfaceImpl::socket_error: (%d), retry (%d), reconnecting (%d)", error_code, retry, _reconnecting);
+#if MBED_CLIENT_RECONNECTION_LOOP < 1
     if (!_retry_timer_expired && _reconnecting) {
         tr_debug("M2MInterfaceImpl::socket_error - retry timer running - return");
         return;
     }
+#endif
+
     M2MInterface::Error error = M2MInterface::ErrorNone;
     switch (error_code) {
     case M2MConnectionHandler::SSL_CONNECTION_ERROR:
@@ -435,29 +425,40 @@ void M2MInterfaceImpl::socket_error(uint8_t error_code, bool retry)
     // Try to do reconnecting
     if (retry) {
         if (_retry_count < MBED_CLIENT_RECONNECTION_COUNT) {
+            _retry_count++;
+        }
+#if MBED_CLIENT_RECONNECTION_LOOP > 0
+        else {
+            tr_debug("M2MInterfaceImpl::socket_error - start again");
+            _retry_count = 1;
+            _observer.error(error);
+        }
+#else
+        else {
+            tr_debug("M2MInterfaceImpl::socket_error - no more retries");
+            _connection_handler.stop_listening();
+            _retry_timer.stop_timer();
+            retry = false;
+        }
+#endif
+        if (retry) {
             internal_event(STATE_IDLE);
             _reconnecting = true;
-            _retry_count++;
-            _connection_handler->stop_listening();
+            _connection_handler.stop_listening();
             int retry_time = MBED_CLIENT_RECONNECTION_INTERVAL *
                     MBED_CLIENT_RECONNECTION_COUNT * _retry_count * 1000;
             _retry_timer_expired = false;
-            _retry_timer->start_timer(retry_time,
+            _retry_timer.start_timer(retry_time,
                                       M2MTimerObserver::RetryTimer);
             tr_debug("M2MInterfaceImpl::socket_error - reconnecting in %d(s), count %d/%d", retry_time / 1000,
                      _retry_count, MBED_CLIENT_RECONNECTION_COUNT);
-        } else {
-            tr_debug("M2MInterfaceImpl::socket_error - no more retries");
-            _connection_handler->stop_listening();
-            _retry_timer->stop_timer();
-            retry = false;
         }
     }
     // Inform application
     if (!retry && M2MInterface::ErrorNone != error) {
         tr_debug("M2MInterfaceImpl::socket_error - send error to application");
-        _connection_handler->stop_listening();
-        _retry_timer->stop_timer();
+        _connection_handler.stop_listening();
+        _retry_timer.stop_timer();
         _retry_count = 0;
         _reconnecting = false;
         _observer.error(error);
@@ -490,12 +491,21 @@ void M2MInterfaceImpl::data_sent()
        _binding_mode == M2MInterface::SMS_QUEUE  ||
        _binding_mode == M2MInterface::UDP_SMS_QUEUE) {
         if(_callback_handler) {
-            _queue_sleep_timer->stop_timer();
-            _queue_sleep_timer->start_timer(MBED_CLIENT_RECONNECTION_COUNT*MBED_CLIENT_RECONNECTION_INTERVAL*1000,
+            _queue_sleep_timer.stop_timer();
+            _queue_sleep_timer.start_timer(MBED_CLIENT_RECONNECTION_COUNT*MBED_CLIENT_RECONNECTION_INTERVAL*1000,
                                             M2MTimerObserver::QueueSleep);
         }
     }
-    internal_event(STATE_COAP_DATA_SENT);
+    if (_current_state == STATE_BOOTSTRAP_WAIT) {
+        // For bootstrap we need to call bootstrap_done callback ONLY after we have
+        // sent the last ACK and ended in STATE_BOOTSTRAP_WAIT
+        M2MSecurity *sec = _security;
+        _security = NULL;
+        bootstrap_done(sec);
+    }
+    else {
+        internal_event(STATE_COAP_DATA_SENT);
+    }
 }
 
 void M2MInterfaceImpl::timer_expired(M2MTimerObserver::Type type)
@@ -508,13 +518,17 @@ void M2MInterfaceImpl::timer_expired(M2MTimerObserver::Type type)
     }
     else if (M2MTimerObserver::RetryTimer == type) {
         _retry_timer_expired = true;
-        _listen_port = rand() % 64511 + 1024;
-        tr_debug("M2MInterfaceImpl::timer_expired() - new port: %d", _listen_port);
-        _connection_handler->bind_connection(_listen_port);
-        internal_event(STATE_REGISTER);
+        if (_bootstrapped) {
+            internal_event(STATE_REGISTER);
+        } else {
+            internal_event(STATE_BOOTSTRAP);
+        }
     }
-    else if (M2MTimerObserver::BootstrapTimer == type) {
+    else if (M2MTimerObserver::BootstrapFlowTimer == type) {
         bootstrap_error();
+    }
+    else if (M2MTimerObserver::RegistrationFlowTimer == type) {
+        registration_error(M2MInterface::Timeout, true);
     }
 }
 
@@ -522,62 +536,75 @@ void M2MInterfaceImpl::timer_expired(M2MTimerObserver::Type type)
 void M2MInterfaceImpl::state_idle(EventData* /*data*/)
 {
     tr_debug("M2MInterfaceImpl::state_idle");
-    _nsdl_interface->stop_timers();
-    _register_ongoing = false;
-    _update_register_ongoing = false;
+    _nsdl_interface.stop_timers();
 }
 
-void M2MInterfaceImpl::state_bootstrap( EventData *data)
+void M2MInterfaceImpl::state_bootstrap(EventData *data)
 {
 #ifndef MBED_CLIENT_DISABLE_BOOTSTRAP_FEATURE
     tr_debug("M2MInterfaceImpl::state_bootstrap");
     // Start with bootstrapping preparation
-    bool success = false;
-    if(data) {
-        M2MSecurityData *event = static_cast<M2MSecurityData *> (data);
-        M2MSecurity *security = event->_object;
-        if(security) {
-            if(M2MSecurity::Bootstrap == security->server_type()) {
-                tr_debug("M2MInterfaceImpl::state_bootstrap - server_type : M2MSecurity::Bootstrap");
-                String server_address = security->resource_value_string(M2MSecurity::M2MServerUri);
-                tr_debug("M2MInterfaceImpl::state_bootstrap - server_address %s", server_address.c_str());
-                _bootstrap_timer->start_timer(MBED_CLIENT_RECONNECTION_COUNT * MBED_CLIENT_RECONNECTION_INTERVAL * 8 * 1000,
-                                              M2MTimerObserver::BootstrapTimer);
-                String ip_address;
-                String  coap;
-                if(server_address.compare(0,sizeof(COAP)-1,COAP) == 0) {
-                     coap = COAP;
-                }
-                else if(server_address.compare(0,sizeof(COAPS)-1,COAPS) == 0) {
-                    security->resource_value_int(M2MSecurity::SecurityMode) != M2MSecurity::NoSecurity ? coap = COAPS: coap = "";
-                }
-                if(!coap.empty()) {
-                    server_address = server_address.substr(coap.size(),
-                                                       server_address.size()-coap.size());
+    _bootstrapped = false;
+    M2MSecurityData *event = static_cast<M2MSecurityData *> (data);
+    if(!_security) {
+        M2MInterface::Error error = M2MInterface::InvalidParameters;
+        if (event) {
+            _security = event->_object;
+            if(_security) {
+                if(M2MSecurity::Bootstrap == _security->server_type()) {
+                    tr_debug("M2MInterfaceImpl::state_bootstrap - server_type : M2MSecurity::Bootstrap");
+                    String server_address = _security->resource_value_string(M2MSecurity::M2MServerUri);
+                    tr_debug("M2MInterfaceImpl::state_bootstrap - server_address %s", server_address.c_str());
+                    String coap;
+                    if(server_address.compare(0,sizeof(COAP)-1,COAP) == 0) {
+                         coap = COAP;
+                    }
+                    else if(server_address.compare(0,sizeof(COAPS)-1,COAPS) == 0) {
+                        _security->resource_value_int(M2MSecurity::SecurityMode) != M2MSecurity::NoSecurity ? coap = COAPS: coap = "";
+                    }
+                    if(!coap.empty()) {
+                        server_address = server_address.substr(coap.size(),
+                                                           server_address.size()-coap.size());
 
-                    process_address(server_address, ip_address, _server_port);
+                        process_address(server_address, _server_ip_address, _server_port);
 
-                    tr_debug("M2MInterfaceImpl::state_bootstrap - IP address %s , Port %d", ip_address.c_str(), _server_port);
-                    // If bind and resolving server address succeed then proceed else
-                    // return error to the application and go to Idle state.
-                    if(ip_address.empty()) {
-                        tr_error("M2MInterfaceImpl::state_bootstrap - set error as M2MInterface::InvalidParameters");
-                        success = false;
-                    } else if(_connection_handler->resolve_server_address(ip_address,
-                                                                  _server_port,
-                                                                  M2MConnectionObserver::Bootstrap,
-                                                                  security)) {
-                       tr_debug("M2MInterfaceImpl::state_bootstrap - resolve_server_address - success");
-                       success = true;
-                   }
+                        tr_debug("M2MInterfaceImpl::state_bootstrap - IP address %s , Port %d", _server_ip_address.c_str(), _server_port);
+                        // If bind and resolving server address succeed then proceed else
+                        // return error to the application and go to Idle state.
+                        if(!_server_ip_address.empty()) {
+                            error = M2MInterface::ErrorNone;
+                            if (_registration_flow_timer) {
+                                _registration_flow_timer->stop_timer();
+                                _registration_flow_timer->start_timer(MBED_CLIENT_RECONNECTION_COUNT * MBED_CLIENT_RECONNECTION_INTERVAL * 8 * 1000,
+                                                              M2MTimerObserver::BootstrapFlowTimer);
+                            }
+                            _connection_handler.resolve_server_address(_server_ip_address,
+                                                                        _server_port,
+                                                                        M2MConnectionObserver::Bootstrap,
+                                                                        _security);
+                        }
+                    }
                 }
             }
         }
-    }
-    if(!success) {
-        tr_error("M2MInterfaceImpl::state_bootstrap - M2MInterface::InvalidParameters");
-        _observer.error(M2MInterface::InvalidParameters);
-        internal_event(STATE_IDLE);
+        if (error != M2MInterface::ErrorNone) {
+            tr_error("M2MInterfaceImpl::state_bootstrap - set error as M2MInterface::InvalidParameters");
+            internal_event(STATE_IDLE);
+            _observer.error(error);
+        }
+    } else {
+        _listen_port = 0;
+        _connection_handler.stop_listening();
+        _connection_handler.bind_connection(_listen_port);
+        if (_registration_flow_timer) {
+            _registration_flow_timer->stop_timer();
+            _registration_flow_timer->start_timer(MBED_CLIENT_RECONNECTION_COUNT * MBED_CLIENT_RECONNECTION_INTERVAL * 8 * 1000,
+                                          M2MTimerObserver::BootstrapFlowTimer);
+        }
+        _connection_handler.resolve_server_address(_server_ip_address,
+                                                    _server_port,
+                                                    M2MConnectionObserver::Bootstrap,
+                                                    _security);
     }
 #endif //MBED_CLIENT_DISABLE_BOOTSTRAP_FEATURE
 }
@@ -586,40 +613,59 @@ void M2MInterfaceImpl::state_bootstrap_address_resolved( EventData *data)
 {
 #ifndef MBED_CLIENT_DISABLE_BOOTSTRAP_FEATURE
     tr_debug("M2MInterfaceImpl::state_bootstrap_address_resolved");
-    ResolvedAddressData *event = static_cast<ResolvedAddressData *> (data);
-    sn_nsdl_addr_s address;
+    if (data) {
+        ResolvedAddressData *event = static_cast<ResolvedAddressData *> (data);
+        sn_nsdl_addr_s address;
 
-    M2MInterface::NetworkStack stack = event->_address->_stack;
+        M2MInterface::NetworkStack stack = event->_address->_stack;
 
-    if(M2MInterface::LwIP_IPv4 == stack) {
-        tr_debug("M2MInterfaceImpl::state_bootstrap_address_resolved : IPv4 address");
-        address.type = SN_NSDL_ADDRESS_TYPE_IPV4;
-        address.addr_len = 4;
-    } else if((M2MInterface::LwIP_IPv6 == stack) ||
-              (M2MInterface::Nanostack_IPv6 == stack)) {
-        tr_debug("M2MInterfaceImpl::state_bootstrap_address_resolved : IPv6 address");
-        address.type = SN_NSDL_ADDRESS_TYPE_IPV6;
-        address.addr_len = 16;
-    }
-    address.port = event->_port;
-    address.addr_ptr = (uint8_t*)event->_address->_address;
-    _connection_handler->start_listening_for_data();
+        if(M2MInterface::LwIP_IPv4 == stack) {
+            tr_debug("M2MInterfaceImpl::state_bootstrap_address_resolved : IPv4 address");
+            address.type = SN_NSDL_ADDRESS_TYPE_IPV4;
+        } else if((M2MInterface::LwIP_IPv6 == stack) ||
+                  (M2MInterface::Nanostack_IPv6 == stack)) {
+            tr_debug("M2MInterfaceImpl::state_bootstrap_address_resolved : IPv6 address");
+            address.type = SN_NSDL_ADDRESS_TYPE_IPV6;
+        }
+        address.port = event->_port;
+        address.addr_ptr = (uint8_t*)event->_address->_address;
+        address.addr_len = event->_address->_length;
+        _connection_handler.start_listening_for_data();
 
-    // Include domain id to be part of endpoint name
-    String new_ep_name;
-    new_ep_name += _nsdl_interface->endpoint_name();
-    if (!_domain.empty()) {
-        new_ep_name += '@';
-        new_ep_name += _domain;
-    }
-    if(_nsdl_interface->create_bootstrap_resource(&address, new_ep_name)) {
-       tr_debug("M2MInterfaceImpl::state_bootstrap_address_resolved : create_bootstrap_resource - success");
-       internal_event(STATE_BOOTSTRAP_RESOURCE_CREATED);
-    } else{
-        // If resource creation fails then inform error to application
-        tr_error("M2MInterfaceImpl::state_bootstrap_address_resolved : M2MInterface::InvalidParameters");
-        internal_event(STATE_IDLE);
-        _observer.error(M2MInterface::InvalidParameters);
+        // Include domain id to be part of endpoint name
+        StringBuffer<M2MBase::MAX_PATH_SIZE> new_ep_name;
+
+        if(!new_ep_name.ensure_space(_nsdl_interface.endpoint_name().size() + 1))
+        {
+            tr_error("MM2MInterfaceImpl::state_bootstrap_address_resolved : name too long");
+            _observer.error(M2MInterface::InvalidParameters);
+            return;
+        }
+
+        new_ep_name.append(_nsdl_interface.endpoint_name().c_str());
+
+        if (!_domain.empty()) {
+
+            if(!new_ep_name.ensure_space(_nsdl_interface.endpoint_name().size() + 1 + _domain.size() + 1))
+            {
+                tr_error("MM2MInterfaceImpl::state_bootstrap_address_resolved : name + domain too long");
+                _observer.error(M2MInterface::InvalidParameters);
+                return;
+            }
+
+            new_ep_name.append('@');
+            new_ep_name.append(_domain.c_str());
+
+        }
+        if(_nsdl_interface.create_bootstrap_resource(&address, new_ep_name.c_str())) {
+           tr_debug("M2MInterfaceImpl::state_bootstrap_address_resolved : create_bootstrap_resource - success");
+           internal_event(STATE_BOOTSTRAP_RESOURCE_CREATED);
+        } else{
+            // If resource creation fails then inform error to application
+            tr_error("M2MInterfaceImpl::state_bootstrap_address_resolved : M2MInterface::InvalidParameters");
+            internal_event(STATE_IDLE);
+            _observer.error(M2MInterface::InvalidParameters);
+        }
     }
 #endif //MBED_CLIENT_DISABLE_BOOTSTRAP_FEATURE
 }
@@ -638,19 +684,19 @@ void M2MInterfaceImpl::state_bootstrapped( EventData */*data*/)
 #endif //MBED_CLIENT_DISABLE_BOOTSTRAP_FEATURE
 }
 
-void M2MInterfaceImpl::state_register( EventData *data)
+void M2MInterfaceImpl::state_register(EventData *data)
 {
     tr_debug("M2MInterfaceImpl::state_register");
+    M2MRegisterData *event = static_cast<M2MRegisterData *> (data);
     if (!_security) {
         M2MInterface::Error error = M2MInterface::InvalidParameters;
         // Start with registration preparation
-        if(data) {
-            M2MRegisterData *event = static_cast<M2MRegisterData *> (data);
+        if(event) {
             _security = event->_object;
             if(_security) {
                 if(M2MSecurity::M2MServer == _security->server_type()) {
                     tr_debug("M2MInterfaceImpl::state_register - server_type : M2MSecurity::M2MServer");
-                    if(_nsdl_interface->create_nsdl_list_structure(event->_object_list)) {
+                    if(_nsdl_interface.create_nsdl_list_structure(event->_object_list)) {
                         tr_debug("M2MInterfaceImpl::state_register - create_nsdl_list_structure - success");
                         // If the nsdl resource structure is created successfully
                         String server_address = _security->resource_value_string(M2MSecurity::M2MServerUri);
@@ -670,8 +716,13 @@ void M2MInterfaceImpl::state_register( EventData *data)
                             tr_debug("M2MInterfaceImpl::state_register - IP address %s , Port %d", _server_ip_address.c_str(), _server_port);
                             if(!_server_ip_address.empty()) {
                                 // Connection related errors are coming through callback
+                                if (_registration_flow_timer) {
+                                    _registration_flow_timer->stop_timer();
+                                    _registration_flow_timer->start_timer(MBED_CLIENT_RECONNECTION_COUNT * MBED_CLIENT_RECONNECTION_INTERVAL * 8 * 1000,
+                                                                  M2MTimerObserver::RegistrationFlowTimer);
+                                }
                                 error = M2MInterface::ErrorNone;
-                                _connection_handler->resolve_server_address(_server_ip_address,_server_port,
+                                _connection_handler.resolve_server_address(_server_ip_address,_server_port,
                                                                             M2MConnectionObserver::LWM2MServer,
                                                                             _security);
                             }
@@ -686,7 +737,18 @@ void M2MInterfaceImpl::state_register( EventData *data)
             _observer.error(error);
         }
     } else {
-        _connection_handler->resolve_server_address(_server_ip_address,_server_port,
+        _listen_port = 0;
+        _connection_handler.stop_listening();
+        if (event) {
+            _nsdl_interface.create_nsdl_list_structure(event->_object_list);
+        }
+        _connection_handler.bind_connection(_listen_port);
+        if (_registration_flow_timer) {
+            _registration_flow_timer->stop_timer();
+            _registration_flow_timer->start_timer(MBED_CLIENT_RECONNECTION_COUNT * MBED_CLIENT_RECONNECTION_INTERVAL * 8 * 1000,
+                                          M2MTimerObserver::RegistrationFlowTimer);
+        }
+        _connection_handler.resolve_server_address(_server_ip_address,_server_port,
                                                     M2MConnectionObserver::LWM2MServer,
                                                     _security);
     }
@@ -730,10 +792,9 @@ void M2MInterfaceImpl::state_register_address_resolved( EventData *data)
             tr_debug("M2MInterfaceImpl::state_register_address_resolved : IPv6 address");
             address_type = SN_NSDL_ADDRESS_TYPE_IPV6;
         }
-        _connection_handler->start_listening_for_data();
-        if(_nsdl_interface->send_register_message((uint8_t*)event->_address->_address,event->_port, address_type)) {
-            internal_event(STATE_REGISTER_RESOURCE_CREATED);
-        } else {
+        _connection_handler.start_listening_for_data();
+        if(!_nsdl_interface.send_register_message((uint8_t*)event->_address->_address,event->_address->_length,
+                                                  event->_port, address_type)) {
             // If resource creation fails then inform error to application
             tr_error("M2MInterfaceImpl::state_register_address_resolved : M2MInterface::InvalidParameters");
             internal_event(STATE_IDLE);
@@ -742,27 +803,23 @@ void M2MInterfaceImpl::state_register_address_resolved( EventData *data)
     }
 }
 
-void M2MInterfaceImpl::state_register_resource_created( EventData */*data*/)
-{
-    tr_debug("M2MInterfaceImpl::state_register_resource_created");
-}
-
 void M2MInterfaceImpl::state_registered( EventData */*data*/)
 {
     tr_debug("M2MInterfaceImpl::state_registered");
     _retry_count = 0;
-    _register_ongoing = false;
-    _update_register_ongoing = false;
     _reconnecting = false;
 }
 
-void M2MInterfaceImpl::state_update_registration( EventData *data)
+void M2MInterfaceImpl::state_update_registration(EventData *data)
 {
     tr_debug("M2MInterfaceImpl::state_update_registration");
-    // Start with registration preparation
     if(data) {
         M2MUpdateRegisterData *event = static_cast<M2MUpdateRegisterData *> (data);
-        _nsdl_interface->send_update_registration(event->_lifetime);
+        // Create new resources if any
+        if (!event->_object_list.empty()) {
+            _nsdl_interface.create_nsdl_list_structure(event->_object_list);
+        }
+        _nsdl_interface.send_update_registration(event->_lifetime);
     }
 }
 
@@ -770,7 +827,7 @@ void M2MInterfaceImpl::state_unregister( EventData */*data*/)
 {
     tr_debug("M2MInterfaceImpl::state_unregister");
     internal_event(STATE_SENDING_COAP_DATA);
-    if(!_nsdl_interface->send_unregister_message()) {
+    if(!_nsdl_interface.send_unregister_message()) {
         tr_error("M2MInterfaceImpl::state_unregister : M2MInterface::NotRegistered");
         internal_event(STATE_IDLE);
         _observer.error(M2MInterface::NotRegistered);
@@ -816,10 +873,11 @@ void M2MInterfaceImpl::state_coap_data_received( EventData *data)
         }
         address.port = event->_address->_port;
         address.addr_ptr = (uint8_t*)event->_address->_address;
+        address.addr_len = event->_address->_length;
 
         // Process received data
         internal_event(STATE_PROCESSING_COAP_DATA);
-        if(!_nsdl_interface->process_received_data(event->_data,
+        if(!_nsdl_interface.process_received_data(event->_data,
                                                   event->_size,
                                                   &address)) {
            tr_error("M2MInterfaceImpl::state_coap_data_received : M2MInterface::ResponseParseFailed");
@@ -925,6 +983,11 @@ void M2MInterfaceImpl::state_function( uint8_t current_state, EventData* data )
             M2MInterfaceImpl::state_bootstrap_resource_created(data);
         #endif //MBED_CLIENT_DISABLE_BOOTSTRAP_FEATURE
             break;
+        case STATE_BOOTSTRAP_WAIT:
+        #ifndef MBED_CLIENT_DISABLE_BOOTSTRAP_FEATURE
+            // Do nothing, we're just waiting for data_sent callback
+        #endif //MBED_CLIENT_DISABLE_BOOTSTRAP_FEATURE
+            break;
         case STATE_BOOTSTRAPPED:
         #ifndef MBED_CLIENT_DISABLE_BOOTSTRAP_FEATURE
             M2MInterfaceImpl::state_bootstrapped(data);
@@ -935,9 +998,6 @@ void M2MInterfaceImpl::state_function( uint8_t current_state, EventData* data )
             break;
         case STATE_REGISTER_ADDRESS_RESOLVED:
             M2MInterfaceImpl::state_register_address_resolved(data);
-            break;
-        case STATE_REGISTER_RESOURCE_CREATED:
-            M2MInterfaceImpl::state_register_resource_created(data);
             break;
         case STATE_REGISTERED:
             M2MInterfaceImpl::state_registered(data);
@@ -969,5 +1029,37 @@ void M2MInterfaceImpl::state_function( uint8_t current_state, EventData* data )
         case STATE_WAITING:
             M2MInterfaceImpl::state_waiting(data);
             break;
+    }
+}
+
+void M2MInterfaceImpl::start_register_update(M2MUpdateRegisterData *data) {
+    tr_debug("M2MInterfaceImpl::start_register_update - IN");
+    if(!data || (data->_lifetime != 0 && (data->_lifetime < MINIMUM_REGISTRATION_TIME))) {
+        _observer.error(M2MInterface::InvalidParameters);
+    }
+    BEGIN_TRANSITION_MAP                                    // - Current State -
+        TRANSITION_MAP_ENTRY (EVENT_IGNORED)                // state_idle
+        TRANSITION_MAP_ENTRY (EVENT_IGNORED)                // state_bootstrap
+        TRANSITION_MAP_ENTRY (EVENT_IGNORED)                // state__bootstrap_address_resolved
+        TRANSITION_MAP_ENTRY (EVENT_IGNORED)                // state_bootstrap_resource_created
+        TRANSITION_MAP_ENTRY (EVENT_IGNORED)                // state_bootstrap_wait
+        TRANSITION_MAP_ENTRY (EVENT_IGNORED)                // state_bootstrapped
+        TRANSITION_MAP_ENTRY (EVENT_IGNORED)                // state_register
+        TRANSITION_MAP_ENTRY (EVENT_IGNORED)                // state_register_address_resolved
+        TRANSITION_MAP_ENTRY (STATE_UPDATE_REGISTRATION)    // state_registered
+        TRANSITION_MAP_ENTRY (EVENT_IGNORED)                // state_update_registration
+        TRANSITION_MAP_ENTRY (EVENT_IGNORED)                // state_unregister
+        TRANSITION_MAP_ENTRY (EVENT_IGNORED)                // state_unregistered
+        TRANSITION_MAP_ENTRY (EVENT_IGNORED)                // state_sending_coap_data
+        TRANSITION_MAP_ENTRY (EVENT_IGNORED)                // state_coap_data_sent
+        TRANSITION_MAP_ENTRY (EVENT_IGNORED)                // state_coap_data_received
+        TRANSITION_MAP_ENTRY (EVENT_IGNORED)                // state_processing_coap_data
+        TRANSITION_MAP_ENTRY (EVENT_IGNORED)                // state_coap_data_processed
+        TRANSITION_MAP_ENTRY (STATE_UPDATE_REGISTRATION)    // state_waiting
+    END_TRANSITION_MAP(data)
+    if(_event_ignored) {
+        _event_ignored = false;
+        if (!_reconnecting)
+            _observer.error(M2MInterface::NotAllowed);
     }
 }
