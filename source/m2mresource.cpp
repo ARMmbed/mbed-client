@@ -102,7 +102,7 @@ M2MResource::~M2MResource()
         }
         _resource_instance_list.clear();
     }
-    free(_delayed_token);
+    memory_free(_delayed_token);
 }
 
 bool M2MResource::supports_multiple_instances() const
@@ -129,7 +129,7 @@ void M2MResource::get_delayed_token(uint8_t *&token, uint8_t &token_length)
 {
     token_length = 0;
     if(token) {
-        free(token);
+        memory_free(token);
         token = NULL;
     }
     if(_delayed_token && _delayed_token_len > 0) {
@@ -414,7 +414,7 @@ sn_coap_hdr_s* M2MResource::handle_put_request(nsdl_s *nsdl,
                         tr_debug("M2MResource::handle_put_request() - Invalid query");
                         msg_code = COAP_MSG_CODE_RESPONSE_BAD_REQUEST; // 4.00
                     }
-                    free(query);
+                    memory_free(query);
                 }
             } else if ((operation() & SN_GRS_PUT_ALLOWED) != 0) {
                 if(!content_type_present &&
@@ -521,7 +521,7 @@ sn_coap_hdr_s* M2MResource::handle_post_request(nsdl_s *nsdl,
                     coap_response->msg_code = msg_code;
                     coap_response->msg_id = received_coap_header->msg_id;
                     if(received_coap_header->token_len) {
-                        free(_delayed_token);
+                        memory_free(_delayed_token);
                         _delayed_token = NULL;
                         _delayed_token_len = 0;
                         _delayed_token = alloc_copy(received_coap_header->token_ptr, received_coap_header->token_len);
@@ -586,7 +586,7 @@ M2MResource::M2MExecuteParameter::M2MExecuteParameter()
 
 M2MResource::M2MExecuteParameter::~M2MExecuteParameter()
 {
-    free(_value);
+    memory_free(_value);
 }
 
 uint8_t *M2MResource::M2MExecuteParameter::get_argument_value() const

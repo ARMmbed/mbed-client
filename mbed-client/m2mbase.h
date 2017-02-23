@@ -489,6 +489,7 @@ protected:
      */
     virtual void set_base_type(M2MBase::BaseType type);
 
+#if 0
     /**
      * \brief Memory allocation required for libCoap.
      * \param size The size of memory to be reserved.
@@ -500,7 +501,7 @@ protected:
      * \param ptr The object whose memory needs to be freed.
     */
     static void memory_free(void *ptr);
-
+#endif
     /**
      * \brief Allocate and make a copy of given zero terminated string. This
      * is functionally equivalent with strdup().

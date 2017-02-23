@@ -139,7 +139,7 @@ M2MResourceInstance::M2MResourceInstance(M2MResource &parent,
 
 M2MResourceInstance::~M2MResourceInstance()
 {
-    free(_value);
+    memory_free(_value);
     delete _execute_function_pointer;
     delete _execute_callback;
     delete _notification_sent_function_pointer;
@@ -201,7 +201,7 @@ void M2MResourceInstance::clear_value()
 {
     tr_debug("M2MResourceInstance::clear_value");
 
-     free(_value);
+     memory_free(_value);
      _value = NULL;
      _value_length = 0;
 
@@ -232,7 +232,7 @@ bool M2MResourceInstance::set_value(const uint8_t *value,
     if( value != NULL && value_length > 0 ) {
         success = true;
 
-        free(_value);
+        memory_free(_value);
         _value_length = 0;
 
         _value = alloc_string_copy(value, value_length);
@@ -326,7 +326,7 @@ void M2MResourceInstance::get_value(uint8_t *&value, uint32_t &value_length)
 {
     value_length = 0;
     if(value) {
-        free(value);
+        memory_free(value);
         value = NULL;
     }
     if(_value && _value_length > 0) {
@@ -347,7 +347,7 @@ int M2MResourceInstance::get_value_int()
     get_value(buffer,length);
     if(buffer) {
         value_int = atoi((const char*)buffer);
-        free(buffer);
+        memory_free(buffer);
     }
     return value_int;
 }
@@ -495,7 +495,7 @@ sn_coap_hdr_s* M2MResourceInstance::handle_put_request(nsdl_s *nsdl,
                         tr_debug("M2MResourceInstance::handle_put_request() - Invalid query");
                         msg_code = COAP_MSG_CODE_RESPONSE_BAD_REQUEST; // 4.00
                     }
-                    free(query);
+                    memory_free(query);
                 }
             } else if ((operation() & SN_GRS_PUT_ALLOWED) != 0) {
                 tr_debug("M2MResourceInstance::handle_put_request() - Request Content-Type %d", coap_content_type);
