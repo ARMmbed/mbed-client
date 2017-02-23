@@ -33,7 +33,7 @@ class M2MFirmware;
  *  object for an application to utilize the LWM2M features provided by the client.
  */
 
-class  M2MInterfaceFactory {
+class  M2MInterfaceFactory : public M2MDynamicMemory {
 private:
     // Prevents the use of an assignment operator by accident.
     M2MInterfaceFactory& operator=( const M2MInterfaceFactory& /*other*/ );
