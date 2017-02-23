@@ -39,16 +39,7 @@ public:
     static void init(void *heapAllocation, size_t size);
     static void print_heap_running_statistics(void);
     static void print_heap_overall_statistics(void);
-    /**
-     * \brief Memory allocation required for libCoap.
-     * \param size The size of memory to be reserved.
-    */
     static void *memory_alloc(uint16_t size);
-
-    /**
-     * \brief Memory free functions required for libCoap.
-     * \param ptr The object whose memory needs to be freed.
-    */
     static void memory_free(void *ptr);
 
     //static deinit();
