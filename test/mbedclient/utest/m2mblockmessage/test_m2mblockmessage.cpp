@@ -15,7 +15,7 @@
  */
 #include "CppUTest/TestHarness.h"
 #include "test_m2mblockmessage.h"
-#include "mbed-coap/sn_coap_header.h"
+#include "sn_coap_header.h"
 #include <string.h>
 Test_M2MBlockMessage::Test_M2MBlockMessage()
 {
