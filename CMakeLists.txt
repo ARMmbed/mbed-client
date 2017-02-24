@@ -38,6 +38,7 @@ set(NS_HAL_PAL_PATH ${CMAKE_CURRENT_SOURCE_DIR}/port_libs/ns-hal-pal)
 set(MBED_COAP_PATH ${CMAKE_CURRENT_SOURCE_DIR}/port_libs/mbed-coap)
 
 include_directories(${MBED_COAP_PATH})
+include_directories(${MBED_COAP_PATH}/mbed-coap/)
 include_directories(${MBED_COAP_PATH}/source/include/)
 
 
