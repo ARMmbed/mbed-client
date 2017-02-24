@@ -18,7 +18,6 @@
 #define M2M_DYNAMIC_MEMORY_H
 
 #include <inttypes.h>
-//#include "m2mdynmemLIB.h"
 
 #define M2M_DYNAMIC_MEMORY_HEAP_SIZE 20000
 class M2MDynamicMemory {
@@ -31,9 +30,6 @@ public:
     void * operator new[] (size_t size);
     void operator delete[] (void * ptr);
 
-    M2MDynamicMemory(void);
-    ~M2MDynamicMemory(void);
-
     static void init(void);
     static void init(size_t size);
     static void init(void *heapAllocation, size_t size);
@@ -42,7 +38,7 @@ public:
     static void *memory_alloc(uint16_t size);
     static void memory_free(void *ptr);
 
-    //static deinit();
+    /* TODO at least for completeness there should be de-init method */
 
 private:
 
@@ -50,7 +46,6 @@ private:
     static void * heapPtr;
     static size_t heapSize;
     static int referenceCount;
-    //static mem_stat_t memInfo;
 };
 
 #endif

@@ -74,7 +74,7 @@ M2MNsdlInterface::M2MNsdlInterface(M2MNsdlObserver &observer, M2MConnectionHandl
     // and free functions in structure and used functions for sending
     // and receiving purposes.
     _nsdl_handle = sn_nsdl_init(&(__nsdl_c_send_to_server), &(__nsdl_c_received_from_server),
-                 &(/*__nsdl_c_M2MDynamicMemory::*/memory_alloc), &(/*__nsdl_c_M2MDynamicMemory::*/memory_free));
+                 &(memory_alloc), &(memory_free));
     sn_nsdl_set_context(_nsdl_handle, this);
 
     initialize();
@@ -302,23 +302,6 @@ bool M2MNsdlInterface::send_unregister_message()
     success = sn_nsdl_unregister_endpoint(_nsdl_handle) != 0;
     return success;
 }
-
-#if 0
-// XXX: move these to common place, no need to copy these wrappers to multiple places:
-void *M2MNsdlInterface::memory_alloc(uint16_t size)
-{
-    if(size)
-        return malloc(size);
-    else
-        return 0;
-}
-
-void M2MNsdlInterface::memory_free(void *ptr)
-{
-    if(ptr)
-        free(ptr);
-}
-#endif
 
 uint8_t* M2MNsdlInterface::alloc_string_copy(const uint8_t* source, uint16_t size)
 {

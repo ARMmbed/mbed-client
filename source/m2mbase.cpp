@@ -496,21 +496,6 @@ sn_coap_hdr_s* M2MBase::handle_post_request(nsdl_s */*nsdl*/,
     return NULL;
 }
 
-#if 0
-void *M2MBase::memory_alloc(uint32_t size)
-{
-    if(size)
-        return malloc(size);
-    else
-        return 0;
-}
-
-void M2MBase::memory_free(void *ptr)
-{
-    free(ptr);
-}
-#endif
-
 char* M2MBase::alloc_string_copy(const char* source)
 {
     assert(source != NULL);
