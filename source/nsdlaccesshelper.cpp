@@ -38,21 +38,7 @@ uint8_t __nsdl_c_callback(struct nsdl_s *nsdl_handle,
     }
     return status;
 }
-#if 0
-void* __nsdl_c_memory_alloc(uint16_t size)
-{
-    if(size)
-        return malloc(size);
-    else
-        return 0;
-}
 
-void __nsdl_c_memory_free(void *ptr)
-{
-    if(ptr)
-        free(ptr);
-}
-#endif
 uint8_t __nsdl_c_send_to_server(struct nsdl_s * nsdl_handle,
                                 sn_nsdl_capab_e protocol,
                                 uint8_t *data_ptr,
@@ -89,16 +75,3 @@ uint8_t __nsdl_c_received_from_server(struct nsdl_s * nsdl_handle,
     }
     return status;
 }
-#if 0
-void* __socket_malloc( void * context, size_t size)
-{
-    (void) context;
-    return malloc(size);
-}
-
-void __socket_free(void * context, void * ptr)
-{
-    (void) context;
-    free(ptr);
-}
-#endif

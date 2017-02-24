@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-//#include <new>
 #include <malloc.h>
 #include "include/m2mdynamicmemory.h"
 #include "include/m2mdynmemLIB.h"
@@ -24,11 +23,14 @@ int M2MDynamicMemory::memCount = 0;
 void * M2MDynamicMemory::heap = 0;
 void * M2MDynamicMemory::heapPtr = 0;
 int M2MDynamicMemory::referenceCount = 0;
-mem_stat_t /*M2MDynamicMemory::*/memInfo;
+
 
 #define M2M_DYNMEM_LIB
 //#define M2M_PASSTHROUGH
 #define M2M_TRACE_PRINTS
+#ifdef M2M_DYNMEM_LIB
+static mem_stat_t memInfo;
+#endif
 static void memory_fail_callback(heap_fail_t fail) {
 #ifdef M2M_TRACE_PRINTS
     printf("\nM2M memory failure: %u\n", fail);
@@ -41,17 +43,11 @@ static void memory_fail_callback(heap_fail_t fail) {
 void * M2MDynamicMemory::operator new (size_t size) {
     void *tmp;
     size_t allocatedSize;
-    //if (size == 0) return 0;
     tmp=m2m_dyn_mem_alloc(size);
-//	tmp=malloc(size);
-//	allocatedSize=((size-1) / 8 + 1) * 8; /* "worst case" 64-bit alignment assumption */
-//	heapPtr+=allocatedSize;
     memTotal+=size; memCount++;
-//    printf("cn:%lu:%lu:%d:%d:", size, /*allocatedSize*/ (long int)0, memTotal, memCount);
 #ifdef M2M_TRACE_PRINTS
     printf("mn"); /* M2M new */
     print_heap_running_statistics();
-    //print_heap_overall_statistics();
 #endif
     return tmp;
 }
@@ -59,7 +55,6 @@ void * M2MDynamicMemory::operator new (size_t size) {
 void M2MDynamicMemory::operator delete (void * ptr) {
     memCount--; /* still update allocation counter */
     m2m_dyn_mem_free(ptr);
-//    printf("cd:%d", memCount);
 #ifdef M2M_TRACE_PRINTS
     printf("md"); /* M2M delete */
     print_heap_overall_statistics();
@@ -69,7 +64,6 @@ void * M2MDynamicMemory::operator new[] (size_t size) {
     void *tmp;
     tmp=m2m_dyn_mem_alloc(size);
     memTotal+=size; memCount++;
-    //printf("cn[]:%lu:%d:%d:", size, memTotal, memCount);
 #ifdef M2M_TRACE_PRINTS
     printf("mn[]"); /* M2M new array */
 #endif
@@ -81,7 +75,6 @@ void M2MDynamicMemory::operator delete[] (void * ptr) {
 #ifdef M2M_TRACE_PRINTS
     printf("md[]"); /* M2M delete array */
 #endif
-//  printf("cd[]:%d:", memCount);
 }
 #endif
 #if 0
@@ -89,14 +82,11 @@ void M2MDynamicMemory::operator delete[] (void * ptr) {
 void * M2MDynamicMemory::operator new (size_t size) {
     void *tmp;
     size_t allocatedSize;
-    //printf("(pcn)");
-    //if (size == 0) return 0;
     tmp=heapPtr;
     allocatedSize=((size-1) / 8 + 1) * 8; /* "worst case" 64-bit alignment assumption */
     heapPtr+=allocatedSize;
     memTotal+=allocatedSize; memCount++;
     printf("cn:%lu:%lu:%d:%d:%p:", size, allocatedSize, memTotal, memCount, tmp);
-    //throw std::bad_alloc();
     return tmp;
 }
 
@@ -108,9 +98,8 @@ void M2MDynamicMemory::operator delete (void * ptr) {
 void * M2MDynamicMemory::operator new[] (size_t size) {
     void *tmp;
     size_t allocatedSize;
-    //if (size == 0) return 0;
     tmp=heapPtr;
-    allocatedSize=((size-1) / 8 + 1) * 8; /* "worst case" 64-bit alignment assumption */ 
+    allocatedSize=((size-1) / 8 + 1) * 8; /* "worst case" 64-bit alignment assumption */
     heapPtr+=allocatedSize;
     memTotal+=allocatedSize; memCount++;
     printf("cn[]:%lu:%lu:%d:%d:%p:", size, allocatedSize, memTotal, memCount, tmp);
@@ -164,35 +153,16 @@ void M2MDynamicMemory::operator delete[] (void * ptr) {
 #endif
 
 void M2MDynamicMemory::init(void) {
-//    printf("Init allocated %d bytes for cloud client heap\n",
-//        );
-//    heap=malloc( M2M_DYNAMIC_MEMORY_HEAP_SIZE);
-//    heapPtr=heap;
-//    m2m_dyn_mem_init((uint8_t *)heap, M2M_DYNAMIC_MEMORY_HEAP_SIZE, 0, &memInfo);
     init(M2M_DYNAMIC_MEMORY_HEAP_SIZE);
-/* sanity check */
-#if 0
-    void * tmp;
-    tmp = memory_alloc(2000);
-    memory_free(tmp);
-    tmp = memory_alloc(200);
-    memory_free(tmp);
-    tmp = memory_alloc(10000);
-    memory_free(tmp);
-#endif
 }
 
 void M2MDynamicMemory::init(size_t heapSize) {
     heap=malloc( heapSize );
     printf("Init allocated %lu bytes for cloud client heap at %p\n", heapSize, heap);
-//    heapPtr=heap;
-//    m2m_dyn_mem_init((uint8_t *)heap, (uint16_t)heapSize, 0, &memInfo);
     init(heap, heapSize);
 }
 
 void M2MDynamicMemory::init(void *heapAllocation, size_t heapSize) {
-//    heap=malloc( M2M_DYNAMIC_MEMORY_HEAP_SIZE)i;
-  //  printf("Init allocated %d bytes for cloud client heap at %p\n", heapSize, heap);
     heapSize=heapSize;
     heapPtr=heapAllocation;
 #ifdef M2M_DYNMEM_LIB
@@ -214,30 +184,6 @@ void M2MDynamicMemory::print_heap_overall_statistics() {
         memInfo.heap_alloc_total_bytes, memInfo.heap_alloc_fail_cnt);
 #else
    // printf(":%lu:%lu:%d:%d:", size, allocatedSize, memTotal, memCount);
-#endif
-}
-M2MDynamicMemory::M2MDynamicMemory(void) {
-#if 0
-    if (heap == 0) {
-        printf("Allocated %d bytes for cloud client heap\n",
-            CLOUD_CLIENT_HEAP_SIZE);
-        heap=malloc(CLOUD_CLIENT_HEAP_SIZE);
-        heapPtr=heap;
-        cloud_client_dyn_mem_init((uint8_t *)heap, CLOUD_CLIENT_HEAP_SIZE, 0, &memInfo);
-    }
-    referenceCount++;
-    //printf ("debug heapPtr: %p, ref: %d\n", heap, referenceCount);
-#endif
-}
-M2MDynamicMemory::~M2MDynamicMemory(void) {
-#if 0
-    referenceCount--;
-    printf("Cloud client heap destructor, refCount: %d\n", referenceCount);
-    if (heap && !referenceCount) {
-        printf("Deleting cloud client heap\n");
-        free(heap);
-        heap=0;
-    }
 #endif
 }
 
