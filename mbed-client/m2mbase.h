@@ -272,7 +272,7 @@ public:
      * \brief Sets the max age for the resource value to be cached.
      * \param max_age The max age in seconds.
      */
-    virtual void set_max_age(const uint32_t max_age);
+    void set_max_age(const uint32_t max_age);
 
     /**
      * \brief Returns the object type.
@@ -284,7 +284,7 @@ public:
      * \brief Returns the operation type of the object.
      * \return The supported operation on the object.
      */
-    virtual M2MBase::Operation operation() const;
+    M2MBase::Operation operation() const;
 
     /**
      * \brief Returns the object name.
@@ -302,19 +302,19 @@ public:
      * \brief Returns the object's instance ID.
      * \returns The instance ID of the object.
      */
-    virtual uint16_t instance_id() const;
+    uint16_t instance_id() const;
 
     /**
      * \brief Returns the interface description of the object.
      * \return The interface description of the object.
      */
-    virtual const char* interface_description() const;
+    const char* interface_description() const;
 
     /**
      * \brief Returns the resource type of the object.
      * \return The resource type of the object.
      */
-    virtual const char* resource_type() const;
+    const char* resource_type() const;
 
     /**
      * \brief Returns the path of the object.
@@ -326,32 +326,32 @@ public:
      * \brief Returns the CoAP content type of the object.
      * \return The CoAP content type of the object.
      */
-    virtual uint8_t coap_content_type() const;
+    uint8_t coap_content_type() const;
 
     /**
      * \brief Returns the observation status of the object.
      * \return True if observable, else false.
      */
-    virtual bool is_observable() const;
+    bool is_observable() const;
 
     /**
      * \brief Returns the observation level of the object.
      * \return The observation level of the object.
      */
-    virtual M2MBase::Observation observation_level() const;
+    M2MBase::Observation observation_level() const;
 
     /**
      * \brief Provides the observation token of the object.
      * \param value[OUT] A pointer to the value of the token.
      * \param value_length[OUT] The length of the token pointer.
      */
-    virtual void get_observation_token(uint8_t *&token, uint32_t &token_length);
+    void get_observation_token(uint8_t *&token, uint32_t &token_length);
 
     /**
      * \brief Returns the mode of the resource.
      * \return The mode of the resource.
      */
-     virtual Mode mode() const;
+     Mode mode() const;
 
     /**
      * \brief Returns the observation number.
@@ -363,7 +363,7 @@ public:
      * \brief Returns the max age for the resource value to be cached.
      * \return The maax age in seconds.
      */
-    virtual uint32_t max_age() const;
+    uint32_t max_age() const;
 
     /**
      * \brief Parses the received query for the notification
@@ -423,13 +423,13 @@ public:
      * \brief Returns whether this resource is published to server or not.
      * \return True if the resource is a part of the registration message, else false.
      */
-    virtual bool register_uri();
+    bool register_uri();
 
     /**
      * @brief Returns whether this resource is under observation or not.
      * @return True if the resource is under observation, else false,
      */
-    virtual bool is_under_observation() const;
+    bool is_under_observation() const;
 
     /**
      * @brief Sets the function that is executed when this
