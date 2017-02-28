@@ -5,32 +5,33 @@ SET(CMAKE_SYSTEM_NAME Generic)
 
 project(mbedClient)
 
-set(port_libs_PATH ${CMAKE_CURRENT_SOURCE_DIR}/port_libs/)
+set(port_libs_PATH ${CMAKE_CURRENT_SOURCE_DIR}/port_libs)
 #own include dirs
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/source)
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/mbed-client-classic/)
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/mbed-client-mbed-tls/)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/mbed-client-c)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/mbed-client-classic)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/mbed-client-mbed-tls)
 
 
 #pal include Dirs
-set(PAL_APIS_INCLUDE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/../mbed-client-pal/Source/PAL-Impl/Services-API/)
+set(PAL_APIS_INCLUDE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/../mbed-client-pal/Source/PAL-Impl/Services-API)
 include_directories(${PAL_APIS_INCLUDE_PATH}/)
 SET(PAL_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../mbed-client-pal/Source)
 #need to make this platform
 include_directories(${PAL_SOURCE_DIR}/Port/Reference-Impl/Linux/CFStore)
-include_directories(${PAL_SOURCE_DIR}/Port/Platform-API/)
+include_directories(${PAL_SOURCE_DIR}/Port/Platform-API)
+
+set(MBED_CLIENT_C_PATH ${CMAKE_CURRENT_SOURCE_DIR}/mbed-client-c)
 
 #porting libs
 include_directories(${port_libs_PATH}/nanostack-libservice/mbed-client-libservice)
 include_directories(${port_libs_PATH}/nanostack-libservice/)
 include_directories(${port_libs_PATH}/sal-stack-nanostack-eventloop/nanostack-event-loop)
-include_directories(${port_libs_PATH}/ns-hal-pal/)
-include_directories(${port_libs_PATH}/mbed-client-c/)
-include_directories(${port_libs_PATH}/mbed-trace/)
+include_directories(${port_libs_PATH}/ns-hal-pal)
+include_directories(${port_libs_PATH}/mbed-trace)
 
 
-set(MBED_CLIENT_C_PATH ${CMAKE_CURRENT_SOURCE_DIR}/port_libs/mbed-client-c)
 set(SAL_NANOSTACK_EVENT_LOOP_PATH ${CMAKE_CURRENT_SOURCE_DIR}/port_libs/sal-stack-nanostack-eventloop)
 set(RANDLIB_C_PATH ${CMAKE_CURRENT_SOURCE_DIR}/port_libs/mbed-client-randlib)
 set(NANOSTACK_LIBSERVICE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/port_libs/nanostack-libservice)
@@ -38,38 +39,38 @@ set(NS_HAL_PAL_PATH ${CMAKE_CURRENT_SOURCE_DIR}/port_libs/ns-hal-pal)
 set(MBED_COAP_PATH ${CMAKE_CURRENT_SOURCE_DIR}/port_libs/mbed-coap)
 
 include_directories(${MBED_COAP_PATH})
-include_directories(${MBED_COAP_PATH}/mbed-coap/)
-include_directories(${MBED_COAP_PATH}/source/include/)
+include_directories(${MBED_COAP_PATH}/mbed-coap)
+include_directories(${MBED_COAP_PATH}/source/include)
 
 
 include_directories(${SAL_NANOSTACK_EVENT_LOOP_PATH})
-include_directories(${SAL_NANOSTACK_EVENT_LOOP_PATH}/nanostack-event-loop/)
-include_directories(${SAL_NANOSTACK_EVENT_LOOP_PATH}/nanostack-event-loop/platform/)
-include_directories(${SAL_NANOSTACK_EVENT_LOOP_PATH}/source/libNsdl/src/include/)
-include_directories(${SAL_NANOSTACK_EVENT_LOOP_PATH}/source/libCoap/src/)
-include_directories(${SAL_NANOSTACK_EVENT_LOOP_PATH}/source/libCoap/src/include/)
+include_directories(${SAL_NANOSTACK_EVENT_LOOP_PATH}/nanostack-event-loop)
+include_directories(${SAL_NANOSTACK_EVENT_LOOP_PATH}/nanostack-event-loop/platform)
+include_directories(${SAL_NANOSTACK_EVENT_LOOP_PATH}/source/libNsdl/src/include)
+include_directories(${SAL_NANOSTACK_EVENT_LOOP_PATH}/source/libCoap/src)
+include_directories(${SAL_NANOSTACK_EVENT_LOOP_PATH}/source/libCoap/src/include)
 
 
 include_directories(${MBED_CLIENT_C_PATH})
-include_directories(${MBED_CLIENT_C_PATH}/nsdl-c/)
-include_directories(${MBED_CLIENT_C_PATH}/source/include/)
+include_directories(${MBED_CLIENT_C_PATH}/nsdl-c)
+include_directories(${MBED_CLIENT_C_PATH}/source/include)
 
 include_directories(${RANDLIB_C_PATH}/mbed-client-randlib)
-include_directories(${RANDLIB_C_PATH}/mbed-client-randlib/platform/)
+include_directories(${RANDLIB_C_PATH}/mbed-client-randlib/platform)
 
 include_directories(${NANOSTACK_LIBSERVICE_PATH}/)
-include_directories(${NANOSTACK_LIBSERVICE_PATH}/mbed-client-libservice/)
-include_directories(${NANOSTACK_LIBSERVICE_PATH}/mbed-client-libservice/platform/)
+include_directories(${NANOSTACK_LIBSERVICE_PATH}/mbed-client-libservice)
+include_directories(${NANOSTACK_LIBSERVICE_PATH}/mbed-client-libservice/platform)
 
 
 include_directories(${NS_HAL_PAL_PATH})
 
 
-set(PAL_HEADER_API ${NS_HAL_PAL_PATH}/../../mbed-client-pal/Source/)
-include_directories(${PAL_HEADER_API}/PAL-Impl/Services-API/)
+set(PAL_HEADER_API ${NS_HAL_PAL_PATH}/../../mbed-client-pal/Source)
+include_directories(${PAL_HEADER_API}/PAL-Impl/Services-API)
 #need to make this platform
 include_directories(${PAL_HEADER_API}/Port/Reference-Impl/Linux/CFStore)
-include_directories(${PAL_HEADER_API}/Port/Platform-API/)
+include_directories(${PAL_HEADER_API}/Port/Platform-API)
 
 include_directories(${PAL_HEADER_API})
 
