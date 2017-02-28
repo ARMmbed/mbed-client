@@ -42,10 +42,9 @@ static void memory_fail_callback(heap_fail_t fail) {
 /* nanostack dynmemlib based implementation */
 void * M2MDynamicMemory::operator new (size_t size) {
     void *tmp;
-    size_t allocatedSize;
     tmp=m2m_dyn_mem_alloc(size);
-    memTotal+=size; memCount++;
 #ifdef M2M_TRACE_PRINTS
+    memTotal+=size; memCount++;
     printf("mn"); /* M2M new */
     print_heap_running_statistics();
 #endif
@@ -53,7 +52,9 @@ void * M2MDynamicMemory::operator new (size_t size) {
 }
 
 void M2MDynamicMemory::operator delete (void * ptr) {
+#ifdef M2M_TRACE_PRINTS
     memCount--; /* still update allocation counter */
+#endif
     m2m_dyn_mem_free(ptr);
 #ifdef M2M_TRACE_PRINTS
     printf("md"); /* M2M delete */
@@ -63,14 +64,16 @@ void M2MDynamicMemory::operator delete (void * ptr) {
 void * M2MDynamicMemory::operator new[] (size_t size) {
     void *tmp;
     tmp=m2m_dyn_mem_alloc(size);
-    memTotal+=size; memCount++;
 #ifdef M2M_TRACE_PRINTS
+    memTotal+=size; memCount++;
     printf("mn[]"); /* M2M new array */
 #endif
     return tmp;
 }
 void M2MDynamicMemory::operator delete[] (void * ptr) {
+#ifdef M2M_TRACE_PRINTS
     memCount--;
+#endif
     m2m_dyn_mem_free(ptr);
 #ifdef M2M_TRACE_PRINTS
     printf("md[]"); /* M2M delete array */
@@ -116,38 +119,50 @@ void M2MDynamicMemory::operator delete[] (void * ptr) {
 /* linux malloc based implementation */
 void * M2MDynamicMemory::operator new (size_t size) {
     void *tmp;
+#ifdef M2M_TRACE_PRINTS
     long int allocatedSize;
+#endif
     tmp=malloc(size);
+#ifdef M2M_TRACE_PRINTS
     allocatedSize=malloc_usable_size(tmp);
     memTotal+=allocatedSize; memCount++;
     printf("mn:%lu:%lu:%d:%d:", size, allocatedSize, memTotal, memCount);
+#endif
     return tmp;
 }
 
 void M2MDynamicMemory::operator delete (void * ptr) {
+#ifdef M2M_TRACE_PRINTS
     long int allocatedSize;
     allocatedSize=malloc_usable_size(ptr);
     memCount--;
     memTotal-=allocatedSize;
     printf("md:%lu:%d:%d:", allocatedSize, memTotal, memCount);
+#endif
     free(ptr);
 }
 
 void * M2MDynamicMemory::operator new[] (size_t size) {
     void *tmp;
+#ifdef M2M_TRACE_PRINTS
     long int allocatedSize;
+#endif
     tmp=malloc(size);
+#ifdef M2M_TRACE_PRINTS
     allocatedSize=malloc_usable_size(tmp);
     memTotal+=allocatedSize; memCount++;
     printf("mn[]:%lu:%lu:%d:%d:", size, allocatedSize, memTotal, memCount);
+#endif
     return tmp;
 }
 void M2MDynamicMemory::operator delete[] (void * ptr) {
+#ifdef M2M_TRACE_PRINTS
     long int allocatedSize;
     allocatedSize=malloc_usable_size(ptr);
     memCount--;
     memTotal-=allocatedSize;
     printf("md[]:%lu:%d:%d:", allocatedSize, memTotal, memCount);
+#endif
     free(ptr);
 }
 #endif
@@ -158,7 +173,9 @@ void M2MDynamicMemory::init(void) {
 
 void M2MDynamicMemory::init(size_t heapSize) {
     heap=malloc( heapSize );
+#ifdef M2M_TRACE_PRINTS
     printf("Init allocated %lu bytes for cloud client heap at %p\n", heapSize, heap);
+#endif
     init(heap, heapSize);
 }
 
@@ -171,19 +188,23 @@ void M2MDynamicMemory::init(void *heapAllocation, size_t heapSize) {
 }
 
 void M2MDynamicMemory::print_heap_running_statistics() {
+#ifdef M2M_TRACE_PRINTS
 #ifdef M2M_DYNMEM_LIB
     printf(":%d:%d:", memInfo.heap_sector_allocated_bytes, memInfo.heap_sector_alloc_cnt);
 #else
     printf(":%d:%d:", memTotal, memCount);
 #endif
+#endif
 }
 void M2MDynamicMemory::print_heap_overall_statistics() {
+#ifdef M2M_TRACE_PRINTS
 #ifdef M2M_DYNMEM_LIB
     printf(":%d:%d:%u:%u:", memInfo.heap_sector_size,
         memInfo.heap_sector_allocated_bytes_max,
         memInfo.heap_alloc_total_bytes, memInfo.heap_alloc_fail_cnt);
 #else
    // printf(":%lu:%lu:%d:%d:", size, allocatedSize, memTotal, memCount);
+#endif
 #endif
 }
 
