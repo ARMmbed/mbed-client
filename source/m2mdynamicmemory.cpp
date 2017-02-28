@@ -27,7 +27,7 @@ int M2MDynamicMemory::referenceCount = 0;
 
 #define M2M_DYNMEM_LIB
 //#define M2M_PASSTHROUGH
-#define M2M_TRACE_PRINTS
+//#define M2M_TRACE_PRINTS
 #ifdef M2M_DYNMEM_LIB
 static mem_stat_t memInfo;
 #endif
