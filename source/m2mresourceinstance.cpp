@@ -31,7 +31,6 @@ M2MResourceInstance::M2MResourceInstance(M2MResource &parent,
                                          const String &res_name,
                                          const String &resource_type,
                                          M2MResourceInstance::ResourceType type,
-                                         const uint16_t object_instance_id,
                                          char* path,
                                          bool external_blockwise_store)
 : M2MBase(res_name,
@@ -44,7 +43,6 @@ M2MResourceInstance::M2MResourceInstance(M2MResource &parent,
  _value_length(0),
  _block_message_data(NULL),
  _resource_callback(NULL),
- _object_instance_id(object_instance_id),
  _resource_type(type)
 {
     M2MBase::set_base_type(M2MBase::ResourceInstance);
@@ -56,7 +54,6 @@ M2MResourceInstance::M2MResourceInstance(M2MResource &parent,
                                          M2MResourceInstance::ResourceType type,
                                          const uint8_t *value,
                                          const uint8_t value_length,
-                                         const uint16_t object_instance_id,
                                          char* path,
                                          bool external_blockwise_store)
 : M2MBase(res_name,
@@ -69,8 +66,7 @@ M2MResourceInstance::M2MResourceInstance(M2MResource &parent,
  _value_length(0),
  _block_message_data(NULL),
  _resource_callback(NULL),
- _object_instance_id(object_instance_id),
-  _resource_type(type)
+ _resource_type(type)
 {
     M2MBase::set_base_type(M2MBase::Resource);
     if (mode() == M2MBase::Dynamic) {
@@ -95,15 +91,13 @@ M2MResourceInstance::M2MResourceInstance(M2MResource &parent,
 
 M2MResourceInstance::M2MResourceInstance(M2MResource &parent,
                                          const lwm2m_parameters_s* s,
-                                         M2MResourceInstance::ResourceType type,
-                                         const uint16_t object_instance_id)
+                                         M2MResourceInstance::ResourceType type)
 : M2MBase(s),
   _parent_resource(parent),
   _value(NULL),
   _value_length(0),
   _block_message_data(NULL),
   _resource_callback(NULL),
-  _object_instance_id(object_instance_id),
   _resource_type(type)
 {
     //TBD: put to flash, or parse from the uri_path!!!!
@@ -567,7 +561,8 @@ void M2MResourceInstance::set_resource_observer(M2MResourceCallback *resource)
 
 uint16_t M2MResourceInstance::object_instance_id() const
 {
-    return _object_instance_id;
+    const M2MObjectInstance& parent_object_instance = get_parent_resource().get_parent_object_instance();
+    return parent_object_instance.instance_id();
 }
 
 M2MBlockMessage* M2MResourceInstance::block_message() const
