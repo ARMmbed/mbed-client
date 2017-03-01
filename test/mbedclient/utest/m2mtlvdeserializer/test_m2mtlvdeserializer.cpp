@@ -178,7 +178,6 @@ void Test_M2MTLVDeserializer::test_deserialise_object_instances()
                                                                 "1",
                                                                 "type",
                                                                 M2MResourceInstance::INTEGER,
-                                                                0,
                                                                 "1",
                                                                 false);
 
@@ -187,7 +186,6 @@ void Test_M2MTLVDeserializer::test_deserialise_object_instances()
                                                                  "2",
                                                                  "type",
                                                                  M2MResourceInstance::INTEGER,
-                                                                 0,
                                                                  "1",
                                                                  false);
 
@@ -339,7 +337,6 @@ void Test_M2MTLVDeserializer::test_deserialize_resources()
                                                                 "1",
                                                                 "type",
                                                                 M2MResourceInstance::INTEGER,
-                                                                0,
                                                                 "1",
                                                                 false);
 
@@ -415,7 +412,6 @@ void Test_M2MTLVDeserializer::test_deserialize_resource_instance_1()
                                                                 "1",
                                                                 "type",
                                                                 M2MResourceInstance::INTEGER,
-                                                                0,
                                                                 "1",
                                                                 false);
 
@@ -426,7 +422,6 @@ void Test_M2MTLVDeserializer::test_deserialize_resource_instance_1()
                                                                  "2",
                                                                  "type",
                                                                  M2MResourceInstance::INTEGER,
-                                                                 0,
                                                                  "2",
                                                                  false);
 
@@ -522,7 +517,6 @@ void Test_M2MTLVDeserializer::test_deserialize_resource_instance()
                                                                 "1",
                                                                 "type",
                                                                 M2MResourceInstance::INTEGER,
-                                                                0,
                                                                 "1",
                                                                 false);
 
@@ -530,7 +524,6 @@ void Test_M2MTLVDeserializer::test_deserialize_resource_instance()
                                                                   "2",
                                                                   "type",
                                                                   M2MResourceInstance::INTEGER,
-                                                                  0,
                                                                   "2",
                                                                   false);
 

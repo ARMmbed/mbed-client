@@ -38,7 +38,6 @@ Test_M2MDevice::Test_M2MDevice()
                                                                               "name",
                                                                               "type",
                                                                               M2MResourceInstance::STRING,
-                                                                              0,
                                                                               "name",
                                                                               false);
     m2mresource_stub::bool_value = true;
@@ -77,7 +76,6 @@ void Test_M2MDevice::test_create_resource_instance()
                                                                              "name",
                                                                              "type",
                                                                              M2MResourceInstance::STRING,
-                                                                             0,
                                                                              "name",
                                                                              false);
 
@@ -470,7 +468,6 @@ void Test_M2MDevice::test_resource_value_int()
                                                         "name",
                                                         "type",
                                                         M2MResourceInstance::STRING,
-                                                        0,
                                                         "name",
                                                         false);
     m2mresource_stub::bool_value = true;
