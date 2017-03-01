@@ -571,7 +571,6 @@ private:
 
 friend class Test_M2MBase;
 friend class Test_M2MObject;
-
 };
 
 #endif // M2M_BASE_H

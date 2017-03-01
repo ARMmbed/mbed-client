@@ -109,7 +109,6 @@ void Test_M2MResource::test_handle_observation_attribute()
                                                                               "name",
                                                                               "type",
                                                                               M2MResourceInstance::INTEGER,
-                                                                              0,
                                                                               "name",
                                                                               false);
 
@@ -138,7 +137,6 @@ void Test_M2MResource::test_add_resource_instance()
                                                                               "name",
                                                                               "type",
                                                                               M2MResourceInstance::INTEGER,
-                                                                              0,
                                                                               "name",
                                                                               false);
     resource->add_resource_instance(res);
@@ -151,7 +149,6 @@ void Test_M2MResource::test_remove_resource_instance()
                                                                               "name",
                                                                               "type",
                                                                               M2MResourceInstance::STRING,
-                                                                              0,
                                                                               "name",
                                                                               false);
     resource->_resource_instance_list.push_back(res);
@@ -164,7 +161,6 @@ void Test_M2MResource::test_resource_instance()
                                                                               "name",
                                                                               "type",
                                                                               M2MResourceInstance::STRING,
-                                                                              0,
                                                                               "name",
                                                                               false);
     resource->_resource_instance_list.push_back(res);
@@ -177,7 +173,6 @@ void Test_M2MResource::test_resource_instances()
                                                                               "name",
                                                                               "type",
                                                                               M2MResourceInstance::STRING,
-                                                                              0,
                                                                               "name",
                                                                               false);
     resource->_resource_instance_list.push_back(res);
@@ -191,7 +186,6 @@ void Test_M2MResource::test_resource_instance_count()
                                                                               "name",
                                                                               "type",
                                                                               M2MResourceInstance::STRING,
-                                                                              0,
                                                                               "name",
                                                                               false);
     resource->_resource_instance_list.push_back(res);
@@ -204,7 +198,6 @@ void Test_M2MResource::test_add_observation_level()
                                                                               "name",
                                                                               "type",
                                                                               M2MResourceInstance::STRING,
-                                                                              0,
                                                                               "name",
                                                                               false);
     resource->_resource_instance_list.push_back(res);
@@ -220,7 +213,6 @@ void Test_M2MResource::test_remove_observation_level()
                                                                               "name",
                                                                               "type",
                                                                               M2MResourceInstance::STRING,
-                                                                              0,
                                                                               "name",
                                                                               false);
     resource->_resource_instance_list.push_back(res);
@@ -265,7 +257,6 @@ void Test_M2MResource::test_handle_get_request()
                                                                               "name",
                                                                               "res2",
                                                                               M2MResourceInstance::STRING,
-                                                                              0,
                                                                               "name",
                                                                               false);
 
@@ -273,7 +264,6 @@ void Test_M2MResource::test_handle_get_request()
                                                                               "name",
                                                                               "res2",
                                                                               M2MResourceInstance::STRING,
-                                                                              0,
                                                                               "name",
                                                                               false);
     CHECK(resource->handle_get_request(NULL,coap_header,handler) == NULL);
@@ -617,13 +607,13 @@ void Test_M2MResource::test_execute_params()
 
 void Test_M2MResource::test_ctor()
 {
-    M2MResource* res = new M2MResource(*m2mobject_stub::inst,&params,M2MResourceInstance::INTEGER,0);
+    M2MResource* res = new M2MResource(*m2mobject_stub::inst,&params,M2MResourceInstance::INTEGER);
     delete res;
 }
 
 void Test_M2MResource::test_get_parent_object_instance()
 {
-    M2MResource* res = new M2MResource(*m2mobject_stub::inst,&params,M2MResourceInstance::INTEGER,0);
+    M2MResource* res = new M2MResource(*m2mobject_stub::inst,&params,M2MResourceInstance::INTEGER);
 
     // Only for the code coverage
     res->get_parent_object_instance();

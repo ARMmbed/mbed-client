@@ -232,7 +232,7 @@ void Test_M2MObjectInstance::test_remove_resource_instance()
     m2mbase_stub::void_value = malloc(20);
 
     m2mresource_stub::bool_value = true;
-    M2MResourceInstance *ins = new M2MResourceInstance(*res,"name","type",M2MResourceInstance::STRING,0,"name",false);
+    M2MResourceInstance *ins = new M2MResourceInstance(*res,"name","type",M2MResourceInstance::STRING,"name",false);
 
     m2mresource_stub::list.push_back(ins);
 
