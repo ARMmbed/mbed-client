@@ -32,8 +32,7 @@ M2MObject::M2MObject(const String &object_name, char *path, bool external_blockw
           M2MBase::Dynamic,
           "",
           path,
-          external_blockwise_store),
-  _max_instance_count(MAX_UNINT_16_COUNT)
+          external_blockwise_store)
 {
     M2MBase::set_base_type(M2MBase::Object);
     if(M2MBase::name_id() != -1) {
@@ -42,8 +41,7 @@ M2MObject::M2MObject(const String &object_name, char *path, bool external_blockw
 }
 
 M2MObject::M2MObject(const M2MBase::lwm2m_parameters_s* static_res)
-: M2MBase(static_res),
-  _max_instance_count(MAX_UNINT_16_COUNT)
+: M2MBase(static_res)
 {
     if(static_res->name_id != -1) {
         M2MBase::set_coap_content_type(COAP_CONTENT_OMA_TLV_TYPE);
@@ -369,13 +367,13 @@ sn_coap_hdr_s* M2MObject::handle_post_request(nsdl_s *nsdl,
                 tr_debug("M2MObject::handle_post_request() - Request Content-Type %d", coap_content_type);
 
                 if(COAP_CONTENT_OMA_TLV_TYPE == coap_content_type) {
-                    uint16_t instance_id = 0;
+                    uint32_t instance_id = 0;
                     // Check next free instance id
-                    for(instance_id = 0; instance_id <= _max_instance_count; instance_id++) {
+                    for(instance_id = 0; instance_id <= MAX_UNINT_16_COUNT; instance_id++) {
                         if(NULL == object_instance(instance_id)) {
                             break;
                         }
-                        if(instance_id == _max_instance_count) {
+                        if(instance_id == MAX_UNINT_16_COUNT) {
                             msg_code = COAP_MSG_CODE_RESPONSE_METHOD_NOT_ALLOWED;
                             break;
                         }
