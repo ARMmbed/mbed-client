@@ -202,7 +202,7 @@ void Test_M2MNsdlInterface::test_create_nsdl_list_structure()
                                                    "name");
 
     M2MResourceInstance* res_instance = new M2MResourceInstance(*create_resource, *name, *name,
-                                       M2MResourceInstance::INTEGER, 0, (char*)name->c_str(), false);
+                                       M2MResourceInstance::INTEGER, (char*)name->c_str(), false);
 
     m2mobject_stub::instance_list.clear();
     m2mobject_stub::instance_list.push_back(instance);
@@ -1424,10 +1424,10 @@ void Test_M2MNsdlInterface::test_observation_to_be_sent()
 
     M2MResourceInstance* res_instance = new M2MResourceInstance(*res,
                                                                 "res", "res",
-                                                                M2MResourceInstance::INTEGER,0,"",false);
+                                                                M2MResourceInstance::INTEGER,"",false);
     M2MResourceInstance* res_instance_1 = new M2MResourceInstance(*res2,
                                                                   "res2", "res2",
-                                                                  M2MResourceInstance::INTEGER,0,"",false);
+                                                                  M2MResourceInstance::INTEGER,"",false);
     m2mresource_stub::list.clear();
     m2mresource_stub::list.push_back(res_instance);
     m2mresource_stub::list.push_back(res_instance_1);
@@ -1566,7 +1566,7 @@ void Test_M2MNsdlInterface::test_value_updated()
                                                                      "resource_name",
                                                                      "resource_type",
                                                                      M2MResourceInstance::INTEGER,
-                                                                     0,"",false);
+                                                                     "",false);
 
     m2mobject_stub::base_type = M2MBase::Object;
     m2mbase_stub::string_value = "name";
@@ -1703,7 +1703,7 @@ void Test_M2MNsdlInterface::test_find_resource()
     M2MResourceInstance *resource_instance = new M2MResourceInstance(*resource,
                                                                      "0",
                                                                      "resource_type",
-                                                                     M2MResourceInstance::INTEGER,0,"0",false);
+                                                                     M2MResourceInstance::INTEGER,"0",false);
 
     m2mobjectinstance_stub::base_type = M2MBase::ObjectInstance;
     m2mobject_stub::instance_list.push_back(object_instance);
