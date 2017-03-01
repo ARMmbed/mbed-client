@@ -726,30 +726,22 @@ void M2MNsdlInterface::send_delayed_response(M2MBase *base)
             resource = static_cast<M2MResource *> (base);
         }
         if(resource) {
-            sn_coap_hdr_s * coap_response = static_cast<sn_coap_hdr_s *>(malloc(sizeof(sn_coap_hdr_s)));
-            if(coap_response) {
-                memset(coap_response,0,sizeof(sn_coap_hdr_s));
+            sn_coap_hdr_s coap_response;
 
-                coap_response->msg_type = COAP_MSG_TYPE_CONFIRMABLE;
-                coap_response->msg_code = COAP_MSG_CODE_RESPONSE_CONTENT;
-                resource->get_delayed_token(coap_response->token_ptr,coap_response->token_len);
+            memset(&coap_response,0,sizeof(sn_coap_hdr_s));
 
-                uint32_t length = 0;
-                resource->get_value(coap_response->payload_ptr, length);
-                coap_response->payload_len = length;
+            coap_response.msg_type = COAP_MSG_TYPE_CONFIRMABLE;
+            coap_response.msg_code = COAP_MSG_CODE_RESPONSE_CONTENT;
+            resource->get_delayed_token(coap_response.token_ptr,coap_response.token_len);
 
-                sn_nsdl_send_coap_message(_nsdl_handle, _nsdl_handle->nsp_address_ptr->omalw_address_ptr, coap_response);
+            uint32_t length = 0;
+            resource->get_value(coap_response.payload_ptr, length);
+            coap_response.payload_len = length;
 
-                if(coap_response->payload_ptr) {
-                   free(coap_response->payload_ptr);
-                   coap_response->payload_ptr = NULL;
-                }
-                if(coap_response->token_ptr) {
-                    free(coap_response->token_ptr);
-                    coap_response->token_ptr = NULL;
-                }
-                free(coap_response);
-            }
+            sn_nsdl_send_coap_message(_nsdl_handle, _nsdl_handle->nsp_address_ptr->omalw_address_ptr, &coap_response);
+
+            free(coap_response.payload_ptr);
+            free(coap_response.token_ptr);
         }
     }
     release_mutex();
