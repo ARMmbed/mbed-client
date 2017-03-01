@@ -40,15 +40,13 @@ M2MObject::M2MObject(const String &object_name, char *path, bool external_blockw
           M2MBase::Dynamic,
           "",
           path,
-          external_blockwise_store),
-  _max_instance_count(65535)
+          external_blockwise_store)
 {
 
 }
 
 M2MObject::M2MObject(const M2MBase::lwm2m_parameters_s* static_res)
-: M2MBase(static_res),
-  _max_instance_count(65535)
+: M2MBase(static_res)
 {
 
 }
