@@ -67,14 +67,12 @@ private: // Constructor and destructor are private
 
     M2MResourceInstance(M2MResource &parent,
                         const lwm2m_parameters_s* s,
-                        M2MResourceInstance::ResourceType type,
-                        const uint16_t object_instance_id);
+                        M2MResourceInstance::ResourceType type);
     /**
      * \brief A constructor for creating a resource.
      * \param resource_name The name of the resource.
      * \param resource_type The type of the resource.
      * \param type The resource data type of the object.
-     * \param object_instance_id Object instance id where resource exists.
      * \param object_name Object name where resource exists.
      * \param path Path of the object like 3/0/1
      * \param external_blockwise_store If true CoAP blocks are passed to application through callbacks
@@ -84,7 +82,6 @@ private: // Constructor and destructor are private
                         const String &resource_name,
                         const String &resource_type,
                         M2MResourceInstance::ResourceType type,
-                        const uint16_t object_instance_id,
                         char* path,
                         bool external_blockwise_store);
 
@@ -96,7 +93,6 @@ private: // Constructor and destructor are private
      * \param value The value pointer of the object.
      * \param value_length The length of the value pointer.
      * \param value_length The length of the value pointer.
-     * \param object_instance_id Object instance id where resource exists.
      * \param object_name Object name where resource exists.
      * \param path Path of the object like 3/0/1
      * \param external_blockwise_store If true CoAP blocks are passed to application through callbacks
@@ -108,7 +104,6 @@ private: // Constructor and destructor are private
                         M2MResourceInstance::ResourceType type,
                         const uint8_t *value,
                         const uint8_t value_length,
-                        const uint16_t object_instance_id,
                         char* path,
                         bool external_blockwise_store);
 
@@ -328,7 +323,7 @@ private:
     // Note: this is not converted yet to the callback storage framework as this pointer could be removed.
     M2MResourceCallback                     *_resource_callback; // Not owned
 
-    uint16_t                                _object_instance_id;
+
     ResourceType                            _resource_type;
 
     friend class Test_M2MResourceInstance;
