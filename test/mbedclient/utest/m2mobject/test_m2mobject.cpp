@@ -401,8 +401,6 @@ void Test_M2MObject::test_handle_post_request()
 
     m2mbase_stub::uint8_value = 99;
 
-    object->_max_instance_count = 0;
-
     M2MObjectInstance *ins = new M2MObjectInstance(*object, "name", "type", "");
     ins->set_instance_id(0);
     object->_instance_list.push_back(ins);
@@ -412,8 +410,6 @@ void Test_M2MObject::test_handle_post_request()
 
     object->remove_object_instance(0);
 
-
-    object->_max_instance_count = 65535;
 
     m2mbase_stub::uint8_value = 0;
 
