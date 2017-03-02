@@ -51,11 +51,7 @@ M2MResourceInstance::M2MResourceInstance(M2MResource &parent,
  _value(NULL),
  _value_length(0),
  _block_message_data(NULL),
- _execute_callback(NULL),
  _resource_callback(NULL),
- _execute_function_pointer(NULL),
- _notification_sent_function_pointer(NULL),
- _notification_sent_callback(NULL),
  _object_instance_id(object_instance_id),
  _resource_type(type)
 {
@@ -80,11 +76,7 @@ M2MResourceInstance::M2MResourceInstance(M2MResource &parent,
  _value(NULL),
  _value_length(0),
  _block_message_data(NULL),
- _execute_callback(NULL),
  _resource_callback(NULL),
- _execute_function_pointer(NULL),
- _notification_sent_function_pointer(NULL),
- _notification_sent_callback(NULL),
  _object_instance_id(object_instance_id),
   _resource_type(type)
 {
@@ -99,10 +91,7 @@ M2MResourceInstance::M2MResourceInstance(M2MResource &parent,
   _value(NULL),
   _value_length(0),
   _block_message_data(NULL),
-  _execute_callback(NULL),
   _resource_callback(NULL),
-  _execute_function_pointer(NULL),
-  _notification_sent_function_pointer(NULL),
   _object_instance_id(object_instance_id),
   _resource_type(type)
 {
@@ -127,7 +116,7 @@ bool M2MResourceInstance::handle_observation_attribute(const char *)
     return m2mresourceinstance_stub::bool_value;
 }
 
-void M2MResourceInstance::set_execute_function(execute_callback)
+bool M2MResourceInstance::set_execute_function(execute_callback)
 {
 }
 
@@ -230,7 +219,7 @@ uint16_t M2MResourceInstance::object_instance_id() const
     return m2mresourceinstance_stub::int_value;
 }
 
-void M2MResourceInstance::set_execute_function(execute_callback_2 callback)
+bool M2MResourceInstance::set_execute_function(execute_callback_2 callback)
 {
 }
 
@@ -239,20 +228,20 @@ M2MBlockMessage* M2MResourceInstance::block_message() const
 
 }
 
-void M2MResourceInstance::set_incoming_block_message_callback(incoming_block_message_callback callback)
+bool M2MResourceInstance::set_incoming_block_message_callback(incoming_block_message_callback callback)
 {
 }
 
-void M2MResourceInstance::set_outgoing_block_message_callback(outgoing_block_message_callback callback)
+bool M2MResourceInstance::set_outgoing_block_message_callback(outgoing_block_message_callback callback)
 {
 
 }
 
-void M2MResourceInstance::set_notification_sent_callback(notification_sent_callback callback)
+bool M2MResourceInstance::set_notification_sent_callback(notification_sent_callback callback)
 {
 }
 
-void M2MResourceInstance::set_notification_sent_callback(notification_sent_callback_2 callback)
+bool M2MResourceInstance::set_notification_sent_callback(notification_sent_callback_2 callback)
 {
 }
 

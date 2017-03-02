@@ -16,6 +16,7 @@
 //CppUTest includes should be after your and system includes
 #include "CppUTest/TestHarness.h"
 #include "test_m2mresourceinstance.h"
+#include "include/m2mcallbackstorage.h"
 
 TEST_GROUP(M2MResourceInstance)
 {
@@ -28,6 +29,7 @@ TEST_GROUP(M2MResourceInstance)
   void teardown()
   {
     delete m2m_resourceinstance;
+    M2MCallbackStorage::delete_instance();
   }
 };
 

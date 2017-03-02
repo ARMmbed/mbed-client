@@ -19,6 +19,7 @@
 #include "mbed-client/m2mobservationhandler.h"
 #include "mbed-client/m2mobject.h"
 #include "mbed-client/m2mobjectinstance.h"
+#include "include/m2mcallbackstorage.h"
 #include "include/m2mreporthandler.h"
 #include "include/nsdllinker.h"
 #include "mbed-client/m2mblockmessage.h"
@@ -42,13 +43,7 @@ M2MResourceInstance::M2MResourceInstance(M2MResource &parent,
  _value(NULL),
  _value_length(0),
  _block_message_data(NULL),
- _execute_callback(NULL),
  _resource_callback(NULL),
- _execute_function_pointer(NULL),
- _notification_sent_function_pointer(NULL),
- _incoming_block_message_cb(NULL),
- _outgoing_block_message_cb(NULL),
- _notification_sent_callback(NULL),
  _object_instance_id(object_instance_id),
  _resource_type(type)
 {
@@ -73,13 +68,7 @@ M2MResourceInstance::M2MResourceInstance(M2MResource &parent,
  _value(NULL),
  _value_length(0),
  _block_message_data(NULL),
- _execute_callback(NULL),
  _resource_callback(NULL),
- _execute_function_pointer(NULL),
- _notification_sent_function_pointer(NULL),
- _incoming_block_message_cb(NULL),
- _outgoing_block_message_cb(NULL),
- _notification_sent_callback(NULL),
  _object_instance_id(object_instance_id),
   _resource_type(type)
 {
@@ -113,13 +102,7 @@ M2MResourceInstance::M2MResourceInstance(M2MResource &parent,
   _value(NULL),
   _value_length(0),
   _block_message_data(NULL),
-  _execute_callback(NULL),
   _resource_callback(NULL),
-  _execute_function_pointer(NULL),
-  _notification_sent_function_pointer(NULL),
-  _incoming_block_message_cb(NULL),
-  _outgoing_block_message_cb(NULL),
-  _notification_sent_callback(NULL),
   _object_instance_id(object_instance_id),
   _resource_type(type)
 {
@@ -140,12 +123,27 @@ M2MResourceInstance::M2MResourceInstance(M2MResource &parent,
 M2MResourceInstance::~M2MResourceInstance()
 {
     free(_value);
-    delete _execute_function_pointer;
-    delete _execute_callback;
-    delete _notification_sent_function_pointer;
-    delete _incoming_block_message_cb;
-    delete _outgoing_block_message_cb;
-    delete _notification_sent_callback;
+
+    execute_callback* callback = (execute_callback*)M2MCallbackStorage::remove_callback(*this,
+                                    M2MCallbackAssociation::M2MResourceInstanceExecuteCallback);
+    delete callback;
+
+    M2MCallbackStorage::remove_callback(*this, M2MCallbackAssociation::M2MResourceInstanceExecuteCallback2);
+
+    incoming_block_message_callback *in_callback = (incoming_block_message_callback*)M2MCallbackStorage::remove_callback(*this,
+                                                        M2MCallbackAssociation::M2MResourceInstanceIncomingBlockMessageCallback);
+    delete in_callback;
+
+    outgoing_block_message_callback *out_callback = (outgoing_block_message_callback*)M2MCallbackStorage::remove_callback(*this,
+                                                        M2MCallbackAssociation::M2MResourceInstanceOutgoingBlockMessageCallback);
+    delete out_callback;
+
+    notification_sent_callback *notif_callback = (notification_sent_callback*)M2MCallbackStorage::remove_callback(*this,
+                                                        M2MCallbackAssociation::M2MResourceInstanceNotificationSentCallback);
+    delete notif_callback;
+
+    M2MCallbackStorage::remove_callback(*this, M2MCallbackAssociation::M2MResourceInstanceNotificationSentCallback2);
+
     delete _block_message_data;
 }
 
@@ -183,18 +181,22 @@ bool M2MResourceInstance::handle_observation_attribute(const char *query)
     return success;
 }
 
-void M2MResourceInstance::set_execute_function(execute_callback callback)
+bool M2MResourceInstance::set_execute_function(execute_callback callback)
 {
-    delete _execute_callback;
-    _execute_callback = new execute_callback(callback);
+    execute_callback* old_callback = (execute_callback*)M2MCallbackStorage::remove_callback(*this, M2MCallbackAssociation::M2MResourceInstanceExecuteCallback);
+    delete old_callback;
+    // XXX: create a copy of the copy of callback object. Perhaps it would better to
+    // give a reference as parameter and just store that, as it would save some memory.
+    execute_callback* new_callback = new execute_callback(callback);
+
+    return M2MCallbackStorage::add_callback(*this, new_callback, M2MCallbackAssociation::M2MResourceInstanceExecuteCallback);
 }
 
-void M2MResourceInstance::set_execute_function(execute_callback_2 callback)
+bool M2MResourceInstance::set_execute_function(execute_callback_2 callback)
 {
-    delete _execute_function_pointer;
+    M2MCallbackStorage::remove_callback(*this, M2MCallbackAssociation::M2MResourceInstanceExecuteCallback2);
 
-    _execute_function_pointer = new FP1<void, void*>(callback);
-    set_execute_function(execute_callback(_execute_function_pointer, &FP1<void, void*>::call));
+    return M2MCallbackStorage::add_callback(*this, (void*)callback, M2MCallbackAssociation::M2MResourceInstanceExecuteCallback2);
 }
 
 void M2MResourceInstance::clear_value()
@@ -317,8 +319,15 @@ bool M2MResourceInstance::is_value_changed(const uint8_t* value, const uint32_t 
 void M2MResourceInstance::execute(void *arguments)
 {
     tr_debug("M2MResourceInstance::execute");
-    if(_execute_callback) {
-        (*_execute_callback)(arguments);
+    execute_callback* callback = (execute_callback*)M2MCallbackStorage::get_callback(*this, M2MCallbackAssociation::M2MResourceInstanceExecuteCallback);
+
+    if (callback) {
+        (*callback)(arguments);
+    }
+
+    execute_callback_2 callback2 = (execute_callback_2)M2MCallbackStorage::get_callback(*this, M2MCallbackAssociation::M2MResourceInstanceExecuteCallback2);
+    if (callback2) {
+        (*callback2)(arguments);
     }
 }
 
@@ -392,14 +401,16 @@ sn_coap_hdr_s* M2MResourceInstance::handle_get_request(nsdl_s *nsdl,
 
                 //If handler exists it means that resource value is stored in application side
                 if (block_message() && block_message()->is_block_message()) {
-                    if(_outgoing_block_message_cb) {
+                    outgoing_block_message_callback* outgoing_block_message_cb = (outgoing_block_message_callback*)M2MCallbackStorage::get_callback(*this,
+                                                                                                        M2MCallbackAssociation::M2MResourceInstanceOutgoingBlockMessageCallback);
+                    if (outgoing_block_message_cb) {
                         String name = "";
                         if (received_coap_header->uri_path_ptr != NULL &&
                                 received_coap_header->uri_path_len > 0) {
                             name.append_raw((char *)received_coap_header->uri_path_ptr,
                                              received_coap_header->uri_path_len);
                         }
-                        (*_outgoing_block_message_cb)(name, coap_response->payload_ptr, payload_len);
+                        (*outgoing_block_message_cb)(name, coap_response->payload_ptr, payload_len);
                     }
                 } else {
                     get_value(coap_response->payload_ptr,payload_len);
@@ -503,8 +514,10 @@ sn_coap_hdr_s* M2MResourceInstance::handle_put_request(nsdl_s *nsdl,
                         block_message()->set_message_info(received_coap_header);
                         if (block_message()->is_block_message()) {
                             external_block_store = true;
-                            if(_incoming_block_message_cb) {
-                                (*_incoming_block_message_cb)(_block_message_data);
+                            incoming_block_message_callback* incoming_block_message_cb = (incoming_block_message_callback*)M2MCallbackStorage::get_callback(*this,
+                                                                                    M2MCallbackAssociation::M2MResourceInstanceIncomingBlockMessageCallback);
+                            if (incoming_block_message_cb) {
+                                (*incoming_block_message_cb)(_block_message_data);
                             }
                             if (block_message()->is_last_block()) {
                                 block_message()->clear_values();
@@ -562,43 +575,61 @@ M2MBlockMessage* M2MResourceInstance::block_message() const
     return _block_message_data;
 }
 
-void M2MResourceInstance::set_incoming_block_message_callback(incoming_block_message_callback callback)
+bool M2MResourceInstance::set_incoming_block_message_callback(incoming_block_message_callback callback)
 {
+    incoming_block_message_callback* old_callback = (incoming_block_message_callback*)M2MCallbackStorage::remove_callback(*this,
+                                                        M2MCallbackAssociation::M2MResourceInstanceIncomingBlockMessageCallback);
+    delete old_callback;
+
     // copy the callback object. This will change on next version to be a direct pointer to a interface class,
     // this FPn<> is just too heavy for this usage.
-    delete _incoming_block_message_cb;
-    _incoming_block_message_cb = new incoming_block_message_callback(callback);
+    incoming_block_message_callback* new_callback = new incoming_block_message_callback(callback);
 
     delete _block_message_data;
     _block_message_data = NULL;
     _block_message_data = new M2MBlockMessage();
+
+    return M2MCallbackStorage::add_callback(*this, new_callback, M2MCallbackAssociation::M2MResourceInstanceIncomingBlockMessageCallback);
 }
 
-void M2MResourceInstance::set_outgoing_block_message_callback(outgoing_block_message_callback callback)
+bool M2MResourceInstance::set_outgoing_block_message_callback(outgoing_block_message_callback callback)
 {
-    delete _outgoing_block_message_cb;
-    _outgoing_block_message_cb = new outgoing_block_message_callback(callback);
+    outgoing_block_message_callback *old_callback = (outgoing_block_message_callback*)M2MCallbackStorage::remove_callback(*this,
+                                                         M2MCallbackAssociation::M2MResourceInstanceOutgoingBlockMessageCallback);
+    delete old_callback;
+
+    outgoing_block_message_callback *new_callback = new outgoing_block_message_callback(callback);
+    return M2MCallbackStorage::add_callback(*this, new_callback, M2MCallbackAssociation::M2MResourceInstanceOutgoingBlockMessageCallback);
 }
 
-void M2MResourceInstance::set_notification_sent_callback(notification_sent_callback callback)
+bool M2MResourceInstance::set_notification_sent_callback(notification_sent_callback callback)
 {
-    delete _notification_sent_callback;
-    _notification_sent_callback = new notification_sent_callback(callback);
+    notification_sent_callback *old_callback = (notification_sent_callback*)M2MCallbackStorage::remove_callback(*this,
+                                                         M2MCallbackAssociation::M2MResourceInstanceNotificationSentCallback);
+    delete old_callback;
+
+    notification_sent_callback *new_callback = new notification_sent_callback(callback);
+    return M2MCallbackStorage::add_callback(*this, new_callback, M2MCallbackAssociation::M2MResourceInstanceNotificationSentCallback);
 }
 
-void M2MResourceInstance::set_notification_sent_callback(notification_sent_callback_2 callback)
+bool M2MResourceInstance::set_notification_sent_callback(notification_sent_callback_2 callback)
 {
-    delete _notification_sent_function_pointer;
+    M2MCallbackStorage::remove_callback(*this, M2MCallbackAssociation::M2MResourceInstanceNotificationSentCallback2);
 
-    _notification_sent_function_pointer = new FP0<void>(callback);
-    set_notification_sent_callback(
-                notification_sent_callback(_notification_sent_function_pointer, &FP0<void>::call));
+    return M2MCallbackStorage::add_callback(*this, (void*)callback, M2MCallbackAssociation::M2MResourceInstanceNotificationSentCallback2);
 }
 
 void M2MResourceInstance::notification_sent()
 {
-    if (_notification_sent_callback) {
-        (*_notification_sent_callback)();
+    // Now we will call both callbacks, if they are set. This is different from original behavior.
+    notification_sent_callback* callback = (notification_sent_callback*)M2MCallbackStorage::get_callback(*this, M2MCallbackAssociation::M2MResourceInstanceNotificationSentCallback);
+    if (callback) {
+        (*callback)();
+    }
+
+    notification_sent_callback_2 callback2 = (notification_sent_callback_2)M2MCallbackStorage::get_callback(*this, M2MCallbackAssociation::M2MResourceInstanceNotificationSentCallback2);
+    if (callback2) {
+        (*callback2)();
     }
 }
 
