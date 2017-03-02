@@ -602,3 +602,62 @@ bool M2MFirmware::check_value_range(FirmwareResource resource, int64_t value) co
     return success;
 }
 
+bool M2MFirmware::set_update_execute_callback(execute_callback callback)
+{
+
+    M2MResource* m2mresource;
+
+    m2mresource = get_resource(Update);
+
+    if(m2mresource) {
+
+        m2mresource->set_execute_function(callback);
+
+        return true;
+
+    }
+
+    return false;
+
+}
+
+bool M2MFirmware::set_resource_value_update_callback(FirmwareResource resource,
+                                        value_updated_callback callback)
+{
+
+    M2MResource* m2mresource;
+
+    m2mresource = get_resource(resource);
+
+    if(m2mresource) {
+
+        m2mresource->set_value_updated_function(callback);
+
+        return true;
+
+    }
+
+    return false;
+
+}
+
+bool M2MFirmware::set_resource_notification_sent_callback(FirmwareResource resource,
+                                             notification_sent_callback_2 callback)
+{
+
+    M2MResource* m2mresource;
+
+    m2mresource = get_resource(resource);
+
+    if(m2mresource) {
+
+        m2mresource->set_notification_sent_callback(callback);
+
+        return true;
+
+    }
+
+    return false;
+}
+
+
