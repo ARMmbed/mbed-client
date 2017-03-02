@@ -25,7 +25,9 @@
 
 #include "include/m2mreporthandler.h"
 #include "include/nsdlaccesshelper.h"
+#include "include/m2mcallbackstorage.h"
 #include "mbed-trace/mbed_trace.h"
+
 #include <assert.h>
 #include <ctype.h>
 #include <string.h>
@@ -43,8 +45,6 @@ M2MBase::M2MBase(const String& resource_name,
   _report_handler(NULL),
   _observation_handler(NULL),
   _token(NULL),
-  _function_pointer(NULL),
-  _value_updated_callback(NULL),
   _observation_number(0),
   _token_length(0),
   _observation_level(M2MBase::None),
@@ -109,8 +109,6 @@ M2MBase::M2MBase(const lwm2m_parameters_s *s):
     _report_handler(NULL),
     _observation_handler(NULL),
     _token(NULL),
-    _function_pointer(NULL),
-    _value_updated_callback(NULL),
     _observation_number(0),
     _token_length(0),
     _observation_level(M2MBase::None),
@@ -127,8 +125,10 @@ M2MBase::~M2MBase()
     delete _report_handler;
     free_resources();
     free(_token);
-    delete _function_pointer;
-    delete _value_updated_callback;
+    value_updated_callback* callback = (value_updated_callback*)M2MCallbackStorage::remove_callback(*this, M2MCallbackAssociation::M2MBaseValueUpdatedCallback);
+    delete callback;
+
+    M2MCallbackStorage::remove_callback(*this, M2MCallbackAssociation::M2MBaseValueUpdatedCallback2);
 }
 
 char* M2MBase::create_path(const M2MObject &parent, uint16_t object_instance)
@@ -622,31 +622,47 @@ bool M2MBase::is_under_observation() const
     return _is_under_observation;
 }
 
-void M2MBase::set_value_updated_function(value_updated_callback callback)
+bool M2MBase::set_value_updated_function(value_updated_callback callback)
 {
-    delete _value_updated_callback;
+    value_updated_callback* old_callback = (value_updated_callback*)M2MCallbackStorage::remove_callback(*this, M2MCallbackAssociation::M2MBaseValueUpdatedCallback);
+    delete old_callback;
     // XXX: create a copy of the copy of callback object. Perhaps it would better to
     // give a reference as parameter and just store that, as it would save some memory.
-    _value_updated_callback = new value_updated_callback(callback);
+    value_updated_callback* new_callback = new value_updated_callback(callback);
+
+    return M2MCallbackStorage::add_callback(*this, new_callback, M2MCallbackAssociation::M2MBaseValueUpdatedCallback);
 }
 
-void M2MBase::set_value_updated_function(value_updated_callback2 callback)
+bool M2MBase::set_value_updated_function(value_updated_callback2 callback)
 {
-    delete _function_pointer;
-    _function_pointer = new FP1<void, const char*>(callback);
-    set_value_updated_function(value_updated_callback(_function_pointer,
-                                                      &FP1<void, const char*>::call));
+    M2MCallbackStorage::remove_callback(*this, M2MCallbackAssociation::M2MBaseValueUpdatedCallback2);
+
+    return M2MCallbackStorage::add_callback(*this, (void*)callback, M2MCallbackAssociation::M2MBaseValueUpdatedCallback2);
 }
 
-bool M2MBase::is_value_updated_function_set()
+bool M2MBase::is_value_updated_function_set() const
 {
-    return (_value_updated_callback) ? true : false;
+    bool func_set = false;
+    if ((M2MCallbackStorage::does_callback_exist(*this, M2MCallbackAssociation::M2MBaseValueUpdatedCallback) == true) ||
+        (M2MCallbackStorage::does_callback_exist(*this, M2MCallbackAssociation::M2MBaseValueUpdatedCallback2) == true)) {
+
+        func_set = true;
+    }
+    return func_set;
 }
 
 void M2MBase::execute_value_updated(const String& name)
 {
-    if(_value_updated_callback) {
-        (*_value_updated_callback)(name.c_str());
+    // Q: is there a point to call both callback types? Or should we call just one of them?
+
+    value_updated_callback* callback = (value_updated_callback*)M2MCallbackStorage::get_callback(*this, M2MCallbackAssociation::M2MBaseValueUpdatedCallback);
+    if (callback) {
+        (*callback)(name.c_str());
+    }
+
+    value_updated_callback2 callback2 = (value_updated_callback2)M2MCallbackStorage::get_callback(*this, M2MCallbackAssociation::M2MBaseValueUpdatedCallback2);
+    if (callback2) {
+        (*callback2)(name.c_str());
     }
 }
 
