@@ -20,7 +20,7 @@
 #include <stdlib.h>
 #include "ns_list.h"
 
-void (*heap_failure_callback)(heap_fail_t);
+static void (*heap_failure_callback)(heap_fail_t);
 
 #ifndef STANDARD_MALLOC
 static int *heap_main = 0;
