@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-#include <malloc.h>
+#include <cstdlib>
 #include "include/m2mdynamicmemory.h"
 #include "include/m2mdynmemLIB.h"
 
@@ -28,6 +28,13 @@ int M2MDynamicMemory::referenceCount = 0;
 #define M2M_DYNMEM_LIB
 //#define M2M_PASSTHROUGH
 //#define M2M_TRACE_PRINTS
+
+#ifdef M2M_PASSTHROUGH
+#ifdef M2M_TRACE_PRINTS
+#include <malloc.h>
+#endif
+#endif
+
 #ifdef M2M_DYNMEM_LIB
 static mem_stat_t memInfo;
 #endif
