@@ -48,8 +48,7 @@ private: // Constructor and destructor are private,
 
     M2MResource(M2MObjectInstance &_parent,
                  const lwm2m_parameters_s* s,
-                 M2MResourceInstance::ResourceType type,
-                 const uint16_t object_instance_id);
+                 M2MResourceInstance::ResourceType type);
     /**
      * \brief Constructor
      * \param resource_name The resource name of the object.
@@ -58,7 +57,6 @@ private: // Constructor and destructor are private,
      * \param value The value pointer of the object.
      * \param value_length The length of the value pointer.
      * \param path Full path of the resource, eg. 1/2/3. Ownership of the memory is transferred.
-     * \param object_instance_id The instance ID of the object where the resource exists.
      * \param object_name The name of the object where the resource exists.
      * \param multiple_instance True if the resource supports instances.
      * \param external_blockwise_store If true CoAP blocks are passed to application through callbacks
@@ -71,7 +69,6 @@ private: // Constructor and destructor are private,
                 const uint8_t *value,
                 const uint8_t value_length,
                 char *path,
-                const uint16_t object_instance_id = 0,
                 bool multiple_instance = false,
                 bool external_blockwise_store = false);
 
@@ -82,7 +79,6 @@ private: // Constructor and destructor are private,
      * \param type The resource data type of the object.
      * \param observable Indicates whether the resource is observable or not.
      * \param path Full path of the resource, eg. 1/2/3. Ownership of the memory is transferred.
-     * \param object_instance_id The ID of the object instance where the resource exists.
      * \param object_name The name of the object where the resource exists.
      * \param multiple_instance True if the resource supports instances.
      * \param external_blockwise_store If true CoAP blocks are passed to application through callbacks
@@ -94,7 +90,6 @@ private: // Constructor and destructor are private,
                 M2MResourceInstance::ResourceType type,
                 bool observable,
                 char *path,
-                const uint16_t object_instance_id = 0,
                 bool multiple_instance = false,
                 bool external_blockwise_store = false);
 

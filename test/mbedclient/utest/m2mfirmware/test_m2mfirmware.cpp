@@ -38,7 +38,6 @@ Test_M2MFirmware::Test_M2MFirmware()
                                                                               "name",
                                                                               "type",
                                                                               M2MResourceInstance::STRING,
-                                                                              0,
                                                                               "name",
                                                                               false);
     m2mresource_stub::bool_value = true;
