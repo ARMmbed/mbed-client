@@ -101,4 +101,18 @@ TEST(M2MFirmware, resource_name)
     m2m_firmware->test_resource_name();
 }
 
+TEST(M2MFirmware, set_update_execute_callback)
+{
+    m2m_firmware->test_set_update_execute_callback();
+}
+
+TEST(M2MFirmware, set_resource_value_update_callback)
+{
+    m2m_firmware->test_set_resource_value_update_callback();
+}
+
+TEST(M2MFirmware, set_resource_notification_sent_callback)
+{
+    m2m_firmware->test_set_resource_notification_sent_callback();
+}
 

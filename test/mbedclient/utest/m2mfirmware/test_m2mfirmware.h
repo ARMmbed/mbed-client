@@ -53,6 +53,12 @@ public:
 
     void test_resource_name();
 
+    void test_set_update_execute_callback();
+
+    void test_set_resource_value_update_callback();
+
+    void test_set_resource_notification_sent_callback();
+
     M2MFirmware* firmware;
 };
 
