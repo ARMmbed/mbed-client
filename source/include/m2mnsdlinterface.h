@@ -86,6 +86,11 @@ public:
     void delete_endpoint();
 
     /**
+     * @brief Updates endpoint name.
+    */
+    void update_endpoint(const String &name);
+
+    /**
      * @brief Creates the NSDL structure for the registered objectlist.
      * @param object_list, List of objects to be registered.
      * @return true if structure created successfully else false.
