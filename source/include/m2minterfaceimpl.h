@@ -180,6 +180,11 @@ public:
      */
     virtual void set_entropy_callback(entropy_cb callback);
 
+    /**
+     * @brief Updates the endpoint name.
+     * @param name New endpoint name
+     */
+    virtual void update_endpoint(String &name);
 
 protected: // From M2MNsdlObserver
 
