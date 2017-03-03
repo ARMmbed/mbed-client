@@ -227,6 +227,7 @@ void M2MBase::set_operation(M2MBase::Operation opr)
 }
 
 #ifndef MEMORY_OPTIMIZED_API
+#ifdef MBED_CLIENT_SUPPORT_INTERFACE_DESCRIPTION_PTR
 void M2MBase::set_interface_description(const char *desc)
 {
     assert(_sn_resource->dynamic_resource_params->static_resource_parameters->free_on_delete);
@@ -244,6 +245,7 @@ void M2MBase::set_interface_description(const String &desc)
     assert(_sn_resource->dynamic_resource_params->static_resource_parameters->free_on_delete);
     set_interface_description(desc.c_str());
 }
+#endif
 
 void M2MBase::set_resource_type(const String &res_type)
 {
@@ -370,11 +372,13 @@ uint16_t M2MBase::instance_id() const
     return _sn_resource->instance_id;
 }
 
+#ifdef MBED_CLIENT_SUPPORT_INTERFACE_DESCRIPTION_PTR
 const char* M2MBase::interface_description() const
 {
     return (reinterpret_cast<char*>(
         _sn_resource->dynamic_resource_params->static_resource_parameters->interface_description_ptr));
 }
+#endif
 
 const char* M2MBase::resource_type() const
 {
@@ -742,7 +746,9 @@ void M2MBase::free_resources()
         free(params->path);
         free(params->resource);
         free(params->resource_type_ptr);
+#ifdef MBED_CLIENT_SUPPORT_INTERFACE_DESCRIPTION_PTR
         free(params->interface_description_ptr);
+#endif
         free(params);
     }
     if (_sn_resource->dynamic_resource_params->free_on_delete) {
