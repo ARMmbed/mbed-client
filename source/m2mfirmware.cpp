@@ -70,7 +70,9 @@ M2MFirmware::~M2MFirmware()
 STATIC_PARAM_TYPE
 static sn_nsdl_static_resource_parameters_s firmware_package_params_static = {
     (char*)OMA_RESOURCE_TYPE,      // resource_type_ptr
+#ifndef DISABLE_INTERFACE_DESCRIPTION
     (char*)"",                     // interface_description_ptr
+#endif	
     (char*)PACKAGE_PATH,    // path
     (uint8_t*)"",           // resource
     0,                      // resourcelen
@@ -84,7 +86,9 @@ static sn_nsdl_static_resource_parameters_s firmware_package_params_static = {
 STATIC_PARAM_TYPE
 static sn_nsdl_static_resource_parameters_s firmware_package_uri_params_static = {
     (char*)OMA_RESOURCE_TYPE,      // resource_type_ptr
+#ifndef DISABLE_INTERFACE_DESCRIPTION
     (char*)"",                     // interface_description_ptr
+#endif
     (char*)PACKAGE_URI_PATH, // path
     (uint8_t*)"",           // resource
     0,                      // resourcelen
@@ -98,7 +102,9 @@ static sn_nsdl_static_resource_parameters_s firmware_package_uri_params_static =
 STATIC_PARAM_TYPE
 static sn_nsdl_static_resource_parameters_s firmware_update_params_static = {
     (char*)OMA_RESOURCE_TYPE,   // resource_type_ptr
+#ifndef DISABLE_INTERFACE_DESCRIPTION
     (char*)"",                  // interface_description_ptr
+#endif
     (char*)UPDATE_PATH,     // path
     (uint8_t*)"",           // resource
     0,                      // resourcelen
@@ -112,7 +118,9 @@ static sn_nsdl_static_resource_parameters_s firmware_update_params_static = {
 STATIC_PARAM_TYPE
 static sn_nsdl_static_resource_parameters_s firmware_state_params_static = {
     (char*)OMA_RESOURCE_TYPE,   // resource_type_ptr
+#ifndef DISABLE_INTERFACE_DESCRIPTION
     (char*)"",                  // interface_description_ptr
+#endif
     (char*)STATE_URI_PATH,   // path
     (uint8_t*)"0",          // resource
     1,                      // resourcelen
@@ -126,7 +134,9 @@ static sn_nsdl_static_resource_parameters_s firmware_state_params_static = {
 STATIC_PARAM_TYPE
 static sn_nsdl_static_resource_parameters_s firmware_update_result_params_static = {
     (char*)OMA_RESOURCE_TYPE,      // resource_type_ptr
+#ifndef DISABLE_INTERFACE_DESCRIPTION
     (char*)"",                     // interface_description_ptr
+#endif
     (char*)UPDATE_RESULT_PATH, // path
     (uint8_t*)"0",          // resource
     1,                      // resourcelen
