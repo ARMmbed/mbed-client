@@ -31,6 +31,7 @@
 #include "include/m2mtlvdeserializer.h"
 #include "include/m2mtlvserializer.h"
 #include "include/m2mnsdlinterface.h"
+#include "include/uriqueryparser.h"
 #include "mbed-client/m2mstring.h"
 #include "mbed-client/m2msecurity.h"
 #include "mbed-client/m2mserver.h"
@@ -62,6 +63,7 @@ M2MNsdlInterface::M2MNsdlInterface(M2MNsdlObserver &observer, M2MConnectionHandl
   _connection_handler(connection_handler),
   _counter_for_nsdl(0),
   _bootstrap_id(0),
+  _server_address(NULL),
   _unregister_ongoing(false),
   _identity_accepted(false)
 {
