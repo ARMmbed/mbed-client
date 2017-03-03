@@ -27,6 +27,7 @@
 #include "m2mobject_stub.h"
 #include "m2mresource_stub.h"
 
+
 static bool cb_visited = false;
 static void callback_function(void *args)
 {
@@ -112,7 +113,6 @@ Test_M2MResourceInstance::Test_M2MResourceInstance()
                           "name",
                           "resource_type",
                           M2MResourceInstance::STRING,
-                          0,
                           "name",
                           false);
 }
@@ -140,7 +140,6 @@ void Test_M2MResourceInstance::test_static_resource_instance()
                                                        "type1",
                                                        M2MResourceInstance::INTEGER,
                                                        value, (uint32_t)sizeof(value),
-                                                       0,
                                                        "name1",
                                                        false);
 
@@ -158,7 +157,6 @@ void Test_M2MResourceInstance::test_static_resource_instance()
                                                        "type1",
                                                        M2MResourceInstance::INTEGER,
                                                        value, (uint32_t)sizeof(value),
-                                                       0,
                                                        "name1",
                                                        false);
 
@@ -607,7 +605,9 @@ void Test_M2MResourceInstance::test_get_object_name()
 
 void Test_M2MResourceInstance::test_get_object_instance_id()
 {
-    resource_instance->_object_instance_id = 100;
+    // the "M2MBase::instance_id()" fetches object_id from this,
+    // which is used by get_parent_resource().get_parent_object_instance() -chain.
+    m2mbase_stub::int_value = 100;
     CHECK(resource_instance->object_instance_id() == 100);
 }
 
@@ -643,7 +643,7 @@ void Test_M2MResourceInstance::test_notification_sent()
 void Test_M2MResourceInstance::test_ctor()
 {
     M2MResourceInstance* instance = new M2MResourceInstance(*m2mobjectinstance_stub::resource, &params,
-                                                            M2MResourceInstance::STRING, 0);
+                                                            M2MResourceInstance::STRING);
     CHECK(instance != NULL);
     delete instance;
 }
@@ -651,7 +651,7 @@ void Test_M2MResourceInstance::test_ctor()
 void Test_M2MResourceInstance::test_get_parent_resource()
 {
     M2MResourceInstance* instance = new M2MResourceInstance(*m2mobjectinstance_stub::resource, &params,
-                                                            M2MResourceInstance::STRING, 0);
+                                                            M2MResourceInstance::STRING);
     // Only for the code coverage
     instance->get_parent_resource();
     delete instance;
