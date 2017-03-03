@@ -180,6 +180,7 @@ public:
      * \brief Sets the interface description of the object.
      * \param description The description to be set.
      */
+#ifndef DISABLE_INTERFACE_DESCRIPTION
     virtual void set_interface_description(const String &description);
 
     /**
@@ -187,7 +188,7 @@ public:
      * \param description The description to be set.
      */
     virtual void set_interface_description(const char *description);
-
+#endif
     /**
      * \brief Sets the resource type of the object.
      * \param resource_type The resource type to be set.
