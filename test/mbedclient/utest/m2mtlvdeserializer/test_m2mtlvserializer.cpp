@@ -88,7 +88,6 @@ void Test_M2MTLVSerializer::test_serialize_object_out_of_memory()
                                                                  "1",
                                                                  "type",
                                                                  M2MResourceInstance::STRING,
-                                                                 0,
                                                                  "1",
                                                                  false);
 
@@ -96,7 +95,6 @@ void Test_M2MTLVSerializer::test_serialize_object_out_of_memory()
                                                                    "2",
                                                                    "type",
                                                                    M2MResourceInstance::STRING,
-                                                                   0,
                                                                    "2",
                                                                    false);
 
@@ -178,7 +176,6 @@ void Test_M2MTLVSerializer::test_serialize_object()
                                                                  "1",
                                                                  "type",
                                                                  M2MResourceInstance::STRING,
-                                                                 0,
                                                                  "1",
                                                                  false);
 
@@ -186,7 +183,6 @@ void Test_M2MTLVSerializer::test_serialize_object()
                                                                    "2",
                                                                    "type",
                                                                    M2MResourceInstance::STRING,
-                                                                   0,
                                                                    "2",
                                                                    false);
 
@@ -275,7 +271,6 @@ void Test_M2MTLVSerializer::test_serialize_object_instance()
                                                                 "1",
                                                                 "type",
                                                                 M2MResourceInstance::STRING,
-                                                                0,
                                                                 "1",
                                                                 false);
 
@@ -329,7 +324,6 @@ void Test_M2MTLVSerializer::test_serialize_resource()
                                                                 "1",
                                                                 "type",
                                                                 M2MResourceInstance::INTEGER,
-                                                                0,
                                                                 "1",
                                                                 false);
 
@@ -383,7 +377,6 @@ void Test_M2MTLVSerializer::test_serialize_resource_instance()
                                                                 "1",
                                                                 "type",
                                                                 M2MResourceInstance::INTEGER,
-                                                                0,
                                                                 "1",
                                                                 false);
 
@@ -438,7 +431,6 @@ void Test_M2MTLVSerializer::test_serialize_resource_instance_out_of_memory()
                                                                 "1",
                                                                 "type",
                                                                 M2MResourceInstance::INTEGER,
-                                                                0,
                                                                 "1",
                                                                 false);
 
