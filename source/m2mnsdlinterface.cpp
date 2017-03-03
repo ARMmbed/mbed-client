@@ -156,6 +156,18 @@ void M2MNsdlInterface::create_endpoint(const String &name,
     }
 }
 
+void M2MNsdlInterface::update_endpoint(const String &name)
+{
+    _endpoint_name = name;
+    if(_endpoint){
+        if(!_endpoint_name.empty()) {
+            memory_free(_endpoint->endpoint_name_ptr);
+            _endpoint->endpoint_name_ptr = alloc_string_copy((uint8_t*)_endpoint_name.c_str(), _endpoint_name.length());
+            _endpoint->endpoint_name_len = _endpoint_name.length();
+        }
+    }
+}
+
 void M2MNsdlInterface::set_endpoint_lifetime_buffer(int lifetime)
 {
     // max len of "-9223372036854775808" plus zero termination

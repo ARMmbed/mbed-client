@@ -1064,3 +1064,7 @@ void M2MInterfaceImpl::start_register_update(M2MUpdateRegisterData *data) {
             _observer.error(M2MInterface::NotAllowed);
     }
 }
+
+void M2MInterfaceImpl::update_endpoint(String &name) {
+    _nsdl_interface.update_endpoint(name);
+}
