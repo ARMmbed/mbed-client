@@ -20,7 +20,9 @@
 #include "nsdlaccesshelper_stub.h"
 static sn_nsdl_static_resource_parameters_s params_static = {
     (char*)"",      // resource_type_ptr
+#ifndef DISABLE_INTERFACE_DESCRIPTION
     (char*)"",                     // interface_description_ptr
+#endif
     (uint8_t*)"",    // path
     (uint8_t*)"value",           // resource
     0,                      // pathlen
