@@ -194,6 +194,12 @@ public:
      * manage the usage of underlying network interface by the client.
      */
     virtual void set_platform_network_handler(void *handler = NULL) = 0;
+
+    /**
+     * @brief Updates the endpoint name.
+     * @param name New endpoint name
+     */
+    virtual void update_endpoint(String &name) = 0;
 };
 
 #endif // M2M_INTERFACE_H
