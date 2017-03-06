@@ -156,7 +156,9 @@ protected:
      */
     M2MBase(const String &name,
             M2MBase::Mode mode,
+#ifndef DISABLE_RESOURCE_TYPE
             const String &resource_type,
+#endif
             char *path,
             bool external_blockwise_store);
 
@@ -189,6 +191,7 @@ public:
      */
     virtual void set_interface_description(const char *description);
 #endif
+#ifndef DISABLE_RESOURCE_TYPE
     /**
      * \brief Sets the resource type of the object.
      * \param resource_type The resource type to be set.
@@ -200,6 +203,7 @@ public:
      * \param resource_type The resource type to be set.
      */
     virtual void set_resource_type(const char *resource_type);
+#endif
 #endif
 
     /**
@@ -311,12 +315,13 @@ public:
      */
     const char* interface_description() const;
 
+#ifndef DISABLE_RESOURCE_TYPE
     /**
      * \brief Returns the resource type of the object.
      * \return The resource type of the object.
      */
     const char* resource_type() const;
-
+#endif
     /**
      * \brief Returns the path of the object.
      * \return The path of the object (eg. 3/0/1).
