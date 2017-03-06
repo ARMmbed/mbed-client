@@ -123,6 +123,7 @@ public:
      */
     bool supports_multiple_instances() const;
 
+#ifdef SUPPORT_DELAYED_RESPONSE
     /**
      * \brief Sets whether the resource should send a delayed response for a POST request.
      * \param delayed_response A boolean value to set the delayed response.
@@ -143,6 +144,7 @@ public:
      * \param value_length[OUT] The length of the token pointer.
      */
     void get_delayed_token(uint8_t *&token, uint8_t &token_length);
+#endif
 
     /**
      * \brief Removes a resource with a given name.
@@ -251,10 +253,13 @@ private:
     M2MObjectInstance &_parent;
 
     M2MResourceInstanceList     _resource_instance_list; // owned
+#ifdef SUPPORT_DELAYED_RESPONSE
     uint8_t                     *_delayed_token;
     uint8_t                     _delayed_token_len;
-    bool                        _has_multiple_instances;
     bool                        _delayed_response;
+#endif
+    bool                        _has_multiple_instances;
+
 
 friend class Test_M2MResource;
 friend class Test_M2MObjectInstance;
