@@ -165,20 +165,19 @@ private:
 class TypeIdLength {
 
 public:
+    TypeIdLength(uint8_t *tlv, uint32_t offset);
 
-    TypeIdLength* createTypeIdLength(uint8_t *tlv, uint32_t offset);
-
-    TypeIdLength* deserialize();
+    void deserialize();
 
     void deserialiseID (uint32_t idLength);
 
     void deserialiseLength (uint32_t lengthType);
 
-    uint8_t             *_tlv;
-    uint32_t            _offset;
-    uint32_t            _type;
-    uint16_t            _id;
-    uint32_t            _length;
+    uint8_t     *_tlv;
+    uint32_t    _offset;
+    uint32_t    _type;
+    uint16_t    _id;
+    uint32_t    _length;
 
     friend class Test_M2MTLVDeserializer;
 };

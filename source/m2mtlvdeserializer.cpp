@@ -126,8 +126,7 @@ M2MTLVDeserializer::Error M2MTLVDeserializer::deserialize_object_instances(uint8
 {
     tr_debug("M2MTLVDeserializer::deserialize_object_instances()");
     M2MTLVDeserializer::Error error = M2MTLVDeserializer::None;
-    TypeIdLength til;
-    til.createTypeIdLength(tlv, offset);
+    TypeIdLength til(tlv, offset);
     til.deserialize();
     offset = til._offset;
 
@@ -159,8 +158,7 @@ M2MTLVDeserializer::Error M2MTLVDeserializer::deserialize_resources(uint8_t *tlv
 {
     tr_debug("M2MTLVDeserializer::deserialize_resources()");
     M2MTLVDeserializer::Error error = M2MTLVDeserializer::None;
-    TypeIdLength til;
-    til.createTypeIdLength(tlv, offset);
+    TypeIdLength til(tlv, offset);
     til.deserialize();
     offset = til._offset;
 
@@ -231,8 +229,8 @@ M2MTLVDeserializer::Error M2MTLVDeserializer::deserialize_resource_instances(uin
                                                                              bool update_value)
 {
     M2MTLVDeserializer::Error error = M2MTLVDeserializer::None;
-    TypeIdLength til;
-    til.createTypeIdLength(tlv, offset)->deserialize();
+    TypeIdLength til(tlv, offset);
+    til.deserialize();
     offset = til._offset;
 
     if (TYPE_MULTIPLE_RESOURCE == til._type || TYPE_RESOURCE_INSTANCE == til._type) {
@@ -291,8 +289,7 @@ M2MTLVDeserializer::Error M2MTLVDeserializer::deserialize_resource_instances(uin
                                                                              bool update_value)
 {
     M2MTLVDeserializer::Error error = M2MTLVDeserializer::None;
-    TypeIdLength til;
-    til.createTypeIdLength(tlv, offset);
+    TypeIdLength til(tlv, offset);
     til.deserialize();
     offset = til._offset;
 
@@ -349,8 +346,7 @@ bool M2MTLVDeserializer::is_object_instance(uint8_t *tlv, uint32_t offset)
 
 uint16_t M2MTLVDeserializer::instance_id(uint8_t *tlv)
 {
-    TypeIdLength til;
-    til.createTypeIdLength(tlv, 0);
+    TypeIdLength til(tlv, 0);
     til.deserialize();
     uint16_t id = til._id;
     return id;
@@ -383,17 +379,16 @@ bool M2MTLVDeserializer::is_resource_instance(uint8_t *tlv, uint32_t offset)
     return ret;
 }
 
-TypeIdLength* TypeIdLength::createTypeIdLength(uint8_t *tlv, uint32_t offset)
+TypeIdLength::TypeIdLength(uint8_t *tlv, uint32_t offset)
 {
     _tlv = tlv;
     _offset = offset;
     _type = tlv[offset] & 0xC0;
     _id = 0;
     _length = 0;
-    return this;
 }
 
-TypeIdLength* TypeIdLength::deserialize()
+void TypeIdLength::deserialize()
 {
     uint32_t idLength = _tlv[_offset] & ID16;
     uint32_t lengthType = _tlv[_offset] & LENGTH24;
@@ -404,8 +399,6 @@ TypeIdLength* TypeIdLength::deserialize()
 
     deserialiseID(idLength);
     deserialiseLength(lengthType);
-
-    return this;
 }
 
 void TypeIdLength::deserialiseID(uint32_t idLength)
