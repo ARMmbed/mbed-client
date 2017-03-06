@@ -126,26 +126,27 @@ M2MTLVDeserializer::Error M2MTLVDeserializer::deserialize_object_instances(uint8
 {
     tr_debug("M2MTLVDeserializer::deserialize_object_instances()");
     M2MTLVDeserializer::Error error = M2MTLVDeserializer::None;
-    TypeIdLength *til = TypeIdLength::createTypeIdLength(tlv, offset)->deserialize();
-    offset = til->_offset;
+    TypeIdLength til;
+    til.createTypeIdLength(tlv, offset);
+    til.deserialize();
+    offset = til._offset;
 
     M2MObjectInstanceList list = object.instances();
     M2MObjectInstanceList::const_iterator it;
     it = list.begin();
 
-    if (TYPE_OBJECT_INSTANCE == til->_type) {
+    if (TYPE_OBJECT_INSTANCE == til._type) {
         for (; it!=list.end(); it++) {
-            if((*it)->instance_id() == til->_id) {
+            if((*it)->instance_id() == til._id) {
                 error = deserialize_resources(tlv, tlv_size, offset, (**it),operation, update_value);
             }
         }
-        offset += til->_length;
+        offset += til._length;
 
         if(offset < tlv_size) {
             error = deserialize_object_instances(tlv, tlv_size, offset, object, operation, update_value);
         }
     }
-    delete til;
     return error;
 }
 
@@ -158,23 +159,25 @@ M2MTLVDeserializer::Error M2MTLVDeserializer::deserialize_resources(uint8_t *tlv
 {
     tr_debug("M2MTLVDeserializer::deserialize_resources()");
     M2MTLVDeserializer::Error error = M2MTLVDeserializer::None;
-    TypeIdLength *til = TypeIdLength::createTypeIdLength(tlv, offset)->deserialize();
-    offset = til->_offset;
+    TypeIdLength til;
+    til.createTypeIdLength(tlv, offset);
+    til.deserialize();
+    offset = til._offset;
 
     M2MResourceList list = object_instance.resources();
     M2MResourceList::const_iterator it;
     it = list.begin();
 
-    if (TYPE_RESOURCE == til->_type || TYPE_RESOURCE_INSTANCE == til->_type) {
+    if (TYPE_RESOURCE == til._type || TYPE_RESOURCE_INSTANCE == til._type) {
         bool found = false;
         for (; it!=list.end(); it++) {
-            if((*it)->name_id() == til->_id){
-                tr_debug("M2MTLVDeserializer::deserialize_resources() - Resource ID %d ", til->_id);
+            if((*it)->name_id() == til._id){
+                tr_debug("M2MTLVDeserializer::deserialize_resources() - Resource ID %d ", til._id);
                 found = true;
                 if(update_value) {
-                    if(til->_length > 0) {
+                    if(til._length > 0) {
                         tr_debug("M2MTLVDeserializer::deserialize_resources() - Update value");
-                        (*it)->set_value(tlv+offset, til->_length);
+                        (*it)->set_value(tlv+offset, til._length);
                     } else {
                         tr_debug("M2MTLVDeserializer::deserialize_resources() - Clear Value");
                         (*it)->clear_value();
@@ -191,7 +194,7 @@ M2MTLVDeserializer::Error M2MTLVDeserializer::deserialize_resources(uint8_t *tlv
             if(M2MTLVDeserializer::Post == operation) {
                 //Create a new Resource
                 String id;
-                id.append_int(til->_id);
+                id.append_int(til._id);
                 M2MResource *resource = object_instance.create_dynamic_resource(id,"",M2MResourceInstance::INTEGER,true,false);
                 if(resource) {
                     resource->set_operation(M2MBase::GET_PUT_POST_DELETE_ALLOWED);
@@ -200,7 +203,7 @@ M2MTLVDeserializer::Error M2MTLVDeserializer::deserialize_resources(uint8_t *tlv
                 error = M2MTLVDeserializer::NotFound;
             }
         }
-    } else if (TYPE_MULTIPLE_RESOURCE == til->_type) {
+    } else if (TYPE_MULTIPLE_RESOURCE == til._type) {
         for (; it!=list.end(); it++) {
             if((*it)->supports_multiple_instances()) {
                 error = deserialize_resource_instances(tlv, tlv_size-offset, offset, (**it), object_instance, operation, update_value);
@@ -208,13 +211,11 @@ M2MTLVDeserializer::Error M2MTLVDeserializer::deserialize_resources(uint8_t *tlv
         }
 
     } else {
-        delete til;
         error = M2MTLVDeserializer::NotValid;
         return error;
     }
-    offset += til->_length;
+    offset += til._length;
 
-    delete til;
     if(offset < tlv_size) {
         error = deserialize_resources(tlv, tlv_size, offset, object_instance, operation, update_value);
     }
@@ -230,20 +231,21 @@ M2MTLVDeserializer::Error M2MTLVDeserializer::deserialize_resource_instances(uin
                                                                              bool update_value)
 {
     M2MTLVDeserializer::Error error = M2MTLVDeserializer::None;
-    TypeIdLength *til = TypeIdLength::createTypeIdLength(tlv, offset)->deserialize();
-    offset = til->_offset;
+    TypeIdLength til;
+    til.createTypeIdLength(tlv, offset)->deserialize();
+    offset = til._offset;
 
-    if (TYPE_MULTIPLE_RESOURCE == til->_type || TYPE_RESOURCE_INSTANCE == til->_type) {
+    if (TYPE_MULTIPLE_RESOURCE == til._type || TYPE_RESOURCE_INSTANCE == til._type) {
         M2MResourceInstanceList list = resource.resource_instances();
         M2MResourceInstanceList::const_iterator it;
         it = list.begin();
         bool found = false;
         for (; it!=list.end(); it++) {
-            if((*it)->instance_id() == til->_id) {
+            if((*it)->instance_id() == til._id) {
                 found = true;
                 if(update_value) {
-                    if(til->_length > 0) {
-                        (*it)->set_value(tlv+offset, til->_length);
+                    if(til._length > 0) {
+                        (*it)->set_value(tlv+offset, til._length);
                     } else {
                         (*it)->clear_value();
                     }
@@ -260,7 +262,7 @@ M2MTLVDeserializer::Error M2MTLVDeserializer::deserialize_resource_instances(uin
                 M2MResourceInstance *res_instance = object_instance.create_dynamic_resource_instance(resource.name(),"",
                                                                                                  M2MResourceInstance::INTEGER,
                                                                                                  true,
-                                                                                                 til->_id);
+                                                                                                 til._id);
                 if(res_instance) {
                     res_instance->set_operation(M2MBase::GET_PUT_POST_DELETE_ALLOWED);
                 }
@@ -269,14 +271,12 @@ M2MTLVDeserializer::Error M2MTLVDeserializer::deserialize_resource_instances(uin
             }
         }
     } else {
-        delete til;
         error = M2MTLVDeserializer::NotValid;
         return error;
     }
 
-    offset += til->_length;
+    offset += til._length;
 
-    delete til;
     if(offset < tlv_size) {
         error = deserialize_resource_instances(tlv, tlv_size-offset, offset, resource, object_instance, operation, update_value);
     }
@@ -291,20 +291,22 @@ M2MTLVDeserializer::Error M2MTLVDeserializer::deserialize_resource_instances(uin
                                                                              bool update_value)
 {
     M2MTLVDeserializer::Error error = M2MTLVDeserializer::None;
-    TypeIdLength *til = TypeIdLength::createTypeIdLength(tlv, offset)->deserialize();
-    offset = til->_offset;
+    TypeIdLength til;
+    til.createTypeIdLength(tlv, offset);
+    til.deserialize();
+    offset = til._offset;
 
-    if (TYPE_RESOURCE_INSTANCE == til->_type) {
+    if (TYPE_RESOURCE_INSTANCE == til._type) {
         M2MResourceInstanceList list = resource.resource_instances();
         M2MResourceInstanceList::const_iterator it;
         it = list.begin();
         bool found = false;
         for (; it!=list.end(); it++) {
-            if((*it)->instance_id() == til->_id) {
+            if((*it)->instance_id() == til._id) {
                 found = true;
                 if(update_value) {
-                    if(til->_length > 0) {
-                    (*it)->set_value(tlv+offset, til->_length);
+                    if(til._length > 0) {
+                    (*it)->set_value(tlv+offset, til._length);
                     } else {
                         (*it)->clear_value();
                     }
@@ -323,14 +325,12 @@ M2MTLVDeserializer::Error M2MTLVDeserializer::deserialize_resource_instances(uin
             }
         }
     } else {
-        delete til;
         error = M2MTLVDeserializer::NotValid;
         return error;
     }
 
-    offset += til->_length;
+    offset += til._length;
 
-    delete til;
     if(offset < tlv_size) {
         error = deserialize_resource_instances(tlv, tlv_size-offset, offset, resource, operation, update_value);
     }
@@ -349,9 +349,10 @@ bool M2MTLVDeserializer::is_object_instance(uint8_t *tlv, uint32_t offset)
 
 uint16_t M2MTLVDeserializer::instance_id(uint8_t *tlv)
 {
-    TypeIdLength *til = TypeIdLength::createTypeIdLength(tlv, 0)->deserialize();
-    uint16_t id = til->_id;
-    delete til;
+    TypeIdLength til;
+    til.createTypeIdLength(tlv, 0);
+    til.deserialize();
+    uint16_t id = til._id;
     return id;
 }
 
@@ -384,13 +385,12 @@ bool M2MTLVDeserializer::is_resource_instance(uint8_t *tlv, uint32_t offset)
 
 TypeIdLength* TypeIdLength::createTypeIdLength(uint8_t *tlv, uint32_t offset)
 {
-    TypeIdLength *til = new TypeIdLength();
-    til->_tlv = tlv;
-    til->_offset = offset;
-    til->_type = tlv[offset] & 0xC0;
-    til->_id = 0;
-    til->_length = 0;
-    return til;
+    _tlv = tlv;
+    _offset = offset;
+    _type = tlv[offset] & 0xC0;
+    _id = 0;
+    _length = 0;
+    return this;
 }
 
 TypeIdLength* TypeIdLength::deserialize()

@@ -166,7 +166,7 @@ class TypeIdLength {
 
 public:
 
-    static TypeIdLength* createTypeIdLength(uint8_t *tlv, uint32_t offset);
+    TypeIdLength* createTypeIdLength(uint8_t *tlv, uint32_t offset);
 
     TypeIdLength* deserialize();
 
