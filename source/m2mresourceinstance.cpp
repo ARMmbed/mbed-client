@@ -35,7 +35,9 @@ M2MResourceInstance::M2MResourceInstance(M2MResource &parent,
                                          bool external_blockwise_store)
 : M2MBase(res_name,
           M2MBase::Dynamic,
+#ifndef DISABLE_RESOURCE_TYPE
           resource_type,
+#endif
           path,
           external_blockwise_store),
  _parent_resource(parent),
@@ -58,7 +60,9 @@ M2MResourceInstance::M2MResourceInstance(M2MResource &parent,
                                          bool external_blockwise_store)
 : M2MBase(res_name,
           M2MBase::Static,
+#ifndef DISABLE_RESOURCE_TYPE
           resource_type,
+#endif
           path,
           external_blockwise_store),
  _parent_resource(parent),

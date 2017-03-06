@@ -37,7 +37,9 @@
 
 M2MBase::M2MBase(const String& resource_name,
                  M2MBase::Mode mode,
+#ifndef DISABLE_RESOURCE_TYPE
                  const String &resource_type,
+#endif
                  char *path,
                  bool external_blockwise_store)
 :
@@ -75,12 +77,13 @@ M2MBase::M2MBase(const String& resource_name,
                 sn_nsdl_static_resource_parameters_s *params =
                         const_cast<sn_nsdl_static_resource_parameters_s *>(_sn_resource->dynamic_resource_params->static_resource_parameters);
                 memset(params, 0, sizeof(sn_nsdl_static_resource_parameters_s));
+#ifndef DISABLE_RESOURCE_TYPE
                 const size_t len = strlen(resource_type.c_str());
                 if (len > 0) {
                     params->resource_type_ptr = (char*)
                             alloc_string_copy((uint8_t*) resource_type.c_str(), len);
                 }
-
+#endif
                 params->path = path;
                 params->mode = (const uint8_t)mode;
                 params->free_on_delete = true;
@@ -245,6 +248,7 @@ void M2MBase::set_interface_description(const String &desc)
 }
 #endif
 
+#ifndef DISABLE_RESOURCE_TYPE
 void M2MBase::set_resource_type(const String &res_type)
 {
     assert(_sn_resource->dynamic_resource_params->static_resource_parameters->free_on_delete);
@@ -262,6 +266,7 @@ void M2MBase::set_resource_type(const char *res_type)
                 alloc_string_copy((uint8_t*) res_type, len);
     }
 }
+#endif
 #endif
 
 void M2MBase::set_coap_content_type(const uint8_t con_type)
@@ -378,11 +383,13 @@ const char* M2MBase::interface_description() const
 }
 #endif
 
+#ifndef DISABLE_RESOURCE_TYPE
 const char* M2MBase::resource_type() const
 {
     return (reinterpret_cast<char*>(
         _sn_resource->dynamic_resource_params->static_resource_parameters->resource_type_ptr));
 }
+#endif
 
 const char* M2MBase::uri_path() const
 {
@@ -759,7 +766,9 @@ void M2MBase::free_resources()
 
         free(params->path);
         free(params->resource);
+#ifndef DISABLE_RESOURCE_TYPE
         free(params->resource_type_ptr);
+#endif
 #ifndef DISABLE_INTERFACE_DESCRIPTION
         free(params->interface_description_ptr);
 #endif

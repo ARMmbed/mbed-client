@@ -95,6 +95,7 @@ void Test_M2MBase::test_uri_path()
     CHECK(test == uri_path());
 }
 
+#ifndef DISABLE_RESOURCE_TYPE
 void Test_M2MBase::test_set_resource_type()
 {
     String test = "resource_type";
@@ -102,6 +103,7 @@ void Test_M2MBase::test_set_resource_type()
 
     CHECK(test == this->_sn_resource->dynamic_resource_params->static_resource_parameters->resource_type_ptr);
 }
+#endif
 
 void Test_M2MBase::test_set_coap_content_type()
 {
@@ -517,7 +519,9 @@ void Test_M2MBase::test_alloc_string_copy()
 void Test_M2MBase::test_ctor()
 {
     static sn_nsdl_static_resource_parameters_s params_static = {
+#ifndef DISABLE_RESOURCE_TYPE
         (char*)"",      // resource_type_ptr
+#endif
 #ifndef DISABLE_INTERFACE_DESCRIPTION
         (char*)"",                     // interface_description_ptr
 #endif
