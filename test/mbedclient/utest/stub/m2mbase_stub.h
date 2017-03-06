@@ -19,7 +19,9 @@
 #include "m2mbase.h"
 #include "nsdlaccesshelper_stub.h"
 static sn_nsdl_static_resource_parameters_s params_static = {
+#ifndef DISABLE_RESOURCE_TYPE
     (char*)"",      // resource_type_ptr
+#endif
 #ifndef DISABLE_INTERFACE_DESCRIPTION
     (char*)"",                     // interface_description_ptr
 #endif
