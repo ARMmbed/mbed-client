@@ -38,7 +38,9 @@ M2MObjectInstance::M2MObjectInstance(M2MObject& parent, const String &object_nam
                                      bool external_blockwise_store)
 : M2MBase(object_name,
           M2MBase::Dynamic,
+#ifndef DISABLE_RESOURCE_TYPE
           resource_type,
+#endif
           path,
           external_blockwise_store),
   _parent(parent)
