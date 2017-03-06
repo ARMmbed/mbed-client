@@ -37,10 +37,13 @@ M2MResource::M2MResource(M2MObjectInstance &parent,
 : M2MResourceInstance(*this, resource_name, resource_type, type, value, value_length,
                       path, external_blockwise_store),
   _parent(parent),
+#ifdef SUPPORT_DELAYED_RESPONSE
   _delayed_token(NULL),
   _delayed_token_len(0),
-  _has_multiple_instances(multiple_instance),
-  _delayed_response(false)
+  _delayed_response(false),
+#endif  
+  _has_multiple_instances(multiple_instance)
+
 {
     M2MBase::set_base_type(M2MBase::Resource);
     M2MBase::set_operation(M2MBase::GET_ALLOWED);
@@ -53,10 +56,13 @@ M2MResource::M2MResource(M2MObjectInstance &parent,
                           M2MResourceInstance::ResourceType type)
 : M2MResourceInstance(*this, s, type),
   _parent(parent),
+#ifdef SUPPORT_DELAYED_RESPONSE
   _delayed_token(NULL),
   _delayed_token_len(0),
-  _has_multiple_instances(false),
-  _delayed_response(false)
+  _delayed_response(false),
+#endif
+  _has_multiple_instances(false)
+
 {
     // tbd: _has_multiple_instances could be in flash, but no real benefit, because of current alignment.
 }
@@ -73,10 +79,12 @@ M2MResource::M2MResource(M2MObjectInstance &parent,
                       path,
                       external_blockwise_store),
   _parent(parent),
+#ifdef SUPPORT_DELAYED_RESPONSE
   _delayed_token(NULL),
   _delayed_token_len(0),
-  _has_multiple_instances(multiple_instance),
-  _delayed_response(false)
+  _delayed_response(false),
+#endif  
+  _has_multiple_instances(multiple_instance)
 {
     M2MBase::set_base_type(M2MBase::Resource);
     M2MBase::set_operation(M2MBase::GET_PUT_ALLOWED);
@@ -97,7 +105,9 @@ M2MResource::~M2MResource()
         }
         _resource_instance_list.clear();
     }
+#ifdef SUPPORT_DELAYED_RESPONSE
     free(_delayed_token);
+#endif
 }
 
 bool M2MResource::supports_multiple_instances() const
@@ -105,6 +115,7 @@ bool M2MResource::supports_multiple_instances() const
     return _has_multiple_instances;
 }
 
+#ifdef SUPPORT_DELAYED_RESPONSE
 void M2MResource::set_delayed_response(bool delayed_response)
 {
     _delayed_response = delayed_response;
@@ -134,6 +145,7 @@ void M2MResource::get_delayed_token(uint8_t *&token, uint8_t &token_length)
         }
     }
 }
+#endif
 
 bool M2MResource::remove_resource_instance(uint16_t inst_id)
 {
@@ -186,10 +198,12 @@ uint16_t M2MResource::resource_instance_count() const
     return (uint16_t)_resource_instance_list.size();
 }
 
+#ifdef SUPPORT_DELAYED_RESPONSE
 bool M2MResource::delayed_response() const
 {
     return _delayed_response;
 }
+#endif
 
 bool M2MResource::handle_observation_attribute(const char *query)
 {
@@ -512,6 +526,7 @@ sn_coap_hdr_s* M2MResource::handle_post_request(nsdl_s *nsdl,
             }
             if(COAP_MSG_CODE_RESPONSE_CHANGED == msg_code) {
                 tr_debug("M2MResource::handle_post_request - Execute resource function");
+#ifdef SUPPORT_DELAYED_RESPONSE
                 if(_delayed_response) {
                     msg_code = COAP_MSG_CODE_EMPTY;
                     coap_response->msg_type = COAP_MSG_TYPE_ACKNOWLEDGEMENT;
@@ -527,7 +542,9 @@ sn_coap_hdr_s* M2MResource::handle_post_request(nsdl_s *nsdl,
                         }
                         sn_nsdl_send_coap_message(nsdl, address, coap_response);
                     }
-                } else {
+                } else
+#endif
+                {
                     uint32_t length = 0;
                     get_value(coap_response->payload_ptr, length);
                     coap_response->payload_len = length;
