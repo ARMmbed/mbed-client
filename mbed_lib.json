@@ -14,7 +14,8 @@
         "sn-coap-resending-queue-size-msgs": null,
         "sn-coap-resending-queue-size-bytes": null,
         "disable-interface-description": null,
-        "disable-resource-type": null
+        "disable-resource-type": null,
+        "support-delayed-response": true
     },
     "macros" : [
         "MBED_CLIENT_C_NEW_API"
