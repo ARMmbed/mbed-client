@@ -33,9 +33,11 @@ class M2MReportObserver
      * \brief An observation callback to be sent to the
      * server due to a change in the observed parameter.
      * \param changed_instance_ids A list of changed object instance IDs.
+     * \param obs_number The observation number.
      * \param send_object Indicates whether the whole object will be sent or not.
      */
     virtual void observation_to_be_sent(const m2m::Vector<uint16_t> &changed_instance_ids,
+                                        uint16_t obs_number,
                                         bool send_object = false) = 0;
 
 };
