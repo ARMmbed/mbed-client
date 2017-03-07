@@ -87,6 +87,19 @@ public:
     }Mode;
 
     /**
+     * \brief Enum defining a resource data type.
+    */
+    typedef enum {
+        STRING,
+        INTEGER,
+        FLOAT,
+        BOOLEAN,
+        OPAQUE,
+        TIME,
+        OBJLINK
+    }DataType;
+
+    /**
      * Enum defining an operation that can be
      * supported by a given resource.
     */
@@ -127,6 +140,8 @@ public:
         char*               name; //for backwards compatibility
         sn_nsdl_dynamic_resource_parameters_s *dynamic_resource_params;
         BaseType            base_type;
+        M2MBase::DataType   data_type;
+        bool                multiple_instance;
         bool                free_on_delete;   /**< true if struct is dynamically allocted and it
                                                  and its members (name) are to be freed on destructor.
                                                  Note: the sn_nsdl_dynamic_resource_parameters_s has
@@ -160,7 +175,9 @@ protected:
             const String &resource_type,
 #endif
             char *path,
-            bool external_blockwise_store);
+            bool external_blockwise_store,
+            bool multiple_instance,
+            M2MBase::DataType type = M2MBase::OBJLINK);
 
     M2MBase(const lwm2m_parameters_s* s);
 
@@ -476,6 +493,13 @@ public:
      * @return Resource information.
      */
     sn_nsdl_dynamic_resource_parameters_s* get_nsdl_resource();
+
+    /**
+     * @brief Returns the resource structure.
+     * @return Resource structure.
+     */
+    M2MBase::lwm2m_parameters_s* get_lwm2m_parameters() const;
+
 
     static char* create_path(const M2MObject &parent, const char *name);
     static char* create_path(const M2MObject &parent, uint16_t object_instance);
