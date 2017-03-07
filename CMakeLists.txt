@@ -15,9 +15,9 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/mbed-client-mbed-tls)
 
 
 #pal include Dirs
-set(PAL_APIS_INCLUDE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/../mbed-client-pal/Source/PAL-Impl/Services-API)
+set(PAL_APIS_INCLUDE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/../pal/Source/PAL-Impl/Services-API)
 include_directories(${PAL_APIS_INCLUDE_PATH}/)
-SET(PAL_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../mbed-client-pal/Source)
+SET(PAL_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../pal/Source)
 #need to make this platform
 include_directories(${PAL_SOURCE_DIR}/Port/Reference-Impl/Linux/CFStore)
 include_directories(${PAL_SOURCE_DIR}/Port/Platform-API)
@@ -66,7 +66,7 @@ include_directories(${NANOSTACK_LIBSERVICE_PATH}/mbed-client-libservice/platform
 include_directories(${NS_HAL_PAL_PATH})
 
 
-set(PAL_HEADER_API ${NS_HAL_PAL_PATH}/../../mbed-client-pal/Source)
+set(PAL_HEADER_API ${NS_HAL_PAL_PATH}/../../pal/Source)
 include_directories(${PAL_HEADER_API}/PAL-Impl/Services-API)
 #need to make this platform
 include_directories(${PAL_HEADER_API}/Port/Reference-Impl/Linux/CFStore)
