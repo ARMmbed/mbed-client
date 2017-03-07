@@ -221,6 +221,8 @@ const static M2MBase::lwm2m_parameters firmware_package_params = {
     (char*)FIRMWARE_PACKAGE, // name
     &firmware_package_params_dynamic,
     M2MBase::Resource, // base_type
+    M2MBase::OPAQUE,
+    false,
     false // free_on_delete
 };
 
@@ -231,6 +233,8 @@ const static M2MBase::lwm2m_parameters firmware_package_uri_params = {
     (char*)FIRMWARE_PACKAGE_URI, // name
     &firmware_package_uri_params_dynamic,
     M2MBase::Resource, // base_type
+    M2MBase::STRING,
+    false,
     false // free_on_delete
 };
 
@@ -241,6 +245,8 @@ const static M2MBase::lwm2m_parameters firmware_update_params = {
     (char*)FIRMWARE_UPDATE, // name
     &firmware_update_params_dynamic,
     M2MBase::Resource, // base_type
+    M2MBase::OPAQUE,
+    false,
     false // free_on_delete
 };
 
@@ -251,6 +257,8 @@ const static M2MBase::lwm2m_parameters firmware_state_params = {
     (char*)FIRMWARE_STATE, // name
     &firmware_state_params_dynamic,
     M2MBase::Resource, // base_type
+    M2MBase::INTEGER,
+    false,
     false // free_on_delete
 };
 
@@ -261,6 +269,8 @@ const static M2MBase::lwm2m_parameters firmware_update_result_params = {
     (char*)FIRMWARE_UPDATE_RESULT, // name
     &firmware_update_result_params_dynamic,
     M2MBase::Resource, // base_type
+    M2MBase::INTEGER,
+    false,
     false // free_on_delete
 };
 

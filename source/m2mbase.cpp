@@ -41,7 +41,9 @@ M2MBase::M2MBase(const String& resource_name,
                  const String &resource_type,
 #endif
                  char *path,
-                 bool external_blockwise_store)
+                 bool external_blockwise_store,
+                 bool multiple_instance,
+                 M2MBase::DataType type)
 :
   _sn_resource(NULL),
   _report_handler(NULL),
@@ -54,6 +56,8 @@ M2MBase::M2MBase(const String& resource_name,
     if(_sn_resource) {
         memset(_sn_resource, 0, sizeof(lwm2m_parameters_s));
         _sn_resource->free_on_delete = true;
+        _sn_resource->multiple_instance = multiple_instance;
+        _sn_resource->data_type = type;
         _sn_resource->dynamic_resource_params =
                 (sn_nsdl_dynamic_resource_parameters_s*)memory_alloc(sizeof(sn_nsdl_dynamic_resource_parameters_s));
         if(_sn_resource->dynamic_resource_params) {
@@ -787,4 +791,9 @@ size_t M2MBase::resource_name_length() const
 sn_nsdl_dynamic_resource_parameters_s* M2MBase::get_nsdl_resource()
 {
     return _sn_resource->dynamic_resource_params;
+}
+
+M2MBase::lwm2m_parameters_s* M2MBase::get_lwm2m_parameters() const
+{
+    return _sn_resource;
 }

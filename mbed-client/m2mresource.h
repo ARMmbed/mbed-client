@@ -23,11 +23,6 @@
 class M2MObjectInstance;
 typedef Vector<M2MResourceInstance *> M2MResourceInstanceList;
 
-class M2MResourceCallback {
-public:
-    virtual void notification_update() = 0;
-};
-
 /*! \file m2mresource.h
  *  \brief M2MResource.
  *  This class is the base class for mbed Client Resources. All defined
@@ -35,7 +30,7 @@ public:
  *  instances associated with the given object.
  */
 
-class M2MResource : public M2MResourceInstance, M2MResourceCallback {
+class M2MResource : public M2MResourceInstance {
 
     friend class M2MObjectInstance;
 
@@ -48,7 +43,7 @@ private: // Constructor and destructor are private,
 
     M2MResource(M2MObjectInstance &_parent,
                  const lwm2m_parameters_s* s,
-                 M2MResourceInstance::ResourceType type);
+                 M2MBase::DataType type);
     /**
      * \brief Constructor
      * \param resource_name The resource name of the object.
@@ -65,7 +60,7 @@ private: // Constructor and destructor are private,
     M2MResource(M2MObjectInstance &_parent,
                 const String &resource_name,
                 const String &resource_type,
-                M2MResourceInstance::ResourceType type,
+                M2MBase::DataType type,
                 const uint8_t *value,
                 const uint8_t value_length,
                 char *path,
@@ -87,7 +82,7 @@ private: // Constructor and destructor are private,
     M2MResource(M2MObjectInstance &_parent,
                 const String &resource_name,
                 const String &resource_type,
-                M2MResourceInstance::ResourceType type,
+                M2MBase::DataType type,
                 bool observable,
                 char *path,
                 bool multiple_instance = false,
@@ -245,10 +240,6 @@ public:
     */
     virtual const char* object_name() const;
 
-protected:
-    virtual void notification_update();
-
-
 private:
     M2MObjectInstance &_parent;
 
@@ -257,9 +248,7 @@ private:
     uint8_t                     *_delayed_token;
     uint8_t                     _delayed_token_len;
     bool                        _delayed_response;
-#endif
-    bool                        _has_multiple_instances;
-
+#endif    
 
 friend class Test_M2MResource;
 friend class Test_M2MObjectInstance;
