@@ -486,6 +486,7 @@ public:
 protected : // from M2MReportObserver
 
     virtual void observation_to_be_sent(const m2m::Vector<uint16_t> &changed_instance_ids,
+                                        uint16_t obs_number,
                                         bool send_object = false);
 
 protected:
@@ -567,13 +568,8 @@ private:
 
 private:
     lwm2m_parameters_s          *_sn_resource;
-    M2MReportHandler            *_report_handler;
-    M2MObservationHandler       *_observation_handler; // Not owned
-    uint8_t                     *_token;
-    unsigned                    _observation_number : 16;
-    unsigned                    _token_length : 8;
-    M2MBase::Observation        _observation_level : 4;
-    bool                        _is_under_observation : 1;
+    M2MReportHandler            *_report_handler; // TODO: can be broken down to smaller classes with inheritance.
+    M2MObservationHandler       *_observation_handler; // Not owned // TODO: This can be moved to higher level , M2MObject ?
 
 friend class Test_M2MBase;
 friend class Test_M2MObject;
