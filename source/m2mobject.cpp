@@ -34,7 +34,8 @@ M2MObject::M2MObject(const String &object_name, char *path, bool external_blockw
           "",
 #endif
           path,
-          external_blockwise_store)
+          external_blockwise_store,
+          false)
 {
     M2MBase::set_base_type(M2MBase::Object);
     if(M2MBase::name_id() != -1) {
