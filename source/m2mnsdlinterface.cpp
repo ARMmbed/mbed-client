@@ -1449,26 +1449,23 @@ bool M2MNsdlInterface::parse_bootstrap_message(sn_coap_hdr_s *coap_header, bool 
     bool is_obj_instance = false;
     uint16_t instance_id = 0;
     if (_security) {
-        // Actually there are no member variables on the M2MTLVDeserializer so all the methods
-        // could be converted to static ones.
-        M2MTLVDeserializer deserializer;
 
-        ret = is_obj_instance = deserializer.is_object_instance(coap_header->payload_ptr);
+        ret = is_obj_instance = M2MTLVDeserializer::is_object_instance(coap_header->payload_ptr);
         if (!is_obj_instance) {
-            ret = deserializer.is_resource(coap_header->payload_ptr);
+            ret = M2MTLVDeserializer::is_resource(coap_header->payload_ptr);
         }
 
         if (ret) {
             M2MTLVDeserializer::Error error = M2MTLVDeserializer::None;
             if (is_obj_instance) {
                 if (is_security_object) {
-                    error = deserializer.deserialise_object_instances(coap_header->payload_ptr,
+                    error = M2MTLVDeserializer::deserialise_object_instances(coap_header->payload_ptr,
                                                                coap_header->payload_len,
                                                                *_security,
                                                                M2MTLVDeserializer::Put);
                     }
                 else {
-                    error = deserializer.deserialise_object_instances(coap_header->payload_ptr,
+                    error = M2MTLVDeserializer::deserialise_object_instances(coap_header->payload_ptr,
                                                                coap_header->payload_len,
                                                                _server,
                                                                M2MTLVDeserializer::Put);
@@ -1476,15 +1473,15 @@ bool M2MNsdlInterface::parse_bootstrap_message(sn_coap_hdr_s *coap_header, bool 
             }
             else {
                 if (is_security_object) {
-                    instance_id = deserializer.instance_id(coap_header->payload_ptr);
-                    error = deserializer.deserialize_resources(coap_header->payload_ptr,
+                    instance_id = M2MTLVDeserializer::instance_id(coap_header->payload_ptr);
+                    error = M2MTLVDeserializer::deserialize_resources(coap_header->payload_ptr,
                                                                coap_header->payload_len,
                                                                *_security->object_instance(instance_id),
                                                                M2MTLVDeserializer::Put);
                 }
                 else {
-                    instance_id = deserializer.instance_id(coap_header->payload_ptr);
-                    error = deserializer.deserialize_resources(coap_header->payload_ptr,
+                    instance_id = M2MTLVDeserializer::instance_id(coap_header->payload_ptr);
+                    error = M2MTLVDeserializer::deserialize_resources(coap_header->payload_ptr,
                                                                coap_header->payload_len,
                                                                *(_server.object_instance(instance_id)),
                                                                M2MTLVDeserializer::Post);

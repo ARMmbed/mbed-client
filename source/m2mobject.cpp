@@ -381,12 +381,11 @@ sn_coap_hdr_s* M2MObject::handle_post_request(nsdl_s *nsdl,
                         }
                     }
                     if(COAP_MSG_CODE_RESPONSE_CHANGED == msg_code) {
-                        M2MTLVDeserializer deserializer;
                         bool is_obj_instance = false;
                         bool obj_instance_exists = false;
-                        is_obj_instance = deserializer.is_object_instance(received_coap_header->payload_ptr);
+                        is_obj_instance = M2MTLVDeserializer::is_object_instance(received_coap_header->payload_ptr);
                         if (is_obj_instance) {
-                            instance_id = deserializer.instance_id(received_coap_header->payload_ptr);
+                            instance_id = M2MTLVDeserializer::instance_id(received_coap_header->payload_ptr);
                             tr_debug("M2MObject::handle_post_request() - instance id in TLV: %d", instance_id);
                             // Check if instance id already exists
                             if (object_instance(instance_id)){
@@ -402,15 +401,15 @@ sn_coap_hdr_s* M2MObject::handle_post_request(nsdl_s *nsdl,
                             M2MTLVDeserializer::Error error = M2MTLVDeserializer::None;
                             if(is_obj_instance) {
                                 tr_debug("M2MObject::handle_post_request() - TLV data contains ObjectInstance");
-                                error = deserializer.deserialise_object_instances(received_coap_header->payload_ptr,
+                                error = M2MTLVDeserializer::deserialise_object_instances(received_coap_header->payload_ptr,
                                                                            received_coap_header->payload_len,
                                                                            *this,
                                                                            M2MTLVDeserializer::Post);
                             } else if(obj_instance &&
-                                        (deserializer.is_resource(received_coap_header->payload_ptr) ||
-                                         deserializer.is_multiple_resource(received_coap_header->payload_ptr))) {
+                                        (M2MTLVDeserializer::is_resource(received_coap_header->payload_ptr) ||
+                                         M2MTLVDeserializer::is_multiple_resource(received_coap_header->payload_ptr))) {
                                 tr_debug("M2MObject::handle_post_request() - TLV data contains Resources");
-                                error = deserializer.deserialize_resources(received_coap_header->payload_ptr,
+                                error = M2MTLVDeserializer::deserialize_resources(received_coap_header->payload_ptr,
                                                                             received_coap_header->payload_len,
                                                                             *obj_instance,
                                                                             M2MTLVDeserializer::Post);
