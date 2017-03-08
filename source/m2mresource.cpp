@@ -37,7 +37,7 @@ M2MResource::M2MResource(M2MObjectInstance &parent,
 : M2MResourceInstance(*this, resource_name, resource_type, type, value, value_length,
                       path, external_blockwise_store, multiple_instance),
   _parent(parent)
-#ifdef SUPPORT_DELAYED_RESPONSE
+#ifndef DISABLE_DELAYED_RESPONSE
   ,_delayed_token(NULL),
   _delayed_token_len(0),
   _delayed_response(false)
@@ -54,7 +54,7 @@ M2MResource::M2MResource(M2MObjectInstance &parent,
                           M2MBase::DataType type)
 : M2MResourceInstance(*this, s, type),
   _parent(parent)
-#ifdef SUPPORT_DELAYED_RESPONSE
+#ifndef DISABLE_DELAYED_RESPONSE
   ,_delayed_token(NULL),
   _delayed_token_len(0),
   _delayed_response(false)
@@ -74,7 +74,7 @@ M2MResource::M2MResource(M2MObjectInstance &parent,
                       path,
                       external_blockwise_store,multiple_instance),
   _parent(parent)
-#ifdef SUPPORT_DELAYED_RESPONSE
+#ifndef DISABLE_DELAYED_RESPONSE
   ,_delayed_token(NULL),
   _delayed_token_len(0),
   _delayed_response(false)
@@ -99,7 +99,7 @@ M2MResource::~M2MResource()
         }
         _resource_instance_list.clear();
     }
-#ifdef SUPPORT_DELAYED_RESPONSE
+#ifndef DISABLE_DELAYED_RESPONSE
     free(_delayed_token);
 #endif
 }
@@ -110,7 +110,7 @@ bool M2MResource::supports_multiple_instances() const
     return param->multiple_instance;
 }
 
-#ifdef SUPPORT_DELAYED_RESPONSE
+#ifndef DISABLE_DELAYED_RESPONSE
 void M2MResource::set_delayed_response(bool delayed_response)
 {
     _delayed_response = delayed_response;
@@ -193,7 +193,7 @@ uint16_t M2MResource::resource_instance_count() const
     return (uint16_t)_resource_instance_list.size();
 }
 
-#ifdef SUPPORT_DELAYED_RESPONSE
+#ifndef DISABLE_DELAYED_RESPONSE
 bool M2MResource::delayed_response() const
 {
     return _delayed_response;
@@ -517,7 +517,7 @@ sn_coap_hdr_s* M2MResource::handle_post_request(nsdl_s *nsdl,
             }
             if(COAP_MSG_CODE_RESPONSE_CHANGED == msg_code) {
                 tr_debug("M2MResource::handle_post_request - Execute resource function");
-#ifdef SUPPORT_DELAYED_RESPONSE
+#ifndef DISABLE_DELAYED_RESPONSE
                 if(_delayed_response) {
                     msg_code = COAP_MSG_CODE_EMPTY;
                     coap_response->msg_type = COAP_MSG_TYPE_ACKNOWLEDGEMENT;
@@ -539,7 +539,7 @@ sn_coap_hdr_s* M2MResource::handle_post_request(nsdl_s *nsdl,
                     uint32_t length = 0;
                     get_value(coap_response->payload_ptr, length);
                     coap_response->payload_len = length;
-#ifdef SUPPORT_DELAYED_RESPONSE
+#ifndef DISABLE_DELAYED_RESPONSE
                 }
 #endif
                 execute(exec_params);
