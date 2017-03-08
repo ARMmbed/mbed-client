@@ -105,6 +105,50 @@ public:
      */
     uint8_t attribute_flags();
 
+    /**
+     * \brief Sets the observation token value.
+     * \param token A pointer to the token of the resource.
+     * \param length The length of the token pointer.
+     */
+    void set_observation_token(const uint8_t *token, const uint8_t length);
+
+    /**
+     * \brief Provides the observation token of the object.
+     * \param value[OUT] A pointer to the value of the token.
+     * \param value_length[OUT] The length of the token pointer.
+     */
+    void get_observation_token(uint8_t *&token, uint32_t &token_length);
+
+    /**
+     * \brief Returns the observation number.
+     * \return The observation number of the object.
+     */
+    uint16_t observation_number() const;
+
+    /**
+     * \brief Adds the observation level for the object.
+     * \param observation_level The level of observation.
+     */
+    void add_observation_level(M2MBase::Observation obs_level);
+
+    /**
+     * \brief Removes the observation level for the object.
+     * \param observation_level The level of observation.
+     */
+    void remove_observation_level(M2MBase::Observation obs_level);
+
+    /**
+     * \brief Returns the observation level of the object.
+     * \return The observation level of the object.
+     */
+    M2MBase::Observation observation_level() const;
+
+    /**
+     * @brief Returns whether this resource is under observation or not.
+     * @return True if the resource is under observation, else false,
+     */
+    bool is_under_observation() const;
+
 protected : // from M2MTimerObserver
 
     virtual void timer_expired(M2MTimerObserver::Type type =
@@ -157,14 +201,40 @@ private:
      */
     bool check_gt_lt_params();
 
+    /**
+     * \brief Allocate (size + 1) amount of memory, copy size bytes into
+     * it and add zero termination.
+     * \param source The source string to copy, may not be NULL.
+     * \param size The size of memory to be reserved.
+    */
+    uint8_t* alloc_string_copy(const uint8_t* source, uint32_t size);
+
+    /**
+     * \brief Memory allocation required for libCoap.
+     * \param size The size of memory to be reserved.
+    */
+    void* memory_alloc(uint32_t size);
+
+    /**
+     * \brief Memory free functions required for libCoap.
+     * \param ptr The object whose memory needs to be freed.
+    */
+    void memory_free(void *ptr);
+
+
 private:
     M2MReportObserver           &_observer;
+    bool                        _is_under_observation : 1;
+    M2MBase::Observation        _observation_level : 4;
     uint8_t                     _attribute_state;
+    unsigned                    _token_length : 8;
     bool                        _notify;
     bool                        _pmin_exceeded;
     bool                        _pmax_exceeded;
+    unsigned                    _observation_number : 16;
     M2MTimer                    _pmin_timer;
     M2MTimer                    _pmax_timer;
+    uint8_t                     *_token;
     int32_t                     _pmax;
     int32_t                     _pmin;
     float                       _current_value;
