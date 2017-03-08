@@ -118,7 +118,7 @@ public:
      */
     bool supports_multiple_instances() const;
 
-#ifdef SUPPORT_DELAYED_RESPONSE
+#ifndef DISABLE_DELAYED_RESPONSE
     /**
      * \brief Sets whether the resource should send a delayed response for a POST request.
      * \param delayed_response A boolean value to set the delayed response.
@@ -244,7 +244,7 @@ private:
     M2MObjectInstance &_parent;
 
     M2MResourceInstanceList     _resource_instance_list; // owned
-#ifdef SUPPORT_DELAYED_RESPONSE
+#ifndef DISABLE_DELAYED_RESPONSE
     uint8_t                     *_delayed_token;
     uint8_t                     _delayed_token_len;
     bool                        _delayed_response;
