@@ -42,7 +42,8 @@ M2MObjectInstance::M2MObjectInstance(M2MObject& parent, const String &object_nam
           resource_type,
 #endif
           path,
-          external_blockwise_store),
+          external_blockwise_store,
+          false),
   _parent(parent)
 {
     M2MBase::set_base_type(M2MBase::ObjectInstance);
@@ -80,7 +81,7 @@ M2MResource* M2MObjectInstance::create_static_resource(const lwm2m_parameters_s*
         return res;
     }
     if(!resource(static_res->name)) {
-        res = new M2MResource(*this, static_res, type);
+        res = new M2MResource(*this, static_res, convert_resource_type(type));
         if(res) {
             res->add_observation_level(observation_level());
             //if (multiple_instance) {
@@ -109,7 +110,7 @@ M2MResource* M2MObjectInstance::create_static_resource(const String &resource_na
         char *path = create_path(*this, resource_name.c_str());
 
         if (path) {
-            res = new M2MResource(*this, resource_name, resource_type, type,
+            res = new M2MResource(*this, resource_name, resource_type, convert_resource_type(type),
                                   value, value_length, path,
                                   multiple_instance, external_blockwise_store);
             if(res) {
@@ -135,7 +136,7 @@ M2MResource* M2MObjectInstance::create_dynamic_resource(const lwm2m_parameters_s
         return res;
     }
     if(!resource(static_res->name)) {
-        res = new M2MResource(*this, static_res, type);
+        res = new M2MResource(*this, static_res, convert_resource_type(type));
         if(res) {
             //if (multiple_instance) { // TODO!
               //  res->set_coap_content_type(COAP_CONTENT_OMA_TLV_TYPE);
@@ -162,7 +163,7 @@ M2MResource* M2MObjectInstance::create_dynamic_resource(const String &resource_n
     if(!resource(resource_name)) {
         char *path = create_path(*this, resource_name.c_str());
         if (path) {
-            res = new M2MResource(*this, resource_name, resource_type, type,
+            res = new M2MResource(*this, resource_name, resource_type, convert_resource_type(type),
                                   observable, path,
                                   multiple_instance, external_blockwise_store);
             if(res) {
@@ -195,7 +196,7 @@ M2MResourceInstance* M2MObjectInstance::create_static_resource_instance(const St
     if(!res) {
         char *path = create_path(*this, resource_name.c_str());
         if (path) {
-            res = new M2MResource(*this, resource_name, resource_type, type,
+            res = new M2MResource(*this, resource_name, resource_type, convert_resource_type(type),
                                   value, value_length, path,
                                   true, external_blockwise_store);
             _resource_list.push_back(res);
@@ -207,9 +208,9 @@ M2MResourceInstance* M2MObjectInstance::create_static_resource_instance(const St
     if(res && res->supports_multiple_instances()&& (res->resource_instance(instance_id) == NULL)) {
         char *path = M2MBase::create_path(*res, instance_id);
         if (path) {
-            instance = new M2MResourceInstance(*res, resource_name, resource_type, type,
+            instance = new M2MResourceInstance(*res, resource_name, resource_type, convert_resource_type(type),
                                                value, value_length,
-                                               path, external_blockwise_store);
+                                               path, external_blockwise_store,true);
             if(instance) {
                 instance->set_operation(M2MBase::GET_ALLOWED);
                 instance->set_instance_id(instance_id);
@@ -236,7 +237,7 @@ M2MResourceInstance* M2MObjectInstance::create_dynamic_resource_instance(const S
     if(!res) {
         char *path = create_path(*this, resource_name.c_str());
         if (path) {
-            res = new M2MResource(*this, resource_name, resource_type, type,
+            res = new M2MResource(*this, resource_name, resource_type, convert_resource_type(type),
                                   false, path, M2MBase::instance_id(), true);
             _resource_list.push_back(res);
             res->set_register_uri(false);
@@ -246,8 +247,8 @@ M2MResourceInstance* M2MObjectInstance::create_dynamic_resource_instance(const S
     if (res && res->supports_multiple_instances() && (res->resource_instance(instance_id) == NULL)) {
         char *path = create_path(*res, instance_id);
         if (path) {
-            instance = new M2MResourceInstance(*res, resource_name, resource_type, type,
-                                               path, external_blockwise_store);
+            instance = new M2MResourceInstance(*res, resource_name, resource_type, convert_resource_type(type),
+                                               path, external_blockwise_store,true);
             if(instance) {
                 instance->set_operation(M2MBase::GET_ALLOWED);
                 instance->set_observable(observable);
@@ -717,4 +718,33 @@ void M2MObjectInstance::notification_update(M2MBase::Observation observation_lev
         }
 
     }
+}
+
+M2MBase::DataType M2MObjectInstance::convert_resource_type(M2MResourceInstance::ResourceType type)
+{
+    M2MBase::DataType data_type = M2MBase::OBJLINK;
+    switch(type) {
+        case M2MResourceInstance::STRING:
+            data_type = M2MBase::STRING;
+            break;
+        case M2MResourceInstance::INTEGER:
+            data_type = M2MBase::INTEGER;
+            break;
+        case M2MResourceInstance::FLOAT:
+            data_type = M2MBase::FLOAT;
+            break;
+        case M2MResourceInstance::OPAQUE:
+            data_type = M2MBase::OPAQUE;
+            break;
+        case M2MResourceInstance::BOOLEAN:
+            data_type = M2MBase::BOOLEAN;
+            break;
+        case M2MResourceInstance::TIME:
+            data_type = M2MBase::TIME;
+            break;
+        case M2MResourceInstance::OBJLINK:
+            data_type = M2MBase::OBJLINK;
+            break;
+    }
+    return data_type;
 }
