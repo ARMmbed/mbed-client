@@ -291,6 +291,16 @@ public:
 
 private:
 
+    /**
+     * \brief Utility function to map M2MResourceInstance ResourceType
+     * to M2MBase::DataType.
+     * \param resource_type M2MResourceInstance::ResourceType.
+     * \return M2MBase::DataType.
+     */
+    M2MBase::DataType convert_resource_type(M2MResourceInstance::ResourceType);
+
+private:
+
     M2MObject      &_parent;
 
     M2MResourceList     _resource_list; // owned
