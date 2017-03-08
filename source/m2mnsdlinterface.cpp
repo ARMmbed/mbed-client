@@ -1191,10 +1191,9 @@ void M2MNsdlInterface::send_object_observation(M2MObject *object,
         uint8_t *token = 0;
         uint32_t token_length = 0;
 
-        M2MTLVSerializer serializer;
         // Send whole object structure
         if (send_object) {
-            value = serializer.serialize(object->instances(), length);
+            value = M2MTLVSerializer::serialize(object->instances(), length);
         }
         // Send only changed object instances
         else {
@@ -1208,7 +1207,7 @@ void M2MNsdlInterface::send_object_observation(M2MObject *object,
                 }
             }
             if (!list.empty()) {
-                value = serializer.serialize(list, length);
+                value = M2MTLVSerializer::serialize(list, length);
                 list.clear();
             }
         }
@@ -1237,8 +1236,7 @@ void M2MNsdlInterface::send_object_instance_observation(M2MObjectInstance *objec
         uint8_t *token = 0;
         uint32_t token_length = 0;
 
-        M2MTLVSerializer serializer;
-        value = serializer.serialize(object_instance->resources(), length);
+        value = M2MTLVSerializer::serialize(object_instance->resources(), length);
 
         object_instance->get_observation_token(token,token_length);
 
@@ -1271,8 +1269,7 @@ void M2MNsdlInterface::send_resource_observation(M2MResource *resource,
         }
         if (resource->resource_instance_count() > 0) {
             content_type = COAP_CONTENT_OMA_TLV_TYPE;
-            M2MTLVSerializer serializer;
-            value = serializer.serialize(resource, length);
+            value = M2MTLVSerializer::serialize(resource, length);
         } else {
             resource->get_value(value,length);
         }
