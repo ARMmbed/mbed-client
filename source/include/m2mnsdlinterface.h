@@ -234,7 +234,7 @@ protected: // from M2MObservationHandler
     virtual void value_updated(M2MBase *base, const String &object_name);
 
     virtual void remove_object(M2MBase *object);
-#ifdef SUPPORT_DELAYED_RESPONSE
+#ifndef DISABLE_DELAYED_RESPONSE
     virtual void send_delayed_response(M2MBase *base);
 #endif
 private:
