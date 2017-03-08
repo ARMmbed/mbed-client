@@ -30,22 +30,25 @@
 M2MResourceInstance::M2MResourceInstance(M2MResource &parent,
                                          const String &res_name,
                                          const String &resource_type,
-                                         M2MResourceInstance::ResourceType type,
+                                         M2MBase::DataType type,
                                          char* path,
-                                         bool external_blockwise_store)
+                                         bool external_blockwise_store,
+                                         bool multiple_instance)
 : M2MBase(res_name,
           M2MBase::Dynamic,
 #ifndef DISABLE_RESOURCE_TYPE
           resource_type,
 #endif
           path,
-          external_blockwise_store),
+          external_blockwise_store,
+          multiple_instance,
+          type),
  _parent_resource(parent),
  _value(NULL),
- _value_length(0),
- _block_message_data(NULL),
- _resource_callback(NULL),
- _resource_type(type)
+ _value_length(0)
+#ifdef SUPPORT_BLOCK_MESSAGE
+ ,_block_message_data(NULL),
+#endif
 {
     M2MBase::set_base_type(M2MBase::ResourceInstance);
 }
@@ -53,24 +56,27 @@ M2MResourceInstance::M2MResourceInstance(M2MResource &parent,
 M2MResourceInstance::M2MResourceInstance(M2MResource &parent,
                                          const String &res_name,
                                          const String &resource_type,
-                                         M2MResourceInstance::ResourceType type,
+                                         M2MBase::DataType type,
                                          const uint8_t *value,
                                          const uint8_t value_length,
                                          char* path,
-                                         bool external_blockwise_store)
+                                         bool external_blockwise_store,
+                                         bool multiple_instance)
 : M2MBase(res_name,
           M2MBase::Static,
 #ifndef DISABLE_RESOURCE_TYPE
           resource_type,
 #endif
           path,
-          external_blockwise_store),
+          external_blockwise_store,
+          multiple_instance,
+          type),
  _parent_resource(parent),
  _value(NULL),
- _value_length(0),
- _block_message_data(NULL),
- _resource_callback(NULL),
- _resource_type(type)
+ _value_length(0)
+#ifdef SUPPORT_BLOCK_MESSAGE
+ ,_block_message_data(NULL),
+#endif
 {
     M2MBase::set_base_type(M2MBase::Resource);
     if (mode() == M2MBase::Dynamic) {
@@ -95,14 +101,14 @@ M2MResourceInstance::M2MResourceInstance(M2MResource &parent,
 
 M2MResourceInstance::M2MResourceInstance(M2MResource &parent,
                                          const lwm2m_parameters_s* s,
-                                         M2MResourceInstance::ResourceType type)
+                                         M2MBase::DataType /*type*/)
 : M2MBase(s),
   _parent_resource(parent),
   _value(NULL),
-  _value_length(0),
-  _block_message_data(NULL),
-  _resource_callback(NULL),
-  _resource_type(type)
+  _value_length(0)
+#ifdef SUPPORT_BLOCK_MESSAGE
+  ,_block_message_data(NULL),
+#endif
 {
     //TBD: put to flash, or parse from the uri_path!!!!
     //same for the _object_instance_id.
@@ -127,7 +133,7 @@ M2MResourceInstance::~M2MResourceInstance()
     delete callback;
 
     M2MCallbackStorage::remove_callback(*this, M2MCallbackAssociation::M2MResourceInstanceExecuteCallback2);
-
+#ifdef SUPPORT_BLOCK_MESSAGE
     incoming_block_message_callback *in_callback = (incoming_block_message_callback*)M2MCallbackStorage::remove_callback(*this,
                                                         M2MCallbackAssociation::M2MResourceInstanceIncomingBlockMessageCallback);
     delete in_callback;
@@ -135,6 +141,7 @@ M2MResourceInstance::~M2MResourceInstance()
     outgoing_block_message_callback *out_callback = (outgoing_block_message_callback*)M2MCallbackStorage::remove_callback(*this,
                                                         M2MCallbackAssociation::M2MResourceInstanceOutgoingBlockMessageCallback);
     delete out_callback;
+#endif
 
     notification_sent_callback *notif_callback = (notification_sent_callback*)M2MCallbackStorage::remove_callback(*this,
                                                         M2MCallbackAssociation::M2MResourceInstanceNotificationSentCallback);
@@ -142,7 +149,9 @@ M2MResourceInstance::~M2MResourceInstance()
 
     M2MCallbackStorage::remove_callback(*this, M2MCallbackAssociation::M2MResourceInstanceNotificationSentCallback2);
 
+#ifdef SUPPORT_BLOCK_MESSAGE
     delete _block_message_data;
+#endif
 }
 
 M2MBase::BaseType M2MResourceInstance::base_type() const
@@ -152,7 +161,9 @@ M2MBase::BaseType M2MResourceInstance::base_type() const
 
 M2MResourceInstance::ResourceType M2MResourceInstance::resource_instance_type() const
 {
-    return _resource_type;
+    M2MBase::lwm2m_parameters_s* param = M2MBase::get_lwm2m_parameters();
+    M2MBase::DataType type = param->data_type;
+    return convert_data_type(type);
 }
 
 bool M2MResourceInstance::handle_observation_attribute(const char *query)
@@ -167,7 +178,7 @@ bool M2MResourceInstance::handle_observation_attribute(const char *query)
 
     if (handler) {
         success = handler->parse_notification_attribute(query,
-                M2MBase::base_type(), _resource_type);
+                M2MBase::base_type(), resource_instance_type());
         if(success) {
             if (is_under_observation()) {
                 handler->set_under_observation(true);
@@ -239,7 +250,7 @@ bool M2MResourceInstance::set_value(const uint8_t *value,
         if(_value) {
             _value_length = value_length;
             if( value_changed ) { //
-                if (_resource_type == M2MResourceInstance::STRING) {
+                if (resource_instance_type() == M2MResourceInstance::STRING) {
                     M2MReportHandler *report_handler = M2MBase::report_handler();
                     if(report_handler && is_under_observation()) {
                         report_handler->set_notification_trigger();
@@ -269,7 +280,7 @@ void M2MResourceInstance::report()
     if(M2MBase::Dynamic == mode() &&
        (M2MBase::R_Attribute & observation_level) == M2MBase::R_Attribute) {
         tr_debug("M2MResourceInstance::report() - resource level");
-        if(!_resource_callback && _resource_type != M2MResourceInstance::STRING) {
+        if(resource_instance_type() != M2MResourceInstance::STRING) {
             M2MReportHandler *report_handler = M2MBase::report_handler();
             if (report_handler && is_observable()) {
                 if(_value) {
@@ -280,8 +291,11 @@ void M2MResourceInstance::report()
             }
         }
         else {
-            if (_resource_callback && base_type() == M2MBase::ResourceInstance) {
-                _resource_callback->notification_update();
+            if (base_type() == M2MBase::ResourceInstance) {
+                M2MReportHandler *report_handler = _parent_resource.report_handler();
+                if(report_handler && _parent_resource.is_observable()) {
+                    report_handler->set_notification_trigger(_parent_resource.get_parent_object_instance().instance_id());
+                }
             }
         }
     } else if(M2MBase::Static == mode()) {
@@ -393,7 +407,7 @@ sn_coap_hdr_s* M2MResourceInstance::handle_get_request(nsdl_s *nsdl,
         // process the GET if we have registered a callback for it
         if ((operation() & SN_GRS_GET_ALLOWED) != 0) {
             if(coap_response) {
-                if(_resource_type == M2MResourceInstance::OPAQUE) {
+                if(resource_instance_type() == M2MResourceInstance::OPAQUE) {
                     coap_response->content_format = sn_coap_content_format_e(COAP_CONTENT_OMA_OPAQUE_TYPE);
                 } else {
                     coap_response->content_format = sn_coap_content_format_e(0);
@@ -401,7 +415,7 @@ sn_coap_hdr_s* M2MResourceInstance::handle_get_request(nsdl_s *nsdl,
                 // fill in the CoAP response payload
                 coap_response->payload_ptr = NULL;
                 uint32_t payload_len = 0;
-
+#ifdef SUPPORT_BLOCK_MESSAGE
                 //If handler exists it means that resource value is stored in application side
                 if (block_message() && block_message()->is_block_message()) {
                     outgoing_block_message_callback* outgoing_block_message_cb = (outgoing_block_message_callback*)M2MCallbackStorage::get_callback(*this,
@@ -416,8 +430,11 @@ sn_coap_hdr_s* M2MResourceInstance::handle_get_request(nsdl_s *nsdl,
                         (*outgoing_block_message_cb)(name, coap_response->payload_ptr, payload_len);
                     }
                 } else {
+#endif
                     get_value(coap_response->payload_ptr,payload_len);
+#ifdef SUPPORT_BLOCK_MESSAGE
                 }
+#endif
 
                 coap_response->payload_len = payload_len;
                 coap_response->options_list_ptr = sn_nsdl_alloc_options_list(nsdl, coap_response);
@@ -513,6 +530,7 @@ sn_coap_hdr_s* M2MResourceInstance::handle_put_request(nsdl_s *nsdl,
                     msg_code = COAP_MSG_CODE_RESPONSE_UNSUPPORTED_CONTENT_FORMAT;
                 } else {
                     bool external_block_store = false;
+#ifdef SUPPORT_BLOCK_MESSAGE
                     if (block_message()) {
                         block_message()->set_message_info(received_coap_header);
                         if (block_message()->is_block_message()) {
@@ -533,6 +551,7 @@ sn_coap_hdr_s* M2MResourceInstance::handle_put_request(nsdl_s *nsdl,
                             }
                         }
                     }
+#endif
                     if (!external_block_store) {
                         set_value(received_coap_header->payload_ptr, received_coap_header->payload_len);
                     }
@@ -563,16 +582,13 @@ sn_coap_hdr_s* M2MResourceInstance::handle_put_request(nsdl_s *nsdl,
     return coap_response;
 }
 
-void M2MResourceInstance::set_resource_observer(M2MResourceCallback *resource)
-{
-    _resource_callback = resource;
-}
-
 uint16_t M2MResourceInstance::object_instance_id() const
 {
     const M2MObjectInstance& parent_object_instance = get_parent_resource().get_parent_object_instance();
     return parent_object_instance.instance_id();
 }
+
+#ifdef SUPPORT_BLOCK_MESSAGE
 
 M2MBlockMessage* M2MResourceInstance::block_message() const
 {
@@ -605,6 +621,7 @@ bool M2MResourceInstance::set_outgoing_block_message_callback(outgoing_block_mes
     outgoing_block_message_callback *new_callback = new outgoing_block_message_callback(callback);
     return M2MCallbackStorage::add_callback(*this, new_callback, M2MCallbackAssociation::M2MResourceInstanceOutgoingBlockMessageCallback);
 }
+#endif
 
 bool M2MResourceInstance::set_notification_sent_callback(notification_sent_callback callback)
 {
@@ -648,4 +665,33 @@ const char* M2MResourceInstance::object_name() const
     const M2MObject& parent_object = parent_object_instance.get_parent_object();
 
     return parent_object.name();
+}
+
+M2MResourceInstance::ResourceType M2MResourceInstance::convert_data_type(M2MBase::DataType type) const
+{
+    M2MResourceInstance::ResourceType res_type = M2MResourceInstance::OBJLINK;
+    switch(type) {
+        case M2MBase::STRING:
+            res_type = M2MResourceInstance::STRING;
+            break;
+        case M2MBase::INTEGER:
+            res_type = M2MResourceInstance::INTEGER;
+            break;
+        case M2MBase::FLOAT:
+            res_type = M2MResourceInstance::FLOAT;
+            break;
+        case M2MBase::OPAQUE:
+            res_type = M2MResourceInstance::OPAQUE;
+            break;
+        case M2MBase::BOOLEAN:
+            res_type = M2MResourceInstance::BOOLEAN;
+            break;
+        case M2MBase::TIME:
+            res_type = M2MResourceInstance::TIME;
+            break;
+        case M2MBase::OBJLINK:
+            res_type = M2MResourceInstance::OBJLINK;
+            break;
+    }
+    return res_type;
 }

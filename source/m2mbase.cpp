@@ -41,16 +41,13 @@ M2MBase::M2MBase(const String& resource_name,
                  const String &resource_type,
 #endif
                  char *path,
-                 bool external_blockwise_store)
+                 bool external_blockwise_store,
+                 bool multiple_instance,
+                 M2MBase::DataType type)
 :
   _sn_resource(NULL),
   _report_handler(NULL),
-  _observation_handler(NULL),
-  _token(NULL),
-  _observation_number(0),
-  _token_length(0),
-  _observation_level(M2MBase::None),
-  _is_under_observation(false)
+  _observation_handler(NULL)
 {
     // Checking the name length properly, i.e returning error is impossible from constructor without exceptions
     assert(resource_name.length() <= MAX_ALLOWED_STRING_LENGTH);
@@ -59,6 +56,8 @@ M2MBase::M2MBase(const String& resource_name,
     if(_sn_resource) {
         memset(_sn_resource, 0, sizeof(lwm2m_parameters_s));
         _sn_resource->free_on_delete = true;
+        _sn_resource->multiple_instance = multiple_instance;
+        _sn_resource->data_type = type;
         _sn_resource->dynamic_resource_params =
                 (sn_nsdl_dynamic_resource_parameters_s*)memory_alloc(sizeof(sn_nsdl_dynamic_resource_parameters_s));
         if(_sn_resource->dynamic_resource_params) {
@@ -110,12 +109,7 @@ M2MBase::M2MBase(const String& resource_name,
 M2MBase::M2MBase(const lwm2m_parameters_s *s):
     _sn_resource((lwm2m_parameters_s*) s),
     _report_handler(NULL),
-    _observation_handler(NULL),
-    _token(NULL),
-    _observation_number(0),
-    _token_length(0),
-    _observation_level(M2MBase::None),
-    _is_under_observation(false)
+    _observation_handler(NULL)
 {
     // Set callback function in case of dynamic resource
     if (M2MBase::Dynamic == _sn_resource->dynamic_resource_params->static_resource_parameters->mode) {
@@ -127,7 +121,6 @@ M2MBase::~M2MBase()
 {
     delete _report_handler;
     free_resources();
-    free(_token);
     value_updated_callback* callback = (value_updated_callback*)M2MCallbackStorage::remove_callback(*this, M2MCallbackAssociation::M2MBaseValueUpdatedCallback);
     delete callback;
 
@@ -281,12 +274,16 @@ void M2MBase::set_observable(bool observable)
 
 void M2MBase::add_observation_level(M2MBase::Observation obs_level)
 {
-    _observation_level = (M2MBase::Observation)(_observation_level | obs_level);
+    if(_report_handler) {
+            _report_handler->add_observation_level(obs_level);
+    }
 }
 
 void M2MBase::remove_observation_level(M2MBase::Observation obs_level)
 {
-    _observation_level = (M2MBase::Observation)(_observation_level & ~obs_level);
+    if(_report_handler) {
+            _report_handler->remove_observation_level(obs_level);
+    }
 }
 
 void M2MBase::set_observation_handler(M2MObservationHandler *handler)
@@ -301,7 +298,9 @@ void M2MBase::set_under_observation(bool observed,
 {
     tr_debug("M2MBase::set_under_observation - observed: %d", observed);
     tr_debug("M2MBase::set_under_observation - base_type: %d", base_type());
-    _is_under_observation = observed;
+    if(_report_handler) {
+        _report_handler->set_under_observation(observed);
+    }
     _observation_handler = handler;
     if (handler) {
         if (base_type() != M2MBase::ResourceInstance) {
@@ -324,15 +323,8 @@ void M2MBase::set_under_observation(bool observed,
 
 void M2MBase::set_observation_token(const uint8_t *token, const uint8_t length)
 {
-     free(_token);
-     _token = NULL;
-     _token_length = 0;
-
-    if( token != NULL && length > 0 ) {
-        _token = alloc_string_copy((uint8_t *)token, length);
-        if(_token) {
-            _token_length = length;
-        }
+    if(_report_handler) {
+        _report_handler->set_observation_token(token, length);
     }
 }
 
@@ -409,18 +401,17 @@ bool M2MBase::is_observable() const
 
 M2MBase::Observation M2MBase::observation_level() const
 {
-    return _observation_level;
+    M2MBase::Observation obs_level = M2MBase::None;
+    if(_report_handler) {
+        obs_level = _report_handler->observation_level();
+    }
+    return obs_level;
 }
 
 void M2MBase::get_observation_token(uint8_t *&token, uint32_t &token_length)
 {
-    token_length = 0;
-    free(token);
-    if (_token) {
-        token = alloc_string_copy((uint8_t *)_token, _token_length);
-        if(token) {
-            token_length = _token_length;
-        }
+    if(_report_handler) {
+        _report_handler->get_observation_token(token, token_length);
     }
 }
 
@@ -431,7 +422,11 @@ M2MBase::Mode M2MBase::mode() const
 
 uint16_t M2MBase::observation_number() const
 {
-    return _observation_number;
+    uint16_t obs_number = 0;
+    if(_report_handler) {
+        obs_number = _report_handler->observation_number();
+    }
+    return obs_number;
 }
 
 uint32_t M2MBase::max_age() const
@@ -460,13 +455,14 @@ bool M2MBase::handle_observation_attribute(const char *query)
     return success;
 }
 
-void M2MBase::observation_to_be_sent(const m2m::Vector<uint16_t> &changed_instance_ids, bool send_object)
+void M2MBase::observation_to_be_sent(const m2m::Vector<uint16_t> &changed_instance_ids,
+                                     uint16_t obs_number,
+                                     bool send_object)
 {
     //TODO: Move this to M2MResourceInstance
     if(_observation_handler) {
-        _observation_number++;
         _observation_handler->observation_to_be_sent(this,
-                                                    _observation_number,
+                                                    obs_number,
                                                     changed_instance_ids,
                                                     send_object);
     }
@@ -573,7 +569,6 @@ bool M2MBase::validate_string_length(const char* string, size_t min_length, size
             valid = true;
         }
     }
-
     return valid;
 }
 
@@ -630,7 +625,11 @@ bool M2MBase::is_integer(const char *value)
 
 bool M2MBase::is_under_observation() const
 {
-    return _is_under_observation;
+   bool under_observation = false;
+    if(_report_handler) {
+        under_observation = _report_handler->is_under_observation();
+    }
+    return under_observation;
 }
 
 bool M2MBase::set_value_updated_function(value_updated_callback callback)
@@ -792,4 +791,9 @@ size_t M2MBase::resource_name_length() const
 sn_nsdl_dynamic_resource_parameters_s* M2MBase::get_nsdl_resource()
 {
     return _sn_resource->dynamic_resource_params;
+}
+
+M2MBase::lwm2m_parameters_s* M2MBase::get_lwm2m_parameters() const
+{
+    return _sn_resource;
 }
