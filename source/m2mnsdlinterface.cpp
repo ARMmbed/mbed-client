@@ -719,7 +719,7 @@ void M2MNsdlInterface::observation_to_be_sent(M2MBase *object,
     release_mutex();
 }
 
-#ifdef SUPPORT_DELAYED_RESPONSE
+#ifndef DISABLE_DELAYED_RESPONSE
 void M2MNsdlInterface::send_delayed_response(M2MBase *base)
 {
     claim_mutex();

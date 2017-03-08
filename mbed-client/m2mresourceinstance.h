@@ -33,7 +33,7 @@ typedef void(*execute_callback_2) (void *arguments);
 typedef FP0<void> notification_sent_callback;
 typedef void(*notification_sent_callback_2) (void);
 
-#ifdef SUPPORT_BLOCK_MESSAGE
+#ifndef DISABLE_BLOCK_MESSAGE
 typedef FP1<void, M2MBlockMessage *> incoming_block_message_callback;
 typedef FP3<void, const String &, uint8_t *&, uint32_t &> outgoing_block_message_callback;
 #endif
@@ -256,7 +256,7 @@ public:
     */
     virtual const char* object_name() const;
 
-#ifdef SUPPORT_BLOCK_MESSAGE
+#ifndef DISABLE_BLOCK_MESSAGE
     /**
      * @brief Sets the function that is executed when this
      * object receives a block-wise message.
@@ -319,7 +319,7 @@ private:
     uint8_t                                 *_value;        //TODO: remove it from here and use it directly from sn_nsdl_static_resource_parameters_
                                                             // but move resource* and resource Len to dynamic resource structure.
     uint32_t                                _value_length;
-#ifdef SUPPORT_BLOCK_MESSAGE
+#ifndef DISABLE_BLOCK_MESSAGE
     M2MBlockMessage                         *_block_message_data;
 #endif
 
