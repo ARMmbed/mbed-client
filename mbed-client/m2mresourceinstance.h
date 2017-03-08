@@ -33,11 +33,12 @@ typedef void(*execute_callback_2) (void *arguments);
 typedef FP0<void> notification_sent_callback;
 typedef void(*notification_sent_callback_2) (void);
 
+#ifdef SUPPORT_BLOCK_MESSAGE
 typedef FP1<void, M2MBlockMessage *> incoming_block_message_callback;
 typedef FP3<void, const String &, uint8_t *&, uint32_t &> outgoing_block_message_callback;
+#endif
 
 class M2MResource;
-class M2MResourceCallback;
 
 class M2MResourceInstance : public M2MBase {
 
@@ -67,7 +68,7 @@ private: // Constructor and destructor are private
 
     M2MResourceInstance(M2MResource &parent,
                         const lwm2m_parameters_s* s,
-                        M2MResourceInstance::ResourceType type);
+                        M2MBase::DataType type);
     /**
      * \brief A constructor for creating a resource.
      * \param resource_name The name of the resource.
@@ -81,9 +82,10 @@ private: // Constructor and destructor are private
     M2MResourceInstance(M2MResource &parent,
                         const String &resource_name,
                         const String &resource_type,
-                        M2MResourceInstance::ResourceType type,
+                        M2MBase::DataType type,
                         char* path,
-                        bool external_blockwise_store);
+                        bool external_blockwise_store,
+                        bool multiple_instance);
 
     /**
      * \brief A Constructor for creating a resource.
@@ -101,11 +103,12 @@ private: // Constructor and destructor are private
     M2MResourceInstance(M2MResource &parent,
                         const String &resource_name,
                         const String &resource_type,
-                        M2MResourceInstance::ResourceType type,
+                        M2MBase::DataType type,
                         const uint8_t *value,
                         const uint8_t value_length,
                         char* path,
-                        bool external_blockwise_store);
+                        bool external_blockwise_store,
+                        bool multiple_instance);
 
     // Prevents the use of default constructor.
     M2MResourceInstance();
@@ -253,6 +256,7 @@ public:
     */
     virtual const char* object_name() const;
 
+#ifdef SUPPORT_BLOCK_MESSAGE
     /**
      * @brief Sets the function that is executed when this
      * object receives a block-wise message.
@@ -275,6 +279,8 @@ public:
     */
     virtual M2MBlockMessage* block_message() const;
 
+#endif
+
     /**
      * @brief Sets the function that is executed when this object receives
      * response(Empty ACK) for notification message.
@@ -296,19 +302,13 @@ public:
 
     M2MResource& get_parent_resource() const;
 
-protected:
-
-    /**
-     * \brief Set an observer for sending the notification update.
-     * \param resource The callback handle.
-     */
-    void set_resource_observer(M2MResourceCallback *resource);
-
 private:
 
     void report();
 
     bool is_value_changed(const uint8_t* value, const uint32_t value_len);
+
+    M2MResourceInstance::ResourceType convert_data_type(M2MBase::DataType type) const;
 
 private:
 
@@ -316,15 +316,12 @@ private:
     // pointer to itself. If this inheritance was broken, we could save some memory.
     M2MResource &_parent_resource;
 
-    uint8_t                                 *_value;
+    uint8_t                                 *_value;        //TODO: remove it from here and use it directly from sn_nsdl_static_resource_parameters_
+                                                            // but move resource* and resource Len to dynamic resource structure.
     uint32_t                                _value_length;
+#ifdef SUPPORT_BLOCK_MESSAGE
     M2MBlockMessage                         *_block_message_data;
-
-    // Note: this is not converted yet to the callback storage framework as this pointer could be removed.
-    M2MResourceCallback                     *_resource_callback; // Not owned
-
-
-    ResourceType                            _resource_type;
+#endif
 
     friend class Test_M2MResourceInstance;
     friend class Test_M2MResource;

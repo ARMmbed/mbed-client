@@ -30,12 +30,17 @@
 
 M2MReportHandler::M2MReportHandler(M2MReportObserver &observer)
 : _observer(observer),
+  _is_under_observation(false),
+  _observation_level(M2MBase::None),
   _attribute_state(0),
+  _token_length(0),
   _notify(false),
   _pmin_exceeded(false),
   _pmax_exceeded(false),
+  _observation_number(0),
   _pmin_timer(*this),
   _pmax_timer(*this),
+  _token(NULL),
   _pmax(-1.0f),
   _pmin(1.0f),
   _current_value(0.0f),
@@ -52,6 +57,7 @@ M2MReportHandler::M2MReportHandler(M2MReportObserver &observer)
 M2MReportHandler::~M2MReportHandler()
 {
     tr_debug("M2MReportHandler::~M2MReportHandler()");
+    free(_token);
 }
 
 void M2MReportHandler::set_under_observation(bool observed)
@@ -304,14 +310,16 @@ void M2MReportHandler::report()
         _pmin_exceeded = false;
         _pmax_exceeded = false;
         _notify = false;
-        _observer.observation_to_be_sent(_changed_instance_ids);
+        _observation_number++;
+        _observer.observation_to_be_sent(_changed_instance_ids, observation_number());
         _changed_instance_ids.clear();
         _pmax_timer.stop_timer();
     }
     else {
         if (_pmax_exceeded) {
             tr_debug("M2MReportHandler::report()- send with PMAX expiration");
-            _observer.observation_to_be_sent(_changed_instance_ids, true);
+            _observation_number++;
+            _observer.observation_to_be_sent(_changed_instance_ids, observation_number(),true);
             _changed_instance_ids.clear();
         }
         else {
@@ -472,4 +480,80 @@ bool M2MReportHandler::check_gt_lt_params()
 uint8_t M2MReportHandler::attribute_flags()
 {
     return _attribute_state;
+}
+
+void M2MReportHandler::set_observation_token(const uint8_t *token, const uint8_t length)
+{
+     free(_token);
+     _token = NULL;
+     _token_length = 0;
+
+    if( token != NULL && length > 0 ) {
+        _token = alloc_string_copy((uint8_t *)token, length);
+        if(_token) {
+            _token_length = length;
+        }
+    }
+}
+
+void M2MReportHandler::get_observation_token(uint8_t *&token, uint32_t &token_length)
+{
+    token_length = 0;
+    free(token);
+    if (_token) {
+        token = alloc_string_copy((uint8_t *)_token, _token_length);
+        if(token) {
+            token_length = _token_length;
+        }
+    }
+}
+
+uint16_t M2MReportHandler::observation_number() const
+{
+    return _observation_number;
+}
+
+void M2MReportHandler::add_observation_level(M2MBase::Observation obs_level)
+{
+    _observation_level = (M2MBase::Observation)(_observation_level | obs_level);
+}
+
+void M2MReportHandler::remove_observation_level(M2MBase::Observation obs_level)
+{
+    _observation_level = (M2MBase::Observation)(_observation_level & ~obs_level);
+}
+
+M2MBase::Observation M2MReportHandler::observation_level() const
+{
+    return _observation_level;
+}
+
+bool M2MReportHandler::is_under_observation() const
+{
+    return _is_under_observation;
+}
+
+uint8_t* M2MReportHandler::alloc_string_copy(const uint8_t* source, uint32_t size)
+{
+    assert(source != NULL);
+
+    uint8_t* result = (uint8_t*)memory_alloc(size + 1);
+    if (result) {
+        memcpy(result, source, size);
+        result[size] = '\0';
+    }
+    return result;
+}
+
+void *M2MReportHandler::memory_alloc(uint32_t size)
+{
+    if(size)
+        return malloc(size);
+    else
+        return 0;
+}
+
+void M2MReportHandler::memory_free(void *ptr)
+{
+    free(ptr);
 }

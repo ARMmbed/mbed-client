@@ -87,6 +87,19 @@ public:
     }Mode;
 
     /**
+     * \brief Enum defining a resource data type.
+    */
+    typedef enum {
+        STRING,
+        INTEGER,
+        FLOAT,
+        BOOLEAN,
+        OPAQUE,
+        TIME,
+        OBJLINK
+    }DataType;
+
+    /**
      * Enum defining an operation that can be
      * supported by a given resource.
     */
@@ -127,6 +140,8 @@ public:
         char*               name; //for backwards compatibility
         sn_nsdl_dynamic_resource_parameters_s *dynamic_resource_params;
         BaseType            base_type;
+        M2MBase::DataType   data_type;
+        bool                multiple_instance;
         bool                free_on_delete;   /**< true if struct is dynamically allocted and it
                                                  and its members (name) are to be freed on destructor.
                                                  Note: the sn_nsdl_dynamic_resource_parameters_s has
@@ -160,7 +175,9 @@ protected:
             const String &resource_type,
 #endif
             char *path,
-            bool external_blockwise_store);
+            bool external_blockwise_store,
+            bool multiple_instance,
+            M2MBase::DataType type = M2MBase::OBJLINK);
 
     M2MBase(const lwm2m_parameters_s* s);
 
@@ -477,6 +494,13 @@ public:
      */
     sn_nsdl_dynamic_resource_parameters_s* get_nsdl_resource();
 
+    /**
+     * @brief Returns the resource structure.
+     * @return Resource structure.
+     */
+    M2MBase::lwm2m_parameters_s* get_lwm2m_parameters() const;
+
+
     static char* create_path(const M2MObject &parent, const char *name);
     static char* create_path(const M2MObject &parent, uint16_t object_instance);
     static char* create_path(const M2MResource &parent, uint16_t resource_instance);
@@ -486,6 +510,7 @@ public:
 protected : // from M2MReportObserver
 
     virtual void observation_to_be_sent(const m2m::Vector<uint16_t> &changed_instance_ids,
+                                        uint16_t obs_number,
                                         bool send_object = false);
 
 protected:
@@ -567,13 +592,8 @@ private:
 
 private:
     lwm2m_parameters_s          *_sn_resource;
-    M2MReportHandler            *_report_handler;
-    M2MObservationHandler       *_observation_handler; // Not owned
-    uint8_t                     *_token;
-    unsigned                    _observation_number : 16;
-    unsigned                    _token_length : 8;
-    M2MBase::Observation        _observation_level : 4;
-    bool                        _is_under_observation : 1;
+    M2MReportHandler            *_report_handler; // TODO: can be broken down to smaller classes with inheritance.
+    M2MObservationHandler       *_observation_handler; // Not owned // TODO: This can be moved to higher level , M2MObject ?
 
 friend class Test_M2MBase;
 friend class Test_M2MObject;
