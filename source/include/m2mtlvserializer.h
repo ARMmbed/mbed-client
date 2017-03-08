@@ -30,16 +30,6 @@ class M2MTLVSerializer {
 public:
 
     /**
-    * Constructor.
-    */
-    M2MTLVSerializer();
-
-    /**
-    * Destructor.
-    */
-    ~M2MTLVSerializer();
-
-    /**
      * Serialises given objects instances that contain resources or multiple 
      * resources. Object instance IDs are also encoded. This method must be 
      * used when an operation targets an object with (potential) multiple 
