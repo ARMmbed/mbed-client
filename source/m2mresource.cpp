@@ -426,9 +426,8 @@ sn_coap_hdr_s* M2MResource::handle_put_request(nsdl_s *nsdl,
                 tr_debug("M2MResource::handle_put_request() - Request Content-Type %d", coap_content_type);
 
                 if(COAP_CONTENT_OMA_TLV_TYPE == coap_content_type) {
-                    M2MTLVDeserializer deserializer;
                     M2MTLVDeserializer::Error error = M2MTLVDeserializer::None;
-                    error = deserializer.deserialize_resource_instances(received_coap_header->payload_ptr,
+                    error = M2MTLVDeserializer::deserialize_resource_instances(received_coap_header->payload_ptr,
                                                                          received_coap_header->payload_len,
                                                                          *this,
                                                                          M2MTLVDeserializer::Put);

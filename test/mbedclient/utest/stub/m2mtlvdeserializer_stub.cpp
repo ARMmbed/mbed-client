@@ -80,15 +80,12 @@ M2MTLVDeserializer::Error M2MTLVDeserializer::deserialise_object_instances(uint8
     return m2mtlvdeserializer_stub::error;
 }
 
-TypeIdLength* TypeIdLength::createTypeIdLength(uint8_t *, uint32_t)
+TypeIdLength::TypeIdLength(uint8_t *, uint32_t)
 {
-    TypeIdLength *til = new TypeIdLength();
-    return til;
 }
 
-TypeIdLength* TypeIdLength::deserialize()
+void TypeIdLength::deserialize()
 {
-    return this;
 }
 
 void TypeIdLength::deserialiseID(uint32_t idLength)

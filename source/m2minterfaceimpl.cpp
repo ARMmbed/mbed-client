@@ -108,8 +108,8 @@ void M2MInterfaceImpl::bootstrap(M2MSecurity *security)
     }
     // Transition to a new state based upon
     // the current state of the state machine
-    M2MSecurityData* data = new M2MSecurityData();
-    data->_object = security;
+    M2MSecurityData data;
+    data._object = security;
     BEGIN_TRANSITION_MAP                                    // - Current State -
         TRANSITION_MAP_ENTRY (STATE_BOOTSTRAP)              // state_idle
         TRANSITION_MAP_ENTRY (EVENT_IGNORED)                // state_bootstrap
@@ -129,7 +129,7 @@ void M2MInterfaceImpl::bootstrap(M2MSecurity *security)
         TRANSITION_MAP_ENTRY (EVENT_IGNORED)                // state_processing_coap_data
         TRANSITION_MAP_ENTRY (EVENT_IGNORED)                // state_coap_data_processed
         TRANSITION_MAP_ENTRY (EVENT_IGNORED)                // state_waiting
-    END_TRANSITION_MAP(data)
+    END_TRANSITION_MAP(&data)
     if(_event_ignored) {
         _event_ignored = false;
         _observer.error(M2MInterface::NotAllowed);
@@ -158,9 +158,9 @@ void M2MInterfaceImpl::register_object(M2MSecurity *security, const M2MObjectLis
     // the current state of the state machine
     //TODO: manage register object in a list.
     _register_server = security;
-    M2MRegisterData *data = new M2MRegisterData();
-    data->_object = security;
-    data->_object_list = object_list;
+    M2MRegisterData data;
+    data._object = security;
+    data._object_list = object_list;
     BEGIN_TRANSITION_MAP                                    // - Current State -
         TRANSITION_MAP_ENTRY (STATE_REGISTER)               // state_idle
         TRANSITION_MAP_ENTRY (EVENT_IGNORED)                // state_bootstrap
@@ -180,7 +180,7 @@ void M2MInterfaceImpl::register_object(M2MSecurity *security, const M2MObjectLis
         TRANSITION_MAP_ENTRY (EVENT_IGNORED)                // state_processing_coap_data
         TRANSITION_MAP_ENTRY (EVENT_IGNORED)                // state_coap_data_processed
         TRANSITION_MAP_ENTRY (STATE_REGISTER)               // state_waiting
-    END_TRANSITION_MAP(data)
+    END_TRANSITION_MAP(&data)
     if(_event_ignored) {
         _event_ignored = false;
         _observer.error(M2MInterface::NotAllowed);
@@ -191,10 +191,10 @@ void M2MInterfaceImpl::register_object(M2MSecurity *security, const M2MObjectLis
 void M2MInterfaceImpl::update_registration(M2MSecurity *security_object, const uint32_t lifetime)
 {
     tr_debug("M2MInterfaceImpl::update_registration(M2MSecurity *security_object, const uint32_t lifetime)");
-    M2MUpdateRegisterData *data = new M2MUpdateRegisterData();
-    data->_object = security_object;
-    data->_lifetime = lifetime;
-    start_register_update(data);
+    M2MUpdateRegisterData data;
+    data._object = security_object;
+    data._lifetime = lifetime;
+    start_register_update(&data);
 }
 
 void M2MInterfaceImpl::update_registration(M2MSecurity *security_object,
@@ -202,11 +202,11 @@ void M2MInterfaceImpl::update_registration(M2MSecurity *security_object,
                                            const uint32_t lifetime)
 {
     tr_debug("M2MInterfaceImpl::update_registration(M2MSecurity *security_object, const M2MObjectList &object_list, const uint32_t lifetime)");
-    M2MUpdateRegisterData *data = new M2MUpdateRegisterData();
-    data->_object = security_object;
-    data->_lifetime = lifetime;
-    data->_object_list = object_list;
-    start_register_update(data);
+    M2MUpdateRegisterData data;
+    data._object = security_object;
+    data._lifetime = lifetime;
+    data._object_list = object_list;
+    start_register_update(&data);
 }
 
 void M2MInterfaceImpl::unregister_object(M2MSecurity* /*security*/)
@@ -381,11 +381,11 @@ void M2MInterfaceImpl::data_available(uint8_t* data,
                                       const M2MConnectionObserver::SocketAddress &address)
 {
     tr_debug("M2MInterfaceImpl::data_available");
-    ReceivedData *event = new ReceivedData();
-    event->_data = data;
-    event->_size = data_size;
-    event->_address = &address;
-    internal_event(STATE_COAP_DATA_RECEIVED, event);
+    ReceivedData event;
+    event._data = data;
+    event._size = data_size;
+    event._address = &address;
+    internal_event(STATE_COAP_DATA_RECEIVED, &event);
 }
 
 void M2MInterfaceImpl::socket_error(uint8_t error_code, bool retry)
@@ -471,15 +471,15 @@ void M2MInterfaceImpl::address_ready(const M2MConnectionObserver::SocketAddress 
                                      const uint16_t server_port)
 {
     tr_debug("M2MInterfaceImpl::address_ready");
-    ResolvedAddressData *data = new ResolvedAddressData();
-    data->_address = &address;
-    data->_port = server_port;
+    ResolvedAddressData data;
+    data._address = &address;
+    data._port = server_port;
     if( M2MConnectionObserver::Bootstrap == server_type) {
         tr_debug("M2MInterfaceImpl::address_ready() Server Type Bootstrap");
-        internal_event(STATE_BOOTSTRAP_ADDRESS_RESOLVED, data);
+        internal_event(STATE_BOOTSTRAP_ADDRESS_RESOLVED, &data);
     } else {
         tr_debug("M2MInterfaceImpl::address_ready() Server Type LWM2M");
-        internal_event(STATE_REGISTER_ADDRESS_RESOLVED, data);
+        internal_event(STATE_REGISTER_ADDRESS_RESOLVED, &data);
     }
 }
 
@@ -912,11 +912,6 @@ void M2MInterfaceImpl::external_event(uint8_t new_state,
     // if we are supposed to ignore this event
     if (new_state == EVENT_IGNORED) {
         tr_debug("M2MInterfaceImpl::external_event : new state is EVENT_IGNORED");
-        // just delete the event data, if any
-        if (p_data) {
-            delete p_data;
-            p_data = NULL;
-        }
         _event_ignored = true;
     }
     else {
@@ -953,12 +948,6 @@ void M2MInterfaceImpl::state_engine (void)
         assert(_current_state < _max_states);
 
         state_function( _current_state, p_data_temp );
-
-        // if event data was used, then delete it
-        if (p_data_temp) {
-            delete p_data_temp;
-            p_data_temp = NULL;
-        }
     }
 }
 
