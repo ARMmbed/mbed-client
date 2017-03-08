@@ -46,8 +46,8 @@ M2MResourceInstance::M2MResourceInstance(M2MResource &parent,
  _parent_resource(parent),
  _value(NULL),
  _value_length(0)
-#ifdef SUPPORT_BLOCK_MESSAGE
- ,_block_message_data(NULL),
+#ifndef DISABLE_BLOCK_MESSAGE
+ ,_block_message_data(NULL)
 #endif
 {
     M2MBase::set_base_type(M2MBase::ResourceInstance);
@@ -74,8 +74,8 @@ M2MResourceInstance::M2MResourceInstance(M2MResource &parent,
  _parent_resource(parent),
  _value(NULL),
  _value_length(0)
-#ifdef SUPPORT_BLOCK_MESSAGE
- ,_block_message_data(NULL),
+#ifndef DISABLE_BLOCK_MESSAGE
+ ,_block_message_data(NULL)
 #endif
 {
     M2MBase::set_base_type(M2MBase::Resource);
@@ -106,8 +106,8 @@ M2MResourceInstance::M2MResourceInstance(M2MResource &parent,
   _parent_resource(parent),
   _value(NULL),
   _value_length(0)
-#ifdef SUPPORT_BLOCK_MESSAGE
-  ,_block_message_data(NULL),
+#ifndef DISABLE_BLOCK_MESSAGE
+  ,_block_message_data(NULL)
 #endif
 {
     //TBD: put to flash, or parse from the uri_path!!!!
@@ -133,7 +133,7 @@ M2MResourceInstance::~M2MResourceInstance()
     delete callback;
 
     M2MCallbackStorage::remove_callback(*this, M2MCallbackAssociation::M2MResourceInstanceExecuteCallback2);
-#ifdef SUPPORT_BLOCK_MESSAGE
+#ifndef DISABLE_BLOCK_MESSAGE
     incoming_block_message_callback *in_callback = (incoming_block_message_callback*)M2MCallbackStorage::remove_callback(*this,
                                                         M2MCallbackAssociation::M2MResourceInstanceIncomingBlockMessageCallback);
     delete in_callback;
@@ -149,7 +149,7 @@ M2MResourceInstance::~M2MResourceInstance()
 
     M2MCallbackStorage::remove_callback(*this, M2MCallbackAssociation::M2MResourceInstanceNotificationSentCallback2);
 
-#ifdef SUPPORT_BLOCK_MESSAGE
+#ifndef DISABLE_BLOCK_MESSAGE
     delete _block_message_data;
 #endif
 }
@@ -415,7 +415,7 @@ sn_coap_hdr_s* M2MResourceInstance::handle_get_request(nsdl_s *nsdl,
                 // fill in the CoAP response payload
                 coap_response->payload_ptr = NULL;
                 uint32_t payload_len = 0;
-#ifdef SUPPORT_BLOCK_MESSAGE
+#ifndef DISABLE_BLOCK_MESSAGE
                 //If handler exists it means that resource value is stored in application side
                 if (block_message() && block_message()->is_block_message()) {
                     outgoing_block_message_callback* outgoing_block_message_cb = (outgoing_block_message_callback*)M2MCallbackStorage::get_callback(*this,
@@ -432,7 +432,7 @@ sn_coap_hdr_s* M2MResourceInstance::handle_get_request(nsdl_s *nsdl,
                 } else {
 #endif
                     get_value(coap_response->payload_ptr,payload_len);
-#ifdef SUPPORT_BLOCK_MESSAGE
+#ifndef DISABLE_BLOCK_MESSAGE
                 }
 #endif
 
@@ -530,7 +530,7 @@ sn_coap_hdr_s* M2MResourceInstance::handle_put_request(nsdl_s *nsdl,
                     msg_code = COAP_MSG_CODE_RESPONSE_UNSUPPORTED_CONTENT_FORMAT;
                 } else {
                     bool external_block_store = false;
-#ifdef SUPPORT_BLOCK_MESSAGE
+#ifndef DISABLE_BLOCK_MESSAGE
                     if (block_message()) {
                         block_message()->set_message_info(received_coap_header);
                         if (block_message()->is_block_message()) {
@@ -588,7 +588,7 @@ uint16_t M2MResourceInstance::object_instance_id() const
     return parent_object_instance.instance_id();
 }
 
-#ifdef SUPPORT_BLOCK_MESSAGE
+#ifndef DISABLE_BLOCK_MESSAGE
 
 M2MBlockMessage* M2MResourceInstance::block_message() const
 {
