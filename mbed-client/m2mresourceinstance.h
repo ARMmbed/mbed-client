@@ -316,9 +316,6 @@ private:
     // pointer to itself. If this inheritance was broken, we could save some memory.
     M2MResource &_parent_resource;
 
-    uint8_t                                 *_value;        //TODO: remove it from here and use it directly from sn_nsdl_static_resource_parameters_
-                                                            // but move resource* and resource Len to dynamic resource structure.
-    uint32_t                                _value_length;
 #ifndef DISABLE_BLOCK_MESSAGE
     M2MBlockMessage                         *_block_message_data;
 #endif
