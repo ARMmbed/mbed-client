@@ -764,7 +764,7 @@ void M2MBase::free_resources()
                 const_cast<sn_nsdl_static_resource_parameters_s *>(_sn_resource->dynamic_resource_params->static_resource_parameters);
 
         free(params->path);
-        free(params->resource);
+//        free(params->resource);
 #ifndef DISABLE_RESOURCE_TYPE
         free(params->resource_type_ptr);
 #endif
@@ -772,6 +772,9 @@ void M2MBase::free_resources()
         free(params->interface_description_ptr);
 #endif
         free(params);
+    }
+    if (_sn_resource->dynamic_resource_params->resource) {
+        free(_sn_resource->dynamic_resource_params->resource);
     }
     if (_sn_resource->dynamic_resource_params->free_on_delete) {
         free(_sn_resource->dynamic_resource_params);
@@ -788,7 +791,7 @@ size_t M2MBase::resource_name_length() const
     return strlen(_sn_resource->name);
 }
 
-sn_nsdl_dynamic_resource_parameters_s* M2MBase::get_nsdl_resource()
+sn_nsdl_dynamic_resource_parameters_s* M2MBase::get_nsdl_resource() const
 {
     return _sn_resource->dynamic_resource_params;
 }
