@@ -76,8 +76,8 @@ static sn_nsdl_static_resource_parameters_s firmware_package_params_static = {
     (char*)"",                     // interface_description_ptr
 #endif	
     (char*)PACKAGE_PATH,    // path
-    (uint8_t*)"",           // resource
-    0,                      // resourcelen
+//    (uint8_t*)"",           // resource
+//    0,                      // resourcelen
     false,                  // external_memory_block
     SN_GRS_DYNAMIC,         // mode
     false                   // free_on_delete
@@ -94,8 +94,8 @@ static sn_nsdl_static_resource_parameters_s firmware_package_uri_params_static =
     (char*)"",                     // interface_description_ptr
 #endif
     (char*)PACKAGE_URI_PATH, // path
-    (uint8_t*)"",           // resource
-    0,                      // resourcelen
+//    (uint8_t*)"",           // resource
+//    0,                      // resourcelen
     false,                  // external_memory_block
     SN_GRS_DYNAMIC,         // mode
     false                   // free_on_delete
@@ -112,8 +112,8 @@ static sn_nsdl_static_resource_parameters_s firmware_update_params_static = {
     (char*)"",                  // interface_description_ptr
 #endif
     (char*)UPDATE_PATH,     // path
-    (uint8_t*)"",           // resource
-    0,                      // resourcelen
+//    (uint8_t*)"",           // resource
+//    0,                      // resourcelen
     false,                  // external_memory_block
     SN_GRS_DYNAMIC,         // mode
     false                   // free_on_delete
@@ -130,8 +130,8 @@ static sn_nsdl_static_resource_parameters_s firmware_state_params_static = {
     (char*)"",                  // interface_description_ptr
 #endif
     (char*)STATE_URI_PATH,   // path
-    (uint8_t*)"0",          // resource
-    1,                      // resourcelen
+//    (uint8_t*)"0",          // resource
+//    1,                      // resourcelen
     false,                  // external_memory_block
     SN_GRS_DYNAMIC,         // mode
     false                   // free_on_delete
@@ -148,8 +148,8 @@ static sn_nsdl_static_resource_parameters_s firmware_update_result_params_static
     (char*)"",                     // interface_description_ptr
 #endif
     (char*)UPDATE_RESULT_PATH, // path
-    (uint8_t*)"0",          // resource
-    1,                      // resourcelen
+//    (uint8_t*)"0",          // resource
+//    1,                      // resourcelen
     false,                  // external_memory_block
     SN_GRS_DYNAMIC,         // mode
     false                   // free_on_delete
@@ -158,7 +158,9 @@ static sn_nsdl_static_resource_parameters_s firmware_update_result_params_static
 static sn_nsdl_dynamic_resource_parameters_s firmware_package_params_dynamic = {
     __nsdl_c_callback,
     &firmware_package_params_static,
+    NULL,
     {NULL, NULL},                     // link
+    0,
     COAP_CONTENT_OMA_PLAIN_TEXT_TYPE, // coap_content_type
     M2MBase::PUT_ALLOWED,   // access
     0,                      // registered
@@ -170,7 +172,9 @@ static sn_nsdl_dynamic_resource_parameters_s firmware_package_params_dynamic = {
 static sn_nsdl_dynamic_resource_parameters_s firmware_package_uri_params_dynamic = {
     __nsdl_c_callback,
     &firmware_package_uri_params_static,
+    NULL,
     {NULL, NULL},                     // link
+    0,
     COAP_CONTENT_OMA_PLAIN_TEXT_TYPE, // coap_content_type
     M2MBase::PUT_ALLOWED,   // access
     0,                      // registered
@@ -182,7 +186,9 @@ static sn_nsdl_dynamic_resource_parameters_s firmware_package_uri_params_dynamic
 static sn_nsdl_dynamic_resource_parameters_s firmware_update_params_dynamic = {
     __nsdl_c_callback,
     &firmware_update_params_static,
+    NULL,
     {NULL, NULL},                     // link
+    0,
     COAP_CONTENT_OMA_PLAIN_TEXT_TYPE, // coap_content_type
     M2MBase::NOT_ALLOWED,   // access
     0,                      // registered
@@ -194,7 +200,9 @@ static sn_nsdl_dynamic_resource_parameters_s firmware_update_params_dynamic = {
 static sn_nsdl_dynamic_resource_parameters_s firmware_state_params_dynamic = {
     __nsdl_c_callback,
     &firmware_state_params_static,
+    NULL,
     {NULL, NULL},                     // link
+    0,
     COAP_CONTENT_OMA_PLAIN_TEXT_TYPE, // coap_content_type
     M2MBase::GET_ALLOWED,   // access
     0,                      // registered
@@ -206,7 +214,9 @@ static sn_nsdl_dynamic_resource_parameters_s firmware_state_params_dynamic = {
 static sn_nsdl_dynamic_resource_parameters_s firmware_update_result_params_dynamic = {
     __nsdl_c_callback,
     &firmware_update_result_params_static,
+    NULL,
     {NULL, NULL},                     // link
+    0,
     COAP_CONTENT_OMA_PLAIN_TEXT_TYPE, // coap_content_type
     M2MBase::GET_ALLOWED,   // access
     0,                      // registered
