@@ -43,9 +43,7 @@ M2MResourceInstance::M2MResourceInstance(M2MResource &parent,
           external_blockwise_store,
           multiple_instance,
           type),
- _parent_resource(parent),
- _value(NULL),
- _value_length(0)
+ _parent_resource(parent)
 #ifndef DISABLE_BLOCK_MESSAGE
  ,_block_message_data(NULL)
 #endif
@@ -71,9 +69,7 @@ M2MResourceInstance::M2MResourceInstance(M2MResource &parent,
           external_blockwise_store,
           multiple_instance,
           type),
- _parent_resource(parent),
- _value(NULL),
- _value_length(0)
+ _parent_resource(parent)
 #ifndef DISABLE_BLOCK_MESSAGE
  ,_block_message_data(NULL)
 #endif
@@ -81,18 +77,16 @@ M2MResourceInstance::M2MResourceInstance(M2MResource &parent,
     M2MBase::set_base_type(M2MBase::Resource);
     if (mode() == M2MBase::Dynamic) {
         if( value != NULL && value_length > 0 ) {
-            _value = alloc_string_copy(value, value_length);
-            if(_value) {
-                _value_length = value_length;
-            }
+            sn_nsdl_dynamic_resource_parameters_s* res = get_nsdl_resource();
+            res->resource = alloc_string_copy(value, value_length);
+            res->resourcelen = value_length;
         }
     }
     // Copy resource value to struct since static resources are handled in mbed-client-c
     else if (mode() == M2MBase::Static) {
        sn_nsdl_dynamic_resource_parameters_s* res = get_nsdl_resource();
-       sn_nsdl_static_resource_parameters_s* params = (sn_nsdl_static_resource_parameters_s*)res->static_resource_parameters;
-       params->resource = alloc_string_copy(value, value_length);
-       params->resourcelen = value_length;
+        res->resource = alloc_string_copy(value, value_length);
+        res->resourcelen = value_length;
     }
     else {
         // Directory, not supported
@@ -103,31 +97,18 @@ M2MResourceInstance::M2MResourceInstance(M2MResource &parent,
                                          const lwm2m_parameters_s* s,
                                          M2MBase::DataType /*type*/)
 : M2MBase(s),
-  _parent_resource(parent),
-  _value(NULL),
-  _value_length(0)
+  _parent_resource(parent)
 #ifndef DISABLE_BLOCK_MESSAGE
   ,_block_message_data(NULL)
 #endif
 {
     //TBD: put to flash, or parse from the uri_path!!!!
     //same for the _object_instance_id.
-    // TBD: we dont need _value here, because in c-struct there is resource field!!!!
-    if( s->dynamic_resource_params->static_resource_parameters->resource != NULL &&
-            s->dynamic_resource_params->static_resource_parameters->resourcelen > 0 ) {
-        _value = alloc_string_copy(s->dynamic_resource_params->static_resource_parameters->resource,
-                                   s->dynamic_resource_params->static_resource_parameters->resourcelen);
-        if(_value) {
-            _value_length = s->dynamic_resource_params->static_resource_parameters->resourcelen;
-        }
-    }
     //M2MBase::set_base_type(M2MBase::ResourceInstance);
 }
 
 M2MResourceInstance::~M2MResourceInstance()
 {
-    free(_value);
-
     execute_callback* callback = (execute_callback*)M2MCallbackStorage::remove_callback(*this,
                                     M2MCallbackAssociation::M2MResourceInstanceExecuteCallback);
     delete callback;
@@ -211,10 +192,10 @@ bool M2MResourceInstance::set_execute_function(execute_callback_2 callback)
 void M2MResourceInstance::clear_value()
 {
     tr_debug("M2MResourceInstance::clear_value");
-
-     free(_value);
-     _value = NULL;
-     _value_length = 0;
+    sn_nsdl_dynamic_resource_parameters_s* res = get_nsdl_resource();
+    free(res->resource);
+    res->resource = NULL;
+    res->resourcelen = 0;
 
     report();
 }
@@ -243,12 +224,14 @@ bool M2MResourceInstance::set_value(const uint8_t *value,
     if( value != NULL && value_length > 0 ) {
         success = true;
 
-        free(_value);
-        _value_length = 0;
+        sn_nsdl_dynamic_resource_parameters_s* res = get_nsdl_resource();
+        free(res->resource);
+        res->resource = NULL;
+        res->resourcelen = 0;
 
-        _value = alloc_string_copy(value, value_length);
-        if(_value) {
-            _value_length = value_length;
+        res->resource = alloc_string_copy(value, value_length);
+        if(res->resource) {
+            res->resourcelen = value_length;
             if( value_changed ) { //
                 if (resource_instance_type() == M2MResourceInstance::STRING) {
                     M2MReportHandler *report_handler = M2MBase::report_handler();
@@ -283,8 +266,9 @@ void M2MResourceInstance::report()
         if(resource_instance_type() != M2MResourceInstance::STRING) {
             M2MReportHandler *report_handler = M2MBase::report_handler();
             if (report_handler && is_observable()) {
-                if(_value) {
-                    report_handler->set_value(atof((const char*)_value));
+                sn_nsdl_dynamic_resource_parameters_s* res = get_nsdl_resource();    
+                if(res->resource) {
+                    report_handler->set_value(atof((const char*)res->resource));
                 } else {
                     report_handler->set_value(0);
                 }
@@ -311,15 +295,17 @@ void M2MResourceInstance::report()
 bool M2MResourceInstance::is_value_changed(const uint8_t* value, const uint32_t value_len)
 {
     bool changed = false;
-    if(value_len != _value_length) {
+    sn_nsdl_dynamic_resource_parameters_s* res = get_nsdl_resource();
+
+    if(value_len != res->resourcelen) {
         changed = true;
-    } else if(value && !_value) {
+    } else if(value && !res->resource) {
         changed = true;
-    } else if(_value && !value) {
+    } else if(res->resource && !value) {
         changed = true;
     } else {
-        if (_value) {
-            if (strcmp((char*)value, (char*)_value) != 0) {
+        if (res->resource) {
+            if (strcmp((char*)value, (char*)res->resource) != 0) {
                 changed = true;
             }
         }
@@ -350,10 +336,11 @@ void M2MResourceInstance::get_value(uint8_t *&value, uint32_t &value_length)
         free(value);
         value = NULL;
     }
-    if(_value && _value_length > 0) {
-        value = alloc_string_copy(_value, _value_length);
+    sn_nsdl_dynamic_resource_parameters_s* res = get_nsdl_resource();
+    if(res->resource && res->resourcelen > 0) {
+        value = alloc_string_copy(res->resource, res->resourcelen);
         if(value) {
-            value_length = _value_length;
+            value_length = res->resourcelen;
         }
     }
 }
@@ -377,21 +364,20 @@ String M2MResourceInstance::get_value_string() const
 {
     // XXX: do a better constructor to avoid pointless malloc
     String value;
-    if (_value) {
-        value.append_raw((char*)_value, _value_length);
+    if (get_nsdl_resource()->resource) {
+        value.append_raw((char*)get_nsdl_resource()->resource, get_nsdl_resource()->resourcelen);
     }
-
     return value;
 }
 
 uint8_t* M2MResourceInstance::value() const
 {
-    return _value;
+    return get_nsdl_resource()->resource;
 }
 
 uint32_t M2MResourceInstance::value_length() const
-{
-    return _value_length;
+{   
+    return get_nsdl_resource()->resourcelen;
 }
 
 sn_coap_hdr_s* M2MResourceInstance::handle_get_request(nsdl_s *nsdl,

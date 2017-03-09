@@ -492,7 +492,7 @@ public:
      * @brief Returns the resource information.
      * @return Resource information.
      */
-    sn_nsdl_dynamic_resource_parameters_s* get_nsdl_resource();
+    sn_nsdl_dynamic_resource_parameters_s* get_nsdl_resource() const;
 
     /**
      * @brief Returns the resource structure.
