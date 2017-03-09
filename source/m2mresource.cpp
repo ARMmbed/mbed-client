@@ -303,8 +303,7 @@ sn_coap_hdr_s* M2MResource::handle_get_request(nsdl_s *nsdl,
                     uint32_t data_length = 0;
                     // fill in the CoAP response payload
                     if(COAP_CONTENT_OMA_TLV_TYPE == coap_content_type) {
-                        M2MTLVSerializer serializer;
-                        data = serializer.serialize(this, data_length);
+                        data = M2MTLVSerializer::serialize(this, data_length);
                     } else {
                         msg_code = COAP_MSG_CODE_RESPONSE_UNSUPPORTED_CONTENT_FORMAT; // Content format not supported
                     }

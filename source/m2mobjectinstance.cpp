@@ -457,8 +457,7 @@ sn_coap_hdr_s* M2MObjectInstance::handle_get_request(nsdl_s *nsdl,
                 }
                 // fill in the CoAP response payload
                 if(COAP_CONTENT_OMA_TLV_TYPE == coap_content_type) {
-                    M2MTLVSerializer serializer;
-                    data = serializer.serialize(_resource_list, data_length);
+                    data = M2MTLVSerializer::serialize(_resource_list, data_length);
                 } else {
                     msg_code = COAP_MSG_CODE_RESPONSE_UNSUPPORTED_CONTENT_FORMAT; // Content format not supported
                 }
@@ -571,12 +570,11 @@ sn_coap_hdr_s* M2MObjectInstance::handle_put_request(nsdl_s *nsdl,
 
             if(COAP_CONTENT_OMA_TLV_TYPE == coap_content_type) {
                 M2MTLVDeserializer::Error error = M2MTLVDeserializer::None;
-                M2MTLVDeserializer deserializer;
                 if(received_coap_header->payload_ptr) {
-                    error = deserializer.deserialize_resources(received_coap_header->payload_ptr,
-                                                                received_coap_header->payload_len,
-                                                                *this,
-                                                                M2MTLVDeserializer::Put);
+                    error = M2MTLVDeserializer::deserialize_resources(
+                                received_coap_header->payload_ptr,
+                                received_coap_header->payload_len, *this,
+                                M2MTLVDeserializer::Put);
                     switch(error) {
                         case M2MTLVDeserializer::None:
                             if(observation_handler) {
@@ -644,14 +642,13 @@ sn_coap_hdr_s* M2MObjectInstance::handle_post_request(nsdl_s *nsdl,
             tr_debug("M2MObjectInstance::handle_post_request() - Request Content-Type %d", coap_content_type);
 
             if(COAP_CONTENT_OMA_TLV_TYPE == coap_content_type) {
-                M2MTLVDeserializer deserializer;
                 M2MTLVDeserializer::Error error = M2MTLVDeserializer::None;
-                error = deserializer.deserialize_resources(received_coap_header->payload_ptr,
-                                                            received_coap_header->payload_len,
-                                                            *this,
-                                                            M2MTLVDeserializer::Post);
+                error = M2MTLVDeserializer::deserialize_resources(
+                            received_coap_header->payload_ptr,
+                            received_coap_header->payload_len, *this,
+                            M2MTLVDeserializer::Post);
 
-                uint16_t instance_id = deserializer.instance_id(received_coap_header->payload_ptr);
+                uint16_t instance_id = M2MTLVDeserializer::instance_id(received_coap_header->payload_ptr);
                 switch(error) {
                     case M2MTLVDeserializer::None:
                         if(observation_handler) {

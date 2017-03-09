@@ -30,16 +30,6 @@ class M2MTLVSerializer {
 public:
 
     /**
-    * Constructor.
-    */
-    M2MTLVSerializer();
-
-    /**
-    * Destructor.
-    */
-    ~M2MTLVSerializer();
-
-    /**
      * Serialises given objects instances that contain resources or multiple 
      * resources. Object instance IDs are also encoded. This method must be 
      * used when an operation targets an object with (potential) multiple 
@@ -60,7 +50,7 @@ public:
      * @return Object instances encoded binary as OMA-TLV 
      * @see #serializeObjectInstances(List) 
      */
-    uint8_t* serialize(M2MObjectInstanceList object_instance_list, uint32_t &size);
+    static uint8_t* serialize(M2MObjectInstanceList object_instance_list, uint32_t &size);
 
     /**
      * Serialises given resources with no information about the parent object
@@ -80,29 +70,29 @@ public:
      * @return Resources encoded binary as OMA-TLV
      * @see #serializeResources(List)
      */
-    uint8_t* serialize(M2MResourceList resource_list, uint32_t &size);
+    static uint8_t* serialize(M2MResourceList resource_list, uint32_t &size);
 
-    uint8_t* serialize(M2MResource *resource, uint32_t &size);
+    static uint8_t* serialize(M2MResource *resource, uint32_t &size);
 
 private :
 
-    uint8_t* serialize_object_instances(M2MObjectInstanceList object_instance_list, uint32_t &size);
+    static uint8_t* serialize_object_instances(M2MObjectInstanceList object_instance_list, uint32_t &size);
 
-    uint8_t* serialize_resources(M2MResourceList resource_list, uint32_t &size, bool &valid);
+    static uint8_t* serialize_resources(M2MResourceList resource_list, uint32_t &size, bool &valid);
 
-    bool serialize(uint16_t id, M2MObjectInstance *object_instance, uint8_t *&data, uint32_t &size);
+    static bool serialize(uint16_t id, M2MObjectInstance *object_instance, uint8_t *&data, uint32_t &size);
     
-    bool serialize (M2MResource *resource, uint8_t *&data, uint32_t &size);
+    static bool serialize (M2MResource *resource, uint8_t *&data, uint32_t &size);
 
-    bool serialize_resource(M2MResource *resource, uint8_t *&data, uint32_t &size);
+    static bool serialize_resource(M2MResource *resource, uint8_t *&data, uint32_t &size);
 
-    bool serialize_multiple_resource(M2MResource *resource, uint8_t *&data, uint32_t &size);
+    static bool serialize_multiple_resource(M2MResource *resource, uint8_t *&data, uint32_t &size);
 
-    bool serialize_resource_instance(uint16_t id, M2MResourceInstance *resource, uint8_t *&data, uint32_t &size);
+    static bool serialize_resource_instance(uint16_t id, M2MResourceInstance *resource, uint8_t *&data, uint32_t &size);
     
-    bool serialize_TILV (uint8_t type, uint16_t id, uint8_t *value, uint32_t value_length, uint8_t *&data, uint32_t &size);
+    static bool serialize_TILV (uint8_t type, uint16_t id, uint8_t *value, uint32_t value_length, uint8_t *&data, uint32_t &size);
 
-    void serialize_id(uint16_t id, uint32_t &size, uint8_t* id_ptr);
+    static void serialize_id(uint16_t id, uint32_t &size, uint8_t* id_ptr);
 
-    void serialize_length(uint32_t length, uint32_t &size, uint8_t* length_ptr);
+    static void serialize_length(uint32_t length, uint32_t &size, uint8_t* length_ptr);
 };

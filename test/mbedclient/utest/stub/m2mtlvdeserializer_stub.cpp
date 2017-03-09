@@ -28,14 +28,6 @@ void m2mtlvdeserializer_stub::clear()
     int_value = 0;
 }
 
-M2MTLVDeserializer::M2MTLVDeserializer()
-{
-}
-
-M2MTLVDeserializer::~M2MTLVDeserializer()
-{
-}
-
 bool M2MTLVDeserializer::is_object_instance(uint8_t *)
 {
     return m2mtlvdeserializer_stub::is_object_bool_value;

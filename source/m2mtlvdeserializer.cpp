@@ -21,14 +21,6 @@
 #define TRACE_GROUP "mClt"
 #define BUFFER_SIZE 10
 
-M2MTLVDeserializer::M2MTLVDeserializer()
-{
-}
-
-M2MTLVDeserializer::~M2MTLVDeserializer()
-{
-}
-
 bool M2MTLVDeserializer::is_object_instance(uint8_t *tlv)
 {
     return is_object_instance(tlv, 0);
