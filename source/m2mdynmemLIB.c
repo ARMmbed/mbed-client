@@ -20,7 +20,6 @@
 #include <stdlib.h>
 #include "ns_list.h"
 
-static void (*heap_failure_callback)(heap_fail_t);
 
 #ifndef STANDARD_MALLOC
 #if 0
@@ -34,9 +33,6 @@ typedef enum mem_stat_update_t {
     DEV_HEAP_FREE,
 } mem_stat_update_t;
 
-
-static mem_stat_t *mem_stat_info_ptr = 0;
-
 typedef struct {
     ns_list_link_t link;
 } hole_t;
@@ -48,8 +44,10 @@ typedef struct {
 struct book {
     int     *heap_main;
     int     *heap_main_end;
-    uint16_t heap_size;
+    mem_stat_t *mem_stat_info_ptr;
+    void (*heap_failure_callback)(heap_fail_t);
     NS_LIST_HEAD(hole_t, link) holes_list;
+    uint16_t heap_size;
 };
 #endif
 // size of a hole_t in our word units
@@ -66,10 +64,10 @@ static NS_INLINE int *block_start_from_hole(hole_t *start)
 }
 
 
-static void heap_failure(heap_fail_t reason)
+static void heap_failure(void (*callback)(heap_fail_t), heap_fail_t reason)
 {
-    if (heap_failure_callback) {
-        heap_failure_callback(reason);
+    if (callback) {
+        callback(reason);
     }
 }
 
@@ -111,25 +109,28 @@ void m2m_dyn_mem_init(uint8_t *heap, uint16_t h_size, void (*passed_fptr)(heap_f
 
     //RESET Memory by Hea Len
     if (info_ptr) {
-        mem_stat_info_ptr = info_ptr;
-        memset(mem_stat_info_ptr, 0, sizeof(mem_stat_t));
-        mem_stat_info_ptr->heap_sector_size = book->heap_size;
+        book->mem_stat_info_ptr = info_ptr;
+        memset(book->mem_stat_info_ptr, 0, sizeof(mem_stat_t));
+        book->mem_stat_info_ptr->heap_sector_size = book->heap_size;
     }
 #endif
-    heap_failure_callback = passed_fptr;
+    //There really is no support to standard malloc in this library anymore
+    book->heap_failure_callback = passed_fptr;
 }
 
 const mem_stat_t *m2m_dyn_mem_get_mem_stat(uint8_t *heap)
 {
 #ifndef STANDARD_MALLOC
-    return mem_stat_info_ptr;
+    struct book *book;
+    book = (struct book *)heap;
+    return book->mem_stat_info_ptr;
 #else
     return NULL;
 #endif
 }
 
 #ifndef STANDARD_MALLOC
-static void dev_stat_update(mem_stat_update_t type, int16_t size)
+static void dev_stat_update(mem_stat_t *mem_stat_info_ptr, mem_stat_update_t type, int16_t size)
 {
     if (mem_stat_info_ptr) {
         switch (type) {
@@ -155,11 +156,11 @@ static void dev_stat_update(mem_stat_update_t type, int16_t size)
 static int convert_allocation_size(struct book *book, int16_t requested_bytes)
 {
     if (book->heap_main == 0) {
-        heap_failure(M2M_DYN_MEM_HEAP_SECTOR_UNITIALIZED);
+        heap_failure(book->heap_failure_callback, M2M_DYN_MEM_HEAP_SECTOR_UNITIALIZED);
     } else if (requested_bytes < 1) {
-        heap_failure(M2M_DYN_MEM_ALLOCATE_SIZE_NOT_VALID);
+        heap_failure(book->heap_failure_callback, M2M_DYN_MEM_ALLOCATE_SIZE_NOT_VALID);
     } else if (requested_bytes > (book->heap_size - 2 * sizeof(int)) ) {
-        heap_failure(M2M_DYN_MEM_ALLOCATE_SIZE_NOT_VALID);
+        heap_failure(book->heap_failure_callback, M2M_DYN_MEM_ALLOCATE_SIZE_NOT_VALID);
     }
     return (requested_bytes + sizeof(int) - 1) / sizeof(int);
 }
@@ -206,7 +207,7 @@ static void *m2m_dyn_mem_internal_alloc(uint8_t *heap, const int16_t alloc_size,
         int *p = block_start_from_hole(cur_hole);
         if (m2m_block_validate(p, direction) != 0 || *p >= 0) {
             //Validation failed, or this supposed hole has positive (allocated) size
-            heap_failure(M2M_DYN_MEM_HEAP_SECTOR_CORRUPTED);
+            heap_failure(book->heap_failure_callback, M2M_DYN_MEM_HEAP_SECTOR_CORRUPTED);
             break;
         }
         if (-*p >= data_size) {
@@ -255,14 +256,14 @@ static void *m2m_dyn_mem_internal_alloc(uint8_t *heap, const int16_t alloc_size,
     block_ptr[1 + data_size] = data_size;
 
  done:
-    if (mem_stat_info_ptr) {
+    if (book->mem_stat_info_ptr) {
         if (block_ptr) {
             //Update Allocate OK
-            dev_stat_update(DEV_HEAP_ALLOC_OK, (data_size + 2) * sizeof(int));
+            dev_stat_update(book->mem_stat_info_ptr, DEV_HEAP_ALLOC_OK, (data_size + 2) * sizeof(int));
 
         } else {
             //Update Allocate Fail, second parameter is not used for stats
-            dev_stat_update(DEV_HEAP_ALLOC_FAIL, 0);
+            dev_stat_update(book->mem_stat_info_ptr, DEV_HEAP_ALLOC_FAIL, 0);
         }
     }
     platform_exit_critical();
@@ -385,7 +386,7 @@ void m2m_dyn_mem_free(uint8_t *heap, void *block)
     }
 
     if (!book->heap_main) {
-        heap_failure(M2M_DYN_MEM_HEAP_SECTOR_UNITIALIZED);
+        heap_failure(book->heap_failure_callback, M2M_DYN_MEM_HEAP_SECTOR_UNITIALIZED);
         return;
     }
 
@@ -394,19 +395,19 @@ void m2m_dyn_mem_free(uint8_t *heap, void *block)
     //Read Current Size
     size = *ptr;
     if (size < 0) {
-        heap_failure(M2M_DYN_MEM_DOUBLE_FREE);
+        heap_failure(book->heap_failure_callback, M2M_DYN_MEM_DOUBLE_FREE);
     } else if (ptr < book->heap_main || ptr >= book->heap_main_end) {
-        heap_failure(M2M_DYN_MEM_POINTER_NOT_VALID);
+        heap_failure(book->heap_failure_callback, M2M_DYN_MEM_POINTER_NOT_VALID);
     } else if ((ptr + size) >= book->heap_main_end) {
-        heap_failure(M2M_DYN_MEM_POINTER_NOT_VALID);
+        heap_failure(book->heap_failure_callback, M2M_DYN_MEM_POINTER_NOT_VALID);
     } else {
         if (m2m_block_validate(ptr, 1) != 0) {
-            heap_failure(M2M_DYN_MEM_HEAP_SECTOR_CORRUPTED);
+            heap_failure(book->heap_failure_callback, M2M_DYN_MEM_HEAP_SECTOR_CORRUPTED);
         } else {
             m2m_free_and_merge_with_adjacent_blocks(book, ptr, size);
-            if (mem_stat_info_ptr) {
+            if (book->mem_stat_info_ptr) {
                 //Update Free Counter
-                dev_stat_update(DEV_HEAP_FREE, (size + 2) * sizeof(int));
+                dev_stat_update(book->mem_stat_info_ptr, DEV_HEAP_FREE, (size + 2) * sizeof(int));
             }
         }
     }
