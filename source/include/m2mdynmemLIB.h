@@ -73,7 +73,7 @@ extern void m2m_dyn_mem_init(uint8_t *heap, uint16_t h_size, void (*passed_fptr)
   * \return 0, Free OK
   * \return <0, Free Fail
   */
-extern void m2m_dyn_mem_free(void *heap_ptr);
+extern void m2m_dyn_mem_free(uint8_t *heap, void *heap_ptr);
 /**
   * \brief Allocate temporary data.
   *
@@ -84,7 +84,7 @@ extern void m2m_dyn_mem_free(void *heap_ptr);
   * \return 0, Allocate Fail
   * \return >0, Pointer to allocated data sector.
   */
-extern void *m2m_dyn_mem_temporary_alloc(int16_t alloc_size);
+extern void *m2m_dyn_mem_temporary_alloc(uint8_t *heap, int16_t alloc_size);
 /**
   * \brief Allocate long period data.
   *
@@ -95,7 +95,7 @@ extern void *m2m_dyn_mem_temporary_alloc(int16_t alloc_size);
   * \return 0, Allocate Fail
   * \return >0, Pointer to allocated data sector.
   */
-extern void *m2m_dyn_mem_alloc(int16_t alloc_size);
+extern void *m2m_dyn_mem_alloc(uint8_t *heap, int16_t alloc_size);
 
 /**
   * \brief Get pointer to the current mem_stat_t set via m2m_dyn_mem_init.
@@ -108,7 +108,7 @@ extern void *m2m_dyn_mem_alloc(int16_t alloc_size);
   * \return NULL, no mem_stat_t was given on initialization
   * \return !=0, Pointer to mem_stat_t.
   */
-extern const mem_stat_t *m2m_dyn_mem_get_mem_stat(void);
+extern const mem_stat_t *m2m_dyn_mem_get_mem_stat(uint8_t *heap);
 
 #ifdef __cplusplus
 }
