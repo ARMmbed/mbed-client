@@ -42,6 +42,15 @@ typedef struct {
 
 static NS_LIST_DEFINE(holes_list, hole_t, link);
 
+#if 1
+/* struct for book-keeping variables */
+struct book {
+    int     *heap_main;
+    int     *heap_main_end;
+    uint16_t heap_size;
+    NS_LIST_HEAD(hole_t, link) holes_list;
+};
+#endif
 // size of a hole_t in our word units
 #define HOLE_T_SIZE ((sizeof(hole_t) + sizeof(int) - 1) / sizeof(int))
 
@@ -68,6 +77,10 @@ static void heap_failure(heap_fail_t reason)
 void m2m_dyn_mem_init(uint8_t *heap, uint16_t h_size, void (*passed_fptr)(heap_fail_t), mem_stat_t *info_ptr)
 {
 #ifndef STANDARD_MALLOC
+    struct book *book;
+    book = (struct book *)heap;
+    book->holes_list.slist.first_entry = NULL;
+    book->holes_list.slist.last_nextptr = &(book->holes_list).slist.first_entry;
     int *ptr;
     int temp_int;
     /* Do memory alignment */
@@ -82,18 +95,18 @@ void m2m_dyn_mem_init(uint8_t *heap, uint16_t h_size, void (*passed_fptr)(heap_f
     if (temp_int) {
         h_size -= (sizeof(int) - temp_int);
     }
-    heap_main = (int *)heap; // SET Heap Pointer
-    heap_size = h_size; //Set Heap Size
-    temp_int = (h_size / sizeof(int));
+    book->heap_main = (int *)&(book[1]); // SET Heap Pointer
+    book->heap_size = h_size - sizeof(book); //Set Heap Size
+    temp_int = (book->heap_size / sizeof(int));
     temp_int -= 2;
-    ptr = heap_main;
+    ptr = book->heap_main;
     *ptr = -(temp_int);
     ptr += (temp_int + 1);
     *ptr = -(temp_int);
-    heap_main_end = ptr;
+    book->heap_main_end = ptr;
 
-    ns_list_init(&holes_list);
-    ns_list_add_to_start(&holes_list, hole_from_block_start(heap_main));
+    ns_list_init(&book->holes_list);
+    ns_list_add_to_start(&book->holes_list, hole_from_block_start(book->heap_main));
 
     //RESET Memory by Hea Len
     if (info_ptr) {
