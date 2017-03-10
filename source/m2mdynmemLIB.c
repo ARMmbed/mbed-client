@@ -23,10 +23,11 @@
 static void (*heap_failure_callback)(heap_fail_t);
 
 #ifndef STANDARD_MALLOC
+#if 0
 static int *heap_main = 0;
 static int *heap_main_end = 0;
 static uint16_t heap_size = 0;
-
+#endif
 typedef enum mem_stat_update_t {
     DEV_HEAP_ALLOC_OK,
     DEV_HEAP_ALLOC_FAIL,
@@ -40,7 +41,7 @@ typedef struct {
     ns_list_link_t link;
 } hole_t;
 
-static NS_LIST_DEFINE(holes_list, hole_t, link);
+//static NS_LIST_DEFINE(holes_list, hole_t, link);
 
 #if 1
 /* struct for book-keeping variables */
@@ -96,7 +97,7 @@ void m2m_dyn_mem_init(uint8_t *heap, uint16_t h_size, void (*passed_fptr)(heap_f
         h_size -= (sizeof(int) - temp_int);
     }
     book->heap_main = (int *)&(book[1]); // SET Heap Pointer
-    book->heap_size = h_size - sizeof(book); //Set Heap Size
+    book->heap_size = h_size - sizeof(struct book); //Set Heap Size
     temp_int = (book->heap_size / sizeof(int));
     temp_int -= 2;
     ptr = book->heap_main;
@@ -112,7 +113,7 @@ void m2m_dyn_mem_init(uint8_t *heap, uint16_t h_size, void (*passed_fptr)(heap_f
     if (info_ptr) {
         mem_stat_info_ptr = info_ptr;
         memset(mem_stat_info_ptr, 0, sizeof(mem_stat_t));
-        mem_stat_info_ptr->heap_sector_size = heap_size;
+        mem_stat_info_ptr->heap_sector_size = book->heap_size;
     }
 #endif
     heap_failure_callback = passed_fptr;
@@ -151,13 +152,13 @@ static void dev_stat_update(mem_stat_update_t type, int16_t size)
     }
 }
 
-static int convert_allocation_size(int16_t requested_bytes)
+static int convert_allocation_size(struct book *book, int16_t requested_bytes)
 {
-    if (heap_main == 0) {
+    if (book->heap_main == 0) {
         heap_failure(M2M_DYN_MEM_HEAP_SECTOR_UNITIALIZED);
     } else if (requested_bytes < 1) {
         heap_failure(M2M_DYN_MEM_ALLOCATE_SIZE_NOT_VALID);
-    } else if (requested_bytes > (heap_size - 2 * sizeof(int)) ) {
+    } else if (requested_bytes > (book->heap_size - 2 * sizeof(int)) ) {
         heap_failure(M2M_DYN_MEM_ALLOCATE_SIZE_NOT_VALID);
     }
     return (requested_bytes + sizeof(int) - 1) / sizeof(int);
@@ -184,21 +185,23 @@ static int8_t m2m_block_validate(int *block_start, int direction)
 static void *m2m_dyn_mem_internal_alloc(uint8_t *heap, const int16_t alloc_size, int direction)
 {
 #ifndef STANDARD_MALLOC
+    struct book *book;
+    book = (struct book *)heap;
     int *block_ptr = NULL;
 
     platform_enter_critical();
 
-    int data_size = convert_allocation_size(alloc_size);
+    int data_size = convert_allocation_size(book, alloc_size);
     if (!data_size) {
         goto done;
     }
 
     // ns_list_foreach, either forwards or backwards, result to ptr
-    for (hole_t *cur_hole = direction > 0 ? ns_list_get_first(&holes_list)
-                                          : ns_list_get_last(&holes_list);
+    for (hole_t *cur_hole = direction > 0 ? ns_list_get_first(&book->holes_list)
+                                          : ns_list_get_last(&book->holes_list);
          cur_hole;
-         cur_hole = direction > 0 ? ns_list_get_next(&holes_list, cur_hole)
-                                  : ns_list_get_previous(&holes_list, cur_hole)
+         cur_hole = direction > 0 ? ns_list_get_next(&book->holes_list, cur_hole)
+                                  : ns_list_get_previous(&book->holes_list, cur_hole)
         ) {
         int *p = block_start_from_hole(cur_hole);
         if (m2m_block_validate(p, direction) != 0 || *p >= 0) {
@@ -228,12 +231,12 @@ static void *m2m_dyn_mem_internal_alloc(uint8_t *heap, const int16_t alloc_size,
             // Would like to just replace this block_ptr with new descriptor, but
             // they could overlap, so ns_list_replace might fail
             //ns_list_replace(&holes_list, block_ptr, hole_from_block_start(hole_ptr));
-            hole_t *before = ns_list_get_previous(&holes_list, hole_from_block_start(block_ptr));
-            ns_list_remove(&holes_list, hole_from_block_start(block_ptr));
+            hole_t *before = ns_list_get_previous(&book->holes_list, hole_from_block_start(block_ptr));
+            ns_list_remove(&book->holes_list, hole_from_block_start(block_ptr));
             if (before) {
-                ns_list_add_after(&holes_list, before, hole_from_block_start(hole_ptr));
+                ns_list_add_after(&book->holes_list, before, hole_from_block_start(hole_ptr));
             } else {
-                ns_list_add_to_start(&holes_list, hole_from_block_start(hole_ptr));
+                ns_list_add_to_start(&book->holes_list, hole_from_block_start(hole_ptr));
             }
         } else {
             hole_ptr = block_ptr;
@@ -246,7 +249,7 @@ static void *m2m_dyn_mem_internal_alloc(uint8_t *heap, const int16_t alloc_size,
     } else {
         // Not enough room for a left-over hole, so use the whole block
         data_size = block_data_size;
-        ns_list_remove(&holes_list, hole_from_block_start(block_ptr));
+        ns_list_remove(&book->holes_list, hole_from_block_start(block_ptr));
     }
     block_ptr[0] = data_size;
     block_ptr[1 + data_size] = data_size;
@@ -287,7 +290,7 @@ void *m2m_dyn_mem_temporary_alloc(uint8_t *heap, int16_t alloc_size)
 }
 
 #ifndef STANDARD_MALLOC
-static void m2m_free_and_merge_with_adjacent_blocks(int *cur_block, int data_size)
+static void m2m_free_and_merge_with_adjacent_blocks(struct book *book, int *cur_block, int data_size)
 {
     // Theory of operation: Block is always in form | Len | Data | Len |
     // So we need to check length of previous (if current not heap start)
@@ -303,7 +306,7 @@ static void m2m_free_and_merge_with_adjacent_blocks(int *cur_block, int data_siz
     *end = -data_size;
     int merged_data_size = data_size;
 
-    if (cur_block != heap_main) {
+    if (cur_block != book->heap_main) {
         cur_block--;
         if (*cur_block < 0) {
             merged_data_size += (2 - *cur_block);
@@ -315,7 +318,7 @@ static void m2m_free_and_merge_with_adjacent_blocks(int *cur_block, int data_siz
         cur_block++;
     }
 
-    if (end != heap_main_end) {
+    if (end != book->heap_main_end) {
         end++;
         if (*end < 0) {
             merged_data_size += (2 - *end);
@@ -335,8 +338,8 @@ static void m2m_free_and_merge_with_adjacent_blocks(int *cur_block, int data_siz
         // Will replace with descriptor at bottom of merged block.
         // (Can't use ns_list_replace, because of danger of overlap)
         // Optimisation - note our position for insertion below.
-        before = ns_list_get_next(&holes_list, existing_end);
-        ns_list_remove(&holes_list, existing_end);
+        before = ns_list_get_next(&book->holes_list, existing_end);
+        ns_list_remove(&book->holes_list, existing_end);
     }
     if (existing_start) {
         // Extending hole described by "existing_start" upwards.
@@ -349,7 +352,7 @@ static void m2m_free_and_merge_with_adjacent_blocks(int *cur_block, int data_siz
             // Locate hole position in list, if we don't already know
             // from merging with the block above.
             if (!existing_end) {
-                ns_list_foreach(hole_t, ptr, &holes_list) {
+                ns_list_foreach(hole_t, ptr, &book->holes_list) {
                     if (ptr > to_add) {
                         before = ptr;
                         break;
@@ -357,9 +360,9 @@ static void m2m_free_and_merge_with_adjacent_blocks(int *cur_block, int data_siz
                 }
             }
             if (before) {
-                ns_list_add_before(&holes_list, before, to_add);
+                ns_list_add_before(&book->holes_list, before, to_add);
             } else {
-                ns_list_add_to_end(&holes_list, to_add);
+                ns_list_add_to_end(&book->holes_list, to_add);
             }
 
         }
@@ -372,6 +375,8 @@ static void m2m_free_and_merge_with_adjacent_blocks(int *cur_block, int data_siz
 void m2m_dyn_mem_free(uint8_t *heap, void *block)
 {
 #ifndef STANDARD_MALLOC
+    struct book *book;
+    book = (struct book *)heap;
     int *ptr = block;
     int size;
 
@@ -379,7 +384,7 @@ void m2m_dyn_mem_free(uint8_t *heap, void *block)
         return;
     }
 
-    if (!heap_main) {
+    if (!book->heap_main) {
         heap_failure(M2M_DYN_MEM_HEAP_SECTOR_UNITIALIZED);
         return;
     }
@@ -390,15 +395,15 @@ void m2m_dyn_mem_free(uint8_t *heap, void *block)
     size = *ptr;
     if (size < 0) {
         heap_failure(M2M_DYN_MEM_DOUBLE_FREE);
-    } else if (ptr < heap_main || ptr >= heap_main_end) {
+    } else if (ptr < book->heap_main || ptr >= book->heap_main_end) {
         heap_failure(M2M_DYN_MEM_POINTER_NOT_VALID);
-    } else if ((ptr + size) >= heap_main_end) {
+    } else if ((ptr + size) >= book->heap_main_end) {
         heap_failure(M2M_DYN_MEM_POINTER_NOT_VALID);
     } else {
         if (m2m_block_validate(ptr, 1) != 0) {
             heap_failure(M2M_DYN_MEM_HEAP_SECTOR_CORRUPTED);
         } else {
-            m2m_free_and_merge_with_adjacent_blocks(ptr, size);
+            m2m_free_and_merge_with_adjacent_blocks(book, ptr, size);
             if (mem_stat_info_ptr) {
                 //Update Free Counter
                 dev_stat_update(DEV_HEAP_FREE, (size + 2) * sizeof(int));
