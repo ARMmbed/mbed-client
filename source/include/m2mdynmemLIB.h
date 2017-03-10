@@ -68,6 +68,7 @@ extern void m2m_dyn_mem_init(uint8_t *heap, uint16_t h_size, void (*passed_fptr)
 /**
   * \brief Free allocated memory.
   *
+  * \param heap Address of heap sector acting as handle
   * \param heap_ptr Pointer to allocated memory
   *
   * \return 0, Free OK
@@ -79,6 +80,7 @@ extern void m2m_dyn_mem_free(uint8_t *heap, void *heap_ptr);
   *
   * Space allocate started from beginning of the heap sector
   *
+  * \param heap Address of heap sector acting as handle
   * \param alloc_size Allocated data size
   *
   * \return 0, Allocate Fail
@@ -90,6 +92,7 @@ extern void *m2m_dyn_mem_temporary_alloc(uint8_t *heap, int16_t alloc_size);
   *
   * Space allocate started from end of the heap sector
   *
+  * \param heap Address of heap sector acting as handle
   * \param alloc_size Allocated data size
   *
   * \return 0, Allocate Fail

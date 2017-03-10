@@ -20,13 +20,7 @@
 #include <stdlib.h>
 #include "ns_list.h"
 
-
 #ifndef STANDARD_MALLOC
-#if 0
-static int *heap_main = 0;
-static int *heap_main_end = 0;
-static uint16_t heap_size = 0;
-#endif
 typedef enum mem_stat_update_t {
     DEV_HEAP_ALLOC_OK,
     DEV_HEAP_ALLOC_FAIL,
@@ -37,19 +31,16 @@ typedef struct {
     ns_list_link_t link;
 } hole_t;
 
-//static NS_LIST_DEFINE(holes_list, hole_t, link);
-
-#if 1
-/* struct for book-keeping variables */
-struct book {
+/* struct for book keeping variables */
+typedef struct book {
     int     *heap_main;
     int     *heap_main_end;
     mem_stat_t *mem_stat_info_ptr;
     void (*heap_failure_callback)(heap_fail_t);
     NS_LIST_HEAD(hole_t, link) holes_list;
     uint16_t heap_size;
-};
-#endif
+} book_t;
+
 // size of a hole_t in our word units
 #define HOLE_T_SIZE ((sizeof(hole_t) + sizeof(int) - 1) / sizeof(int))
 
@@ -63,7 +54,6 @@ static NS_INLINE int *block_start_from_hole(hole_t *start)
     return ((int *)start) - 1;
 }
 
-
 static void heap_failure(void (*callback)(heap_fail_t), heap_fail_t reason)
 {
     if (callback) {
@@ -76,8 +66,8 @@ static void heap_failure(void (*callback)(heap_fail_t), heap_fail_t reason)
 void m2m_dyn_mem_init(uint8_t *heap, uint16_t h_size, void (*passed_fptr)(heap_fail_t), mem_stat_t *info_ptr)
 {
 #ifndef STANDARD_MALLOC
-    struct book *book;
-    book = (struct book *)heap;
+    book_t *book = (book_t *)heap;
+
     book->holes_list.slist.first_entry = NULL;
     book->holes_list.slist.last_nextptr = &(book->holes_list).slist.first_entry;
     int *ptr;
@@ -95,7 +85,7 @@ void m2m_dyn_mem_init(uint8_t *heap, uint16_t h_size, void (*passed_fptr)(heap_f
         h_size -= (sizeof(int) - temp_int);
     }
     book->heap_main = (int *)&(book[1]); // SET Heap Pointer
-    book->heap_size = h_size - sizeof(struct book); //Set Heap Size
+    book->heap_size = h_size - sizeof(book_t); //Set Heap Size
     temp_int = (book->heap_size / sizeof(int));
     temp_int -= 2;
     ptr = book->heap_main;
@@ -121,8 +111,7 @@ void m2m_dyn_mem_init(uint8_t *heap, uint16_t h_size, void (*passed_fptr)(heap_f
 const mem_stat_t *m2m_dyn_mem_get_mem_stat(uint8_t *heap)
 {
 #ifndef STANDARD_MALLOC
-    struct book *book;
-    book = (struct book *)heap;
+    book_t *book = (book_t *)heap;
     return book->mem_stat_info_ptr;
 #else
     return NULL;
@@ -153,7 +142,7 @@ static void dev_stat_update(mem_stat_t *mem_stat_info_ptr, mem_stat_update_t typ
     }
 }
 
-static int convert_allocation_size(struct book *book, int16_t requested_bytes)
+static int convert_allocation_size(book_t *book, int16_t requested_bytes)
 {
     if (book->heap_main == 0) {
         heap_failure(book->heap_failure_callback, M2M_DYN_MEM_HEAP_SECTOR_UNITIALIZED);
@@ -186,8 +175,7 @@ static int8_t m2m_block_validate(int *block_start, int direction)
 static void *m2m_dyn_mem_internal_alloc(uint8_t *heap, const int16_t alloc_size, int direction)
 {
 #ifndef STANDARD_MALLOC
-    struct book *book;
-    book = (struct book *)heap;
+    book_t *book = (book_t *)heap;
     int *block_ptr = NULL;
 
     platform_enter_critical();
@@ -291,7 +279,7 @@ void *m2m_dyn_mem_temporary_alloc(uint8_t *heap, int16_t alloc_size)
 }
 
 #ifndef STANDARD_MALLOC
-static void m2m_free_and_merge_with_adjacent_blocks(struct book *book, int *cur_block, int data_size)
+static void m2m_free_and_merge_with_adjacent_blocks(book_t *book, int *cur_block, int data_size)
 {
     // Theory of operation: Block is always in form | Len | Data | Len |
     // So we need to check length of previous (if current not heap start)
@@ -376,8 +364,7 @@ static void m2m_free_and_merge_with_adjacent_blocks(struct book *book, int *cur_
 void m2m_dyn_mem_free(uint8_t *heap, void *block)
 {
 #ifndef STANDARD_MALLOC
-    struct book *book;
-    book = (struct book *)heap;
+    book_t *book = (book_t *)heap;
     int *ptr = block;
     int size;
 
