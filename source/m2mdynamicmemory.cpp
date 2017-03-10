@@ -53,7 +53,7 @@ static void memory_fail_callback(heap_fail_t fail) {
 /* nanostack dynmemlib based implementation */
 void * M2MDynamicMemory::operator new (size_t size) {
     void *tmp;
-    tmp=m2m_dyn_mem_alloc(size);
+    tmp=m2m_dyn_mem_alloc((uint8_t *)heapPtr, size);
 #ifdef M2M_TRACE_PRINTS
     memTotal+=size; memCount++;
     printf("mn"); /* M2M new */
@@ -66,7 +66,7 @@ void M2MDynamicMemory::operator delete (void * ptr) {
 #ifdef M2M_TRACE_PRINTS
     memCount--; /* still update allocation counter */
 #endif
-    m2m_dyn_mem_free(ptr);
+    m2m_dyn_mem_free((uint8_t *)heapPtr, ptr);
 #ifdef M2M_TRACE_PRINTS
     printf("md"); /* M2M delete */
     print_heap_overall_statistics();
@@ -74,7 +74,7 @@ void M2MDynamicMemory::operator delete (void * ptr) {
 }
 void * M2MDynamicMemory::operator new[] (size_t size) {
     void *tmp;
-    tmp=m2m_dyn_mem_alloc(size);
+    tmp=m2m_dyn_mem_alloc((uint8_t *)heapPtr, size);
 #ifdef M2M_TRACE_PRINTS
     memTotal+=size; memCount++;
     printf("mn[]"); /* M2M new array */
@@ -85,7 +85,7 @@ void M2MDynamicMemory::operator delete[] (void * ptr) {
 #ifdef M2M_TRACE_PRINTS
     memCount--;
 #endif
-    m2m_dyn_mem_free(ptr);
+    m2m_dyn_mem_free((uint8_t *)heapPtr, ptr);
 #ifdef M2M_TRACE_PRINTS
     printf("md[]"); /* M2M delete array */
 #endif
@@ -222,7 +222,7 @@ void M2MDynamicMemory::print_heap_overall_statistics() {
 void* M2MDynamicMemory::memory_alloc(uint16_t size){
     void *tmp;
     #ifdef M2M_DYNMEM_LIB
-    tmp = m2m_dyn_mem_alloc(size);
+    tmp = m2m_dyn_mem_alloc((uint8_t *)heapPtr, size);
     #endif
     #ifdef M2M_PASSTHROUGH
     memTotal+=size; memCount++;
@@ -237,7 +237,7 @@ void* M2MDynamicMemory::memory_alloc(uint16_t size){
 
 void M2MDynamicMemory::memory_free(void *ptr) {
     #ifdef M2M_DYNMEM_LIB
-    m2m_dyn_mem_free(ptr);
+    m2m_dyn_mem_free((uint8_t *)heapPtr, ptr);
     #endif
     #ifdef M2M_PASSTHROUGH
     free(ptr);

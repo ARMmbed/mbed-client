@@ -118,7 +118,7 @@ void m2m_dyn_mem_init(uint8_t *heap, uint16_t h_size, void (*passed_fptr)(heap_f
     heap_failure_callback = passed_fptr;
 }
 
-const mem_stat_t *m2m_dyn_mem_get_mem_stat(void)
+const mem_stat_t *m2m_dyn_mem_get_mem_stat(uint8_t *heap)
 {
 #ifndef STANDARD_MALLOC
     return mem_stat_info_ptr;
@@ -181,7 +181,7 @@ static int8_t m2m_block_validate(int *block_start, int direction)
 #endif
 
 // For direction, use 1 for direction up and -1 for down
-static void *m2m_dyn_mem_internal_alloc(const int16_t alloc_size, int direction)
+static void *m2m_dyn_mem_internal_alloc(uint8_t *heap, const int16_t alloc_size, int direction)
 {
 #ifndef STANDARD_MALLOC
     int *block_ptr = NULL;
@@ -276,14 +276,14 @@ static void *m2m_dyn_mem_internal_alloc(const int16_t alloc_size, int direction)
 #endif
 }
 
-void *m2m_dyn_mem_alloc(int16_t alloc_size)
+void *m2m_dyn_mem_alloc(uint8_t *heap, int16_t alloc_size)
 {
-    return m2m_dyn_mem_internal_alloc(alloc_size, -1);
+    return m2m_dyn_mem_internal_alloc(heap, alloc_size, -1);
 }
 
-void *m2m_dyn_mem_temporary_alloc(int16_t alloc_size)
+void *m2m_dyn_mem_temporary_alloc(uint8_t *heap, int16_t alloc_size)
 {
-    return m2m_dyn_mem_internal_alloc(alloc_size, 1);
+    return m2m_dyn_mem_internal_alloc(heap, alloc_size, 1);
 }
 
 #ifndef STANDARD_MALLOC
@@ -369,7 +369,7 @@ static void m2m_free_and_merge_with_adjacent_blocks(int *cur_block, int data_siz
 }
 #endif
 
-void m2m_dyn_mem_free(void *block)
+void m2m_dyn_mem_free(uint8_t *heap, void *block)
 {
 #ifndef STANDARD_MALLOC
     int *ptr = block;
