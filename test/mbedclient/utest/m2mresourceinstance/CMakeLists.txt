@@ -17,6 +17,7 @@ add_executable(m2mresourceinstance
         "m2mresourceinstancetest.cpp"
         "test_m2mresourceinstance.cpp"
         "../../../../source/m2mstringbufferbase.cpp"
+        "../../../../source/m2mcallbackstorage.cpp"
 )
 target_link_libraries(m2mresourceinstance
     CppUTest
