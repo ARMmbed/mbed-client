@@ -35,7 +35,7 @@ class M2MReportObserver
      * \param changed_instance_ids A list of changed object instance IDs.
      * \param send_object Indicates whether the whole object will be sent or not.
      */
-    virtual void observation_to_be_sent(m2m::Vector<uint16_t> changed_instance_ids,
+    virtual void observation_to_be_sent(const m2m::Vector<uint16_t> &changed_instance_ids,
                                         bool send_object = false) = 0;
 
 };

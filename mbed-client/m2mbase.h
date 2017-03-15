@@ -124,7 +124,7 @@ public:
         uint32_t            max_age;
         uint32_t            instance_id;
         int32_t             name_id;
-        char*               name; //for backwards compability
+        char*               name; //for backwards compatibility
         sn_nsdl_dynamic_resource_parameters_s *dynamic_resource_params;
         BaseType            base_type;
         bool                free_on_delete;   /**< true if struct is dynamically allocted and it
@@ -477,7 +477,7 @@ public:
 
 protected : // from M2MReportObserver
 
-    virtual void observation_to_be_sent(m2m::Vector<uint16_t> changed_instance_ids,
+    virtual void observation_to_be_sent(const m2m::Vector<uint16_t> &changed_instance_ids,
                                         bool send_object = false);
 
 protected:
