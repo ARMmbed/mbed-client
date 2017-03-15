@@ -140,10 +140,6 @@ void M2MBase::set_instance_id(const uint16_t /*inst_id*/)
 {
 }
 
-void M2MBase::set_observation_number(const uint16_t /*observation_number*/)
-{
-}
-
 void M2MBase::set_max_age(const uint32_t /*max_age*/)
 {
 }
