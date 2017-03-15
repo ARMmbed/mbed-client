@@ -147,6 +147,8 @@ bool M2MSecurity::delete_resource(SecurityResource resource)
         case ShortServerID:
             if(M2MSecurity::Bootstrap == _server_type) {
                 security_id_ptr = SECURITY_SHORT_SERVER_ID;
+            } else {
+                security_id_ptr = NULL;
             }
             break;
         case ClientHoldOffTime:
