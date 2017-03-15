@@ -188,11 +188,6 @@ TEST(M2MBase, test_set_register_uri)
     m2m_base->test_set_register_uri();
 }
 
-TEST(M2MBase, test_set_observation_number)
-{
-    m2m_base->test_set_observation_number();
-}
-
 TEST(M2MBase, test_set_max_age)
 {
     m2m_base->test_set_max_age();
