@@ -43,16 +43,6 @@ public :
 
 
     /**
-    * Constructor.
-    */
-    M2MTLVDeserializer();
-
-    /**
-    * Destructor.
-    */
-    ~M2MTLVDeserializer();
-
-    /**
      * This method checks whether the given binary encodes an object instance
      * or something else. It returns <code>true</code> if bits 7-6 of the first
      * byte is "00".

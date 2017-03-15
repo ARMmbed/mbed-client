@@ -22,14 +22,6 @@ void m2mtlvserializer_stub::clear()
     uint8_value = NULL;
 }
 
-M2MTLVSerializer::M2MTLVSerializer()
-{
-}
-
-M2MTLVSerializer::~M2MTLVSerializer()
-{
-}
-
 uint8_t* M2MTLVSerializer::serialize(M2MObjectInstanceList object_instance_list, uint32_t &)
 {
     return m2mtlvserializer_stub::uint8_value;

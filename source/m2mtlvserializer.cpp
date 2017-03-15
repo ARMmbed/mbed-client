@@ -24,14 +24,6 @@
 #define MAX_TLV_ID_SIZE 2
 #define TLV_TYPE_SIZE 1
 
-M2MTLVSerializer::M2MTLVSerializer()
-{
-}
-
-M2MTLVSerializer::~M2MTLVSerializer()
-{
-}
-
 uint8_t* M2MTLVSerializer::serialize(M2MObjectInstanceList object_instance_list, uint32_t &size)
 {
     return serialize_object_instances(object_instance_list, size);
