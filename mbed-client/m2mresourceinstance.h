@@ -136,7 +136,7 @@ public:
      * \brief Returns the resource data type.
      * \return ResourceType.
      */
-    virtual M2MResourceInstance::ResourceType resource_instance_type() const;
+    M2MResourceInstance::ResourceType resource_instance_type() const;
 
     /**
      * \brief Parses the received query for a notification
@@ -151,7 +151,7 @@ public:
      * \param callback The function pointer that needs to be executed.
      * \return True, if callback could be set, false otherwise.
      */
-    virtual bool set_execute_function(execute_callback callback);
+    bool set_execute_function(execute_callback callback);
 
     /**
      * \brief Sets the function that should be executed when this
@@ -159,7 +159,7 @@ public:
      * \param callback The function pointer that needs to be executed.
      * \return True, if callback could be set, false otherwise.
      */
-    virtual bool set_execute_function(execute_callback_2 callback);
+    bool set_execute_function(execute_callback_2 callback);
 
     /**
      * \brief Sets a value of a given resource.
@@ -167,7 +167,7 @@ public:
      * \param value_length The length of the value pointer.
      * \return True if successfully set, else false.
      */
-    virtual bool set_value(const uint8_t *value, const uint32_t value_length);
+    bool set_value(const uint8_t *value, const uint32_t value_length);
 
     /**
      * \brief Sets a value of a given resource.
@@ -175,12 +175,12 @@ public:
      * and set on the resource.
      * \return True if successfully set, else false.
      */
-    virtual bool set_value(int64_t value);
+    bool set_value(int64_t value);
 
     /**
      * \brief Clears the value of a given resource.
      */
-    virtual void clear_value();
+    void clear_value();
 
     /**
      * \brief Executes the function that is set in "set_execute_function".
@@ -193,7 +193,7 @@ public:
      * \param value[OUT] A pointer to the resource value.
      * \param value_length[OUT] The length of the value pointer.
      */
-    virtual void get_value(uint8_t *&value, uint32_t &value_length);
+    void get_value(uint8_t *&value, uint32_t &value_length);
 
     /**
      * \brief Converts a value to integer and returns it. Note: Conversion
@@ -262,7 +262,7 @@ public:
      * object receives a block-wise message.
      * @param callback The function pointer that is called.
      */
-    virtual bool set_incoming_block_message_callback(incoming_block_message_callback callback);
+    bool set_incoming_block_message_callback(incoming_block_message_callback callback);
 
     /**
      * @brief Sets the function that is executed when this
@@ -271,13 +271,13 @@ public:
      * NOTE! Due to a limitation in the mbed-client-c library, a GET request can only contain data size up to 65KB.
      * @param callback The function pointer that is called.
      */
-    virtual bool set_outgoing_block_message_callback(outgoing_block_message_callback callback);
+    bool set_outgoing_block_message_callback(outgoing_block_message_callback callback);
 
     /**
      * \brief Returns the block message object.
      * \return Block message.
     */
-    virtual M2MBlockMessage* block_message() const;
+    M2MBlockMessage* block_message() const;
 
 #endif
 
