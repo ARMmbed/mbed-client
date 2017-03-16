@@ -676,6 +676,13 @@ void Test_M2MInterfaceImpl::test_address_ready()
     impl->address_ready(*address,server_type,server_port);
     CHECK(impl->_current_state == M2MInterfaceImpl::STATE_REGISTER_ADDRESS_RESOLVED);
 
+    impl->_reconnection_state = M2MInterfaceImpl::WithUpdate;
+    impl->address_ready(*address,server_type,server_port);
+    CHECK(impl->_current_state == M2MInterfaceImpl::STATE_UPDATE_REGISTRATION);
+
+
+    impl->_reconnection_state = M2MInterfaceImpl::None;
+
     address->_stack = M2MInterface::LwIP_IPv6;
     m2mnsdlinterface_stub::bool_value = false;
 

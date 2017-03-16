@@ -107,17 +107,21 @@ public:
     bool create_bootstrap_resource(sn_nsdl_addr_s *address, const String &bootstrap_endpoint_name);
 
     /**
-     * @brief Sends the register message to the server.
+     * @brief Sets the register message to the server.
      * @param address M2MServer address.
      * @param address_length M2MServer address length.
      * @param port M2MServer port.
      * @param address_type IP Address type.
+    */
+    void set_server_address(uint8_t* address,
+                            uint8_t address_length,
+                            const uint16_t port,
+                            sn_nsdl_addr_type_e address_type);
+    /**
+     * @brief Sends the register message to the server.
      * @return  true if register sent successfully else false.
     */
-    bool send_register_message(uint8_t* address,
-                               uint8_t address_length,
-                               const uint16_t port,
-                               sn_nsdl_addr_type_e address_type);
+    bool send_register_message();
 
     /**
      * @brief Sends the update registration message to the server.

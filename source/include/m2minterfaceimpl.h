@@ -388,6 +388,12 @@ private: // state machine state functions
      */
     static void process_address(const String& server_address, String& ip_address, uint16_t& port);
 
+    enum ReconnectionState{
+        None,
+        WithUpdate,
+        FullRegistration
+    };
+
 private:
 
     EventData                   *_event_data;
@@ -412,6 +418,7 @@ private:
     uint8_t                     _current_state;
     uint8_t                     _retry_count;
     BindingMode                 _binding_mode;
+    ReconnectionState           _reconnection_state;
     M2MInterfaceObserver        &_observer;
     M2MConnectionSecurity       *_security_connection; // Doesn't own
     M2MConnectionHandler        _connection_handler;

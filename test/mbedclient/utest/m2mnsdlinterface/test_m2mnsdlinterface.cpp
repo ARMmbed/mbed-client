@@ -268,14 +268,22 @@ void Test_M2MNsdlInterface::test_create_bootstrap_resource()
     CHECK(nsdl->create_bootstrap_resource(NULL, "") == false);
 }
 
+void Test_M2MNsdlInterface::test_set_server_address()
+{
+    // to cover the test coverage
+    nsdl->set_server_address(NULL,4,100,SN_NSDL_ADDRESS_TYPE_IPV6);
+}
+
 void Test_M2MNsdlInterface::test_send_register_message()
 {
     common_stub::uint_value = 12;
     common_stub::int_value = 0;
-    CHECK(nsdl->send_register_message(NULL,4,100,SN_NSDL_ADDRESS_TYPE_IPV6) == true);
+    nsdl->set_server_address(NULL,4,100,SN_NSDL_ADDRESS_TYPE_IPV6);
+    CHECK(nsdl->send_register_message() == true);
 
     common_stub::uint_value = 0;
-    CHECK(nsdl->send_register_message(NULL,4,100,SN_NSDL_ADDRESS_TYPE_IPV6) == false);
+    nsdl->set_server_address(NULL,4,100,SN_NSDL_ADDRESS_TYPE_IPV6);
+    CHECK(nsdl->send_register_message() == false);
 }
 
 void Test_M2MNsdlInterface::test_send_update_registration()

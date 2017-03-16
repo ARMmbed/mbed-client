@@ -234,20 +234,23 @@ bool M2MNsdlInterface::create_bootstrap_resource(sn_nsdl_addr_s *address, const 
 #endif //MBED_CLIENT_DISABLE_BOOTSTRAP_FEATURE
 }
 
-bool M2MNsdlInterface::send_register_message(uint8_t* address,
-                                             uint8_t address_length,
-                                             const uint16_t port,
-                                             sn_nsdl_addr_type_e address_type)
+void M2MNsdlInterface::set_server_address(uint8_t* address,
+                                          uint8_t address_length,
+                                          const uint16_t port,
+                                          sn_nsdl_addr_type_e address_type)
+{
+    tr_debug("M2MNsdlInterface::set_server_address()");
+    set_NSP_address(_nsdl_handle, address, address_length, port, address_type);
+}
+
+bool M2MNsdlInterface::send_register_message()
 {
     tr_debug("M2MNsdlInterface::send_register_message()");
     _nsdl_exceution_timer->stop_timer();
     _nsdl_exceution_timer->start_timer(ONE_SECOND_TIMER * 1000,
                                        M2MTimerObserver::NsdlExecution,
                                        false);
-    bool success = false;
-    if(set_NSP_address(_nsdl_handle, address, address_length, port, address_type) == 0) {
-        success = sn_nsdl_register_endpoint(_nsdl_handle,_endpoint) != 0;
-    }
+    bool success = sn_nsdl_register_endpoint(_nsdl_handle,_endpoint) != 0;
     return success;
 }
 
