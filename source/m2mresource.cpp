@@ -105,6 +105,8 @@ M2MResource::~M2MResource()
 #ifndef DISABLE_DELAYED_RESPONSE
     free(_delayed_token);
 #endif
+
+    free_resources();
 }
 
 bool M2MResource::supports_multiple_instances() const
@@ -202,6 +204,22 @@ bool M2MResource::delayed_response() const
     return _delayed_response;
 }
 #endif
+
+M2MObservationHandler* M2MResource::observation_handler() const
+{
+    const M2MObjectInstance& parent_object_instance = get_parent_object_instance();
+
+    // XXX: need to check the flag too
+    return parent_object_instance.observation_handler();
+}
+
+void M2MResource::set_observation_handler(M2MObservationHandler *handler)
+{
+    M2MObjectInstance& parent_object_instance = get_parent_object_instance();
+
+    // XXX: need to set the flag too
+    parent_object_instance.set_observation_handler(handler);
+}
 
 bool M2MResource::handle_observation_attribute(const char *query)
 {

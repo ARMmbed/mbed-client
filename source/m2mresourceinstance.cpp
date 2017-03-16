@@ -86,6 +86,23 @@ M2MResourceInstance::M2MResourceInstance(M2MResource &parent,
 
 M2MResourceInstance::~M2MResourceInstance()
 {
+    free_resources();
+}
+
+M2MObservationHandler* M2MResourceInstance::observation_handler() const
+{
+    const M2MResource& parent_resource = get_parent_resource();
+
+    // XXX: need to check the flag too
+    return parent_resource.observation_handler();
+}
+
+void M2MResourceInstance::set_observation_handler(M2MObservationHandler *handler)
+{
+    M2MResource& parent_resource = get_parent_resource();
+
+    // XXX: need to set the flag too
+    parent_resource.set_observation_handler(handler);
 }
 
 bool M2MResourceInstance::handle_observation_attribute(const char *query)
@@ -117,7 +134,6 @@ uint16_t M2MResourceInstance::object_instance_id() const
     const M2MObjectInstance& parent_object_instance = get_parent_resource().get_parent_object_instance();
     return parent_object_instance.instance_id();
 }
-
 
 M2MResource& M2MResourceInstance::get_parent_resource() const
 {

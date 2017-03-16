@@ -134,9 +134,9 @@ public:
 
     typedef struct lwm2m_parameters {
         //add multiple_instances
-        uint32_t            max_age;
+        uint32_t            max_age; // todo: add flag
         uint16_t            instance_id; // XXX: this is not properly aligned now, need to reorder these after the elimination is done
-        int32_t             name_id;
+        int32_t             name_id; // XXX calculate runtime
         char*               name; //for backwards compatibility
         sn_nsdl_dynamic_resource_parameters_s *dynamic_resource_params;
         BaseType            base_type;
@@ -260,13 +260,13 @@ public:
      * \brief Returns the Observation Handler object.
      * \return M2MObservationHandler object.
     */
-    M2MObservationHandler* observation_handler();
+    virtual M2MObservationHandler* observation_handler() const = 0;
 
     /**
      * \brief Sets the observation handler
      * \param handler Observation handler
     */
-    void set_observation_handler(M2MObservationHandler *handler);
+    virtual void set_observation_handler(M2MObservationHandler *handler) = 0;
 
     /**
      * \brief Sets the observation token value.
@@ -574,18 +574,23 @@ protected:
 
     static char* stringdup(const char* s);
 
+    /**
+     * \brief Delete the resource structures owned by this object. Note: this needs
+     * to be called separately from each subclass' destructor as this method uses a
+     * virtual method and the call needs to be done at same class which has the
+     * implementation of the pure virtual method.
+     */
+    void free_resources();
+
 private:
 
     static bool is_integer(const String &value);
 
     static bool is_integer(const char *value);
 
-    void free_resources();
-
 private:
     lwm2m_parameters_s          *_sn_resource;
     M2MReportHandler            *_report_handler; // TODO: can be broken down to smaller classes with inheritance.
-    M2MObservationHandler       *_observation_handler; // Not owned // TODO: This can be moved to higher level , M2MObject ?
 
 friend class Test_M2MBase;
 friend class Test_M2MObject;
