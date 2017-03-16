@@ -24,7 +24,7 @@
 #include "mbed-client/m2mbase.h"
 #include "mbed-client/m2mserver.h"
 #include "include/nsdllinker.h"
-#include "include/m2mdynamicmemory.h"
+#include "include/m2mcorememory.h"
 
 //FORWARD DECLARARTION
 class M2MSecurity;
@@ -45,7 +45,7 @@ typedef Vector<M2MObject *> M2MObjectList;
  */
 class M2MNsdlInterface : public M2MTimerObserver,
                          public M2MObservationHandler,
-                         public M2MDynamicMemory
+                         public M2MCoreMemory
 {
 private:
     // Prevents the use of assignment operator by accident.
