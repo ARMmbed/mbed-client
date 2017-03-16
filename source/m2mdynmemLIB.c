@@ -35,8 +35,8 @@ typedef struct {
 typedef struct book {
     int     *heap_main;
     int     *heap_main_end;
-    mem_stat_t *mem_stat_info_ptr;
-    void (*heap_failure_callback)(heap_fail_t);
+    m2m_mem_stat_t *mem_stat_info_ptr;
+    void (*heap_failure_callback)(m2m_heap_fail_t);
     NS_LIST_HEAD(hole_t, link) holes_list;
     uint16_t heap_size;
 } book_t;
@@ -54,7 +54,7 @@ static NS_INLINE int *block_start_from_hole(hole_t *start)
     return ((int *)start) - 1;
 }
 
-static void heap_failure(void (*callback)(heap_fail_t), heap_fail_t reason)
+static void heap_failure(void (*callback)(m2m_heap_fail_t), m2m_heap_fail_t reason)
 {
     if (callback) {
         callback(reason);
@@ -63,7 +63,7 @@ static void heap_failure(void (*callback)(heap_fail_t), heap_fail_t reason)
 
 #endif
 
-void m2m_dyn_mem_init(uint8_t *heap, uint16_t h_size, void (*passed_fptr)(heap_fail_t), mem_stat_t *info_ptr)
+void m2m_dyn_mem_init(uint8_t *heap, uint16_t h_size, void (*passed_fptr)(m2m_heap_fail_t), m2m_mem_stat_t *info_ptr)
 {
 #ifndef STANDARD_MALLOC
     book_t *book = (book_t *)heap;
@@ -100,7 +100,7 @@ void m2m_dyn_mem_init(uint8_t *heap, uint16_t h_size, void (*passed_fptr)(heap_f
     //RESET Memory by Hea Len
     if (info_ptr) {
         book->mem_stat_info_ptr = info_ptr;
-        memset(book->mem_stat_info_ptr, 0, sizeof(mem_stat_t));
+        memset(book->mem_stat_info_ptr, 0, sizeof(m2m_mem_stat_t));
         book->mem_stat_info_ptr->heap_sector_size = book->heap_size;
     }
 #endif
@@ -108,7 +108,7 @@ void m2m_dyn_mem_init(uint8_t *heap, uint16_t h_size, void (*passed_fptr)(heap_f
     book->heap_failure_callback = passed_fptr;
 }
 
-const mem_stat_t *m2m_dyn_mem_get_mem_stat(uint8_t *heap)
+const m2m_mem_stat_t *m2m_dyn_mem_get_mem_stat(uint8_t *heap)
 {
 #ifndef STANDARD_MALLOC
     book_t *book = (book_t *)heap;
@@ -119,7 +119,7 @@ const mem_stat_t *m2m_dyn_mem_get_mem_stat(uint8_t *heap)
 }
 
 #ifndef STANDARD_MALLOC
-static void dev_stat_update(mem_stat_t *mem_stat_info_ptr, mem_stat_update_t type, int16_t size)
+static void dev_stat_update(m2m_mem_stat_t *mem_stat_info_ptr, mem_stat_update_t type, int16_t size)
 {
     if (mem_stat_info_ptr) {
         switch (type) {
