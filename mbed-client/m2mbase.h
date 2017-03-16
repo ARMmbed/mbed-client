@@ -192,7 +192,7 @@ public:
      * \brief Sets the operation type for an object.
      * \param operation The operation to be set.
      */
-    virtual void set_operation(M2MBase::Operation operation);
+    void set_operation(M2MBase::Operation operation);
 
 #ifndef MEMORY_OPTIMIZED_API
     /**
@@ -200,13 +200,13 @@ public:
      * \param description The description to be set.
      */
 #ifndef DISABLE_INTERFACE_DESCRIPTION
-    virtual void set_interface_description(const String &description);
+    void set_interface_description(const String &description);
 
     /**
      * \brief Sets the interface description of the object.
      * \param description The description to be set.
      */
-    virtual void set_interface_description(const char *description);
+    void set_interface_description(const char *description);
 #endif
 #ifndef DISABLE_RESOURCE_TYPE
     /**
@@ -228,13 +228,13 @@ public:
      * \param content_type The content type to be set based on
      * CoAP specifications.
      */
-    virtual void set_coap_content_type(const uint8_t content_type);
+    void set_coap_content_type(const uint8_t content_type);
 
     /**
      * \brief Sets the observable mode for the object.
      * \param observable A value for the observation.
      */
-    virtual void set_observable(bool observable);
+    void set_observable(bool observable);
 
     /**
      * \brief Adds the observation level for the object.
@@ -254,7 +254,7 @@ public:
      * \param handler A handler object for sending
      * observation callbacks.
      */
-    virtual void set_under_observation(bool observed,
+    void set_under_observation(bool observed,
                                        M2MObservationHandler *handler);
     /**
      * \brief Returns the Observation Handler object.
@@ -273,21 +273,21 @@ public:
      * \param token A pointer to the token of the resource.
      * \param length The length of the token pointer.
      */
-    virtual void set_observation_token(const uint8_t *token,
+    void set_observation_token(const uint8_t *token,
                                        const uint8_t length);
 
     /**
      * \brief Sets the instance ID of the object.
      * \param instance_id The instance ID of the object.
      */
-    virtual void set_instance_id(const uint16_t instance_id);
+    void set_instance_id(const uint16_t instance_id);
 
     /**
      * This function is deprecated. An increment of the observation number is done internally.
      * \brief Sets the observation number of the object.
      * \param observation_number The observation number of the object.
      */
-    virtual void set_observation_number(const uint16_t observation_number)
+    void set_observation_number(const uint16_t observation_number)
         m2m_deprecated;
 
     /**
@@ -312,13 +312,13 @@ public:
      * \brief Returns the object name.
      * \return The name of the object.
      */
-    virtual const char* name() const;
+    const char* name() const;
 
     /**
      * \brief Returns the object name in integer.
      * \return The name of the object in integer.
      */
-    virtual int32_t name_id() const;
+    int32_t name_id() const;
 
     /**
      * \brief Returns the object's instance ID.
@@ -343,7 +343,7 @@ public:
      * \brief Returns the path of the object.
      * \return The path of the object (eg. 3/0/1).
      */
-    virtual const char* uri_path() const;
+    const char* uri_path() const;
 
     /**
      * \brief Returns the CoAP content type of the object.
@@ -380,7 +380,7 @@ public:
      * \brief Returns the observation number.
      * \return The observation number of the object.
      */
-    virtual uint16_t observation_number() const;
+    uint16_t observation_number() const;
 
     /**
      * \brief Returns the max age for the resource value to be cached.
@@ -440,7 +440,7 @@ public:
      * \brief Sets whether this resource is published to server or not.
      * \param register_uri True sets the resource as part of registration message.
      */
-    virtual void set_register_uri(bool register_uri);
+    void set_register_uri(bool register_uri);
 
     /**
      * \brief Returns whether this resource is published to server or not.
@@ -460,7 +460,7 @@ public:
      * @param callback The function pointer that is called.
      * @return True, if callback could be set, false otherwise.
      */
-    virtual bool set_value_updated_function(value_updated_callback callback);
+    bool set_value_updated_function(value_updated_callback callback);
 
     /**
      * @brief Sets the function that is executed when this
@@ -468,19 +468,19 @@ public:
      * @param callback The function pointer that is called.
      * @return True, if callback could be set, false otherwise.
      */
-    virtual bool set_value_updated_function(value_updated_callback2 callback);
+    bool set_value_updated_function(value_updated_callback2 callback);
 
     /**
      * @brief Returns whether a callback function is set or not.
      * @return True if the callback function is set, else false.
      */
-    virtual bool is_value_updated_function_set() const;
+    bool is_value_updated_function_set() const;
 
     /**
      * @brief Calls the function that is set in the "set_value_updated_function".
      * @param name The name of the object.
      */
-    virtual void execute_value_updated(const String& name);
+    void execute_value_updated(const String& name);
 
     /**
      * @brief Returns length of the object name.
@@ -519,7 +519,7 @@ protected:
      * \brief Sets the base type for an object.
      * \param type The base type of the object.
      */
-    virtual void set_base_type(M2MBase::BaseType type);
+    void set_base_type(M2MBase::BaseType type);
 
     /**
      * \brief Memory allocation required for libCoap.
