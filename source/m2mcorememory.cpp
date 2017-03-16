@@ -18,16 +18,11 @@
 #include "include/m2mcorememory.h"
 #include "include/m2mdynmemLIB.h"
 
+#ifdef M2M_TRACE_PRINTS
 int M2MCoreMemory::memTotal = 0;
 int M2MCoreMemory::memCount = 0;
-void * M2MCoreMemory::heap = 0;
+#endif
 void * M2MCoreMemory::heapPtr = 0;
-int M2MCoreMemory::referenceCount = 0;
-
-
-#define M2M_DYNMEM_LIB
-//#define M2M_PASSTHROUGH
-//#define M2M_TRACE_PRINTS
 
 #ifdef M2M_PASSTHROUGH
 #ifdef M2M_TRACE_PRINTS
@@ -40,17 +35,17 @@ int M2MCoreMemory::referenceCount = 0;
 #endif
 
 #ifdef M2M_DYNMEM_LIB
-static mem_stat_t memInfo;
-#endif
-static void memory_fail_callback(heap_fail_t fail) {
 #ifdef M2M_TRACE_PRINTS
+m2m_mem_stat_t M2MCoreMemory::memInfo;
+void M2MCoreMemory::memory_fail_callback(m2m_heap_fail_t fail) {
     printf("\nM2M memory failure: %u\n", fail);
-#endif
 }
+#endif
+#endif
 
 #ifdef M2M_DYNMEM_LIB
 
-/* nanostack dynmemlib based implementation */
+/* nanoservices dynmemlib based implementation */
 void * M2MCoreMemory::operator new (size_t size) {
     void *tmp;
     tmp=m2m_dyn_mem_alloc((uint8_t *)heapPtr, size);
@@ -91,43 +86,9 @@ void M2MCoreMemory::operator delete[] (void * ptr) {
 #endif
 }
 #endif
-#if 0
-/* own very simple only alloc alloc */
-void * M2MCoreMemory::operator new (size_t size) {
-    void *tmp;
-    size_t allocatedSize;
-    tmp=heapPtr;
-    allocatedSize=((size-1) / 8 + 1) * 8; /* "worst case" 64-bit alignment assumption */
-    heapPtr+=allocatedSize;
-    memTotal+=allocatedSize; memCount++;
-    printf("cn:%lu:%lu:%d:%d:%p:", size, allocatedSize, memTotal, memCount, tmp);
-    return tmp;
-}
-
-void M2MCoreMemory::operator delete (void * ptr) {
-    memCount--; /* still update allocation counter */
-    printf("cd:nop:%d", memCount);
-}
-
-void * M2MCoreMemory::operator new[] (size_t size) {
-    void *tmp;
-    size_t allocatedSize;
-    tmp=heapPtr;
-    allocatedSize=((size-1) / 8 + 1) * 8; /* "worst case" 64-bit alignment assumption */
-    heapPtr+=allocatedSize;
-    memTotal+=allocatedSize; memCount++;
-    printf("cn[]:%lu:%lu:%d:%d:%p:", size, allocatedSize, memTotal, memCount, tmp);
-    return tmp;
-}
-
-void M2MCoreMemory::operator delete[] (void * ptr) {
-    memCount--; /* still update allocation counter */
-    printf("cd[]:nop:%d", memCount);
-}
-#endif
 
 #ifdef M2M_PASSTHROUGH
-/* linux malloc based implementation */
+/* system malloc based implementation */
 void * M2MCoreMemory::operator new (size_t size) {
     void *tmp;
 #ifdef M2M_TRACE_PRINTS
@@ -178,12 +139,13 @@ void M2MCoreMemory::operator delete[] (void * ptr) {
 }
 #endif
 
+#ifdef M2M_DYNMEM_LIB
 void M2MCoreMemory::init(void) {
     init(M2M_DYNAMIC_MEMORY_HEAP_SIZE);
 }
 
 void M2MCoreMemory::init(size_t heapSize) {
-    heap=malloc( heapSize );
+    void *heap=malloc( heapSize );
 #ifdef M2M_TRACE_PRINTS
     printf("Init allocated %lu bytes for cloud client heap at %p\n", heapSize, heap);
 #endif
@@ -193,31 +155,30 @@ void M2MCoreMemory::init(size_t heapSize) {
 void M2MCoreMemory::init(void *heapAllocation, size_t heapSize) {
     heapSize=heapSize;
     heapPtr=heapAllocation;
-#ifdef M2M_DYNMEM_LIB
+#ifdef M2M_TRACE_PRINTS
     m2m_dyn_mem_init((uint8_t *)heapAllocation, (uint16_t)heapSize, &memory_fail_callback, &memInfo);
+#else
+    m2m_dyn_mem_init((uint8_t *)heapAllocation, (uint16_t)heapSize, NULL, NULL);
 #endif
 }
+#endif
 
-void M2MCoreMemory::print_heap_running_statistics() {
 #ifdef M2M_TRACE_PRINTS
+void M2MCoreMemory::print_heap_running_statistics() {
 #ifdef M2M_DYNMEM_LIB
     printf(":%d:%d:", memInfo.heap_sector_allocated_bytes, memInfo.heap_sector_alloc_cnt);
 #else
     printf(":%d:%d:", memTotal, memCount);
 #endif
-#endif
 }
 void M2MCoreMemory::print_heap_overall_statistics() {
-#ifdef M2M_TRACE_PRINTS
 #ifdef M2M_DYNMEM_LIB
     printf(":%d:%d:%u:%u:", memInfo.heap_sector_size,
         memInfo.heap_sector_allocated_bytes_max,
         memInfo.heap_alloc_total_bytes, memInfo.heap_alloc_fail_cnt);
-#else
-   // printf(":%lu:%lu:%d:%d:", size, allocatedSize, memTotal, memCount);
-#endif
 #endif
 }
+#endif
 
 void* M2MCoreMemory::memory_alloc(uint16_t size){
     void *tmp;

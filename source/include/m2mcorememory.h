@@ -18,6 +18,11 @@
 #define M2M_CORE_MEMORY_H
 
 #include <inttypes.h>
+#include "source/include/m2mdynmemLIB.h"
+
+#define M2M_DYNMEM_LIB
+//#define M2M_PASSTHROUGH
+//#define M2M_TRACE_PRINTS
 
 #define M2M_DYNAMIC_MEMORY_HEAP_SIZE 20000
 class M2MCoreMemory {
@@ -25,16 +30,21 @@ public:
     static int memTotal;
     static int memCount;
 
+#if (defined(M2M_DYNMEM_LIB)||defined(M2M_PASSTHROUGH))
     void * operator new (size_t size);
     void operator delete (void * ptr);
     void * operator new[] (size_t size);
     void operator delete[] (void * ptr);
-
+#endif
+#ifdef M2M_DYNMEM_LIB
     static void init(void);
     static void init(size_t size);
     static void init(void *heapAllocation, size_t size);
+#endif
+#ifdef M2M_TRACE_PRINTS
     static void print_heap_running_statistics(void);
     static void print_heap_overall_statistics(void);
+#endif
     static void *memory_alloc(uint16_t size);
     static void memory_free(void *ptr);
 
@@ -42,10 +52,13 @@ public:
 
 private:
 
-    static void * heap;
+#ifdef M2M_DYNMEM_LIB
     static void * heapPtr;
-    static size_t heapSize;
-    static int referenceCount;
+#ifdef M2M_TRACE_PRINTS
+    static m2m_mem_stat_t memInfo;
+    static void memory_fail_callback(m2m_heap_fail_t fail);
+#endif
+#endif
 };
 
 #endif
