@@ -147,26 +147,26 @@ public:
      * \param instance_id The instance ID of the resource to be removed, default is 0.
      * \return True if removed, else false.
      */
-    virtual bool remove_resource_instance(uint16_t instance_id = 0);
+    bool remove_resource_instance(uint16_t instance_id = 0);
 
     /**
      * \brief Returns a resource instance with a given name.
      * \param instance_id The instance ID of the requested resource, default is 0
      * \return M2MResourceInstance object if found, else NULL.
      */
-    virtual M2MResourceInstance* resource_instance(uint16_t instance_id = 0) const;
+    M2MResourceInstance* resource_instance(uint16_t instance_id = 0) const;
 
     /**
      * \brief Returns a list of resources.
      * \return A list of resources.
      */
-    virtual const M2MResourceInstanceList& resource_instances() const;
+    const M2MResourceInstanceList& resource_instances() const;
 
     /**
      * \brief Returns the total number of resources.
      * \return The total number of resources.
      */
-    virtual uint16_t resource_instance_count() const;
+    uint16_t resource_instance_count() const;
 
     /**
      * \brief Returns the value set for delayed response.
