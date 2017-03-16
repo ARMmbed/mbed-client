@@ -15,7 +15,7 @@
  */
 #include "include/nsdlaccesshelper.h"
 #include "include/m2mnsdlinterface.h"
-#include "include/m2mdynamicmemory.h"
+#include "include/m2mcorememory.h"
 
 #include <stdlib.h>
 
@@ -32,7 +32,7 @@ uint8_t __nsdl_c_callback(struct nsdl_s *nsdl_handle,
                                                      address, nsdl_capab);
         // Payload freeing must be done in app level if blockwise message
         if (received_coap_ptr->coap_status == COAP_STATUS_PARSER_BLOCKWISE_MSG_RECEIVED) {
-            M2MDynamicMemory::memory_free(received_coap_ptr->payload_ptr);
+            M2MCoreMemory::memory_free(received_coap_ptr->payload_ptr);
             received_coap_ptr->payload_ptr = NULL;
         }
     }
@@ -69,7 +69,7 @@ uint8_t __nsdl_c_received_from_server(struct nsdl_s * nsdl_handle,
         if (coap_header &&
                 coap_header->options_list_ptr &&
                 coap_header->options_list_ptr->block1 != -1) {
-            M2MDynamicMemory::memory_free(coap_header->payload_ptr);
+            M2MCoreMemory::memory_free(coap_header->payload_ptr);
             coap_header->payload_ptr = NULL;
         }
     }
