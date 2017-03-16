@@ -87,26 +87,26 @@ public:
      * \param instance_id The instance ID of the object instance to be removed, default is 0.
      * \return True if removed, else false.
      */
-    virtual bool remove_object_instance(uint16_t instance_id = 0);
+    bool remove_object_instance(uint16_t instance_id = 0);
 
     /**
      * \brief Returns the object instance with the the given instance ID.
      * \param instance_id The instance ID of the requested object instance ID, default is 0.
      * \return Object instance reference if found, else NULL.
      */
-    virtual M2MObjectInstance* object_instance(uint16_t instance_id = 0) const;
+    M2MObjectInstance* object_instance(uint16_t instance_id = 0) const;
 
     /**
      * \brief Returns a list of object instances.
      * \return A list of object instances.
      */
-    virtual const M2MObjectInstanceList& instances() const;
+    const M2MObjectInstanceList& instances() const;
 
     /**
      * \brief Returns the total number of object instances-
      * \return The total number of the object instances.
      */
-    virtual uint16_t instance_count() const;
+    uint16_t instance_count() const;
 
     /**
      * \brief Returns the object type.
@@ -167,7 +167,7 @@ public:
                                                bool &execute_value_updated,
                                                sn_nsdl_addr_s *address = NULL);
 
-    virtual void notification_update(uint16_t obj_instance_id);
+    void notification_update(uint16_t obj_instance_id);
 
 protected :
 
