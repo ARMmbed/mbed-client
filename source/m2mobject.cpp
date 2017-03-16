@@ -35,7 +35,8 @@ M2MObject::M2MObject(const String &object_name, char *path, bool external_blockw
 #endif
           path,
           external_blockwise_store,
-          false)
+          false),
+          _observation_handler(NULL)
 {
     M2MBase::set_base_type(M2MBase::Object);
     if(M2MBase::name_id() != -1) {
@@ -44,7 +45,8 @@ M2MObject::M2MObject(const String &object_name, char *path, bool external_blockw
 }
 
 M2MObject::M2MObject(const M2MBase::lwm2m_parameters_s* static_res)
-: M2MBase(static_res)
+: M2MBase(static_res),
+_observation_handler(NULL)
 {
     if(M2MBase::name_id() != -1) {
         M2MBase::set_coap_content_type(COAP_CONTENT_OMA_TLV_TYPE);
@@ -67,6 +69,8 @@ M2MObject::~M2MObject()
 
         _instance_list.clear();
     }
+
+    free_resources();
 }
 
 M2MObjectInstance* M2MObject::create_object_instance(uint16_t instance_id)
@@ -159,6 +163,18 @@ const M2MObjectInstanceList& M2MObject::instances() const
 uint16_t M2MObject::instance_count() const
 {
     return (uint16_t)_instance_list.size();
+}
+
+M2MObservationHandler* M2MObject::observation_handler() const
+{
+    // XXX: need to check the flag too
+    return _observation_handler;
+}
+
+void M2MObject::set_observation_handler(M2MObservationHandler *handler)
+{
+    tr_debug("M2MObject::set_observation_handler - handler: 0x%p", (void*)handler);
+    _observation_handler = handler;
 }
 
 void M2MObject::add_observation_level(M2MBase::Observation observation_level)
