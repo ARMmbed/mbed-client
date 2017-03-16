@@ -39,13 +39,13 @@ typedef enum {
     M2M_DYN_MEM_POINTER_NOT_VALID,       /**< ns_dyn_mem_free(), try to free pointer which not at heap sector */
     M2M_DYN_MEM_HEAP_SECTOR_CORRUPTED,   /**< Heap system detect sector corruption */
     M2M_DYN_MEM_HEAP_SECTOR_UNITIALIZED /**< ns_dyn_mem_free(), ns_dyn_mem_temporary_alloc() or ns_dyn_mem_alloc() called before ns_dyn_mem_init() */
-} heap_fail_t;
+} m2m_heap_fail_t;
 
 /**
  * /struct mem_stat_t
  * /brief Struct for Memory stats Buffer structure
  */
-typedef struct mem_stat_t {
+typedef struct m2m_mem_stat_t {
     /*Heap stats*/
     int16_t heap_sector_size;                   /**< Heap total Sector len. */
     int16_t heap_sector_alloc_cnt;              /**< Reserved Heap sector cnt. */
@@ -53,7 +53,7 @@ typedef struct mem_stat_t {
     int16_t heap_sector_allocated_bytes_max;    /**< Reserved Heap data in bytes max value. */
     uint32_t heap_alloc_total_bytes;            /**< Total Heap allocated bytes. */
     uint32_t heap_alloc_fail_cnt;               /**< Counter for Heap allocation fail. */
-} mem_stat_t;
+} m2m_mem_stat_t;
 
 /**
   * \brief Init and set Dynamical heap pointer and length.
@@ -62,7 +62,7 @@ typedef struct mem_stat_t {
   * \param heap_size size of the heap buffer
   * \return None
   */
-extern void m2m_dyn_mem_init(uint8_t *heap, uint16_t h_size, void (*passed_fptr)(heap_fail_t), mem_stat_t *info_ptr);
+extern void m2m_dyn_mem_init(uint8_t *heap, uint16_t h_size, void (*passed_fptr)(m2m_heap_fail_t), m2m_mem_stat_t *info_ptr);
 
 
 /**
@@ -111,7 +111,7 @@ extern void *m2m_dyn_mem_alloc(uint8_t *heap, int16_t alloc_size);
   * \return NULL, no mem_stat_t was given on initialization
   * \return !=0, Pointer to mem_stat_t.
   */
-extern const mem_stat_t *m2m_dyn_mem_get_mem_stat(uint8_t *heap);
+extern const m2m_mem_stat_t *m2m_dyn_mem_get_mem_stat(uint8_t *heap);
 
 #ifdef __cplusplus
 }
