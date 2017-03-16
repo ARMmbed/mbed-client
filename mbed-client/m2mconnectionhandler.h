@@ -94,9 +94,9 @@ public:
     * \param address_ptr The address structure to which the data needs to be sent.
     * \return True if data is sent successfully, else false.
     */
-    bool send_data(uint8_t *data_ptr,
+    bool send_data(const uint8_t *data_ptr,
                            uint16_t data_len,
-                           sn_nsdl_addr_s *address_ptr);
+                           const sn_nsdl_addr_s *address_ptr);
 
     /**
     * \brief Listens to the incoming data from a remote server.

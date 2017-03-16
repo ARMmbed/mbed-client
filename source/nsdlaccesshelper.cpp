@@ -21,7 +21,7 @@
 // callback function for NSDL library to call into
 uint8_t __nsdl_c_callback(struct nsdl_s *nsdl_handle,
                           sn_coap_hdr_s *received_coap_ptr,
-                          sn_nsdl_addr_s *address,
+                          const sn_nsdl_addr_s *address,
                           sn_nsdl_capab_e nsdl_capab)
 {
     uint8_t status = 0;
@@ -54,9 +54,9 @@ void __nsdl_c_memory_free(void *ptr)
 
 uint8_t __nsdl_c_send_to_server(struct nsdl_s * nsdl_handle,
                                 sn_nsdl_capab_e protocol,
-                                uint8_t *data_ptr,
+                                const uint8_t *data_ptr,
                                 uint16_t data_len,
-                                sn_nsdl_addr_s *address_ptr)
+                                const sn_nsdl_addr_s *address_ptr)
 {
     uint8_t status = 0;
     M2MNsdlInterface *interface = (M2MNsdlInterface*)sn_nsdl_get_context(nsdl_handle);
@@ -70,7 +70,7 @@ uint8_t __nsdl_c_send_to_server(struct nsdl_s * nsdl_handle,
 
 uint8_t __nsdl_c_received_from_server(struct nsdl_s * nsdl_handle,
                                       sn_coap_hdr_s *coap_header,
-                                      sn_nsdl_addr_s *address_ptr)
+                                      const sn_nsdl_addr_s *address_ptr)
 {
     uint8_t status = 0;
     M2MNsdlInterface *interface = (M2MNsdlInterface*)sn_nsdl_get_context(nsdl_handle);

@@ -46,7 +46,6 @@ M2MResource::M2MResource(M2MObjectInstance &parent,
     M2MBase::set_base_type(M2MBase::Resource);
     M2MBase::set_operation(M2MBase::GET_ALLOWED);
     M2MBase::set_observable(false);
-
 }
 
 M2MResource::M2MResource(M2MObjectInstance &parent,
@@ -482,7 +481,7 @@ sn_coap_hdr_s* M2MResource::handle_post_request(nsdl_s *nsdl,
                                                 sn_coap_hdr_s *received_coap_header,
                                                 M2MObservationHandler */*observation_handler*/,
                                                 bool &/*execute_value_updated*/,
-                                                sn_nsdl_addr_s *address)
+                                                const sn_nsdl_addr_s *address)
 {
     tr_debug("M2MResource::handle_post_request()");
     sn_coap_msg_code_e msg_code = COAP_MSG_CODE_RESPONSE_CHANGED; // 2.04

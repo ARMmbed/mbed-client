@@ -37,9 +37,9 @@ public :
     * @param data_len, Length of the data object.
     * @param address_ptr, Address structure of the server.
     */
-    virtual void coap_message_ready(uint8_t *data_ptr,
+    virtual void coap_message_ready(const uint8_t *data_ptr,
                                     uint16_t data_len,
-                                    sn_nsdl_addr_s *address_ptr) = 0;
+                                    const sn_nsdl_addr_s *address_ptr) = 0;
 
     /**
     * @brief Informs that client is registered successfully.

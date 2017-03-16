@@ -94,9 +94,9 @@ void M2MInterfaceImpl::set_entropy_callback(entropy_cb)
 
 }
 
-void M2MInterfaceImpl::coap_message_ready(uint8_t *,
+void M2MInterfaceImpl::coap_message_ready(const uint8_t *,
                                 uint16_t ,
-                                sn_nsdl_addr_s *)
+                                const sn_nsdl_addr_s *)
 {
 
 }

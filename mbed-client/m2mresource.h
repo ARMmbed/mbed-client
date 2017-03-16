@@ -230,7 +230,7 @@ public:
                                                sn_coap_hdr_s *received_coap_header,
                                                M2MObservationHandler *observation_handler,
                                                bool &execute_value_updated,
-                                               sn_nsdl_addr_s *address = NULL);
+                                               const sn_nsdl_addr_s *address = NULL);
 
     M2MObjectInstance& get_parent_object_instance() const;
 

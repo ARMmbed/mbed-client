@@ -161,9 +161,9 @@ public:
     */
     uint8_t send_to_server_callback(struct nsdl_s * nsdl_handle,
                                     sn_nsdl_capab_e protocol,
-                                    uint8_t *data,
+                                    const uint8_t *data,
                                     uint16_t data_len,
-                                    sn_nsdl_addr_s *address);
+                                    const sn_nsdl_addr_s *address);
 
     /**
     * @brief Callback from nsdl library to inform the data which is
@@ -175,7 +175,7 @@ public:
     */
     uint8_t received_from_server_callback(struct nsdl_s * nsdl_handle,
                                           sn_coap_hdr_s *coap_header,
-                                          sn_nsdl_addr_s *address);
+                                          const sn_nsdl_addr_s *address);
 
     /**
     * @brief Callback from nsdl library to inform the data which is
@@ -187,7 +187,7 @@ public:
     * @return 1 if successful else 0.
     */
     uint8_t resource_callback(struct nsdl_s *nsdl_handle, sn_coap_hdr_s *coap,
-                               sn_nsdl_addr_s *address,
+                               const sn_nsdl_addr_s *address,
                                sn_nsdl_capab_e nsdl_capab);
 
     /**
@@ -325,21 +325,21 @@ private:
      * @param coap_header, Received CoAP message
      * @param address, Server address
     */
-    void handle_bootstrap_put_message(sn_coap_hdr_s *coap_header, sn_nsdl_addr_s *address);
+    void handle_bootstrap_put_message(sn_coap_hdr_s *coap_header, const sn_nsdl_addr_s *address);
 
     /**
      * @brief Handle bootstrap finished message.
      * @param coap_header, Received CoAP message
      * @param address, Server address
     */
-    void handle_bootstrap_finished(sn_coap_hdr_s *coap_header,sn_nsdl_addr_s *address);
+    void handle_bootstrap_finished(sn_coap_hdr_s *coap_header, const sn_nsdl_addr_s *address);
 
     /**
      * @brief Handle bootstrap delete message.
      * @param coap_header, Received CoAP message
      * @param address, Server address
     */
-    void handle_bootstrap_delete(sn_coap_hdr_s *coap_header,sn_nsdl_addr_s *address);
+    void handle_bootstrap_delete(sn_coap_hdr_s *coap_header, const sn_nsdl_addr_s *address);
 
     /**
      * @brief Parse bootstrap TLV message.

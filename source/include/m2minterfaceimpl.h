@@ -183,9 +183,9 @@ public:
 
 protected: // From M2MNsdlObserver
 
-    virtual void coap_message_ready(uint8_t *data_ptr,
+    virtual void coap_message_ready(const uint8_t *data_ptr,
                                     uint16_t data_len,
-                                    sn_nsdl_addr_s *address_ptr);
+                                    const sn_nsdl_addr_s *address_ptr);
 
     virtual void client_registered(M2MServer *server_object);
 

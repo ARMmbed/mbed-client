@@ -332,9 +332,9 @@ uint8_t* M2MNsdlInterface::alloc_string_copy(const uint8_t* source, uint16_t siz
 
 uint8_t M2MNsdlInterface::send_to_server_callback(struct nsdl_s * /*nsdl_handle*/,
                                                   sn_nsdl_capab_e /*protocol*/,
-                                                  uint8_t *data_ptr,
+                                                  const uint8_t *data_ptr,
                                                   uint16_t data_len,
-                                                  sn_nsdl_addr_s *address)
+                                                  const sn_nsdl_addr_s *address)
 {
     tr_debug("M2MNsdlInterface::send_to_server_callback()");
     _observer.coap_message_ready(data_ptr,data_len,address);
@@ -343,7 +343,7 @@ uint8_t M2MNsdlInterface::send_to_server_callback(struct nsdl_s * /*nsdl_handle*
 
 uint8_t M2MNsdlInterface::received_from_server_callback(struct nsdl_s *nsdl_handle,
                                                         sn_coap_hdr_s *coap_header,
-                                                        sn_nsdl_addr_s *address)
+                                                        const sn_nsdl_addr_s *address)
 {
     _observer.coap_data_processed();
     uint8_t value = 0;
@@ -574,7 +574,7 @@ uint8_t M2MNsdlInterface::received_from_server_callback(struct nsdl_s *nsdl_hand
 
 uint8_t M2MNsdlInterface::resource_callback(struct nsdl_s */*nsdl_handle*/,
                                             sn_coap_hdr_s *received_coap_header,
-                                            sn_nsdl_addr_s *address,
+                                            const sn_nsdl_addr_s *address,
                                             sn_nsdl_capab_e /*nsdl_capab*/)
 {
     tr_debug("M2MNsdlInterface::resource_callback()");
@@ -1340,7 +1340,7 @@ nsdl_s * M2MNsdlInterface::get_nsdl_handle()
 }
 
 void M2MNsdlInterface::handle_bootstrap_put_message(sn_coap_hdr_s *coap_header,
-                                                sn_nsdl_addr_s *address) {
+                                                const sn_nsdl_addr_s *address) {
 #ifndef M2M_CLIENT_DISABLE_BOOTSTRAP_FEATURE
     tr_debug("M2MNsdlInterface::handle_bootstrap_message");
     uint8_t response_code = COAP_MSG_CODE_RESPONSE_CHANGED;
@@ -1495,7 +1495,7 @@ bool M2MNsdlInterface::parse_bootstrap_message(sn_coap_hdr_s *coap_header, bool 
 #endif
 }
 
-void M2MNsdlInterface::handle_bootstrap_finished(sn_coap_hdr_s *coap_header,sn_nsdl_addr_s *address)
+void M2MNsdlInterface::handle_bootstrap_finished(sn_coap_hdr_s *coap_header, const sn_nsdl_addr_s *address)
 {
 #ifndef M2M_CLIENT_DISABLE_BOOTSTRAP_FEATURE
     String object_name = coap_to_string(coap_header->uri_path_ptr,
@@ -1541,7 +1541,7 @@ void M2MNsdlInterface::handle_bootstrap_finished(sn_coap_hdr_s *coap_header,sn_n
 #endif
 }
 
-void M2MNsdlInterface::handle_bootstrap_delete(sn_coap_hdr_s *coap_header,sn_nsdl_addr_s *address)
+void M2MNsdlInterface::handle_bootstrap_delete(sn_coap_hdr_s *coap_header, const sn_nsdl_addr_s *address)
 {
 #ifndef M2M_CLIENT_DISABLE_BOOTSTRAP_FEATURE
     sn_coap_hdr_s *coap_response = NULL;

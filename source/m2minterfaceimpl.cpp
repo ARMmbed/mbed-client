@@ -269,9 +269,9 @@ void M2MInterfaceImpl::set_platform_network_handler(void *handler)
     _connection_handler.set_platform_network_handler(handler);
 }
 
-void M2MInterfaceImpl::coap_message_ready(uint8_t *data_ptr,
+void M2MInterfaceImpl::coap_message_ready(const uint8_t *data_ptr,
                                           uint16_t data_len,
-                                          sn_nsdl_addr_s *address_ptr)
+                                          const sn_nsdl_addr_s *address_ptr)
 {
     tr_debug("M2MInterfaceImpl::coap_message_ready");
     if (_current_state != STATE_IDLE) {

@@ -615,7 +615,7 @@ sn_coap_hdr_s* M2MObjectInstance::handle_post_request(nsdl_s *nsdl,
                                                       sn_coap_hdr_s *received_coap_header,
                                                       M2MObservationHandler *observation_handler,
                                                       bool &execute_value_updated,
-                                                      sn_nsdl_addr_s *)
+                                                      const sn_nsdl_addr_s *)
 {
     tr_debug("M2MObjectInstance::handle_post_request()");
     sn_coap_msg_code_e msg_code = COAP_MSG_CODE_RESPONSE_CHANGED; // 2.04
