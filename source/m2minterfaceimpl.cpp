@@ -839,7 +839,18 @@ void M2MInterfaceImpl::state_update_registration(EventData *data)
         }
         lifetime = event->_lifetime;
     }
-    _nsdl_interface.send_update_registration(lifetime);
+
+    bool success = _nsdl_interface.send_update_registration(lifetime);
+    if(!success) {
+        if(_reconnection_state == M2MInterfaceImpl::WithUpdate) {
+            _reconnection_state = M2MInterfaceImpl::FullRegistration;
+            if(!_nsdl_interface.send_register_message()) {
+                tr_error("M2MInterfaceImpl::state_update_registration : M2MInterface::InvalidParameters");
+                internal_event(STATE_IDLE);
+                _observer.error(M2MInterface::InvalidParameters);
+            }
+        }
+    }
 }
 
 void M2MInterfaceImpl::state_unregister( EventData */*data*/)
