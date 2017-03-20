@@ -116,3 +116,8 @@ TEST(M2MFirmware, set_resource_notification_sent_callback)
     m2m_firmware->test_set_resource_notification_sent_callback();
 }
 
+TEST(M2MFirmware, set_package_block_message_callback)
+{
+    m2m_firmware->test_set_package_block_message_callback();
+}
+

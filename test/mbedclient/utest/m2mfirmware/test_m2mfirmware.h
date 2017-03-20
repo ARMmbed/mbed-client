@@ -59,6 +59,8 @@ public:
 
     void test_set_resource_notification_sent_callback();
 
+    void test_set_package_block_message_callback();
+
     M2MFirmware* firmware;
 };
 
