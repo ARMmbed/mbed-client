@@ -1071,7 +1071,7 @@ M2MBase* M2MNsdlInterface::find_resource(const M2MObjectInstance *object_instanc
                     uint32_t stored_token_length = 0;
                     tr_debug("M2MNsdlInterface::find_resource(resource level) - in token (%.*s)", token_len, token);
                     (*it)->get_observation_token(stored_token, stored_token_length);
-                    tr_debug("M2MNsdlInterface::find_resource(resource level) - stored token (%.*s)", stored_token_length, stored_token);
+                    tr_debug("M2MNsdlInterface::find_resource(resource level) - stored token (%s)", tr_array(stored_token, stored_token_length));
                     if (stored_token) {
                         if (stored_token_length == token_len &&
                                 memcmp(token, stored_token, token_len) == 0) {
