@@ -438,3 +438,83 @@ void Test_M2MFirmware::test_resource_name()
     STRCMP_EQUAL(firmware->resource_name(M2MFirmware::PackageName), "6");
     STRCMP_EQUAL(firmware->resource_name(M2MFirmware::PackageVersion), "7");
 }
+
+void Test_M2MFirmware::test_set_update_execute_callback()
+{
+    m2mresourceinstance_stub::bool_value = true;
+
+    m2mobjectinstance_stub::resource = new M2MResource(*m2mobject_stub::inst,
+                                                       "name",
+                                                       "type",
+                                                       M2MResourceInstance::STRING,
+                                                       false,
+                                                       "name");
+
+    CHECK(firmware->set_update_execute_callback(NULL) == true);
+
+    delete m2mobjectinstance_stub::resource;
+    m2mobjectinstance_stub::resource = NULL;
+
+    CHECK(firmware->set_update_execute_callback(NULL) == false);
+
+}
+
+void Test_M2MFirmware::test_set_resource_value_update_callback()
+{
+    m2mresourceinstance_stub::bool_value = true;
+
+    m2mobjectinstance_stub::resource = new M2MResource(*m2mobject_stub::inst,
+                                                       "name",
+                                                       "type",
+                                                       M2MResourceInstance::STRING,
+                                                       false,
+                                                       "name");
+
+    CHECK(firmware->set_resource_value_update_callback(M2MFirmware::PackageUri, NULL) == true);
+
+    delete m2mobjectinstance_stub::resource;
+    m2mobjectinstance_stub::resource = NULL;
+
+    CHECK(firmware->set_resource_value_update_callback(M2MFirmware::PackageUri, NULL) == false);
+
+}
+
+void Test_M2MFirmware::test_set_resource_notification_sent_callback()
+{
+    m2mresourceinstance_stub::bool_value = true;
+
+    m2mobjectinstance_stub::resource = new M2MResource(*m2mobject_stub::inst,
+                                                       "name",
+                                                       "type",
+                                                       M2MResourceInstance::STRING,
+                                                       false,
+                                                       "name");
+
+    CHECK(firmware->set_resource_notification_sent_callback(M2MFirmware::PackageUri, NULL) == true);
+
+    delete m2mobjectinstance_stub::resource;
+    m2mobjectinstance_stub::resource = NULL;
+
+    CHECK(firmware->set_resource_notification_sent_callback(M2MFirmware::PackageUri, NULL) == false);
+
+}
+
+void Test_M2MFirmware::test_set_package_block_message_callback()
+{
+    m2mresourceinstance_stub::bool_value = true;
+
+    m2mobjectinstance_stub::resource = new M2MResource(*m2mobject_stub::inst,
+                                                       "name",
+                                                       "type",
+                                                       M2MResourceInstance::STRING,
+                                                       false,
+                                                       "name");
+
+    CHECK(firmware->set_package_block_message_callback(NULL) == true);
+
+    delete m2mobjectinstance_stub::resource;
+    m2mobjectinstance_stub::resource = NULL;
+
+    CHECK(firmware->set_package_block_message_callback(NULL) == false);
+
+}

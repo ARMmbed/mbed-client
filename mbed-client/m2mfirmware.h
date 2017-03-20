@@ -210,6 +210,41 @@ public:
      */
     uint16_t per_resource_count(FirmwareResource resource) const;
 
+    /**
+     * \brief Set update resource execute callback function. This is called when update resource
+     *        receives POST command
+     * \param callback The function pointer that is called.
+     * \return True if successfully set, else false.
+     */
+    bool set_update_execute_callback(execute_callback callback);
+
+    /**
+     * \brief Set resource value update callback function. This is called when resource value
+     *        is updated.
+     * \param resource The resource enum.
+     * \param callback The function pointer that is called.
+     * \return True if successfully set, else false.
+     */
+    bool set_resource_value_update_callback(FirmwareResource resource,
+                                            value_updated_callback callback);
+
+    /**
+     * \brief Sets the callback function that is executed when this object receives
+     *        response(Empty ACK) for notification message
+     * \param resource The resource enum.
+     * \param callback The function pointer that is called.
+     * \return True if successfully set, else false.
+     */
+    bool set_resource_notification_sent_callback(FirmwareResource resource,
+                                                 notification_sent_callback_2 callback);
+
+    /**
+     * \brief Set incoming_block_message_callback for the package resource.
+     *        The callback will be called when a block of the package has been received.
+     * \param callback The function pointer to be called.
+     * \return true if successfully set, else false.
+     */
+    bool set_package_block_message_callback(incoming_block_message_callback callback);
 
 private:
 
