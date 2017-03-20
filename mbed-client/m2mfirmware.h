@@ -213,7 +213,7 @@ public:
     /**
      * \brief Set update resource execute callback function. This is called when update resource
      *        receives POST command
-     * \param callback The function pointer is called.
+     * \param callback The function pointer that is called.
      * \return True if successfully set, else false.
      */
     bool set_update_execute_callback(execute_callback callback);
@@ -237,6 +237,14 @@ public:
      */
     bool set_resource_notification_sent_callback(FirmwareResource resource,
                                                  notification_sent_callback_2 callback);
+
+    /**
+     * \brief Set incoming_block_message_callback for the package resource.
+     *        The callback will be called when a block of the package has been received.
+     * \param callback The function pointer to be called.
+     * \return true if successfully set, else false.
+     */
+    bool set_package_block_message_callback(incoming_block_message_callback callback);
 
 private:
 

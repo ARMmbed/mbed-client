@@ -646,4 +646,17 @@ bool M2MFirmware::set_resource_notification_sent_callback(FirmwareResource resou
     return false;
 }
 
+bool M2MFirmware::set_package_block_message_callback(incoming_block_message_callback callback)
+{
+    M2MResource* m2mresource;
+
+    m2mresource = get_resource(Package);
+
+    if(m2mresource) {
+        m2mresource->set_incoming_block_message_callback(callback);
+        return true;
+    }
+
+    return false;
+}
 
