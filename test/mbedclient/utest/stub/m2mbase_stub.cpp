@@ -322,7 +322,7 @@ uint8_t* M2MBase::alloc_copy(const uint8_t* source, uint32_t size)
     return result;
 }
 
-M2MReportHandler* M2MBase::report_handler()
+M2MReportHandler* M2MBase::report_handler() const
 {
     return m2mbase_stub::report;
 }
