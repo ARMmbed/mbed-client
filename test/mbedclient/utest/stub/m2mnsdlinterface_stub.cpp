@@ -73,10 +73,14 @@ bool M2MNsdlInterface::create_bootstrap_resource(sn_nsdl_addr_s *, const String&
     return m2mnsdlinterface_stub::bool_value;
 }
 
-bool M2MNsdlInterface::send_register_message(uint8_t*,
+void M2MNsdlInterface::set_server_address(uint8_t*,
                                              uint8_t,
                                              const uint16_t,
                                              sn_nsdl_addr_type_e)
+{
+}
+
+bool M2MNsdlInterface::send_register_message()
 {
     return m2mnsdlinterface_stub::bool_value;
 }

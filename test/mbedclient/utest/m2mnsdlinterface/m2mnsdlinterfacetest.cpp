@@ -57,6 +57,11 @@ TEST(M2MNsdlInterface, send_update_registration)
     m2m_nsdl_interface->test_send_update_registration();
 }
 
+TEST(M2MNsdlInterface, set_server_address)
+{
+    m2m_nsdl_interface->test_set_server_address();
+}
+
 TEST(M2MNsdlInterface, send_register_message)
 {
     m2m_nsdl_interface->test_send_register_message();
