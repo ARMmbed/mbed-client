@@ -191,13 +191,11 @@ void M2MReportHandler::timer_expired(M2MTimerObserver::Type type)
     switch(type) {
         case M2MTimerObserver::PMinTimer: {
             tr_debug("M2MReportHandler::timer_expired - PMIN");
+            _pmin_exceeded = true;
             if (_notify ||
                     (_pmin > 0 &&
                      (_attribute_state & M2MReportHandler::Pmax) != M2MReportHandler::Pmax)){
                 report();
-            }
-            else{
-                _pmin_exceeded = true;
             }
         }
         break;
@@ -298,7 +296,11 @@ void M2MReportHandler::report()
 {
     tr_debug("M2MReportHandler::report()");
     if(_current_value != _last_value && _notify) {
-        tr_debug("M2MReportHandler::report()- send with PMIN");
+        if (_pmin_exceeded) {
+            tr_debug("M2MReportHandler::report()- send with PMIN expiration");
+        } else {
+            tr_debug("M2MReportHandler::report()- send with VALUE change");
+        }
         _pmin_exceeded = false;
         _pmax_exceeded = false;
         _notify = false;
@@ -308,7 +310,7 @@ void M2MReportHandler::report()
     }
     else {
         if (_pmax_exceeded) {
-            tr_debug("M2MReportHandler::report()- send with PMAX");
+            tr_debug("M2MReportHandler::report()- send with PMAX expiration");
             _observer.observation_to_be_sent(_changed_instance_ids, true);
             _changed_instance_ids.clear();
         }
