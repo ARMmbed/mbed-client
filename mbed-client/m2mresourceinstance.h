@@ -127,12 +127,6 @@ private: // Constructor and destructor are private
 public:
 
     /**
-     * \brief Returns the object type.
-     * \return BaseType.
-     */
-    virtual M2MBase::BaseType base_type() const;
-
-    /**
      * \brief Returns the resource data type.
      * \return ResourceType.
      */
