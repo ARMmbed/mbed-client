@@ -51,6 +51,7 @@
 
 #define BUFFER_SIZE 21
 #define TRACE_GROUP "mClt"
+#define MAX_QUERY_COUNT 10
 
 M2MNsdlInterface::M2MNsdlInterface(M2MNsdlObserver &observer, M2MConnectionHandler &connection_handler)
 : _observer(observer),
@@ -240,7 +241,7 @@ bool M2MNsdlInterface::create_bootstrap_resource(sn_nsdl_addr_s *address)
                 if (query != NULL) {
                     int param_count = query_param_count(query);
                     if (param_count) {
-                        char* uri_query_params[param_count];
+                        char* uri_query_params[MAX_QUERY_COUNT];
                         if (uri_query_parameters(query, uri_query_params)) {
                             msg_sent = true;
                             _bootstrap_id = sn_nsdl_oma_bootstrap(_nsdl_handle,
@@ -1739,7 +1740,7 @@ bool M2MNsdlInterface::parse_and_send_uri_query_parameters()
         if (query != NULL) {
             int param_count = query_param_count(query);
             if (param_count) {
-                char* uri_query_params[param_count];
+                char* uri_query_params[MAX_QUERY_COUNT];
                 if (uri_query_parameters(query, uri_query_params)) {
                     msg_sent = sn_nsdl_register_endpoint(_nsdl_handle,_endpoint,uri_query_params, param_count) != 0;
                 }
