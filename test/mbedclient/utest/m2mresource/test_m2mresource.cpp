@@ -29,7 +29,7 @@ class TestReportObserver :  public M2MReportObserver{
 public :
     TestReportObserver() {}
     ~TestReportObserver() {}
-    void observation_to_be_sent(m2m::Vector<uint16_t>,bool){ }
+    virtual void observation_to_be_sent(const m2m::Vector<uint16_t>&,bool){ }
 };
 
 class Handler : public M2MObservationHandler {
@@ -38,7 +38,7 @@ public:
 
     Handler(){}
     ~Handler(){}
-    void observation_to_be_sent(M2MBase *, uint16_t,m2m::Vector<uint16_t>,bool){
+    virtual void observation_to_be_sent(M2MBase *, uint16_t, const m2m::Vector<uint16_t>&,bool){
         visited = true;
     }
     void send_delayed_response(M2MBase *){}

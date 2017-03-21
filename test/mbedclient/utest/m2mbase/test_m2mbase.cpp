@@ -45,7 +45,7 @@ public:
     Observer(){}
     ~Observer(){}
 
-    void observation_to_be_sent(m2m::Vector<uint16_t>,bool){}
+    virtual void observation_to_be_sent(const m2m::Vector<uint16_t>&,bool){}
 };
 
 Test_M2MBase::Test_M2MBase(char* path, Handler *handler)

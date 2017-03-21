@@ -451,12 +451,12 @@ bool M2MBase::handle_observation_attribute(const char *query)
     return success;
 }
 
-void M2MBase::observation_to_be_sent(m2m::Vector<uint16_t> changed_instance_ids, bool send_object)
+void M2MBase::observation_to_be_sent(const m2m::Vector<uint16_t> &changed_instance_ids, bool send_object)
 {
     //TODO: Move this to M2MResourceInstance
     if(_observation_handler) {
-       _observation_number++;
-       _observation_handler->observation_to_be_sent(this,
+        _observation_number++;
+        _observation_handler->observation_to_be_sent(this,
                                                     _observation_number,
                                                     changed_instance_ids,
                                                     send_object);

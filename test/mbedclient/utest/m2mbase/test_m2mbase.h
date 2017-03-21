@@ -24,7 +24,7 @@ public:
 
     Handler() : visited(false) {}
     ~Handler(){}
-    void observation_to_be_sent(M2MBase *, uint16_t, m2m::Vector<uint16_t>, bool){
+    virtual void observation_to_be_sent(M2MBase *, uint16_t, const m2m::Vector<uint16_t>&, bool){
         visited = true;
     }
     void send_delayed_response(M2MBase *){}

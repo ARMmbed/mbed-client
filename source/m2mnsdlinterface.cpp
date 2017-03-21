@@ -698,7 +698,7 @@ void M2MNsdlInterface::timer_expired(M2MTimerObserver::Type type)
 
 void M2MNsdlInterface::observation_to_be_sent(M2MBase *object,
                                               uint16_t obs_number,
-                                              m2m::Vector<uint16_t> changed_instance_ids,
+                                              const m2m::Vector<uint16_t> &changed_instance_ids,
                                               bool send_object)
 {
     claim_mutex();
@@ -1184,7 +1184,7 @@ M2MInterface::Error M2MNsdlInterface::interface_error(sn_coap_hdr_s *coap_header
 
 void M2MNsdlInterface::send_object_observation(M2MObject *object,
                                                uint16_t obs_number,
-                                               m2m::Vector<uint16_t> changed_instance_ids,
+                                               const m2m::Vector<uint16_t> &changed_instance_ids,
                                                bool send_object)
 {
     tr_debug("M2MNsdlInterface::send_object_observation");
