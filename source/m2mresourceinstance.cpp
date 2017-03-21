@@ -135,11 +135,6 @@ M2MResourceInstance::~M2MResourceInstance()
 #endif
 }
 
-M2MBase::BaseType M2MResourceInstance::base_type() const
-{
-    return M2MBase::base_type();
-}
-
 M2MResourceInstance::ResourceType M2MResourceInstance::resource_instance_type() const
 {
     M2MBase::lwm2m_parameters_s* param = M2MBase::get_lwm2m_parameters();

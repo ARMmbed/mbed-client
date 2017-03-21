@@ -292,7 +292,7 @@ public:
      * \brief Returns the object type.
      * \return The base type of the object.
      */
-    virtual M2MBase::BaseType base_type() const;
+    M2MBase::BaseType base_type() const;
 
     /**
      * \brief Returns the operation type of the object.
