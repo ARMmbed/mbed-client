@@ -17,6 +17,7 @@
 #define M2M_RESOURCE_H
 
 #include "mbed-client/m2mvector.h"
+#include "mbed-client/m2mresourcebase.h"
 #include "mbed-client/m2mresourceinstance.h"
 
 //FORWARD DECLARATION
@@ -30,7 +31,7 @@ typedef Vector<M2MResourceInstance *> M2MResourceInstanceList;
  *  instances associated with the given object.
  */
 
-class M2MResource : public M2MResourceInstance {
+class M2MResource : public M2MResourceBase {
 
     friend class M2MObjectInstance;
 
@@ -235,11 +236,18 @@ public:
     M2MObjectInstance& get_parent_object_instance() const;
 
     /**
+     * \brief Returns the instance ID of the object where the resource exists.
+     * \return Object instance ID.
+    */
+    virtual uint16_t object_instance_id() const;
+
+    /**
      * \brief Returns the name of the object where the resource exists.
      * \return Object name.
     */
     virtual const char* object_name() const;
 
+    virtual M2MResource& get_parent_resource() const;
 private:
     M2MObjectInstance &_parent;
 

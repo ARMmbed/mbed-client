@@ -112,31 +112,6 @@ public:
 
 
     /**
-     * \brief Handles the GET request for the registered objects.
-     * \param nsdl An NSDL handler for the CoAP library.
-     * \param received_coap_header The CoAP message received from the server.
-     * \param observation_handler A handler object for sending
-     * observation callbacks.
-     * \return sn_coap_hdr_s The message that needs to be sent to the server.
-     */
-    virtual sn_coap_hdr_s* handle_get_request(nsdl_s *nsdl,
-                                              sn_coap_hdr_s *received_coap_header,
-                                              M2MObservationHandler *observation_handler = NULL);
-    /**
-     * \brief Handles the PUT request for the registered objects.
-     * \param nsdl An NSDL handler for the CoAP library.
-     * \param received_coap_header The CoAP message received from the server.
-     * \param observation_handler A handler object for sending
-     * observation callbacks.
-     * \param execute_value_updated True will execute the "value_updated" callback.
-     * \return sn_coap_hdr_s The message that needs to be sent to the server.
-     */
-    virtual sn_coap_hdr_s* handle_put_request(nsdl_s *nsdl,
-                                              sn_coap_hdr_s *received_coap_header,
-                                              M2MObservationHandler *observation_handler,
-                                              bool &execute_value_updated);
-
-    /**
      * \brief Returns the instance ID of the object where the resource exists.
      * \return Object instance ID.
     */
