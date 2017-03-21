@@ -208,6 +208,17 @@ public:
      */
     ServerType server_type() const;
 
+    /**
+     * \brief Enable checking of certificate expiration based on device object when using this security object
+     */
+    void set_verify_cert_expiration(bool verify);
+
+    /**
+     * \brief Returns whether certificate expiration should be checked when using this security object
+     * \return True when certificate expiration should be checked, false otherwise.
+     */
+    bool verify_cert_expiration() const;
+
 private:
 
     M2MResource* get_resource(SecurityResource resource) const;
@@ -217,6 +228,7 @@ private:
 
     M2MObjectInstance*    _server_instance;
     ServerType            _server_type;
+    bool                  _verify_cert_expiration;
 
     friend class Test_M2MSecurity;
     friend class Test_M2MInterfaceImpl;

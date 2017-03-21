@@ -1691,6 +1691,9 @@ bool M2MNsdlInterface::validate_security_object()
             return false;
         }
     }
+    else {
+        tr_error("No security object to validate!");
+    }
     return false;
 #else
     return false;
