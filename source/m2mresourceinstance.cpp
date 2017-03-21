@@ -34,19 +34,14 @@ M2MResourceInstance::M2MResourceInstance(M2MResource &parent,
                                          char* path,
                                          bool external_blockwise_store,
                                          bool multiple_instance)
-: M2MBase(res_name,
-          M2MBase::Dynamic,
-#ifndef DISABLE_RESOURCE_TYPE
+: M2MResourceBase(res_name,
           resource_type,
-#endif
+          type,
           path,
           external_blockwise_store,
-          multiple_instance,
-          type),
+          multiple_instance
+          ),
  _parent_resource(parent)
-#ifndef DISABLE_BLOCK_MESSAGE
- ,_block_message_data(NULL)
-#endif
 {
     M2MBase::set_base_type(M2MBase::ResourceInstance);
 }
@@ -60,47 +55,23 @@ M2MResourceInstance::M2MResourceInstance(M2MResource &parent,
                                          char* path,
                                          bool external_blockwise_store,
                                          bool multiple_instance)
-: M2MBase(res_name,
-          M2MBase::Static,
-#ifndef DISABLE_RESOURCE_TYPE
+: M2MResourceBase(res_name,
           resource_type,
-#endif
+          type,
           path,
           external_blockwise_store,
-          multiple_instance,
-          type),
+          multiple_instance),
  _parent_resource(parent)
-#ifndef DISABLE_BLOCK_MESSAGE
- ,_block_message_data(NULL)
-#endif
 {
+    // XXX: isn't the base type wrong?
     M2MBase::set_base_type(M2MBase::Resource);
-    if (mode() == M2MBase::Dynamic) {
-        if( value != NULL && value_length > 0 ) {
-            sn_nsdl_dynamic_resource_parameters_s* res = get_nsdl_resource();
-            res->resource = alloc_string_copy(value, value_length);
-            res->resourcelen = value_length;
-        }
-    }
-    // Copy resource value to struct since static resources are handled in mbed-client-c
-    else if (mode() == M2MBase::Static) {
-       sn_nsdl_dynamic_resource_parameters_s* res = get_nsdl_resource();
-        res->resource = alloc_string_copy(value, value_length);
-        res->resourcelen = value_length;
-    }
-    else {
-        // Directory, not supported
-    }
 }
 
 M2MResourceInstance::M2MResourceInstance(M2MResource &parent,
                                          const lwm2m_parameters_s* s,
-                                         M2MBase::DataType /*type*/)
-: M2MBase(s),
+                                         M2MBase::DataType type)
+: M2MResourceBase(s, type),
   _parent_resource(parent)
-#ifndef DISABLE_BLOCK_MESSAGE
-  ,_block_message_data(NULL)
-#endif
 {
     //TBD: put to flash, or parse from the uri_path!!!!
     //same for the _object_instance_id.
@@ -109,38 +80,8 @@ M2MResourceInstance::M2MResourceInstance(M2MResource &parent,
 
 M2MResourceInstance::~M2MResourceInstance()
 {
-    execute_callback* callback = (execute_callback*)M2MCallbackStorage::remove_callback(*this,
-                                    M2MCallbackAssociation::M2MResourceInstanceExecuteCallback);
-    delete callback;
-
-    M2MCallbackStorage::remove_callback(*this, M2MCallbackAssociation::M2MResourceInstanceExecuteCallback2);
-#ifndef DISABLE_BLOCK_MESSAGE
-    incoming_block_message_callback *in_callback = (incoming_block_message_callback*)M2MCallbackStorage::remove_callback(*this,
-                                                        M2MCallbackAssociation::M2MResourceInstanceIncomingBlockMessageCallback);
-    delete in_callback;
-
-    outgoing_block_message_callback *out_callback = (outgoing_block_message_callback*)M2MCallbackStorage::remove_callback(*this,
-                                                        M2MCallbackAssociation::M2MResourceInstanceOutgoingBlockMessageCallback);
-    delete out_callback;
-#endif
-
-    notification_sent_callback *notif_callback = (notification_sent_callback*)M2MCallbackStorage::remove_callback(*this,
-                                                        M2MCallbackAssociation::M2MResourceInstanceNotificationSentCallback);
-    delete notif_callback;
-
-    M2MCallbackStorage::remove_callback(*this, M2MCallbackAssociation::M2MResourceInstanceNotificationSentCallback2);
-
-#ifndef DISABLE_BLOCK_MESSAGE
-    delete _block_message_data;
-#endif
 }
 
-M2MResourceInstance::ResourceType M2MResourceInstance::resource_instance_type() const
-{
-    M2MBase::lwm2m_parameters_s* param = M2MBase::get_lwm2m_parameters();
-    M2MBase::DataType type = param->data_type;
-    return convert_data_type(type);
-}
 
 bool M2MResourceInstance::handle_observation_attribute(const char *query)
 {
@@ -166,214 +107,9 @@ bool M2MResourceInstance::handle_observation_attribute(const char *query)
     return success;
 }
 
-bool M2MResourceInstance::set_execute_function(execute_callback callback)
-{
-    execute_callback* old_callback = (execute_callback*)M2MCallbackStorage::remove_callback(*this, M2MCallbackAssociation::M2MResourceInstanceExecuteCallback);
-    delete old_callback;
-    // XXX: create a copy of the copy of callback object. Perhaps it would better to
-    // give a reference as parameter and just store that, as it would save some memory.
-    execute_callback* new_callback = new execute_callback(callback);
 
-    return M2MCallbackStorage::add_callback(*this, new_callback, M2MCallbackAssociation::M2MResourceInstanceExecuteCallback);
-}
 
-bool M2MResourceInstance::set_execute_function(execute_callback_2 callback)
-{
-    M2MCallbackStorage::remove_callback(*this, M2MCallbackAssociation::M2MResourceInstanceExecuteCallback2);
 
-    return M2MCallbackStorage::add_callback(*this, (void*)callback, M2MCallbackAssociation::M2MResourceInstanceExecuteCallback2);
-}
-
-void M2MResourceInstance::clear_value()
-{
-    tr_debug("M2MResourceInstance::clear_value");
-    sn_nsdl_dynamic_resource_parameters_s* res = get_nsdl_resource();
-    free(res->resource);
-    res->resource = NULL;
-    res->resourcelen = 0;
-
-    report();
-}
-
-bool M2MResourceInstance::set_value(int64_t value)
-{
-    bool success;
-    // max len of "-9223372036854775808" plus zero termination
-    char buffer[20+1];
-    uint32_t size = m2m::itoa_c(value, buffer);
-
-    success = set_value((const uint8_t*)buffer, size);
-
-    return success;
-}
-
-bool M2MResourceInstance::set_value(const uint8_t *value,
-                                    const uint32_t value_length)
-{
-    tr_debug("M2MResourceInstance::set_value()");
-    bool success = false;
-    bool value_changed = false;
-    if(is_value_changed(value,value_length)) {
-        value_changed = true;
-    }
-    if( value != NULL && value_length > 0 ) {
-        success = true;
-
-        sn_nsdl_dynamic_resource_parameters_s* res = get_nsdl_resource();
-        free(res->resource);
-        res->resource = NULL;
-        res->resourcelen = 0;
-
-        res->resource = alloc_string_copy(value, value_length);
-        if(res->resource) {
-            res->resourcelen = value_length;
-            if( value_changed ) { //
-                if (resource_instance_type() == M2MResourceInstance::STRING) {
-                    M2MReportHandler *report_handler = M2MBase::report_handler();
-                    if(report_handler && is_under_observation()) {
-                        report_handler->set_notification_trigger();
-                    }
-                }
-                else {
-                    report();
-                }
-            }
-        }
-    }
-    return success;
-}
-
-void M2MResourceInstance::report()
-{
-    tr_debug("M2MResourceInstance::report()");
-    M2MBase::Observation  observation_level = M2MBase::observation_level();
-    tr_debug("M2MResourceInstance::report() - level %d", observation_level);
-    if((M2MBase::O_Attribute & observation_level) == M2MBase::O_Attribute ||
-       (M2MBase::OI_Attribute & observation_level) == M2MBase::OI_Attribute) {
-        tr_debug("M2MResourceInstance::report() -- object/instance level");
-        M2MObjectInstance& object_instance = get_parent_resource().get_parent_object_instance();
-        object_instance.notification_update(observation_level);
-    }
-
-    if(M2MBase::Dynamic == mode() &&
-       (M2MBase::R_Attribute & observation_level) == M2MBase::R_Attribute) {
-        tr_debug("M2MResourceInstance::report() - resource level");
-        if(resource_instance_type() != M2MResourceInstance::STRING) {
-            M2MReportHandler *report_handler = M2MBase::report_handler();
-            if (report_handler && is_observable()) {
-                sn_nsdl_dynamic_resource_parameters_s* res = get_nsdl_resource();    
-                if(res->resource) {
-                    report_handler->set_value(atof((const char*)res->resource));
-                } else {
-                    report_handler->set_value(0);
-                }
-            }
-        }
-        else {
-            if (base_type() == M2MBase::ResourceInstance) {
-                M2MReportHandler *report_handler = _parent_resource.report_handler();
-                if(report_handler && _parent_resource.is_observable()) {
-                    report_handler->set_notification_trigger(_parent_resource.get_parent_object_instance().instance_id());
-                }
-            }
-        }
-    } else if(M2MBase::Static == mode()) {
-        M2MObservationHandler *observation_handler = M2MBase::observation_handler();
-        if(observation_handler) {
-            observation_handler->value_updated(this);
-        }
-    } else {
-        tr_debug("M2MResourceInstance::report() - mode = %d, is_observable = %d", mode(), is_observable());
-    }
-}
-
-bool M2MResourceInstance::is_value_changed(const uint8_t* value, const uint32_t value_len)
-{
-    bool changed = false;
-    sn_nsdl_dynamic_resource_parameters_s* res = get_nsdl_resource();
-
-    if(value_len != res->resourcelen) {
-        changed = true;
-    } else if(value && !res->resource) {
-        changed = true;
-    } else if(res->resource && !value) {
-        changed = true;
-    } else {
-        if (res->resource) {
-            if (strcmp((char*)value, (char*)res->resource) != 0) {
-                changed = true;
-            }
-        }
-    }
-    tr_debug("M2MResourceInstance::is_value_changed() -- %s", changed ? "true" : "false");
-    return changed;
-}
-
-void M2MResourceInstance::execute(void *arguments)
-{
-    tr_debug("M2MResourceInstance::execute");
-    execute_callback* callback = (execute_callback*)M2MCallbackStorage::get_callback(*this, M2MCallbackAssociation::M2MResourceInstanceExecuteCallback);
-
-    if (callback) {
-        (*callback)(arguments);
-    }
-
-    execute_callback_2 callback2 = (execute_callback_2)M2MCallbackStorage::get_callback(*this, M2MCallbackAssociation::M2MResourceInstanceExecuteCallback2);
-    if (callback2) {
-        (*callback2)(arguments);
-    }
-}
-
-void M2MResourceInstance::get_value(uint8_t *&value, uint32_t &value_length)
-{
-    value_length = 0;
-    if(value) {
-        free(value);
-        value = NULL;
-    }
-    sn_nsdl_dynamic_resource_parameters_s* res = get_nsdl_resource();
-    if(res->resource && res->resourcelen > 0) {
-        value = alloc_string_copy(res->resource, res->resourcelen);
-        if(value) {
-            value_length = res->resourcelen;
-        }
-    }
-}
-
-int M2MResourceInstance::get_value_int()
-{
-    int value_int = 0;
-    // Get the value and convert it into integer. This is not the most
-    // efficient way, as it takes pointless heap copy to get the zero termination.
-    uint8_t* buffer = NULL;
-    uint32_t length;
-    get_value(buffer,length);
-    if(buffer) {
-        value_int = atoi((const char*)buffer);
-        free(buffer);
-    }
-    return value_int;
-}
-
-String M2MResourceInstance::get_value_string() const
-{
-    // XXX: do a better constructor to avoid pointless malloc
-    String value;
-    if (get_nsdl_resource()->resource) {
-        value.append_raw((char*)get_nsdl_resource()->resource, get_nsdl_resource()->resourcelen);
-    }
-    return value;
-}
-
-uint8_t* M2MResourceInstance::value() const
-{
-    return get_nsdl_resource()->resource;
-}
-
-uint32_t M2MResourceInstance::value_length() const
-{   
-    return get_nsdl_resource()->resourcelen;
-}
 
 sn_coap_hdr_s* M2MResourceInstance::handle_get_request(nsdl_s *nsdl,
                                                sn_coap_hdr_s *received_coap_header,
@@ -569,71 +305,6 @@ uint16_t M2MResourceInstance::object_instance_id() const
     return parent_object_instance.instance_id();
 }
 
-#ifndef DISABLE_BLOCK_MESSAGE
-
-M2MBlockMessage* M2MResourceInstance::block_message() const
-{
-    return _block_message_data;
-}
-
-bool M2MResourceInstance::set_incoming_block_message_callback(incoming_block_message_callback callback)
-{
-    incoming_block_message_callback* old_callback = (incoming_block_message_callback*)M2MCallbackStorage::remove_callback(*this,
-                                                        M2MCallbackAssociation::M2MResourceInstanceIncomingBlockMessageCallback);
-    delete old_callback;
-
-    // copy the callback object. This will change on next version to be a direct pointer to a interface class,
-    // this FPn<> is just too heavy for this usage.
-    incoming_block_message_callback* new_callback = new incoming_block_message_callback(callback);
-
-    delete _block_message_data;
-    _block_message_data = NULL;
-    _block_message_data = new M2MBlockMessage();
-
-    return M2MCallbackStorage::add_callback(*this, new_callback, M2MCallbackAssociation::M2MResourceInstanceIncomingBlockMessageCallback);
-}
-
-bool M2MResourceInstance::set_outgoing_block_message_callback(outgoing_block_message_callback callback)
-{
-    outgoing_block_message_callback *old_callback = (outgoing_block_message_callback*)M2MCallbackStorage::remove_callback(*this,
-                                                         M2MCallbackAssociation::M2MResourceInstanceOutgoingBlockMessageCallback);
-    delete old_callback;
-
-    outgoing_block_message_callback *new_callback = new outgoing_block_message_callback(callback);
-    return M2MCallbackStorage::add_callback(*this, new_callback, M2MCallbackAssociation::M2MResourceInstanceOutgoingBlockMessageCallback);
-}
-#endif
-
-bool M2MResourceInstance::set_notification_sent_callback(notification_sent_callback callback)
-{
-    notification_sent_callback *old_callback = (notification_sent_callback*)M2MCallbackStorage::remove_callback(*this,
-                                                         M2MCallbackAssociation::M2MResourceInstanceNotificationSentCallback);
-    delete old_callback;
-
-    notification_sent_callback *new_callback = new notification_sent_callback(callback);
-    return M2MCallbackStorage::add_callback(*this, new_callback, M2MCallbackAssociation::M2MResourceInstanceNotificationSentCallback);
-}
-
-bool M2MResourceInstance::set_notification_sent_callback(notification_sent_callback_2 callback)
-{
-    M2MCallbackStorage::remove_callback(*this, M2MCallbackAssociation::M2MResourceInstanceNotificationSentCallback2);
-
-    return M2MCallbackStorage::add_callback(*this, (void*)callback, M2MCallbackAssociation::M2MResourceInstanceNotificationSentCallback2);
-}
-
-void M2MResourceInstance::notification_sent()
-{
-    // Now we will call both callbacks, if they are set. This is different from original behavior.
-    notification_sent_callback* callback = (notification_sent_callback*)M2MCallbackStorage::get_callback(*this, M2MCallbackAssociation::M2MResourceInstanceNotificationSentCallback);
-    if (callback) {
-        (*callback)();
-    }
-
-    notification_sent_callback_2 callback2 = (notification_sent_callback_2)M2MCallbackStorage::get_callback(*this, M2MCallbackAssociation::M2MResourceInstanceNotificationSentCallback2);
-    if (callback2) {
-        (*callback2)();
-    }
-}
 
 M2MResource& M2MResourceInstance::get_parent_resource() const
 {
@@ -648,31 +319,3 @@ const char* M2MResourceInstance::object_name() const
     return parent_object.name();
 }
 
-M2MResourceInstance::ResourceType M2MResourceInstance::convert_data_type(M2MBase::DataType type) const
-{
-    M2MResourceInstance::ResourceType res_type = M2MResourceInstance::OBJLINK;
-    switch(type) {
-        case M2MBase::STRING:
-            res_type = M2MResourceInstance::STRING;
-            break;
-        case M2MBase::INTEGER:
-            res_type = M2MResourceInstance::INTEGER;
-            break;
-        case M2MBase::FLOAT:
-            res_type = M2MResourceInstance::FLOAT;
-            break;
-        case M2MBase::OPAQUE:
-            res_type = M2MResourceInstance::OPAQUE;
-            break;
-        case M2MBase::BOOLEAN:
-            res_type = M2MResourceInstance::BOOLEAN;
-            break;
-        case M2MBase::TIME:
-            res_type = M2MResourceInstance::TIME;
-            break;
-        case M2MBase::OBJLINK:
-            res_type = M2MResourceInstance::OBJLINK;
-            break;
-    }
-    return res_type;
-}

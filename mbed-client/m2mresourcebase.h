@@ -1,4 +1,4 @@
-    /*
+/*
  * Copyright (c) 2015 ARM Limited. All rights reserved.
  * SPDX-License-Identifier: Apache-2.0
  * Licensed under the Apache License, Version 2.0 (the License); you may
@@ -13,8 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef M2M_RESOURCE_INSTANCE_H
-#define M2M_RESOURCE_INSTANCE_H
+#ifndef M2M_RESOURCE_BASE_H
+#define M2M_RESOURCE_BASE_H
 
 #include "mbed-client/m2mbase.h"
 #include "mbed-client/functionpointer.h"
@@ -40,10 +40,11 @@ typedef FP3<void, const String &, uint8_t *&, uint32_t &> outgoing_block_message
 
 class M2MResource;
 
-class M2MResourceInstance : public M2MBase {
+class M2MResourceBase : public M2MBase {
 
 friend class M2MObjectInstance;
 friend class M2MResource;
+friend class M2MResourceInstance;
 
 public:
 
@@ -62,11 +63,11 @@ public:
     }ResourceType;
 
 
-private: // Constructor and destructor are private
+protected: // Constructor and destructor are private
          // which means that these objects can be created or
          // deleted only through a function provided by the M2MObjectInstance.
 
-    M2MResourceInstance(M2MResource &parent,
+    M2MResourceBase(
                         const lwm2m_parameters_s* s,
                         M2MBase::DataType type);
     /**
@@ -79,7 +80,7 @@ private: // Constructor and destructor are private
      * \param external_blockwise_store If true CoAP blocks are passed to application through callbacks
      *        otherwise handled in mbed-client-c.
      */
-    M2MResourceInstance(M2MResource &parent,
+    M2MResourceBase(
                         const String &resource_name,
                         const String &resource_type,
                         M2MBase::DataType type,
@@ -100,7 +101,7 @@ private: // Constructor and destructor are private
      * \param external_blockwise_store If true CoAP blocks are passed to application through callbacks
      *        otherwise handled in mbed-client-c.
      */
-    M2MResourceInstance(M2MResource &parent,
+    M2MResourceBase(
                         const String &resource_name,
                         const String &resource_type,
                         M2MBase::DataType type,
@@ -111,18 +112,18 @@ private: // Constructor and destructor are private
                         bool multiple_instance);
 
     // Prevents the use of default constructor.
-    M2MResourceInstance();
+    M2MResourceBase();
 
     // Prevents the use of assignment operator.
-    M2MResourceInstance& operator=( const M2MResourceInstance& /*other*/ );
+    M2MResourceBase& operator=( const M2MResourceBase& /*other*/ );
 
     // Prevents the use of copy constructor
-    M2MResourceInstance( const M2MResourceInstance& /*other*/ );
+    M2MResourceBase( const M2MResourceBase& /*other*/ );
 
     /**
      * Destructor
      */
-    virtual ~M2MResourceInstance();
+    virtual ~M2MResourceBase();
 
 public:
 
@@ -130,14 +131,7 @@ public:
      * \brief Returns the resource data type.
      * \return ResourceType.
      */
-    M2MResourceInstance::ResourceType resource_instance_type() const;
-
-    /**
-     * \brief Parses the received query for a notification
-     * attribute.
-     * \return True if required attributes are present, else false.
-     */
-    virtual bool handle_observation_attribute(const char *query);
+    M2MResourceBase::ResourceType resource_instance_type() const;
 
     /**
      * \brief Sets the function that should be executed when this
@@ -214,41 +208,18 @@ public:
     uint32_t value_length() const;
 
     /**
-     * \brief Handles the GET request for the registered objects.
-     * \param nsdl An NSDL handler for the CoAP library.
-     * \param received_coap_header The CoAP message received from the server.
-     * \param observation_handler A handler object for sending
-     * observation callbacks.
-     * \return sn_coap_hdr_s The message that needs to be sent to the server.
-     */
-    virtual sn_coap_hdr_s* handle_get_request(nsdl_s *nsdl,
-                                              sn_coap_hdr_s *received_coap_header,
-                                              M2MObservationHandler *observation_handler = NULL);
-    /**
-     * \brief Handles the PUT request for the registered objects.
-     * \param nsdl An NSDL handler for the CoAP library.
-     * \param received_coap_header The CoAP message received from the server.
-     * \param observation_handler A handler object for sending
-     * observation callbacks.
-     * \param execute_value_updated True will execute the "value_updated" callback.
-     * \return sn_coap_hdr_s The message that needs to be sent to the server.
-     */
-    virtual sn_coap_hdr_s* handle_put_request(nsdl_s *nsdl,
-                                              sn_coap_hdr_s *received_coap_header,
-                                              M2MObservationHandler *observation_handler,
-                                              bool &execute_value_updated);
-
-    /**
      * \brief Returns the instance ID of the object where the resource exists.
      * \return Object instance ID.
     */
-    uint16_t object_instance_id() const;
+    virtual uint16_t object_instance_id() const = 0;
 
     /**
      * \brief Returns the name of the object where the resource exists.
      * \return Object name.
     */
-    virtual const char* object_name() const;
+    virtual const char* object_name() const = 0;
+
+    virtual M2MResource& get_parent_resource() const = 0;
 
 #ifndef DISABLE_BLOCK_MESSAGE
     /**
@@ -294,7 +265,6 @@ public:
      */
     void notification_sent();
 
-    M2MResource& get_parent_resource() const;
 
 private:
 
@@ -302,13 +272,10 @@ private:
 
     bool is_value_changed(const uint8_t* value, const uint32_t value_len);
 
-    M2MResourceInstance::ResourceType convert_data_type(M2MBase::DataType type) const;
+    M2MResourceBase::ResourceType convert_data_type(M2MBase::DataType type) const;
 
 private:
 
-    // XXX: since the M2MResource is inherited from this class, the resource actually has back
-    // pointer to itself. If this inheritance was broken, we could save some memory.
-    M2MResource &_parent_resource;
 
 #ifndef DISABLE_BLOCK_MESSAGE
     M2MBlockMessage                         *_block_message_data;
@@ -327,4 +294,4 @@ private:
     friend class Test_M2MTLVDeserializer;
 };
 
-#endif // M2M_RESOURCE_INSTANCE_H
+#endif // M2M_RESOURCE_BASE_H
