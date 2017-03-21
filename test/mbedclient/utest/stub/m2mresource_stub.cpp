@@ -40,32 +40,34 @@ void m2mresource_stub::clear()
 M2MResource::M2MResource(M2MObjectInstance &parent,
                          const String &resource_name,
                          const String &resource_type,
-                         M2MResourceInstance::ResourceType type,
+                         M2MBase::DataType type,
                          const uint8_t *value,
                          const uint8_t value_length,
-                         char* path,
+                         char *path,
                          bool multiple_instance,
                          bool external_blockwise_store)
-: M2MResourceInstance(*this, resource_name, resource_type, type, value, value_length, 
-                      path, external_blockwise_store),
-  _parent(parent),
-  _delayed_token(NULL),
+: M2MResourceInstance(*this, resource_name, resource_type, type, value, value_length,
+                      path, external_blockwise_store, multiple_instance),
+  _parent(parent)
+#ifndef DISABLE_DELAYED_RESPONSE
+  ,_delayed_token(NULL),
   _delayed_token_len(0),
-  _has_multiple_instances(multiple_instance),
   _delayed_response(false)
+#endif
 {
 
 }
 
 M2MResource::M2MResource(M2MObjectInstance &parent,
                          const lwm2m_parameters_s* s,
-                          M2MResourceInstance::ResourceType type)
+                          M2MBase::DataType type)
 : M2MResourceInstance(*this, s, type),
-  _parent(parent),
-  _delayed_token(NULL),
+  _parent(parent)
+#ifndef DISABLE_DELAYED_RESPONSE
+  ,_delayed_token(NULL),
   _delayed_token_len(0),
-  _has_multiple_instances(false),
   _delayed_response(false)
+#endif
 {
     // tbd: _has_multiple_instances could be in flash, but no real benefit, because of current alignment.
 }
@@ -73,18 +75,20 @@ M2MResource::M2MResource(M2MObjectInstance &parent,
 M2MResource::M2MResource(M2MObjectInstance &parent,
                          const String &resource_name,
                          const String &resource_type,
-                         M2MResourceInstance::ResourceType type,
+                         M2MBase::DataType type,
                          bool observable,
                          char *path,
                          bool multiple_instance,
                          bool external_blockwise_store)
 : M2MResourceInstance(*this, resource_name, resource_type, type,
-                      path, external_blockwise_store),
-  _parent(parent),
-  _delayed_token(NULL),
+                      path,
+                      external_blockwise_store,multiple_instance),
+  _parent(parent)
+#ifndef DISABLE_DELAYED_RESPONSE
+  ,_delayed_token(NULL),
   _delayed_token_len(0),
-  _has_multiple_instances(multiple_instance),
   _delayed_response(false)
+#endif
 {
 
 }
@@ -146,10 +150,6 @@ void M2MResource::add_observation_level(M2MBase::Observation)
 }
 
 void M2MResource::remove_observation_level(M2MBase::Observation)
-{
-}
-
-void M2MResource::notification_update()
 {
 }
 

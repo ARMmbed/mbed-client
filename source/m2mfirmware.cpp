@@ -681,6 +681,7 @@ bool M2MFirmware::set_resource_notification_sent_callback(FirmwareResource resou
     return false;
 }
 
+#ifndef DISABLE_BLOCK_MESSAGE
 bool M2MFirmware::set_package_block_message_callback(incoming_block_message_callback callback)
 {
     M2MResource* m2mresource;
@@ -694,4 +695,5 @@ bool M2MFirmware::set_package_block_message_callback(incoming_block_message_call
 
     return false;
 }
+#endif
 

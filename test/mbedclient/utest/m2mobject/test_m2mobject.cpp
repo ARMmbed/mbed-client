@@ -28,7 +28,7 @@ class TestReportObserver :  public M2MReportObserver{
 public :
     TestReportObserver() {}
     ~TestReportObserver() {}
-    virtual void observation_to_be_sent(const m2m::Vector<uint16_t>&,bool){ }
+    virtual void observation_to_be_sent(const m2m::Vector<uint16_t>&, uint16_t, bool){ }
 };
 
 class Handler : public M2MObservationHandler {

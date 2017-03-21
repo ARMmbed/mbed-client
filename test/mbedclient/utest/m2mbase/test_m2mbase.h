@@ -61,21 +61,21 @@ public:
 
     void test_set_observable();
 
-    void test_add_observation_level();
+//    void test_add_observation_level();
 
-    void test_remove_observation_level();
+//    void test_remove_observation_level();
 
-    void test_set_under_observation();
+//    void test_set_under_observation();
 
-    void test_set_observation_token();
+//    void test_set_observation_token();
 
-    void test_observation_level();
+//    void test_observation_level();
 
-    void test_get_observation_token();
+//    void test_get_observation_token();
 
     void test_mode();
 
-    void test_observation_number();
+//    void test_observation_number();
 
     void test_name();
 
@@ -85,9 +85,9 @@ public:
 
     void test_base_type();
 
-    void test_handle_observation_attribute();
+   // void test_handle_observation_attribute();
 
-    void test_observation_to_be_sent();
+//    void test_observation_to_be_sent();
 
     void test_handle_get_request();
 
@@ -111,7 +111,7 @@ public:
 
     void test_set_max_age();
 
-    void test_is_under_observation();
+    //void test_is_under_observation();
 
     void test_value_updated_function();
 

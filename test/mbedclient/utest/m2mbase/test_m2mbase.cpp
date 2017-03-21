@@ -49,8 +49,14 @@ public:
 };
 
 Test_M2MBase::Test_M2MBase(char* path, Handler *handler)
-    : M2MBase("name",M2MBase::Dynamic, "type", path, false)
-
+    : M2MBase("a",
+     M2MBase::Static,
+#ifndef DISABLE_RESOURCE_TYPE
+     "type",
+#endif
+     "a",
+     false,
+     false)
 {
     obsHandler = handler;
 }
@@ -129,7 +135,7 @@ void Test_M2MBase::test_set_observable()
     CHECK(test == this->is_observable());
 }
 
-void Test_M2MBase::test_add_observation_level()
+/*void Test_M2MBase::test_add_observation_level()
 {
     add_observation_level(M2MBase::R_Attribute);
     CHECK(M2MBase::R_Attribute == this->_observation_level);
@@ -213,20 +219,20 @@ void Test_M2MBase::test_get_observation_token()
     CHECK(out_size == 6);
 
     free(out_value);
-}
+}*/
 
 void Test_M2MBase::test_mode()
 {
     CHECK(M2MBase::Dynamic == mode());
 }
 
-void Test_M2MBase::test_observation_number()
+/*void Test_M2MBase::test_observation_number()
 {
     u_int8_t test = 1;
     this->_observation_number = test;
 
     CHECK(test == observation_number());
-}
+}*/
 
 void Test_M2MBase::test_name()
 {
@@ -242,7 +248,7 @@ void Test_M2MBase::test_name_id()
     CHECK(id == name_id());
 }
 
-void Test_M2MBase::test_handle_observation_attribute()
+/*void Test_M2MBase::test_handle_observation_attribute()
 {
     char *s = "wrong";
     bool ret = handle_observation_attribute(s);
@@ -277,7 +283,7 @@ void Test_M2MBase::test_observation_to_be_sent()
     set_under_observation(test,obsHandler);
     observation_to_be_sent(list);
     CHECK(obsHandler->visited == true);
-}
+}*/
 
 void Test_M2MBase::test_handle_get_request()
 {
@@ -326,14 +332,29 @@ void Test_M2MBase::test_id_number()
 {
     char* path = (char*)malloc(3);
     strcpy(path, "10");
-    M2MBase* b = new M2MBase("10", M2MBase::Static, "", path, false);
+    M2MBase* b = new M2MBase("10",
+                 M2MBase::Static,
+#ifndef DISABLE_RESOURCE_TYPE                 
+                 "",
+#endif 
+                path,
+                false,
+                false);
+
     CHECK(b->name_id() == 10);
     delete b;
 
     char* path1 = (char*)malloc(6);
     strcpy(path1, "66567");
 
-    M2MBase * test1 = new M2MBase("66567",M2MBase::Static, "", path1, false);
+    M2MBase * test1 = new M2MBase("66567",
+                      M2MBase::Static,
+#ifndef DISABLE_RESOURCE_TYPE 
+                      "",
+#endif
+                      path1,
+                      false,
+                      false);
     CHECK(test1->name_id() == -1);
     delete test1;
 }
@@ -344,11 +365,11 @@ void Test_M2MBase::test_set_register_uri()
     CHECK(this->register_uri() == false);
 }
 
-void Test_M2MBase::test_set_observation_number()
+/*void Test_M2MBase::test_set_observation_number()
 {
     set_observation_number(0);
     CHECK(0 == this->_observation_number);
-}
+}*/
 
 void Test_M2MBase::test_set_max_age()
 {
@@ -356,12 +377,12 @@ void Test_M2MBase::test_set_max_age()
     CHECK(this->max_age() == 10000);
 }
 
-void Test_M2MBase::test_is_under_observation()
+/*void Test_M2MBase::test_is_under_observation()
 {
     CHECK(false == is_under_observation());
     this->_is_under_observation = true;
     CHECK(true == is_under_observation());
-}
+}*/
 
 void Test_M2MBase::test_value_updated_function()
 {
@@ -458,7 +479,7 @@ void Test_M2MBase::test_create_path()
     M2MResource* res = new M2MResource(*m2mresource_stub::object_instance,
                                        "resource",
                                        "type",
-                                       M2MResourceInstance::INTEGER,
+                                       M2MBase::INTEGER,
                                        false,
                                        path3);
 
@@ -525,10 +546,10 @@ void Test_M2MBase::test_ctor()
 #ifndef DISABLE_INTERFACE_DESCRIPTION
         (char*)"",                     // interface_description_ptr
 #endif
-        (uint8_t*)"",    // path
-        (uint8_t*)"",           // resource
-        0,                      // pathlen
-        0,                      // resourcelen
+        (char*)"",    // path
+//        (uint8_t*)"",           // resource
+//        0,                      // pathlen
+//        0,                      // resourcelen
         false,                  // external_memory_block
         SN_GRS_DYNAMIC,         // mode
         false                   // free_on_delete
@@ -537,7 +558,9 @@ void Test_M2MBase::test_ctor()
     static sn_nsdl_dynamic_resource_parameters_s params_dynamic = {
         __nsdl_c_callback,
         &params_static,
+        (uint8_t*)"",           // resource
         {NULL, NULL},                     // link
+        0,                      // resourcelen
         0, // coap_content_type
         M2MBase::PUT_ALLOWED,   // access
         0,                      // registered
@@ -553,6 +576,8 @@ void Test_M2MBase::test_ctor()
         (char*)"", // name
         &params_dynamic,
         M2MBase::Resource, // base_type
+        M2MBase::OBJLINK, // data_type
+        false,// multiple_instance 
         false // free_on_delete
     };
     M2MBase* base = new M2MBase(&params);

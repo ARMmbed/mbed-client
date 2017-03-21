@@ -197,12 +197,12 @@ void Test_M2MNsdlInterface::test_create_nsdl_list_structure()
     M2MResource* create_resource = new M2MResource(*instance,
                                                    *name,
                                                    *name,
-                                                   M2MResourceInstance::INTEGER,
+                                                   M2MBase::INTEGER,
                                                    false,
                                                    "name");
 
     M2MResourceInstance* res_instance = new M2MResourceInstance(*create_resource, *name, *name,
-                                       M2MResourceInstance::INTEGER, (char*)name->c_str(), false);
+                                       M2MBase::INTEGER, (char*)name->c_str(), false, false);
 
     m2mobject_stub::instance_list.clear();
     m2mobject_stub::instance_list.push_back(instance);
@@ -597,13 +597,13 @@ void Test_M2MNsdlInterface::test_received_from_server_callback()
             (sn_nsdl_dynamic_resource_parameters_s*) malloc(sizeof(sn_nsdl_dynamic_resource_parameters_s));
     m2mbase_stub::nsdl_resource->static_resource_parameters =
             (sn_nsdl_static_resource_parameters_s*) malloc(sizeof(sn_nsdl_static_resource_parameters_s));
-    m2mbase_stub::nsdl_resource->static_resource_parameters->path = (uint8_t*)malloc(5);
+    m2mbase_stub::nsdl_resource->static_resource_parameters->path = (char*)malloc(5);
     m2mbase_stub::nsdl_resource->static_resource_parameters->path[0] = 'n';
     m2mbase_stub::nsdl_resource->static_resource_parameters->path[1] = 'a';
     m2mbase_stub::nsdl_resource->static_resource_parameters->path[2] = 'm';
     m2mbase_stub::nsdl_resource->static_resource_parameters->path[3] = 'e';
     m2mbase_stub::nsdl_resource->static_resource_parameters->path[4] = '\0';
-    m2mbase_stub::nsdl_resource->static_resource_parameters->pathlen = 5;
+ //   m2mbase_stub::nsdl_resource->static_resource_parameters->pathlen = 5;
 
     nsdl->_object_list.push_back(obj);
 
@@ -685,7 +685,7 @@ void Test_M2MNsdlInterface::test_received_from_server_callback()
     coap_header->token_ptr = token;
     coap_header->token_len = 4;
 
-    M2MResource res2(*m2mobject_stub::inst, "test","test",M2MResourceInstance::STRING,false, "test");
+    M2MResource res2(*m2mobject_stub::inst, "test","test",M2MBase::STRING,false, "test");
     m2mbase_stub::object_token = token;
     m2mbase_stub::object_token_len = 4;
     m2mobject_stub::base_type = M2MBase::Resource;
@@ -735,10 +735,10 @@ void Test_M2MNsdlInterface::test_received_from_server_callback()
     uint8_t security[] = {"0"};
     coap_header->uri_path_ptr = security;
     coap_header->uri_path_len = sizeof(security);
-    M2MResource res(*m2mobject_stub::inst,"test","test",M2MResourceInstance::STRING,false,"test");
+    M2MResource res(*m2mobject_stub::inst,"test","test",M2MBase::STRING,false,"test");
     m2mobjectinstance_stub::resource_list.push_back(&res);
     observer->boot_error = false;
-    m2msecurity_stub::resource = new M2MResource(*m2mobject_stub::inst,"1","type",M2MResourceInstance::STRING,false,"1");
+    m2msecurity_stub::resource = new M2MResource(*m2mobject_stub::inst,"1","type",M2MBase::STRING,false,"1");
     CHECK(0 == nsdl->received_from_server_callback(handle,coap_header,address));
     CHECK(observer->boot_error == true);
 
@@ -1024,13 +1024,13 @@ void Test_M2MNsdlInterface::test_resource_callback()
             (sn_nsdl_dynamic_resource_parameters_s*) malloc(sizeof(sn_nsdl_dynamic_resource_parameters_s));
     m2mbase_stub::nsdl_resource->static_resource_parameters =
             (sn_nsdl_static_resource_parameters_s*) malloc(sizeof(sn_nsdl_static_resource_parameters_s));
-    m2mbase_stub::nsdl_resource->static_resource_parameters->path = (uint8_t*)malloc(5);
+    m2mbase_stub::nsdl_resource->static_resource_parameters->path = (char*)malloc(5);
     m2mbase_stub::nsdl_resource->static_resource_parameters->path[0] = 'n';
     m2mbase_stub::nsdl_resource->static_resource_parameters->path[1] = 'a';
     m2mbase_stub::nsdl_resource->static_resource_parameters->path[2] = 'm';
     m2mbase_stub::nsdl_resource->static_resource_parameters->path[3] = 'e';
     m2mbase_stub::nsdl_resource->static_resource_parameters->path[4] = '\0';
-    m2mbase_stub::nsdl_resource->static_resource_parameters->pathlen = 5;
+//    m2mbase_stub::nsdl_resource->static_resource_parameters->pathlen = 5;
 
     nsdl->_object_list.push_back(object);
 
@@ -1083,7 +1083,7 @@ void Test_M2MNsdlInterface::test_resource_callback_put()
     M2MResource* create_resource = new M2MResource(*instance,
                                                    "res",
                                                    "res",
-                                                   M2MResourceInstance::INTEGER,
+                                                   M2MBase::INTEGER,
                                                    false,
                                                    "res");
     m2mobject_stub::int_value = 2;
@@ -1169,7 +1169,7 @@ void Test_M2MNsdlInterface::test_resource_callback_post()
     M2MResource* create_resource = new M2MResource(*instance,
                                                    "name",
                                                    "name",
-                                                   M2MResourceInstance::INTEGER,
+                                                   M2MBase::INTEGER,
                                                    false,
                                                    "name");
     m2mobject_stub::int_value = 2;
@@ -1194,13 +1194,13 @@ void Test_M2MNsdlInterface::test_resource_callback_post()
             (sn_nsdl_dynamic_resource_parameters_s*) malloc(sizeof(sn_nsdl_dynamic_resource_parameters_s));
     m2mbase_stub::nsdl_resource->static_resource_parameters =
             (sn_nsdl_static_resource_parameters_s*) malloc(sizeof(sn_nsdl_static_resource_parameters_s));
-    m2mbase_stub::nsdl_resource->static_resource_parameters->path = (uint8_t*)malloc(5);
+    m2mbase_stub::nsdl_resource->static_resource_parameters->path = (char*)malloc(5);
     m2mbase_stub::nsdl_resource->static_resource_parameters->path[0] = 'n';
     m2mbase_stub::nsdl_resource->static_resource_parameters->path[1] = 'a';
     m2mbase_stub::nsdl_resource->static_resource_parameters->path[2] = 'm';
     m2mbase_stub::nsdl_resource->static_resource_parameters->path[3] = 'e';
     m2mbase_stub::nsdl_resource->static_resource_parameters->path[4] = '\0';
-    m2mbase_stub::nsdl_resource->static_resource_parameters->pathlen = 5;
+//    m2mbase_stub::nsdl_resource->static_resource_parameters->pathlen = 5;
 
     common_stub::coap_header = (sn_coap_hdr_ *)malloc(sizeof(sn_coap_hdr_));
     memset(common_stub::coap_header,0,sizeof(sn_coap_hdr_));
@@ -1275,7 +1275,7 @@ void Test_M2MNsdlInterface::test_resource_callback_delete()
     m2mbase_stub::nsdl_resource->static_resource_parameters =
             (sn_nsdl_static_resource_parameters_s*) malloc(sizeof(sn_nsdl_static_resource_parameters_s));
 
-    m2mbase_stub::nsdl_resource->static_resource_parameters->path = (uint8_t*)malloc(7);
+    m2mbase_stub::nsdl_resource->static_resource_parameters->path = (char*)malloc(7);
     m2mbase_stub::nsdl_resource->static_resource_parameters->path[0] = 'n';
     m2mbase_stub::nsdl_resource->static_resource_parameters->path[1] = 'a';
     m2mbase_stub::nsdl_resource->static_resource_parameters->path[2] = 'm';
@@ -1283,7 +1283,7 @@ void Test_M2MNsdlInterface::test_resource_callback_delete()
     m2mbase_stub::nsdl_resource->static_resource_parameters->path[4] = '/';
     m2mbase_stub::nsdl_resource->static_resource_parameters->path[5] = '0';
     m2mbase_stub::nsdl_resource->static_resource_parameters->path[6] = '\0';
-    m2mbase_stub::nsdl_resource->static_resource_parameters->pathlen = 7;
+//    m2mbase_stub::nsdl_resource->static_resource_parameters->pathlen = 7;
 
     CHECK(nsdl->resource_callback(NULL,coap_header,address,SN_NSDL_PROTOCOL_HTTP) ==0);
 
@@ -1418,16 +1418,16 @@ void Test_M2MNsdlInterface::test_observation_to_be_sent()
     m2mbase_stub::clear();
     M2MObject *object = new M2MObject("name", "name");
     M2MObjectInstance* instance = new M2MObjectInstance(*object, "name", "", "");
-    M2MResource *res = new M2MResource(*instance,"res", "res", M2MResourceInstance::INTEGER,false, "res");
-    M2MResource *res2 = new M2MResource(*instance,"res2", "res2", M2MResourceInstance::INTEGER,false, "res2");
+    M2MResource *res = new M2MResource(*instance,"res", "res", M2MBase::INTEGER,false, "res");
+    M2MResource *res2 = new M2MResource(*instance,"res2", "res2", M2MBase::INTEGER,false, "res2");
 
 
     M2MResourceInstance* res_instance = new M2MResourceInstance(*res,
                                                                 "res", "res",
-                                                                M2MResourceInstance::INTEGER,"",false);
+                                                                M2MBase::INTEGER,"",false, false);
     M2MResourceInstance* res_instance_1 = new M2MResourceInstance(*res2,
                                                                   "res2", "res2",
-                                                                  M2MResourceInstance::INTEGER,"",false);
+                                                                  M2MBase::INTEGER,"",false, false);
     m2mresource_stub::list.clear();
     m2mresource_stub::list.push_back(res_instance);
     m2mresource_stub::list.push_back(res_instance_1);
@@ -1558,15 +1558,15 @@ void Test_M2MNsdlInterface::test_value_updated()
     M2MResource *resource = new M2MResource(*object_instance,
                                             "resource_name",
                                             "resource_type",
-                                            M2MResourceInstance::INTEGER,
+                                            M2MBase::INTEGER,
                                             false,
                                             "resource_name");
 
     M2MResourceInstance *resource_instance = new M2MResourceInstance(*resource,
                                                                      "resource_name",
                                                                      "resource_type",
-                                                                     M2MResourceInstance::INTEGER,
-                                                                     "",false);
+                                                                     M2MBase::INTEGER,
+                                                                     "",false, false);
 
     m2mobject_stub::base_type = M2MBase::Object;
     m2mbase_stub::string_value = "name";
@@ -1588,8 +1588,8 @@ void Test_M2MNsdlInterface::test_value_updated()
             (sn_nsdl_static_resource_parameters_s*)malloc(sizeof(sn_nsdl_static_resource_parameters_s));
     memset(common_stub::resource->static_resource_parameters,0, sizeof(sn_nsdl_static_resource_parameters_s));
 
-    common_stub::resource->static_resource_parameters->resource = (uint8_t*)malloc(2);
-    memset(common_stub::resource->static_resource_parameters->resource,0, 2);
+//    common_stub::resource->static_resource_parameters->resource = (char*)malloc(2);
+//    memset(common_stub::resource->static_resource_parameters->resource,0, 2);
 
     common_stub::resource->static_resource_parameters->mode = SN_GRS_STATIC;
     m2mbase_stub::mode_value = M2MBase::Static;
@@ -1608,7 +1608,7 @@ void Test_M2MNsdlInterface::test_value_updated()
     observer->value_update = false;
 
     m2mresourceinstance_stub::clear();
-    free(common_stub::resource->static_resource_parameters->resource);
+ //   free(common_stub::resource->static_resource_parameters->resource);
     free(common_stub::resource->static_resource_parameters);
     free(common_stub::resource);
     common_stub::resource = NULL;
@@ -1623,8 +1623,8 @@ void Test_M2MNsdlInterface::test_value_updated()
             (sn_nsdl_static_resource_parameters_s*)malloc(sizeof(sn_nsdl_static_resource_parameters_s));
     memset(common_stub::resource->static_resource_parameters,0, sizeof(sn_nsdl_static_resource_parameters_s));
 
-    common_stub::resource->static_resource_parameters->resource = (uint8_t*)malloc(2);
-    memset(common_stub::resource->static_resource_parameters->resource,0, 2);
+  //  common_stub::resource->static_resource_parameters->resource = (uint8_t*)malloc(2);
+    //memset(common_stub::resource->static_resource_parameters->resource,0, 2);
 
     common_stub::resource->static_resource_parameters->mode = SN_GRS_STATIC;
     m2mbase_stub::mode_value = M2MBase::Static;
@@ -1646,7 +1646,7 @@ void Test_M2MNsdlInterface::test_value_updated()
 
     m2mresourceinstance_stub::clear();
 
-    free(common_stub::resource->static_resource_parameters->resource);
+//    free(common_stub::resource->static_resource_parameters->resource);
     free(common_stub::resource->static_resource_parameters);
     free(common_stub::resource);
 
@@ -1696,14 +1696,16 @@ void Test_M2MNsdlInterface::test_find_resource()
     M2MResource *resource = new M2MResource(*object_instance,
                                             "resource_name",
                                             "resource_type",
-                                            M2MResourceInstance::INTEGER,
+                                            M2MBase::INTEGER,
                                             false,
-                                            "resource_name");
+                                            "resource_name",
+                                            false,
+                                            false);
 
     M2MResourceInstance *resource_instance = new M2MResourceInstance(*resource,
                                                                      "0",
                                                                      "resource_type",
-                                                                     M2MResourceInstance::INTEGER,"0",false);
+                                                                     M2MBase::INTEGER,"0",false, false);
 
     m2mobjectinstance_stub::base_type = M2MBase::ObjectInstance;
     m2mobject_stub::instance_list.push_back(object_instance);
@@ -1791,7 +1793,7 @@ void Test_M2MNsdlInterface::test_send_delayed_response()
     M2MResource* resource = new M2MResource(*instance,
                                             "name",
                                             "name",
-                                            M2MResourceInstance::INTEGER,
+                                            M2MBase::INTEGER,
                                             false,
                                             "name");
 
