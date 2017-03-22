@@ -231,7 +231,7 @@ protected: // from M2MObservationHandler
 
     virtual void resource_to_be_deleted(M2MBase* base);
 
-    virtual void value_updated(M2MBase *base, const String &object_name);
+    virtual void value_updated(M2MBase *base);
 
     virtual void remove_object(M2MBase *object);
 #ifndef DISABLE_DELAYED_RESPONSE

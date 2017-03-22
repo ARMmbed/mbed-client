@@ -135,9 +135,10 @@ public:
     typedef struct lwm2m_parameters {
         //add multiple_instances
         uint32_t            max_age;
-        uint16_t            instance_id; // XXX: this is not properly aligned now, need to reorder these after the elimination is done
-        int32_t             name_id;
-        char*               name; //for backwards compatibility
+        mutable union {
+        uint16_t            instance_id; // XXX: this is not properly aligned now, need to reorder these after the elimination is done        
+        char*               name; //for backwards compability
+        } identifier;
         sn_nsdl_dynamic_resource_parameters_s *dynamic_resource_params;
         BaseType            base_type;
         M2MBase::DataType   data_type;
@@ -147,6 +148,7 @@ public:
                                                  Note: the sn_nsdl_dynamic_resource_parameters_s has
                                                  its own similar, independent flag.
                                                  Note: this also serves as a read-only flag. */
+       bool                 identifier_int_type;
     } lwm2m_parameters_s;
 
 protected:
