@@ -564,7 +564,7 @@ uint8_t M2MNsdlInterface::received_from_server_callback(struct nsdl_s *nsdl_hand
             }
 
             if (execute_value_updated) {
-                value_updated(obj_instance, resource_name);
+                value_updated(obj_instance);
             }
 
         }
@@ -610,15 +610,15 @@ uint8_t M2MNsdlInterface::resource_callback(struct nsdl_s */*nsdl_handle*/,
             tr_debug("M2MNsdlInterface::resource_callback() - DELETE the object instance");
             M2MBase::BaseType type = base->base_type();
             if(M2MBase::ObjectInstance == type) {
-                M2MBase* base_object = find_resource(base->name());
+                M2MBase* base_object = find_resource(base->uri_path());
                 if(base_object) {
-                    M2MObject *object = static_cast<M2MObject*> (base_object);
+                    M2MObject &object = ((M2MObjectInstance*)base_object)->get_parent_object();
                     int slash_found = resource_name.find_last_of('/');
                     // Object instance validty checks done in upper level, no need for error handling
                     if(slash_found != -1) {
                         String object_name;
                         object_name = resource_name.substr(slash_found + 1, resource_name.length());
-                        if (object->remove_object_instance(strtoul(
+                        if (object.remove_object_instance(strtoul(
                                 object_name.c_str(),
                                 NULL,
                                 10))) {
@@ -654,7 +654,7 @@ uint8_t M2MNsdlInterface::resource_callback(struct nsdl_s */*nsdl_handle*/,
     if (execute_value_updated &&
             coap_response &&
             coap_response->coap_status != COAP_STATUS_PARSER_BLOCKWISE_MSG_RECEIVING) {
-        value_updated(base,resource_name);
+        value_updated(base);
     }
 
     sn_nsdl_release_allocated_coap_msg_mem(_nsdl_handle, coap_response);
@@ -754,39 +754,46 @@ void M2MNsdlInterface::send_delayed_response(M2MBase *base)
 
 void M2MNsdlInterface::resource_to_be_deleted(M2MBase *base)
 {
+    tr_debug("M2MNsdlInterface::resource_to_be_deleted()");
     claim_mutex();
     remove_nsdl_resource(base);
     release_mutex();
 }
 
-void M2MNsdlInterface::value_updated(M2MBase *base,
-                                     const String &object_name)
+void M2MNsdlInterface::value_updated(M2MBase *base)
 {
     tr_debug("M2MNsdlInterface::value_updated()");
+    String name;
     if(base) {
         switch(base->base_type()) {
             case M2MBase::Object:
                 create_nsdl_object_structure(static_cast<M2MObject*> (base));
+                name =  base->name();
             break;
             case M2MBase::ObjectInstance:
                 create_nsdl_object_instance_structure(static_cast<M2MObjectInstance*> (base));
+                name = static_cast<M2MObjectInstance*> (base)->get_parent_object().name();
+
             break;
             case M2MBase::Resource: {
-                    M2MResource* resource = static_cast<M2MResource*> (base);
-                    create_nsdl_resource_structure(resource,
-                                               resource->supports_multiple_instances());
+                M2MResource* resource = static_cast<M2MResource*> (base);
+                create_nsdl_resource_structure(resource,
+                                           resource->supports_multiple_instances());
+                name =  base->name();
             }
             break;
             case M2MBase::ResourceInstance: {
                 M2MResourceInstance* instance = static_cast<M2MResourceInstance*> (base);
                 create_nsdl_resource(instance);
+                name = static_cast<M2MResourceInstance*> (base)->get_parent_resource().name();
             }
             break;
         }
     }
 
     if (base && base->is_value_updated_function_set()) {
-        base->execute_value_updated(base->name());
+
+        base->execute_value_updated(name);
     }
     else {
         _observer.value_updated(base);

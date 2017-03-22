@@ -46,7 +46,7 @@ private: // Constructor and destructor are private which means
      * \brief Constructor
      * \param name Name of the object
      */
-    M2MObjectInstance(M2MObject& parent, const String &object_name,
+    M2MObjectInstance(M2MObject& parent,
                       const String &resource_type,
                       char *path,
                       bool external_blockwise_store = false);

@@ -91,18 +91,15 @@ M2MBase::M2MBase(const String& resource_name,
             }
         }
 
-        _sn_resource->name = stringdup((char*)resource_name.c_str());
+        if((!resource_name.empty())) {            
+            _sn_resource->identifier_int_type = false;
+            _sn_resource->identifier.name = stringdup((char*)resource_name.c_str());            
+        } else {
+            tr_debug("M2MBase::M2Mbase resource name is EMPTY ===========");
+            _sn_resource->identifier_int_type = true;
+        }        
         _sn_resource->dynamic_resource_params->publish_uri = true;
         _sn_resource->dynamic_resource_params->free_on_delete = true;
-
-        if(is_integer(resource_name) && resource_name.size() <= MAX_ALLOWED_STRING_LENGTH) {
-            _sn_resource->name_id = strtoul(resource_name.c_str(), NULL, 10);
-            if(_sn_resource->name_id > 65535){
-                _sn_resource->name_id = -1;
-            }
-        } else {
-            _sn_resource->name_id = -1;
-        }
     }
 }
 
@@ -111,14 +108,16 @@ M2MBase::M2MBase(const lwm2m_parameters_s *s):
     _report_handler(NULL),
     _observation_handler(NULL)
 {
+    tr_debug("M2MBase::M2MBase(const lwm2m_parameters_s *s)");
     // Set callback function in case of dynamic resource
     if (M2MBase::Dynamic == _sn_resource->dynamic_resource_params->static_resource_parameters->mode) {
         _sn_resource->dynamic_resource_params->sn_grs_dyn_res_callback = __nsdl_c_callback;
-    }
+    }    
 }
 
 M2MBase::~M2MBase()
 {
+    tr_debug("M2MBase::~M2MBase()");
     delete _report_handler;
     free_resources();
     value_updated_callback* callback = (value_updated_callback*)M2MCallbackStorage::remove_callback(*this, M2MCallbackAssociation::M2MBaseValueUpdatedCallback);
@@ -330,7 +329,8 @@ void M2MBase::set_observation_token(const uint8_t *token, const uint8_t length)
 
 void M2MBase::set_instance_id(const uint16_t inst_id)
 {
-    _sn_resource->instance_id = inst_id;
+    _sn_resource->identifier_int_type = true;
+    _sn_resource->identifier.instance_id = inst_id;
 }
 
 void M2MBase::set_max_age(const uint32_t max_age)
@@ -350,17 +350,27 @@ M2MBase::Operation M2MBase::operation() const
 
 const char* M2MBase::name() const
 {
-    return _sn_resource->name;
+    assert(_sn_resource->identifier_int_type == false);
+    return _sn_resource->identifier.name;
 }
 
 int32_t M2MBase::name_id() const
 {
-    return _sn_resource->name_id;
+    int32_t name_id = -1;
+    assert(_sn_resource->identifier_int_type == false);
+    if(is_integer(_sn_resource->identifier.name) && strlen(_sn_resource->identifier.name) <= MAX_ALLOWED_STRING_LENGTH) {
+        name_id = strtoul(_sn_resource->identifier.name, NULL, 10);
+        if(name_id > 65535){
+            name_id = -1;
+        }
+    }
+    return name_id;
 }
 
 uint16_t M2MBase::instance_id() const
 {
-    return _sn_resource->instance_id;
+    assert(_sn_resource->identifier_int_type == true);
+    return _sn_resource->identifier.instance_id;
 }
 
 #ifndef DISABLE_INTERFACE_DESCRIPTION
@@ -752,6 +762,7 @@ void M2MBase::free_resources()
 {
     // remove the nsdl structures from the nsdlinterface's lists.
     if (_observation_handler) {
+        tr_debug("M2MBase::free_resources()");
         _observation_handler->resource_to_be_deleted(this);
     }
 
@@ -776,15 +787,19 @@ void M2MBase::free_resources()
         free(_sn_resource->dynamic_resource_params);
     }
 
-    if (_sn_resource->free_on_delete) {
-        free(_sn_resource->name);
+    if(_sn_resource->free_on_delete && _sn_resource->identifier_int_type == false) {
+        tr_debug("M2MBase::free_resources()");
+        free(_sn_resource->identifier.name);
+    }
+    if(_sn_resource->free_on_delete) {
         free(_sn_resource);
     }
 }
 
 size_t M2MBase::resource_name_length() const
 {
-    return strlen(_sn_resource->name);
+    assert(_sn_resource->identifier_int_type == false);
+    return strlen(_sn_resource->identifier.name);
 }
 
 sn_nsdl_dynamic_resource_parameters_s* M2MBase::get_nsdl_resource() const
