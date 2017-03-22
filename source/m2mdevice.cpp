@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+#include <stdlib.h>
 #include "mbed-client/m2mdevice.h"
 #include "mbed-client/m2mconstants.h"
 #include "mbed-client/m2mobject.h"
@@ -203,11 +204,11 @@ M2MResource* M2MDevice::create_resource(DeviceResource resource, int64_t value)
                                                             true);
 
             if(res) {
-
-
                 res->set_operation(operation);
-                res->set_value(value);
-
+                uint8_t size = 0;
+                uint8_t *buffer = String::convert_integer_to_array(value, size);
+                res->set_value(buffer,size);
+                free(buffer);
                 res->set_register_uri(false);
             }
         }
@@ -361,8 +362,10 @@ bool M2MDevice::set_resource_value(DeviceResource resource,
             // If it is any of the above resource
             // set the value of the resource.
             if (check_value_range(resource, value)) {
-
-                success = res->set_value(value);
+                uint8_t size = 0;
+                uint8_t *buffer = String::convert_integer_to_array(value, size);
+                success = res->set_value(buffer,size);
+                free(buffer);
             }
         }
     }
@@ -407,9 +410,11 @@ int64_t M2MDevice::resource_value_int(DeviceResource resource,
            M2MDevice::AvailablePowerSources == resource ||
            M2MDevice::PowerSourceVoltage == resource    ||
            M2MDevice::PowerSourceCurrent == resource) {
-
-            // note: the value may be 32bit int on 32b archs.
-            value = res->get_value_int();
+            uint8_t* buffer = NULL;
+            uint32_t length;
+            res->get_value(buffer, length);
+            value = String::convert_array_to_integer(buffer, length);
+            free(buffer);
         }
     }
     return value;
