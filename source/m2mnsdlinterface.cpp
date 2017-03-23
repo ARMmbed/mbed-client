@@ -100,7 +100,7 @@ M2MNsdlInterface::~M2MNsdlInterface()
 
     sn_nsdl_destroy(_nsdl_handle);
     _nsdl_handle = NULL;
-
+    free(_server_address);
     tr_debug("M2MNsdlInterface::~M2MNsdlInterface() - OUT");
 }
 
