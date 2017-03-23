@@ -166,7 +166,24 @@ M2MTLVDeserializer::Error M2MTLVDeserializer::deserialize_resources(const uint8_
                 if(update_value) {
                     if(til._length > 0) {
                         tr_debug("M2MTLVDeserializer::deserialize_resources() - Update value");
-                        (*it)->set_value(tlv+offset, til._length);
+                        int64_t value = 0;
+                        switch ((*it)->resource_instance_type()) {
+                            case M2MResourceInstance::INTEGER:
+                            case M2MResourceInstance::BOOLEAN:
+                                value = String::convert_array_to_integer(tlv+offset, til._length);
+                                (*it)->set_value(value);
+                                break;
+                            // Todo! implement support for other types as well
+                            case M2MResourceInstance::STRING:
+                            case M2MResourceInstance::FLOAT:
+                            case M2MResourceInstance::OPAQUE:
+                            case M2MResourceInstance::TIME:
+                            case M2MResourceInstance::OBJLINK:
+                                (*it)->set_value(tlv+offset, til._length);
+                                break;
+                            default:
+                                break;
+                        }
                     } else {
                         tr_debug("M2MTLVDeserializer::deserialize_resources() - Clear Value");
                         (*it)->clear_value();
@@ -235,7 +252,7 @@ M2MTLVDeserializer::Error M2MTLVDeserializer::deserialize_resource_instances(con
                 found = true;
                 if(update_value) {
                     if(til._length > 0) {
-                        (*it)->set_value(tlv+offset, til._length);
+                        set_resource_instance_value((*it), tlv+offset, til._length);
                     } else {
                         (*it)->clear_value();
                     }
@@ -295,7 +312,7 @@ M2MTLVDeserializer::Error M2MTLVDeserializer::deserialize_resource_instances(con
                 found = true;
                 if(update_value) {
                     if(til._length > 0) {
-                        (*it)->set_value(tlv+offset, til._length);
+                        set_resource_instance_value((*it),tlv+offset, til._length);
                     } else {
                         (*it)->clear_value();
                     }
@@ -369,6 +386,28 @@ bool M2MTLVDeserializer::is_resource_instance(const uint8_t *tlv, uint32_t offse
         ret = (TYPE_RESOURCE_INSTANCE == (tlv[offset] & TYPE_RESOURCE));
     }
     return ret;
+}
+
+void M2MTLVDeserializer::set_resource_instance_value(M2MResourceInstance *res, uint8_t *tlv, uint32_t size)
+{
+    int64_t value = 0;
+    switch (res->resource_instance_type()) {
+        case M2MResourceInstance::INTEGER:
+        case M2MResourceInstance::BOOLEAN:
+            value = String::convert_array_to_integer(tlv, size);
+            res->set_value(value);
+            break;
+        // Todo! implement conversion for other types as well
+        case M2MResourceInstance::STRING:
+        case M2MResourceInstance::FLOAT:
+        case M2MResourceInstance::OPAQUE:
+        case M2MResourceInstance::TIME:
+        case M2MResourceInstance::OBJLINK:
+            res->set_value(tlv, size);
+            break;
+        default:
+            break;
+    }
 }
 
 TypeIdLength::TypeIdLength(const uint8_t *tlv, uint32_t offset)

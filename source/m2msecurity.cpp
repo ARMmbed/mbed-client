@@ -192,12 +192,8 @@ bool M2MSecurity::set_resource_value(SecurityResource resource,
            M2MSecurity::M2MServerSMSNumber == resource  ||
            M2MSecurity::ShortServerID == resource       ||
            M2MSecurity::ClientHoldOffTime == resource) {
-            // If it is any of the above resource
-            // set the value of the resource.
-            uint8_t size = 0;
-            uint8_t *buffer = String::convert_integer_to_array(value, size);
-            success = res->set_value(buffer,size);
-            free(buffer);
+            success = res->set_value(value);
+
         }
     }
     return success;
@@ -274,15 +270,8 @@ uint32_t M2MSecurity::resource_value_int(SecurityResource resource) const
            M2MSecurity::M2MServerSMSNumber == resource  ||
            M2MSecurity::ShortServerID == resource       ||
            M2MSecurity::ClientHoldOffTime == resource) {
-            // Get the value and convert it into integer. This is not the most
-            // efficient way, as it takes pointless heap copy to get the zero termination.
-            uint8_t* buffer = NULL;
-            uint32_t length = 0;
-            res->get_value(buffer,length);
-            if(buffer) {
-                value = String::convert_array_to_integer(buffer,length);
-                free(buffer);
-            }
+            // note: the value may be 32bit int on 32b archs.
+            value = res->get_value_int();
         }
     }
     return value;
