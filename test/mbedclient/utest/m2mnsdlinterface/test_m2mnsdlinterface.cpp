@@ -263,22 +263,22 @@ void Test_M2MNsdlInterface::test_delete_nsdl_resource()
 void Test_M2MNsdlInterface::test_create_bootstrap_resource()
 {
     common_stub::uint_value = 11;
-    CHECK(nsdl->create_bootstrap_resource(NULL, "") == true);
+    CHECK(nsdl->create_bootstrap_resource(NULL) == true);
 
     const char address[] = "coap://127.0.0.1:5683?param=1&param2=2&param3=3";
     uriqueryparser_stub::int_value = 3;
     nsdl->_bootstrap_id = 0;
     uriqueryparser_stub::bool_value = true;
     nsdl->set_server_address(address);
-    CHECK(nsdl->create_bootstrap_resource(NULL, "") == true);
+    CHECK(nsdl->create_bootstrap_resource(NULL) == true);
 
     common_stub::uint_value = 0;
-    CHECK(nsdl->create_bootstrap_resource(NULL, "") == false);
+    CHECK(nsdl->create_bootstrap_resource(NULL) == false);
 
     // Query param count set to 0
     nsdl->_bootstrap_id = 0;
     uriqueryparser_stub::int_value = 0;
-    CHECK(nsdl->create_bootstrap_resource(NULL, "") == false);
+    CHECK(nsdl->create_bootstrap_resource(NULL) == false);
 }
 
 void Test_M2MNsdlInterface::test_send_register_message()

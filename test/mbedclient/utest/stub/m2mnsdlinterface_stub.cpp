@@ -68,7 +68,7 @@ bool M2MNsdlInterface::remove_nsdl_resource(M2MBase* base)
     return m2mnsdlinterface_stub::bool_value;
 }
 
-bool M2MNsdlInterface::create_bootstrap_resource(sn_nsdl_addr_s *, const String& name)
+bool M2MNsdlInterface::create_bootstrap_resource(sn_nsdl_addr_s *)
 {
     return m2mnsdlinterface_stub::bool_value;
 }
@@ -211,6 +211,11 @@ const String& M2MNsdlInterface::endpoint_name() const
 }
 
 void M2MNsdlInterface::set_server_address(const char* server_address)
+{
+
+}
+
+void M2MNsdlInterface::update_endpoint(const String &name)
 {
 
 }
