@@ -45,7 +45,7 @@ public:
     Observer(){}
     ~Observer(){}
 
-    virtual void observation_to_be_sent(const m2m::Vector<uint16_t>&,bool){}
+    virtual void observation_to_be_sent(const m2m::Vector<uint16_t>&, uint16_t ,bool){}
 };
 
 Test_M2MBase::Test_M2MBase(char* path, Handler *handler)
@@ -135,32 +135,23 @@ void Test_M2MBase::test_set_observable()
     CHECK(test == this->is_observable());
 }
 
-/*void Test_M2MBase::test_add_observation_level()
+void Test_M2MBase::test_add_observation_level()
 {
     add_observation_level(M2MBase::R_Attribute);
-    CHECK(M2MBase::R_Attribute == this->_observation_level);
 
     add_observation_level(M2MBase::O_Attribute);
-    CHECK(M2MBase::OR_Attribute == this->_observation_level);
 }
 
 void Test_M2MBase::test_remove_observation_level()
 {
-    this->_observation_level = M2MBase::OR_Attribute;
     remove_observation_level(M2MBase::R_Attribute);
-    CHECK(M2MBase::O_Attribute == this->_observation_level);
 
     remove_observation_level(M2MBase::O_Attribute);
-    CHECK(M2MBase::None == this->_observation_level);
 
-    this->_observation_level = M2MBase::OI_Attribute;
     remove_observation_level(M2MBase::R_Attribute);
-    CHECK(M2MBase::OI_Attribute == this->_observation_level);
 
     remove_observation_level(M2MBase::OI_Attribute);
-    CHECK(M2MBase::None == this->_observation_level);
     remove_observation_level(M2MBase::OI_Attribute);
-    CHECK(M2MBase::None == this->_observation_level);
 }
 
 void Test_M2MBase::test_set_under_observation()
@@ -186,17 +177,12 @@ void Test_M2MBase::test_set_under_observation()
 
 void Test_M2MBase::test_set_observation_token()
 {
-    this->_token_length = 4;
-    this->_token = (u_int8_t *)malloc(this->_token_length);
     String test = "token";
     set_observation_token((const u_int8_t*)test.c_str(), (u_int8_t)test.size());
-
-    CHECK(this->_token_length == 5);
 }
 
 void Test_M2MBase::test_observation_level()
 {
-    this->_observation_level = M2MBase::OR_Attribute;
     CHECK(M2MBase::OR_Attribute == this->observation_level());
 }
 
@@ -210,29 +196,25 @@ void Test_M2MBase::test_get_observation_token()
     memcpy((u_int8_t *)out_value, (u_int8_t *)test_value, value_length);
 
     u_int8_t test[] = {"token"};
-    this->_token_length = (u_int8_t)sizeof(test);
-    this->_token = (u_int8_t *)malloc(this->_token_length);
-    memcpy((u_int8_t *)this->_token, (u_int8_t *)test, this->_token_length);
 
     get_observation_token(out_value,out_size);
 
     CHECK(out_size == 6);
 
     free(out_value);
-}*/
+}
 
 void Test_M2MBase::test_mode()
 {
     CHECK(M2MBase::Dynamic == mode());
 }
 
-/*void Test_M2MBase::test_observation_number()
+void Test_M2MBase::test_observation_number()
 {
     u_int8_t test = 1;
-    this->_observation_number = test;
 
     CHECK(test == observation_number());
-}*/
+}
 
 void Test_M2MBase::test_name()
 {
@@ -248,7 +230,7 @@ void Test_M2MBase::test_name_id()
     CHECK(id == name_id());
 }
 
-/*void Test_M2MBase::test_handle_observation_attribute()
+void Test_M2MBase::test_handle_observation_attribute()
 {
     char *s = "wrong";
     bool ret = handle_observation_attribute(s);
@@ -262,11 +244,9 @@ void Test_M2MBase::test_name_id()
     ret = handle_observation_attribute(s);
     CHECK(ret == true);
 
-    this->_is_under_observation = true;
     ret = handle_observation_attribute(s);
     CHECK(ret == true);
 
-    this->_is_under_observation = true;
     m2mreporthandler_stub::bool_return = false;
     ret = handle_observation_attribute(s);
     CHECK(ret == false);
@@ -275,15 +255,15 @@ void Test_M2MBase::test_name_id()
 void Test_M2MBase::test_observation_to_be_sent()
 {
     Vector<uint16_t> list;
-    observation_to_be_sent(list);
+    observation_to_be_sent(list, observation_number());
     CHECK(obsHandler->visited == false);
     this->set_base_type(M2MBase::ObjectInstance);
 
     bool test = true;
     set_under_observation(test,obsHandler);
-    observation_to_be_sent(list);
+    observation_to_be_sent(list, observation_number());
     CHECK(obsHandler->visited == true);
-}*/
+}
 
 void Test_M2MBase::test_handle_get_request()
 {
@@ -365,11 +345,10 @@ void Test_M2MBase::test_set_register_uri()
     CHECK(this->register_uri() == false);
 }
 
-/*void Test_M2MBase::test_set_observation_number()
+void Test_M2MBase::test_set_observation_number()
 {
     set_observation_number(0);
-    CHECK(0 == this->_observation_number);
-}*/
+}
 
 void Test_M2MBase::test_set_max_age()
 {
@@ -377,12 +356,11 @@ void Test_M2MBase::test_set_max_age()
     CHECK(this->max_age() == 10000);
 }
 
-/*void Test_M2MBase::test_is_under_observation()
+void Test_M2MBase::test_is_under_observation()
 {
     CHECK(false == is_under_observation());
-    this->_is_under_observation = true;
     CHECK(true == is_under_observation());
-}*/
+}
 
 void Test_M2MBase::test_value_updated_function()
 {

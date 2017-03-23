@@ -78,17 +78,17 @@ TEST(M2MBase, set_instance_id)
     m2m_base->test_set_instance_id();
 }
 
-/*TEST(M2MBase, observation_number)
+TEST(M2MBase, observation_number)
 {
     m2m_base->test_observation_number();
-}*/
+}
 
 TEST(M2MBase, mode)
 {
     m2m_base->test_mode();
 }
 
-/*TEST(M2MBase, observation_token)
+TEST(M2MBase, observation_token)
 {
     m2m_base->test_get_observation_token();
 }
@@ -106,14 +106,14 @@ TEST(M2MBase, set_observation_token)
 TEST(M2MBase, set_under_observation)
 {
     m2m_base->test_set_under_observation();
-}*/
+}
 
 TEST(M2MBase, set_observable)
 {
     m2m_base->test_set_observable();
 }
 
-/*TEST(M2MBase, add_observation_level)
+TEST(M2MBase, add_observation_level)
 {
     m2m_base->test_add_observation_level();
 }
@@ -121,7 +121,7 @@ TEST(M2MBase, set_observable)
 TEST(M2MBase, remove_observation_level)
 {
     m2m_base->test_remove_observation_level();
-}*/
+}
 
 TEST(M2MBase, name)
 {
@@ -133,7 +133,7 @@ TEST(M2MBase, name_id)
     m2m_base->test_name_id();
 }
 
-/*TEST(M2MBase, test_handle_observation_attribute)
+TEST(M2MBase, test_handle_observation_attribute)
 {
     m2m_base->test_handle_observation_attribute();
 }
@@ -141,7 +141,7 @@ TEST(M2MBase, name_id)
 TEST(M2MBase, test_observation_to_be_sent)
 {
     m2m_base->test_observation_to_be_sent();
-}*/
+}
 
 TEST(M2MBase, test_handle_get_request)
 {
@@ -188,20 +188,20 @@ TEST(M2MBase, test_set_register_uri)
     m2m_base->test_set_register_uri();
 }
 
-/*TEST(M2MBase, test_set_observation_number)
+TEST(M2MBase, test_set_observation_number)
 {
     m2m_base->test_set_observation_number();
-}*/
+}
 
 TEST(M2MBase, test_set_max_age)
 {
     m2m_base->test_set_max_age();
 }
 
-/*TEST(M2MBase, test_is_under_observation)
+TEST(M2MBase, test_is_under_observation)
 {
     m2m_base->test_is_under_observation();
-}*/
+}
 
 TEST(M2MBase, test_value_updated_function)
 {
@@ -263,7 +263,7 @@ TEST(M2MBase, test_alloc_copy)
     m2m_base->test_alloc_copy();
 }
 
-/*TEST(M2MBase, test_ctor)
+TEST(M2MBase, test_ctor)
 {
     m2m_base->test_ctor();
-}*/
+}
