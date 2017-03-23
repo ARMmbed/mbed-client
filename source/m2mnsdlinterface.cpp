@@ -1674,7 +1674,7 @@ bool M2MNsdlInterface::validate_security_object()
         uint32_t pkey_size = _security->get_resource(M2MSecurity::Secretkey)->value_length();
         M2MDevice* dev = M2MInterfaceFactory::create_device();
         if (dev) {
-            tr_debug("M2MNsdlInterface::validate_security_object - Current time: %" PRIu32,
+            tr_debug("M2MNsdlInterface::validate_security_object - Current time: %" PRId64,
                      dev->resource_value_int(M2MDevice::CurrentTime));
         }
         tr_debug("M2MNsdlInterface::validate_security_object - Server URI /0/0: %s", address.c_str());
