@@ -1669,14 +1669,16 @@ bool M2MNsdlInterface::validate_security_object()
         uint32_t server_key_size = _security->get_resource(M2MSecurity::ServerPublicKey)->value_length();
         uint32_t pkey_size = _security->get_resource(M2MSecurity::Secretkey)->value_length();
         M2MDevice* dev = M2MInterfaceFactory::create_device();
-        uint32_t time = dev->resource_value_int(M2MDevice::CurrentTime);
+        if (dev) {
+            tr_debug("M2MNsdlInterface::validate_security_object - Current time: %" PRIu32,
+                     dev->resource_value_int(M2MDevice::CurrentTime));
+        }
         tr_debug("M2MNsdlInterface::validate_security_object - Server URI /0/0: %s", address.c_str());
         tr_debug("M2MNsdlInterface::validate_security_object - is bs server /0/1: %d", is_bs_server);
         tr_debug("M2MNsdlInterface::validate_security_object - Security Mode /0/2: %" PRIu32, sec_mode);
         tr_debug("M2MNsdlInterface::validate_security_object - Public key size /0/3: %" PRIu32, public_key_size);
         tr_debug("M2MNsdlInterface::validate_security_object - Server Public key size /0/4: %" PRIu32, server_key_size);
         tr_debug("M2MNsdlInterface::validate_security_object - Secret key size /0/5: %" PRIu32, pkey_size);
-        tr_debug("M2MNsdlInterface::validate_security_object - Current time: %" PRIu32, time);
         // Only NoSec and Certificate modes are supported
         if (!address.empty() && !is_bs_server) {
             if (M2MSecurity::Certificate == sec_mode) {
