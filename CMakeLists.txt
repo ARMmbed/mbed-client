@@ -9,6 +9,7 @@ set(port_libs_PATH ${CMAKE_CURRENT_SOURCE_DIR}/port_libs)
 #own include dirs
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/source)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/mbed-client)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/mbed-client-c)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/mbed-client-classic)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/mbed-client-mbed-tls)
