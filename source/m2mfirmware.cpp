@@ -226,7 +226,7 @@ static sn_nsdl_dynamic_resource_parameters_s firmware_update_result_params_dynam
 };
 const static M2MBase::lwm2m_parameters firmware_package_params = {
     0, // max_age
-    0, // (char*)FIRMWARE_PACKAGE
+    (char*)FIRMWARE_PACKAGE,
     &firmware_package_params_dynamic,
     M2MBase::Resource, // base_type
     M2MBase::OPAQUE,
@@ -237,46 +237,46 @@ const static M2MBase::lwm2m_parameters firmware_package_params = {
 
 const static M2MBase::lwm2m_parameters firmware_package_uri_params = {
     0, // max_age
-    0, //(char*)FIRMWARE_PACKAGE_URI
+    (char*)FIRMWARE_PACKAGE_URI,
     &firmware_package_uri_params_dynamic,
     M2MBase::Resource, // base_type
     M2MBase::STRING,
     false,
     false, // free_on_delete
-    false  // idenifier_int_type
+    false  // identifier_int_type
 };
 
 const static M2MBase::lwm2m_parameters firmware_update_params = {
     0, // max_age
-    0, // (char*)FIRMWARE_UPDATE
+    (char*)FIRMWARE_UPDATE,
     &firmware_update_params_dynamic,
     M2MBase::Resource, // base_type
     M2MBase::OPAQUE,
     false,
     false, // free_on_delete
-    false  // idenifier_int_type
+    false  // identifier_int_type
 };
 
 const static M2MBase::lwm2m_parameters firmware_state_params = {
     0, // max_age
-    0, //(char*)FIRMWARE_STATE
+    (char*)FIRMWARE_STATE,
     &firmware_state_params_dynamic,
     M2MBase::Resource, // base_type
     M2MBase::INTEGER,
     false,
     false, // free_on_delete
-    false  // idenifier_int_type
+    false  // identifier_int_type
 };
 
 const static M2MBase::lwm2m_parameters firmware_update_result_params = {
     0, // max_age
-    0, // (char*)FIRMWARE_UPDATE_RESULT
+    (char*)FIRMWARE_UPDATE_RESULT,
     &firmware_update_result_params_dynamic,
     M2MBase::Resource, // base_type
     M2MBase::INTEGER,
     false,
     false, // free_on_delete
-    false  // idenifier_int_type
+    false  // identifier_int_type
 };
 
 void M2MFirmware::create_mandatory_resources()
@@ -288,27 +288,22 @@ void M2MFirmware::create_mandatory_resources()
     // todo:
     // perhaps we should have a API for batch creation of objects by using a array
     // of lwm2m_parameters.
-    firmware_package_params.identifier.name = (char*)FIRMWARE_PACKAGE;
     res = _firmware_instance->create_dynamic_resource(&firmware_package_params,
                                                         M2MResourceInstance::OPAQUE,
                                                         false);
 
-    firmware_package_uri_params.identifier.name = (char*)FIRMWARE_PACKAGE_URI;
     res = _firmware_instance->create_dynamic_resource(&firmware_package_uri_params,
                                                     M2MResourceInstance::STRING,
                                                     false);
 
-    firmware_update_params.identifier.name = (char*)FIRMWARE_UPDATE;
     res = _firmware_instance->create_dynamic_resource(&firmware_update_params,
                                                     M2MResourceInstance::OPAQUE,
                                                     false);
 
-    firmware_state_params.identifier.name = (char*)FIRMWARE_STATE;
     res = _firmware_instance->create_dynamic_resource(&firmware_state_params,
                                                     M2MResourceInstance::INTEGER,
                                                     true);
 
-    firmware_update_result_params.identifier.name = (char*)FIRMWARE_UPDATE_RESULT;
     res = _firmware_instance->create_dynamic_resource(&firmware_update_result_params,
                                                     M2MResourceInstance::INTEGER,
                                                     true);

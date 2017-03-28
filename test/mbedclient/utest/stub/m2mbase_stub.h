@@ -18,6 +18,7 @@
 
 #include "m2mbase.h"
 #include "nsdlaccesshelper_stub.h"
+
 static sn_nsdl_static_resource_parameters_s params_static = {
 #ifndef DISABLE_RESOURCE_TYPE
     (char*)"",      // resource_type_ptr
@@ -25,10 +26,7 @@ static sn_nsdl_static_resource_parameters_s params_static = {
 #ifndef DISABLE_INTERFACE_DESCRIPTION
     (char*)"",                     // interface_description_ptr
 #endif
-    (uint8_t*)"",    // path
-    (uint8_t*)"value",           // resource
-    0,                      // pathlen
-    5,                      // resourcelen
+    "",                     // path
     false,                  // external_memory_block
     SN_GRS_DYNAMIC,         // mode
     false                   // free_on_delete
@@ -37,7 +35,9 @@ static sn_nsdl_static_resource_parameters_s params_static = {
 static sn_nsdl_dynamic_resource_parameters_s params_dynamic = {
     __nsdl_c_callback,
     &params_static,
+    (uint8_t*)"value",           // resource
     {NULL, NULL},                     // link
+    5,                      // resourcelen
     0, // coap_content_type
     M2MBase::PUT_ALLOWED,   // access
     0,                      // registered
@@ -48,12 +48,13 @@ static sn_nsdl_dynamic_resource_parameters_s params_dynamic = {
 
 const static M2MBase::lwm2m_parameters params = {
     0, // max_age
-    1, // instance_id
-    0, // name_id
     (char*)"", // name
     &params_dynamic,
     M2MBase::Resource, // base_type
-    false // free_on_delete
+    M2MBase::OBJLINK, // datatype
+    false, // multiple_instance
+    false, // free_on_delete
+    false  // identifier_int_type
 };
 
 //some internal test related stuff

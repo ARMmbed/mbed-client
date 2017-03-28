@@ -97,6 +97,7 @@ M2MBase::M2MBase(const String& resource_name,
         } else {
             tr_debug("M2MBase::M2Mbase resource name is EMPTY ===========");
             _sn_resource->identifier_int_type = true;
+            _sn_resource->identifier.instance_id = 0;
         }        
         _sn_resource->dynamic_resource_params->publish_uri = true;
         _sn_resource->dynamic_resource_params->free_on_delete = true;
