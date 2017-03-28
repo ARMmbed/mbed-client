@@ -826,7 +826,7 @@ bool M2MNsdlInterface::create_nsdl_object_structure(M2MObject *object)
     tr_debug("M2MNsdlInterface::create_nsdl_object_structure()");
     bool success = false;
     if(object) {
-        M2MObjectInstanceList instance_list = object->instances();
+        const M2MObjectInstanceList &instance_list = object->instances();
         tr_debug("M2MNsdlInterface::create_nsdl_object_structure - Object Instance count %d", instance_list.size());
         if(!instance_list.empty()) {
            M2MObjectInstanceList::const_iterator it;
@@ -848,7 +848,7 @@ bool M2MNsdlInterface::create_nsdl_object_instance_structure(M2MObjectInstance *
     tr_debug("M2MNsdlInterface::create_nsdl_object_instance_structure()");
     bool success = false;
     if( object_instance) {
-        M2MResourceList res_list = object_instance->resources();
+        const M2MResourceList &res_list = object_instance->resources();
         tr_debug("M2MNsdlInterface::create_nsdl_object_instance_structure - ResourceBase count %d", res_list.size());
         if(!res_list.empty()) {
             M2MResourceList::const_iterator it;
@@ -874,7 +874,7 @@ bool M2MNsdlInterface::create_nsdl_resource_structure(M2MResource *res,
     if(res) {
         // if there are multiple instances supported
         if(multiple_instances) {
-            M2MResourceInstanceList res_list = res->resource_instances();
+            const M2MResourceInstanceList &res_list = res->resource_instances();
             tr_debug("M2MNsdlInterface::create_nsdl_resource_structure - ResourceInstance count %d", res_list.size());
             if(!res_list.empty()) {
                 M2MResourceInstanceList::const_iterator it;
@@ -1005,7 +1005,7 @@ M2MBase* M2MNsdlInterface::find_resource(const M2MObject *object,
     tr_debug("M2MNsdlInterface::find_resource(object instance level) - name (%s)", object_instance.c_str());
     M2MBase *instance = NULL;
     if(object) {
-        M2MObjectInstanceList list = object->instances();
+        const M2MObjectInstanceList &list = object->instances();
         if(!list.empty()) {
             M2MObjectInstanceList::const_iterator it;
             it = list.begin();
@@ -1052,7 +1052,7 @@ M2MBase* M2MNsdlInterface::find_resource(const M2MObjectInstance *object_instanc
     tr_debug("M2MNsdlInterface::find_resource(resource level) - name (%s)", resource_instance.c_str());
     M2MBase *instance = NULL;
     if(object_instance) {
-        M2MResourceList list = object_instance->resources();
+        const M2MResourceList &list = object_instance->resources();
         if(!list.empty()) {
             M2MResourceList::const_iterator it;
             it = list.begin();
@@ -1102,7 +1102,7 @@ M2MBase* M2MNsdlInterface::find_resource(const M2MResource *resource,
     M2MBase *res = NULL;
     if(resource) {
         if(resource->supports_multiple_instances()) {
-            M2MResourceInstanceList list = resource->resource_instances();
+            const M2MResourceInstanceList &list = resource->resource_instances();
             if(!list.empty()) {
                 M2MResourceInstanceList::const_iterator it;
                 it = list.begin();
@@ -1372,7 +1372,7 @@ void M2MNsdlInterface::handle_bootstrap_put_message(sn_coap_hdr_s *coap_header,
             // Not mandatory resource that's why it must be created first
             _security->create_resource(M2MSecurity::ShortServerID, 1);
             // Change operation mode
-            M2MResourceList list = _security->object_instance()->resources();
+            const M2MResourceList &list = _security->object_instance()->resources();
             if(!list.empty()) {
                 M2MResourceList::const_iterator it;
                 it = list.begin();
@@ -1412,7 +1412,7 @@ void M2MNsdlInterface::handle_bootstrap_put_message(sn_coap_hdr_s *coap_header,
             success = parse_bootstrap_message(coap_header, security_object);
             // Set operation back to default ones
             if (_security) {
-                M2MResourceList list = _security->object_instance()->resources();
+                const M2MResourceList &list = _security->object_instance()->resources();
                 if(!list.empty()) {
                     M2MResourceList::const_iterator it;
                     it = list.begin();
