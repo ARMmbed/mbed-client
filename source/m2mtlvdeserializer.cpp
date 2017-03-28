@@ -21,27 +21,27 @@
 #define TRACE_GROUP "mClt"
 #define BUFFER_SIZE 10
 
-bool M2MTLVDeserializer::is_object_instance(uint8_t *tlv)
+bool M2MTLVDeserializer::is_object_instance(const uint8_t *tlv)
 {
     return is_object_instance(tlv, 0);
 }
 
-bool M2MTLVDeserializer::is_resource(uint8_t *tlv)
+bool M2MTLVDeserializer::is_resource(const uint8_t *tlv)
 {
     return is_resource(tlv, 0);
 }
 
-bool M2MTLVDeserializer::is_multiple_resource(uint8_t *tlv)
+bool M2MTLVDeserializer::is_multiple_resource(const uint8_t *tlv)
 {
     return is_multiple_resource(tlv, 0);
 }
 
-bool M2MTLVDeserializer::is_resource_instance(uint8_t *tlv)
+bool M2MTLVDeserializer::is_resource_instance(const uint8_t *tlv)
 {
     return is_resource_instance(tlv, 0);
 }
 
-M2MTLVDeserializer::Error M2MTLVDeserializer::deserialise_object_instances(uint8_t* tlv,
+M2MTLVDeserializer::Error M2MTLVDeserializer::deserialise_object_instances(const uint8_t* tlv,
                                                                            uint32_t tlv_size,
                                                                            M2MObject &object,
                                                                            M2MTLVDeserializer::Operation operation)
@@ -60,7 +60,7 @@ M2MTLVDeserializer::Error M2MTLVDeserializer::deserialise_object_instances(uint8
     return error;
 }
 
-M2MTLVDeserializer::Error M2MTLVDeserializer::deserialize_resources(uint8_t *tlv,
+M2MTLVDeserializer::Error M2MTLVDeserializer::deserialize_resources(const uint8_t *tlv,
                                                                     uint32_t tlv_size,
                                                                     M2MObjectInstance &object_instance,
                                                                     M2MTLVDeserializer::Operation operation)
@@ -77,7 +77,7 @@ M2MTLVDeserializer::Error M2MTLVDeserializer::deserialize_resources(uint8_t *tlv
     return error;
 }
 
-M2MTLVDeserializer::Error M2MTLVDeserializer::deserialize_resource_instances(uint8_t *tlv,
+M2MTLVDeserializer::Error M2MTLVDeserializer::deserialize_resource_instances(const uint8_t *tlv,
                                                                              uint32_t tlv_size,
                                                                              M2MResource &resource,
                                                                              M2MTLVDeserializer::Operation operation)
@@ -109,7 +109,7 @@ M2MTLVDeserializer::Error M2MTLVDeserializer::deserialize_resource_instances(uin
     return error;
 }
 
-M2MTLVDeserializer::Error M2MTLVDeserializer::deserialize_object_instances(uint8_t *tlv,
+M2MTLVDeserializer::Error M2MTLVDeserializer::deserialize_object_instances(const uint8_t *tlv,
                                                                            uint32_t tlv_size,
                                                                            uint32_t offset,
                                                                            M2MObject &object,
@@ -141,7 +141,7 @@ M2MTLVDeserializer::Error M2MTLVDeserializer::deserialize_object_instances(uint8
     return error;
 }
 
-M2MTLVDeserializer::Error M2MTLVDeserializer::deserialize_resources(uint8_t *tlv,
+M2MTLVDeserializer::Error M2MTLVDeserializer::deserialize_resources(const uint8_t *tlv,
                                                                     uint32_t tlv_size,
                                                                     uint32_t offset,
                                                                     M2MObjectInstance &object_instance,
@@ -212,7 +212,7 @@ M2MTLVDeserializer::Error M2MTLVDeserializer::deserialize_resources(uint8_t *tlv
     return error;
 }
 
-M2MTLVDeserializer::Error M2MTLVDeserializer::deserialize_resource_instances(uint8_t *tlv,
+M2MTLVDeserializer::Error M2MTLVDeserializer::deserialize_resource_instances(const uint8_t *tlv,
                                                                              uint32_t tlv_size,
                                                                              uint32_t offset,
                                                                              M2MResource &resource,
@@ -273,7 +273,7 @@ M2MTLVDeserializer::Error M2MTLVDeserializer::deserialize_resource_instances(uin
     return error;
 }
 
-M2MTLVDeserializer::Error M2MTLVDeserializer::deserialize_resource_instances(uint8_t *tlv,
+M2MTLVDeserializer::Error M2MTLVDeserializer::deserialize_resource_instances(const uint8_t *tlv,
                                                                              uint32_t tlv_size,
                                                                              uint32_t offset,
                                                                              M2MResource &resource,
@@ -326,7 +326,7 @@ M2MTLVDeserializer::Error M2MTLVDeserializer::deserialize_resource_instances(uin
     return error;
 }
 
-bool M2MTLVDeserializer::is_object_instance(uint8_t *tlv, uint32_t offset)
+bool M2MTLVDeserializer::is_object_instance(const uint8_t *tlv, uint32_t offset)
 {
     bool ret = false;
     if (tlv) {
@@ -336,7 +336,7 @@ bool M2MTLVDeserializer::is_object_instance(uint8_t *tlv, uint32_t offset)
     return ret;
 }
 
-uint16_t M2MTLVDeserializer::instance_id(uint8_t *tlv)
+uint16_t M2MTLVDeserializer::instance_id(const uint8_t *tlv)
 {
     TypeIdLength til(tlv, 0);
     til.deserialize();
@@ -344,7 +344,7 @@ uint16_t M2MTLVDeserializer::instance_id(uint8_t *tlv)
     return id;
 }
 
-bool M2MTLVDeserializer::is_resource(uint8_t *tlv, uint32_t offset)
+bool M2MTLVDeserializer::is_resource(const uint8_t *tlv, uint32_t offset)
 {
     bool ret = false;
     if (tlv) {
@@ -353,7 +353,7 @@ bool M2MTLVDeserializer::is_resource(uint8_t *tlv, uint32_t offset)
     return ret;
 }
 
-bool M2MTLVDeserializer::is_multiple_resource(uint8_t *tlv, uint32_t offset)
+bool M2MTLVDeserializer::is_multiple_resource(const uint8_t *tlv, uint32_t offset)
 {
     bool ret = false;
     if (tlv) {
@@ -362,7 +362,7 @@ bool M2MTLVDeserializer::is_multiple_resource(uint8_t *tlv, uint32_t offset)
     return ret;
 }
 
-bool M2MTLVDeserializer::is_resource_instance(uint8_t *tlv, uint32_t offset)
+bool M2MTLVDeserializer::is_resource_instance(const uint8_t *tlv, uint32_t offset)
 {
     bool ret = false;
     if (tlv) {
@@ -371,7 +371,7 @@ bool M2MTLVDeserializer::is_resource_instance(uint8_t *tlv, uint32_t offset)
     return ret;
 }
 
-TypeIdLength::TypeIdLength(uint8_t *tlv, uint32_t offset)
+TypeIdLength::TypeIdLength(const uint8_t *tlv, uint32_t offset)
 {
     _tlv = tlv;
     _offset = offset;
