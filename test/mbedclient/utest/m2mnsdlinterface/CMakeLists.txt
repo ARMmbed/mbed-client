@@ -19,6 +19,7 @@ add_executable(m2mnsdlinterface
         "../stub/nsdlaccesshelper_stub.cpp"
         "../stub/m2mtlvserializer_stub.cpp"
         "../stub/m2mtlvdeserializer_stub.cpp"
+        "../stub/mbed_trace_stub.cpp"
         "../../../../source/m2mnsdlinterface.cpp"
         "../../../../source/m2mstringbufferbase.cpp"
 )

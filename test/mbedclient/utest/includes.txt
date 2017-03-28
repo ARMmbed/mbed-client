@@ -10,6 +10,7 @@ include_directories(
 	"../../../../yotta_modules/mbed-client-linux/mbed-client-linux"
         "../../../../yotta_modules/mbed-client-mbed-os"
 	"../../../../yotta_modules/mbed-client-c"
+	"../../../../yotta_modules/mbed-trace"
 	"usr/include"
 	"$ENV{CPPUTEST_HOME}/include"
 )

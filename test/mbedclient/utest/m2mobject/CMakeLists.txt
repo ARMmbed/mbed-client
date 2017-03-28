@@ -17,6 +17,7 @@ add_executable(m2mobject
         "../stub/nsdlaccesshelper_stub.cpp"
         "../../../../source/m2mobject.cpp"
         "../stub/m2mtimer_stub.cpp"
+        "../stub/mbed_trace_stub.cpp"
         "../../../../source/m2mstringbufferbase.cpp"
 )
 target_link_libraries(m2mobject

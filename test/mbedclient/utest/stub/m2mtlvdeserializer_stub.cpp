@@ -28,27 +28,27 @@ void m2mtlvdeserializer_stub::clear()
     int_value = 0;
 }
 
-bool M2MTLVDeserializer::is_object_instance(uint8_t *)
+bool M2MTLVDeserializer::is_object_instance(const uint8_t *)
 {
     return m2mtlvdeserializer_stub::is_object_bool_value;
 }
 
-bool M2MTLVDeserializer::is_resource(uint8_t *)
+bool M2MTLVDeserializer::is_resource(const uint8_t *)
 {
     return m2mtlvdeserializer_stub::bool_value;
 }
 
-bool M2MTLVDeserializer::is_multiple_resource(uint8_t *)
+bool M2MTLVDeserializer::is_multiple_resource(const uint8_t *)
 {
     return m2mtlvdeserializer_stub::bool_value;
 }
 
-bool M2MTLVDeserializer::is_resource_instance(uint8_t *)
+bool M2MTLVDeserializer::is_resource_instance(const uint8_t *)
 {
     return m2mtlvdeserializer_stub::bool_value;
 }
 
-M2MTLVDeserializer::Error M2MTLVDeserializer::deserialize_resources(uint8_t*,
+M2MTLVDeserializer::Error M2MTLVDeserializer::deserialize_resources(const uint8_t *,
                                                                     uint32_t,
                                                                     M2MObjectInstance &,
                                                                     M2MTLVDeserializer::Operation )
@@ -56,7 +56,7 @@ M2MTLVDeserializer::Error M2MTLVDeserializer::deserialize_resources(uint8_t*,
     return m2mtlvdeserializer_stub::error;
 }
 
-M2MTLVDeserializer::Error M2MTLVDeserializer::deserialize_resource_instances(uint8_t *,
+M2MTLVDeserializer::Error M2MTLVDeserializer::deserialize_resource_instances(const uint8_t *,
                                                                              uint32_t,
                                                                              M2MResource &,
                                                                              M2MTLVDeserializer::Operation )
@@ -64,7 +64,7 @@ M2MTLVDeserializer::Error M2MTLVDeserializer::deserialize_resource_instances(uin
     return m2mtlvdeserializer_stub::error;
 }
 
-M2MTLVDeserializer::Error M2MTLVDeserializer::deserialise_object_instances(uint8_t*,
+M2MTLVDeserializer::Error M2MTLVDeserializer::deserialise_object_instances(const uint8_t *,
                                                                            uint32_t ,
                                                                            M2MObject &,
                                                                            M2MTLVDeserializer::Operation)
@@ -72,7 +72,7 @@ M2MTLVDeserializer::Error M2MTLVDeserializer::deserialise_object_instances(uint8
     return m2mtlvdeserializer_stub::error;
 }
 
-TypeIdLength::TypeIdLength(uint8_t *, uint32_t)
+TypeIdLength::TypeIdLength(const uint8_t *, uint32_t)
 {
 }
 
@@ -88,7 +88,7 @@ void TypeIdLength::deserialiseLength(uint32_t lengthType)
 {
 }
 
-uint16_t M2MTLVDeserializer::instance_id(uint8_t *tlv)
+uint16_t M2MTLVDeserializer::instance_id(const uint8_t *tlv)
 {
     return m2mtlvdeserializer_stub::int_value;
 }
