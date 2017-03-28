@@ -36,6 +36,37 @@ M2MReportHandler::~M2MReportHandler()
 {
 }
 
+void M2MReportHandler::add_observation_level(M2MBase::Observation obs_level)
+{
+}
+
+void M2MReportHandler::remove_observation_level(M2MBase::Observation obs_level)
+{
+}
+
+void M2MReportHandler::set_observation_token(const uint8_t *token, const uint8_t length)
+{
+}
+
+M2MBase::Observation M2MReportHandler::observation_level() const
+{
+    return _observation_level;
+}
+
+void M2MReportHandler::get_observation_token(uint8_t *&token, uint32_t &token_length)
+{
+}
+
+uint16_t M2MReportHandler::observation_number() const
+{
+    return _observation_number;
+}
+
+bool M2MReportHandler::is_under_observation() const
+{
+    return _is_under_observation;
+}
+
 void M2MReportHandler::set_under_observation(bool)
 {
 }

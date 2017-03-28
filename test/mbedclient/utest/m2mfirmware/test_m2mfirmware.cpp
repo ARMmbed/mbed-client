@@ -30,23 +30,28 @@ Test_M2MFirmware::Test_M2MFirmware()
     m2mobjectinstance_stub::resource = new M2MResource(*m2mobject_stub::inst,
                                                        "name",
                                                        "type",
-                                                       M2MResourceInstance::STRING,
+                                                       M2MBase::STRING,
                                                        false,
-                                                       "name");
+                                                       "name",
+                                                       false,
+                                                       false);
 
     m2mobjectinstance_stub::create_resource_instance= new M2MResourceInstance(*m2mobjectinstance_stub::resource,
                                                                               "name",
                                                                               "type",
-                                                                              M2MResourceInstance::STRING,
+                                                                              M2MBase::STRING,
                                                                               "name",
+                                                                              false,
                                                                               false);
     m2mresource_stub::bool_value = true;
     m2mobjectinstance_stub::create_resource = new M2MResource(*m2mobject_stub::inst,
                                                               "name",
                                                               "type",
-                                                              M2MResourceInstance::STRING,
+                                                              M2MBase::STRING,
                                                               false,
-                                                              "name");
+                                                              "name",
+                                                              false,
+                                                              false);
     firmware = M2MFirmware::get_instance();
 
     delete m2mobjectinstance_stub::create_resource;
@@ -78,7 +83,7 @@ void Test_M2MFirmware::test_create_resource_string()
     m2mobjectinstance_stub::create_resource = new M2MResource(*m2mobject_stub::inst,
                                                               "name",
                                                               "type",
-                                                              M2MResourceInstance::STRING,
+                                                              M2MBase::STRING,
                                                               false,
                                                               "name");
     CHECK(firmware->create_resource(M2MFirmware::PackageName,"test") != NULL);
@@ -117,7 +122,7 @@ void Test_M2MFirmware::test_create_resource_int()
     m2mobjectinstance_stub::create_resource = new M2MResource(*m2mobject_stub::inst,
                                                               "name",
                                                               "type",
-                                                              M2MResourceInstance::STRING,
+                                                              M2MBase::STRING,
                                                               false,
                                                               "name");
 
@@ -165,7 +170,7 @@ void Test_M2MFirmware::test_set_resource_value_string()
     m2mobjectinstance_stub::resource = new M2MResource(*m2mobject_stub::inst,
                                                        "name",
                                                        "type",
-                                                       M2MResourceInstance::STRING,
+                                                       M2MBase::STRING,
                                                        false,
                                                        "name");
     m2mresource_stub::bool_value = false;
@@ -202,7 +207,7 @@ void Test_M2MFirmware::test_set_resource_value_int()
     m2mobjectinstance_stub::resource = new M2MResource(*m2mobject_stub::inst,
                                                        "name",
                                                        "type",
-                                                       M2MResourceInstance::STRING,
+                                                       M2MBase::STRING,
                                                        false,
                                                        "name");
     m2mresource_stub::bool_value = false;
@@ -243,7 +248,7 @@ void Test_M2MFirmware::test_resource_value_int()
     m2mobjectinstance_stub::resource = new M2MResource(*m2mobject_stub::inst,
                                                        "name",
                                                        "type",
-                                                       M2MResourceInstance::STRING,
+                                                       M2MBase::STRING,
                                                        false,
                                                        "name");
 
@@ -279,7 +284,7 @@ void Test_M2MFirmware::test_resource_value_string()
     m2mobjectinstance_stub::resource = new M2MResource(*m2mobject_stub::inst,
                                                        "name",
                                                        "type",
-                                                       M2MResourceInstance::STRING,
+                                                       M2MBase::STRING,
                                                        false,
                                                        "name");
 
@@ -310,7 +315,7 @@ void Test_M2MFirmware::test_is_resource_present()
     m2mobjectinstance_stub::resource = new M2MResource(*m2mobject_stub::inst,
                                                        "name",
                                                        "type",
-                                                       M2MResourceInstance::STRING,
+                                                       M2MBase::STRING,
                                                        false,
                                                        "name");
     m2mresource_stub::bool_value = false;
@@ -340,7 +345,7 @@ void Test_M2MFirmware::test_total_resource_count()
     M2MResource res(*m2mobject_stub::inst,
                     "name",
                     "type",
-                    M2MResourceInstance::STRING,
+                    M2MBase::STRING,
                     false,
                     "name");
 
@@ -348,7 +353,7 @@ void Test_M2MFirmware::test_total_resource_count()
     M2MResource res2(*m2mobject_stub::inst,
                      "name",
                      "type",
-                     M2MResourceInstance::STRING,
+                     M2MBase::STRING,
                      false,
                      "name");
 
@@ -374,7 +379,7 @@ void Test_M2MFirmware::test_resource_value_buffer()
     m2mobjectinstance_stub::resource = new M2MResource(*m2mobject_stub::inst,
                                                        "name",
                                                        "type",
-                                                       M2MResourceInstance::STRING,
+                                                       M2MBase::STRING,
                                                        false,
                                                        "name");
 
@@ -409,7 +414,7 @@ void Test_M2MFirmware::test_set_resource_value_buffer()
     m2mobjectinstance_stub::resource = new M2MResource(*m2mobject_stub::inst,
                                                        "name",
                                                        "type",
-                                                       M2MResourceInstance::STRING,
+                                                       M2MBase::STRING,
                                                        false,
                                                        "name");
 
@@ -445,7 +450,7 @@ void Test_M2MFirmware::test_set_update_execute_callback()
     m2mobjectinstance_stub::resource = new M2MResource(*m2mobject_stub::inst,
                                                        "name",
                                                        "type",
-                                                       M2MResourceInstance::STRING,
+                                                       M2MBase::STRING,
                                                        false,
                                                        "name");
 
@@ -465,7 +470,7 @@ void Test_M2MFirmware::test_set_resource_value_update_callback()
     m2mobjectinstance_stub::resource = new M2MResource(*m2mobject_stub::inst,
                                                        "name",
                                                        "type",
-                                                       M2MResourceInstance::STRING,
+                                                       M2MBase::STRING,
                                                        false,
                                                        "name");
 
@@ -485,7 +490,7 @@ void Test_M2MFirmware::test_set_resource_notification_sent_callback()
     m2mobjectinstance_stub::resource = new M2MResource(*m2mobject_stub::inst,
                                                        "name",
                                                        "type",
-                                                       M2MResourceInstance::STRING,
+                                                       M2MBase::STRING,
                                                        false,
                                                        "name");
 
@@ -505,7 +510,7 @@ void Test_M2MFirmware::test_set_package_block_message_callback()
     m2mobjectinstance_stub::resource = new M2MResource(*m2mobject_stub::inst,
                                                        "name",
                                                        "type",
-                                                       M2MResourceInstance::STRING,
+                                                       M2MBase::STRING,
                                                        false,
                                                        "name");
 
