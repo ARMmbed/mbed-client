@@ -24,25 +24,25 @@
 #define MAX_TLV_ID_SIZE 2
 #define TLV_TYPE_SIZE 1
 
-uint8_t* M2MTLVSerializer::serialize(M2MObjectInstanceList object_instance_list, uint32_t &size)
+uint8_t* M2MTLVSerializer::serialize(const M2MObjectInstanceList &object_instance_list, uint32_t &size)
 {
     return serialize_object_instances(object_instance_list, size);
 }
 
-uint8_t* M2MTLVSerializer::serialize(M2MResourceList resource_list, uint32_t &size)
+uint8_t* M2MTLVSerializer::serialize(const M2MResourceList &resource_list, uint32_t &size)
 {
     bool valid = true;
     return serialize_resources(resource_list, size,valid);
 }
 
-uint8_t* M2MTLVSerializer::serialize(M2MResource *resource, uint32_t &size)
+uint8_t* M2MTLVSerializer::serialize(const M2MResource *resource, uint32_t &size)
 {
     uint8_t* data = NULL;
     serialize(resource, data, size);
     return data;
 }
 
-uint8_t* M2MTLVSerializer::serialize_object_instances(M2MObjectInstanceList object_instance_list, uint32_t &size)
+uint8_t* M2MTLVSerializer::serialize_object_instances(const M2MObjectInstanceList &object_instance_list, uint32_t &size)
 {
     uint8_t *data = NULL;
 
@@ -57,7 +57,7 @@ uint8_t* M2MTLVSerializer::serialize_object_instances(M2MObjectInstanceList obje
     return data;
 }
 
-uint8_t* M2MTLVSerializer::serialize_resources(M2MResourceList resource_list, uint32_t &size, bool &valid)
+uint8_t* M2MTLVSerializer::serialize_resources(const M2MResourceList &resource_list, uint32_t &size, bool &valid)
 {
     uint8_t *data = NULL;
 
@@ -88,7 +88,7 @@ uint8_t* M2MTLVSerializer::serialize_resources(M2MResourceList resource_list, ui
     return data;
 }
 
-bool M2MTLVSerializer::serialize(uint16_t id, M2MObjectInstance *object_instance, uint8_t *&data, uint32_t &size)
+bool M2MTLVSerializer::serialize(uint16_t id, const M2MObjectInstance *object_instance, uint8_t *&data, uint32_t &size)
 {
     uint8_t *resource_data = NULL;
     uint32_t resource_size = 0;
@@ -111,7 +111,7 @@ bool M2MTLVSerializer::serialize(uint16_t id, M2MObjectInstance *object_instance
     return success;
 }
 
-bool M2MTLVSerializer::serialize(M2MResource *resource, uint8_t *&data, uint32_t &size)
+bool M2MTLVSerializer::serialize(const M2MResource *resource, uint8_t *&data, uint32_t &size)
 {
     bool success = false;
     if(resource->name_id() != -1) {
@@ -122,7 +122,7 @@ bool M2MTLVSerializer::serialize(M2MResource *resource, uint8_t *&data, uint32_t
     return success;
 }
 
-bool M2MTLVSerializer::serialize_resource(M2MResource *resource, uint8_t *&data, uint32_t &size)
+bool M2MTLVSerializer::serialize_resource(const M2MResource *resource, uint8_t *&data, uint32_t &size)
 {
     bool success = false;
     if(resource->name_id() != -1) {
@@ -132,7 +132,7 @@ bool M2MTLVSerializer::serialize_resource(M2MResource *resource, uint8_t *&data,
     return success;
 }
 
-bool M2MTLVSerializer::serialize_multiple_resource(M2MResource *resource, uint8_t *&data, uint32_t &size)
+bool M2MTLVSerializer::serialize_multiple_resource(const M2MResource *resource, uint8_t *&data, uint32_t &size)
 {
     bool success = false;
     uint8_t *nested_data = NULL;
@@ -164,7 +164,7 @@ bool M2MTLVSerializer::serialize_multiple_resource(M2MResource *resource, uint8_
     return success;
 }
 
-bool M2MTLVSerializer::serialize_resource_instance(uint16_t id, M2MResourceInstance *resource, uint8_t *&data, uint32_t &size)
+bool M2MTLVSerializer::serialize_resource_instance(uint16_t id, const M2MResourceInstance *resource, uint8_t *&data, uint32_t &size)
 {
     return serialize_TILV(TYPE_RESOURCE_INSTANCE, id, resource->value(), resource->value_length(), data, size);
 }

@@ -63,8 +63,6 @@ void Test_M2MTLVSerializer::test_serialize_object_out_of_memory()
 
     m2mobject_stub::instance_list.push_back(instance);
 
-
-
     M2MResource* resource = new M2MResource(*instance,
                                             "1",
                                             "type",
@@ -77,12 +75,12 @@ void Test_M2MTLVSerializer::test_serialize_object_out_of_memory()
 
     m2mbase_stub::name_id_value = 0;
     memory_fail_counter=1; //apply for 1 time failing malloc
-    memory_will_fail_counter=3; //after 3 successful ones
+    memory_will_fail_counter=0; //after 0 successful ones
     data = serializer->serialize( m2mobject_stub::instance_list,size);
     CHECK(data == NULL);
 
     memory_fail_counter=1; //apply for 1 time failing malloc
-    memory_will_fail_counter=4; //after 4 successful ones
+    memory_will_fail_counter=1; //after 1 successful ones
     data = serializer->serialize( m2mobject_stub::instance_list,size);
     CHECK(data == NULL);
 
@@ -106,6 +104,16 @@ void Test_M2MTLVSerializer::test_serialize_object_out_of_memory()
     m2mresource_stub::list.push_back(res_instance);
     m2mresource_stub::list.push_back(res_instance_1);
     memory_fail_counter=1; //apply for 1 time failing malloc
+    memory_will_fail_counter=2; //after 2 successful ones
+    data = serializer->serialize( m2mobject_stub::instance_list,size);
+    CHECK(data == NULL);
+
+    memory_fail_counter=1; //apply for 1 time failing malloc
+    memory_will_fail_counter=3; //after 3 successful ones
+    data = serializer->serialize( m2mobject_stub::instance_list,size);
+    CHECK(data == NULL);
+
+    memory_fail_counter=1; //apply for 1 time failing malloc
     memory_will_fail_counter=4; //after 4 successful ones
     data = serializer->serialize( m2mobject_stub::instance_list,size);
     CHECK(data == NULL);
@@ -113,17 +121,15 @@ void Test_M2MTLVSerializer::test_serialize_object_out_of_memory()
     memory_fail_counter=1; //apply for 1 time failing malloc
     memory_will_fail_counter=5; //after 5 successful ones
     data = serializer->serialize( m2mobject_stub::instance_list,size);
-    CHECK(data == NULL);
+    // the data was actually encoded 
+    CHECK(data != NULL);
 
-    memory_fail_counter=1; //apply for 1 time failing malloc
-    memory_will_fail_counter=6; //after 6 successful ones
-    data = serializer->serialize( m2mobject_stub::instance_list,size);
-    CHECK(data == NULL);
+    free(data);
 
-    memory_fail_counter=1; //apply for 1 time failing malloc
-    memory_will_fail_counter=7; //after 7 successful ones
-    data = serializer->serialize( m2mobject_stub::instance_list,size);
-    CHECK(data == NULL);
+    // Disable the failures in allocator as the cpputest will otherwise panic 
+    // on its own cleanup which does allocation.
+    memory_fail_counter = 0;
+    memory_will_fail_counter = 0;
 
     delete res_instance_1;
     delete res_instance;
@@ -445,12 +451,12 @@ void Test_M2MTLVSerializer::test_serialize_resource_instance_out_of_memory()
 
     m2mbase_stub::operation = M2MBase::GET_ALLOWED;
     memory_fail_counter=1; //apply for 1 time failing malloc
-    memory_will_fail_counter=3; //after 3 successful ones
+    memory_will_fail_counter=1; //after 1 successful ones
     data = serializer->serialize( m2mobjectinstance_stub::resource_list,size);
     CHECK(data == NULL);
 
     memory_fail_counter=1; //apply for 1 time failing malloc
-    memory_will_fail_counter=4; //after 4 successful ones
+    memory_will_fail_counter=2; //after 2 successful ones
     data = serializer->serialize( m2mobjectinstance_stub::resource_list,size);
     CHECK(data == NULL);
 
