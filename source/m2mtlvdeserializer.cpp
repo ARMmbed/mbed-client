@@ -93,11 +93,11 @@ M2MTLVDeserializer::Error M2MTLVDeserializer::deserialize_resource_instances(con
 
         uint8_t length = tlv[0] & 0x18;
         if(length == 0x08) {
-        offset+= 1;
+            offset += 1;
         } else if(length == 0x10) {
-        offset+= 2;
+            offset += 2;
         } else if(length == 0x18) {
-        offset+= 3;
+            offset += 3;
         }
 
         tr_debug("M2MTLVDeserializer::deserialize_resource_instances() Offset %d", offset);
@@ -295,7 +295,7 @@ M2MTLVDeserializer::Error M2MTLVDeserializer::deserialize_resource_instances(con
                 found = true;
                 if(update_value) {
                     if(til._length > 0) {
-                    (*it)->set_value(tlv+offset, til._length);
+                        (*it)->set_value(tlv+offset, til._length);
                     } else {
                         (*it)->clear_value();
                     }
@@ -372,12 +372,8 @@ bool M2MTLVDeserializer::is_resource_instance(const uint8_t *tlv, uint32_t offse
 }
 
 TypeIdLength::TypeIdLength(const uint8_t *tlv, uint32_t offset)
+: _tlv(tlv), _offset(offset), _type(tlv[offset] & 0xC0), _id(0), _length(0)
 {
-    _tlv = tlv;
-    _offset = offset;
-    _type = tlv[offset] & 0xC0;
-    _id = 0;
-    _length = 0;
 }
 
 void TypeIdLength::deserialize()
