@@ -144,11 +144,11 @@ private:
                                                              bool update_value);
 
     static bool is_object_instance(const uint8_t *tlv, uint32_t offset);
-    
+
     static bool is_resource(const uint8_t *tlv, uint32_t offset);
-    
+
     static bool is_multiple_resource(const uint8_t *tlv, uint32_t offset);
-    
+
     static bool is_resource_instance(const uint8_t *tlv, uint32_t offset);
 };
 
@@ -159,9 +159,9 @@ public:
 
     void deserialize();
 
-    void deserialiseID (uint32_t idLength);
+    void deserialiseID(uint32_t idLength);
 
-    void deserialiseLength (uint32_t lengthType);
+    void deserialiseLength(uint32_t lengthType);
 
     const uint8_t     *_tlv;
     uint32_t    _offset;

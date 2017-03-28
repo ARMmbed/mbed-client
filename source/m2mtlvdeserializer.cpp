@@ -122,7 +122,7 @@ M2MTLVDeserializer::Error M2MTLVDeserializer::deserialize_object_instances(const
     til.deserialize();
     offset = til._offset;
 
-    M2MObjectInstanceList list = object.instances();
+    const M2MObjectInstanceList &list = object.instances();
     M2MObjectInstanceList::const_iterator it;
     it = list.begin();
 
@@ -154,7 +154,7 @@ M2MTLVDeserializer::Error M2MTLVDeserializer::deserialize_resources(const uint8_
     til.deserialize();
     offset = til._offset;
 
-    M2MResourceList list = object_instance.resources();
+    const M2MResourceList &list = object_instance.resources();
     M2MResourceList::const_iterator it;
     it = list.begin();
 
@@ -226,7 +226,7 @@ M2MTLVDeserializer::Error M2MTLVDeserializer::deserialize_resource_instances(con
     offset = til._offset;
 
     if (TYPE_MULTIPLE_RESOURCE == til._type || TYPE_RESOURCE_INSTANCE == til._type) {
-        M2MResourceInstanceList list = resource.resource_instances();
+        const M2MResourceInstanceList &list = resource.resource_instances();
         M2MResourceInstanceList::const_iterator it;
         it = list.begin();
         bool found = false;
@@ -286,7 +286,7 @@ M2MTLVDeserializer::Error M2MTLVDeserializer::deserialize_resource_instances(con
     offset = til._offset;
 
     if (TYPE_RESOURCE_INSTANCE == til._type) {
-        M2MResourceInstanceList list = resource.resource_instances();
+        const M2MResourceInstanceList &list = resource.resource_instances();
         M2MResourceInstanceList::const_iterator it;
         it = list.begin();
         bool found = false;
