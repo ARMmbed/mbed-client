@@ -8,6 +8,7 @@ add_executable(m2mreporthandler
         "test_m2mreporthandler.cpp"
         "../stub/m2mtimer_stub.cpp"
         "../stub/m2mstring_stub.cpp"
+        "../stub/mbed_trace_stub.cpp"
         "../../../../source/m2mreporthandler.cpp"
 
 )
