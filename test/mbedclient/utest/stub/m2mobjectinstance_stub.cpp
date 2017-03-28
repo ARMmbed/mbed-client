@@ -41,15 +41,18 @@ void m2mobjectinstance_stub::clear()
     resource_list.clear();
 }
 
-M2MObjectInstance::M2MObjectInstance(M2MObject& parent, const String &object_name,
+M2MObjectInstance::M2MObjectInstance(M2MObject& parent,
                                      const String &resource_type,
                                      char *path,
                                      bool external_blockwise_store)
-: M2MBase(object_name,
+: M2MBase("",
           M2MBase::Dynamic,
+#ifndef DISABLE_RESOURCE_TYPE
           resource_type,
+#endif
           path,
-          external_blockwise_store),
+          external_blockwise_store,
+          false),
   _parent(parent)
 {
 }

@@ -135,9 +135,9 @@ public:
     typedef struct lwm2m_parameters {
         //add multiple_instances
         uint32_t            max_age;
-        mutable union {
-        uint16_t            instance_id; // XXX: this is not properly aligned now, need to reorder these after the elimination is done        
-        char*               name; //for backwards compability
+        union {
+            char*               name; //for backwards compability
+            uint16_t            instance_id; // XXX: this is not properly aligned now, need to reorder these after the elimination is done
         } identifier;
         sn_nsdl_dynamic_resource_parameters_s *dynamic_resource_params;
         BaseType            base_type;
