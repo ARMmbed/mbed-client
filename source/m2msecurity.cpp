@@ -197,7 +197,8 @@ bool M2MSecurity::set_resource_value(SecurityResource resource,
             uint8_t size = 0;
             uint8_t *buffer = String::convert_integer_to_array(value, size);
             success = res->set_value(buffer,size);
-            memory_free(buffer);
+            /* String is not yet using own heap, so force freeing with system free */
+            /*memory_*/free(buffer); 
         }
     }
     return success;
