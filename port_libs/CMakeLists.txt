@@ -1,6 +1,0 @@
-INCLUDE(CMakeForceCompiler)
-# CROSS COMPILER SETTING
-cmake_minimum_required (VERSION 2.8)
-SET(CMAKE_SYSTEM_NAME Generic)
-
-ADDSUBDIRS()
