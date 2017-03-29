@@ -17,7 +17,7 @@
 #include "mbed-client/m2mobject.h"
 #include "mbed-client/m2mobjectinstance.h"
 #include "mbed-client/m2mresource.h"
-#include "include/m2mapplicationmemory.h"
+#include "include/m2mcorememory.h"
 
 class M2MResourceBase;
 
@@ -28,7 +28,7 @@ class M2MResourceBase;
  * for resource model) as OMA-TLV according described in chapter 6.3.3. 
  * 
  */
-class M2MTLVSerializer : public M2MApplicationMemory {
+class M2MTLVSerializer : public M2MCoreMemory {
 
 public:
 
