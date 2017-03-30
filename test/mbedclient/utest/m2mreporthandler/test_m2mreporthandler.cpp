@@ -454,3 +454,76 @@ void Test_M2MReportHandler::test_attribute_flags()
             M2MReportHandler::St | M2MReportHandler::Gt | M2MReportHandler::Lt | M2MReportHandler::Cancel;
     CHECK(_handler->attribute_flags() == (1 << 6) - 1);
 }
+
+void Test_M2MReportHandler::test_get_observation_token()
+{
+    u_int8_t test_value[] = {"val"};
+    u_int32_t value_length((u_int32_t)sizeof(test_value));
+
+    u_int8_t* out_value = (u_int8_t *)malloc(value_length);
+    u_int32_t out_size = value_length;
+    memcpy((u_int8_t *)out_value, (u_int8_t *)test_value, value_length);
+
+    u_int8_t test[] = {"token"};
+    _handler->_token_length = (u_int8_t)sizeof(test);
+    _handler->_token = (u_int8_t *)malloc(_handler->_token_length);
+    memcpy((u_int8_t *)_handler->_token, (u_int8_t *)test, _handler->_token_length);
+
+    _handler->get_observation_token(out_value,out_size);
+
+    CHECK(out_size == 6);
+
+    free(out_value);
+}
+
+void Test_M2MReportHandler::test_observation_level()
+{
+    _handler->_observation_level = M2MBase::OR_Attribute;
+    CHECK(M2MBase::OR_Attribute == _handler->observation_level());
+}
+
+void Test_M2MReportHandler::test_set_observation_token()
+{
+    _handler->_token_length = 4;
+    _handler->_token = (u_int8_t *)malloc(_handler->_token_length);
+    String test = "token";
+    _handler->set_observation_token((const u_int8_t*)test.c_str(), (u_int8_t)test.size());
+
+    CHECK(_handler->_token_length == 5);
+}
+
+void Test_M2MReportHandler::test_add_observation_level()
+{
+    _handler->add_observation_level(M2MBase::R_Attribute);
+    CHECK(M2MBase::R_Attribute == _handler->_observation_level);
+
+    _handler->add_observation_level(M2MBase::O_Attribute);
+    CHECK(M2MBase::OR_Attribute == _handler->_observation_level);
+}
+
+void Test_M2MReportHandler::test_remove_observation_level()
+{
+    _handler->_observation_level = M2MBase::OR_Attribute;
+    _handler->remove_observation_level(M2MBase::R_Attribute);
+    CHECK(M2MBase::O_Attribute == _handler->_observation_level);
+
+    _handler->remove_observation_level(M2MBase::O_Attribute);
+    CHECK(M2MBase::None == _handler->_observation_level);
+
+    _handler->_observation_level = M2MBase::OI_Attribute;
+    _handler->remove_observation_level(M2MBase::R_Attribute);
+    CHECK(M2MBase::OI_Attribute == _handler->_observation_level);
+
+    _handler->remove_observation_level(M2MBase::OI_Attribute);
+    CHECK(M2MBase::None == _handler->_observation_level);
+    _handler->remove_observation_level(M2MBase::OI_Attribute);
+    CHECK(M2MBase::None == _handler->_observation_level);
+
+}
+
+void Test_M2MReportHandler::test_is_under_observation()
+{
+    CHECK(false == _handler->is_under_observation());
+    _handler->_is_under_observation = true;
+    CHECK(true == _handler->is_under_observation());
+}

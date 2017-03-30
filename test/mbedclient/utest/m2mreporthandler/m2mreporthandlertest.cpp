@@ -79,3 +79,33 @@ TEST(M2MReportHandler, test_attribute_flags)
     m2m_reporthandler->test_attribute_flags();
 }
 
+TEST(M2MReportHandler, observation_token)
+{
+    m2m_reporthandler->test_get_observation_token();
+}
+
+TEST(M2MReportHandler, observation_level)
+{
+    m2m_reporthandler->test_observation_level();
+}
+
+TEST(M2MReportHandler, set_observation_token)
+{
+    m2m_reporthandler->test_set_observation_token();
+}
+
+TEST(M2MReportHandler, add_observation_level)
+{
+    m2m_reporthandler->test_add_observation_level();
+}
+
+TEST(M2MReportHandler, remove_observation_level)
+{
+    m2m_reporthandler->test_remove_observation_level();
+}
+
+TEST(M2MReportHandler, test_is_under_observation)
+{
+    m2m_reporthandler->test_is_under_observation();
+}
+

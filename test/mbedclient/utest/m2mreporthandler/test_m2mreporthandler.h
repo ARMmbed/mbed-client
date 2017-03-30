@@ -43,6 +43,18 @@ public:
 
     void test_attribute_flags();
 
+    void test_get_observation_token();
+
+    void test_observation_level();
+
+    void test_set_observation_token();
+
+    void test_add_observation_level();
+
+    void test_remove_observation_level();
+
+    void test_is_under_observation();
+
     M2MReportHandler *_handler;
     Observer         * _observer;
 };
