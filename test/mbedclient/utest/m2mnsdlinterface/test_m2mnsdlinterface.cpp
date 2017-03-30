@@ -1246,6 +1246,7 @@ void Test_M2MNsdlInterface::test_resource_callback_post()
     free(m2mbase_stub::nsdl_resource->static_resource_parameters->path);
     free(m2mbase_stub::nsdl_resource->static_resource_parameters);
     free(m2mbase_stub::nsdl_resource);
+    m2mbase_stub::nsdl_resource = NULL;
 
     m2mbase_stub::clear();
     common_stub::clear();
