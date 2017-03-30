@@ -73,14 +73,8 @@ void m2mbase_stub::clear()
     resource_token = NULL;
     resource_token_len = 0;
     object_inst_token = NULL;
-    if(sn_resource) {
-        free(sn_resource);
-    }
-    sn_resource= NULL;
-    if(nsdl_resource) {
-        free(nsdl_resource);
-    }
-
+    sn_resource = NULL;
+    sn_resource = NULL;
     nsdl_resource = NULL;
     object_inst_token_len = 0;
     find_resource = false;

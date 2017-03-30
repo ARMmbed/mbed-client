@@ -245,10 +245,12 @@ void Test_M2MResourceInstance::test_set_value()
   //  resource_instance->_value = (u_int8_t*)malloc(sizeof(u_int8_t));
     m2mbase_stub::bool_value = true;
 
-    m2mbase_stub::nsdl_resource = (sn_nsdl_dynamic_resource_parameters_s *)malloc(sizeof(sn_nsdl_dynamic_resource_parameters_s));
+    sn_nsdl_dynamic_resource_parameters_s res_param;
+    m2mbase_stub::nsdl_resource = &res_param;
     memset(m2mbase_stub::nsdl_resource,0,sizeof(sn_nsdl_dynamic_resource_parameters_s));
 
-    m2mbase_stub::sn_resource = (M2MBase::lwm2m_parameters_s*) malloc(sizeof(M2MBase::lwm2m_parameters_s));
+    M2MBase::lwm2m_parameters_s param;
+    m2mbase_stub::sn_resource = &param;
     memset(m2mbase_stub::sn_resource,0,sizeof(M2MBase::lwm2m_parameters_s));
     m2mbase_stub::sn_resource->data_type = M2MBase::STRING;
 
@@ -338,14 +340,9 @@ void Test_M2MResourceInstance::test_set_value()
     m2mbase_stub::report = NULL;
     delete resource_cb;
 
-    free(m2mbase_stub::sn_resource);
-    m2mbase_stub::sn_resource = NULL;
 
     free(m2mbase_stub::nsdl_resource->resource);
     m2mbase_stub::nsdl_resource->resource = NULL;
-
-    free(m2mbase_stub::nsdl_resource);
-    m2mbase_stub::nsdl_resource = NULL;
 }
 
 void Test_M2MResourceInstance::test_clear_value()
@@ -479,11 +476,13 @@ void Test_M2MResourceInstance::test_handle_get_request()
 
     coap_header->content_format = sn_coap_content_format_e(110);
 
-    m2mbase_stub::sn_resource = (M2MBase::lwm2m_parameters_s*) malloc(sizeof(M2MBase::lwm2m_parameters_s));
+    M2MBase::lwm2m_parameters_s param;
+    m2mbase_stub::sn_resource = &param;
     memset(m2mbase_stub::sn_resource,0,sizeof(M2MBase::lwm2m_parameters_s));
     m2mbase_stub::sn_resource->data_type = M2MBase::STRING;
 
-    m2mbase_stub::nsdl_resource = (sn_nsdl_dynamic_resource_parameters_s *)malloc(sizeof(sn_nsdl_dynamic_resource_parameters_s));
+    sn_nsdl_dynamic_resource_parameters_s res_param;
+    m2mbase_stub::nsdl_resource = &res_param;
     memset(m2mbase_stub::nsdl_resource,0,sizeof(sn_nsdl_dynamic_resource_parameters_s));
 
     CHECK(resource_instance->handle_get_request(NULL,coap_header,handler) != NULL);
@@ -595,7 +594,8 @@ void Test_M2MResourceInstance::test_handle_put_request()
 
     m2mbase_stub::bool_value = false;
 
-    m2mbase_stub::sn_resource = (M2MBase::lwm2m_parameters_s*) malloc(sizeof(M2MBase::lwm2m_parameters_s));
+    M2MBase::lwm2m_parameters_s param;
+    m2mbase_stub::sn_resource = &param;
 
     memset(m2mbase_stub::sn_resource,0,sizeof(M2MBase::lwm2m_parameters_s));
 
@@ -619,7 +619,8 @@ void Test_M2MResourceInstance::test_handle_put_request()
 
     coap_header->content_format = sn_coap_content_format_e(100);
 
-    m2mbase_stub::nsdl_resource = (sn_nsdl_dynamic_resource_parameters_s *)malloc(sizeof(sn_nsdl_dynamic_resource_parameters_s));
+    sn_nsdl_dynamic_resource_parameters_s res_param;
+    m2mbase_stub::nsdl_resource = &res_param;
     memset(m2mbase_stub::nsdl_resource,0,sizeof(sn_nsdl_dynamic_resource_parameters_s));
 
     coap_response = resource_instance->handle_put_request(NULL,coap_header,handler,execute_value_updated);
