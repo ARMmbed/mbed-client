@@ -100,9 +100,32 @@ void Test_M2MObjectInstance::test_create_static_resource()
     CHECK(res != NULL);
 
     m2mbase_stub::bool_value = false;
-    res = object_instance->create_static_resource(&params,M2MResourceInstance::STRING);
+    res = object_instance->create_static_resource(&params,M2MResourceInstance::INTEGER);
     CHECK(res == NULL);
 
+    m2mbase_stub::bool_value = true;
+    res = object_instance->create_static_resource(&params,M2MResourceInstance::INTEGER);
+    CHECK(res != NULL);
+
+    m2mbase_stub::bool_value = true;
+    res = object_instance->create_static_resource(&params,M2MResourceInstance::BOOLEAN);
+    CHECK(res != NULL);
+
+    m2mbase_stub::bool_value = true;
+    res = object_instance->create_static_resource(&params,M2MResourceInstance::FLOAT);
+    CHECK(res != NULL);
+
+    m2mbase_stub::bool_value = true;
+    res = object_instance->create_static_resource(&params,M2MResourceInstance::OBJLINK);
+    CHECK(res != NULL);
+
+    m2mbase_stub::bool_value = true;
+    res = object_instance->create_static_resource(&params,M2MResourceInstance::OPAQUE);
+    CHECK(res != NULL);
+
+    m2mbase_stub::bool_value = true;
+    res = object_instance->create_static_resource(&params,M2MResourceInstance::TIME);
+    CHECK(res != NULL);
 }
 
 void Test_M2MObjectInstance::test_create_static_resource_instance()
@@ -205,7 +228,8 @@ void Test_M2MObjectInstance::test_create_dynamic_resource()
 
 void Test_M2MObjectInstance::test_remove_resource()
 {
-    CHECK(false == object_instance->remove_resource("name"));
+    CHECK(object_instance->remove_resource(String("name")) == false);
+    CHECK(object_instance->remove_resource("name") == false);
     M2MResource *res = new M2MResource(*object_instance,"name","type",M2MBase::STRING,false, "name");
     object_instance->_resource_list.push_back(res);
 
@@ -299,6 +323,8 @@ void Test_M2MObjectInstance::test_resource_count()
     m2mresource_stub::bool_value = false;
 
     CHECK(2 == object_instance->resource_count("name"));
+
+    CHECK(2 == object_instance->resource_count(String("name")));
 }
 
 void Test_M2MObjectInstance::test_total_resource_count()
