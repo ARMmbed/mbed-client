@@ -137,6 +137,8 @@ public:
 
     void test_ctor();
 
+    void test_get_lwm2m_parameter();
+
     Handler *obsHandler;
 };
 

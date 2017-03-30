@@ -125,8 +125,7 @@ void Test_M2MBase::test_set_instance_id()
     if(_sn_resource->identifier_int_type == false) {
         free(_sn_resource->identifier.name);
     }
-    _sn_resource->identifier_int_type = true;
-    _sn_resource->identifier.instance_id = test;
+    set_instance_id(test);
 
     CHECK(test == this->instance_id());
 }
@@ -141,6 +140,8 @@ void Test_M2MBase::test_set_observable()
 
 void Test_M2MBase::test_add_observation_level()
 {
+    Observer obs;
+    this->_report_handler = new M2MReportHandler(obs);
     add_observation_level(M2MBase::R_Attribute);
 
     add_observation_level(M2MBase::O_Attribute);
@@ -148,6 +149,9 @@ void Test_M2MBase::test_add_observation_level()
 
 void Test_M2MBase::test_remove_observation_level()
 {
+    Observer obs;
+    this->_report_handler = new M2MReportHandler(obs);
+
     remove_observation_level(M2MBase::R_Attribute);
 
     remove_observation_level(M2MBase::O_Attribute);
@@ -182,6 +186,8 @@ void Test_M2MBase::test_set_under_observation()
 void Test_M2MBase::test_set_observation_token()
 {
     String test = "token";
+    Observer obs;
+    this->_report_handler = new M2MReportHandler(obs);
     set_observation_token((const u_int8_t*)test.c_str(), (u_int8_t)test.size());
 }
 
@@ -506,6 +512,11 @@ void Test_M2MBase::test_is_integer()
     CHECK(is_integer("10") == true);
     CHECK(is_integer("+10") == true);
     CHECK(is_integer("-10") == true);
+
+    String id("");
+    CHECK(is_integer(id) == false);
+    String id1("10");
+    CHECK(is_integer(id1) == true);
 }
 
 void Test_M2MBase::test_alloc_copy()
@@ -570,4 +581,9 @@ void Test_M2MBase::test_ctor()
     };
     M2MBase* base = new M2MBase(&params);
     delete base;
+}
+
+void Test_M2MBase::test_get_lwm2m_parameter()
+{
+    CHECK(get_lwm2m_parameters() != NULL);
 }
