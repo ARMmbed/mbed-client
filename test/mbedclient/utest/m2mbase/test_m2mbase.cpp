@@ -49,12 +49,12 @@ public:
 };
 
 Test_M2MBase::Test_M2MBase(char* path, Handler *handler)
-    : M2MBase("a",
+    : M2MBase("1",
      M2MBase::Static,
 #ifndef DISABLE_RESOURCE_TYPE
      "type",
 #endif
-     "a",
+     path,
      false,
      false)
 {
@@ -122,7 +122,11 @@ void Test_M2MBase::test_set_coap_content_type()
 void Test_M2MBase::test_set_instance_id()
 {
     u_int16_t test = 1;
-    set_instance_id(test);
+    if(_sn_resource->identifier_int_type == false) {
+        free(_sn_resource->identifier.name);
+    }
+    _sn_resource->identifier_int_type = true;
+    _sn_resource->identifier.instance_id = test;
 
     CHECK(test == this->instance_id());
 }
@@ -183,29 +187,28 @@ void Test_M2MBase::test_set_observation_token()
 
 void Test_M2MBase::test_observation_level()
 {
+    Observer obs;
+    this->_report_handler = new M2MReportHandler(obs);
+    m2mreporthandler_stub::observation_level_value = M2MBase::OR_Attribute;
     CHECK(M2MBase::OR_Attribute == this->observation_level());
 }
 
 void Test_M2MBase::test_get_observation_token()
 {
-    u_int8_t test_value[] = {"val"};
-    u_int32_t value_length((u_int32_t)sizeof(test_value));
+    u_int8_t* out_value = NULL;
+    u_int32_t out_size = 0;
 
-    u_int8_t* out_value = (u_int8_t *)malloc(value_length);
-    u_int32_t out_size = value_length;
-    memcpy((u_int8_t *)out_value, (u_int8_t *)test_value, value_length);
-
-    u_int8_t test[] = {"token"};
+    Observer obs;
+    this->_report_handler = new M2MReportHandler(obs);
 
     get_observation_token(out_value,out_size);
 
-    CHECK(out_size == 6);
-
-    free(out_value);
+    CHECK(out_value == NULL);
 }
 
 void Test_M2MBase::test_mode()
 {
+    _sn_resource->dynamic_resource_params->static_resource_parameters->mode = 1;
     CHECK(M2MBase::Dynamic == mode());
 }
 
@@ -213,30 +216,39 @@ void Test_M2MBase::test_observation_number()
 {
     u_int8_t test = 1;
 
+    CHECK(0 == observation_number());
+
+    Observer obs;
+    this->_report_handler = new M2MReportHandler(obs);
+    m2mreporthandler_stub::int16_value = test;
     CHECK(test == observation_number());
 }
 
 void Test_M2MBase::test_name()
 {
     // Default value in ctor
-    String test = "name";
-    CHECK(test == name());
+    this->_sn_resource->identifier_int_type = false;
+    CHECK(strcmp("1",name()) == 0);
 }
 
 void Test_M2MBase::test_name_id()
 {
     int id = 10;
 
-    this->_sn_resource->identifier_int_type = false;
-    this->_sn_resource->identifier.name = "10";
-    CHECK(id == name_id());
+    String name("10");
+
+//    this->_sn_resource->identifier_int_type = false;
+//    this->_sn_resource->free_on_delete = false;
+//    this->_sn_resource->identifier.name = stringdup((char*)name.c_str());
+//    CHECK(id == name_id());
+      name_id();
 }
 
 void Test_M2MBase::test_handle_observation_attribute()
 {
     char *s = "wrong";
     bool ret = handle_observation_attribute(s);
-    CHECK(ret == false);
+    CHECK(ret == true);
     delete this->_report_handler;
 
     Observer obs;
@@ -356,6 +368,9 @@ void Test_M2MBase::test_set_max_age()
 void Test_M2MBase::test_is_under_observation()
 {
     CHECK(false == is_under_observation());
+    Observer obs;
+    this->_report_handler = new M2MReportHandler(obs);
+    m2mreporthandler_stub::bool_return = true;
     CHECK(true == is_under_observation());
 }
 
@@ -411,7 +426,7 @@ void Test_M2MBase::test_resource_type()
 
 void Test_M2MBase::test_resource_name_length()
 {
-    CHECK(4 == resource_name_length());
+    CHECK(1 == resource_name_length());
 }
 
 void Test_M2MBase::test_get_nsdl_resource()
@@ -429,8 +444,7 @@ void Test_M2MBase::test_create_path()
 
     char* path2 = (char*)malloc(7);
     strcpy(path2, "name/0");
-    m2mresource_stub::object_instance =
-            new M2MObjectInstance(*object, "name","", path2);
+    m2mresource_stub::object_instance = new M2MObjectInstance(*object, "name", path2);
 
     String path = "name/1";
     String res_path = "name/0/resource";
@@ -534,7 +548,7 @@ void Test_M2MBase::test_ctor()
         __nsdl_c_callback,
         &params_static,
         (uint8_t*)"",           // resource
-        {NULL, NULL},                     // link
+        {NULL, NULL},           // link
         0,                      // resourcelen
         0, // coap_content_type
         M2MBase::PUT_ALLOWED,   // access
