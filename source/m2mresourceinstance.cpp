@@ -24,6 +24,8 @@
 #include "mbed-client/m2mblockmessage.h"
 #include "mbed-trace/mbed_trace.h"
 
+#include "include/m2mcorememory.h" //hack for dual heap implementation
+
 #define TRACE_GROUP "mClt"
 
 M2MResourceInstance::M2MResourceInstance(M2MResource &parent,
@@ -404,10 +406,19 @@ sn_coap_hdr_s* M2MResourceInstance::handle_get_request(nsdl_s *nsdl,
                             name.append_raw((char *)received_coap_header->uri_path_ptr,
                                              received_coap_header->uri_path_len);
                         }
-                        (*_outgoing_block_message_cb)(name, coap_response->payload_ptr, payload_len);
+                        /* Here would probably also be a problem with dual heaps. Should make a copy to correct memory space */
+                        (*_outgoing_block_message_cb)(name, coap_response->payload_ptr, payload_len); 
                     }
                 } else {
-                    get_value(coap_response->payload_ptr,payload_len);
+                    uint8_t *tempPayload=0;
+                    get_value(tempPayload,payload_len); //This is a problem because get_value makes a copy from M2Mbase heap and not fron "coap" heap
+                    if(payload_len > 0){
+                        coap_response->payload_ptr = (uint8_t *)M2MCoreMemory::memory_alloc(payload_len); //hack alloc CoreMemory
+                        memcpy(coap_response->payload_ptr, tempPayload, payload_len); // hack copy to CoreMemory
+                        memory_free(tempPayload); //hack free temp payload from ApplicationMemory
+                    } else {
+                        coap_response->payload_ptr = tempPayload;
+                    }
                 }
 
                 coap_response->payload_len = payload_len;
