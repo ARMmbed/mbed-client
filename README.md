@@ -9,7 +9,7 @@ Running Unit Tests
 -----------------------
 
 Pre-requisites for the unit tests includes the following tools:
-- CppUTest
+- CppUTestasdasdasdasdasd
 - XSL
 - lcov
 - gcovr
