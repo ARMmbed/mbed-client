@@ -74,7 +74,7 @@ M2MNsdlInterface::M2MNsdlInterface(M2MNsdlObserver &observer, M2MConnectionHandl
     // and free functions in structure and used functions for sending
     // and receiving purposes.
     _nsdl_handle = sn_nsdl_init(&(__nsdl_c_send_to_server), &(__nsdl_c_received_from_server),
-                 &(memory_alloc), &(memory_free));
+                 &(__nsdl_c_memory_alloc), &(__nsdl_c_memory_free));
     sn_nsdl_set_context(_nsdl_handle, this);
 
     initialize();

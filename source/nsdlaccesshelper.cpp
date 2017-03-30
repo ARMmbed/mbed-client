@@ -39,6 +39,20 @@ uint8_t __nsdl_c_callback(struct nsdl_s *nsdl_handle,
     return status;
 }
 
+void* __nsdl_c_memory_alloc(uint16_t size)
+{
+    if(size)
+        return M2MCoreMemory::memory_alloc(size);
+    else
+        return 0;
+}
+
+void __nsdl_c_memory_free(void *ptr)
+{
+    if(ptr)
+        M2MCoreMemory::memory_free(ptr);
+}
+
 uint8_t __nsdl_c_send_to_server(struct nsdl_s * nsdl_handle,
                                 sn_nsdl_capab_e protocol,
                                 uint8_t *data_ptr,
