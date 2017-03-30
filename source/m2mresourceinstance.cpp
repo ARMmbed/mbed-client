@@ -24,6 +24,8 @@
 #include "mbed-client/m2mblockmessage.h"
 #include "mbed-trace/mbed_trace.h"
 
+#include "include/m2mcorememory.h" //hack for dual heap implementation
+
 #define TRACE_GROUP "mClt"
 
 M2MResourceInstance::M2MResourceInstance(M2MResource &parent,
