@@ -209,19 +209,6 @@ private:
     */
     uint8_t* alloc_string_copy(const uint8_t* source, uint32_t size);
 
-    /**
-     * \brief Memory allocation required for libCoap.
-     * \param size The size of memory to be reserved.
-    */
-    void* memory_alloc(uint32_t size);
-
-    /**
-     * \brief Memory free functions required for libCoap.
-     * \param ptr The object whose memory needs to be freed.
-    */
-    void memory_free(void *ptr);
-
-
 private:
     M2MReportObserver           &_observer;
     bool                        _is_under_observation : 1;
