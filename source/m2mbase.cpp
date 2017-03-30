@@ -66,10 +66,8 @@ M2MBase::M2MBase(const String& resource_name,
             _sn_resource->dynamic_resource_params->static_resource_parameters =
                     (sn_nsdl_static_resource_parameters_s*)memory_alloc(sizeof(sn_nsdl_static_resource_parameters_s));
 
-            // Set callback function in case of dynamic resource
-            if (M2MBase::Dynamic == mode) {
-                _sn_resource->dynamic_resource_params->sn_grs_dyn_res_callback = __nsdl_c_callback;
-            }
+            // Set callback function in case of both dynamic and static resource
+            _sn_resource->dynamic_resource_params->sn_grs_dyn_res_callback = __nsdl_c_callback;
 
             if(_sn_resource->dynamic_resource_params->static_resource_parameters) {
                 // Cast const away to able to compile using MEMORY_OPTIMIZED_API flag
@@ -110,10 +108,8 @@ M2MBase::M2MBase(const lwm2m_parameters_s *s):
     _observation_handler(NULL)
 {
     tr_debug("M2MBase::M2MBase(const lwm2m_parameters_s *s)");
-    // Set callback function in case of dynamic resource
-    if (M2MBase::Dynamic == _sn_resource->dynamic_resource_params->static_resource_parameters->mode) {
-        _sn_resource->dynamic_resource_params->sn_grs_dyn_res_callback = __nsdl_c_callback;
-    }    
+    // Set callback function in case of both dynamic and static resource
+    _sn_resource->dynamic_resource_params->sn_grs_dyn_res_callback = __nsdl_c_callback;
 }
 
 M2MBase::~M2MBase()
