@@ -15,14 +15,23 @@
  */
 #include "m2mreporthandler_stub.h"
 #include "m2mtimer_stub.h"
+#include "m2mbase_stub.h"
 
 bool m2mreporthandler_stub::bool_return;
-u_int8_t m2mreporthandler_stub::int_value;
+uint8_t m2mreporthandler_stub::int_value;
+uint16_t m2mreporthandler_stub::int16_value;
+M2MBase::Observation m2mreporthandler_stub::observation_level_value;
+uint32_t m2mreporthandler_stub::token_len;
+uint8_t* m2mreporthandler_stub::token;
 
 void m2mreporthandler_stub::clear()
 {
     bool_return = false;
     int_value = 0;
+    int16_value = 0;
+    observation_level_value = M2MBase::None;
+    token_len = 0;
+    token = NULL;
 }
 
 M2MReportHandler::M2MReportHandler(M2MReportObserver &observer)
@@ -50,21 +59,31 @@ void M2MReportHandler::set_observation_token(const uint8_t *token, const uint8_t
 
 M2MBase::Observation M2MReportHandler::observation_level() const
 {
-    return _observation_level;
+    return m2mreporthandler_stub::observation_level_value;
 }
 
-void M2MReportHandler::get_observation_token(uint8_t *&token, uint32_t &token_length)
+void M2MReportHandler::get_observation_token(uint8_t *&token, uint32_t &length)
 {
+//    length = 0;
+//    if(token) {
+//        free(token);
+//        token = NULL;
+//    }
+//   token = (uint8_t *)malloc(m2mreporthandler_stub::token_len);
+//    if(token) {
+//        length = m2mreporthandler_stub::token_len;
+//        memcpy((uint8_t *)token, (uint8_t *)m2mreporthandler_stub::token, length);
+//    }
 }
 
 uint16_t M2MReportHandler::observation_number() const
 {
-    return _observation_number;
+    return m2mreporthandler_stub::int16_value;
 }
 
 bool M2MReportHandler::is_under_observation() const
 {
-    return _is_under_observation;
+    return m2mreporthandler_stub::bool_return;
 }
 
 void M2MReportHandler::set_under_observation(bool)
