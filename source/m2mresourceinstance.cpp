@@ -29,12 +29,14 @@
 
 M2MResourceInstance::M2MResourceInstance(M2MResource &parent,
                                          const String &res_name,
+                                         M2MBase::Mode resource_mode,
                                          const String &resource_type,
                                          M2MBase::DataType type,
                                          char* path,
                                          bool external_blockwise_store,
                                          bool multiple_instance)
 : M2MResourceBase(res_name,
+          resource_mode,
           resource_type,
           type,
           path,
@@ -43,11 +45,12 @@ M2MResourceInstance::M2MResourceInstance(M2MResource &parent,
           ),
  _parent_resource(parent)
 {
-    M2MBase::set_base_type(M2MBase::ResourceInstance);
+    set_base_type(M2MBase::ResourceInstance);
 }
 
 M2MResourceInstance::M2MResourceInstance(M2MResource &parent,
                                          const String &res_name,
+                                         M2MBase::Mode resource_mode,
                                          const String &resource_type,
                                          M2MBase::DataType type,
                                          const uint8_t *value,
@@ -56,15 +59,17 @@ M2MResourceInstance::M2MResourceInstance(M2MResource &parent,
                                          bool external_blockwise_store,
                                          bool multiple_instance)
 : M2MResourceBase(res_name,
+          resource_mode,
           resource_type,
           type,
+          value,
+          value_length,
           path,
           external_blockwise_store,
           multiple_instance),
  _parent_resource(parent)
 {
-    // XXX: isn't the base type wrong?
-    M2MBase::set_base_type(M2MBase::Resource);
+    set_base_type(M2MBase::ResourceInstance);    
 }
 
 M2MResourceInstance::M2MResourceInstance(M2MResource &parent,
@@ -76,12 +81,12 @@ M2MResourceInstance::M2MResourceInstance(M2MResource &parent,
     //TBD: put to flash, or parse from the uri_path!!!!
     //same for the _object_instance_id.
     //M2MBase::set_base_type(M2MBase::ResourceInstance);
+    assert(base_type() == M2MBase::ResourceInstance);
 }
 
 M2MResourceInstance::~M2MResourceInstance()
 {
 }
-
 
 bool M2MResourceInstance::handle_observation_attribute(const char *query)
 {
@@ -106,11 +111,6 @@ bool M2MResourceInstance::handle_observation_attribute(const char *query)
     }
     return success;
 }
-
-
-
-
-
 
 uint16_t M2MResourceInstance::object_instance_id() const
 {

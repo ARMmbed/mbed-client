@@ -30,13 +30,14 @@
 
 M2MResourceBase::M2MResourceBase(
                                          const String &res_name,
+                                         M2MBase::Mode resource_mode,
                                          const String &resource_type,
                                          M2MBase::DataType type,
                                          char* path,
                                          bool external_blockwise_store,
                                          bool multiple_instance)
 : M2MBase(res_name,
-          M2MBase::Dynamic,
+          resource_mode,
 #ifndef DISABLE_RESOURCE_TYPE
           resource_type,
 #endif
@@ -52,6 +53,7 @@ M2MResourceBase::M2MResourceBase(
 
 M2MResourceBase::M2MResourceBase(
                                          const String &res_name,
+                                         M2MBase::Mode resource_mode,
                                          const String &resource_type,
                                          M2MBase::DataType type,
                                          const uint8_t *value,
@@ -60,7 +62,7 @@ M2MResourceBase::M2MResourceBase(
                                          bool external_blockwise_store,
                                          bool multiple_instance)
 : M2MBase(res_name,
-          M2MBase::Static,
+          resource_mode,
 #ifndef DISABLE_RESOURCE_TYPE
           resource_type,
 #endif

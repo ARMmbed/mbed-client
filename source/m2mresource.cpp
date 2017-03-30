@@ -27,6 +27,7 @@
 
 M2MResource::M2MResource(M2MObjectInstance &parent,
                          const String &resource_name,
+                         M2MBase::Mode resource_mode,
                          const String &resource_type,
                          M2MBase::DataType type,
                          const uint8_t *value,
@@ -34,7 +35,7 @@ M2MResource::M2MResource(M2MObjectInstance &parent,
                          char *path,
                          bool multiple_instance,
                          bool external_blockwise_store)
-: M2MResourceBase(resource_name, resource_type, type, value, value_length,
+: M2MResourceBase(resource_name, resource_mode, resource_type, type, value, value_length,
                       path, external_blockwise_store, multiple_instance),
   _parent(parent)
 #ifndef DISABLE_DELAYED_RESPONSE
@@ -59,18 +60,20 @@ M2MResource::M2MResource(M2MObjectInstance &parent,
   _delayed_token_len(0),
   _delayed_response(false)
 #endif
-{    
+{
+    assert(base_type() == M2MBase::Resource);
 }
 
 M2MResource::M2MResource(M2MObjectInstance &parent,
                          const String &resource_name,
+                         M2MBase::Mode resource_mode,
                          const String &resource_type,
                          M2MBase::DataType type,
                          bool observable,
                          char *path,
                          bool multiple_instance,
                          bool external_blockwise_store)
-: M2MResourceBase(resource_name, resource_type, type,
+: M2MResourceBase(resource_name, resource_mode, resource_type, type,
                       path,
                       external_blockwise_store,multiple_instance),
   _parent(parent)

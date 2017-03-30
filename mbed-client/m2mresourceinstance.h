@@ -56,6 +56,7 @@ private: // Constructor and destructor are private
      */
     M2MResourceInstance(M2MResource &parent,
                         const String &resource_name,
+                        M2MBase::Mode mode,
                         const String &resource_type,
                         M2MBase::DataType type,
                         char* path,
@@ -77,6 +78,7 @@ private: // Constructor and destructor are private
      */
     M2MResourceInstance(M2MResource &parent,
                         const String &resource_name,
+                        M2MBase::Mode mode,
                         const String &resource_type,
                         M2MBase::DataType type,
                         const uint8_t *value,
