@@ -22,7 +22,12 @@
 namespace m2mreporthandler_stub
 {
     extern bool bool_return;
-    extern u_int8_t int_value;
+    extern uint8_t int_value;
+    extern uint16_t int16_value;
+    extern M2MBase::Observation observation_level_value;
+    extern uint32_t token_len;
+    extern uint8_t* token;
+
     void clear();
 }
 
