@@ -82,6 +82,7 @@ protected: // Constructor and destructor are private
      */
     M2MResourceBase(
                         const String &resource_name,
+                        M2MBase::Mode mode,
                         const String &resource_type,
                         M2MBase::DataType type,
                         char* path,
@@ -103,6 +104,7 @@ protected: // Constructor and destructor are private
      */
     M2MResourceBase(
                         const String &resource_name,
+                        M2MBase::Mode mode,
                         const String &resource_type,
                         M2MBase::DataType type,
                         const uint8_t *value,

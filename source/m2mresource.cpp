@@ -27,6 +27,7 @@
 
 M2MResource::M2MResource(M2MObjectInstance &parent,
                          const String &resource_name,
+                         M2MBase::Mode resource_mode,
                          const String &resource_type,
                          M2MBase::DataType type,
                          const uint8_t *value,
@@ -34,7 +35,7 @@ M2MResource::M2MResource(M2MObjectInstance &parent,
                          char *path,
                          bool multiple_instance,
                          bool external_blockwise_store)
-: M2MResourceBase(resource_name, resource_type, type, value, value_length,
+: M2MResourceBase(resource_name, resource_mode, resource_type, type, value, value_length,
                       path, external_blockwise_store, multiple_instance),
   _parent(parent)
 #ifndef DISABLE_DELAYED_RESPONSE
@@ -66,13 +67,14 @@ M2MResource::M2MResource(M2MObjectInstance &parent,
 
 M2MResource::M2MResource(M2MObjectInstance &parent,
                          const String &resource_name,
+                         M2MBase::Mode resource_mode,
                          const String &resource_type,
                          M2MBase::DataType type,
                          bool observable,
                          char *path,
                          bool multiple_instance,
                          bool external_blockwise_store)
-: M2MResourceBase(resource_name, resource_type, type,
+: M2MResourceBase(resource_name, resource_mode, resource_type, type,
                       path,
                       external_blockwise_store,multiple_instance),
   _parent(parent)
@@ -333,7 +335,7 @@ sn_coap_hdr_s* M2MResource::handle_get_request(nsdl_s *nsdl,
                                     if(received_coap_header->options_list_ptr->observe != -1) {
                                         number = received_coap_header->options_list_ptr->observe;
                                     }
-                                    
+
                                     // If the observe value is 0 means register for observation.
                                     if(number == 0) {
                                         tr_debug("M2MResource::handle_get_request - Put Resource under Observation");
