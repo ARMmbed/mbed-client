@@ -103,10 +103,10 @@ TEST(M2MResourceInstance, test_handle_put_request)
     m2m_resourceinstance->test_handle_put_request();
 }
 
-/*TEST(M2MResourceInstance, test_set_resource_observer)
-{
-    m2m_resourceinstance->test_set_resource_observer();
-}*/
+//TEST(M2MResourceInstance, test_set_resource_observer)
+//{
+//    m2m_resourceinstance->test_set_resource_observer();
+//}
 
 TEST(M2MResourceInstance, test_get_object_instance_id)
 {

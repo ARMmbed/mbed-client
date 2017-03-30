@@ -86,6 +86,7 @@ namespace m2mbase_stub
     extern uint8_t* object_inst_token;
     extern uint32_t object_inst_token_len;
     extern sn_nsdl_dynamic_resource_parameters_s *nsdl_resource;
+    extern M2MBase::lwm2m_parameters_s* sn_resource;
     extern bool find_resource;
     extern int32_t ret_counter;
 }

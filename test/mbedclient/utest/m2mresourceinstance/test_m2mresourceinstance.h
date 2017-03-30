@@ -55,7 +55,7 @@ public:
 
     void test_handle_put_request();
 
-    void test_set_resource_observer();
+//    void test_set_resource_observer();
 
     void test_get_object_name();
 

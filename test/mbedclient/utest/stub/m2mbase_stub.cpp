@@ -44,6 +44,7 @@ uint32_t m2mbase_stub::object_token_len;
 uint8_t *m2mbase_stub::resource_token;
 uint32_t m2mbase_stub::resource_token_len;
 sn_nsdl_dynamic_resource_parameters_s *m2mbase_stub::nsdl_resource;
+M2MBase::lwm2m_parameters_s* m2mbase_stub::sn_resource;
 bool m2mbase_stub::find_resource;
 int32_t m2mbase_stub::ret_counter;
 
@@ -72,6 +73,15 @@ void m2mbase_stub::clear()
     resource_token = NULL;
     resource_token_len = 0;
     object_inst_token = NULL;
+    if(sn_resource) {
+        free(sn_resource);
+    }
+    sn_resource= NULL;
+    if(nsdl_resource) {
+        free(nsdl_resource);
+    }
+
+    nsdl_resource = NULL;
     object_inst_token_len = 0;
     find_resource = false;
     ret_counter = 0;
@@ -520,7 +530,7 @@ size_t M2MBase::resource_name_length() const
 
 M2MBase::lwm2m_parameters_s* M2MBase::get_lwm2m_parameters() const
 {
-    return _sn_resource;
+    return m2mbase_stub::sn_resource;
 }
 
 bool M2MBase::validate_string_length(const String &string, size_t min_length, size_t max_length)
