@@ -262,3 +262,9 @@ TEST(M2MBase, test_ctor)
 {
     m2m_base->test_ctor();
 }
+
+TEST(M2MBase, test_get_lwm2m_parameter)
+{
+    m2m_base->test_get_lwm2m_parameter();
+}
+
