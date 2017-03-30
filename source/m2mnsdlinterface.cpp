@@ -160,11 +160,10 @@ void M2MNsdlInterface::set_endpoint_lifetime_buffer(int lifetime)
     uint32_t size = m2m::itoa_c(lifetime, buffer);
 
     if (_endpoint && size <= sizeof(buffer)) {
+        _endpoint->lifetime_len = 0;
         _endpoint->lifetime_ptr = alloc_string_copy((uint8_t*)buffer, size);
         if(_endpoint->lifetime_ptr) {
             _endpoint->lifetime_len =  size;
-        } else {
-            _endpoint->lifetime_len = 0;
         }
     }
 }
