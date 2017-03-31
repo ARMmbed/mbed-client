@@ -45,7 +45,7 @@ public:
     static void print_heap_running_statistics(void);
     static void print_heap_overall_statistics(void);
 #endif
-    static void *memory_alloc(uint16_t size);
+    static void *memory_alloc(size_t size);
     static void memory_free(void *ptr);
 
     /* TODO at least for completeness there should be de-init method */

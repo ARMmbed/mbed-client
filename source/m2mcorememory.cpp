@@ -180,7 +180,7 @@ void M2MCoreMemory::print_heap_overall_statistics() {
 }
 #endif
 
-void* M2MCoreMemory::memory_alloc(uint16_t size){
+void* M2MCoreMemory::memory_alloc(size_t size){
     void *tmp;
     #ifdef M2M_DYNMEM_LIB
     tmp = m2m_dyn_mem_alloc((uint8_t *)heapPtr, size);
