@@ -283,14 +283,6 @@ public:
     void set_instance_id(const uint16_t instance_id);
 
     /**
-     * This function is deprecated. An increment of the observation number is done internally.
-     * \brief Sets the observation number of the object.
-     * \param observation_number The observation number of the object.
-     */
-    void set_observation_number(const uint16_t observation_number)
-        m2m_deprecated;
-
-    /**
      * \brief Sets the max age for the resource value to be cached.
      * \param max_age The max age in seconds.
      */
