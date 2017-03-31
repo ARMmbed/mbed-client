@@ -773,9 +773,9 @@ void M2MBase::free_resources()
 #endif
         free(params);
     }
-    if (_sn_resource->dynamic_resource_params->resource) {
-        free(_sn_resource->dynamic_resource_params->resource);
-    }
+//    if (_sn_resource->dynamic_resource_params->resource) {
+//       free(_sn_resource->dynamic_resource_params->resource);
+//    }
     if (_sn_resource->dynamic_resource_params->free_on_delete) {
         free(_sn_resource->dynamic_resource_params);
     }

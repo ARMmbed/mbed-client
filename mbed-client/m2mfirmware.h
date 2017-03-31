@@ -244,7 +244,9 @@ public:
      * \param callback The function pointer to be called.
      * \return true if successfully set, else false.
      */
+#ifndef DISABLE_BLOCK_MESSAGE
     bool set_package_block_message_callback(incoming_block_message_callback callback);
+#endif
 
 private:
 
