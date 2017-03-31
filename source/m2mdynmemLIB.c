@@ -38,7 +38,7 @@ typedef struct book {
     m2m_mem_stat_t *mem_stat_info_ptr;
     void (*heap_failure_callback)(m2m_heap_fail_t);
     NS_LIST_HEAD(hole_t, link) holes_list;
-    uint16_t heap_size;
+    size_t heap_size;
 } book_t;
 
 // size of a hole_t in our word units
@@ -63,7 +63,7 @@ static void heap_failure(void (*callback)(m2m_heap_fail_t), m2m_heap_fail_t reas
 
 #endif
 
-void m2m_dyn_mem_init(uint8_t *heap, uint16_t h_size, void (*passed_fptr)(m2m_heap_fail_t), m2m_mem_stat_t *info_ptr)
+void m2m_dyn_mem_init(uint8_t *heap, size_t h_size, void (*passed_fptr)(m2m_heap_fail_t), m2m_mem_stat_t *info_ptr)
 {
 #ifndef STANDARD_MALLOC
     book_t *book = (book_t *)heap;
@@ -119,7 +119,7 @@ const m2m_mem_stat_t *m2m_dyn_mem_get_mem_stat(uint8_t *heap)
 }
 
 #ifndef STANDARD_MALLOC
-static void dev_stat_update(m2m_mem_stat_t *mem_stat_info_ptr, mem_stat_update_t type, int16_t size)
+static void dev_stat_update(m2m_mem_stat_t *mem_stat_info_ptr, mem_stat_update_t type, size_t size)
 {
     if (mem_stat_info_ptr) {
         switch (type) {
@@ -142,7 +142,7 @@ static void dev_stat_update(m2m_mem_stat_t *mem_stat_info_ptr, mem_stat_update_t
     }
 }
 
-static int convert_allocation_size(book_t *book, int16_t requested_bytes)
+static int convert_allocation_size(book_t *book, size_t requested_bytes)
 {
     if (book->heap_main == 0) {
         heap_failure(book->heap_failure_callback, M2M_DYN_MEM_HEAP_SECTOR_UNITIALIZED);
@@ -172,7 +172,7 @@ static int8_t m2m_block_validate(int *block_start, int direction)
 #endif
 
 // For direction, use 1 for direction up and -1 for down
-static void *m2m_dyn_mem_internal_alloc(uint8_t *heap, const int16_t alloc_size, int direction)
+static void *m2m_dyn_mem_internal_alloc(uint8_t *heap, const size_t alloc_size, int direction)
 {
 #ifndef STANDARD_MALLOC
     book_t *book = (book_t *)heap;
@@ -268,12 +268,12 @@ static void *m2m_dyn_mem_internal_alloc(uint8_t *heap, const int16_t alloc_size,
 #endif
 }
 
-void *m2m_dyn_mem_alloc(uint8_t *heap, int16_t alloc_size)
+void *m2m_dyn_mem_alloc(uint8_t *heap, size_t alloc_size)
 {
     return m2m_dyn_mem_internal_alloc(heap, alloc_size, -1);
 }
 
-void *m2m_dyn_mem_temporary_alloc(uint8_t *heap, int16_t alloc_size)
+void *m2m_dyn_mem_temporary_alloc(uint8_t *heap, size_t alloc_size)
 {
     return m2m_dyn_mem_internal_alloc(heap, alloc_size, 1);
 }

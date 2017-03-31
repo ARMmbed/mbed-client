@@ -47,10 +47,10 @@ typedef enum {
  */
 typedef struct m2m_mem_stat_t {
     /*Heap stats*/
-    int16_t heap_sector_size;                   /**< Heap total Sector len. */
-    int16_t heap_sector_alloc_cnt;              /**< Reserved Heap sector cnt. */
-    int16_t heap_sector_allocated_bytes;        /**< Reserved Heap data in bytes. */
-    int16_t heap_sector_allocated_bytes_max;    /**< Reserved Heap data in bytes max value. */
+    size_t heap_sector_size;                   /**< Heap total Sector len. */
+    size_t heap_sector_allocated_bytes;        /**< Reserved Heap data in bytes. */
+    size_t heap_sector_allocated_bytes_max;    /**< Reserved Heap data in bytes max value. */
+    uint32_t heap_sector_alloc_cnt;              /**< Reserved Heap sector cnt. */
     uint32_t heap_alloc_total_bytes;            /**< Total Heap allocated bytes. */
     uint32_t heap_alloc_fail_cnt;               /**< Counter for Heap allocation fail. */
 } m2m_mem_stat_t;
@@ -62,7 +62,7 @@ typedef struct m2m_mem_stat_t {
   * \param heap_size size of the heap buffer
   * \return None
   */
-extern void m2m_dyn_mem_init(uint8_t *heap, uint16_t h_size, void (*passed_fptr)(m2m_heap_fail_t), m2m_mem_stat_t *info_ptr);
+extern void m2m_dyn_mem_init(uint8_t *heap, size_t h_size, void (*passed_fptr)(m2m_heap_fail_t), m2m_mem_stat_t *info_ptr);
 
 
 /**
@@ -86,7 +86,7 @@ extern void m2m_dyn_mem_free(uint8_t *heap, void *heap_ptr);
   * \return 0, Allocate Fail
   * \return >0, Pointer to allocated data sector.
   */
-extern void *m2m_dyn_mem_temporary_alloc(uint8_t *heap, int16_t alloc_size);
+extern void *m2m_dyn_mem_temporary_alloc(uint8_t *heap, size_t alloc_size);
 /**
   * \brief Allocate long period data.
   *
@@ -98,7 +98,7 @@ extern void *m2m_dyn_mem_temporary_alloc(uint8_t *heap, int16_t alloc_size);
   * \return 0, Allocate Fail
   * \return >0, Pointer to allocated data sector.
   */
-extern void *m2m_dyn_mem_alloc(uint8_t *heap, int16_t alloc_size);
+extern void *m2m_dyn_mem_alloc(uint8_t *heap, size_t alloc_size);
 
 /**
   * \brief Get pointer to the current mem_stat_t set via m2m_dyn_mem_init.
