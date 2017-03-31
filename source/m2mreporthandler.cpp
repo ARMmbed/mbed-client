@@ -63,6 +63,9 @@ M2MReportHandler::~M2MReportHandler()
 void M2MReportHandler::set_under_observation(bool observed)
 {
     tr_debug("M2MReportHandler::set_under_observation(observed %d)", (int)observed);
+
+    _is_under_observation = observed;
+
     stop_timers();
     if(observed) {
         handle_timers();
