@@ -68,6 +68,8 @@ M2MObjectInstance::~M2MObjectInstance()
         }
         _resource_list.clear();
     }
+
+    free_resources();
 }
 
 // TBD, ResourceType to the base class struct?? TODO!
@@ -109,7 +111,7 @@ M2MResource* M2MObjectInstance::create_static_resource(const String &resource_na
         char *path = create_path(*this, resource_name.c_str());
 
         if (path) {
-            res = new M2MResource(*this, resource_name, resource_type, convert_resource_type(type),
+            res = new M2MResource(*this, resource_name, M2MBase::Static, resource_type, convert_resource_type(type),
                                   value, value_length, path,
                                   multiple_instance, external_blockwise_store);
             if(res) {
@@ -162,7 +164,7 @@ M2MResource* M2MObjectInstance::create_dynamic_resource(const String &resource_n
     if(!resource(resource_name)) {
         char *path = create_path(*this, resource_name.c_str());
         if (path) {
-            res = new M2MResource(*this, resource_name, resource_type, convert_resource_type(type),
+            res = new M2MResource(*this, resource_name, M2MBase::Dynamic, resource_type, convert_resource_type(type),
                                   observable, path,
                                   multiple_instance, external_blockwise_store);
             if(res) {
@@ -195,7 +197,7 @@ M2MResourceInstance* M2MObjectInstance::create_static_resource_instance(const St
     if(!res) {
         char *path = create_path(*this, resource_name.c_str());
         if (path) {
-            res = new M2MResource(*this, resource_name, resource_type, convert_resource_type(type),
+            res = new M2MResource(*this, resource_name, M2MBase::Static, resource_type, convert_resource_type(type),
                                   value, value_length, path,
                                   true, external_blockwise_store);
             _resource_list.push_back(res);
@@ -207,7 +209,7 @@ M2MResourceInstance* M2MObjectInstance::create_static_resource_instance(const St
     if(res && res->supports_multiple_instances()&& (res->resource_instance(instance_id) == NULL)) {
         char *path = M2MBase::create_path(*res, instance_id);
         if (path) {
-            instance = new M2MResourceInstance(*res, resource_name, resource_type, convert_resource_type(type),
+            instance = new M2MResourceInstance(*res, resource_name, M2MBase::Static, resource_type, convert_resource_type(type),
                                                value, value_length,
                                                path, external_blockwise_store,true);
             if(instance) {
@@ -236,7 +238,7 @@ M2MResourceInstance* M2MObjectInstance::create_dynamic_resource_instance(const S
     if(!res) {
         char *path = create_path(*this, resource_name.c_str());
         if (path) {
-            res = new M2MResource(*this, resource_name, resource_type, convert_resource_type(type),
+            res = new M2MResource(*this, resource_name, M2MBase::Dynamic, resource_type, convert_resource_type(type),
                                   false, path, M2MBase::instance_id(), true);
             _resource_list.push_back(res);
             res->set_register_uri(false);
@@ -246,7 +248,7 @@ M2MResourceInstance* M2MObjectInstance::create_dynamic_resource_instance(const S
     if (res && res->supports_multiple_instances() && (res->resource_instance(instance_id) == NULL)) {
         char *path = create_path(*res, instance_id);
         if (path) {
-            instance = new M2MResourceInstance(*res, resource_name, resource_type, convert_resource_type(type),
+            instance = new M2MResourceInstance(*res, resource_name, M2MBase::Dynamic, resource_type, convert_resource_type(type),
                                                path, external_blockwise_store,true);
             if(instance) {
                 instance->set_operation(M2MBase::GET_ALLOWED);
@@ -389,9 +391,16 @@ uint16_t M2MObjectInstance::resource_count(const char *resource) const
     return count;
 }
 
-M2MBase::BaseType M2MObjectInstance::base_type() const
+M2MObservationHandler* M2MObjectInstance::observation_handler() const
 {
-    return M2MBase::base_type();
+    // XXX: need to check the flag too
+    return _parent.observation_handler();
+}
+
+void M2MObjectInstance::set_observation_handler(M2MObservationHandler *handler)
+{
+    // XXX: need to set the flag too
+    _parent.set_observation_handler(handler);
 }
 
 void M2MObjectInstance::add_observation_level(M2MBase::Observation observation_level)

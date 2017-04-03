@@ -227,12 +227,6 @@ public:
     uint16_t resource_count(const char *resource) const;
 
     /**
-     * \brief Returns the object type.
-     * \return BaseType.
-     */
-    virtual M2MBase::BaseType base_type() const;
-
-    /**
      * \brief Adds the observation level for the object.
      * \param observation_level The level of observation.
      */
@@ -243,6 +237,18 @@ public:
      * \param observation_level The level of observation.
      */
     virtual void remove_observation_level(M2MBase::Observation observation_level);
+
+    /**
+     * \brief Returns the Observation Handler object.
+     * \return M2MObservationHandler object.
+    */
+    virtual M2MObservationHandler* observation_handler() const;
+
+    /**
+     * \brief Sets the observation handler
+     * \param handler Observation handler
+    */
+    virtual void set_observation_handler(M2MObservationHandler *handler);
 
     /**
      * \brief Handles GET request for the registered objects.
