@@ -41,6 +41,9 @@ typedef enum {
     M2M_DYN_MEM_HEAP_SECTOR_UNITIALIZED /**< ns_dyn_mem_free(), ns_dyn_mem_temporary_alloc() or ns_dyn_mem_alloc() called before ns_dyn_mem_init() */
 } m2m_heap_fail_t;
 
+//typedef int16_t m2m_block_size_t; // type to be most likely
+typedef int m2m_block_size_t; //current for testing just new typedef
+
 /**
  * /struct mem_stat_t
  * /brief Struct for Memory stats Buffer structure
@@ -86,7 +89,7 @@ extern void m2m_dyn_mem_free(uint8_t *heap, void *heap_ptr);
   * \return 0, Allocate Fail
   * \return >0, Pointer to allocated data sector.
   */
-extern void *m2m_dyn_mem_temporary_alloc(uint8_t *heap, size_t alloc_size);
+extern void *m2m_dyn_mem_temporary_alloc(uint8_t *heap, m2m_block_size_t alloc_size);
 /**
   * \brief Allocate long period data.
   *
@@ -98,7 +101,7 @@ extern void *m2m_dyn_mem_temporary_alloc(uint8_t *heap, size_t alloc_size);
   * \return 0, Allocate Fail
   * \return >0, Pointer to allocated data sector.
   */
-extern void *m2m_dyn_mem_alloc(uint8_t *heap, size_t alloc_size);
+extern void *m2m_dyn_mem_alloc(uint8_t *heap, m2m_block_size_t alloc_size);
 
 /**
   * \brief Get pointer to the current mem_stat_t set via m2m_dyn_mem_init.
