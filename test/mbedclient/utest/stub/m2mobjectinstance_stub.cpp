@@ -26,7 +26,6 @@ M2MResourceList m2mobjectinstance_stub::resource_list(12);
 
 M2MResourceInstance* m2mobjectinstance_stub::create_resource_instance;
 sn_coap_hdr_s* m2mobjectinstance_stub::header;
-M2MBase::BaseType m2mobjectinstance_stub::base_type;
 
 
 void m2mobjectinstance_stub::clear()
@@ -37,7 +36,6 @@ void m2mobjectinstance_stub::clear()
     create_resource = NULL;
     create_resource_instance = NULL;
     header = NULL;
-    base_type = M2MBase::ObjectInstance;
     resource_list.clear();
 }
 
@@ -55,12 +53,14 @@ M2MObjectInstance::M2MObjectInstance(M2MObject& parent,
           false),
   _parent(parent)
 {
+    set_base_type(M2MBase::ObjectInstance);
 }
 
 M2MObjectInstance::M2MObjectInstance(M2MObject& parent, const lwm2m_parameters_s* static_res)
 : M2MBase(static_res), _parent(parent)
 {
 
+    set_base_type(M2MBase::ObjectInstance);
 }
 
 M2MObjectInstance::~M2MObjectInstance()
@@ -166,11 +166,6 @@ uint16_t M2MObjectInstance::resource_count(const String& ) const
 uint16_t M2MObjectInstance::resource_count(const char* ) const
 {
     return m2mobjectinstance_stub::int_value;
-}
-
-M2MBase::BaseType M2MObjectInstance::base_type() const
-{
-    return m2mobjectinstance_stub::base_type;
 }
 
 void M2MObjectInstance::add_observation_level(M2MBase::Observation)

@@ -255,8 +255,9 @@ void M2MBase::get_observation_token(uint8_t *&token,
     }
 }
 
-void M2MBase::set_base_type(M2MBase::BaseType /*type*/)
+void M2MBase::set_base_type(M2MBase::BaseType type)
 {
+    m2mbase_stub::base_type = type;
 }
 
 M2MBase::BaseType M2MBase::base_type() const

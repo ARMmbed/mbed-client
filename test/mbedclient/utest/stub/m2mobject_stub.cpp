@@ -30,7 +30,6 @@ void m2mobject_stub::clear()
 {
     int_value = 0;
     bool_value = false;
-    m2mobject_stub::base_type = M2MBase::Object;
     instance_list.clear();
     header = NULL;
 }
@@ -45,13 +44,13 @@ M2MObject::M2MObject(const String &object_name, char *path, bool external_blockw
           external_blockwise_store,
           false)
 {
-
+    set_base_type(M2MBase::Object);
 }
 
 M2MObject::M2MObject(const M2MBase::lwm2m_parameters_s* static_res)
 : M2MBase(static_res)
 {
-
+    set_base_type(M2MBase::Object);
 }
 
 M2MObject::~M2MObject()
@@ -81,11 +80,6 @@ const M2MObjectInstanceList& M2MObject::instances() const
 uint16_t M2MObject::instance_count() const
 {
     return m2mobject_stub::int_value;
-}
-
-M2MBase::BaseType M2MObject::base_type() const
-{
-    return m2mobject_stub::base_type;
 }
 
 void M2MObject::add_observation_level(M2MBase::Observation)
