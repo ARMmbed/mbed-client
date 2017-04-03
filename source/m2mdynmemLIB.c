@@ -142,7 +142,7 @@ static void dev_stat_update(m2m_mem_stat_t *mem_stat_info_ptr, mem_stat_update_t
     }
 }
 
-static int convert_allocation_size(book_t *book, size_t requested_bytes)
+static int convert_allocation_size(book_t *book, m2m_block_size_t requested_bytes)
 {
     if (book->heap_main == 0) {
         heap_failure(book->heap_failure_callback, M2M_DYN_MEM_HEAP_SECTOR_UNITIALIZED);
@@ -172,7 +172,7 @@ static int8_t m2m_block_validate(int *block_start, int direction)
 #endif
 
 // For direction, use 1 for direction up and -1 for down
-static void *m2m_dyn_mem_internal_alloc(uint8_t *heap, const size_t alloc_size, int direction)
+static void *m2m_dyn_mem_internal_alloc(uint8_t *heap, const m2m_block_size_t alloc_size, int direction)
 {
 #ifndef STANDARD_MALLOC
     book_t *book = (book_t *)heap;
@@ -268,12 +268,12 @@ static void *m2m_dyn_mem_internal_alloc(uint8_t *heap, const size_t alloc_size, 
 #endif
 }
 
-void *m2m_dyn_mem_alloc(uint8_t *heap, size_t alloc_size)
+void *m2m_dyn_mem_alloc(uint8_t *heap, m2m_block_size_t alloc_size)
 {
     return m2m_dyn_mem_internal_alloc(heap, alloc_size, -1);
 }
 
-void *m2m_dyn_mem_temporary_alloc(uint8_t *heap, size_t alloc_size)
+void *m2m_dyn_mem_temporary_alloc(uint8_t *heap, m2m_block_size_t alloc_size)
 {
     return m2m_dyn_mem_internal_alloc(heap, alloc_size, 1);
 }
