@@ -55,7 +55,7 @@ M2MResource::M2MResource(M2MObjectInstance &parent,
   _delayed_response(false)
 #endif
 {
-
+    set_base_type(M2MBase::Resource);
 }
 
 M2MResource::M2MResource(M2MObjectInstance &parent,
@@ -69,7 +69,7 @@ M2MResource::M2MResource(M2MObjectInstance &parent,
   _delayed_response(false)
 #endif
 {
-    // tbd: _has_multiple_instances could be in flash, but no real benefit, because of current alignment.
+    set_base_type(M2MBase::Resource);
 }
 
 M2MResource::M2MResource(M2MObjectInstance &parent,
@@ -90,7 +90,7 @@ M2MResource::M2MResource(M2MObjectInstance &parent,
   _delayed_response(false)
 #endif
 {
-
+    set_base_type(M2MBase::Resource);
 }
 
 M2MResource::~M2MResource()

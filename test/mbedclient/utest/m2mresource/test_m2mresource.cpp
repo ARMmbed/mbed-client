@@ -85,8 +85,15 @@ void Test_M2MResource::test_static_resource()
 
 void Test_M2MResource::test_base_type()
 {
-    m2mresourceinstance_stub::base_type = M2MBase::Resource;
-    CHECK(M2MBase::Resource == resource->base_type());
+    u_int8_t value[] = {"value"};
+    M2MResource resource(*m2mobject_stub::inst,
+                                       "name",
+                                      "resource_type",
+                                      M2MBase::INTEGER,
+                                      value,
+                                      (uint8_t)sizeof(value),"name");
+
+    CHECK(M2MBase::Resource == resource.base_type());
 }
 
 void Test_M2MResource::test_muliptle_instances()

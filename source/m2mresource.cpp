@@ -59,7 +59,9 @@ M2MResource::M2MResource(M2MObjectInstance &parent,
   _delayed_token_len(0),
   _delayed_response(false)
 #endif
-{    
+{
+    // verify, that the client has hardcoded proper type to the structure
+    assert(base_type() == M2MBase::Resource);
 }
 
 M2MResource::M2MResource(M2MObjectInstance &parent,
