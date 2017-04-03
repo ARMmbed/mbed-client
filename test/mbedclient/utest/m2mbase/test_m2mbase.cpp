@@ -239,15 +239,7 @@ void Test_M2MBase::test_name()
 
 void Test_M2MBase::test_name_id()
 {
-    int id = 10;
-
-    String name("10");
-
-//    this->_sn_resource->identifier_int_type = false;
-//    this->_sn_resource->free_on_delete = false;
-//    this->_sn_resource->identifier.name = stringdup((char*)name.c_str());
-//    CHECK(id == name_id());
-      name_id();
+    CHECK(1 == name_id());
 }
 
 void Test_M2MBase::test_handle_observation_attribute()
