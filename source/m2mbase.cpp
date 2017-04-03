@@ -576,7 +576,7 @@ M2MReportHandler* M2MBase::create_report_handler()
     return _report_handler;
 }
 
-M2MReportHandler* M2MBase::report_handler()
+M2MReportHandler* M2MBase::report_handler() const
 {
     return _report_handler;
 }

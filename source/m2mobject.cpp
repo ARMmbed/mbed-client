@@ -161,11 +161,6 @@ uint16_t M2MObject::instance_count() const
     return (uint16_t)_instance_list.size();
 }
 
-M2MBase::BaseType M2MObject::base_type() const
-{
-    return M2MBase::base_type();
-}
-
 void M2MObject::add_observation_level(M2MBase::Observation observation_level)
 {
     M2MBase::add_observation_level(observation_level);
