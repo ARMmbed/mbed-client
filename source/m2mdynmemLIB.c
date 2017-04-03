@@ -31,7 +31,7 @@ typedef struct {
     ns_list_link_t link;
 } hole_t;
 
-typedef int m2m_word_size_t; // internal signed heap block size type
+typedef int16_t m2m_word_size_t; // internal signed heap block size type
 
 /* struct for book keeping variables */
 typedef struct book {
