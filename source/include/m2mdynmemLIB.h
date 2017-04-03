@@ -42,6 +42,8 @@ typedef enum {
 } m2m_heap_fail_t;
 
 typedef uint16_t m2m_block_size_t; //external interface unsigned heap block size type
+typedef uint16_t m2m_heap_size_t; //total heap size type.
+/* With current implementation m2m_block_size_t and m2m_heap_size_t should be same size */
 
 /**
  * /struct mem_stat_t
@@ -49,12 +51,12 @@ typedef uint16_t m2m_block_size_t; //external interface unsigned heap block size
  */
 typedef struct m2m_mem_stat_t {
     /*Heap stats*/
-    size_t heap_sector_size;                   /**< Heap total Sector len. */
-    size_t heap_sector_allocated_bytes;        /**< Reserved Heap data in bytes. */
-    size_t heap_sector_allocated_bytes_max;    /**< Reserved Heap data in bytes max value. */
-    uint32_t heap_sector_alloc_cnt;              /**< Reserved Heap sector cnt. */
-    uint32_t heap_alloc_total_bytes;            /**< Total Heap allocated bytes. */
-    uint32_t heap_alloc_fail_cnt;               /**< Counter for Heap allocation fail. */
+    uint32_t heap_sector_alloc_cnt;                  /**< Reserved Heap sector cnt. */
+    uint32_t heap_alloc_total_bytes;                 /**< Total Heap allocated bytes. */
+    uint32_t heap_alloc_fail_cnt;                    /**< Counter for Heap allocation fail. */
+    m2m_heap_size_t heap_sector_size;                /**< Heap total Sector len. */
+    m2m_heap_size_t heap_sector_allocated_bytes;     /**< Reserved Heap data in bytes. */
+    m2m_heap_size_t heap_sector_allocated_bytes_max; /**< Reserved Heap data in bytes max value. */
 } m2m_mem_stat_t;
 
 /**
@@ -64,7 +66,7 @@ typedef struct m2m_mem_stat_t {
   * \param heap_size size of the heap buffer
   * \return None
   */
-extern void m2m_dyn_mem_init(uint8_t *heap, size_t h_size, void (*passed_fptr)(m2m_heap_fail_t), m2m_mem_stat_t *info_ptr);
+extern void m2m_dyn_mem_init(uint8_t *heap, m2m_heap_size_t h_size, void (*passed_fptr)(m2m_heap_fail_t), m2m_mem_stat_t *info_ptr);
 
 
 /**
