@@ -41,8 +41,7 @@ typedef enum {
     M2M_DYN_MEM_HEAP_SECTOR_UNITIALIZED /**< ns_dyn_mem_free(), ns_dyn_mem_temporary_alloc() or ns_dyn_mem_alloc() called before ns_dyn_mem_init() */
 } m2m_heap_fail_t;
 
-//typedef int16_t m2m_block_size_t; // type to be most likely
-typedef int m2m_block_size_t; //current for testing just new typedef
+typedef uint16_t m2m_block_size_t; //external interface unsigned heap block size type
 
 /**
  * /struct mem_stat_t

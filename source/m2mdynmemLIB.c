@@ -31,10 +31,12 @@ typedef struct {
     ns_list_link_t link;
 } hole_t;
 
+typedef int m2m_word_size_t; // internal signed heap block size type
+
 /* struct for book keeping variables */
 typedef struct book {
-    int     *heap_main;
-    int     *heap_main_end;
+    m2m_word_size_t     *heap_main;
+    m2m_word_size_t     *heap_main_end;
     m2m_mem_stat_t *mem_stat_info_ptr;
     void (*heap_failure_callback)(m2m_heap_fail_t);
     NS_LIST_HEAD(hole_t, link) holes_list;
@@ -42,16 +44,16 @@ typedef struct book {
 } book_t;
 
 // size of a hole_t in our word units
-#define HOLE_T_SIZE ((sizeof(hole_t) + sizeof(int) - 1) / sizeof(int))
+#define HOLE_T_SIZE ((sizeof(hole_t) + sizeof(m2m_word_size_t) - 1) / sizeof(m2m_word_size_t))
 
-static NS_INLINE hole_t *hole_from_block_start(int *start)
+static NS_INLINE hole_t *hole_from_block_start(m2m_word_size_t *start)
 {
     return (hole_t *)(start + 1);
 }
 
-static NS_INLINE int *block_start_from_hole(hole_t *start)
+static NS_INLINE m2m_word_size_t *block_start_from_hole(hole_t *start)
 {
-    return ((int *)start) - 1;
+    return ((m2m_word_size_t *)start) - 1;
 }
 
 static void heap_failure(void (*callback)(m2m_heap_fail_t), m2m_heap_fail_t reason)
@@ -70,23 +72,23 @@ void m2m_dyn_mem_init(uint8_t *heap, size_t h_size, void (*passed_fptr)(m2m_heap
 
     book->holes_list.slist.first_entry = NULL;
     book->holes_list.slist.last_nextptr = &(book->holes_list).slist.first_entry;
-    int *ptr;
-    int temp_int;
+    m2m_word_size_t *ptr;
+    m2m_word_size_t temp_int;
     /* Do memory alignment */
-    temp_int = ((uintptr_t)heap % sizeof(int));
+    temp_int = ((uintptr_t)heap % sizeof(m2m_word_size_t));
     if (temp_int) {
-        heap += (sizeof(int) - temp_int);
-        h_size -= (sizeof(int) - temp_int);
+        heap += (sizeof(m2m_word_size_t) - temp_int);
+        h_size -= (sizeof(m2m_word_size_t) - temp_int);
     }
 
     /* Make correction for total length also */
-    temp_int = (h_size % sizeof(int));
+    temp_int = (h_size % sizeof(m2m_word_size_t));
     if (temp_int) {
-        h_size -= (sizeof(int) - temp_int);
+        h_size -= (sizeof(m2m_word_size_t) - temp_int);
     }
-    book->heap_main = (int *)&(book[1]); // SET Heap Pointer
+    book->heap_main = (m2m_word_size_t *)&(book[1]); // SET Heap Pointer
     book->heap_size = h_size - sizeof(book_t); //Set Heap Size
-    temp_int = (book->heap_size / sizeof(int));
+    temp_int = (book->heap_size / sizeof(m2m_word_size_t));
     temp_int -= 2;
     ptr = book->heap_main;
     *ptr = -(temp_int);
@@ -119,7 +121,7 @@ const m2m_mem_stat_t *m2m_dyn_mem_get_mem_stat(uint8_t *heap)
 }
 
 #ifndef STANDARD_MALLOC
-static void dev_stat_update(m2m_mem_stat_t *mem_stat_info_ptr, mem_stat_update_t type, size_t size)
+static void dev_stat_update(m2m_mem_stat_t *mem_stat_info_ptr, mem_stat_update_t type, m2m_block_size_t size)
 {
     if (mem_stat_info_ptr) {
         switch (type) {
@@ -142,27 +144,27 @@ static void dev_stat_update(m2m_mem_stat_t *mem_stat_info_ptr, mem_stat_update_t
     }
 }
 
-static int convert_allocation_size(book_t *book, m2m_block_size_t requested_bytes)
+static m2m_word_size_t convert_allocation_size(book_t *book, m2m_block_size_t requested_bytes)
 {
     if (book->heap_main == 0) {
         heap_failure(book->heap_failure_callback, M2M_DYN_MEM_HEAP_SECTOR_UNITIALIZED);
     } else if (requested_bytes < 1) {
         heap_failure(book->heap_failure_callback, M2M_DYN_MEM_ALLOCATE_SIZE_NOT_VALID);
-    } else if (requested_bytes > (book->heap_size - 2 * sizeof(int)) ) {
+    } else if (requested_bytes > (book->heap_size - 2 * sizeof(m2m_word_size_t)) ) {
         heap_failure(book->heap_failure_callback, M2M_DYN_MEM_ALLOCATE_SIZE_NOT_VALID);
     }
-    return (requested_bytes + sizeof(int) - 1) / sizeof(int);
+    return (requested_bytes + sizeof(m2m_word_size_t) - 1) / sizeof(m2m_word_size_t);
 }
 
 // Checks that block length indicators are valid
 // Block has format: Size of data area [1 word] | data area [abs(size) words]| Size of data area [1 word]
 // If Size is negative it means area is unallocated
 // For direction, use 1 for direction up and -1 for down
-static int8_t m2m_block_validate(int *block_start, int direction)
+static int8_t m2m_block_validate(m2m_word_size_t *block_start, int direction)
 {
     int8_t ret_val = -1;
-    int *end = block_start;
-    int size_start = *end;
+    m2m_word_size_t *end = block_start;
+    m2m_word_size_t size_start = *end;
     end += (1 + abs(size_start));
     if (size_start != 0 && size_start == *end) {
         ret_val = 0;
@@ -176,11 +178,11 @@ static void *m2m_dyn_mem_internal_alloc(uint8_t *heap, const m2m_block_size_t al
 {
 #ifndef STANDARD_MALLOC
     book_t *book = (book_t *)heap;
-    int *block_ptr = NULL;
+    m2m_word_size_t *block_ptr = NULL;
 
     platform_enter_critical();
 
-    int data_size = convert_allocation_size(book, alloc_size);
+    m2m_word_size_t data_size = convert_allocation_size(book, alloc_size);
     if (!data_size) {
         goto done;
     }
@@ -192,7 +194,7 @@ static void *m2m_dyn_mem_internal_alloc(uint8_t *heap, const m2m_block_size_t al
          cur_hole = direction > 0 ? ns_list_get_next(&book->holes_list, cur_hole)
                                   : ns_list_get_previous(&book->holes_list, cur_hole)
         ) {
-        int *p = block_start_from_hole(cur_hole);
+        m2m_word_size_t *p = block_start_from_hole(cur_hole);
         if (m2m_block_validate(p, direction) != 0 || *p >= 0) {
             //Validation failed, or this supposed hole has positive (allocated) size
             heap_failure(book->heap_failure_callback, M2M_DYN_MEM_HEAP_SECTOR_CORRUPTED);
@@ -209,10 +211,10 @@ static void *m2m_dyn_mem_internal_alloc(uint8_t *heap, const m2m_block_size_t al
         goto done;
     }
 
-    int block_data_size = -*block_ptr;
+    m2m_word_size_t block_data_size = -*block_ptr;
     if (block_data_size >= (data_size + 2 + HOLE_T_SIZE)) {
-        int hole_size = block_data_size - data_size - 2;
-        int *hole_ptr;
+        m2m_word_size_t hole_size = block_data_size - data_size - 2;
+        m2m_word_size_t *hole_ptr;
         //There is enough room for a new hole so create it first
         if ( direction > 0 ) {
             hole_ptr = block_ptr + 1 + data_size + 1;
@@ -247,7 +249,7 @@ static void *m2m_dyn_mem_internal_alloc(uint8_t *heap, const m2m_block_size_t al
     if (book->mem_stat_info_ptr) {
         if (block_ptr) {
             //Update Allocate OK
-            dev_stat_update(book->mem_stat_info_ptr, DEV_HEAP_ALLOC_OK, (data_size + 2) * sizeof(int));
+            dev_stat_update(book->mem_stat_info_ptr, DEV_HEAP_ALLOC_OK, (data_size + 2) * sizeof(m2m_word_size_t));
 
         } else {
             //Update Allocate Fail, second parameter is not used for stats
@@ -279,7 +281,7 @@ void *m2m_dyn_mem_temporary_alloc(uint8_t *heap, m2m_block_size_t alloc_size)
 }
 
 #ifndef STANDARD_MALLOC
-static void m2m_free_and_merge_with_adjacent_blocks(book_t *book, int *cur_block, int data_size)
+static void m2m_free_and_merge_with_adjacent_blocks(book_t *book, m2m_word_size_t *cur_block, m2m_word_size_t data_size)
 {
     // Theory of operation: Block is always in form | Len | Data | Len |
     // So we need to check length of previous (if current not heap start)
@@ -288,12 +290,12 @@ static void m2m_free_and_merge_with_adjacent_blocks(book_t *book, int *cur_block
 
     hole_t *existing_start = NULL;
     hole_t *existing_end = NULL;
-    int *start = cur_block;
-    int *end = cur_block + data_size + 1;
+    m2m_word_size_t *start = cur_block;
+    m2m_word_size_t *end = cur_block + data_size + 1;
     //invalidate current block
     *cur_block = -data_size;
     *end = -data_size;
-    int merged_data_size = data_size;
+    m2m_word_size_t merged_data_size = data_size;
 
     if (cur_block != book->heap_main) {
         cur_block--;
@@ -365,8 +367,8 @@ void m2m_dyn_mem_free(uint8_t *heap, void *block)
 {
 #ifndef STANDARD_MALLOC
     book_t *book = (book_t *)heap;
-    int *ptr = block;
-    int size;
+    m2m_word_size_t *ptr = block;
+    m2m_word_size_t size;
 
     if (!block) {
         return;
@@ -394,7 +396,7 @@ void m2m_dyn_mem_free(uint8_t *heap, void *block)
             m2m_free_and_merge_with_adjacent_blocks(book, ptr, size);
             if (book->mem_stat_info_ptr) {
                 //Update Free Counter
-                dev_stat_update(book->mem_stat_info_ptr, DEV_HEAP_FREE, (size + 2) * sizeof(int));
+                dev_stat_update(book->mem_stat_info_ptr, DEV_HEAP_FREE, (size + 2) * sizeof(m2m_word_size_t));
             }
         }
     }
