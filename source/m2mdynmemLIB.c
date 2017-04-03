@@ -40,7 +40,7 @@ typedef struct book {
     m2m_mem_stat_t *mem_stat_info_ptr;
     void (*heap_failure_callback)(m2m_heap_fail_t);
     NS_LIST_HEAD(hole_t, link) holes_list;
-    size_t heap_size;
+    m2m_heap_size_t heap_size;
 } book_t;
 
 // size of a hole_t in our word units
@@ -65,7 +65,7 @@ static void heap_failure(void (*callback)(m2m_heap_fail_t), m2m_heap_fail_t reas
 
 #endif
 
-void m2m_dyn_mem_init(uint8_t *heap, size_t h_size, void (*passed_fptr)(m2m_heap_fail_t), m2m_mem_stat_t *info_ptr)
+void m2m_dyn_mem_init(uint8_t *heap, m2m_heap_size_t h_size, void (*passed_fptr)(m2m_heap_fail_t), m2m_mem_stat_t *info_ptr)
 {
 #ifndef STANDARD_MALLOC
     book_t *book = (book_t *)heap;
