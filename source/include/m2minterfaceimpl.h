@@ -186,6 +186,12 @@ public:
      */
     virtual void update_endpoint(String &name);
 
+    /**
+     * @brief Return internal endpoint name
+     * @return internal endpoint name
+     */
+    virtual const String internal_endpoint_name() const;
+
 protected: // From M2MNsdlObserver
 
     virtual void coap_message_ready(uint8_t *data_ptr,

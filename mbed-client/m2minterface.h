@@ -200,6 +200,12 @@ public:
      * @param name New endpoint name
      */
     virtual void update_endpoint(String &name) = 0;
+
+    /**
+     * @brief Return internal endpoint name
+     * @return internal endpoint name
+     */
+    virtual const String internal_endpoint_name() const = 0;
 };
 
 #endif // M2M_INTERFACE_H
