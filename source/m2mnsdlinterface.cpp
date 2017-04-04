@@ -414,7 +414,6 @@ uint8_t M2MNsdlInterface::received_from_server_callback(struct nsdl_s *nsdl_hand
         if(coap_header->msg_id == nsdl_handle->register_msg_id) {
             if(coap_header->msg_code == COAP_MSG_CODE_RESPONSE_CREATED) {
                 tr_debug("M2MNsdlInterface::received_from_server_callback - registration callback");
-                _observer.client_registered(&_server);
                 // If lifetime is less than zero then leave the field empty
                 if(coap_header->options_list_ptr) {
                     memory_free(_endpoint->lifetime_ptr);
@@ -431,6 +430,7 @@ uint8_t M2MNsdlInterface::received_from_server_callback(struct nsdl_s *nsdl_hand
                                                       coap_header->options_list_ptr->location_path_ptr,
                                                       coap_header->options_list_ptr->location_path_len);
                     }
+                    _observer.client_registered(&_server);
                 }
                 if(_endpoint->lifetime_ptr) {
                     _registration_timer->stop_timer();
@@ -1720,6 +1720,21 @@ void M2MNsdlInterface::handle_bootstrap_error()
 const String& M2MNsdlInterface::endpoint_name() const
 {
     return _endpoint_name;
+}
+
+const String M2MNsdlInterface::internal_endpoint_name() const
+{
+    String iep("");
+    if (_nsdl_handle->ep_information_ptr->location_ptr) {
+        String temp((const char*)_nsdl_handle->ep_information_ptr->location_ptr,
+                   _nsdl_handle->ep_information_ptr->location_len);
+        // Get last part of the location path.
+        // In mbed Cloud environment full path is /rd/accountid/internal_endpoint
+        int location = temp.find_last_of('/') + 1;
+        iep.append((const char*)_nsdl_handle->ep_information_ptr->location_ptr + location,
+                   _nsdl_handle->ep_information_ptr->location_len);
+    }
+    return iep;
 }
 
 void M2MNsdlInterface::change_operation_mode(M2MObject *object, M2MBase::Operation operation)
