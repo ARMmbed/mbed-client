@@ -20,28 +20,28 @@
 #include <inttypes.h>
 #include "source/include/m2mdynmemLIB.h"
 
-#define M2M_DYNMEM_LIB
-//#define M2M_PASSTHROUGH
-//#define M2M_TRACE_PRINTS
+#define M2M_APPLICATION_DYNMEM_LIB
+//#define M2M_APPLICATION_PASSTHROUGH
+//#define M2M_APPLICATION_TRACE_PRINTS
 
-#define M2M_DYNAMIC_MEMORY_HEAP_SIZE 20000
+#define M2M_APPLICATION_DYNAMIC_MEMORY_HEAP_SIZE 20000
 class M2MApplicationMemory {
 public:
     static int memTotal;
     static int memCount;
 
-#if (defined(M2M_DYNMEM_LIB)||defined(M2M_PASSTHROUGH))
+#if (defined(M2M_APPLICATION_DYNMEM_LIB)||defined(M2M_APPLICATION_PASSTHROUGH))
     void * operator new (size_t size);
     void operator delete (void * ptr);
     void * operator new[] (size_t size);
     void operator delete[] (void * ptr);
 #endif
-#ifdef M2M_DYNMEM_LIB
+#ifdef M2M_APPLICATION_DYNMEM_LIB
     static void init(void);
     static void init(size_t size);
     static void init(void *heapAllocation, size_t size);
 #endif
-#ifdef M2M_TRACE_PRINTS
+#ifdef M2M_APPLICATION_TRACE_PRINTS
     static void print_heap_running_statistics(void);
     static void print_heap_overall_statistics(void);
 #endif
@@ -52,9 +52,9 @@ public:
 
 private:
 
-#ifdef M2M_DYNMEM_LIB
+#ifdef M2M_APPLICATION_DYNMEM_LIB
     static void * heapPtr;
-#ifdef M2M_TRACE_PRINTS
+#ifdef M2M_APPLICATION_TRACE_PRINTS
     static m2m_mem_stat_t memInfo;
     static void memory_fail_callback(m2m_heap_fail_t fail);
 #endif
