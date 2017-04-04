@@ -220,6 +220,12 @@ public:
     const String& endpoint_name() const;
 
     /**
+     * @brief Get internal endpoint name
+     * @return internal endpoint name
+     */
+    const String internal_endpoint_name() const;
+
+    /**
      * @brief Set server address
      * @param server_address, Bootstrap or M2M server address.
      */
