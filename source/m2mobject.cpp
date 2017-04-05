@@ -46,7 +46,7 @@ M2MObject::M2MObject(const String &object_name, char *path, bool external_blockw
 M2MObject::M2MObject(const M2MBase::lwm2m_parameters_s* static_res)
 : M2MBase(static_res)
 {
-    if(static_res->name_id != -1) {
+    if(M2MBase::name_id() != -1) {
         M2MBase::set_coap_content_type(COAP_CONTENT_OMA_TLV_TYPE);
     }
 }
@@ -76,7 +76,7 @@ M2MObjectInstance* M2MObject::create_object_instance(uint16_t instance_id)
     if(!object_instance(instance_id)) {
         char* path = create_path(*this, instance_id);
         // Note: the object instance's name contains actually object's name.
-        instance = new M2MObjectInstance(*this, this->name(), "", path);
+        instance = new M2MObjectInstance(*this, "", path);
         if(instance) {
             instance->add_observation_level(observation_level());
             instance->set_instance_id(instance_id);
@@ -92,9 +92,9 @@ M2MObjectInstance* M2MObject::create_object_instance(uint16_t instance_id)
 // KS: is this needed for object instance?? TODO!
 M2MObjectInstance* M2MObject::create_object_instance(const lwm2m_parameters_s* s)
 {
-    tr_debug("M2MObject::create_object_instance - id: %d", s->instance_id);
+    tr_debug("M2MObject::create_object_instance - id: %d", s->identifier.instance_id);
     M2MObjectInstance *instance = NULL;
-    if(!object_instance(s->instance_id)) {
+    if(!object_instance(s->identifier.instance_id)) {
 
         instance = new M2MObjectInstance(*this, s);
         if(instance) {

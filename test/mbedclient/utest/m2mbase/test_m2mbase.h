@@ -30,7 +30,7 @@ public:
     void send_delayed_response(M2MBase *){}
     void resource_to_be_deleted(M2MBase *){visited=true;}
     void remove_object(M2MBase *){visited = true;}
-    void value_updated(M2MBase *,const String&){visited = true;}
+    void value_updated(M2MBase *){visited = true;}
 
     void clear() {visited = false;}
     bool visited;
@@ -136,6 +136,8 @@ public:
     void test_alloc_string_copy();
 
     void test_ctor();
+
+    void test_get_lwm2m_parameter();
 
     Handler *obsHandler;
 };

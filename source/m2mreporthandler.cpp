@@ -540,23 +540,10 @@ uint8_t* M2MReportHandler::alloc_string_copy(const uint8_t* source, uint32_t siz
 {
     assert(source != NULL);
 
-    uint8_t* result = (uint8_t*)memory_alloc(size + 1);
+    uint8_t* result = (uint8_t*)malloc(size + 1);
     if (result) {
         memcpy(result, source, size);
         result[size] = '\0';
     }
     return result;
-}
-
-void *M2MReportHandler::memory_alloc(uint32_t size)
-{
-    if(size)
-        return malloc(size);
-    else
-        return 0;
-}
-
-void M2MReportHandler::memory_free(void *ptr)
-{
-    free(ptr);
 }
