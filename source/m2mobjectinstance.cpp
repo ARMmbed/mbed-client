@@ -237,7 +237,7 @@ M2MResourceInstance* M2MObjectInstance::create_dynamic_resource_instance(const S
         char *path = create_path(*this, resource_name.c_str());
         if (path) {
             res = new M2MResource(*this, resource_name, resource_type, convert_resource_type(type),
-                                  false, path, M2MBase::instance_id(), true);
+                                  false, path, true, external_blockwise_store);
             _resource_list.push_back(res);
             res->set_register_uri(false);
             res->set_operation(M2MBase::GET_ALLOWED);
