@@ -242,11 +242,15 @@ void M2MResourceInstance::report()
     tr_debug("M2MResourceInstance::report()");
     M2MBase::Observation  observation_level = M2MBase::observation_level();
     tr_debug("M2MResourceInstance::report() - level %d", observation_level);
-    if((M2MBase::O_Attribute & observation_level) == M2MBase::O_Attribute ||
-       (M2MBase::OI_Attribute & observation_level) == M2MBase::OI_Attribute) {
+    M2MObjectInstance& object_instance = get_parent_resource().get_parent_object_instance();
+    int  parent_observation_level = (int)object_instance.observation_level();
+    parent_observation_level |= (int)object_instance.get_parent_object().observation_level();
+    
+    if((M2MBase::O_Attribute & parent_observation_level) == M2MBase::O_Attribute ||
+       (M2MBase::OI_Attribute & parent_observation_level) == M2MBase::OI_Attribute) {
         tr_debug("M2MResourceInstance::report() -- object/instance level");
         M2MObjectInstance& object_instance = get_parent_resource().get_parent_object_instance();
-        object_instance.notification_update(observation_level);
+        object_instance.notification_update((M2MBase::Observation)parent_observation_level);
     }
 
     if(M2MBase::Dynamic == mode() &&
