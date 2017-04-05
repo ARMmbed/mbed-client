@@ -256,7 +256,7 @@ void M2MFirmware::create_mandatory_resources()
     M2MResource* res;
 
     // todo:
-    // perhaps we should have a API for batch creation of objects by using a array
+    // perhaps we should have an API for batch creation of objects by using an array
     // of lwm2m_parameters.
 
     res = _firmware_instance->create_dynamic_resource(&firmware_package_params,

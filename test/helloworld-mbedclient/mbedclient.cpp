@@ -327,7 +327,7 @@ void MbedClient::registration_updated(M2MSecurity */*security_object*/, const M2
 
 void MbedClient::error(M2MInterface::Error error){
     _error = true;
-    printf("\nError occured Error code %d\n", (int)error);
+    printf("\nError occurred Error code %d\n", (int)error);
 }
 
 void MbedClient::value_updated(M2MBase *base, M2MBase::BaseType type) {

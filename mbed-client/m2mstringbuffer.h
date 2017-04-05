@@ -26,7 +26,7 @@ class StringBuffer : private StringBufferBase
 {
 public:
     /**
-     * Initialize a empty buffer with zero length and zero content.
+     * Initialize an empty buffer with zero length and zero content.
      */
     inline StringBuffer();
 
@@ -89,7 +89,7 @@ public:
 
     // API functionality copied from m2mstring:
 
-    // find the index of last occurance of given char in string, or negative if not found
+    // find the index of last occurrence of given char in string, or negative if not found
     int find_last_of(char search_char) const;
 
     /**
@@ -106,7 +106,7 @@ private:
 template <int SIZE>
 inline StringBuffer<SIZE>::StringBuffer()
 {
-    // actually a assert_compile() would be better as this is completely a code problem
+    // actually assert_compile() would be better as this is completely a code problem
     assert(SIZE > 0);
 
     _buff[0] = '\0';
