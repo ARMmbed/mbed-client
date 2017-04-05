@@ -31,11 +31,11 @@
 #define BUFFER_SIZE 10
 #define TRACE_GROUP "mClt"
 
-M2MObjectInstance::M2MObjectInstance(M2MObject& parent, const String &object_name,
+M2MObjectInstance::M2MObjectInstance(M2MObject& parent,
                                      const String &resource_type,
                                      char *path,
                                      bool external_blockwise_store)
-: M2MBase(object_name,
+: M2MBase("",
           M2MBase::Dynamic,
 #ifndef DISABLE_RESOURCE_TYPE
           resource_type,
@@ -74,12 +74,12 @@ M2MObjectInstance::~M2MObjectInstance()
 M2MResource* M2MObjectInstance::create_static_resource(const lwm2m_parameters_s* static_res,
                                                        M2MResourceInstance::ResourceType type)
 {
-    tr_debug("M2MObjectInstance::create_static_resource(lwm2m_parameters_s resource_name %s)", static_res->name);
+    tr_debug("M2MObjectInstance::create_static_resource(lwm2m_parameters_s resource_name %s)", static_res->identifier.name);
     M2MResource *res = NULL;
-    if (validate_string_length(static_res->name, 1, MAX_ALLOWED_STRING_LENGTH) == false) {
+    if (validate_string_length(static_res->identifier.name, 1, MAX_ALLOWED_STRING_LENGTH) == false) {
         return res;
     }
-    if(!resource(static_res->name)) {
+    if(!resource(static_res->identifier.name)) {
         res = new M2MResource(*this, static_res, convert_resource_type(type));
         if(res) {
             res->add_observation_level(observation_level());
@@ -128,13 +128,13 @@ M2MResource* M2MObjectInstance::create_dynamic_resource(const lwm2m_parameters_s
                                                         M2MResourceInstance::ResourceType type,
                                                         bool observable)
 {
-    tr_debug("M2MObjectInstance::create_dynamic_resource(resource_name %s)", static_res->name);
+    tr_debug("M2MObjectInstance::create_dynamic_resource(resource_name %s)", static_res->identifier.name);
     M2MResource *res = NULL;
 
-    if (validate_string_length(static_res->name, 1, MAX_ALLOWED_STRING_LENGTH) == false) {
+    if (validate_string_length(static_res->identifier.name, 1, MAX_ALLOWED_STRING_LENGTH) == false) {
         return res;
     }
-    if(!resource(static_res->name)) {
+    if(!resource(static_res->identifier.name)) {
         res = new M2MResource(*this, static_res, convert_resource_type(type));
         if(res) {
             //if (multiple_instance) { // TODO!
@@ -207,7 +207,7 @@ M2MResourceInstance* M2MObjectInstance::create_static_resource_instance(const St
     if(res && res->supports_multiple_instances()&& (res->resource_instance(instance_id) == NULL)) {
         char *path = M2MBase::create_path(*res, instance_id);
         if (path) {
-            instance = new M2MResourceInstance(*res, resource_name, resource_type, convert_resource_type(type),
+            instance = new M2MResourceInstance(*res, "", resource_type, convert_resource_type(type),
                                                value, value_length,
                                                path, external_blockwise_store,true);
             if(instance) {
@@ -246,7 +246,7 @@ M2MResourceInstance* M2MObjectInstance::create_dynamic_resource_instance(const S
     if (res && res->supports_multiple_instances() && (res->resource_instance(instance_id) == NULL)) {
         char *path = create_path(*res, instance_id);
         if (path) {
-            instance = new M2MResourceInstance(*res, resource_name, resource_type, convert_resource_type(type),
+            instance = new M2MResourceInstance(*res, "", resource_type, convert_resource_type(type),
                                                path, external_blockwise_store,true);
             if(instance) {
                 instance->set_operation(M2MBase::GET_ALLOWED);

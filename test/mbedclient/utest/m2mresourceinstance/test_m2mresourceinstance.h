@@ -35,8 +35,6 @@ public:
 
     void test_resource_instance_type();
 
-    void test_handle_observation_attribute();
-
     void test_set_execute_function();
 
     void test_execute();
@@ -54,8 +52,6 @@ public:
     void test_handle_get_request();
 
     void test_handle_put_request();
-
-    void test_set_resource_observer();
 
     void test_get_object_name();
 

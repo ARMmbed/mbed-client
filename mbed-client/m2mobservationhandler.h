@@ -55,7 +55,7 @@ class M2MObservationHandler
      * \param base The object whose value is updated.
      * \param object_name The name of the updated resource, default is empty.
      */
-    virtual void value_updated(M2MBase *base, const String &object_name = "") = 0;
+    virtual void value_updated(M2MBase *base) = 0;
 
     /**
      * \brief A callback for removing an object from the list.
