@@ -187,7 +187,11 @@ void* M2MApplicationMemory::memory_alloc(size_t size){
     #ifdef M2M_APPLICATION_DYNMEM_LIB
     tmp = m2m_dyn_mem_alloc((uint8_t *)heapPtr, size);
     #else
-    tmp = malloc(size);
+    if (size) {
+        tmp = malloc(size);
+    } else {
+        tmp = 0;
+    }
     #endif
     #ifdef M2M_APPLICATION_TRACE_PRINTS
     #ifdef M2M_APPLICATION_PASSTHROUGH

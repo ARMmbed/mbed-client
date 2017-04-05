@@ -95,17 +95,6 @@ bool M2MNsdlInterface::send_unregister_message()
     return m2mnsdlinterface_stub::bool_value;
 }
 
-void *M2MNsdlInterface::memory_alloc(uint16_t size)
-{
-    return malloc(size);
-}
-
-void M2MNsdlInterface::memory_free(void *ptr)
-{
-    free(ptr);
-    ptr = NULL;
-}
-
 uint8_t M2MNsdlInterface::send_to_server_callback(struct nsdl_s *,
                                                   sn_nsdl_capab_e,
                                                   uint8_t *,

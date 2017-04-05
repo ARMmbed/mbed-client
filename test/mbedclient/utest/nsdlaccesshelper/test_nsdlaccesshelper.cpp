@@ -195,21 +195,3 @@ void Test_NsdlAccessHelper::test_nsdl_c_received_from_server()
     delete (M2MNsdlInterface*)common_stub::void_value;
     free(m2mnsdlinterface_stub::void_value);
 }
-
-void Test_NsdlAccessHelper::test_socket_malloc()
-{
-    void *ptr = __socket_malloc(NULL, 6);
-    CHECK(ptr != NULL);
-
-    free(ptr);
-}
-
-void Test_NsdlAccessHelper::test_socket_free()
-{
-    void* ptr = malloc(7);
-    __socket_free(NULL, ptr);
-
-    ptr = NULL;
-    //No need to check anything, since memory leak is the test
-}
-

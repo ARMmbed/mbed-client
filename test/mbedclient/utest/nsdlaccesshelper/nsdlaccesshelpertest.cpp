@@ -61,15 +61,3 @@ TEST(NsdlAccessHelper, test_nsdl_c_received_from_server)
 {
     nsdl->test_nsdl_c_received_from_server();
 }
-
-
-TEST(NsdlAccessHelper, test_socket_malloc)
-{
-    nsdl->test_socket_malloc();
-}
-
-TEST(NsdlAccessHelper, test_socket_free)
-{
-    nsdl->test_socket_free();
-}
-

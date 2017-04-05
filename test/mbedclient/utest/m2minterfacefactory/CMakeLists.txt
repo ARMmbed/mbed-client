@@ -21,6 +21,7 @@ add_executable(m2minterfacefactorytest
         "../stub/m2mconnectionsecurity_stub.cpp"
         "../stub/nsdlaccesshelper_stub.cpp"
         "../stub/mbed_trace_stub.cpp"
+        "../stub/m2mapplicationmemory_stub.cpp"
         "../../../../source/m2minterfacefactory.cpp"
         "../../../../source/m2mstringbufferbase.cpp"
 )

@@ -8,6 +8,7 @@ add_executable(m2mdevice
         "../stub/m2mresourceinstance_stub.cpp"
         "../stub/m2mbase_stub.cpp"
         "../stub/m2mstring_stub.cpp"
+        "../stub/m2mapplicationmemory_stub.cpp"
         "../stub/nsdlaccesshelper_stub.cpp"
         "m2mdevicetest.cpp"
         "test_m2mdevice.cpp"
