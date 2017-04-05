@@ -173,3 +173,11 @@ void M2MInterfaceImpl::value_updated(M2MBase *)
 
 }
 
+void M2MInterfaceImpl::update_endpoint(String &name) {
+
+}
+
+const String M2MInterfaceImpl::internal_endpoint_name() const
+{
+
+}
