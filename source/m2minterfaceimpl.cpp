@@ -1067,3 +1067,8 @@ void M2MInterfaceImpl::start_register_update(M2MUpdateRegisterData *data) {
 void M2MInterfaceImpl::update_endpoint(String &name) {
     _nsdl_interface.update_endpoint(name);
 }
+
+const String M2MInterfaceImpl::internal_endpoint_name() const
+{
+    return _nsdl_interface.internal_endpoint_name();
+}

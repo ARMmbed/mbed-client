@@ -267,22 +267,22 @@ void Test_M2MNsdlInterface::test_delete_nsdl_resource()
 void Test_M2MNsdlInterface::test_create_bootstrap_resource()
 {
     common_stub::uint_value = 11;
-    CHECK(nsdl->create_bootstrap_resource(NULL, "") == true);
+    CHECK(nsdl->create_bootstrap_resource(NULL) == true);
 
     const char address[] = "coap://127.0.0.1:5683?param=1&param2=2&param3=3";
     uriqueryparser_stub::int_value = 3;
     nsdl->_bootstrap_id = 0;
     uriqueryparser_stub::bool_value = true;
     nsdl->set_server_address(address);
-    CHECK(nsdl->create_bootstrap_resource(NULL, "") == true);
+    CHECK(nsdl->create_bootstrap_resource(NULL) == true);
 
     common_stub::uint_value = 0;
-    CHECK(nsdl->create_bootstrap_resource(NULL, "") == false);
+    CHECK(nsdl->create_bootstrap_resource(NULL) == false);
 
     // Query param count set to 0
     nsdl->_bootstrap_id = 0;
     uriqueryparser_stub::int_value = 0;
-    CHECK(nsdl->create_bootstrap_resource(NULL, "") == false);
+    CHECK(nsdl->create_bootstrap_resource(NULL) == false);
 }
 
 void Test_M2MNsdlInterface::test_set_server_address()
@@ -1900,4 +1900,32 @@ void Test_M2MNsdlInterface::test_endpoint_name()
     String endpoint = "test";
     nsdl->_endpoint_name = endpoint;
     CHECK(nsdl->endpoint_name() == endpoint);
+}
+
+void Test_M2MNsdlInterface::test_update_endpoint()
+{
+    String name = "endpoint_name";
+    nsdl->update_endpoint(name);
+    STRCMP_EQUAL(name.c_str(), nsdl->endpoint_name().c_str());
+
+}
+
+void Test_M2MNsdlInterface::test_internal_endpoint_name()
+{
+    nsdl->_nsdl_handle = (nsdl_s*)malloc(sizeof(nsdl_s));
+    memset(nsdl->_nsdl_handle,0,sizeof(nsdl_s));
+    nsdl->_nsdl_handle->ep_information_ptr = (sn_nsdl_ep_parameters_s *)malloc(sizeof(sn_nsdl_ep_parameters_s));
+    memset(nsdl->_nsdl_handle->ep_information_ptr,0,sizeof(sn_nsdl_ep_parameters_s));
+    STRCMP_EQUAL(nsdl->internal_endpoint_name().c_str(), "");
+
+    nsdl->_nsdl_handle->ep_information_ptr->location_ptr = (uint8_t *)malloc(13);
+    nsdl->_nsdl_handle->ep_information_ptr->location_len = 13;
+    memset(nsdl->_nsdl_handle->ep_information_ptr->location_ptr, 0, 13);
+
+    memcpy(nsdl->_nsdl_handle->ep_information_ptr->location_ptr,(uint8_t*)"rd/1000/1234\0", 13);
+    STRCMP_EQUAL(nsdl->internal_endpoint_name().c_str(), "1234");
+
+    free(nsdl->_nsdl_handle->ep_information_ptr->location_ptr);
+    free(nsdl->_nsdl_handle->ep_information_ptr);
+    free(nsdl->_nsdl_handle);
 }
