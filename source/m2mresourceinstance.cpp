@@ -75,21 +75,10 @@ M2MResourceInstance::M2MResourceInstance(M2MResource &parent,
 #endif
 {
     M2MBase::set_base_type(M2MBase::Resource);
-    if (mode() == M2MBase::Dynamic) {
-        if( value != NULL && value_length > 0 ) {
-            sn_nsdl_dynamic_resource_parameters_s* res = get_nsdl_resource();
-            res->resource = alloc_string_copy(value, value_length);
-            res->resourcelen = value_length;
-        }
-    }
-    // Copy resource value to struct since static resources are handled in mbed-client-c
-    else if (mode() == M2MBase::Static) {
-       sn_nsdl_dynamic_resource_parameters_s* res = get_nsdl_resource();
+    if( value != NULL && value_length > 0 ) {
+        sn_nsdl_dynamic_resource_parameters_s* res = get_nsdl_resource();
         res->resource = alloc_string_copy(value, value_length);
         res->resourcelen = value_length;
-    }
-    else {
-        // Directory, not supported
     }
 }
 
@@ -253,11 +242,15 @@ void M2MResourceInstance::report()
     tr_debug("M2MResourceInstance::report()");
     M2MBase::Observation  observation_level = M2MBase::observation_level();
     tr_debug("M2MResourceInstance::report() - level %d", observation_level);
-    if((M2MBase::O_Attribute & observation_level) == M2MBase::O_Attribute ||
-       (M2MBase::OI_Attribute & observation_level) == M2MBase::OI_Attribute) {
+    M2MObjectInstance& object_instance = get_parent_resource().get_parent_object_instance();
+    int  parent_observation_level = (int)object_instance.observation_level();
+    parent_observation_level |= (int)object_instance.get_parent_object().observation_level();
+    
+    if((M2MBase::O_Attribute & parent_observation_level) == M2MBase::O_Attribute ||
+       (M2MBase::OI_Attribute & parent_observation_level) == M2MBase::OI_Attribute) {
         tr_debug("M2MResourceInstance::report() -- object/instance level");
         M2MObjectInstance& object_instance = get_parent_resource().get_parent_object_instance();
-        object_instance.notification_update(observation_level);
+        object_instance.notification_update((M2MBase::Observation)parent_observation_level);
     }
 
     if(M2MBase::Dynamic == mode() &&

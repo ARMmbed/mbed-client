@@ -38,9 +38,12 @@ void m2mobject_stub::clear()
 M2MObject::M2MObject(const String &object_name, char *path, bool external_blockwise_store)
 : M2MBase(object_name,
           M2MBase::Dynamic,
+#ifndef DISABLE_RESOURCE_TYPE
           "",
+#endif          
           path,
-          external_blockwise_store)
+          external_blockwise_store,
+          false)
 {
 
 }

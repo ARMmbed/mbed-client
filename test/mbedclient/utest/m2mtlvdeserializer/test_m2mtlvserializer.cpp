@@ -66,7 +66,7 @@ void Test_M2MTLVSerializer::test_serialize_object_out_of_memory()
     M2MResource* resource = new M2MResource(*instance,
                                             "1",
                                             "type",
-                                            M2MResourceInstance::INTEGER,
+                                            M2MBase::INTEGER,
                                             false,
                                             "1");
 
@@ -87,15 +87,17 @@ void Test_M2MTLVSerializer::test_serialize_object_out_of_memory()
     M2MResourceInstance* res_instance =  new M2MResourceInstance(*m2mobjectinstance_stub::resource,
                                                                  "1",
                                                                  "type",
-                                                                 M2MResourceInstance::STRING,
+                                                                 M2MBase::STRING,
                                                                  "1",
+                                                                 false,
                                                                  false);
 
     M2MResourceInstance* res_instance_1 =  new M2MResourceInstance(*m2mobjectinstance_stub::resource,
                                                                    "2",
                                                                    "type",
-                                                                   M2MResourceInstance::STRING,
+                                                                   M2MBase::STRING,
                                                                    "2",
+                                                                   false,
                                                                    false);
 
     m2mresource_stub::bool_value = true;
@@ -156,7 +158,7 @@ void Test_M2MTLVSerializer::test_serialize_object()
     M2MResource* resource = new M2MResource(*instance,
                                             "1",
                                             "type",
-                                            M2MResourceInstance::INTEGER,
+                                            M2MBase::INTEGER,
                                             false,
                                             "1");
 
@@ -175,15 +177,17 @@ void Test_M2MTLVSerializer::test_serialize_object()
     M2MResourceInstance* res_instance =  new M2MResourceInstance(*m2mobjectinstance_stub::resource,
                                                                  "1",
                                                                  "type",
-                                                                 M2MResourceInstance::STRING,
+                                                                 M2MBase::STRING,
                                                                  "1",
+                                                                 false,
                                                                  false);
 
     M2MResourceInstance* res_instance_1 =  new M2MResourceInstance(*m2mobjectinstance_stub::resource,
                                                                    "2",
                                                                    "type",
-                                                                   M2MResourceInstance::STRING,
+                                                                   M2MBase::STRING,
                                                                    "2",
+                                                                   false,
                                                                    false);
 
 
@@ -263,15 +267,16 @@ void Test_M2MTLVSerializer::test_serialize_object_instance()
     M2MResource* resource = new M2MResource(*instance,
                                             "1",
                                             "type",
-                                            M2MResourceInstance::STRING,
+                                            M2MBase::STRING,
                                             false,
                                             "1");
 
     M2MResourceInstance* res_instance = new M2MResourceInstance(*resource,
                                                                 "1",
                                                                 "type",
-                                                                M2MResourceInstance::STRING,
+                                                                M2MBase::STRING,
                                                                 "1",
+                                                                false,
                                                                 false);
 
     m2mobjectinstance_stub::resource_list.clear();
@@ -316,15 +321,16 @@ void Test_M2MTLVSerializer::test_serialize_resource()
     M2MResource* resource = new M2MResource(*instance,
                                             "1",
                                             "type",
-                                            M2MResourceInstance::INTEGER,
+                                            M2MBase::INTEGER,
                                             false,
                                             "1");
 
     M2MResourceInstance* res_instance = new M2MResourceInstance(*resource,
                                                                 "1",
                                                                 "type",
-                                                                M2MResourceInstance::INTEGER,
+                                                                M2MBase::INTEGER,
                                                                 "1",
+                                                                false,
                                                                 false);
 
 
@@ -369,15 +375,16 @@ void Test_M2MTLVSerializer::test_serialize_resource_instance()
     M2MResource* resource = new M2MResource(*instance,
                                             "1",
                                             "type",
-                                            M2MResourceInstance::INTEGER,
+                                            M2MBase::INTEGER,
                                             false,
                                             "1");
 
     M2MResourceInstance* res_instance = new M2MResourceInstance(*resource,
                                                                 "1",
                                                                 "type",
-                                                                M2MResourceInstance::INTEGER,
+                                                                M2MBase::INTEGER,
                                                                 "1",
+                                                                false,
                                                                 false);
 
 
@@ -423,15 +430,16 @@ void Test_M2MTLVSerializer::test_serialize_resource_instance_out_of_memory()
     M2MResource* resource = new M2MResource(*instance,
                                             "1",
                                             "type",
-                                            M2MResourceInstance::INTEGER,
+                                            M2MBase::INTEGER,
                                             false,
                                             "1");
 
     M2MResourceInstance* res_instance = new M2MResourceInstance(*resource,
                                                                 "1",
                                                                 "type",
-                                                                M2MResourceInstance::INTEGER,
+                                                                M2MBase::INTEGER,
                                                                 "1",
+                                                                false,
                                                                 false);
 
 

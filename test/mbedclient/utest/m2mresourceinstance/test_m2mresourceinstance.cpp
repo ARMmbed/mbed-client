@@ -58,7 +58,7 @@ public:
     bool block_requested;
 };
 
-class ResourceCallback : public M2MResourceCallback {
+class ResourceCallback {
 
 public:
 
@@ -76,7 +76,7 @@ class TestReportObserver :  public M2MReportObserver{
 public :
     TestReportObserver() {}
     ~TestReportObserver() {}
-    virtual void observation_to_be_sent(const m2m::Vector<uint16_t>&,bool){ }
+    virtual void observation_to_be_sent(const m2m::Vector<uint16_t>&, uint16_t, bool){ }
 };
 
 class Handler : public M2MObservationHandler {
@@ -91,7 +91,7 @@ public:
     void send_delayed_response(M2MBase *){}
     void resource_to_be_deleted(M2MBase *){visited=true;}
     void remove_object(M2MBase *){visited = true;}
-    void value_updated(M2MBase *,const String&){visited = true;}
+    void value_updated(M2MBase *){visited = true;}
 
     void clear() {visited = false;}
     bool visited;
@@ -105,15 +105,16 @@ Test_M2MResourceInstance::Test_M2MResourceInstance()
     m2mobjectinstance_stub::resource = new M2MResource(*m2mresource_stub::object_instance,
                                                        "name",
                                                        "type",
-                                                       M2MResourceInstance::STRING,
+                                                       M2MBase::STRING,
                                                        false,
                                                        "name");
 
     resource_instance = new M2MResourceInstance(*m2mobjectinstance_stub::resource,
                           "name",
                           "resource_type",
-                          M2MResourceInstance::STRING,
+                          M2MBase::STRING,
                           "name",
+                          false,
                           false);
 }
 
@@ -128,41 +129,79 @@ Test_M2MResourceInstance::~Test_M2MResourceInstance()
 
 void Test_M2MResourceInstance::test_resource_instance_type()
 {
+    m2mbase_stub::sn_resource = (M2MBase::lwm2m_parameters_s*) malloc(sizeof(M2MBase::lwm2m_parameters_s));
+    memset(m2mbase_stub::sn_resource,0,sizeof(M2MBase::lwm2m_parameters_s));
+    m2mbase_stub::sn_resource->data_type = M2MBase::STRING;
+
     CHECK(resource_instance->resource_instance_type() == M2MResourceInstance::STRING);
+
+    m2mbase_stub::sn_resource->data_type = M2MBase::INTEGER;
+
+    CHECK(resource_instance->resource_instance_type() == M2MResourceInstance::INTEGER);
+
+    m2mbase_stub::sn_resource->data_type = M2MBase::FLOAT;
+
+    CHECK(resource_instance->resource_instance_type() == M2MResourceInstance::FLOAT);
+
+    m2mbase_stub::sn_resource->data_type = M2MBase::BOOLEAN;
+
+    CHECK(resource_instance->resource_instance_type() == M2MResourceInstance::BOOLEAN);
+
+    m2mbase_stub::sn_resource->data_type = M2MBase::OPAQUE;
+
+    CHECK(resource_instance->resource_instance_type() == M2MResourceInstance::OPAQUE);
+
+    m2mbase_stub::sn_resource->data_type = M2MBase::TIME;
+
+    CHECK(resource_instance->resource_instance_type() == M2MResourceInstance::TIME);
+
+    m2mbase_stub::sn_resource->data_type = M2MBase::OBJLINK;
+
+    CHECK(resource_instance->resource_instance_type() == M2MResourceInstance::OBJLINK);
+
+    free(m2mbase_stub::sn_resource);
+    m2mbase_stub::sn_resource = NULL;
 }
 
 void Test_M2MResourceInstance::test_static_resource_instance()
 {
     u_int8_t value[] = {"value"};
+
+    m2mbase_stub::nsdl_resource = (sn_nsdl_dynamic_resource_parameters_s*)malloc(sizeof(sn_nsdl_dynamic_resource_parameters_s));
+    m2mbase_stub::nsdl_resource->static_resource_parameters =
+            (sn_nsdl_static_resource_parameters_s*)malloc(sizeof(sn_nsdl_static_resource_parameters_s));
+
     m2mbase_stub::mode_value = M2MBase::Dynamic;
     M2MResourceInstance *res = new M2MResourceInstance(*m2mobjectinstance_stub::resource,
                                                        "name1",
                                                        "type1",
-                                                       M2MResourceInstance::INTEGER,
+                                                       M2MBase::INTEGER,
                                                        value, (uint32_t)sizeof(value),
                                                        "name1",
+                                                       false,
                                                        false);
 
+    free(m2mbase_stub::nsdl_resource->resource);
     CHECK(res != NULL);
     delete res;
     res = NULL;
 
     m2mbase_stub::mode_value = M2MBase::Static;
-    m2mbase_stub::nsdl_resource = (sn_nsdl_dynamic_resource_parameters_s*)malloc(sizeof(sn_nsdl_dynamic_resource_parameters_s));
-    m2mbase_stub::nsdl_resource->static_resource_parameters =
-            (sn_nsdl_static_resource_parameters_s*)malloc(sizeof(sn_nsdl_static_resource_parameters_s));
 
     res = new M2MResourceInstance(*m2mobjectinstance_stub::resource,
                                                        "name1",
                                                        "type1",
-                                                       M2MResourceInstance::INTEGER,
+                                                       M2MBase::INTEGER,
                                                        value, (uint32_t)sizeof(value),
                                                        "name1",
+                                                       false,
                                                        false);
 
-    free(m2mbase_stub::nsdl_resource->static_resource_parameters->resource);
+    free(m2mbase_stub::nsdl_resource->resource);
     free(m2mbase_stub::nsdl_resource->static_resource_parameters);
     free(m2mbase_stub::nsdl_resource);
+    m2mbase_stub::nsdl_resource = NULL;
+
     CHECK(res != NULL);
     delete res;
 }
@@ -171,30 +210,6 @@ void Test_M2MResourceInstance::test_base_type()
 {
     m2mbase_stub::base_type = M2MBase::Resource;
     CHECK(M2MBase::Resource == resource_instance->base_type());
-}
-
-void Test_M2MResourceInstance::test_handle_observation_attribute()
-{
-    char *d = "s";
-    TestReportObserver obs;
-    m2mbase_stub::report = new M2MReportHandler(obs);
-
-    CHECK(false == resource_instance->handle_observation_attribute(d));
-
-    resource_instance->_resource_type = M2MResourceInstance::INTEGER;
-    CHECK(false == resource_instance->handle_observation_attribute(d));
-
-    resource_instance->_resource_type = M2MResourceInstance::FLOAT;
-    CHECK(false == resource_instance->handle_observation_attribute(d));
-
-    m2mreporthandler_stub::bool_return = true;
-    CHECK(true == resource_instance->handle_observation_attribute(d));
-
-    m2mbase_stub::bool_value = false;
-    CHECK(true == resource_instance->handle_observation_attribute(d));
-
-    delete m2mbase_stub::report;
-    m2mbase_stub::report = NULL;
 }
 
 void Test_M2MResourceInstance::test_set_execute_function()
@@ -227,12 +242,21 @@ void Test_M2MResourceInstance::test_execute()
 void Test_M2MResourceInstance::test_set_value()
 {
     u_int8_t value[] = {"value2"};
-    resource_instance->_value = (u_int8_t*)malloc(sizeof(u_int8_t));
+  //  resource_instance->_value = (u_int8_t*)malloc(sizeof(u_int8_t));
     m2mbase_stub::bool_value = true;
 
+    sn_nsdl_dynamic_resource_parameters_s res_param;
+    m2mbase_stub::nsdl_resource = &res_param;
+    memset(m2mbase_stub::nsdl_resource,0,sizeof(sn_nsdl_dynamic_resource_parameters_s));
+
+    M2MBase::lwm2m_parameters_s param;
+    m2mbase_stub::sn_resource = &param;
+    memset(m2mbase_stub::sn_resource,0,sizeof(M2MBase::lwm2m_parameters_s));
+    m2mbase_stub::sn_resource->data_type = M2MBase::STRING;
+
     CHECK(resource_instance->set_value(value,(u_int32_t)sizeof(value)) == true);
-    CHECK( resource_instance->_value_length == sizeof(value));
-    CHECK( *resource_instance->_value == *value);
+
+    m2mbase_stub::sn_resource->data_type = M2MBase::INTEGER;
 
     m2mbase_stub::observe = (M2MObservationHandler*)handler;
 
@@ -243,7 +267,6 @@ void Test_M2MResourceInstance::test_set_value()
     CHECK(resource_instance->set_value(value3,(u_int32_t)sizeof(value3)) == true);
 
     CHECK(resource_instance->set_value(123456789) == true);
-    CHECK(memcmp(resource_instance->_value, "123456789", 9) == 0);
 
     // verify int value helper
     CHECK(resource_instance->get_value_int() == 123456789);
@@ -251,31 +274,36 @@ void Test_M2MResourceInstance::test_set_value()
     // verify string value helper
     CHECK(resource_instance->get_value_string() == "123456789");
 
-    free(resource_instance->_value);
-    resource_instance->_value_length = 0;
+    free(m2mbase_stub::nsdl_resource->resource);
+    m2mbase_stub::nsdl_resource->resourcelen = 0;
 
     CHECK(resource_instance->set_value(NULL,0) == false);
 
     CHECK(resource_instance->set_value(NULL,0) == false);
 
-    m2mbase_stub::observation_level_value = M2MBase::R_Attribute;
-    resource_instance->_value = (u_int8_t*)malloc(sizeof(value)+1);
-    memset(resource_instance->_value,0,sizeof(value)+1);
-    memcpy(resource_instance->_value,value,sizeof(value));
-    resource_instance->_value_length = sizeof(value);
+    m2mreporthandler_stub::observation_level_value = M2MBase::O_Attribute;
+    m2mbase_stub::nsdl_resource->resource = (u_int8_t*)malloc(sizeof(value)+1);
+    memset(m2mbase_stub::nsdl_resource->resource,0,sizeof(value)+1);
+    memcpy(m2mbase_stub::nsdl_resource->resource,value,sizeof(value));
+    m2mbase_stub::nsdl_resource->resourcelen = sizeof(value);
+
     TestReportObserver obs;
     m2mbase_stub::report = new M2MReportHandler(obs);
 
     u_int8_t value4[] = {"value4"};
     CHECK(resource_instance->set_value(value4,(u_int32_t)sizeof(value4)) == true);
 
+    free(m2mbase_stub::nsdl_resource->resource);
+    m2mbase_stub::nsdl_resource->resource = NULL;
+    m2mbase_stub::nsdl_resource->resourcelen = 0;
+
+    CHECK(resource_instance->set_value(value4,(u_int32_t)sizeof(value4)) == true);
 
     m2mbase_stub::base_type = M2MBase::ResourceInstance;
     m2mbase_stub::observation_level_value = M2MBase::O_Attribute;
-    resource_instance->_resource_type = M2MResourceInstance::INTEGER;
+    m2mbase_stub::sn_resource->data_type = M2MBase::INTEGER;
     m2mbase_stub::mode_value = M2MBase::Dynamic;
     ResourceCallback *resource_cb = new ResourceCallback();
-    resource_instance->set_resource_observer(resource_cb);
     CHECK(resource_instance->set_value(value2,(u_int32_t)sizeof(value2)) == true);
 
     // XXX: the callback will not be called on current code with combination of
@@ -285,9 +313,7 @@ void Test_M2MResourceInstance::test_set_value()
     resource_cb->visited = false;
     m2mbase_stub::observation_level_value = M2MBase::R_Attribute;
     CHECK(resource_instance->set_value(value3,(u_int32_t)sizeof(value3)) == true);
-    CHECK(resource_cb->visited == true);
 
-    resource_instance->set_resource_observer(NULL);
     resource_cb->visited = false;
     m2mbase_stub::observation_level_value = M2MBase::R_Attribute;
     CHECK(resource_instance->set_value(value2,(u_int32_t)sizeof(value2)) == true);
@@ -298,7 +324,7 @@ void Test_M2MResourceInstance::test_set_value()
 
     m2mbase_stub::observation_level_value = M2MBase::OI_Attribute;
 
-    resource_instance->_resource_type = M2MResourceInstance::INTEGER;
+    m2mbase_stub::sn_resource->data_type = M2MBase::INTEGER;
 
     m2mbase_stub::mode_value = M2MBase::Dynamic;
 
@@ -306,45 +332,68 @@ void Test_M2MResourceInstance::test_set_value()
 
     m2mbase_stub::observation_level_value = M2MBase::OOI_Attribute;
 
-    resource_instance->_resource_type = M2MResourceInstance::INTEGER;
+    m2mbase_stub::sn_resource->data_type = M2MBase::INTEGER;
 
     m2mbase_stub::mode_value = M2MBase::Dynamic;
 
     CHECK(resource_instance->set_value(value2,(u_int32_t)sizeof(value2)) == true);
 
+    m2mbase_stub::sn_resource->data_type = M2MBase::STRING;
+    m2mbase_stub::bool_value = true;
+    CHECK(resource_instance->set_value(value,(u_int32_t)sizeof(value)) == true);
+
     delete m2mbase_stub::report;
     m2mbase_stub::report = NULL;
     delete resource_cb;
+
+
+    free(m2mbase_stub::nsdl_resource->resource);
+    m2mbase_stub::nsdl_resource->resource = NULL;
 }
 
 void Test_M2MResourceInstance::test_clear_value()
 {
     u_int8_t value[] = {"value"};
-    resource_instance->_value = (u_int8_t*)malloc(sizeof(u_int8_t));
+//    resource_instance->_value = (u_int8_t*)malloc(sizeof(u_int8_t));
 
     m2mbase_stub::observe = handler;
     TestReportObserver obs;
     m2mbase_stub::report = new M2MReportHandler(obs);
 
+    m2mbase_stub::nsdl_resource = (sn_nsdl_dynamic_resource_parameters_s *)malloc(sizeof(sn_nsdl_dynamic_resource_parameters_s));
+    memset(m2mbase_stub::nsdl_resource,0,sizeof(sn_nsdl_dynamic_resource_parameters_s));
+
+    m2mbase_stub::sn_resource = (M2MBase::lwm2m_parameters_s*) malloc(sizeof(M2MBase::lwm2m_parameters_s));
+    memset(m2mbase_stub::sn_resource,0,sizeof(M2MBase::lwm2m_parameters_s));
+    m2mbase_stub::sn_resource->data_type = M2MBase::STRING;
+
     CHECK(resource_instance->set_value(value,(u_int32_t)sizeof(value)) == true);
-    CHECK( resource_instance->_value_length == sizeof(value));
-    CHECK( *resource_instance->_value == *value);
     resource_instance->clear_value();
 
-    CHECK( resource_instance->_value_length == 0);
-    CHECK( resource_instance->_value == NULL);
 
     m2mbase_stub::bool_value = true;
     m2mbase_stub::mode_value = M2MBase::Dynamic;
     m2mbase_stub::observation_level_value = M2MBase::R_Attribute;
-    resource_instance->_resource_type = M2MResourceInstance::INTEGER;
+    m2mbase_stub::sn_resource->data_type = M2MBase::STRING;
+    m2mbase_stub::base_type = M2MBase::ResourceInstance;
+
     resource_instance->clear_value();
 
-    CHECK( resource_instance->_value_length == 0);
-    CHECK( resource_instance->_value == NULL);
+    m2mbase_stub::sn_resource->data_type = M2MBase::INTEGER;
+    resource_instance->clear_value();
+
 
     delete m2mbase_stub::report;
     m2mbase_stub::report = NULL;
+
+    free(m2mbase_stub::sn_resource);
+    m2mbase_stub::sn_resource = NULL;
+
+    free(m2mbase_stub::nsdl_resource->resource);
+    m2mbase_stub::nsdl_resource->resource = NULL;
+
+    free(m2mbase_stub::nsdl_resource);
+    m2mbase_stub::nsdl_resource = NULL;
 }
 
 void Test_M2MResourceInstance::test_get_value()
@@ -352,30 +401,53 @@ void Test_M2MResourceInstance::test_get_value()
     u_int8_t test_value[] = {"value3"};
     u_int32_t value_length((u_int32_t)sizeof(test_value));
 
-    resource_instance->_value = (u_int8_t *)malloc(value_length);
-    resource_instance->_value_length = value_length;
-    memcpy((u_int8_t *)resource_instance->_value, (u_int8_t *)test_value, value_length);
-
     uint8_t* buffer = (uint8_t*)malloc(5);
     uint32_t val_size = 0;
+    m2mbase_stub::nsdl_resource = (sn_nsdl_dynamic_resource_parameters_s *)malloc(sizeof(sn_nsdl_dynamic_resource_parameters_s));
+    memset(m2mbase_stub::nsdl_resource,0,sizeof(sn_nsdl_dynamic_resource_parameters_s));
+
+    m2mbase_stub::sn_resource = (M2MBase::lwm2m_parameters_s*) malloc(sizeof(M2MBase::lwm2m_parameters_s));
+    memset(m2mbase_stub::sn_resource,0,sizeof(M2MBase::lwm2m_parameters_s));
+    m2mbase_stub::sn_resource->data_type = M2MBase::STRING;
+
+    m2mbase_stub::nsdl_resource->resource = (u_int8_t *)malloc(value_length);
+    m2mbase_stub::nsdl_resource->resourcelen = value_length;
+    memcpy(m2mbase_stub::nsdl_resource->resource, test_value, value_length);
+
     resource_instance->get_value(buffer, val_size);
     CHECK(val_size == value_length);
     free(buffer);
 
-    resource_instance->clear_value();
-    CHECK(resource_instance->_value == NULL);
+    free(m2mbase_stub::sn_resource);
+    m2mbase_stub::sn_resource = NULL;
 
+    free(m2mbase_stub::nsdl_resource->resource);
+    m2mbase_stub::nsdl_resource->resource = NULL;
 
+    free(m2mbase_stub::nsdl_resource);
+    m2mbase_stub::nsdl_resource = NULL;
 }
 
 void Test_M2MResourceInstance::test_value()
 {
+    m2mbase_stub::nsdl_resource = (sn_nsdl_dynamic_resource_parameters_s *)malloc(sizeof(sn_nsdl_dynamic_resource_parameters_s));
+    memset(m2mbase_stub::nsdl_resource,0,sizeof(sn_nsdl_dynamic_resource_parameters_s));
+
     CHECK(resource_instance->value() == NULL);
+
+    free(m2mbase_stub::nsdl_resource);
+    m2mbase_stub::nsdl_resource = NULL;
 }
 
 void Test_M2MResourceInstance::test_value_length()
 {
+    m2mbase_stub::nsdl_resource = (sn_nsdl_dynamic_resource_parameters_s *)malloc(sizeof(sn_nsdl_dynamic_resource_parameters_s));
+    memset(m2mbase_stub::nsdl_resource,0,sizeof(sn_nsdl_dynamic_resource_parameters_s));
+
     CHECK(resource_instance->value_length() == 0);
+
+    free(m2mbase_stub::nsdl_resource);
+    m2mbase_stub::nsdl_resource = NULL;
 }
 
 void Test_M2MResourceInstance::test_handle_get_request()
@@ -406,6 +478,15 @@ void Test_M2MResourceInstance::test_handle_get_request()
 
     coap_header->content_format = sn_coap_content_format_e(110);
 
+    M2MBase::lwm2m_parameters_s param;
+    m2mbase_stub::sn_resource = &param;
+    memset(m2mbase_stub::sn_resource,0,sizeof(M2MBase::lwm2m_parameters_s));
+    m2mbase_stub::sn_resource->data_type = M2MBase::STRING;
+
+    sn_nsdl_dynamic_resource_parameters_s res_param;
+    m2mbase_stub::nsdl_resource = &res_param;
+    memset(m2mbase_stub::nsdl_resource,0,sizeof(sn_nsdl_dynamic_resource_parameters_s));
+
     CHECK(resource_instance->handle_get_request(NULL,coap_header,handler) != NULL);
 
     MyTest test;
@@ -420,7 +501,7 @@ void Test_M2MResourceInstance::test_handle_get_request()
     m2mblockmessage_stub::is_block_message = false;
 
     // OMA OPAQUE
-    resource_instance->_resource_type = M2MResourceInstance::OPAQUE;
+    m2mbase_stub::sn_resource->data_type = M2MBase::OPAQUE;
 
     CHECK(resource_instance->handle_get_request(NULL,coap_header,handler) != NULL);
 
@@ -515,12 +596,29 @@ void Test_M2MResourceInstance::test_handle_put_request()
 
     m2mbase_stub::bool_value = false;
 
+    M2MBase::lwm2m_parameters_s param;
+    m2mbase_stub::sn_resource = &param;
+
+    memset(m2mbase_stub::sn_resource,0,sizeof(M2MBase::lwm2m_parameters_s));
+
+    m2mbase_stub::sn_resource->data_type = M2MBase::STRING;
+
+
     sn_coap_hdr_s *coap_response = NULL;
+    coap_response = resource_instance->handle_put_request(NULL,coap_header,handler,execute_value_updated);
+    CHECK( coap_response != NULL);
+
+    m2mreporthandler_stub::bool_return = true;
+    m2mbase_stub::bool_value = true;
+
     coap_response = resource_instance->handle_put_request(NULL,coap_header,handler,execute_value_updated);
     CHECK( coap_response != NULL);
 
     free(coap_header->options_list_ptr);
     coap_header->options_list_ptr = NULL;
+
+    m2mreporthandler_stub::bool_return = false;
+    m2mbase_stub::bool_value = false;
 
     coap_response = resource_instance->handle_put_request(NULL,coap_header,handler,execute_value_updated);
     CHECK( coap_response != NULL);
@@ -532,6 +630,10 @@ void Test_M2MResourceInstance::test_handle_put_request()
     CHECK( coap_response != NULL);
 
     coap_header->content_format = sn_coap_content_format_e(100);
+
+    sn_nsdl_dynamic_resource_parameters_s res_param;
+    m2mbase_stub::nsdl_resource = &res_param;
+    memset(m2mbase_stub::nsdl_resource,0,sizeof(sn_nsdl_dynamic_resource_parameters_s));
 
     coap_response = resource_instance->handle_put_request(NULL,coap_header,handler,execute_value_updated);
 
@@ -588,15 +690,6 @@ void Test_M2MResourceInstance::test_handle_put_request()
     m2mbase_stub::clear();
 }
 
-void Test_M2MResourceInstance::test_set_resource_observer()
-{
-    ResourceCallback *resource_cb = new ResourceCallback();
-    resource_instance->set_resource_observer(resource_cb);
-    CHECK(resource_instance->_resource_callback == resource_cb)
-    delete resource_cb;
-}
-
-
 void Test_M2MResourceInstance::test_get_object_name()
 {
     m2mbase_stub::string_value = "name";
@@ -643,7 +736,7 @@ void Test_M2MResourceInstance::test_notification_sent()
 void Test_M2MResourceInstance::test_ctor()
 {
     M2MResourceInstance* instance = new M2MResourceInstance(*m2mobjectinstance_stub::resource, &params,
-                                                            M2MResourceInstance::STRING);
+                                                            M2MBase::STRING);
     CHECK(instance != NULL);
     delete instance;
 }
@@ -651,7 +744,7 @@ void Test_M2MResourceInstance::test_ctor()
 void Test_M2MResourceInstance::test_get_parent_resource()
 {
     M2MResourceInstance* instance = new M2MResourceInstance(*m2mobjectinstance_stub::resource, &params,
-                                                            M2MResourceInstance::STRING);
+                                                            M2MBase::STRING);
     // Only for the code coverage
     instance->get_parent_resource();
     delete instance;

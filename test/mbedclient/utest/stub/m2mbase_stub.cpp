@@ -44,6 +44,7 @@ uint32_t m2mbase_stub::object_token_len;
 uint8_t *m2mbase_stub::resource_token;
 uint32_t m2mbase_stub::resource_token_len;
 sn_nsdl_dynamic_resource_parameters_s *m2mbase_stub::nsdl_resource;
+M2MBase::lwm2m_parameters_s* m2mbase_stub::sn_resource;
 bool m2mbase_stub::find_resource;
 int32_t m2mbase_stub::ret_counter;
 
@@ -72,25 +73,29 @@ void m2mbase_stub::clear()
     resource_token = NULL;
     resource_token_len = 0;
     object_inst_token = NULL;
+    sn_resource = NULL;
+    sn_resource = NULL;
+    nsdl_resource = NULL;
     object_inst_token_len = 0;
     find_resource = false;
     ret_counter = 0;
 }
 
+
+
 M2MBase::M2MBase(const String& resource_name,
                  M2MBase::Mode mode,
+#ifndef DISABLE_RESOURCE_TYPE
                  const String &resource_type,
+#endif
                  char *path,
-                 bool external_blockwise_store)
+                 bool external_blockwise_store,
+                 bool multiple_instance,
+                 M2MBase::DataType type)
 :
   _sn_resource(NULL),
   _report_handler(NULL),
-  _observation_handler(NULL),
-  _token(NULL),
-  _observation_number(0),
-  _token_length(0),
-  _observation_level(M2MBase::None),
-  _is_under_observation(false)
+  _observation_handler(NULL)
 {
 
 }
@@ -98,12 +103,7 @@ M2MBase::M2MBase(const String& resource_name,
 M2MBase::M2MBase(const lwm2m_parameters_s *s):
     _sn_resource((lwm2m_parameters_s*) s),
     _report_handler(NULL),
-    _observation_handler(NULL),
-    _token(NULL),
-    _observation_number(0),
-    _token_length(0),
-    _observation_level(M2MBase::None),
-    _is_under_observation(false)
+    _observation_handler(NULL)
 {
 }
 
@@ -279,9 +279,11 @@ bool M2MBase::handle_observation_attribute(const char *query)
     return m2mbase_stub::bool_value;
 }
 
-void M2MBase::observation_to_be_sent(const m2m::Vector<uint16_t>&, bool)
+void M2MBase::observation_to_be_sent(const m2m::Vector<uint16_t>&,
+                                        uint16_t,
+                                        bool send_object)
 {
-}
+}                                        
 
 void *M2MBase::memory_alloc(uint32_t size)
 {
@@ -475,7 +477,7 @@ bool M2MBase::build_path(StringBuffer<MAX_PATH_SIZE_4> &buffer, const char *s1, 
 
 }
 
-sn_nsdl_dynamic_resource_parameters_s* M2MBase::get_nsdl_resource()
+sn_nsdl_dynamic_resource_parameters_s* M2MBase::get_nsdl_resource() const
 {
     return m2mbase_stub::nsdl_resource;
 }
@@ -518,6 +520,11 @@ void M2MBase::set_observation_handler(M2MObservationHandler *handler)
 size_t M2MBase::resource_name_length() const
 {
 
+}
+
+M2MBase::lwm2m_parameters_s* M2MBase::get_lwm2m_parameters() const
+{
+    return m2mbase_stub::sn_resource;
 }
 
 bool M2MBase::validate_string_length(const String &string, size_t min_length, size_t max_length)
