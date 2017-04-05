@@ -79,6 +79,10 @@ public:
 
     void test_callback_handler();
 
+    void test_update_endpoint();
+
+    void test_internal_endpoint_name();
+
     M2MInterfaceImpl*   impl;
     TestObserver        *observer;
     bool visited;

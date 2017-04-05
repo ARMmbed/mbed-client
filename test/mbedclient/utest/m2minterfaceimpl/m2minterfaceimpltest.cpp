@@ -159,3 +159,12 @@ TEST(M2MInterfaceImpl, timer_expired)
     m2m_interface_impl->test_timer_expired();
 }
 
+TEST(M2MInterfaceImpl, update_endpoint)
+{
+    m2m_interface_impl->test_update_endpoint();
+}
+
+TEST(M2MInterfaceImpl, internal_endpoint_name)
+{
+    m2m_interface_impl->test_internal_endpoint_name();
+}
