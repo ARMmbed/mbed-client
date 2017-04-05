@@ -187,7 +187,11 @@ void* M2MCoreMemory::memory_alloc(size_t size){
     #ifdef M2M_CORE_DYNMEM_LIB
     tmp = m2m_dyn_mem_alloc((uint8_t *)heapPtr, size);
     #else
-    tmp = malloc(size);
+    if (size) {
+        tmp = malloc(size);
+    } else {
+        tmp = 0;
+    }
     #endif
     #ifdef M2M_CORE_TRACE_PRINTS
     #ifdef M2M_CORE_PASSTHROUGH

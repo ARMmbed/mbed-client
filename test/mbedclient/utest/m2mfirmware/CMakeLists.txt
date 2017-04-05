@@ -11,6 +11,7 @@ add_executable(m2mfirmware
         "../stub/m2mresourceinstance_stub.cpp"
         "../stub/m2mbase_stub.cpp"
         "../stub/m2mstring_stub.cpp"
+        "../stub/m2mapplicationmemory_stub.cpp"
         "../stub/nsdlaccesshelper_stub.cpp"
         "../../../../source/m2mfirmware.cpp"
         "../../../../source/m2mstringbufferbase.cpp"

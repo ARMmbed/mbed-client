@@ -13,6 +13,8 @@ add_executable(m2mtlv
         "../stub/m2mresourceinstance_stub.cpp"
         "../stub/m2mobjectinstance_stub.cpp"
         "../stub/m2mobject_stub.cpp"
+        "../stub/m2mcorememory_stub.cpp"
+        "../stub/m2mapplicationmemory_stub.cpp"
         "../stub/nsdlaccesshelper_stub.cpp"
         "../stub/mbed_trace_stub.cpp"
         "test_m2mtlvserializer.cpp"

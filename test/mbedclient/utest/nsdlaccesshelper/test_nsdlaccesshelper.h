@@ -38,10 +38,6 @@ public:
 
     void test_nsdl_c_received_from_server();
 
-    void test_socket_malloc();
-
-    void test_socket_free();
-
     TestObserver *observer;
     M2MConnectionHandler *connection_handler;
 private:
