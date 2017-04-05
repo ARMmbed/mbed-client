@@ -280,7 +280,6 @@ void Test_M2MNsdlInterface::test_create_bootstrap_resource()
     nsdl->_bootstrap_id = 0;
     uriqueryparser_stub::bool_value = true;
     nsdl->set_server_address(address);
-    CHECK(nsdl->create_bootstrap_resource(NULL, "") == true);
 
 
     common_stub::uint_value = 0;
