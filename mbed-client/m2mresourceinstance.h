@@ -199,7 +199,7 @@ public:
      * \brief Converts a value to integer and returns it. Note: Conversion
      * errors are not detected.
      */
-    int get_value_int();
+    int64_t get_value_int() const;
 
     /**
      * Get the value as a string object. No encoding/charset conversions

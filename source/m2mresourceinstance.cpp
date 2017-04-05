@@ -337,17 +337,13 @@ void M2MResourceInstance::get_value(uint8_t *&value, uint32_t &value_length)
     }
 }
 
-int M2MResourceInstance::get_value_int()
+int64_t M2MResourceInstance::get_value_int() const
 {
     int value_int = 0;
-    // Get the value and convert it into integer. This is not the most
-    // efficient way, as it takes pointless heap copy to get the zero termination.
-    uint8_t* buffer = NULL;
-    uint32_t length;
-    get_value(buffer,length);
+    uint8_t* buffer = _value;
+
     if(buffer) {
         value_int = atoi((const char*)buffer);
-        free(buffer);
     }
     return value_int;
 }

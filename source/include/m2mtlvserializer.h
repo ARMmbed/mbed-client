@@ -95,4 +95,6 @@ private :
     static void serialize_id(uint16_t id, uint32_t &size, uint8_t *id_ptr);
 
     static void serialize_length(uint32_t length, uint32_t &size, uint8_t *length_ptr);
+
+    template <typename T> static void set_value_int(T value, uint8_t *buffer, uint32_t &size);
 };
