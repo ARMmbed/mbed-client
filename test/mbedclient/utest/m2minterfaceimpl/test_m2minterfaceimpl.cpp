@@ -787,3 +787,17 @@ uint32_t test_random_callback(void)
 {
     return 1;
 }
+
+void Test_M2MInterfaceImpl::test_update_endpoint()
+{
+    String data = "name";
+    impl->update_endpoint(data);
+}
+
+void Test_M2MInterfaceImpl::test_internal_endpoint_name()
+{
+    String value;
+    *m2mnsdlinterface_stub::string_value = "test";
+    value = impl->internal_endpoint_name();
+    STRCMP_EQUAL(value.c_str(),m2mnsdlinterface_stub::string_value->c_str());
+}

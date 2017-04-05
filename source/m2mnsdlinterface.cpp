@@ -429,7 +429,7 @@ uint8_t M2MNsdlInterface::received_from_server_callback(struct nsdl_s *nsdl_hand
                                                       coap_header->options_list_ptr->location_path_ptr,
                                                       coap_header->options_list_ptr->location_path_len);
                     }
-                    _observer.client_registered(&_server);
+
                 }
                 if(_endpoint->lifetime_ptr) {
                     _registration_timer->stop_timer();
@@ -437,6 +437,7 @@ uint8_t M2MNsdlInterface::received_from_server_callback(struct nsdl_s *nsdl_hand
                                                      M2MTimerObserver::Registration,
                                                      false);
                 }
+                _observer.client_registered(&_server);
             } else {
                 tr_error("M2MNsdlInterface::received_from_server_callback - registration error %d", coap_header->msg_code);
                 // Try to do clean register again
