@@ -20,8 +20,8 @@
 
 /**
  * @brief M2MTLVDeserializer
- * TLV Deserialiser get the object instances and resources as binary data and 
- * builds the <code>lwm2m</code> representation from it. See OMA-LWM2M 
+ * TLV Deserialiser get the object instances and resources as binary data and
+ * builds the <code>lwm2m</code> representation from it. See OMA-LWM2M
  * specification, chapter 6.1 for the resource model and chapter 6.3.3 for
  * the OMA-TLV specification.
  */
@@ -51,9 +51,9 @@ public :
      */
     static bool is_object_instance(uint8_t *tlv);
 
-    
+
     /**
-     * This method checks whether the given binary encodes a resource or 
+     * This method checks whether the given binary encodes a resource or
      * something else. It returns <code>true</code> if bits 7-6 of the first
      * byte is "11".
      * @param tlv Binary to be checked as LWM2M resource.
@@ -69,7 +69,7 @@ public :
      * @return <code>true</code> or <code>false</code>.
      */
     static bool is_multiple_resource(uint8_t *tlv);
-    
+
     /**
      * This method checks whether the given binary encodes a resource instance
      * or something else. It returns <code>true</code> if bits 7-6 of the first
@@ -81,7 +81,7 @@ public :
 
     /**
      * Deserialises the given binary that must encode object instances. Binary
-     * array can be checked before invoking this method with 
+     * array can be checked before invoking this method with
      */
     static M2MTLVDeserializer::Error deserialise_object_instances(uint8_t* tlv,
                                                            uint32_t tlv_size,
@@ -89,7 +89,7 @@ public :
                                                            M2MTLVDeserializer::Operation operation);
 
     /**
-     * Deserialises the given binary that must encode resources. Binary array 
+     * Deserialises the given binary that must encode resources. Binary array
      * can be checked before invoking this method.
      */
     static M2MTLVDeserializer::Error deserialize_resources(uint8_t *tlv,
@@ -111,7 +111,7 @@ public :
      * @return Object instance id or resource id.
      */
     static uint16_t instance_id(uint8_t *tlv);
-    
+
 private:
 
     static M2MTLVDeserializer::Error deserialize_object_instances(uint8_t *tlv,
@@ -120,7 +120,7 @@ private:
                                                            M2MObject &object,
                                                            M2MTLVDeserializer::Operation operation,
                                                            bool update_value);
-    
+
     static M2MTLVDeserializer::Error deserialize_resources(uint8_t *tlv,
                                                     uint32_t tlv_size,
                                                     uint32_t offset,
@@ -144,12 +144,14 @@ private:
                                                              bool update_value);
 
     static bool is_object_instance(uint8_t *tlv, uint32_t offset);
-    
+
     static bool is_resource(uint8_t *tlv, uint32_t offset);
-    
+
     static bool is_multiple_resource(uint8_t *tlv, uint32_t offset);
-    
+
     static bool is_resource_instance(uint8_t *tlv, uint32_t offset);
+
+    static void set_resource_instance_value(M2MResourceInstance *res, uint8_t *tlv, uint32_t size);
 };
 
 class TypeIdLength {

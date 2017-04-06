@@ -90,6 +90,10 @@ public:
 
     void test_endpoint_name();
 
+    void test_update_endpoint();
+
+    void test_internal_endpoint_name();
+
     M2MNsdlInterface* nsdl;
 
     TestObserver *observer;

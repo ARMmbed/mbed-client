@@ -36,3 +36,9 @@ coverage/*
 results/*
 output/*
 .yotta.json
+
+# Dependency folders
+mbed-client-c/*
+mbed-client-classic/*
+mbed-client-mbed-tls/*
+

@@ -1886,3 +1886,31 @@ void Test_M2MNsdlInterface::test_endpoint_name()
     nsdl->_endpoint_name = endpoint;
     CHECK(nsdl->endpoint_name() == endpoint);
 }
+
+void Test_M2MNsdlInterface::test_update_endpoint()
+{
+    String name = "endpoint_name";
+    nsdl->update_endpoint(name);
+    STRCMP_EQUAL(name.c_str(), nsdl->endpoint_name().c_str());
+
+}
+
+void Test_M2MNsdlInterface::test_internal_endpoint_name()
+{
+    nsdl->_nsdl_handle = (nsdl_s*)malloc(sizeof(nsdl_s));
+    memset(nsdl->_nsdl_handle,0,sizeof(nsdl_s));
+    nsdl->_nsdl_handle->ep_information_ptr = (sn_nsdl_ep_parameters_s *)malloc(sizeof(sn_nsdl_ep_parameters_s));
+    memset(nsdl->_nsdl_handle->ep_information_ptr,0,sizeof(sn_nsdl_ep_parameters_s));
+    STRCMP_EQUAL(nsdl->internal_endpoint_name().c_str(), "");
+
+    nsdl->_nsdl_handle->ep_information_ptr->location_ptr = (uint8_t *)malloc(13);
+    nsdl->_nsdl_handle->ep_information_ptr->location_len = 13;
+    memset(nsdl->_nsdl_handle->ep_information_ptr->location_ptr, 0, 13);
+
+    memcpy(nsdl->_nsdl_handle->ep_information_ptr->location_ptr,(uint8_t*)"rd/1000/1234\0", 13);
+    STRCMP_EQUAL(nsdl->internal_endpoint_name().c_str(), "1234");
+
+    free(nsdl->_nsdl_handle->ep_information_ptr->location_ptr);
+    free(nsdl->_nsdl_handle->ep_information_ptr);
+    free(nsdl->_nsdl_handle);
+}

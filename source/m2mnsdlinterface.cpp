@@ -100,7 +100,7 @@ M2MNsdlInterface::~M2MNsdlInterface()
 
     sn_nsdl_destroy(_nsdl_handle);
     _nsdl_handle = NULL;
-
+    free(_server_address);
     tr_debug("M2MNsdlInterface::~M2MNsdlInterface() - OUT");
 }
 
@@ -410,7 +410,6 @@ uint8_t M2MNsdlInterface::received_from_server_callback(struct nsdl_s *nsdl_hand
         if(coap_header->msg_id == nsdl_handle->register_msg_id) {
             if(coap_header->msg_code == COAP_MSG_CODE_RESPONSE_CREATED) {
                 tr_debug("M2MNsdlInterface::received_from_server_callback - registration callback");
-                _observer.client_registered(&_server);
                 // If lifetime is less than zero then leave the field empty
                 if(coap_header->options_list_ptr) {
                     memory_free(_endpoint->lifetime_ptr);
@@ -427,6 +426,7 @@ uint8_t M2MNsdlInterface::received_from_server_callback(struct nsdl_s *nsdl_hand
                                                       coap_header->options_list_ptr->location_path_ptr,
                                                       coap_header->options_list_ptr->location_path_len);
                     }
+
                 }
                 if(_endpoint->lifetime_ptr) {
                     _registration_timer->stop_timer();
@@ -434,6 +434,7 @@ uint8_t M2MNsdlInterface::received_from_server_callback(struct nsdl_s *nsdl_hand
                                                      M2MTimerObserver::Registration,
                                                      false);
                 }
+                _observer.client_registered(&_server);
             } else {
                 tr_error("M2MNsdlInterface::received_from_server_callback - registration error %d", coap_header->msg_code);
                 // Try to do clean register again
@@ -1668,6 +1669,11 @@ bool M2MNsdlInterface::validate_security_object()
         uint32_t public_key_size = _security->get_resource(M2MSecurity::PublicKey)->value_length();
         uint32_t server_key_size = _security->get_resource(M2MSecurity::ServerPublicKey)->value_length();
         uint32_t pkey_size = _security->get_resource(M2MSecurity::Secretkey)->value_length();
+        M2MDevice* dev = M2MInterfaceFactory::create_device();
+        if (dev) {
+            tr_debug("M2MNsdlInterface::validate_security_object - Current time: %" PRId64,
+                     dev->resource_value_int(M2MDevice::CurrentTime));
+        }
         tr_debug("M2MNsdlInterface::validate_security_object - Server URI /0/0: %s", address.c_str());
         tr_debug("M2MNsdlInterface::validate_security_object - is bs server /0/1: %d", is_bs_server);
         tr_debug("M2MNsdlInterface::validate_security_object - Security Mode /0/2: %" PRIu32, sec_mode);
@@ -1711,6 +1717,21 @@ void M2MNsdlInterface::handle_bootstrap_error()
 const String& M2MNsdlInterface::endpoint_name() const
 {
     return _endpoint_name;
+}
+
+const String M2MNsdlInterface::internal_endpoint_name() const
+{
+    String iep("");
+    if (_nsdl_handle->ep_information_ptr->location_ptr) {
+        String temp((const char*)_nsdl_handle->ep_information_ptr->location_ptr,
+                   _nsdl_handle->ep_information_ptr->location_len);
+        // Get last part of the location path.
+        // In mbed Cloud environment full path is /rd/accountid/internal_endpoint
+        int location = temp.find_last_of('/') + 1;
+        iep.append((const char*)_nsdl_handle->ep_information_ptr->location_ptr + location,
+                   _nsdl_handle->ep_information_ptr->location_len - location);
+    }
+    return iep;
 }
 
 void M2MNsdlInterface::change_operation_mode(M2MObject *object, M2MBase::Operation operation)

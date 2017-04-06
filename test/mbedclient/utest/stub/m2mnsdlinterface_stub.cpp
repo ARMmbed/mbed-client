@@ -219,3 +219,7 @@ void M2MNsdlInterface::update_endpoint(const String &name)
 {
 
 }
+const String M2MNsdlInterface::internal_endpoint_name() const
+{
+    return *m2mnsdlinterface_stub::string_value;
+}
