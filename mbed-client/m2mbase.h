@@ -294,7 +294,7 @@ public:
      * \brief Returns the object type.
      * \return The base type of the object.
      */
-    virtual M2MBase::BaseType base_type() const;
+    M2MBase::BaseType base_type() const;
 
     /**
      * \brief Returns the operation type of the object.
@@ -563,7 +563,7 @@ protected:
      * \brief Returns the Report Handler object.
      * \return M2MReportHandler object.
     */
-    M2MReportHandler* report_handler();
+    M2MReportHandler* report_handler() const;
 
 
     static bool build_path(StringBuffer<MAX_PATH_SIZE> &buffer, const char *s1, uint16_t i1, const char *s2, uint16_t i2);

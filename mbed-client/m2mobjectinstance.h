@@ -227,12 +227,6 @@ public:
     uint16_t resource_count(const char *resource) const;
 
     /**
-     * \brief Returns the object type.
-     * \return BaseType.
-     */
-    virtual M2MBase::BaseType base_type() const;
-
-    /**
      * \brief Adds the observation level for the object.
      * \param observation_level The level of observation.
      */

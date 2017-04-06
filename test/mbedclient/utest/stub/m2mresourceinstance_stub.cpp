@@ -21,7 +21,6 @@ String *m2mresourceinstance_stub::string_value;
 M2MResourceInstance::ResourceType m2mresourceinstance_stub::resource_type;
 sn_coap_hdr_s *m2mresourceinstance_stub::header;
 uint8_t* m2mresourceinstance_stub::value;
-M2MBase::BaseType m2mresourceinstance_stub::base_type;
 
 
 void m2mresourceinstance_stub::clear()
@@ -31,7 +30,6 @@ void m2mresourceinstance_stub::clear()
     resource_type = M2MResourceInstance::STRING;
     header = NULL;
     value = NULL;
-    base_type = M2MBase::ResourceInstance;
     string_value = NULL;
 }
 
@@ -56,7 +54,7 @@ M2MResourceInstance::M2MResourceInstance(M2MResource &parent,
  ,_block_message_data(NULL)
 #endif
 {
-
+    set_base_type(M2MBase::ResourceInstance);
 }
 
 M2MResourceInstance::M2MResourceInstance(M2MResource &parent,
@@ -82,7 +80,7 @@ M2MResourceInstance::M2MResourceInstance(M2MResource &parent,
  ,_block_message_data(NULL)
 #endif
 {
-	
+    set_base_type(M2MBase::ResourceInstance);
 }
 
 M2MResourceInstance::M2MResourceInstance(M2MResource &parent,
@@ -94,15 +92,11 @@ M2MResourceInstance::M2MResourceInstance(M2MResource &parent,
   ,_block_message_data(NULL)
 #endif
 {
+    set_base_type(M2MBase::ResourceInstance);
 }
 
 M2MResourceInstance::~M2MResourceInstance()
 {
-}
-
-M2MBase::BaseType M2MResourceInstance::base_type() const
-{
-    return m2mresourceinstance_stub::base_type;
 }
 
 M2MResourceInstance::ResourceType M2MResourceInstance::resource_instance_type() const

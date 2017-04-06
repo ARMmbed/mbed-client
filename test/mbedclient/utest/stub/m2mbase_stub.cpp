@@ -255,8 +255,9 @@ void M2MBase::get_observation_token(uint8_t *&token,
     }
 }
 
-void M2MBase::set_base_type(M2MBase::BaseType /*type*/)
+void M2MBase::set_base_type(M2MBase::BaseType type)
 {
+    m2mbase_stub::base_type = type;
 }
 
 M2MBase::BaseType M2MBase::base_type() const
@@ -322,7 +323,7 @@ uint8_t* M2MBase::alloc_copy(const uint8_t* source, uint32_t size)
     return result;
 }
 
-M2MReportHandler* M2MBase::report_handler()
+M2MReportHandler* M2MBase::report_handler() const
 {
     return m2mbase_stub::report;
 }
