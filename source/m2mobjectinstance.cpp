@@ -389,11 +389,6 @@ uint16_t M2MObjectInstance::resource_count(const char *resource) const
     return count;
 }
 
-M2MBase::BaseType M2MObjectInstance::base_type() const
-{
-    return M2MBase::base_type();
-}
-
 void M2MObjectInstance::add_observation_level(M2MBase::Observation observation_level)
 {
     M2MBase::add_observation_level(observation_level);

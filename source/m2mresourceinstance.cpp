@@ -74,7 +74,7 @@ M2MResourceInstance::M2MResourceInstance(M2MResource &parent,
  ,_block_message_data(NULL)
 #endif
 {
-    M2MBase::set_base_type(M2MBase::Resource);
+    M2MBase::set_base_type(M2MBase::ResourceInstance);
     if( value != NULL && value_length > 0 ) {
         sn_nsdl_dynamic_resource_parameters_s* res = get_nsdl_resource();
         res->resource = alloc_string_copy(value, value_length);
@@ -91,9 +91,7 @@ M2MResourceInstance::M2MResourceInstance(M2MResource &parent,
   ,_block_message_data(NULL)
 #endif
 {
-    //TBD: put to flash, or parse from the uri_path!!!!
-    //same for the _object_instance_id.
-    //M2MBase::set_base_type(M2MBase::ResourceInstance);
+    // we are not there yet for this check as this is called from M2MResource(): assert(base_type() == M2MBase::ResourceInstance);
 }
 
 M2MResourceInstance::~M2MResourceInstance()
@@ -122,11 +120,6 @@ M2MResourceInstance::~M2MResourceInstance()
 #ifndef DISABLE_BLOCK_MESSAGE
     delete _block_message_data;
 #endif
-}
-
-M2MBase::BaseType M2MResourceInstance::base_type() const
-{
-    return M2MBase::base_type();
 }
 
 M2MResourceInstance::ResourceType M2MResourceInstance::resource_instance_type() const
