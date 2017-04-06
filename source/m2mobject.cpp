@@ -248,11 +248,6 @@ sn_coap_hdr_s* M2MObject::handle_get_request(nsdl_s *nsdl,
                                     if(received_coap_header->options_list_ptr->observe != -1) {
                                         number = received_coap_header->options_list_ptr->observe;
                                     }
-                                    if(received_coap_header->token_ptr) {
-                                        tr_debug("M2MObject::handle_get_request - Sets Observation Token to resource");
-                                        set_observation_token(received_coap_header->token_ptr,
-                                                              received_coap_header->token_len);
-                                    }
 
                                     // If the observe value is 0 means register for observation.
                                     if(number == 0) {
@@ -261,6 +256,12 @@ sn_coap_hdr_s* M2MObject::handle_get_request(nsdl_s *nsdl,
                                         add_observation_level(M2MBase::O_Attribute);
                                         tr_debug("M2MObject::handle_get_request - Observation Number %d", observation_number());
                                         coap_response->options_list_ptr->observe = observation_number();
+                                    }
+
+                                    if(received_coap_header->token_ptr) {
+                                        tr_debug("M2MObject::handle_get_request - Sets Observation Token to resource");
+                                        set_observation_token(received_coap_header->token_ptr,
+                                                              received_coap_header->token_len);
                                     }
                                 } else if (STOP_OBSERVATION == observe_option) {
                                     tr_debug("M2MObject::handle_get_request - Stops Observation");
