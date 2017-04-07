@@ -653,18 +653,17 @@ sn_coap_hdr_s* M2MObjectInstance::handle_post_request(nsdl_s *nsdl,
 
                         if (coap_response->options_list_ptr) {
 
-                              StringBuffer<MAX_PATH_SIZE_3> obj_name;
-                              if(!build_path(obj_name, M2MBase::name(), M2MBase::instance_id(), instance_id))
-                              {
-                                  msg_code = COAP_MSG_CODE_RESPONSE_INTERNAL_SERVER_ERROR;
-                                  break;
-                              }
+                            StringBuffer<MAX_PATH_SIZE_3> obj_name;
+                            if(!build_path(obj_name, _parent.name(), M2MBase::instance_id(), instance_id)) {
+                                msg_code = COAP_MSG_CODE_RESPONSE_INTERNAL_SERVER_ERROR;
+                                break;
+                            }
 
-                              coap_response->options_list_ptr->location_path_len = obj_name.get_size();
-                              coap_response->options_list_ptr->location_path_ptr =
-                                  alloc_string_copy((uint8_t*)obj_name.c_str(),
-                                                    coap_response->options_list_ptr->location_path_len);
-                              // todo: handle allocation error
+                            coap_response->options_list_ptr->location_path_len = obj_name.get_size();
+                            coap_response->options_list_ptr->location_path_ptr =
+                              alloc_string_copy((uint8_t*)obj_name.c_str(),
+                                                coap_response->options_list_ptr->location_path_len);
+                            // todo: handle allocation error
                         }
                         msg_code = COAP_MSG_CODE_RESPONSE_CREATED;
                         break;
