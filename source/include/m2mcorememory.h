@@ -18,7 +18,7 @@
 #define M2M_CORE_MEMORY_H
 
 #include <inttypes.h>
-#include "source/include/m2mdynmemLIB.h"
+#include "mbed-client-libservice/m2mdynmemLIB.h"
 
 #define M2M_CORE_DYNMEM_LIB
 //#define M2M_CORE_PASSTHROUGH
