@@ -16,7 +16,6 @@
 
 #include <stdlib.h>
 #include "include/m2mapplicationmemory.h"
-//#include "include/m2mdynmemLIB.h"
 #include "mbed-trace/mbed_trace.h"
 
 #define TRACE_GROUP "mClt"

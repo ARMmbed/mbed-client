@@ -29,7 +29,6 @@ class M2MCoreMemory {
 public:
     static int memTotal;
     static int memCount;
-
 #if (defined(M2M_CORE_DYNMEM_LIB)||defined(M2M_CORE_PASSTHROUGH))
     void * operator new (size_t size);
     void operator delete (void * ptr);
@@ -47,11 +46,7 @@ public:
 #endif
     static void *memory_alloc(size_t size);
     static void memory_free(void *ptr);
-
-    /* TODO at least for completeness there should be de-init method */
-
 private:
-
 #ifdef M2M_CORE_DYNMEM_LIB
     static void * heapPtr;
 #ifdef M2M_CORE_TRACE_PRINTS
@@ -60,5 +55,4 @@ private:
 #endif
 #endif
 };
-
 #endif
