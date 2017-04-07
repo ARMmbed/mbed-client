@@ -17,6 +17,9 @@
 #include <stdlib.h>
 #include "include/m2mapplicationmemory.h"
 //#include "include/m2mdynmemLIB.h"
+#include "mbed-trace/mbed_trace.h"
+
+#define TRACE_GROUP "mClt"
 
 #ifdef M2M_APPLICATION_TRACE_PRINTS
 int M2MApplicationMemory::memTotal = 0;
@@ -32,15 +35,11 @@ void * M2MApplicationMemory::heapPtr = 0;
 #endif
 #endif
 
-#ifdef M2M_APPLICATION_TRACE_PRINTS
-#include <stdio.h>
-#endif
-
 #ifdef M2M_APPLICATION_DYNMEM_LIB
 #ifdef M2M_APPLICATION_TRACE_PRINTS
 m2m_mem_stat_t M2MApplicationMemory::memInfo;
 void M2MApplicationMemory::memory_fail_callback(m2m_heap_fail_t fail) {
-    printf("\nM2M memory failure: %u\n", fail);
+    tr_error("\nM2M memory failure: %u\n", fail);
 }
 #endif
 #endif
@@ -53,7 +52,7 @@ void * M2MApplicationMemory::operator new (size_t size) {
     tmp=m2m_dyn_mem_alloc((uint8_t *)heapPtr, size);
 #ifdef M2M_APPLICATION_TRACE_PRINTS
     memTotal+=size; memCount++;
-    printf("mn"); /* M2M new */
+    tr_debug("mn"); /* M2M new */
     print_heap_running_statistics();
 #endif
     return tmp;
@@ -65,7 +64,7 @@ void M2MApplicationMemory::operator delete (void * ptr) {
 #endif
     m2m_dyn_mem_free((uint8_t *)heapPtr, ptr);
 #ifdef M2M_APPLICATION_TRACE_PRINTS
-    printf("md"); /* M2M delete */
+    tr_debug("md"); /* M2M delete */
     print_heap_overall_statistics();
 #endif
 }
@@ -74,7 +73,7 @@ void * M2MApplicationMemory::operator new[] (size_t size) {
     tmp=m2m_dyn_mem_alloc((uint8_t *)heapPtr, size);
 #ifdef M2M_APPLICATION_TRACE_PRINTS
     memTotal+=size; memCount++;
-    printf("mn[]"); /* M2M new array */
+    tr_debug("mn[]"); /* M2M new array */
 #endif
     return tmp;
 }
@@ -84,7 +83,7 @@ void M2MApplicationMemory::operator delete[] (void * ptr) {
 #endif
     m2m_dyn_mem_free((uint8_t *)heapPtr, ptr);
 #ifdef M2M_APPLICATION_TRACE_PRINTS
-    printf("md[]"); /* M2M delete array */
+    tr_debug("md[]"); /* M2M delete array */
 #endif
 }
 #endif
@@ -100,7 +99,7 @@ void * M2MApplicationMemory::operator new (size_t size) {
 #ifdef M2M_APPLICATION_TRACE_PRINTS
     allocatedSize=malloc_usable_size(tmp);
     memTotal+=allocatedSize; memCount++;
-    printf("mn:%lu:%lu:%d:%d:", size, allocatedSize, memTotal, memCount);
+    tr_debug("mn:%lu:%lu:%d:%d:", size, allocatedSize, memTotal, memCount);
 #endif
     return tmp;
 }
@@ -111,7 +110,7 @@ void M2MApplicationMemory::operator delete (void * ptr) {
     allocatedSize=malloc_usable_size(ptr);
     memCount--;
     memTotal-=allocatedSize;
-    printf("md:%lu:%d:%d:", allocatedSize, memTotal, memCount);
+    tr_debug("md:%lu:%d:%d:", allocatedSize, memTotal, memCount);
 #endif
     free(ptr);
 }
@@ -125,7 +124,7 @@ void * M2MApplicationMemory::operator new[] (size_t size) {
 #ifdef M2M_APPLICATION_TRACE_PRINTS
     allocatedSize=malloc_usable_size(tmp);
     memTotal+=allocatedSize; memCount++;
-    printf("mn[]:%lu:%lu:%d:%d:", size, allocatedSize, memTotal, memCount);
+    tr_debug("mn[]:%lu:%lu:%d:%d:", size, allocatedSize, memTotal, memCount);
 #endif
     return tmp;
 }
@@ -135,7 +134,7 @@ void M2MApplicationMemory::operator delete[] (void * ptr) {
     allocatedSize=malloc_usable_size(ptr);
     memCount--;
     memTotal-=allocatedSize;
-    printf("md[]:%lu:%d:%d:", allocatedSize, memTotal, memCount);
+    tr_debug("md[]:%lu:%d:%d:", allocatedSize, memTotal, memCount);
 #endif
     free(ptr);
 }
@@ -149,7 +148,7 @@ void M2MApplicationMemory::init(void) {
 void M2MApplicationMemory::init(size_t heapSize) {
     void *heap=malloc( heapSize );
 #ifdef M2M_APPLICATION_TRACE_PRINTS
-    printf("Init allocated %lu bytes for cloud client heap at %p\n", heapSize, heap);
+    tr_debug("Init allocated %lu bytes for cloud client heap at %p\n", heapSize, heap);
 #endif
     init(heap, heapSize);
 }
@@ -168,14 +167,14 @@ void M2MApplicationMemory::init(void *heapAllocation, size_t heapSize) {
 #ifdef M2M_APPLICATION_TRACE_PRINTS
 void M2MApplicationMemory::print_heap_running_statistics() {
 #ifdef M2M_APPLICATION_DYNMEM_LIB
-    printf(":%d:%d:", memInfo.heap_sector_allocated_bytes, memInfo.heap_sector_alloc_cnt);
+    tr_debug(":%d:%d:", memInfo.heap_sector_allocated_bytes, memInfo.heap_sector_alloc_cnt);
 #else
-    printf(":%d:%d:", memTotal, memCount);
+    tr_debug(":%d:%d:", memTotal, memCount);
 #endif
 }
 void M2MApplicationMemory::print_heap_overall_statistics() {
 #ifdef M2M_APPLICATION_DYNMEM_LIB
-    printf(":%d:%d:%u:%u:", memInfo.heap_sector_size,
+    tr_debug(":%d:%d:%u:%u:", memInfo.heap_sector_size,
         memInfo.heap_sector_allocated_bytes_max,
         memInfo.heap_alloc_total_bytes, memInfo.heap_alloc_fail_cnt);
 #endif
@@ -197,7 +196,7 @@ void* M2MApplicationMemory::memory_alloc(size_t size){
     #ifdef M2M_APPLICATION_PASSTHROUGH
     memTotal+=size; memCount++;
     #endif
-    printf(":ma:%p", tmp);
+    tr_debug(":ma:%p", tmp);
     print_heap_running_statistics();
     #endif
     return tmp;
@@ -210,7 +209,7 @@ void M2MApplicationMemory::memory_free(void *ptr) {
     free(ptr);
     #endif
     #ifdef M2M_APPLICATION_TRACE_PRINTS
-    printf(":mf:%p", ptr);
+    tr_debug(":mf:%p", ptr);
     print_heap_overall_statistics();
     #endif
  }
