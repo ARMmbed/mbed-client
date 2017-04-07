@@ -291,7 +291,7 @@ bool M2MResourceInstance::is_value_changed(const uint8_t* value, const uint32_t 
         changed = true;
     } else {
         if (res->resource) {
-            if (strcmp((char*)value, (char*)res->resource) != 0) {
+            if (memcmp(value, res->resource, res->resourcelen) != 0) {
                 changed = true;
             }
         }
