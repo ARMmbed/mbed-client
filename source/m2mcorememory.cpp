@@ -16,7 +16,6 @@
 
 #include <stdlib.h>
 #include "include/m2mcorememory.h"
-#include "include/m2mdynmemLIB.h"
 
 #ifdef M2M_CORE_TRACE_PRINTS
 int M2MCoreMemory::memTotal = 0;
