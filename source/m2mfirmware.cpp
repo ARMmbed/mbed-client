@@ -130,8 +130,6 @@ static sn_nsdl_static_resource_parameters_s firmware_state_params_static = {
     (char*)"",                  // interface_description_ptr
 #endif
     (char*)STATE_URI_PATH,   // path
-//    (uint8_t*)"0",          // resource
-//    1,                      // resourcelen
     false,                  // external_memory_block
     SN_GRS_DYNAMIC,         // mode
     false                   // free_on_delete
@@ -148,8 +146,6 @@ static sn_nsdl_static_resource_parameters_s firmware_update_result_params_static
     (char*)"",                     // interface_description_ptr
 #endif
     (char*)UPDATE_RESULT_PATH, // path
-//    (uint8_t*)"0",          // resource
-//    1,                      // resourcelen
     false,                  // external_memory_block
     SN_GRS_DYNAMIC,         // mode
     false                   // free_on_delete
@@ -200,9 +196,9 @@ static sn_nsdl_dynamic_resource_parameters_s firmware_update_params_dynamic = {
 static sn_nsdl_dynamic_resource_parameters_s firmware_state_params_dynamic = {
     __nsdl_c_callback,
     &firmware_state_params_static,
-    NULL,
-    {NULL, NULL},                     // link
-    0,
+    NULL,                   // resource
+    {NULL, NULL},           // link
+    0,                      // resourcelen
     COAP_CONTENT_OMA_PLAIN_TEXT_TYPE, // coap_content_type
     M2MBase::GET_ALLOWED,   // access
     0,                      // registered
@@ -214,9 +210,9 @@ static sn_nsdl_dynamic_resource_parameters_s firmware_state_params_dynamic = {
 static sn_nsdl_dynamic_resource_parameters_s firmware_update_result_params_dynamic = {
     __nsdl_c_callback,
     &firmware_update_result_params_static,
-    NULL,
-    {NULL, NULL},                     // link
-    0,
+    NULL,                   // resource
+    {NULL, NULL},           // link
+    0,                      // resourcelen
     COAP_CONTENT_OMA_PLAIN_TEXT_TYPE, // coap_content_type
     M2MBase::GET_ALLOWED,   // access
     0,                      // registered
@@ -224,6 +220,7 @@ static sn_nsdl_dynamic_resource_parameters_s firmware_update_result_params_dynam
     false,                  // free_on_delete
     true                    // observable
 };
+
 const static M2MBase::lwm2m_parameters firmware_package_params = {
     0, // max_age
     (char*)FIRMWARE_PACKAGE,
@@ -304,9 +301,19 @@ void M2MFirmware::create_mandatory_resources()
                                                     M2MResourceInstance::INTEGER,
                                                     true);
 
+    // XXX: some of the tests expect to have some value available here
+    if (res) {
+        res->set_value(0);
+    }
+
     res = _firmware_instance->create_dynamic_resource(&firmware_update_result_params,
                                                     M2MResourceInstance::INTEGER,
                                                     true);
+                                                    
+    // XXX: some of the tests expect to have some value available here
+    if (res) {
+        res->set_value(0);
+    }
 }
 
 M2MResource* M2MFirmware::create_resource(FirmwareResource resource, const String &value)
