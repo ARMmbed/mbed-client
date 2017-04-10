@@ -27,8 +27,6 @@
 #define M2M_CORE_DYNAMIC_MEMORY_HEAP_SIZE 20000
 class M2MCoreMemory {
 public:
-    static int memTotal;
-    static int memCount;
 #if (defined(M2M_CORE_DYNMEM_LIB)||defined(M2M_CORE_PASSTHROUGH))
     void * operator new (size_t size);
     void operator delete (void * ptr);
@@ -41,6 +39,10 @@ public:
     static void init(void *heapAllocation, size_t size);
 #endif
 #ifdef M2M_CORE_TRACE_PRINTS
+#ifdef M2M_CORE_PASSTHROUGH
+    static int memTotal;
+    static int memCount;
+#endif
     static void print_heap_running_statistics(void);
     static void print_heap_overall_statistics(void);
 #endif

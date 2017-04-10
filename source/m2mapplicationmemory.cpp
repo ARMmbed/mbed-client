@@ -21,36 +21,28 @@
 #define TRACE_GROUP "mClt"
 
 #ifdef M2M_APPLICATION_TRACE_PRINTS
+#ifdef M2M_APPLICATION_PASSTHROUGH
+#include <malloc.h>
 int M2MApplicationMemory::memTotal = 0;
 int M2MApplicationMemory::memCount = 0;
 #endif
 #ifdef M2M_APPLICATION_DYNMEM_LIB
-void * M2MApplicationMemory::heapPtr = 0;
-#endif
-
-#ifdef M2M_APPLICATION_PASSTHROUGH
-#ifdef M2M_APPLICATION_TRACE_PRINTS
-#include <malloc.h>
-#endif
-#endif
-
-#ifdef M2M_APPLICATION_DYNMEM_LIB
-#ifdef M2M_APPLICATION_TRACE_PRINTS
 m2m_mem_stat_t M2MApplicationMemory::memInfo;
 void M2MApplicationMemory::memory_fail_callback(m2m_heap_fail_t fail) {
-    tr_error("\nM2M memory failure: %u\n", fail);
+    tr_error("\nM2M application memory failure: %u\n", fail);
 }
 #endif
 #endif
 
 #ifdef M2M_APPLICATION_DYNMEM_LIB
-
 /* nanoservices dynmemlib based implementation */
+
+void * M2MApplicationMemory::heapPtr = 0;
+
 void * M2MApplicationMemory::operator new (size_t size) {
     void *tmp;
     tmp=m2m_dyn_mem_alloc((uint8_t *)heapPtr, size);
 #ifdef M2M_APPLICATION_TRACE_PRINTS
-    memTotal+=size; memCount++;
     tr_debug("mn"); /* M2M new */
     print_heap_running_statistics();
 #endif
@@ -58,9 +50,6 @@ void * M2MApplicationMemory::operator new (size_t size) {
 }
 
 void M2MApplicationMemory::operator delete (void * ptr) {
-#ifdef M2M_APPLICATION_TRACE_PRINTS
-    memCount--; /* still update allocation counter */
-#endif
     m2m_dyn_mem_free((uint8_t *)heapPtr, ptr);
 #ifdef M2M_APPLICATION_TRACE_PRINTS
     tr_debug("md"); /* M2M delete */
@@ -71,15 +60,11 @@ void * M2MApplicationMemory::operator new[] (size_t size) {
     void *tmp;
     tmp=m2m_dyn_mem_alloc((uint8_t *)heapPtr, size);
 #ifdef M2M_APPLICATION_TRACE_PRINTS
-    memTotal+=size; memCount++;
     tr_debug("mn[]"); /* M2M new array */
 #endif
     return tmp;
 }
 void M2MApplicationMemory::operator delete[] (void * ptr) {
-#ifdef M2M_APPLICATION_TRACE_PRINTS
-    memCount--;
-#endif
     m2m_dyn_mem_free((uint8_t *)heapPtr, ptr);
 #ifdef M2M_APPLICATION_TRACE_PRINTS
     tr_debug("md[]"); /* M2M delete array */
