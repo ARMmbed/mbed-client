@@ -30,7 +30,8 @@
 M2MSecurity::M2MSecurity(ServerType ser_type)
 : M2MObject(M2M_SECURITY_ID, stringdup(M2M_SECURITY_ID)),
  _server_instance(NULL),
- _server_type(ser_type)
+ _server_type(ser_type),
+ _verify_cert_expiration(false)
 {
      _server_instance  = M2MObject::create_object_instance();
 
@@ -358,4 +359,14 @@ void M2MSecurity::clear_resources()
             res->clear_value();
         }
     }
+}
+
+void M2MSecurity::set_verify_cert_expiration(bool verify)
+{
+    _verify_cert_expiration = verify;
+}
+
+bool M2MSecurity::verify_cert_expiration() const
+{
+    return _verify_cert_expiration;
 }
