@@ -126,16 +126,9 @@ bool M2MTLVSerializer::serialize_resource(const M2MResource *resource, uint8_t *
 {
     bool success = false;
     if(resource->name_id() != -1) {
-        if ( resource->resource_instance_type() == M2MResourceInstance::INTEGER) {
-            int64_t valueInt = resource->get_value_int();
-            uint32_t buf_size;
-            /* max len 8 bytes */
-            uint8_t buffer[8];
-
-            // write bytes to big endian order in buffer
-            set_value_int(valueInt, buffer, buf_size);
-            success = serialize_TILV(TYPE_RESOURCE, resource->name_id(),
-                       buffer, buf_size, data, size);
+        if ( (resource->resource_instance_type() == M2MResourceInstance::INTEGER) ||
+           ( resource->resource_instance_type() == M2MResourceInstance::BOOLEAN)) {
+            success = serialize_TLV_binary_int(resource, TYPE_RESOURCE, resource->name_id(), data, size);
         }
         else {
              success = serialize_TILV(TYPE_RESOURCE, resource->name_id(),
@@ -200,22 +193,36 @@ bool M2MTLVSerializer::serialize_resource_instance(uint16_t id, const M2MResourc
 {
     bool success;
 
-    if ( resource->resource_instance_type() == M2MResourceInstance::INTEGER) {
-        int64_t valueInt = resource->get_value_int();
-        uint32_t buf_size;
-        /* max len 8 bytes */
-        uint8_t buffer[8];
-
-        // write bytes to big endian order in buffer
-        set_value_int(valueInt, buffer, buf_size);
-        success=serialize_TILV(TYPE_RESOURCE_INSTANCE, id, buffer, buf_size, data, size);
-    }
+    if ( (resource->resource_instance_type() == M2MResourceInstance::INTEGER) ||
+        ( resource->resource_instance_type() == M2MResourceInstance::BOOLEAN)) {
+        success=serialize_TLV_binary_int(resource, TYPE_RESOURCE_INSTANCE, id, data, size);
+        }
     else {
         success=serialize_TILV(TYPE_RESOURCE_INSTANCE, id, resource->value(), resource->value_length(), data, size);
     }
 
     return success;
 }
+
+template <typename T> bool M2MTLVSerializer::serialize_TLV_binary_int(T *resource, uint8_t type, uint16_t id, uint8_t *&data, uint32_t &size)
+{
+        int64_t valueInt = resource->get_value_int();
+        uint32_t buffer_size;
+        /* max len 8 bytes */
+        uint8_t buffer[8];
+
+        if (resource->resource_instance_type() == M2MResourceInstance::BOOLEAN) {
+            set_value_int((int8_t)valueInt, buffer, buffer_size);
+        }
+        else {
+            set_value_int(valueInt, buffer, buffer_size);
+        }
+
+        return serialize_TILV(type, id, buffer, buffer_size, data, size);
+}
+
+template bool M2MTLVSerializer::serialize_TLV_binary_int<const M2MResourceInstance>(const M2MResourceInstance *resource, uint8_t type, uint16_t id, uint8_t *&data, uint32_t &size);
+template bool M2MTLVSerializer::serialize_TLV_binary_int<const M2MResource>(const M2MResource *resource, uint8_t type, uint16_t id, uint8_t *&data, uint32_t &size);
 
 bool M2MTLVSerializer::serialize_TILV(uint8_t type, uint16_t id, uint8_t *value, uint32_t value_length, uint8_t *&data, uint32_t &size)
 {

@@ -97,4 +97,5 @@ private :
     static void serialize_length(uint32_t length, uint32_t &size, uint8_t *length_ptr);
 
     template <typename T> static void set_value_int(T value, uint8_t *buffer, uint32_t &size);
+    template <typename T> static bool serialize_TLV_binary_int(T *resource, uint8_t type, uint16_t id, uint8_t *&data, uint32_t &size);
 };
