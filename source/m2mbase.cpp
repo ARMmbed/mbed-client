@@ -270,15 +270,16 @@ void M2MBase::set_observable(bool observable)
 
 void M2MBase::add_observation_level(M2MBase::Observation obs_level)
 {
+
     if(_report_handler) {
-            _report_handler->add_observation_level(obs_level);
+        _report_handler->add_observation_level(obs_level);
     }
 }
 
 void M2MBase::remove_observation_level(M2MBase::Observation obs_level)
 {
     if(_report_handler) {
-            _report_handler->remove_observation_level(obs_level);
+        _report_handler->remove_observation_level(obs_level);
     }
 }
 

@@ -232,13 +232,20 @@ bool M2MResourceInstance::set_value(const uint8_t *value,
 
 void M2MResourceInstance::report()
 {
-    tr_debug("M2MResourceInstance::report()");
-    M2MBase::Observation  observation_level = M2MBase::observation_level();
+    M2MBase::Observation observation_level = M2MBase::observation_level();
     tr_debug("M2MResourceInstance::report() - level %d", observation_level);
+
+    // We must combine the parent object/objectinstance/resource observation information
+    // when determining if there is observation set or not.
     M2MObjectInstance& object_instance = get_parent_resource().get_parent_object_instance();
-    int  parent_observation_level = (int)object_instance.observation_level();
+    int parent_observation_level = (int)object_instance.observation_level();
+
     parent_observation_level |= (int)object_instance.get_parent_object().observation_level();
-    
+    parent_observation_level |= (int)get_parent_resource().observation_level();
+    parent_observation_level |= (int)observation_level;
+
+    tr_debug("M2MResourceInstance::report() - combined level %d", parent_observation_level);
+
     if((M2MBase::O_Attribute & parent_observation_level) == M2MBase::O_Attribute ||
        (M2MBase::OI_Attribute & parent_observation_level) == M2MBase::OI_Attribute) {
         tr_debug("M2MResourceInstance::report() -- object/instance level");
@@ -247,9 +254,10 @@ void M2MResourceInstance::report()
     }
 
     if(M2MBase::Dynamic == mode() &&
-       (M2MBase::R_Attribute & observation_level) == M2MBase::R_Attribute) {
+       (M2MBase::R_Attribute & parent_observation_level) == M2MBase::R_Attribute) {
         tr_debug("M2MResourceInstance::report() - resource level");
-        if(resource_instance_type() != M2MResourceInstance::STRING) {
+
+        if ((resource_instance_type() != M2MResourceInstance::STRING) && (observation_level != M2MBase::None)) {
             M2MReportHandler *report_handler = M2MBase::report_handler();
             if (report_handler && is_observable()) {
                 sn_nsdl_dynamic_resource_parameters_s* res = get_nsdl_resource();    
