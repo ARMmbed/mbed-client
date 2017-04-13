@@ -1732,7 +1732,7 @@ const String M2MNsdlInterface::internal_endpoint_name() const
         // Get last part of the location path.
         // In mbed Cloud environment full path is /rd/accountid/internal_endpoint
         int location = temp.find_last_of('/') + 1;
-        iep.append((const char*)_nsdl_handle->ep_information_ptr->location_ptr + location,
+        iep.append_raw((const char*)_nsdl_handle->ep_information_ptr->location_ptr + location,
                    _nsdl_handle->ep_information_ptr->location_len - location);
     }
     return iep;
