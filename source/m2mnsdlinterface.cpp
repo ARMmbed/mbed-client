@@ -293,14 +293,14 @@ bool M2MNsdlInterface::send_register_message()
     _nsdl_exceution_timer->start_timer(ONE_SECOND_TIMER * 1000,
                                        M2MTimerObserver::NsdlExecution,
                                        false);
-    bool success = sn_nsdl_register_endpoint(_nsdl_handle,_endpoint) != 0;
-        if (_server_address) {
-            success = parse_and_send_uri_query_parameters();
-        }
-        // If URI parsing fails or there is no parameters, try again without parameters
-        if (!success) {
-            success = sn_nsdl_register_endpoint(_nsdl_handle,_endpoint, NULL, 0) != 0;
-        }
+    bool success = false;
+    if (_server_address) {
+        success = parse_and_send_uri_query_parameters();
+    }
+    // If URI parsing fails or there is no parameters, try again without parameters
+    if (!success) {
+        success = sn_nsdl_register_endpoint(_nsdl_handle,_endpoint, NULL, 0) != 0;
+    }
     return success;
 }
 
