@@ -20,6 +20,8 @@ add_executable(m2mnsdlinterface
         "../stub/m2mtlvserializer_stub.cpp"
         "../stub/m2mtlvdeserializer_stub.cpp"
         "../stub/mbed_trace_stub.cpp"
+        "../stub/m2mcorememory_stub.cpp"
+        "../stub/m2mapplicationmemory_stub.cpp"
         "../../../../source/m2mnsdlinterface.cpp"
         "../../../../source/m2mstringbufferbase.cpp"
 )

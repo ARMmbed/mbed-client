@@ -25,6 +25,7 @@
 #include "mbed-client/m2mtimerobserver.h"
 #include "mbed-client/m2mtimer.h"
 #include "mbed-client/m2mconnectionhandler.h"
+#include "include/m2mcorememory.h"
 
 //FORWARD DECLARATION
 class M2MConnectionSecurity;
@@ -41,7 +42,8 @@ class M2MUpdateRegisterData;
 class  M2MInterfaceImpl : public M2MInterface,
                           public M2MNsdlObserver,
                           public M2MConnectionObserver,
-                          public M2MTimerObserver
+                          public M2MTimerObserver,
+                          public M2MCoreMemory
 {
 private:
     // Prevents the use of assignment operator by accident.

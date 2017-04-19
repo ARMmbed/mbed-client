@@ -555,7 +555,7 @@ sn_coap_hdr_s* M2MObjectInstance::handle_put_request(nsdl_s *nsdl,
                 } else {
                     msg_code =COAP_MSG_CODE_RESPONSE_CHANGED;
                 }
-                free(query);
+                memory_free(query);
             }
         } else if ((operation() & SN_GRS_PUT_ALLOWED) != 0) {
             if(!content_type_present &&

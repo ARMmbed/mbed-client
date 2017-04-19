@@ -289,20 +289,6 @@ void M2MBase::observation_to_be_sent(const m2m::Vector<uint16_t>&, bool)
 {
 }
 
-void *M2MBase::memory_alloc(uint32_t size)
-{
-    if(size)
-        return malloc(size);
-    else
-        return 0;
-}
-
-void M2MBase::memory_free(void *ptr)
-{
-    if(ptr)
-        free(ptr);
-}
-
 uint8_t* M2MBase::alloc_string_copy(const uint8_t* source, uint32_t size)
 {
     assert(source != NULL);

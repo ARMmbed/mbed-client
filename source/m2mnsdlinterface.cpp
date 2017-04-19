@@ -174,7 +174,7 @@ void M2MNsdlInterface::delete_endpoint()
 {
     tr_debug("M2MNsdlInterface::delete_endpoint()");
     if(_endpoint) {
-        free(_endpoint->lifetime_ptr);
+        memory_free(_endpoint->lifetime_ptr);
 
         memory_free(_endpoint);
         _endpoint = NULL;
@@ -301,21 +301,6 @@ bool M2MNsdlInterface::send_unregister_message()
     _unregister_ongoing = true;
     success = sn_nsdl_unregister_endpoint(_nsdl_handle) != 0;
     return success;
-}
-
-// XXX: move these to common place, no need to copy these wrappers to multiple places:
-void *M2MNsdlInterface::memory_alloc(uint16_t size)
-{
-    if(size)
-        return malloc(size);
-    else
-        return 0;
-}
-
-void M2MNsdlInterface::memory_free(void *ptr)
-{
-    if(ptr)
-        free(ptr);
 }
 
 uint8_t* M2MNsdlInterface::alloc_string_copy(const uint8_t* source, uint16_t size)
@@ -646,7 +631,7 @@ uint8_t M2MNsdlInterface::resource_callback(struct nsdl_s */*nsdl_handle*/,
         tr_debug("M2MNsdlInterface::resource_callback() - send CoAP response");
         (sn_nsdl_send_coap_message(_nsdl_handle, address, coap_response) == 0) ? result = 0 : result = 1;
         if(coap_response->payload_ptr) {
-            free(coap_response->payload_ptr);
+            memory_free(coap_response->payload_ptr);
             coap_response->payload_ptr = NULL;
         }
     }
@@ -729,7 +714,7 @@ void M2MNsdlInterface::send_delayed_response(M2MBase *base)
             resource = static_cast<M2MResource *> (base);
         }
         if(resource) {
-            sn_coap_hdr_s * coap_response = static_cast<sn_coap_hdr_s *>(malloc(sizeof(sn_coap_hdr_s)));
+            sn_coap_hdr_s * coap_response = static_cast<sn_coap_hdr_s *>(memory_alloc(sizeof(sn_coap_hdr_s)));
             if(coap_response) {
                 memset(coap_response,0,sizeof(sn_coap_hdr_s));
 
@@ -744,14 +729,14 @@ void M2MNsdlInterface::send_delayed_response(M2MBase *base)
                 sn_nsdl_send_coap_message(_nsdl_handle, _nsdl_handle->nsp_address_ptr->omalw_address_ptr, coap_response);
 
                 if(coap_response->payload_ptr) {
-                   free(coap_response->payload_ptr);
+                   memory_free(coap_response->payload_ptr);
                    coap_response->payload_ptr = NULL;
                 }
                 if(coap_response->token_ptr) {
-                    free(coap_response->token_ptr);
+                    memory_free(coap_response->token_ptr);
                     coap_response->token_ptr = NULL;
                 }
-                free(coap_response);
+                memory_free(coap_response);
             }
         }
     }
@@ -981,10 +966,10 @@ M2MBase* M2MNsdlInterface::find_resource(const String &object_name,
                             memcmp(token, stored_token, token_len) == 0) {
                         object = (*it);
                         tr_debug("M2MNsdlInterface::find_resource - token found");
-                        free(stored_token);
+                        memory_free(stored_token);
                         break;
                     } else {
-                        free(stored_token);
+                        memory_free(stored_token);
                     }
                 }
             }
@@ -1027,10 +1012,10 @@ M2MBase* M2MNsdlInterface::find_resource(const M2MObject *object,
                         if (stored_token_length == token_len &&
                                 memcmp(token, stored_token, token_len) == 0) {
                             instance = (*it);
-                            free(stored_token);
+                            memory_free(stored_token);
                             break;
                         } else {
-                            free(stored_token);
+                            memory_free(stored_token);
                         }
                     }
                 }
@@ -1079,10 +1064,10 @@ M2MBase* M2MNsdlInterface::find_resource(const M2MObjectInstance *object_instanc
                         if (stored_token_length == token_len &&
                                 memcmp(token, stored_token, token_len) == 0) {
                             instance = *it;
-                            free(stored_token);
+                            memory_free(stored_token);
                             break;
                         } else {
-                            free(stored_token);
+                            memory_free(stored_token);
                         }
                     }
                 }

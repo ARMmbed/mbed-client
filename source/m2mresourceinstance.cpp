@@ -24,6 +24,8 @@
 #include "mbed-client/m2mblockmessage.h"
 #include "mbed-trace/mbed_trace.h"
 
+#include "include/m2mcorememory.h" //hack for dual heap implementation
+
 #define TRACE_GROUP "mClt"
 
 M2MResourceInstance::M2MResourceInstance(M2MResource &parent,
@@ -139,7 +141,7 @@ M2MResourceInstance::M2MResourceInstance(M2MResource &parent,
 
 M2MResourceInstance::~M2MResourceInstance()
 {
-    free(_value);
+    memory_free(_value);
     delete _execute_function_pointer;
     delete _execute_callback;
     delete _notification_sent_function_pointer;
@@ -201,7 +203,7 @@ void M2MResourceInstance::clear_value()
 {
     tr_debug("M2MResourceInstance::clear_value");
 
-     free(_value);
+     memory_free(_value);
      _value = NULL;
      _value_length = 0;
 
@@ -232,7 +234,7 @@ bool M2MResourceInstance::set_value(const uint8_t *value,
     if( value != NULL && value_length > 0 ) {
         success = true;
 
-        free(_value);
+        memory_free(_value);
         _value_length = 0;
 
         _value = alloc_string_copy(value, value_length);
@@ -326,7 +328,7 @@ void M2MResourceInstance::get_value(uint8_t *&value, uint32_t &value_length)
 {
     value_length = 0;
     if(value) {
-        free(value);
+        memory_free(value);
         value = NULL;
     }
     if(_value && _value_length > 0) {
@@ -347,7 +349,7 @@ int M2MResourceInstance::get_value_int()
     get_value(buffer,length);
     if(buffer) {
         value_int = atoi((const char*)buffer);
-        free(buffer);
+        memory_free(buffer);
     }
     return value_int;
 }
@@ -404,10 +406,19 @@ sn_coap_hdr_s* M2MResourceInstance::handle_get_request(nsdl_s *nsdl,
                             name.append_raw((char *)received_coap_header->uri_path_ptr,
                                              received_coap_header->uri_path_len);
                         }
-                        (*_outgoing_block_message_cb)(name, coap_response->payload_ptr, payload_len);
+                        /* Here would probably also be a problem with dual heaps. Should make a copy to correct memory space */
+                        (*_outgoing_block_message_cb)(name, coap_response->payload_ptr, payload_len); 
                     }
                 } else {
-                    get_value(coap_response->payload_ptr,payload_len);
+                    uint8_t *tempPayload=0;
+                    get_value(tempPayload,payload_len); //This is a problem because get_value makes a copy from M2Mbase heap and not fron "coap" heap
+                    if(payload_len > 0){
+                        coap_response->payload_ptr = (uint8_t *)M2MCoreMemory::memory_alloc(payload_len); //hack alloc CoreMemory
+                        memcpy(coap_response->payload_ptr, tempPayload, payload_len); // hack copy to CoreMemory
+                        memory_free(tempPayload); //hack free temp payload from ApplicationMemory
+                    } else {
+                        coap_response->payload_ptr = tempPayload;
+                    }
                 }
 
                 coap_response->payload_len = payload_len;
@@ -495,7 +506,7 @@ sn_coap_hdr_s* M2MResourceInstance::handle_put_request(nsdl_s *nsdl,
                         tr_debug("M2MResourceInstance::handle_put_request() - Invalid query");
                         msg_code = COAP_MSG_CODE_RESPONSE_BAD_REQUEST; // 4.00
                     }
-                    free(query);
+                    memory_free(query);
                 }
             } else if ((operation() & SN_GRS_PUT_ALLOWED) != 0) {
                 tr_debug("M2MResourceInstance::handle_put_request() - Request Content-Type %d", coap_content_type);

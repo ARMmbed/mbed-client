@@ -20,6 +20,7 @@
 #include "mbed-client/m2msecurity.h"
 #include "mbed-client/m2mresource.h"
 #include "mbed-client/m2minterfaceobserver.h"
+#include "source/include/m2mcorememory.h"
 
 //FORWARD DECLARATION
 class M2MDevice;
@@ -33,7 +34,7 @@ class M2MFirmware;
  *  object for an application to utilize the LWM2M features provided by the client.
  */
 
-class  M2MInterfaceFactory {
+class  M2MInterfaceFactory : public M2MCoreMemory {
 private:
     // Prevents the use of an assignment operator by accident.
     M2MInterfaceFactory& operator=( const M2MInterfaceFactory& /*other*/ );

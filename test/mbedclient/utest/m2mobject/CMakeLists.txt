@@ -18,6 +18,7 @@ add_executable(m2mobject
         "../../../../source/m2mobject.cpp"
         "../stub/m2mtimer_stub.cpp"
         "../stub/mbed_trace_stub.cpp"
+        "../stub/m2mapplicationmemory_stub.cpp"
         "../../../../source/m2mstringbufferbase.cpp"
 )
 target_link_libraries(m2mobject

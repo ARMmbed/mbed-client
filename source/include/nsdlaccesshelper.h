@@ -39,9 +39,6 @@ uint8_t __nsdl_c_received_from_server(struct nsdl_s * nsdl_handle,
                                       sn_coap_hdr_s *coap_header,
                                       sn_nsdl_addr_s *address_ptr);
 
-void *__socket_malloc( void * context, size_t size);
-void __socket_free(void * context, void * ptr);
-
 M2MNsdlInterface* get_interface(struct nsdl_s* nsdl_handle);
 
 #ifdef __cplusplus

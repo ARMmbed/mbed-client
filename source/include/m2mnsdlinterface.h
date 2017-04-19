@@ -24,6 +24,7 @@
 #include "mbed-client/m2mbase.h"
 #include "mbed-client/m2mserver.h"
 #include "include/nsdllinker.h"
+#include "include/m2mcorememory.h"
 
 //FORWARD DECLARARTION
 class M2MSecurity;
@@ -43,7 +44,8 @@ typedef Vector<M2MObject *> M2MObjectList;
  * Class which interacts between mbed Client C++ Library and mbed-client-c library.
  */
 class M2MNsdlInterface : public M2MTimerObserver,
-                         public M2MObservationHandler
+                         public M2MObservationHandler,
+                         public M2MCoreMemory
 {
 private:
     // Prevents the use of assignment operator by accident.
@@ -136,18 +138,6 @@ public:
      * @return  true if unregister sent successfully else false.
     */
     bool send_unregister_message();
-
-    /**
-     * @brief Memory Allocation required for libCoap.
-     * @param size, Size of memory to be reserved.
-    */
-    static void* memory_alloc(uint16_t size);
-
-    /**
-     * @brief Memory free functions required for libCoap
-     * @param ptr, Object whose memory needs to be freed.
-    */
-    static void memory_free(void *ptr);
 
     /**
     * @brief Callback from nsdl library to inform the data is ready

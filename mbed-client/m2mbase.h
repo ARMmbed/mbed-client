@@ -25,6 +25,7 @@
 #include "nsdl-c/sn_nsdl.h"
 #include "sn_coap_header.h"
 #include "nsdl-c/sn_nsdl_lib.h"
+#include "source/include/m2mapplicationmemory.h"
 
 //FORWARD DECLARATION
 struct sn_coap_hdr_;
@@ -48,7 +49,7 @@ class M2MResource;
  *  This class is the base class based on which all LWM2M object models
  *  can be created. This serves base class for Object, ObjectInstances and Resources.
  */
-class M2MBase : public M2MReportObserver {
+class M2MBase : public M2MReportObserver, public M2MApplicationMemory {
 
 public:
 
@@ -487,18 +488,6 @@ protected:
      * \param type The base type of the object.
      */
     virtual void set_base_type(M2MBase::BaseType type);
-
-    /**
-     * \brief Memory allocation required for libCoap.
-     * \param size The size of memory to be reserved.
-    */
-    static void* memory_alloc(uint32_t size);
-
-    /**
-     * \brief Memory free functions required for libCoap.
-     * \param ptr The object whose memory needs to be freed.
-    */
-    static void memory_free(void *ptr);
 
     /**
      * \brief Allocate and make a copy of given zero terminated string. This

@@ -17,7 +17,7 @@
 #include "mbed-client/m2mobject.h"
 #include "mbed-client/m2mobjectinstance.h"
 #include "mbed-client/m2mresource.h"
-
+#include "include/m2mcorememory.h"
 /**
  * @brief M2MTLVSerializer
  * TLV Serialiser constructs the binary representation of object instances,
@@ -25,7 +25,7 @@
  * for resource model) as OMA-TLV according described in chapter 6.3.3. 
  * 
  */
-class M2MTLVSerializer {
+class M2MTLVSerializer : public M2MCoreMemory {
 
 public:
 
