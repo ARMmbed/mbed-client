@@ -24,7 +24,7 @@ class Test_M2MString;
 namespace m2m
 {
 
-/*! \file m2mstring.h 
+/*! \file m2mstring.h
 * \brief A simple C++ string class, used as replacement for std::string.
    */
   class String
@@ -112,8 +112,8 @@ namespace m2m
 
     int find_last_of(char c) const;
 
-    static uint8_t* convert_integer_to_array(int64_t value, uint8_t &size, uint8_t *array = NULL, uint32_t array_size = 0);
-    static int64_t convert_array_to_integer(uint8_t *value, uint32_t size);
+    static uint8_t* convert_integer_to_array(int64_t value, uint8_t &size, const uint8_t *array = NULL, const uint32_t array_size = 0);
+    static int64_t convert_array_to_integer(const uint8_t *value, const uint32_t size);
 
   private:
     // reallocate the internal memory

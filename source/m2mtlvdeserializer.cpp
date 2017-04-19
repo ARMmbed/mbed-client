@@ -389,7 +389,7 @@ bool M2MTLVDeserializer::is_resource_instance(const uint8_t *tlv, uint32_t offse
     return ret;
 }
 
-void M2MTLVDeserializer::set_resource_instance_value(M2MResourceInstance *res, uint8_t *tlv, uint32_t size)
+void M2MTLVDeserializer::set_resource_instance_value(M2MResourceInstance *res, const uint8_t *tlv, const uint32_t size)
 {
     int64_t value = 0;
     switch (res->resource_instance_type()) {

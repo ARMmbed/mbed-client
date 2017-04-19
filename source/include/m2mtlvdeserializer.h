@@ -151,7 +151,7 @@ private:
 
     static bool is_resource_instance(const uint8_t *tlv, uint32_t offset);
 
-    static void set_resource_instance_value(M2MResourceInstance *res, uint8_t *tlv, uint32_t size);
+    static void set_resource_instance_value(M2MResourceInstance *res, const uint8_t *tlv, const uint32_t size);
 };
 
 class TypeIdLength {
