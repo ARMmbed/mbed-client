@@ -127,7 +127,8 @@ bool M2MTLVSerializer::serialize_resource(const M2MResource *resource, uint8_t *
     bool success = false;
     if(resource->name_id() != -1) {
         if ( (resource->resource_instance_type() == M2MResourceInstance::INTEGER) ||
-           ( resource->resource_instance_type() == M2MResourceInstance::BOOLEAN)) {
+             (resource->resource_instance_type() == M2MResourceInstance::BOOLEAN) ||
+             (resource->resource_instance_type() == M2MResourceInstance::TIME) ) {
             success = serialize_TLV_binary_int(resource, TYPE_RESOURCE, resource->name_id(), data, size);
         }
         else {
@@ -194,7 +195,8 @@ bool M2MTLVSerializer::serialize_resource_instance(uint16_t id, const M2MResourc
     bool success;
 
     if ( (resource->resource_instance_type() == M2MResourceInstance::INTEGER) ||
-        ( resource->resource_instance_type() == M2MResourceInstance::BOOLEAN)) {
+         (resource->resource_instance_type() == M2MResourceInstance::BOOLEAN) ||
+         (resource->resource_instance_type() == M2MResourceInstance::TIME) ) {
         success=serialize_TLV_binary_int(resource, TYPE_RESOURCE_INSTANCE, id, data, size);
         }
     else {
