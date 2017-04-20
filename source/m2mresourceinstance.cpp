@@ -21,7 +21,6 @@
 #include "mbed-client/m2mobjectinstance.h"
 #include "include/m2mcallbackstorage.h"
 #include "include/m2mreporthandler.h"
-#include "include/nsdllinker.h"
 #include "mbed-client/m2mblockmessage.h"
 #include "mbed-trace/mbed_trace.h"
 

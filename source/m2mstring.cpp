@@ -27,9 +27,11 @@ char* String::strdup(const char* s)
 {
     const size_t len = strlen(s)+1;
     char *p2 = static_cast<char*>(malloc(len));
-    memcpy(p2, s, len);
-    allocated_ = len;
-    size_ = len-1;
+    if (p2) {
+        memcpy(p2, s, len);
+        allocated_ = len;
+        size_ = len-1;
+    }
     return p2;
 }
 
@@ -47,13 +49,11 @@ String::~String()
 String::String(const String& s)
     : p(0)
 {
-    if( &s != NULL ) {
-        p = static_cast<char*>(malloc(s.size_ + 1));
+    p = static_cast<char*>(malloc(s.size_ + 1));
 
-        allocated_ = s.size_ + 1;
-        size_      = s.size_;
-        memcpy(p, s.p, size_ + 1);
-    }
+    allocated_ = s.size_ + 1;
+    size_      = s.size_;
+    memcpy(p, s.p, size_ + 1);
 }
 
 String::String(const char* s)

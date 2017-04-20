@@ -118,6 +118,9 @@ M2MObject* M2MInterfaceFactory::create_object(const String &name)
     }
 
     M2MObject *object = NULL;
-    object = new M2MObject(name, M2MBase::stringdup(name.c_str()));
+    char *name_copy = M2MBase::stringdup(name.c_str());
+    if (name_copy) {
+        object = new M2MObject(name, name_copy);
+    }
     return object;
 }
