@@ -314,6 +314,7 @@ void M2MInterfaceImpl::registration_error(uint8_t error_code, bool retry)
         socket_error(M2MConnectionHandler::SOCKET_SEND_ERROR);
         _reconnection_state = M2MInterfaceImpl::FullRegistration;
     } else {
+        _security = NULL;
         internal_event(STATE_IDLE);
         _observer.error((M2MInterface::Error)error_code);
     }
@@ -465,6 +466,7 @@ void M2MInterfaceImpl::socket_error(uint8_t error_code, bool retry)
         _connection_handler.stop_listening();
         _retry_timer.stop_timer();
         _retry_count = 0;
+        _security = NULL;
         _reconnecting = false;
         _reconnection_state = M2MInterfaceImpl::None;
         _observer.error(error);
