@@ -57,6 +57,7 @@ M2MInterfaceImpl::M2MInterfaceImpl(M2MInterfaceObserver& observer,
   _max_states( STATE_MAX_STATES ),
   _event_ignored(false),
   _event_generated(false),
+  _state_engine_running(false),
   _reconnecting(false),
   _retry_timer_expired(false),
   _bootstrapped(true), // True as default to get it working with connector only configuration
@@ -960,14 +961,20 @@ void M2MInterfaceImpl::internal_event(uint8_t new_state,
     _event_data = p_data;
     _event_generated = true;
     _current_state = new_state;
-    state_engine();
+
+    if (!_state_engine_running) {
+        state_engine();
+    }
 }
 
 // the state engine executes the state machine states
-void M2MInterfaceImpl::state_engine (void)
+void M2MInterfaceImpl::state_engine(void)
 {
     tr_debug("M2MInterfaceImpl::state_engine");
     EventData* p_data_temp = NULL;
+
+    // this simple flagging gets rid of recursive calls to this method
+    _state_engine_running = true;
 
     // while events are being generated keep executing states
     while (_event_generated) {
@@ -979,6 +986,7 @@ void M2MInterfaceImpl::state_engine (void)
 
         state_function( _current_state, p_data_temp );
     }
+    _state_engine_running = false;
 }
 
 void M2MInterfaceImpl::state_function( uint8_t current_state, EventData* data )

@@ -412,6 +412,7 @@ private:
     const uint8_t               _max_states;
     bool                        _event_ignored;
     bool                        _event_generated;
+    bool                        _state_engine_running;
     bool                        _reconnecting;
     bool                        _retry_timer_expired;
     bool                        _bootstrapped;
