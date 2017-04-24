@@ -206,7 +206,7 @@ bool M2MTLVSerializer::serialize_resource_instance(uint16_t id, const M2MResourc
     return success;
 }
 
-template <typename T> bool M2MTLVSerializer::serialize_TLV_binary_int(T *resource, uint8_t type, uint16_t id, uint8_t *&data, uint32_t &size)
+bool M2MTLVSerializer::serialize_TLV_binary_int(const M2MResourceInstance *resource, uint8_t type, uint16_t id, uint8_t *&data, uint32_t &size)
 {
         int64_t valueInt = resource->get_value_int();
         uint32_t buffer_size;
@@ -223,8 +223,6 @@ template <typename T> bool M2MTLVSerializer::serialize_TLV_binary_int(T *resourc
         return serialize_TILV(type, id, buffer, buffer_size, data, size);
 }
 
-template bool M2MTLVSerializer::serialize_TLV_binary_int<const M2MResourceInstance>(const M2MResourceInstance *resource, uint8_t type, uint16_t id, uint8_t *&data, uint32_t &size);
-template bool M2MTLVSerializer::serialize_TLV_binary_int<const M2MResource>(const M2MResource *resource, uint8_t type, uint16_t id, uint8_t *&data, uint32_t &size);
 
 bool M2MTLVSerializer::serialize_TILV(uint8_t type, uint16_t id, uint8_t *value, uint32_t value_length, uint8_t *&data, uint32_t &size)
 {

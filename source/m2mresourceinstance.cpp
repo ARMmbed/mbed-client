@@ -340,10 +340,9 @@ void M2MResourceInstance::get_value(uint8_t *&value, uint32_t &value_length)
 int64_t M2MResourceInstance::get_value_int() const
 {
     int64_t value_int = 0;
-    uint8_t* buffer = _value;
 
-    if(buffer) {
-        value_int = atoll((const char*)buffer);
+    if(_value) {
+        value_int = atoll((const char*)_value);
     }
     return value_int;
 }
