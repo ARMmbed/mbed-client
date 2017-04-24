@@ -238,6 +238,7 @@ public:
     bool set_resource_notification_sent_callback(FirmwareResource resource,
                                                  notification_sent_callback_2 callback);
 
+#ifndef DISABLE_BLOCK_MESSAGE
     /**
      * \brief Set incoming_block_message_callback for the package resource.
      *        The callback will be called when a block of the package has been received.
@@ -245,6 +246,7 @@ public:
      * \return true if successfully set, else false.
      */
     bool set_package_block_message_callback(incoming_block_message_callback callback);
+#endif
 
 private:
 
