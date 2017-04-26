@@ -103,7 +103,7 @@ public:
     /**
      * @brief Return write attribute flags.
      */
-    uint8_t attribute_flags();
+    uint8_t attribute_flags() const;
 
     /**
      * \brief Sets the observation token value.
@@ -113,11 +113,14 @@ public:
     void set_observation_token(const uint8_t *token, const uint8_t length);
 
     /**
-     * \brief Provides the observation token of the object.
+     * \brief Provides a copy of the observation token of the object.
      * \param value[OUT] A pointer to the value of the token.
      * \param value_length[OUT] The length of the token pointer.
      */
-    void get_observation_token(uint8_t *&token, uint32_t &token_length);
+    void get_observation_token(const uint8_t *&token, uint32_t &token_length) const;
+
+    /** Deprecated compatibility wrapper for get_observation_token(const uint8_t*&). */
+    void get_observation_token(uint8_t *&token, uint32_t &token_length) const;
 
     /**
      * \brief Returns the observation number.
@@ -182,7 +185,7 @@ private:
     /**
     * @brief Check whether notification params can be accepted.
     */
-    bool check_attribute_validity();
+    bool check_attribute_validity() const;
 
     /**
     * @brief Stop pmin & pmax timers.
@@ -193,13 +196,13 @@ private:
      * @brief Check if current value match threshold values.
      * @return True if notify can be send otherwise false.
      */
-    bool check_threshold_values();
+    bool check_threshold_values() const;
 
     /**
      * @brief Check whether current value matches with GT & LT.
      * @return True if current value match with GT or LT values.
      */
-    bool check_gt_lt_params();
+    bool check_gt_lt_params() const;
 
     /**
      * \brief Allocate (size + 1) amount of memory, copy size bytes into
@@ -207,7 +210,7 @@ private:
      * \param source The source string to copy, may not be NULL.
      * \param size The size of memory to be reserved.
     */
-    uint8_t* alloc_string_copy(const uint8_t* source, uint32_t size);
+    static uint8_t* alloc_string_copy(const uint8_t* source, uint32_t size);
 
 private:
     M2MReportObserver           &_observer;

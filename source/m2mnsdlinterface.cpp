@@ -971,7 +971,7 @@ M2MBase* M2MNsdlInterface::find_resource(const String &object_name,
                     break;
                 }
             } else {
-                uint8_t *stored_token = 0;
+                const uint8_t *stored_token = 0;
                 uint32_t stored_token_length = 0;
                 (*it)->get_observation_token(stored_token, stored_token_length);
                 tr_debug("M2MNsdlInterface::find_resource(object level) - stored token (%s)", tr_array(stored_token, stored_token_length));
@@ -980,10 +980,7 @@ M2MBase* M2MNsdlInterface::find_resource(const String &object_name,
                             memcmp(token, stored_token, token_len) == 0) {
                         object = (*it);
                         tr_debug("M2MNsdlInterface::find_resource - token found");
-                        free(stored_token);
                         break;
-                    } else {
-                        free(stored_token);
                     }
                 }
             }
@@ -1017,7 +1014,7 @@ M2MBase* M2MNsdlInterface::find_resource(const M2MObject *object,
                         break;
                     }
                 } else {
-                    uint8_t *stored_token = 0;
+                    const uint8_t *stored_token = 0;
                     uint32_t stored_token_length = 0;
                     tr_debug("M2MNsdlInterface::find_resource(object instance level) - in token (%s)", tr_array(token, token_len));
                     (*it)->get_observation_token(stored_token, stored_token_length);
@@ -1026,10 +1023,7 @@ M2MBase* M2MNsdlInterface::find_resource(const M2MObject *object,
                         if (stored_token_length == token_len &&
                                 memcmp(token, stored_token, token_len) == 0) {
                             instance = (*it);
-                            free(stored_token);
                             break;
-                        } else {
-                            free(stored_token);
                         }
                     }
                 }
@@ -1069,7 +1063,7 @@ M2MBase* M2MNsdlInterface::find_resource(const M2MObjectInstance *object_instanc
                         }
                     }
                 } else {
-                    uint8_t *stored_token = 0;
+                    const uint8_t *stored_token = 0;
                     uint32_t stored_token_length = 0;
                     tr_debug("M2MNsdlInterface::find_resource(resource level) - in token (%s)", tr_array(token, token_len));
                     (*it)->get_observation_token(stored_token, stored_token_length);
@@ -1078,10 +1072,7 @@ M2MBase* M2MNsdlInterface::find_resource(const M2MObjectInstance *object_instanc
                         if (stored_token_length == token_len &&
                                 memcmp(token, stored_token, token_len) == 0) {
                             instance = *it;
-                            free(stored_token);
                             break;
-                        } else {
-                            free(stored_token);
                         }
                     }
                 }

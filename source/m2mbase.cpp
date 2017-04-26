@@ -406,7 +406,14 @@ M2MBase::Observation M2MBase::observation_level() const
     return obs_level;
 }
 
-void M2MBase::get_observation_token(uint8_t *&token, uint32_t &token_length)
+void M2MBase::get_observation_token(uint8_t *&token, uint32_t &token_length) const
+{
+    if(_report_handler) {
+        _report_handler->get_observation_token(token, token_length);
+    }
+}
+
+void M2MBase::get_observation_token(const uint8_t *&token, uint32_t &token_length) const
 {
     if(_report_handler) {
         _report_handler->get_observation_token(token, token_length);
