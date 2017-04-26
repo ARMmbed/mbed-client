@@ -362,7 +362,13 @@ public:
      * \param value[OUT] A pointer to the value of the token.
      * \param value_length[OUT] The length of the token pointer.
      */
-    void get_observation_token(uint8_t *&token, uint32_t &token_length);
+    void get_observation_token(const uint8_t *&token, uint32_t &token_length) const;
+
+    /**
+     * Deprecated compatibility wrapper for get_observation_token(const uint8_t*&),
+     * to be removed on next version.
+     */
+    void get_observation_token(uint8_t *&token, uint32_t &token_length) const;
 
     /**
      * \brief Returns the mode of the resource.

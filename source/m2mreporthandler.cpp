@@ -360,7 +360,7 @@ void M2MReportHandler::handle_timers()
     }
 }
 
-bool M2MReportHandler::check_attribute_validity()
+bool M2MReportHandler::check_attribute_validity() const
 {
     bool success = true;
     if ((_attribute_state & M2MReportHandler::Pmax) == M2MReportHandler::Pmax &&
@@ -405,7 +405,7 @@ void M2MReportHandler::set_default_values()
     _changed_instance_ids.clear();
 }
 
-bool M2MReportHandler::check_threshold_values()
+bool M2MReportHandler::check_threshold_values() const
 {
     tr_debug("M2MReportHandler::check_threshold_values");
     tr_debug("Current value: %f", _current_value);
@@ -438,7 +438,7 @@ bool M2MReportHandler::check_threshold_values()
     return can_send;
 }
 
-bool M2MReportHandler::check_gt_lt_params()
+bool M2MReportHandler::check_gt_lt_params() const
 {
     tr_debug("M2MReportHandler::check_gt_lt_params");
     bool can_send = false;
@@ -480,7 +480,7 @@ bool M2MReportHandler::check_gt_lt_params()
     return can_send;
 }
 
-uint8_t M2MReportHandler::attribute_flags()
+uint8_t M2MReportHandler::attribute_flags() const
 {
     return _attribute_state;
 }
@@ -499,16 +499,23 @@ void M2MReportHandler::set_observation_token(const uint8_t *token, const uint8_t
     }
 }
 
-void M2MReportHandler::get_observation_token(uint8_t *&token, uint32_t &token_length)
+void M2MReportHandler::get_observation_token(uint8_t *&token, uint32_t &token_length) const
 {
     token_length = 0;
     free(token);
+    token = NULL;
     if (_token) {
         token = alloc_string_copy((uint8_t *)_token, _token_length);
         if(token) {
             token_length = _token_length;
         }
     }
+}
+
+void M2MReportHandler::get_observation_token(const uint8_t *&token, uint32_t &token_length) const
+{
+    token = _token;
+    token_length = _token_length;
 }
 
 uint16_t M2MReportHandler::observation_number() const
