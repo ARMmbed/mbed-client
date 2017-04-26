@@ -732,6 +732,9 @@ void M2MBase::free_resources()
 {
     // remove the nsdl structures from the nsdlinterface's lists.
     if (_observation_handler) {
+        if (_sn_resource->base_type == M2MBase::Object) {
+            _observation_handler->remove_object(this);
+        }
         _observation_handler->resource_to_be_deleted(this);
     }
 
