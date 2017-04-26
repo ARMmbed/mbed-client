@@ -27,6 +27,7 @@
 
 M2MResource::M2MResource(M2MObjectInstance &parent,
                          const String &resource_name,
+                         M2MBase::Mode resource_mode,
                          const String &resource_type,
                          M2MBase::DataType type,
                          const uint8_t *value,
@@ -34,7 +35,7 @@ M2MResource::M2MResource(M2MObjectInstance &parent,
                          char *path,
                          bool multiple_instance,
                          bool external_blockwise_store)
-: M2MResourceInstance(*this, resource_name, resource_type, type, value, value_length,
+: M2MResourceBase(resource_name, resource_mode, resource_type, type, value, value_length,
                       path, external_blockwise_store, multiple_instance),
   _parent(parent)
 #ifndef DISABLE_DELAYED_RESPONSE
@@ -52,7 +53,7 @@ M2MResource::M2MResource(M2MObjectInstance &parent,
 M2MResource::M2MResource(M2MObjectInstance &parent,
                          const lwm2m_parameters_s* s,
                           M2MBase::DataType type)
-: M2MResourceInstance(*this, s, type),
+: M2MResourceBase(s, type),
   _parent(parent)
 #ifndef DISABLE_DELAYED_RESPONSE
   ,_delayed_token(NULL),
@@ -66,13 +67,14 @@ M2MResource::M2MResource(M2MObjectInstance &parent,
 
 M2MResource::M2MResource(M2MObjectInstance &parent,
                          const String &resource_name,
+                         M2MBase::Mode resource_mode,
                          const String &resource_type,
                          M2MBase::DataType type,
                          bool observable,
                          char *path,
                          bool multiple_instance,
                          bool external_blockwise_store)
-: M2MResourceInstance(*this, resource_name, resource_type, type,
+: M2MResourceBase(resource_name, resource_mode, resource_type, type,
                       path,
                       external_blockwise_store,multiple_instance),
   _parent(parent)
@@ -333,7 +335,7 @@ sn_coap_hdr_s* M2MResource::handle_get_request(nsdl_s *nsdl,
                                     if(received_coap_header->options_list_ptr->observe != -1) {
                                         number = received_coap_header->options_list_ptr->observe;
                                     }
-                                    
+
                                     // If the observe value is 0 means register for observation.
                                     if(number == 0) {
                                         tr_debug("M2MResource::handle_get_request - Put Resource under Observation");
@@ -381,7 +383,7 @@ sn_coap_hdr_s* M2MResource::handle_get_request(nsdl_s *nsdl,
             coap_response->msg_code = msg_code;
         }
     } else {
-        coap_response = M2MResourceInstance::handle_get_request(nsdl,
+        coap_response = M2MResourceBase::handle_get_request(nsdl,
                             received_coap_header,
                             observation_handler);
     }
@@ -474,13 +476,14 @@ sn_coap_hdr_s* M2MResource::handle_put_request(nsdl_s *nsdl,
             coap_response->msg_code = msg_code;
         }
     } else {
-        coap_response = M2MResourceInstance::handle_put_request(nsdl,
+        coap_response = M2MResourceBase::handle_put_request(nsdl,
                             received_coap_header,
                             observation_handler,
                             execute_value_updated);
     }
     return coap_response;
 }
+
 
 sn_coap_hdr_s* M2MResource::handle_post_request(nsdl_s *nsdl,
                                                 sn_coap_hdr_s *received_coap_header,
@@ -568,6 +571,17 @@ M2MObjectInstance& M2MResource::get_parent_object_instance() const
     return _parent;
 }
 
+uint16_t M2MResource::object_instance_id() const
+{
+    const M2MObjectInstance& parent_object_instance = get_parent_object_instance();
+    return parent_object_instance.instance_id();
+}
+
+M2MResource& M2MResource::get_parent_resource() const
+{
+    return (M2MResource&)*this;
+}
+
 const char* M2MResource::object_name() const
 {
     const M2MObjectInstance& parent_object_instance = _parent;
@@ -575,7 +589,6 @@ const char* M2MResource::object_name() const
 
     return parent_object.name();
 }
-
 
 M2MResource::M2MExecuteParameter::M2MExecuteParameter()
 {

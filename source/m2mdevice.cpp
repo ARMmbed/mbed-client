@@ -454,7 +454,7 @@ M2MResourceInstance* M2MDevice::get_resource_instance(DeviceResource dev_res,
             if(res->supports_multiple_instances()) {
                inst = res->resource_instance(instance_id);
             } else {
-                inst = res;
+//XXX horrors!                inst = res;
             }
         }
     }
