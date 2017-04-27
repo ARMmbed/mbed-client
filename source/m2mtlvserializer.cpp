@@ -17,6 +17,7 @@
 #include "include/nsdllinker.h"
 #include "mbed-client/m2mconstants.h"
 #include <stdlib.h>
+#include "common_functions.h"
 
 #define TRACE_GROUP "mClt"
 
@@ -171,25 +172,6 @@ bool M2MTLVSerializer::serialize_multiple_resource(const M2MResource *resource, 
     return success;
 }
 
-/* See, OMA-TS-LightweightM2M-V1_0-20170208-A, Appendix C,
- * Data Types, Integer, TLV Format 
- * 
- * This is easy to change to support 8, 16 or 32 interger. */
-template <typename T> void M2MTLVSerializer::set_value_int(T value, uint8_t *buffer, uint32_t &size)
-{
-    size = sizeof(value);
-
-    /* write bytes to big endian order in buffer */
-    for (uint8_t ind=0;ind<size;ind++) {
-        buffer[size-ind-1] = ((value >> (ind*8)) & 0xFF);
-    }
-}
-
-template void M2MTLVSerializer::set_value_int<int8_t>(int8_t value, uint8_t *buffer, uint32_t &size);
-template void M2MTLVSerializer::set_value_int<int16_t>(int16_t value, uint8_t *buffer, uint32_t &size);
-template void M2MTLVSerializer::set_value_int<int32_t>(int32_t value, uint8_t *buffer, uint32_t &size);
-template void M2MTLVSerializer::set_value_int<int64_t>(int64_t value, uint8_t *buffer, uint32_t &size);
-
 bool M2MTLVSerializer::serialize_resource_instance(uint16_t id, const M2MResourceInstance *resource, uint8_t *&data, uint32_t &size)
 {
     bool success;
@@ -206,6 +188,9 @@ bool M2MTLVSerializer::serialize_resource_instance(uint16_t id, const M2MResourc
     return success;
 }
 
+/* See, OMA-TS-LightweightM2M-V1_0-20170208-A, Appendix C,
+ * Data Types, Integer, Boolean and TY
+ * Yime, TLV Format */
 bool M2MTLVSerializer::serialize_TLV_binary_int(const M2MResourceInstance *resource, uint8_t type, uint16_t id, uint8_t *&data, uint32_t &size)
 {
         int64_t valueInt = resource->get_value_int();
@@ -214,10 +199,12 @@ bool M2MTLVSerializer::serialize_TLV_binary_int(const M2MResourceInstance *resou
         uint8_t buffer[8];
 
         if (resource->resource_instance_type() == M2MResourceInstance::BOOLEAN) {
-            set_value_int((int8_t)valueInt, buffer, buffer_size);
+            buffer_size = 1;
+            buffer[0] = valueInt;
         }
         else {
-            set_value_int(valueInt, buffer, buffer_size);
+            buffer_size = 8;
+            common_write_64_bit(valueInt, buffer);
         }
 
         return serialize_TILV(type, id, buffer, buffer_size, data, size);
