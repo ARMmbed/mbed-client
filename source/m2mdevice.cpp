@@ -320,7 +320,7 @@ bool M2MDevice::set_resource_value(DeviceResource resource,
                                    uint16_t instance_id)
 {
     bool success = false;
-    M2MResourceInstance* res = get_resource_instance(resource,instance_id);
+    M2MResourceBase* res = get_resource_instance(resource, instance_id);
     if(res && value.size() <= MAX_ALLOWED_STRING_LENGTH) {
         if(M2MDevice::Manufacturer == resource          ||
            M2MDevice::ModelNumber == resource           ||
@@ -347,7 +347,7 @@ bool M2MDevice::set_resource_value(DeviceResource resource,
                                        uint16_t instance_id)
 {
     bool success = false;
-    M2MResourceInstance* res = get_resource_instance(resource,instance_id);
+    M2MResourceBase* res = get_resource_instance(resource, instance_id);
     if(res) {
         if(M2MDevice::BatteryLevel == resource          ||
            M2MDevice::BatteryStatus == resource         ||
@@ -373,7 +373,7 @@ String M2MDevice::resource_value_string(DeviceResource resource,
                                         uint16_t instance_id) const
 {
     String value = "";
-    M2MResourceInstance* res = get_resource_instance(resource,instance_id);
+    const M2MResourceBase* res = get_resource_instance(resource, instance_id);
     if(res) {
         if(M2MDevice::Manufacturer == resource          ||
            M2MDevice::ModelNumber == resource           ||
@@ -396,7 +396,7 @@ int64_t M2MDevice::resource_value_int(DeviceResource resource,
                                       uint16_t instance_id) const
 {
     int64_t value = -1;
-    M2MResourceInstance* res = get_resource_instance(resource,instance_id);
+    M2MResourceBase* res = get_resource_instance(resource, instance_id);
     if(res) {
         if(M2MDevice::BatteryLevel == resource          ||
            M2MDevice::BatteryStatus == resource         ||
@@ -418,7 +418,7 @@ int64_t M2MDevice::resource_value_int(DeviceResource resource,
 bool M2MDevice::is_resource_present(DeviceResource resource) const
 {
     bool success = false;
-    M2MResourceInstance* res = get_resource_instance(resource,0);
+    const M2MResourceBase* res = get_resource_instance(resource,0);
     if(res) {
         success = true;
     }
@@ -443,18 +443,18 @@ uint16_t M2MDevice::total_resource_count() const
     return count;
 }
 
-M2MResourceInstance* M2MDevice::get_resource_instance(DeviceResource dev_res,
+M2MResourceBase* M2MDevice::get_resource_instance(DeviceResource dev_res,
                                                       uint16_t instance_id) const
 {
     M2MResource* res = NULL;
-    M2MResourceInstance* inst = NULL;
+    M2MResourceBase* inst = NULL;
     if(_device_instance) {
         res = _device_instance->resource(resource_name(dev_res));
         if(res) {
             if(res->supports_multiple_instances()) {
                inst = res->resource_instance(instance_id);
             } else {
-//XXX horrors!                inst = res;
+                inst = res;
             }
         }
     }
@@ -535,7 +535,7 @@ const char* M2MDevice::resource_name(DeviceResource resource)
     return res_name;
 }
 
-bool M2MDevice::check_value_range(DeviceResource resource, int64_t value) const
+bool M2MDevice::check_value_range(DeviceResource resource, int64_t value)
 {
     bool success = false;
     switch (resource) {
