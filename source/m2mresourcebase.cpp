@@ -253,9 +253,9 @@ void M2MResourceBase::report()
             }
         }
     } else if(M2MBase::Static == mode()) {
-        M2MObservationHandler *observation_handler = M2MBase::observation_handler();
-        if(observation_handler) {
-            observation_handler->value_updated(this);
+        M2MObservationHandler *obs_handler = observation_handler();
+        if(obs_handler) {
+            obs_handler->value_updated(this);
         }
     } else {
         tr_debug("M2MResourceBase::report() - mode = %d, is_observable = %d", mode(), is_observable());

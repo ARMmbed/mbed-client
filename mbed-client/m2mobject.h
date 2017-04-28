@@ -109,6 +109,18 @@ public:
     uint16_t instance_count() const;
 
     /**
+     * \brief Returns the Observation Handler object.
+     * \return M2MObservationHandler object.
+    */
+    virtual M2MObservationHandler* observation_handler() const;
+
+    /**
+     * \brief Sets the observation handler
+     * \param handler Observation handler
+    */
+    virtual void set_observation_handler(M2MObservationHandler *handler);
+
+    /**
      * \brief Adds the observation level for the object.
      * \param observation_level The level of observation.
      */
@@ -169,6 +181,8 @@ protected :
 private:
 
     M2MObjectInstanceList     _instance_list; // owned
+
+    M2MObservationHandler    *_observation_handler; // Not owned
 
 friend class Test_M2MObject;
 friend class Test_M2MInterfaceImpl;

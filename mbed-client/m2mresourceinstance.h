@@ -103,6 +103,17 @@ private: // Constructor and destructor are private
 
 public:
 
+    /**
+     * \brief Returns the Observation Handler object.
+     * \return M2MObservationHandler object.
+    */
+    virtual M2MObservationHandler* observation_handler() const;
+
+    /**
+     * \brief Sets the observation handler
+     * \param handler Observation handler
+    */
+    virtual void set_observation_handler(M2MObservationHandler *handler);
 
     /**
      * \brief Parses the received query for a notification
