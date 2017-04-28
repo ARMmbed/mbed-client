@@ -46,8 +46,7 @@ M2MBase::M2MBase(const String& resource_name,
                  M2MBase::DataType type)
 :
   _sn_resource(NULL),
-  _report_handler(NULL),
-  _observation_handler(NULL)
+  _report_handler(NULL)
 {
     // Checking the name length properly, i.e returning error is impossible from constructor without exceptions
     assert(resource_name.length() <= MAX_ALLOWED_STRING_LENGTH);
@@ -104,8 +103,7 @@ M2MBase::M2MBase(const String& resource_name,
 
 M2MBase::M2MBase(const lwm2m_parameters_s *s):
     _sn_resource((lwm2m_parameters_s*) s),
-    _report_handler(NULL),
-    _observation_handler(NULL)
+    _report_handler(NULL)
 {
     tr_debug("M2MBase::M2MBase(const lwm2m_parameters_s *s)");
     // Set callback function in case of both dynamic and static resource
@@ -116,7 +114,7 @@ M2MBase::~M2MBase()
 {
     tr_debug("M2MBase::~M2MBase()");
     delete _report_handler;
-    free_resources();
+
     value_updated_callback* callback = (value_updated_callback*)M2MCallbackStorage::remove_callback(*this, M2MCallbackAssociation::M2MBaseValueUpdatedCallback);
     delete callback;
 
@@ -283,12 +281,6 @@ void M2MBase::remove_observation_level(M2MBase::Observation obs_level)
     }
 }
 
-void M2MBase::set_observation_handler(M2MObservationHandler *handler)
-{
-    tr_debug("M2MBase::set_observation_handler - handler: 0x%p", (void*)handler);
-    _observation_handler = handler;
-}
-
 
 void M2MBase::set_under_observation(bool observed,
                                     M2MObservationHandler *handler)
@@ -298,7 +290,9 @@ void M2MBase::set_under_observation(bool observed,
     if(_report_handler) {
         _report_handler->set_under_observation(observed);
     }
-    _observation_handler = handler;
+
+    set_observation_handler(handler);
+
     if (handler) {
         if (base_type() != M2MBase::ResourceInstance) {
             // Create report handler only if it does not exist and one wants observation
@@ -464,11 +458,12 @@ void M2MBase::observation_to_be_sent(const m2m::Vector<uint16_t> &changed_instan
                                      bool send_object)
 {
     //TODO: Move this to M2MResourceInstance
-    if(_observation_handler) {
-        _observation_handler->observation_to_be_sent(this,
-                                                    obs_number,
-                                                    changed_instance_ids,
-                                                    send_object);
+    M2MObservationHandler *obs_handler = observation_handler();
+    if (obs_handler) {
+        obs_handler->observation_to_be_sent(this,
+                                            obs_number,
+                                            changed_instance_ids,
+                                            send_object);
     }
 }
 
@@ -587,11 +582,6 @@ M2MReportHandler* M2MBase::create_report_handler()
 M2MReportHandler* M2MBase::report_handler() const
 {
     return _report_handler;
-}
-
-M2MObservationHandler* M2MBase::observation_handler()
-{
-    return _observation_handler;
 }
 
 void M2MBase::set_register_uri(bool register_uri)
@@ -759,9 +749,10 @@ char* M2MBase::stringdup(const char* src)
 void M2MBase::free_resources()
 {
     // remove the nsdl structures from the nsdlinterface's lists.
-    if (_observation_handler) {
+    M2MObservationHandler *obs_handler = observation_handler();
+    if (obs_handler) {
         tr_debug("M2MBase::free_resources()");
-        _observation_handler->resource_to_be_deleted(this);
+        obs_handler->resource_to_be_deleted(this);
     }
 
     if (_sn_resource->dynamic_resource_params->static_resource_parameters->free_on_delete) {

@@ -68,6 +68,8 @@ M2MObjectInstance::~M2MObjectInstance()
         }
         _resource_list.clear();
     }
+
+    free_resources();
 }
 
 // TBD, ResourceType to the base class struct?? TODO!
@@ -387,6 +389,18 @@ uint16_t M2MObjectInstance::resource_count(const char *resource) const
         }
     }
     return count;
+}
+
+M2MObservationHandler* M2MObjectInstance::observation_handler() const
+{
+    // XXX: need to check the flag too
+    return _parent.observation_handler();
+}
+
+void M2MObjectInstance::set_observation_handler(M2MObservationHandler *handler)
+{
+    // XXX: need to set the flag too
+    _parent.set_observation_handler(handler);
 }
 
 void M2MObjectInstance::add_observation_level(M2MBase::Observation observation_level)

@@ -239,6 +239,18 @@ public:
     virtual void remove_observation_level(M2MBase::Observation observation_level);
 
     /**
+     * \brief Returns the Observation Handler object.
+     * \return M2MObservationHandler object.
+    */
+    virtual M2MObservationHandler* observation_handler() const;
+
+    /**
+     * \brief Sets the observation handler
+     * \param handler Observation handler
+    */
+    virtual void set_observation_handler(M2MObservationHandler *handler);
+
+    /**
      * \brief Handles GET request for the registered objects.
      * \param nsdl The NSDL handler for the CoAP library.
      * \param received_coap_header The CoAP message received from the server.
