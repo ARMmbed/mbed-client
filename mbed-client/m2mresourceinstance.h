@@ -123,12 +123,11 @@ public:
     virtual bool handle_observation_attribute(const char *query);
 
 
-
     /**
      * \brief Returns the instance ID of the object where the resource exists.
      * \return Object instance ID.
     */
-    uint16_t object_instance_id() const;
+    virtual uint16_t object_instance_id() const;
 
     /**
      * \brief Returns the name of the object where the resource exists.
@@ -136,20 +135,16 @@ public:
     */
     virtual const char* object_name() const;
 
-
+    /**
+     * \brief Get reference to the resource owning this resource instance.
+     * \return parent resource
+     */
     virtual M2MResource& get_parent_resource() const;
 
 private:
 
-
-
-
-private:
-
-    // XXX: since the M2MResource is inherited from this class, the resource actually has back
-    // pointer to itself. If this inheritance was broken, we could save some memory.
+    // Parent resource which owns this resource instance
     M2MResource &_parent_resource;
-
 
     friend class Test_M2MResourceInstance;
     friend class Test_M2MResource;

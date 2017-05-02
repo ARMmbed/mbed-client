@@ -81,7 +81,7 @@ M2MBase::M2MBase(const String& resource_name,
                 }
 #endif
                 params->path = path;
-                params->mode = (const uint8_t)mode;
+                params->mode = (unsigned)mode;
                 params->free_on_delete = true;
                 params->external_memory_block = external_blockwise_store;
                 _sn_resource->dynamic_resource_params->static_resource_parameters = params;
