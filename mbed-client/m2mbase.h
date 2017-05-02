@@ -140,8 +140,8 @@ public:
             uint16_t            instance_id; // XXX: this is not properly aligned now, need to reorder these after the elimination is done
         } identifier;
         sn_nsdl_dynamic_resource_parameters_s *dynamic_resource_params;
-        BaseType            base_type;
-        M2MBase::DataType   data_type;
+        BaseType            base_type : 2;
+        M2MBase::DataType   data_type : 3;
         bool                multiple_instance;
         bool                free_on_delete;   /**< true if struct is dynamically allocted and it
                                                  and its members (name) are to be freed on destructor.
