@@ -1595,7 +1595,7 @@ void M2MNsdlInterface::handle_bootstrap_finished(sn_coap_hdr_s *coap_header,sn_n
         _server.set_resource_value(M2MServer::ShortServerID,
                                     _security->resource_value_int(M2MSecurity::ShortServerID));
     }
-
+    /*
     coap_response = sn_nsdl_build_response(_nsdl_handle,
                                            coap_header,
                                            msg_code);
@@ -1613,7 +1613,7 @@ void M2MNsdlInterface::handle_bootstrap_finished(sn_coap_hdr_s *coap_header,sn_n
         // Inform observer that bootstrap is finished but it should wait until nsdl has sent data.
         // The final bootstrap_done callback is called in the observers data_sent callback.
         _observer.bootstrap_wait(_security);
-    } else {
+    } else */{
         handle_bootstrap_error();
     }
 #else
