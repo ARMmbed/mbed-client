@@ -40,7 +40,6 @@
 #include "mbed-client/m2mresource.h"
 #include "mbed-client/m2mconstants.h"
 #include "mbed-trace/mbed_trace.h"
-#include "mbed-client/m2mtimer.h"
 #include "sn_grs.h"
 #include "mbed-client/m2minterfacefactory.h"
 #include "mbed-client/m2mdevice.h"
@@ -59,14 +58,15 @@ M2MNsdlInterface::M2MNsdlInterface(M2MNsdlObserver &observer, M2MConnectionHandl
   _nsdl_handle(NULL),
   _security(NULL),
   _server(),
-  _nsdl_exceution_timer(new M2MTimer(*this)),
-  _registration_timer(new M2MTimer(*this)),
+  _nsdl_exceution_timer(*this),
+  _registration_timer(*this),
   _connection_handler(connection_handler),
   _counter_for_nsdl(0),
   _bootstrap_id(0),
   _server_address(NULL),
   _unregister_ongoing(false),
-  _identity_accepted(false)
+  _identity_accepted(false),
+  _nsdl_exceution_timer_running(false)
 {
     tr_debug("M2MNsdlInterface::M2MNsdlInterface()");
     _sn_nsdl_address.addr_len = 0;
@@ -93,8 +93,6 @@ M2MNsdlInterface::~M2MNsdlInterface()
          memory_free(_endpoint->lifetime_ptr);
          memory_free(_endpoint);
     }
-    delete _nsdl_exceution_timer;
-    delete _registration_timer;
     _object_list.clear();
     _security = NULL;
 
@@ -231,6 +229,7 @@ bool M2MNsdlInterface::create_bootstrap_resource(sn_nsdl_addr_s *address)
              _endpoint->endpoint_name_ptr);
 
     if(_bootstrap_id == 0) {
+        start_nsdl_execution_timer();
         // Take copy of the address, uri_query_parameters() will modify the source buffer
         bool msg_sent = false;
         if (_server_address) {
@@ -289,10 +288,8 @@ void M2MNsdlInterface::set_server_address(uint8_t* address,
 bool M2MNsdlInterface::send_register_message()
 {
     tr_debug("M2MNsdlInterface::send_register_message()");
-    _nsdl_exceution_timer->stop_timer();
-    _nsdl_exceution_timer->start_timer(ONE_SECOND_TIMER * 1000,
-                                       M2MTimerObserver::NsdlExecution,
-                                       false);
+    start_nsdl_execution_timer();
+
     bool success = false;
     if (_server_address) {
         success = parse_and_send_uri_query_parameters();
@@ -307,6 +304,7 @@ bool M2MNsdlInterface::send_register_message()
 bool M2MNsdlInterface::send_update_registration(const uint32_t lifetime)
 {
     tr_debug("M2MNsdlInterface::send_update_registration( lifetime %" PRIu32 ")", lifetime);
+    start_nsdl_execution_timer();
     bool success = false;
     create_nsdl_list_structure(_object_list);
 
@@ -319,8 +317,8 @@ bool M2MNsdlInterface::send_update_registration(const uint32_t lifetime)
         }
         set_endpoint_lifetime_buffer(lifetime);
 
-        _registration_timer->stop_timer();
-        _registration_timer->start_timer(registration_time() * 1000,
+        _registration_timer.stop_timer();
+        _registration_timer.start_timer(registration_time() * 1000,
                                          M2MTimerObserver::Registration,
                                          false);
         if(_nsdl_handle &&
@@ -432,8 +430,8 @@ uint8_t M2MNsdlInterface::received_from_server_callback(struct nsdl_s *nsdl_hand
 
                 }
                 if(_endpoint->lifetime_ptr) {
-                    _registration_timer->stop_timer();
-                    _registration_timer->start_timer(registration_time() * 1000,
+                    _registration_timer.stop_timer();
+                    _registration_timer.start_timer(registration_time() * 1000,
                                                      M2MTimerObserver::Registration,
                                                      false);
                 }
@@ -453,7 +451,7 @@ uint8_t M2MNsdlInterface::received_from_server_callback(struct nsdl_s *nsdl_hand
             _unregister_ongoing = false;
             tr_debug("M2MNsdlInterface::received_from_server_callback - unregistration callback");
             if(coap_header->msg_code == COAP_MSG_CODE_RESPONSE_DELETED) {
-                _registration_timer->stop_timer();
+                _registration_timer.stop_timer();
                 _observer.client_unregistered();
             } else {
                 tr_error("M2MNsdlInterface::received_from_server_callback - unregistration error %d", coap_header->msg_code);
@@ -466,7 +464,7 @@ uint8_t M2MNsdlInterface::received_from_server_callback(struct nsdl_s *nsdl_hand
                 _observer.registration_updated(_server);
             } else {
                 tr_error("M2MNsdlInterface::received_from_server_callback - registration_updated failed %d", coap_header->msg_code);
-                _registration_timer->stop_timer();
+                _registration_timer.stop_timer();
                 bool msg_sent = false;
                 if (_server_address) {
                     msg_sent = parse_and_send_uri_query_parameters();
@@ -732,12 +730,10 @@ bool M2MNsdlInterface::process_received_data(uint8_t *data,
 void M2MNsdlInterface::stop_timers()
 {
     tr_debug("M2MNsdlInterface::stop_timers()");
-    if(_registration_timer) {
-        _registration_timer->stop_timer();
-    }
-    if (_nsdl_exceution_timer) {
-        _nsdl_exceution_timer->stop_timer();
-    }
+    _registration_timer.stop_timer();
+    _nsdl_exceution_timer.stop_timer();
+    _nsdl_exceution_timer_running = false;
+    _counter_for_nsdl = 0;
     _bootstrap_id = 0;
     _unregister_ongoing = false;
 }
@@ -1345,6 +1341,9 @@ void M2MNsdlInterface::send_notification(uint8_t *token,
 
 {
     tr_debug("M2MNsdlInterface::send_notification");
+    if(!_nsdl_exceution_timer_running) {
+        send_update_registration();
+    }
     sn_coap_hdr_s *notification_message_ptr;
 
     /* Allocate and initialize memory for header struct */
@@ -1744,6 +1743,11 @@ void M2MNsdlInterface::set_server_address(const char* server_address)
     _server_address = M2MBase::alloc_string_copy(server_address);
 }
 
+M2MTimer &M2MNsdlInterface::get_nsdl_execution_timer()
+{
+    return _nsdl_exceution_timer;
+}
+
 bool M2MNsdlInterface::parse_and_send_uri_query_parameters()
 {
     bool msg_sent = false;
@@ -1774,4 +1778,14 @@ void M2MNsdlInterface::claim_mutex()
 void M2MNsdlInterface::release_mutex()
 {
     _connection_handler.release_mutex();
+}
+
+void M2MNsdlInterface::start_nsdl_execution_timer()
+{
+    tr_debug("M2MNsdlInterface::start_nsdl_execution_timer");
+    _nsdl_exceution_timer_running = true;
+    _nsdl_exceution_timer.stop_timer();
+    _nsdl_exceution_timer.start_timer(ONE_SECOND_TIMER * 1000,
+                                       M2MTimerObserver::NsdlExecution,
+                                      false);
 }
