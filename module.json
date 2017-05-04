@@ -7,8 +7,10 @@
   "homepage": "https://github.com/ARMmbed/mbed-client",
   "license": "Apache-2.0",
   "dependencies": {
+
     "mbed-client-c": "ARMmbed/mbed-client-c#mbed-cloud-client-rel1.2",
-    "mbed-trace": ">=0.2.0,<2.0.0"
+    "mbed-trace": ">=0.2.0,<2.0.0",
+    "nanostack-libservice": "^3.0.0"
   },
   "targetDependencies": {
     "arm": {
