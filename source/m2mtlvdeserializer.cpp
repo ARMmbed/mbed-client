@@ -195,7 +195,8 @@ M2MTLVDeserializer::Error M2MTLVDeserializer::deserialize_resources(const uint8_
         }
     } else if (TYPE_MULTIPLE_RESOURCE == til._type) {
         for (; it!=list.end(); it++) {
-            if((*it)->supports_multiple_instances()) {
+            if((*it)->supports_multiple_instances() &&
+                    (*it)->name_id() == til._id) {
                 error = deserialize_resource_instances(tlv, tlv_size, offset, (**it), object_instance, operation, update_value);
             }
         }
@@ -231,7 +232,7 @@ M2MTLVDeserializer::Error M2MTLVDeserializer::deserialize_resource_instances(con
         it = list.begin();
         bool found = false;
         for (; it!=list.end(); it++) {
-            if((*it)->instance_id() == til._id) {
+            if((*it)->instance_id() == til._id && TYPE_RESOURCE_INSTANCE == til._type) {
                 found = true;
                 if(update_value) {
                     if(til._length > 0) {
