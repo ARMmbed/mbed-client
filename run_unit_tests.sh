@@ -32,7 +32,8 @@ find ./build -name '*.xml' | xargs cp -t ./results/
 find ./build/x86-linux-native-coverage/test -name '*.gcno' | xargs cp -t ./coverage/
 find ./build/x86-linux-native-coverage/test -name '*.gcda' | xargs cp -t ./coverage/
 touch coverage/*.gcda
-exclude_files="${PWD}/test/"
+exclude_files="${PWD}/test/|${PWD}/yotta_modules*"
+#exclude_files2="${PWD}/yotta_modules*"
 gcovr -r ./ --gcov-filter='.*source*.' --exclude-unreachable-branches --exclude $exclude_files --object-directory ./coverage -x -o ./results/gcovr.xml
 echo
 echo "Create coverage document"
