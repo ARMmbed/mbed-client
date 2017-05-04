@@ -21,6 +21,7 @@ add_executable(m2mtlv
 target_link_libraries(m2mtlv
     CppUTest
     CppUTestExt
+    nanostack-libservice
 )
 set_target_properties(m2mtlv
 PROPERTIES COMPILE_FLAGS "${CMAKE_CXX_FLAGS}"
