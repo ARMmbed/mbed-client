@@ -518,7 +518,9 @@ void Test_M2MBase::test_ctor()
 {
     static sn_nsdl_static_resource_parameters_s params_static = {
         (char*)"",      // resource_type_ptr
+#ifdef MBED_CLIENT_SUPPORT_INTERFACE_DESCRIPTION_PTR
         (char*)"",                     // interface_description_ptr
+#endif
         (uint8_t*)"",    // path
         (uint8_t*)"",           // resource
         0,                      // pathlen

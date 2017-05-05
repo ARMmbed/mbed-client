@@ -180,6 +180,7 @@ public:
      * \brief Sets the interface description of the object.
      * \param description The description to be set.
      */
+#ifdef MBED_CLIENT_SUPPORT_INTERFACE_DESCRIPTION_PTR
     virtual void set_interface_description(const String &description);
 
     /**
@@ -187,7 +188,7 @@ public:
      * \param description The description to be set.
      */
     virtual void set_interface_description(const char *description);
-
+#endif
     /**
      * \brief Sets the resource type of the object.
      * \param resource_type The resource type to be set.
@@ -308,8 +309,9 @@ public:
      * \brief Returns the interface description of the object.
      * \return The interface description of the object.
      */
+#ifdef MBED_CLIENT_SUPPORT_INTERFACE_DESCRIPTION_PTR
     virtual const char* interface_description() const;
-
+#endif
     /**
      * \brief Returns the resource type of the object.
      * \return The resource type of the object.

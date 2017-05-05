@@ -70,7 +70,9 @@ M2MFirmware::~M2MFirmware()
 STATIC_PARAM_TYPE
 static sn_nsdl_static_resource_parameters_s firmware_package_params_static = {
     (char*)OMA_RESOURCE_TYPE,      // resource_type_ptr
+#ifdef MBED_CLIENT_SUPPORT_INTERFACE_DESCRIPTION_PTR
     (char*)"",                     // interface_description_ptr
+#endif
     (uint8_t*)PACKAGE_PATH,    // path
     (uint8_t*)"",           // resource
     5,                      // strlen("5/0/0")
@@ -85,7 +87,9 @@ static sn_nsdl_static_resource_parameters_s firmware_package_params_static = {
 STATIC_PARAM_TYPE
 static sn_nsdl_static_resource_parameters_s firmware_package_uri_params_static = {
     (char*)OMA_RESOURCE_TYPE,      // resource_type_ptr
+#ifdef MBED_CLIENT_SUPPORT_INTERFACE_DESCRIPTION_PTR
     (char*)"",                     // interface_description_ptr
+#endif
     (uint8_t*)PACKAGE_URI_PATH, // path
     (uint8_t*)"",           // resource
     5,                      // strlen("5/0/1")
@@ -100,7 +104,9 @@ static sn_nsdl_static_resource_parameters_s firmware_package_uri_params_static =
 STATIC_PARAM_TYPE
 static sn_nsdl_static_resource_parameters_s firmware_update_params_static = {
     (char*)OMA_RESOURCE_TYPE,   // resource_type_ptr
+#ifdef MBED_CLIENT_SUPPORT_INTERFACE_DESCRIPTION_PTR
     (char*)"",                  // interface_description_ptr
+#endif
     (uint8_t*)UPDATE_PATH,  // path
     (uint8_t*)"",           // resource
     5,                      // strlen(5/0/2)
@@ -115,7 +121,9 @@ static sn_nsdl_static_resource_parameters_s firmware_update_params_static = {
 STATIC_PARAM_TYPE
 static sn_nsdl_static_resource_parameters_s firmware_state_params_static = {
     (char*)OMA_RESOURCE_TYPE,   // resource_type_ptr
+#ifdef MBED_CLIENT_SUPPORT_INTERFACE_DESCRIPTION_PTR
     (char*)"",                  // interface_description_ptr
+#endif
     (uint8_t*)STATE_URI_PATH,   // path
     (uint8_t*)"0",          // resource
     5,                      // strlen("5/0/3")
@@ -130,7 +138,9 @@ static sn_nsdl_static_resource_parameters_s firmware_state_params_static = {
 STATIC_PARAM_TYPE
 static sn_nsdl_static_resource_parameters_s firmware_update_result_params_static = {
     (char*)OMA_RESOURCE_TYPE,      // resource_type_ptr
+#ifdef MBED_CLIENT_SUPPORT_INTERFACE_DESCRIPTION_PTR
     (char*)"",                     // interface_description_ptr
+#endif
     (uint8_t*)UPDATE_RESULT_PATH, // path
     (uint8_t*)"0",          // resource
     5,                      // strlen(5/0/5)
