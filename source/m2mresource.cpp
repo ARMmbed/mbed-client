@@ -47,6 +47,9 @@ M2MResource::M2MResource(M2MObjectInstance &parent,
     M2MBase::set_base_type(M2MBase::Resource);
     M2MBase::set_operation(M2MBase::GET_ALLOWED);
     M2MBase::set_observable(false);
+    if (_has_multiple_instances) {
+        M2MBase::set_coap_content_type(COAP_CONTENT_OMA_TLV_TYPE);
+    }
 
 }
 
@@ -86,6 +89,9 @@ M2MResource::M2MResource(M2MObjectInstance &parent,
     M2MBase::set_base_type(M2MBase::Resource);
     M2MBase::set_operation(M2MBase::GET_PUT_ALLOWED);
     M2MBase::set_observable(observable);
+    if (_has_multiple_instances) {
+        M2MBase::set_coap_content_type(COAP_CONTENT_OMA_TLV_TYPE);
+    }
 }
 
 
