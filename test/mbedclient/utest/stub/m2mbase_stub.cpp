@@ -134,7 +134,7 @@ void M2MBase::set_resource_type(const char */*res_type*/)
 {
 }
 
-void M2MBase::set_coap_content_type(const uint8_t /*con_type*/)
+void M2MBase::set_coap_content_type(const uint16_t /*con_type*/)
 {
 }
 
@@ -180,7 +180,7 @@ const char* M2MBase::resource_type() const
     return m2mbase_stub::string_value;
 }
 
-uint8_t M2MBase::coap_content_type() const
+uint16_t M2MBase::coap_content_type() const
 {
     return m2mbase_stub::uint8_value;
 }
