@@ -519,6 +519,8 @@ void M2MInterfaceImpl::timer_expired(M2MTimerObserver::Type type)
 {
     tr_debug("M2MInterfaceImpl::timer_expired()");
     if(M2MTimerObserver::QueueSleep == type) {
+        M2MTimer &timer = _nsdl_interface.get_nsdl_execution_timer();
+        timer.stop_timer();
         if(_callback_handler) {
             _callback_handler();
         }

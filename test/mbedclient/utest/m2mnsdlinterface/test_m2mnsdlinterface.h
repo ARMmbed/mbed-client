@@ -96,6 +96,8 @@ public:
 
     void test_internal_endpoint_name();
 
+    void test_get_nsdl_execution_timer();
+
     M2MNsdlInterface* nsdl;
 
     TestObserver *observer;
