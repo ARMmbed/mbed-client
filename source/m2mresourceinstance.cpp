@@ -239,7 +239,7 @@ bool M2MResourceInstance::set_value(const uint8_t *value,
         if(_value) {
             _value_length = value_length;
             if( value_changed ) { //
-                if (_resource_type == M2MResourceInstance::STRING) {
+                if (_resource_type == M2MResourceInstance::STRING || _resource_type == M2MResourceInstance::OPAQUE) {
                     M2MReportHandler *report_handler = M2MBase::report_handler();
                     if(report_handler && is_under_observation()) {
                         report_handler->set_notification_trigger();
@@ -305,7 +305,7 @@ bool M2MResourceInstance::is_value_changed(const uint8_t* value, const uint32_t 
         changed = true;
     } else {
         if (_value) {
-            if (strcmp((char*)value, (char*)_value) != 0) {
+            if (memcmp((void*)value, (void*)_value, (size_t)value_len) != 0) {
                 changed = true;
             }
         }
