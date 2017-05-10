@@ -201,3 +201,8 @@ TEST(M2MNsdlInterface, get_nsdl_execution_timer)
 {
     m2m_nsdl_interface->test_get_nsdl_execution_timer();
 }
+
+TEST(M2MNsdlInterface, coap_error)
+{
+    m2m_nsdl_interface->test_coap_error();
+}

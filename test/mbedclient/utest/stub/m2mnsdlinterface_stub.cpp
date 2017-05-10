@@ -200,7 +200,7 @@ bool M2MNsdlInterface::validate_security_object()
 
 }
 
-void M2MNsdlInterface::handle_bootstrap_error()
+void M2MNsdlInterface::handle_bootstrap_error(const char *reason)
 {
 
 }

@@ -192,6 +192,12 @@ public:
      */
     virtual const String internal_endpoint_name() const;
 
+    /**
+     * @brief Return error description for the latest error code
+     * @return Error description string
+     */
+    virtual const char *error_description() const;
+
 protected: // From M2MNsdlObserver
 
     virtual void coap_message_ready(uint8_t *data_ptr,
@@ -210,7 +216,7 @@ protected: // From M2MNsdlObserver
 
     virtual void bootstrap_wait(M2MSecurity *security_object);
 
-    virtual void bootstrap_error();
+    virtual void bootstrap_error(const char *reason);
 
     virtual void coap_data_processed();
 
@@ -435,6 +441,7 @@ private:
     M2MConnectionHandler        _connection_handler;
     M2MNsdlInterface            _nsdl_interface;
     M2MSecurity                 *_security;
+    char                        _error_description[64];
 
     friend class Test_M2MInterfaceImpl;
 

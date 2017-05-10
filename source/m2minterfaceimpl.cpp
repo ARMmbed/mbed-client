@@ -15,6 +15,7 @@
  */
 #include <assert.h>
 #include <stdlib.h>
+#include <stdio.h>
 #include "include/m2minterfaceimpl.h"
 #include "include/eventdata.h"
 #include "mbed-client/m2minterfaceobserver.h"
@@ -104,6 +105,7 @@ void M2MInterfaceImpl::bootstrap(M2MSecurity *security)
 #ifndef MBED_CLIENT_DISABLE_BOOTSTRAP_FEATURE
     tr_debug("M2MInterfaceImpl::bootstrap(M2MSecurity *security) - IN");
     if(!security) {
+        strncpy(_error_description,ERROR_REASON_1, sizeof(_error_description));
         _observer.error(M2MInterface::InvalidParameters);
         return;
     }
@@ -133,10 +135,12 @@ void M2MInterfaceImpl::bootstrap(M2MSecurity *security)
     END_TRANSITION_MAP(&data)
     if(_event_ignored) {
         _event_ignored = false;
+        strncpy(_error_description,ERROR_REASON_2, sizeof(_error_description));
         _observer.error(M2MInterface::NotAllowed);
     }
     tr_debug("M2MInterfaceImpl::bootstrap(M2MSecurity *security) - OUT");
 #else
+    strncpy(_error_description,ERROR_REASON_3, sizeof(_error_description));
     _observer.error(M2MInterface::NotAllowed);
 #endif //MBED_CLIENT_DISABLE_BOOTSTRAP_FEATURE
 }
@@ -152,6 +156,7 @@ void M2MInterfaceImpl::register_object(M2MSecurity *security, const M2MObjectLis
 {
     tr_debug("M2MInterfaceImpl::register_object - IN");
     if(!security) {
+        strncpy(_error_description,ERROR_REASON_4, sizeof(_error_description));
         _observer.error(M2MInterface::InvalidParameters);
         return;
     }
@@ -184,6 +189,7 @@ void M2MInterfaceImpl::register_object(M2MSecurity *security, const M2MObjectLis
     END_TRANSITION_MAP(&data)
     if(_event_ignored) {
         _event_ignored = false;
+        strncpy(_error_description,ERROR_REASON_5, sizeof(_error_description));
         _observer.error(M2MInterface::NotAllowed);
     }
     tr_debug("M2MInterfaceImpl::register_object - OUT");
@@ -238,6 +244,7 @@ void M2MInterfaceImpl::unregister_object(M2MSecurity* /*security*/)
     END_TRANSITION_MAP(NULL)
     if(_event_ignored) {
         _event_ignored = false;
+        strncpy(_error_description,ERROR_REASON_6, sizeof(_error_description));
         _observer.error(M2MInterface::NotAllowed);
     }
     tr_debug("M2MInterfaceImpl::unregister_object - OUT");
@@ -280,7 +287,8 @@ void M2MInterfaceImpl::coap_message_ready(uint8_t *data_ptr,
             internal_event( STATE_IDLE);
             tr_error("M2MInterfaceImpl::coap_message_ready() - M2MInterface::NetworkError");
             if (!_reconnecting) {
-                _observer.error(M2MInterface::NetworkError);
+            strncpy(_error_description,ERROR_REASON_7, sizeof(_error_description));
+            _observer.error(M2MInterface::NetworkError);
             }
         }
     }
@@ -316,6 +324,7 @@ void M2MInterfaceImpl::registration_error(uint8_t error_code, bool retry)
     } else {
         _security = NULL;
         internal_event(STATE_IDLE);
+        strncpy(_error_description,ERROR_REASON_8, sizeof(_error_description));
         _observer.error((M2MInterface::Error)error_code);
     }
 }
@@ -353,15 +362,17 @@ void M2MInterfaceImpl::bootstrap_wait(M2MSecurity *security_object)
 #endif //MBED_CLIENT_DISABLE_BOOTSTRAP_FEATURE
 }
 
-void M2MInterfaceImpl::bootstrap_error()
+void M2MInterfaceImpl::bootstrap_error(const char *reason)
 {
 #ifndef MBED_CLIENT_DISABLE_BOOTSTRAP_FEATURE
-    tr_debug("M2MInterfaceImpl::bootstrap_error()");
+    tr_debug("M2MInterfaceImpl::bootstrap_error(%s)", reason);
     _bootstrapped = false;
     if (_registration_flow_timer) {
         _registration_flow_timer->stop_timer();
     }
-    socket_error(M2MInterface::BootstrapFailed, true);
+    internal_event(STATE_IDLE);
+    strncpy(_error_description,reason,sizeof(_error_description));
+    _observer.error(M2MInterface::BootstrapFailed);
 #endif //MBED_CLIENT_DISABLE_BOOTSTRAP_FEATURE
 }
 
@@ -404,25 +415,33 @@ void M2MInterfaceImpl::socket_error(uint8_t error_code, bool retry)
     }
 #endif
 
+    char error_code_des[24];
+    memset(error_code_des, 0 , 24);
     M2MInterface::Error error = M2MInterface::ErrorNone;
     switch (error_code) {
     case M2MConnectionHandler::SSL_CONNECTION_ERROR:
         error = M2MInterface::SecureConnectionFailed;
+        memcpy(error_code_des,"SecureConnectionFailed", 23);
         break;
     case M2MConnectionHandler::DNS_RESOLVING_ERROR:
         error = M2MInterface::DnsResolvingFailed;
+        memcpy(error_code_des,"DnsResolvingFailed", 20);
         break;
     case M2MConnectionHandler::SOCKET_READ_ERROR:
         error = M2MInterface::NetworkError;
+        memcpy(error_code_des,"NetworkError", 12);
         break;
     case M2MConnectionHandler::SOCKET_SEND_ERROR:
         error = M2MInterface::NetworkError;
+        memcpy(error_code_des,"NetworkError", 12);
         break;
     case M2MConnectionHandler::SSL_HANDSHAKE_ERROR:
         error = M2MInterface::SecureConnectionFailed;
+        memcpy(error_code_des,"SecureConnectionFailed", 23);
         break;
     case M2MConnectionHandler::SOCKET_ABORT:
         error = M2MInterface::NetworkError;
+        memcpy(error_code_des,"NetworkError", 12);
         break;
     default:
         break;
@@ -437,6 +456,7 @@ void M2MInterfaceImpl::socket_error(uint8_t error_code, bool retry)
         else {
             tr_debug("M2MInterfaceImpl::socket_error - start again");
             _retry_count = 1;
+            snprintf(_error_description, sizeof(_error_description), ERROR_REASON_9, error_code_des);
             _observer.error(error);
         }
 #else
@@ -469,6 +489,7 @@ void M2MInterfaceImpl::socket_error(uint8_t error_code, bool retry)
         _security = NULL;
         _reconnecting = false;
         _reconnection_state = M2MInterfaceImpl::None;
+        snprintf(_error_description, sizeof(_error_description), ERROR_REASON_10, error_code_des);
         _observer.error(error);
         internal_event(STATE_IDLE);
     }
@@ -535,7 +556,13 @@ void M2MInterfaceImpl::timer_expired(M2MTimerObserver::Type type)
         }
     }
     else if (M2MTimerObserver::BootstrapFlowTimer == type) {
-        bootstrap_error();
+#ifndef MBED_CLIENT_DISABLE_BOOTSTRAP_FEATURE
+        _bootstrapped = false;
+        if (_registration_flow_timer) {
+            _registration_flow_timer->stop_timer();
+        }
+        socket_error(M2MInterface::BootstrapFailed, true);
+#endif //MBED_CLIENT_DISABLE_BOOTSTRAP_FEATURE
     }
     else if (M2MTimerObserver::RegistrationFlowTimer == type) {
         registration_error(M2MInterface::Timeout, true);
@@ -601,6 +628,7 @@ void M2MInterfaceImpl::state_bootstrap(EventData *data)
         if (error != M2MInterface::ErrorNone) {
             tr_error("M2MInterfaceImpl::state_bootstrap - set error as M2MInterface::InvalidParameters");
             internal_event(STATE_IDLE);
+            strncpy(_error_description,ERROR_REASON_11, sizeof(_error_description));
             _observer.error(error);
         }
     } else {
@@ -650,6 +678,7 @@ void M2MInterfaceImpl::state_bootstrap_address_resolved( EventData *data)
             // If resource creation fails then inform error to application
             tr_error("M2MInterfaceImpl::state_bootstrap_address_resolved : M2MInterface::InvalidParameters");
             internal_event(STATE_IDLE);
+            strncpy(_error_description,ERROR_REASON_12, sizeof(_error_description));
             _observer.error(M2MInterface::InvalidParameters);
         }
     }
@@ -721,6 +750,7 @@ void M2MInterfaceImpl::state_register(EventData *data)
         if (error != M2MInterface::ErrorNone) {
             tr_error("M2MInterfaceImpl::state_register - set error as M2MInterface::InvalidParameters");
             internal_event(STATE_IDLE);
+            strncpy(_error_description,ERROR_REASON_13, sizeof(_error_description));
             _observer.error(error);
         }
     } else {
@@ -789,6 +819,7 @@ void M2MInterfaceImpl::state_register_address_resolved( EventData *data)
                     // If resource creation fails then inform error to application
                     tr_error("M2MInterfaceImpl::state_register_address_resolved : M2MInterface::InvalidParameters");
                     internal_event(STATE_IDLE);
+                    strncpy(_error_description,ERROR_REASON_14, sizeof(_error_description));
                     _observer.error(M2MInterface::InvalidParameters);
                 }
                 break;
@@ -828,6 +859,7 @@ void M2MInterfaceImpl::state_update_registration(EventData *data)
             if(!_nsdl_interface.send_register_message()) {
                 tr_error("M2MInterfaceImpl::state_update_registration : M2MInterface::InvalidParameters");
                 internal_event(STATE_IDLE);
+                strncpy(_error_description,ERROR_REASON_1, sizeof(_error_description));
                 _observer.error(M2MInterface::InvalidParameters);
             }
         }
@@ -841,6 +873,7 @@ void M2MInterfaceImpl::state_unregister( EventData */*data*/)
     if(!_nsdl_interface.send_unregister_message()) {
         tr_error("M2MInterfaceImpl::state_unregister : M2MInterface::NotRegistered");
         internal_event(STATE_IDLE);
+        strncpy(_error_description,ERROR_REASON_16, sizeof(_error_description));
         _observer.error(M2MInterface::NotRegistered);
     }
 }
@@ -892,6 +925,7 @@ void M2MInterfaceImpl::state_coap_data_received( EventData *data)
                                                   event->_size,
                                                   &address)) {
            tr_error("M2MInterfaceImpl::state_coap_data_received : M2MInterface::ResponseParseFailed");
+           strncpy(_error_description,ERROR_REASON_17, sizeof(_error_description));
             _observer.error(M2MInterface::ResponseParseFailed);
         }
     }
@@ -1035,6 +1069,7 @@ void M2MInterfaceImpl::state_function( uint8_t current_state, EventData* data )
 void M2MInterfaceImpl::start_register_update(M2MUpdateRegisterData *data) {
     tr_debug("M2MInterfaceImpl::start_register_update - IN");
     if(!data || (data->_lifetime != 0 && (data->_lifetime < MINIMUM_REGISTRATION_TIME))) {
+        strncpy(_error_description,ERROR_REASON_18, sizeof(_error_description));
         _observer.error(M2MInterface::InvalidParameters);
     }
     if (_reconnecting) {
@@ -1065,6 +1100,7 @@ void M2MInterfaceImpl::start_register_update(M2MUpdateRegisterData *data) {
     if(_event_ignored) {
         _event_ignored = false;
         if (!_reconnecting)
+            strncpy(_error_description,ERROR_REASON_19, sizeof(_error_description));
             _observer.error(M2MInterface::NotAllowed);
     }
 }
@@ -1076,4 +1112,9 @@ void M2MInterfaceImpl::update_endpoint(String &name) {
 const String M2MInterfaceImpl::internal_endpoint_name() const
 {
     return _nsdl_interface.internal_endpoint_name();
+}
+
+const char *M2MInterfaceImpl::error_description() const
+{
+    return _error_description;
 }

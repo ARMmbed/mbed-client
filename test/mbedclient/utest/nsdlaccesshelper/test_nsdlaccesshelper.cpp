@@ -60,7 +60,7 @@ public:
             boot_wait = true;
         }
     }
-    void bootstrap_error(){
+    void bootstrap_error(const char */*reason*/){
         boot_error = true;
     }
 

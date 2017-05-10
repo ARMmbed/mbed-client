@@ -98,6 +98,8 @@ public:
 
     void test_get_nsdl_execution_timer();
 
+    void test_coap_error();
+
     M2MNsdlInterface* nsdl;
 
     TestObserver *observer;

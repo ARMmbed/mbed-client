@@ -394,8 +394,16 @@ private:
 
     /**
      * @brief Handle bootstrap errors.
+     * @param reason, Reason for Bootstrap failure.
     */
-    void handle_bootstrap_error();
+    void handle_bootstrap_error(const char *reason);
+
+    /**
+     * @brief Handle different coap errors.
+     * @param coap_header, CoAP structure.
+     * @return Error reason.
+    */
+    const char *coap_error(sn_coap_hdr_s *coap_header);
 
     /**
      * @brief Claim
