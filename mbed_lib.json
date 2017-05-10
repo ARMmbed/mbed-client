@@ -8,7 +8,7 @@
         "disable-bootstrap-feature": null,
         "coap-disable-obs-feature":null,
         "reconnection-loop": 1,
-        "sn-coap-max-blockwise-payload-size" : 0,
+        "sn-coap-max-blockwise-payload-size" : null,
         "sn-coap-duplication-max-msgs-count": null,
         "sn-coap-max-incoming-message-size": null,
         "sn-coap-resending-queue-size-msgs": null,
