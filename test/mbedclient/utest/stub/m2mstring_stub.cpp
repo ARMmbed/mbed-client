@@ -380,7 +380,7 @@ uint32_t itoa_c (int64_t n, char s[])
     return i;
 }
 
-uint8_t* String::convert_integer_to_array(int64_t value, uint8_t &size, uint8_t *array, uint32_t array_size)
+uint8_t* String::convert_integer_to_array(int64_t value, uint8_t &size, const uint8_t *array, const uint32_t array_size)
 {
     uint8_t* buffer = NULL;
     size = 0;
@@ -417,7 +417,7 @@ uint8_t* String::convert_integer_to_array(int64_t value, uint8_t &size, uint8_t 
     return buffer;
 }
 
-int64_t String::convert_array_to_integer(uint8_t *value, uint32_t size)
+int64_t String::convert_array_to_integer(const uint8_t *value, const uint32_t size)
 {
     int64_t temp_64 = 0;
     for (int i = size - 1; i >= 0; i--) {

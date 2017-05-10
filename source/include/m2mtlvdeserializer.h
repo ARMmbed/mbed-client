@@ -51,7 +51,6 @@ public :
      */
     static bool is_object_instance(const uint8_t *tlv);
 
-
     /**
      * This method checks whether the given binary encodes a resource or
      * something else. It returns <code>true</code> if bits 7-6 of the first
@@ -111,7 +110,7 @@ public :
      * @return Object instance id or resource id.
      */
     static uint16_t instance_id(const uint8_t *tlv);
-
+  
 private:
 
     static M2MTLVDeserializer::Error deserialize_object_instances(const uint8_t *tlv,
