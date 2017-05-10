@@ -73,10 +73,14 @@ bool M2MNsdlInterface::create_bootstrap_resource(sn_nsdl_addr_s *)
     return m2mnsdlinterface_stub::bool_value;
 }
 
-bool M2MNsdlInterface::send_register_message(uint8_t*,
+void M2MNsdlInterface::set_server_address(uint8_t*,
                                              uint8_t,
                                              const uint16_t,
                                              sn_nsdl_addr_type_e)
+{
+}
+
+bool M2MNsdlInterface::send_register_message()
 {
     return m2mnsdlinterface_stub::bool_value;
 }
@@ -143,7 +147,7 @@ void M2MNsdlInterface::timer_expired(M2MTimerObserver::Type)
 {
 }
 
-void M2MNsdlInterface::observation_to_be_sent(M2MBase *, uint16_t, Vector<uint16_t>, bool)
+void M2MNsdlInterface::observation_to_be_sent(M2MBase *, uint16_t, const Vector<uint16_t>&, bool)
 {
 }
 
@@ -219,6 +223,7 @@ void M2MNsdlInterface::update_endpoint(const String &name)
 {
 
 }
+
 const String M2MNsdlInterface::internal_endpoint_name() const
 {
     return *m2mnsdlinterface_stub::string_value;

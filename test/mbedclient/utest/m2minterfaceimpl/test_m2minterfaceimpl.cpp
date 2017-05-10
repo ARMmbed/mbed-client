@@ -366,12 +366,22 @@ void Test_M2MInterfaceImpl::test_update_registration()
     CHECK(impl->_current_state == M2MInterfaceImpl::STATE_UPDATE_REGISTRATION);
 
     impl->_current_state = M2MInterfaceImpl::STATE_REGISTERED;
-    m2mnsdlinterface_stub::bool_value = false;
+    m2mnsdlinterface_stub::bool_value = true;
     impl->update_registration(NULL,120);
 
     CHECK(impl->_current_state == M2MInterfaceImpl::STATE_UPDATE_REGISTRATION);
 
     impl->_current_state = M2MInterfaceImpl::STATE_IDLE;
+
+    impl->_current_state = M2MInterfaceImpl::STATE_REGISTERED;
+
+    m2mnsdlinterface_stub::bool_value = false;
+    impl->update_registration(NULL,120);
+
+    CHECK(impl->_current_state == M2MInterfaceImpl::STATE_IDLE);
+    CHECK(observer->error_occured == true);
+
+    m2mnsdlinterface_stub::bool_value = true;
     impl->update_registration(NULL,120);
 
     CHECK(impl->_current_state == M2MInterfaceImpl::STATE_IDLE);
@@ -397,14 +407,14 @@ void Test_M2MInterfaceImpl::test_update_registration()
     M2MObjectList list;
     list.push_back(object);
     impl->_current_state = M2MInterfaceImpl::STATE_REGISTERED;
-    m2mnsdlinterface_stub::bool_value = false;
+    m2mnsdlinterface_stub::bool_value = true;
     impl->update_registration(NULL, list);
 
     CHECK(impl->_current_state == M2MInterfaceImpl::STATE_UPDATE_REGISTRATION);
     list.clear();
 
     impl->_current_state = M2MInterfaceImpl::STATE_REGISTERED;
-    m2mnsdlinterface_stub::bool_value = false;
+    m2mnsdlinterface_stub::bool_value = true;
     impl->update_registration(NULL, list);
 
     CHECK(impl->_current_state == M2MInterfaceImpl::STATE_UPDATE_REGISTRATION);
@@ -675,6 +685,13 @@ void Test_M2MInterfaceImpl::test_address_ready()
 
     impl->address_ready(*address,server_type,server_port);
     CHECK(impl->_current_state == M2MInterfaceImpl::STATE_REGISTER_ADDRESS_RESOLVED);
+
+    impl->_reconnection_state = M2MInterfaceImpl::WithUpdate;
+    impl->address_ready(*address,server_type,server_port);
+    CHECK(impl->_current_state == M2MInterfaceImpl::STATE_UPDATE_REGISTRATION);
+
+
+    impl->_reconnection_state = M2MInterfaceImpl::None;
 
     address->_stack = M2MInterface::LwIP_IPv6;
     m2mnsdlinterface_stub::bool_value = false;

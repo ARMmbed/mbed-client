@@ -22,17 +22,17 @@ void m2mtlvserializer_stub::clear()
     uint8_value = NULL;
 }
 
-uint8_t* M2MTLVSerializer::serialize(M2MObjectInstanceList object_instance_list, uint32_t &)
+uint8_t* M2MTLVSerializer::serialize(const M2MObjectInstanceList &object_instance_list, uint32_t &)
 {
     return m2mtlvserializer_stub::uint8_value;
 }
 
-uint8_t* M2MTLVSerializer::serialize(M2MResourceList resource_list, uint32_t &size)
+uint8_t* M2MTLVSerializer::serialize(const M2MResourceList &resource_list, uint32_t &size)
 {
     return m2mtlvserializer_stub::uint8_value;
 }
 
-uint8_t* M2MTLVSerializer::serialize(M2MResource *, uint32_t &)
+uint8_t* M2MTLVSerializer::serialize(const M2MResource *, uint32_t &)
 {
     return m2mtlvserializer_stub::uint8_value;
 }

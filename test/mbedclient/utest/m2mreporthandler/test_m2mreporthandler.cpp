@@ -28,7 +28,7 @@ public:
 
     Observer() : visited(false) {}
     virtual ~Observer(){}
-    void observation_to_be_sent(m2m::Vector<uint16_t>,bool){
+    virtual void observation_to_be_sent(const m2m::Vector<uint16_t>&,bool){
         visited = true;
     }
     bool visited;

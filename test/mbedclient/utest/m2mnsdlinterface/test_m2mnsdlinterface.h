@@ -38,6 +38,8 @@ public:
 
     void test_create_bootstrap_resource();
 
+    void test_set_server_address();
+
     void test_send_register_message();
 
     void test_send_update_registration();

@@ -112,17 +112,21 @@ public:
     bool create_bootstrap_resource(sn_nsdl_addr_s *address);
 
     /**
-     * @brief Sends the register message to the server.
+     * @brief Sets the register message to the server.
      * @param address M2MServer address.
      * @param address_length M2MServer address length.
      * @param port M2MServer port.
      * @param address_type IP Address type.
+    */
+    void set_server_address(uint8_t* address,
+                            uint8_t address_length,
+                            const uint16_t port,
+                            sn_nsdl_addr_type_e address_type);
+    /**
+     * @brief Sends the register message to the server.
      * @return  true if register sent successfully else false.
     */
-    bool send_register_message(uint8_t* address,
-                               uint8_t address_length,
-                               const uint16_t port,
-                               sn_nsdl_addr_type_e address_type);
+    bool send_register_message();
 
     /**
      * @brief Sends the update registration message to the server.
@@ -239,7 +243,7 @@ protected: // from M2MObservationHandler
 
     virtual void observation_to_be_sent(M2MBase *object,
                                         uint16_t obs_number,
-                                        m2m::Vector<uint16_t> changed_instance_ids,
+                                        const m2m::Vector<uint16_t> &changed_instance_ids,
                                         bool send_object = false);
 
     virtual void resource_to_be_deleted(M2MBase* base);
@@ -311,7 +315,7 @@ private:
 
     void send_object_observation(M2MObject *object,
                                  uint16_t obs_number,
-                                 m2m::Vector<uint16_t> changed_instance_ids,
+                                 const m2m::Vector<uint16_t> &changed_instance_ids,
                                  bool send_object);
 
     void send_object_instance_observation(M2MObjectInstance *object_instance,

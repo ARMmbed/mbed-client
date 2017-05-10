@@ -23,7 +23,6 @@
 #include "mbed-client/m2mstringbuffer.h"
 #include "include/m2mtlvserializer.h"
 #include "include/m2mtlvdeserializer.h"
-#include "include/nsdllinker.h"
 #include "include/m2mreporthandler.h"
 #include "mbed-trace/mbed_trace.h"
 
@@ -279,13 +278,12 @@ bool M2MObjectInstance::remove_resource(const char *resource_name)
                 // Resource found and deleted.
                 res = *it;
                 delete res;
-                res = NULL;
                 _resource_list.erase(pos);
                 success = true;
                 break;
              }
          }
-     }
+    }
     return success;
 }
 
@@ -310,7 +308,6 @@ bool M2MObjectInstance::remove_resource_instance(const String &resource_name,
                     for ( ; itr != _resource_list.end(); itr++, pos++ ) {
                         if(strcmp((*itr)->name(),resource_name.c_str()) == 0) {
                             delete res;
-                            res = NULL;
                             _resource_list.erase(pos);
                             break;
                         }

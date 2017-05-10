@@ -36,7 +36,7 @@ Because there can be only one instance of M2MDevice, it is a static class and yo
 
 `M2MDevice::delete_instance();`
 
-Check the [M2MDevice class documentation](https://docs.mbed.com/docs/mbed-client-guide/en/latest/api/m2mdevice_8h.html) to see how to configure the Device Object. 
+Check the [M2MDevice class documentation](https://docs.mbed.com/docs/mbed-client-guide/en/latest/api/m2mdevice_8h.html) to see how to configure the Device Object.
 
 #### Security Object
 
@@ -196,7 +196,7 @@ object_instance->set_coap_content_type(120);
 
 <span class="tips">**Tip:** In future version, we will introduce support for the JSON content types.</span>
 
-There are additional APIs that provide getter and remove functions for Object Instances in the `M2MObjectInstance` class; [check the API documentation](https://docs.mbed.com/docs/mbed-client-guide/en/latest/api/classM2MObjectInstance.html) for their usage. 
+There are additional APIs that provide getter and remove functions for Object Instances in the `M2MObjectInstance` class; [check the API documentation](https://docs.mbed.com/docs/mbed-client-guide/en/latest/api/m2mobjectinstance_8h.html) for their usage. 
 
 ## How to create and configure Resources and Resource Instances
 
@@ -229,7 +229,7 @@ There are direct APIs to create and set values for the Device Resources. You can
 
 Where `instance_id` is the Resource Instance ID, for example `/3/0/11/0`.
 
-Check the [M2MDevice API documentation](https://docs.mbed.com/docs/mbed-client-guide/en/latest/api/classM2MDevice.html) to find which enums are supported for `integer` or `string` value types.
+Check the [M2MDevice API documentation](https://docs.mbed.com/docs/mbed-client-guide/en/latest/api/m2mdevice_8h.html) to find which enums are supported for `integer` or `string` value types.
 
 There are other APIs in the `M2MDevice` class that you can use to set, remove and modify new values for the resources.
 
@@ -290,7 +290,7 @@ To create and set values for the optional Resources that take an integer value:
 `security_object->create_resource(M2MSecurity::M2MServerSMSNumber, 123542323);`
 
 
-Check the [M2MSecurity API documentation](https://docs.mbed.com/docs/mbed-client-guide/en/latest/api/classM2MSecurity.html) to find which enums are supported for `integer`, `string` or `uint8_t*` value types.
+Check the [M2MSecurity API documentation](https://docs.mbed.com/docs/mbed-client-guide/en/latest/api/m2msecurity_8h.html) to find which enums are supported for `integer`, `string` or `uint8_t*` value types.
 
 There are more APIs in the `M2MSecurity` class that you can use to set, remove and modify Resource values.
 

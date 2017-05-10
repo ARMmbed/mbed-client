@@ -17,6 +17,7 @@
 #include "include/nsdllinker.h"
 #include "mbed-client/m2mconstants.h"
 #include <stdlib.h>
+#include "common_functions.h"
 
 #define TRACE_GROUP "mClt"
 
@@ -24,25 +25,25 @@
 #define MAX_TLV_ID_SIZE 2
 #define TLV_TYPE_SIZE 1
 
-uint8_t* M2MTLVSerializer::serialize(M2MObjectInstanceList object_instance_list, uint32_t &size)
+uint8_t* M2MTLVSerializer::serialize(const M2MObjectInstanceList &object_instance_list, uint32_t &size)
 {
     return serialize_object_instances(object_instance_list, size);
 }
 
-uint8_t* M2MTLVSerializer::serialize(M2MResourceList resource_list, uint32_t &size)
+uint8_t* M2MTLVSerializer::serialize(const M2MResourceList &resource_list, uint32_t &size)
 {
     bool valid = true;
     return serialize_resources(resource_list, size,valid);
 }
 
-uint8_t* M2MTLVSerializer::serialize(M2MResource *resource, uint32_t &size)
+uint8_t* M2MTLVSerializer::serialize(const M2MResource *resource, uint32_t &size)
 {
     uint8_t* data = NULL;
     serialize(resource, data, size);
     return data;
 }
 
-uint8_t* M2MTLVSerializer::serialize_object_instances(M2MObjectInstanceList object_instance_list, uint32_t &size)
+uint8_t* M2MTLVSerializer::serialize_object_instances(const M2MObjectInstanceList &object_instance_list, uint32_t &size)
 {
     uint8_t *data = NULL;
 
@@ -57,7 +58,7 @@ uint8_t* M2MTLVSerializer::serialize_object_instances(M2MObjectInstanceList obje
     return data;
 }
 
-uint8_t* M2MTLVSerializer::serialize_resources(M2MResourceList resource_list, uint32_t &size, bool &valid)
+uint8_t* M2MTLVSerializer::serialize_resources(const M2MResourceList &resource_list, uint32_t &size, bool &valid)
 {
     uint8_t *data = NULL;
 
@@ -88,7 +89,7 @@ uint8_t* M2MTLVSerializer::serialize_resources(M2MResourceList resource_list, ui
     return data;
 }
 
-bool M2MTLVSerializer::serialize(uint16_t id, M2MObjectInstance *object_instance, uint8_t *&data, uint32_t &size)
+bool M2MTLVSerializer::serialize(uint16_t id, const M2MObjectInstance *object_instance, uint8_t *&data, uint32_t &size)
 {
     uint8_t *resource_data = NULL;
     uint32_t resource_size = 0;
@@ -111,7 +112,7 @@ bool M2MTLVSerializer::serialize(uint16_t id, M2MObjectInstance *object_instance
     return success;
 }
 
-bool M2MTLVSerializer::serialize(M2MResource *resource, uint8_t *&data, uint32_t &size)
+bool M2MTLVSerializer::serialize(const M2MResource *resource, uint8_t *&data, uint32_t &size)
 {
     bool success = false;
     if(resource->name_id() != -1) {
@@ -122,17 +123,24 @@ bool M2MTLVSerializer::serialize(M2MResource *resource, uint8_t *&data, uint32_t
     return success;
 }
 
-bool M2MTLVSerializer::serialize_resource(M2MResource *resource, uint8_t *&data, uint32_t &size)
+bool M2MTLVSerializer::serialize_resource(const M2MResource *resource, uint8_t *&data, uint32_t &size)
 {
     bool success = false;
     if(resource->name_id() != -1) {
-        success = serialize_TILV(TYPE_RESOURCE, resource->name_id(),
+        if ( (resource->resource_instance_type() == M2MResourceInstance::INTEGER) ||
+             (resource->resource_instance_type() == M2MResourceInstance::BOOLEAN) ||
+             (resource->resource_instance_type() == M2MResourceInstance::TIME) ) {
+            success = serialize_TLV_binary_int(resource, TYPE_RESOURCE, resource->name_id(), data, size);
+        }
+        else {
+             success = serialize_TILV(TYPE_RESOURCE, resource->name_id(),
                       resource->value(), resource->value_length(), data, size);
+        }
     }
     return success;
 }
 
-bool M2MTLVSerializer::serialize_multiple_resource(M2MResource *resource, uint8_t *&data, uint32_t &size)
+bool M2MTLVSerializer::serialize_multiple_resource(const M2MResource *resource, uint8_t *&data, uint32_t &size)
 {
     bool success = false;
     uint8_t *nested_data = NULL;
@@ -164,10 +172,44 @@ bool M2MTLVSerializer::serialize_multiple_resource(M2MResource *resource, uint8_
     return success;
 }
 
-bool M2MTLVSerializer::serialize_resource_instance(uint16_t id, M2MResourceInstance *resource, uint8_t *&data, uint32_t &size)
+bool M2MTLVSerializer::serialize_resource_instance(uint16_t id, const M2MResourceInstance *resource, uint8_t *&data, uint32_t &size)
 {
-    return serialize_TILV(TYPE_RESOURCE_INSTANCE, id, resource->value(), resource->value_length(), data, size);
+    bool success;
+
+    if ( (resource->resource_instance_type() == M2MResourceInstance::INTEGER) ||
+         (resource->resource_instance_type() == M2MResourceInstance::BOOLEAN) ||
+         (resource->resource_instance_type() == M2MResourceInstance::TIME) ) {
+        success=serialize_TLV_binary_int(resource, TYPE_RESOURCE_INSTANCE, id, data, size);
+        }
+    else {
+        success=serialize_TILV(TYPE_RESOURCE_INSTANCE, id, resource->value(), resource->value_length(), data, size);
+    }
+
+    return success;
 }
+
+/* See, OMA-TS-LightweightM2M-V1_0-20170208-A, Appendix C,
+ * Data Types, Integer, Boolean and TY
+ * Yime, TLV Format */
+bool M2MTLVSerializer::serialize_TLV_binary_int(const M2MResourceInstance *resource, uint8_t type, uint16_t id, uint8_t *&data, uint32_t &size)
+{
+        int64_t valueInt = resource->get_value_int();
+        uint32_t buffer_size;
+        /* max len 8 bytes */
+        uint8_t buffer[8];
+
+        if (resource->resource_instance_type() == M2MResourceInstance::BOOLEAN) {
+            buffer_size = 1;
+            buffer[0] = valueInt;
+        }
+        else {
+            buffer_size = 8;
+            common_write_64_bit(valueInt, buffer);
+        }
+
+        return serialize_TILV(type, id, buffer, buffer_size, data, size);
+}
+
 
 bool M2MTLVSerializer::serialize_TILV(uint8_t type, uint16_t id, uint8_t *value, uint32_t value_length, uint8_t *&data, uint32_t &size)
 {

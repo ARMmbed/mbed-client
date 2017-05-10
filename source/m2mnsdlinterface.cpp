@@ -278,10 +278,16 @@ bool M2MNsdlInterface::create_bootstrap_resource(sn_nsdl_addr_s *address)
 #endif //MBED_CLIENT_DISABLE_BOOTSTRAP_FEATURE
 }
 
-bool M2MNsdlInterface::send_register_message(uint8_t* address,
-                                             uint8_t address_length,
-                                             const uint16_t port,
-                                             sn_nsdl_addr_type_e address_type)
+void M2MNsdlInterface::set_server_address(uint8_t* address,
+                                          uint8_t address_length,
+                                          const uint16_t port,
+                                          sn_nsdl_addr_type_e address_type)
+{
+    tr_debug("M2MNsdlInterface::set_server_address()");
+    set_NSP_address(_nsdl_handle, address, address_length, port, address_type);
+}
+
+bool M2MNsdlInterface::send_register_message()
 {
     tr_debug("M2MNsdlInterface::send_register_message()");
     _nsdl_exceution_timer->stop_timer();
@@ -289,14 +295,12 @@ bool M2MNsdlInterface::send_register_message(uint8_t* address,
                                        M2MTimerObserver::NsdlExecution,
                                        false);
     bool success = false;
-    if(set_NSP_address(_nsdl_handle, address, address_length, port, address_type) == 0) {
-        if (_server_address) {
-            success = parse_and_send_uri_query_parameters();
-        }
-        // If URI parsing fails or there is no parameters, try again without parameters
-        if (!success) {
-            success = sn_nsdl_register_endpoint(_nsdl_handle,_endpoint, NULL, 0) != 0;
-        }
+    if (_server_address) {
+        success = parse_and_send_uri_query_parameters();
+    }
+    // If URI parsing fails or there is no parameters, try again without parameters
+    if (!success) {
+        success = sn_nsdl_register_endpoint(_nsdl_handle,_endpoint, NULL, 0) != 0;
     }
     return success;
 }
@@ -752,7 +756,7 @@ void M2MNsdlInterface::timer_expired(M2MTimerObserver::Type type)
 
 void M2MNsdlInterface::observation_to_be_sent(M2MBase *object,
                                               uint16_t obs_number,
-                                              m2m::Vector<uint16_t> changed_instance_ids,
+                                              const m2m::Vector<uint16_t> &changed_instance_ids,
                                               bool send_object)
 {
     claim_mutex();
@@ -880,7 +884,7 @@ bool M2MNsdlInterface::create_nsdl_object_structure(M2MObject *object)
     tr_debug("M2MNsdlInterface::create_nsdl_object_structure()");
     bool success = false;
     if(object) {
-        M2MObjectInstanceList instance_list = object->instances();
+        const M2MObjectInstanceList &instance_list = object->instances();
         tr_debug("M2MNsdlInterface::create_nsdl_object_structure - Object Instance count %d", instance_list.size());
         if(!instance_list.empty()) {
            M2MObjectInstanceList::const_iterator it;
@@ -902,7 +906,7 @@ bool M2MNsdlInterface::create_nsdl_object_instance_structure(M2MObjectInstance *
     tr_debug("M2MNsdlInterface::create_nsdl_object_instance_structure()");
     bool success = false;
     if( object_instance) {
-        M2MResourceList res_list = object_instance->resources();
+        const M2MResourceList &res_list = object_instance->resources();
         tr_debug("M2MNsdlInterface::create_nsdl_object_instance_structure - ResourceBase count %d", res_list.size());
         if(!res_list.empty()) {
             M2MResourceList::const_iterator it;
@@ -928,7 +932,7 @@ bool M2MNsdlInterface::create_nsdl_resource_structure(M2MResource *res,
     if(res) {
         // if there are multiple instances supported
         if(multiple_instances) {
-            M2MResourceInstanceList res_list = res->resource_instances();
+            const M2MResourceInstanceList &res_list = res->resource_instances();
             tr_debug("M2MNsdlInterface::create_nsdl_resource_structure - ResourceInstance count %d", res_list.size());
             if(!res_list.empty()) {
                 M2MResourceInstanceList::const_iterator it;
@@ -1011,7 +1015,7 @@ M2MBase* M2MNsdlInterface::find_resource(const String &object_name,
                                          uint8_t token_len)
 {
     tr_debug("M2MNsdlInterface::find_resource(object level) - name (%s)", object_name.c_str());
-    tr_debug("M2MNsdlInterface::find_resource - token (%.*s)", token_len, token);
+    tr_debug("M2MNsdlInterface::find_resource - token (%s)", tr_array(token, token_len));
     M2MBase *object = NULL;
     if(!_object_list.empty()) {
         M2MObjectList::const_iterator it;
@@ -1029,7 +1033,7 @@ M2MBase* M2MNsdlInterface::find_resource(const String &object_name,
                 uint8_t *stored_token = 0;
                 uint32_t stored_token_length = 0;
                 (*it)->get_observation_token(stored_token, stored_token_length);
-                tr_debug("M2MNsdlInterface::find_resource(object level) - stored token (%.*s)", stored_token_length, stored_token);
+                tr_debug("M2MNsdlInterface::find_resource(object level) - stored token (%s)", tr_array(stored_token, stored_token_length));
                 if (stored_token) {
                     if (stored_token_length == token_len &&
                             memcmp(token, stored_token, token_len) == 0) {
@@ -1059,7 +1063,7 @@ M2MBase* M2MNsdlInterface::find_resource(const M2MObject *object,
     tr_debug("M2MNsdlInterface::find_resource(object instance level) - name (%s)", object_instance.c_str());
     M2MBase *instance = NULL;
     if(object) {
-        M2MObjectInstanceList list = object->instances();
+        const M2MObjectInstanceList &list = object->instances();
         if(!list.empty()) {
             M2MObjectInstanceList::const_iterator it;
             it = list.begin();
@@ -1074,9 +1078,9 @@ M2MBase* M2MNsdlInterface::find_resource(const M2MObject *object,
                 } else {
                     uint8_t *stored_token = 0;
                     uint32_t stored_token_length = 0;
-                    tr_debug("M2MNsdlInterface::find_resource(object instance level) - in token (%.*s)", token_len, token);
+                    tr_debug("M2MNsdlInterface::find_resource(object instance level) - in token (%s)", tr_array(token, token_len));
                     (*it)->get_observation_token(stored_token, stored_token_length);
-                    tr_debug("M2MNsdlInterface::find_resource(object instance level) - stored token (%.*s)", stored_token_length, stored_token);
+                    tr_debug("M2MNsdlInterface::find_resource(object instance level) - stored token (%s)", tr_array(stored_token, stored_token_length));
                     if (stored_token) {
                         if (stored_token_length == token_len &&
                                 memcmp(token, stored_token, token_len) == 0) {
@@ -1106,7 +1110,7 @@ M2MBase* M2MNsdlInterface::find_resource(const M2MObjectInstance *object_instanc
     tr_debug("M2MNsdlInterface::find_resource(resource level) - name (%s)", resource_instance.c_str());
     M2MBase *instance = NULL;
     if(object_instance) {
-        M2MResourceList list = object_instance->resources();
+        const M2MResourceList &list = object_instance->resources();
         if(!list.empty()) {
             M2MResourceList::const_iterator it;
             it = list.begin();
@@ -1126,9 +1130,9 @@ M2MBase* M2MNsdlInterface::find_resource(const M2MObjectInstance *object_instanc
                 } else {
                     uint8_t *stored_token = 0;
                     uint32_t stored_token_length = 0;
-                    tr_debug("M2MNsdlInterface::find_resource(resource level) - in token (%.*s)", token_len, token);
+                    tr_debug("M2MNsdlInterface::find_resource(resource level) - in token (%s)", tr_array(token, token_len));
                     (*it)->get_observation_token(stored_token, stored_token_length);
-                    tr_debug("M2MNsdlInterface::find_resource(resource level) - stored token (%.*s)", stored_token_length, stored_token);
+                    tr_debug("M2MNsdlInterface::find_resource(resource level) - stored token (%s)", tr_array(stored_token, stored_token_length));
                     if (stored_token) {
                         if (stored_token_length == token_len &&
                                 memcmp(token, stored_token, token_len) == 0) {
@@ -1156,7 +1160,7 @@ M2MBase* M2MNsdlInterface::find_resource(const M2MResource *resource,
     M2MBase *res = NULL;
     if(resource) {
         if(resource->supports_multiple_instances()) {
-            M2MResourceInstanceList list = resource->resource_instances();
+            const M2MResourceInstanceList &list = resource->resource_instances();
             if(!list.empty()) {
                 M2MResourceInstanceList::const_iterator it;
                 it = list.begin();
@@ -1238,7 +1242,7 @@ M2MInterface::Error M2MNsdlInterface::interface_error(sn_coap_hdr_s *coap_header
 
 void M2MNsdlInterface::send_object_observation(M2MObject *object,
                                                uint16_t obs_number,
-                                               m2m::Vector<uint16_t> changed_instance_ids,
+                                               const m2m::Vector<uint16_t> &changed_instance_ids,
                                                bool send_object)
 {
     tr_debug("M2MNsdlInterface::send_object_observation");
@@ -1728,7 +1732,7 @@ const String M2MNsdlInterface::internal_endpoint_name() const
         // Get last part of the location path.
         // In mbed Cloud environment full path is /rd/accountid/internal_endpoint
         int location = temp.find_last_of('/') + 1;
-        iep.append((const char*)_nsdl_handle->ep_information_ptr->location_ptr + location,
+        iep.append_raw((const char*)_nsdl_handle->ep_information_ptr->location_ptr + location,
                    _nsdl_handle->ep_information_ptr->location_len - location);
     }
     return iep;

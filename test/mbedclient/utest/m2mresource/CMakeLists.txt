@@ -14,6 +14,7 @@ add_executable(m2mresource
         "../stub/m2mtlvserializer_stub.cpp"
         "../stub/nsdlaccesshelper_stub.cpp"
         "../stub/common_stub.cpp"
+        "../stub/mbed_trace_stub.cpp"
         "m2mresourcetest.cpp"
         "test_m2mresource.cpp"
         "../../../../source/m2mstringbufferbase.cpp"

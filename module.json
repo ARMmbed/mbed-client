@@ -1,6 +1,6 @@
 {
   "name": "mbed-client",
-  "version": "2.1.1",
+  "version": "2.2.1",
   "description": "mbed Client C++ API",
   "keywords": [],
   "author": "Yogesh Pande <yogesh.pande@arm.com>",
@@ -8,7 +8,8 @@
   "license": "Apache-2.0",
   "dependencies": {
     "mbed-client-c": "ARMmbed/mbed-client-c#mbed-cloud-client-rel1.2",
-    "mbed-trace": ">=0.2.0,<2.0.0"
+    "mbed-trace": ">=0.2.0,<2.0.0",
+    "nanostack-libservice": "^3.0.0"
   },
   "targetDependencies": {
     "arm": {

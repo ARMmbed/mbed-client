@@ -40,7 +40,7 @@ class M2MObservationHandler
      */
     virtual void observation_to_be_sent(M2MBase *object,
                                         uint16_t obs_number,
-                                        m2m::Vector<uint16_t> changed_instance_ids,
+                                        const m2m::Vector<uint16_t> &changed_instance_ids,
                                         bool send_object = false) = 0;
 
     /**
