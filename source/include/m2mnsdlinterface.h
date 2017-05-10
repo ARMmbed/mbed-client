@@ -21,6 +21,7 @@
 #include "mbed-client/m2minterface.h"
 #include "mbed-client/m2mtimerobserver.h"
 #include "mbed-client/m2mobservationhandler.h"
+#include "mbed-client/m2mtimer.h"
 #include "mbed-client/m2mbase.h"
 #include "mbed-client/m2mserver.h"
 #include "include/nsdllinker.h"
@@ -33,7 +34,6 @@ class M2MResource;
 class M2MResourceInstance;
 class M2MNsdlObserver;
 class M2MServer;
-class M2MTimer;
 class M2MConnectionHandler;
 
 typedef Vector<M2MObject *> M2MObjectList;
@@ -235,6 +235,8 @@ public:
      */
     void set_server_address(const char *server_address);
 
+    M2MTimer &get_nsdl_execution_timer();
+
 protected: // from M2MTimerObserver
 
     virtual void timer_expired(M2MTimerObserver::Type type);
@@ -409,6 +411,8 @@ private:
     */
     bool parse_and_send_uri_query_parameters();
 
+    void start_nsdl_execution_timer();
+
 private:
 
     M2MNsdlObserver                         &_observer;
@@ -417,8 +421,8 @@ private:
     nsdl_s                                  *_nsdl_handle;
     M2MSecurity                             *_security; // Not owned
     M2MServer                               _server;
-    M2MTimer                                *_nsdl_exceution_timer;
-    M2MTimer                                *_registration_timer;
+    M2MTimer                                _nsdl_exceution_timer;
+    M2MTimer                                _registration_timer;
     M2MConnectionHandler                    &_connection_handler;
     sn_nsdl_addr_s                          _sn_nsdl_address;
     String                                  _endpoint_name;
@@ -427,6 +431,7 @@ private:
     char                                    *_server_address; // BS or M2M address
     bool                                    _unregister_ongoing;
     bool                                    _identity_accepted;
+    bool                                    _nsdl_exceution_timer_running;
 
 friend class Test_M2MNsdlInterface;
 
