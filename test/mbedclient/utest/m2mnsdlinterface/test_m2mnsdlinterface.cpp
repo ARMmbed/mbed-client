@@ -1929,3 +1929,9 @@ void Test_M2MNsdlInterface::test_internal_endpoint_name()
     free(nsdl->_nsdl_handle->ep_information_ptr);
     free(nsdl->_nsdl_handle);
 }
+
+void Test_M2MNsdlInterface::test_get_nsdl_execution_timer()
+{
+    M2MTimer &timer = nsdl->get_nsdl_execution_timer();
+    (void)timer;
+}
