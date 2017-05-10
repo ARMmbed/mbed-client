@@ -251,3 +251,8 @@ const String M2MNsdlInterface::internal_endpoint_name() const
 {
     return *m2mnsdlinterface_stub::string_value;
 }
+
+M2MTimer &M2MNsdlInterface::get_nsdl_execution_timer()
+{
+    return _nsdl_exceution_timer;
+}
