@@ -301,14 +301,14 @@ void Test_M2MNsdlInterface::test_send_register_message()
     uriqueryparser_stub::int_value = 3;
     nsdl->set_server_address(address);
 
-    CHECK(nsdl->send_register_message(NULL,4,100,SN_NSDL_ADDRESS_TYPE_IPV6) == false);
+    CHECK(nsdl->send_register_message() == false);
 
     common_stub::uint_value = 10;
-    CHECK(nsdl->send_register_message(NULL,4,100,SN_NSDL_ADDRESS_TYPE_IPV6) == true);
+    CHECK(nsdl->send_register_message() == true);
 
     // Query param count set to 0
     uriqueryparser_stub::int_value = 0;
-    CHECK(nsdl->send_register_message(NULL,4,100,SN_NSDL_ADDRESS_TYPE_IPV6) == true);
+    CHECK(nsdl->send_register_message() == true);
 }
 
 void Test_M2MNsdlInterface::test_send_update_registration()
