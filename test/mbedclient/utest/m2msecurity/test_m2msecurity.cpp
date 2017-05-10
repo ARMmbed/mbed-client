@@ -29,6 +29,7 @@ Test_M2MSecurity::Test_M2MSecurity()
     m2mresource_stub::bool_value = true;
     m2mobjectinstance_stub::create_resource = new M2MResource(*m2mobject_stub::inst,
                                                               "name",
+                                                              M2MBase::Dynamic,
                                                               "type",
                                                               M2MBase::STRING,
                                                               false,
@@ -56,6 +57,7 @@ void Test_M2MSecurity::test_create_resource_int()
 {
     m2mobjectinstance_stub::create_resource = new M2MResource(*m2mobject_stub::inst,
                                                               "name",
+                                                              M2MBase::Dynamic,
                                                               "type",
                                                               M2MBase::STRING,
                                                               false,
@@ -84,6 +86,7 @@ void Test_M2MSecurity::test_delete_resource()
     m2mresourceinstance_stub::bool_value = true;
     m2mobjectinstance_stub::resource = new M2MResource(*m2mobject_stub::inst,
                                                       "name",
+                                                      M2MBase::Dynamic,
                                                       "type",
                                                       M2MBase::STRING,
                                                       false,
@@ -114,6 +117,7 @@ void Test_M2MSecurity::test_set_resource_value_string()
     m2mresourceinstance_stub::bool_value = true;
     m2mobjectinstance_stub::resource = new M2MResource(*m2mobject_stub::inst,
                                                        "name",
+                                                      M2MBase::Dynamic,
                                                        "type",
                                                        M2MBase::STRING,
                                                        false,
@@ -142,6 +146,7 @@ void Test_M2MSecurity::test_set_resource_value_int()
     m2mresourceinstance_stub::bool_value = true;
     m2mobjectinstance_stub::resource = new M2MResource(*m2mobject_stub::inst,
                                                        "name",
+                                                       M2MBase::Dynamic,
                                                        "type",
                                                        M2MBase::STRING,
                                                        false,
@@ -174,6 +179,7 @@ void Test_M2MSecurity::test_set_resource_value_buffer()
 
     m2mobjectinstance_stub::resource = new M2MResource(*m2mobject_stub::inst,
                                                        "name",
+                                                       M2MBase::Dynamic,
                                                        "type",
                                                        M2MBase::STRING,
                                                        false,
@@ -212,6 +218,7 @@ void Test_M2MSecurity::test_resource_value_int()
 
     m2mobjectinstance_stub::resource = new M2MResource(*m2mobject_stub::inst,
                                                        "name",
+                                                       M2MBase::Dynamic,
                                                        "type",
                                                        M2MBase::STRING,
                                                        false,
@@ -263,6 +270,7 @@ void Test_M2MSecurity::test_resource_value_string()
 
     m2mobjectinstance_stub::resource = new M2MResource(*m2mobject_stub::inst,
                                                        "name",
+                                                       M2MBase::Dynamic,
                                                        "type",
                                                        M2MBase::STRING,
                                                        false,
@@ -303,6 +311,7 @@ void Test_M2MSecurity::test_resource_value_buffer()
 
     m2mobjectinstance_stub::resource = new M2MResource(*m2mobject_stub::inst,
                                                        "name",
+                                                       M2MBase::Dynamic,
                                                        "type",
                                                        M2MBase::STRING,
                                                        false,
@@ -342,6 +351,7 @@ void Test_M2MSecurity::test_is_resource_present()
 {
     m2mobjectinstance_stub::resource = new M2MResource(*m2mobject_stub::inst,
                                                        "name",
+                                                       M2MBase::Dynamic,
                                                        "type",
                                                        M2MBase::STRING,
                                                        false,
@@ -359,6 +369,7 @@ void Test_M2MSecurity::test_total_resource_count()
 {
     M2MResource *res = new M2MResource(*m2mobject_stub::inst,
                                        "name",
+                                       M2MBase::Dynamic,
                                        "type",
                                        M2MBase::STRING,
                                        false,
@@ -367,6 +378,7 @@ void Test_M2MSecurity::test_total_resource_count()
     m2mobjectinstance_stub::resource_list.push_back(res);
     M2MResource *res2 = new M2MResource(*m2mobject_stub::inst,
                                         "name",
+                                        M2MBase::Dynamic,
                                         "type",
                                         M2MBase::STRING,
                                         false,
@@ -386,6 +398,7 @@ void Test_M2MSecurity::test_m2m_server_constructor()
 {
     m2mobjectinstance_stub::create_resource = new M2MResource(*m2mobject_stub::inst,
                                                               "name",
+                                                              M2MBase::Dynamic,
                                                               "type",
                                                               M2MBase::STRING,
                                                               false,

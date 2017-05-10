@@ -104,6 +104,7 @@ Test_M2MResourceInstance::Test_M2MResourceInstance()
     m2mresource_stub::object_instance = new M2MObjectInstance(*obj, "name", "", "");
     m2mobjectinstance_stub::resource = new M2MResource(*m2mresource_stub::object_instance,
                                                        "name",
+                                                       M2MBase::Dynamic,
                                                        "type",
                                                        M2MBase::STRING,
                                                        false,
@@ -111,6 +112,7 @@ Test_M2MResourceInstance::Test_M2MResourceInstance()
 
     resource_instance = new M2MResourceInstance(*m2mobjectinstance_stub::resource,
                           "name",
+                          M2MBase::Dynamic,
                           "resource_type",
                           M2MBase::STRING,
                           "name",
@@ -174,6 +176,7 @@ void Test_M2MResourceInstance::test_static_resource_instance()
     m2mbase_stub::mode_value = M2MBase::Dynamic;
     M2MResourceInstance *res = new M2MResourceInstance(*m2mobjectinstance_stub::resource,
                                                        "name1",
+                                                       M2MBase::Dynamic,
                                                        "type1",
                                                        M2MBase::INTEGER,
                                                        value, (uint32_t)sizeof(value),
@@ -190,6 +193,7 @@ void Test_M2MResourceInstance::test_static_resource_instance()
 
     res = new M2MResourceInstance(*m2mobjectinstance_stub::resource,
                                                        "name1",
+                                                       M2MBase::Dynamic,
                                                        "type1",
                                                        M2MBase::INTEGER,
                                                        value, (uint32_t)sizeof(value),

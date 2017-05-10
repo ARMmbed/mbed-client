@@ -65,6 +65,7 @@ void Test_M2MTLVSerializer::test_serialize_object_out_of_memory()
 
     M2MResource* resource = new M2MResource(*instance,
                                             "1",
+                                            M2MBase::Dynamic,
                                             "type",
                                             M2MBase::INTEGER,
                                             false,
@@ -86,6 +87,7 @@ void Test_M2MTLVSerializer::test_serialize_object_out_of_memory()
 
     M2MResourceInstance* res_instance =  new M2MResourceInstance(*m2mobjectinstance_stub::resource,
                                                                  "1",
+                                                                 M2MBase::Dynamic,
                                                                  "type",
                                                                  M2MBase::STRING,
                                                                  "1",
@@ -94,6 +96,7 @@ void Test_M2MTLVSerializer::test_serialize_object_out_of_memory()
 
     M2MResourceInstance* res_instance_1 =  new M2MResourceInstance(*m2mobjectinstance_stub::resource,
                                                                    "2",
+                                                                   M2MBase::Dynamic,
                                                                    "type",
                                                                    M2MBase::STRING,
                                                                    "2",
@@ -157,6 +160,7 @@ void Test_M2MTLVSerializer::test_serialize_object()
 
     M2MResource* resource = new M2MResource(*instance,
                                             "1",
+                                            M2MBase::Dynamic,
                                             "type",
                                             M2MBase::INTEGER,
                                             false,
@@ -176,6 +180,7 @@ void Test_M2MTLVSerializer::test_serialize_object()
 
     M2MResourceInstance* res_instance =  new M2MResourceInstance(*m2mobjectinstance_stub::resource,
                                                                  "1",
+                                                                 M2MBase::Dynamic,
                                                                  "type",
                                                                  M2MBase::STRING,
                                                                  "1",
@@ -184,6 +189,7 @@ void Test_M2MTLVSerializer::test_serialize_object()
 
     M2MResourceInstance* res_instance_1 =  new M2MResourceInstance(*m2mobjectinstance_stub::resource,
                                                                    "2",
+                                                                   M2MBase::Dynamic,
                                                                    "type",
                                                                    M2MBase::STRING,
                                                                    "2",
@@ -266,6 +272,7 @@ void Test_M2MTLVSerializer::test_serialize_object_instance()
     m2mbase_stub::name_id_value = 0;
     M2MResource* resource = new M2MResource(*instance,
                                             "1",
+                                            M2MBase::Dynamic,
                                             "type",
                                             M2MBase::STRING,
                                             false,
@@ -273,6 +280,7 @@ void Test_M2MTLVSerializer::test_serialize_object_instance()
 
     M2MResourceInstance* res_instance = new M2MResourceInstance(*resource,
                                                                 "1",
+                                                                M2MBase::Dynamic,
                                                                 "type",
                                                                 M2MBase::STRING,
                                                                 "1",
@@ -320,6 +328,7 @@ void Test_M2MTLVSerializer::test_serialize_resource()
     m2mbase_stub::name_id_value = 0;
     M2MResource* resource = new M2MResource(*instance,
                                             "1",
+                                            M2MBase::Dynamic,
                                             "type",
                                             M2MBase::INTEGER,
                                             false,
@@ -327,6 +336,7 @@ void Test_M2MTLVSerializer::test_serialize_resource()
 
     M2MResourceInstance* res_instance = new M2MResourceInstance(*resource,
                                                                 "1",
+                                                                M2MBase::Dynamic,
                                                                 "type",
                                                                 M2MBase::INTEGER,
                                                                 "1",
@@ -374,6 +384,7 @@ void Test_M2MTLVSerializer::test_serialize_resource_instance()
     m2mbase_stub::name_id_value = 0;
     M2MResource* resource = new M2MResource(*instance,
                                             "1",
+                                            M2MBase::Dynamic,
                                             "type",
                                             M2MBase::INTEGER,
                                             false,
@@ -381,6 +392,7 @@ void Test_M2MTLVSerializer::test_serialize_resource_instance()
 
     M2MResourceInstance* res_instance = new M2MResourceInstance(*resource,
                                                                 "1",
+                                                                M2MBase::Dynamic,
                                                                 "type",
                                                                 M2MBase::INTEGER,
                                                                 "1",
@@ -429,6 +441,7 @@ void Test_M2MTLVSerializer::test_serialize_resource_instance_out_of_memory()
     m2mbase_stub::name_id_value = 0;
     M2MResource* resource = new M2MResource(*instance,
                                             "1",
+                                            M2MBase::Dynamic,
                                             "type",
                                             M2MBase::INTEGER,
                                             false,
@@ -436,6 +449,7 @@ void Test_M2MTLVSerializer::test_serialize_resource_instance_out_of_memory()
 
     M2MResourceInstance* res_instance = new M2MResourceInstance(*resource,
                                                                 "1",
+                                                                M2MBase::Dynamic,
                                                                 "type",
                                                                 M2MBase::INTEGER,
                                                                 "1",

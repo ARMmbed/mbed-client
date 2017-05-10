@@ -12,6 +12,7 @@ add_executable(nsdlaccesshelper
         "../stub/m2mconnectionsecurity_stub.cpp"
         "../stub/m2mserver_stub.cpp"
         "../stub/m2mbase_stub.cpp"
+        "../stub/m2mresourcebase_stub.cpp"
         "../stub/m2mobject_stub.cpp"
         "../stub/m2mstringbufferbase_stub.cpp"
 )

@@ -198,12 +198,13 @@ void Test_M2MNsdlInterface::test_create_nsdl_list_structure()
 
     M2MResource* create_resource = new M2MResource(*instance,
                                                    *name,
+                                                    M2MBase::Dynamic,
                                                    *name,
                                                    M2MBase::INTEGER,
                                                    false,
                                                    "name");
 
-    M2MResourceInstance* res_instance = new M2MResourceInstance(*create_resource, *name, *name,
+    M2MResourceInstance* res_instance = new M2MResourceInstance(*create_resource, *name, M2MBase::Dynamic, *name,
                                        M2MBase::INTEGER, (char*)name->c_str(), false, false);
 
     m2mobject_stub::instance_list.clear();
@@ -687,7 +688,7 @@ void Test_M2MNsdlInterface::test_received_from_server_callback()
     coap_header->token_ptr = token;
     coap_header->token_len = 4;
 
-    M2MResource res2(*m2mobject_stub::inst, "test","test",M2MBase::STRING,false, "test");
+    M2MResource res2(*m2mobject_stub::inst, "test",M2MBase::Dynamic,"test",M2MBase::STRING,false, "test");
     m2mbase_stub::object_token = token;
     m2mbase_stub::object_token_len = 4;
     res2.set_observation_token(token, 4);
@@ -736,10 +737,10 @@ void Test_M2MNsdlInterface::test_received_from_server_callback()
     uint8_t security[] = {"0"};
     coap_header->uri_path_ptr = security;
     coap_header->uri_path_len = sizeof(security);
-    M2MResource res(*m2mobject_stub::inst,"test","test",M2MBase::STRING,false,"test");
+    M2MResource res(*m2mobject_stub::inst,"test",M2MBase::Dynamic,"test",M2MBase::STRING,false,"test");
     m2mobjectinstance_stub::resource_list.push_back(&res);
     observer->boot_error = false;
-    m2msecurity_stub::resource = new M2MResource(*m2mobject_stub::inst,"1","type",M2MBase::STRING,false,"1");
+    m2msecurity_stub::resource = new M2MResource(*m2mobject_stub::inst,"1", M2MBase::Dynamic,"type",M2MBase::STRING,false,"1");
     CHECK(0 == nsdl->received_from_server_callback(handle,coap_header,address));
     CHECK(observer->boot_error == true);
 
@@ -1083,6 +1084,7 @@ void Test_M2MNsdlInterface::test_resource_callback_put()
 
     M2MResource* create_resource = new M2MResource(*instance,
                                                    "res",
+                                                   M2MBase::Dynamic,
                                                    "res",
                                                    M2MBase::INTEGER,
                                                    false,
@@ -1167,6 +1169,7 @@ void Test_M2MNsdlInterface::test_resource_callback_post()
     M2MObjectInstance* instance = new M2MObjectInstance(*object,"name","","");
     M2MResource* create_resource = new M2MResource(*instance,
                                                    "name",
+                                                   M2MBase::Dynamic,
                                                    "name",
                                                    M2MBase::INTEGER,
                                                    false,
@@ -1413,15 +1416,15 @@ void Test_M2MNsdlInterface::test_observation_to_be_sent()
     m2mbase_stub::clear();
     M2MObject *object = new M2MObject("name", "name");
     M2MObjectInstance* instance = new M2MObjectInstance(*object, "name", "", "");
-    M2MResource *res = new M2MResource(*instance,"res", "res", M2MBase::INTEGER,false, "res");
-    M2MResource *res2 = new M2MResource(*instance,"res2", "res2", M2MBase::INTEGER,false, "res2");
+    M2MResource *res = new M2MResource(*instance,"res", M2MBase::Dynamic,"res", M2MBase::INTEGER,false, "res");
+    M2MResource *res2 = new M2MResource(*instance,"res2", M2MBase::Dynamic,"res2", M2MBase::INTEGER,false, "res2");
 
 
     M2MResourceInstance* res_instance = new M2MResourceInstance(*res,
-                                                                "res", "res",
+                                                                "res", M2MBase::Dynamic, "res",
                                                                 M2MBase::INTEGER,"",false, false);
     M2MResourceInstance* res_instance_1 = new M2MResourceInstance(*res2,
-                                                                  "res2", "res2",
+                                                                  "res2", M2MBase::Dynamic, "res2",
                                                                   M2MBase::INTEGER,"",false, false);
     m2mresource_stub::list.clear();
     m2mresource_stub::list.push_back(res_instance);
@@ -1553,6 +1556,7 @@ void Test_M2MNsdlInterface::test_value_updated()
     M2MObjectInstance *object_instance = new M2MObjectInstance(*object, "name", "", "");
     M2MResource *resource = new M2MResource(*object_instance,
                                             "resource_name",
+                                            M2MBase::Dynamic,
                                             "resource_type",
                                             M2MBase::INTEGER,
                                             false,
@@ -1560,6 +1564,7 @@ void Test_M2MNsdlInterface::test_value_updated()
 
     M2MResourceInstance *resource_instance = new M2MResourceInstance(*resource,
                                                                      "resource_name",
+                                                                     M2MBase::Dynamic,
                                                                      "resource_type",
                                                                      M2MBase::INTEGER,
                                                                      "",false, false);
@@ -1693,6 +1698,7 @@ void Test_M2MNsdlInterface::test_find_resource()
     M2MObjectInstance *object_instance = new M2MObjectInstance(*object,"name/0", "","name/0");
     M2MResource *resource = new M2MResource(*object_instance,
                                             "resource_name",
+                                            M2MBase::Dynamic,
                                             "resource_type",
                                             M2MBase::INTEGER,
                                             false,
@@ -1702,6 +1708,7 @@ void Test_M2MNsdlInterface::test_find_resource()
 
     M2MResourceInstance *resource_instance = new M2MResourceInstance(*resource,
                                                                      "0",
+                                                                     M2MBase::Dynamic,
                                                                      "resource_type",
                                                                      M2MBase::INTEGER,"0",false, false);
 
@@ -1791,6 +1798,7 @@ void Test_M2MNsdlInterface::test_send_delayed_response()
 
     M2MResource* resource = new M2MResource(*instance,
                                             "name",
+                                            M2MBase::Dynamic,
                                             "name",
                                             M2MBase::INTEGER,
                                             false,

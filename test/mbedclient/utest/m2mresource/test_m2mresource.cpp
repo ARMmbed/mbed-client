@@ -56,7 +56,9 @@ Test_M2MResource::Test_M2MResource()
     object = new M2MObject("name", "name");
     object_instance = new M2MObjectInstance(*object, "name", "type", "");
     resource = new M2MResource(*object_instance,
-                               "name","resource_type",
+                               "name",
+                               M2MBase::Dynamic,
+                               "resource_type",
                                M2MBase::INTEGER,false, "name");
 }
 
@@ -74,6 +76,7 @@ void Test_M2MResource::test_static_resource()
     u_int8_t value[] = {"value"};
     M2MResource *res = new M2MResource(*m2mobject_stub::inst,
                                        "name",
+                                      M2MBase::Dynamic,
                                       "resource_type",
                                       M2MBase::INTEGER,
                                       value,
@@ -88,6 +91,7 @@ void Test_M2MResource::test_base_type()
     u_int8_t value[] = {"value"};
     M2MResource resource(*m2mobject_stub::inst,
                                        "name",
+                                      M2MBase::Dynamic,
                                       "resource_type",
                                       M2MBase::INTEGER,
                                       value,
@@ -119,6 +123,7 @@ void Test_M2MResource::test_handle_observation_attribute()
 
     M2MResourceInstance *res = new M2MResourceInstance(*m2mobjectinstance_stub::resource,
                                                                               "name",
+                                                                              M2MBase::Dynamic,
                                                                               "type",
                                                                               M2MBase::INTEGER,
                                                                               "name",
@@ -147,6 +152,7 @@ void Test_M2MResource::test_add_resource_instance()
 {
     M2MResourceInstance *res = new M2MResourceInstance(*m2mobjectinstance_stub::resource,
                                                                               "name",
+                                                                              M2MBase::Dynamic,
                                                                               "type",
                                                                               M2MBase::INTEGER,
                                                                               "name",
@@ -160,6 +166,7 @@ void Test_M2MResource::test_remove_resource_instance()
 {
     M2MResourceInstance *res = new M2MResourceInstance(*m2mobjectinstance_stub::resource,
                                                                               "name",
+                                                                              M2MBase::Dynamic,
                                                                               "type",
                                                                               M2MBase::STRING,
                                                                               "name",
@@ -173,6 +180,7 @@ void Test_M2MResource::test_resource_instance()
 {
     M2MResourceInstance *res = new M2MResourceInstance(*m2mobjectinstance_stub::resource,
                                                                               "name",
+                                                                              M2MBase::Dynamic,
                                                                               "type",
                                                                               M2MBase::STRING,
                                                                               "name",
@@ -186,6 +194,7 @@ void Test_M2MResource::test_resource_instances()
 {
     M2MResourceInstance *res = new M2MResourceInstance(*m2mobjectinstance_stub::resource,
                                                                               "name",
+                                                                              M2MBase::Dynamic,
                                                                               "type",
                                                                               M2MBase::STRING,
                                                                               "name",
@@ -200,6 +209,7 @@ void Test_M2MResource::test_resource_instance_count()
 {
     M2MResourceInstance *res = new M2MResourceInstance(*m2mobjectinstance_stub::resource,
                                                                               "name",
+                                                                              M2MBase::Dynamic,
                                                                               "type",
                                                                               M2MBase::STRING,
                                                                               "name",
@@ -213,6 +223,7 @@ void Test_M2MResource::test_add_observation_level()
 {
     M2MResourceInstance *res = new M2MResourceInstance(*m2mobjectinstance_stub::resource,
                                                                               "name",
+                                                                              M2MBase::Dynamic,
                                                                               "type",
                                                                               M2MBase::STRING,
                                                                               "name",
@@ -229,6 +240,7 @@ void Test_M2MResource::test_remove_observation_level()
 {
     M2MResourceInstance *res = new M2MResourceInstance(*m2mobjectinstance_stub::resource,
                                                                               "name",
+                                                                              M2MBase::Dynamic,
                                                                               "type",
                                                                               M2MBase::STRING,
                                                                               "name",
@@ -283,6 +295,7 @@ void Test_M2MResource::test_handle_get_request()
 
     M2MResourceInstance *res_instance = new M2MResourceInstance(*m2mobjectinstance_stub::resource,
                                                                               "name",
+                                                                              M2MBase::Dynamic,
                                                                               "res2",
                                                                               M2MBase::STRING,
                                                                               "name",
@@ -291,6 +304,7 @@ void Test_M2MResource::test_handle_get_request()
 
     M2MResourceInstance *res_instance_1 = new M2MResourceInstance(*m2mobjectinstance_stub::resource,
                                                                               "name",
+                                                                              M2MBase::Dynamic,
                                                                               "res2",
                                                                               M2MBase::STRING,
                                                                               "name",

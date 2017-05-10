@@ -127,7 +127,12 @@ bool M2MResource::send_delayed_post_response()
     bool success = false;
     if(_delayed_response) {
         success = true;
-        observation_handler()->send_delayed_response(this);
+        // At least on some unit tests the resource object is not fully constructed, which would
+        // cause issues if the observation_handler is NULL. So do the check before dereferencing pointer.
+        M2MObservationHandler* obs = observation_handler();
+        if (obs) {
+            obs->send_delayed_response(this);
+        }
     }
     return success;
 }

@@ -6,6 +6,7 @@ add_executable(m2mbase
     "../stub/m2mreporthandler_stub.cpp"
     "../stub/nsdlaccesshelper_stub.cpp"
     "../stub/m2mresource_stub.cpp"
+    "../stub/m2mresourcebase_stub.cpp"
     "../stub/m2mresourceinstance_stub.cpp"
     "../stub/m2mstring_stub.cpp"
     "../stub/m2mtimer_stub.cpp"

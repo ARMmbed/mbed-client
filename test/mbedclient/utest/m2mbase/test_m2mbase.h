@@ -40,8 +40,22 @@ class Test_M2MBase : M2MBase
 {
 public:
     Test_M2MBase(char* path, Handler *handler);
+    Test_M2MBase(const String &name,
+            M2MBase::Mode mode,
+#ifndef DISABLE_RESOURCE_TYPE
+            const String &resource_type,
+#endif
+            char *path,
+            bool external_blockwise_store,
+            bool multiple_instance,
+            M2MBase::DataType type = M2MBase::OBJLINK);
+
+    Test_M2MBase(const lwm2m_parameters_s* s);
 
     virtual ~Test_M2MBase();
+
+    virtual M2MObservationHandler* observation_handler() const;
+    virtual void set_observation_handler(M2MObservationHandler *handler);
 
     void test_copy_constructor();
 

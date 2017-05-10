@@ -167,7 +167,7 @@ void M2MNsdlInterface::remove_object(M2MBase *)
 {
 }
 
-nsdl_s* M2MNsdlInterface::get_nsdl_handle()
+nsdl_s* M2MNsdlInterface::get_nsdl_handle() const
 {
     return (nsdl_s*) m2mnsdlinterface_stub::void_value;
 }

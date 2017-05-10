@@ -55,6 +55,7 @@ M2MObject::M2MObject(const M2MBase::lwm2m_parameters_s* static_res)
 
 M2MObject::~M2MObject()
 {
+    free_resources();
 }
 
 M2MObjectInstance* M2MObject::create_object_instance(uint16_t instance_id)
@@ -80,6 +81,16 @@ const M2MObjectInstanceList& M2MObject::instances() const
 uint16_t M2MObject::instance_count() const
 {
     return m2mobject_stub::int_value;
+}
+
+M2MObservationHandler* M2MObject::observation_handler() const
+{
+    //return _parent.observation_handler();
+    return NULL;
+}
+
+void M2MObject::set_observation_handler(M2MObservationHandler *handler)
+{
 }
 
 void M2MObject::add_observation_level(M2MBase::Observation)

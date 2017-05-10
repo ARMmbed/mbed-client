@@ -94,20 +94,22 @@ M2MBase::M2MBase(const String& resource_name,
                  M2MBase::DataType type)
 :
   _sn_resource(NULL),
-  _report_handler(NULL),
-  _observation_handler(NULL)
+  _report_handler(NULL)
 {
 
 }
 
 M2MBase::M2MBase(const lwm2m_parameters_s *s):
     _sn_resource((lwm2m_parameters_s*) s),
-    _report_handler(NULL),
-    _observation_handler(NULL)
+    _report_handler(NULL)
 {
 }
 
 M2MBase::~M2MBase()
+{
+}
+
+void M2MBase::free_resources()
 {
 }
 
@@ -197,8 +199,9 @@ void M2MBase::remove_observation_level(M2MBase::Observation)
 }
 
 void M2MBase::set_under_observation(bool /*observed*/,
-                                   M2MObservationHandler */*handler*/)
+                                   M2MObservationHandler *handler)
 {
+    m2mbase_stub::observe = handler;
 }
 
 void M2MBase::set_observation_token(const uint8_t */*token*/,
@@ -217,7 +220,7 @@ M2MBase::Observation M2MBase::observation_level() const
 }
 
 void M2MBase::get_observation_token(uint8_t *&token,
-                                    uint32_t &length)
+                                    uint32_t &length) const
 {
     length = 0;
     if(token) {
@@ -253,6 +256,11 @@ void M2MBase::get_observation_token(uint8_t *&token,
             memcpy((uint8_t *)token, (uint8_t *)m2mbase_stub::object_token, length);
         }
     }
+}
+
+void M2MBase::get_observation_token(const uint8_t *&token, uint32_t &token_length) const
+{
+    // XXX
 }
 
 void M2MBase::set_base_type(M2MBase::BaseType type)
@@ -328,7 +336,7 @@ M2MReportHandler* M2MBase::report_handler() const
     return m2mbase_stub::report;
 }
 
-M2MObservationHandler* M2MBase::observation_handler()
+M2MObservationHandler* M2MBase::observation_handler() const
 {
     return m2mbase_stub::observe;
 }

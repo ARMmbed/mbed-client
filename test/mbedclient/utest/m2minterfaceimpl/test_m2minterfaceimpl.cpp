@@ -78,6 +78,9 @@ public:
      "a",
      false,
      false){}
+
+     virtual M2MObservationHandler* observation_handler() const {};
+     virtual void set_observation_handler(M2MObservationHandler*) {};
 };
 
 Test_M2MInterfaceImpl::Test_M2MInterfaceImpl()

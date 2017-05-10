@@ -62,7 +62,7 @@ M2MBase::Observation M2MReportHandler::observation_level() const
     return m2mreporthandler_stub::observation_level_value;
 }
 
-void M2MReportHandler::get_observation_token(uint8_t *&token, uint32_t &length)
+void M2MReportHandler::get_observation_token(uint8_t *&token, uint32_t &length) const
 {
 //    length = 0;
 //    if(token) {
@@ -74,6 +74,9 @@ void M2MReportHandler::get_observation_token(uint8_t *&token, uint32_t &length)
 //        length = m2mreporthandler_stub::token_len;
 //        memcpy((uint8_t *)token, (uint8_t *)m2mreporthandler_stub::token, length);
 //    }
+}
+void M2MReportHandler::get_observation_token(const uint8_t *&token, uint32_t &token_length) const
+{
 }
 
 uint16_t M2MReportHandler::observation_number() const
@@ -113,7 +116,7 @@ void M2MReportHandler::set_default_values()
 {
 }
 
-uint8_t M2MReportHandler::attribute_flags()
+uint8_t M2MReportHandler::attribute_flags() const
 {
     return m2mreporthandler_stub::int_value;
 }

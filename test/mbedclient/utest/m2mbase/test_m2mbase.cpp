@@ -61,9 +61,46 @@ Test_M2MBase::Test_M2MBase(char* path, Handler *handler)
     obsHandler = handler;
 }
 
-Test_M2MBase::~Test_M2MBase()
+Test_M2MBase::Test_M2MBase(const String &name,
+        M2MBase::Mode mode,
+#ifndef DISABLE_RESOURCE_TYPE
+        const String &resource_type,
+#endif
+        char *path,
+        bool external_blockwise_store,
+        bool multiple_instance,
+        M2MBase::DataType type)
+: M2MBase(name,
+        mode,
+#ifndef DISABLE_RESOURCE_TYPE
+        resource_type,
+#endif
+        path,
+        external_blockwise_store,
+        multiple_instance,
+        type)
 {
 }
+
+Test_M2MBase::Test_M2MBase(const lwm2m_parameters_s* s)
+: M2MBase(s)
+{
+}
+
+Test_M2MBase::~Test_M2MBase()
+{
+    free_resources();
+}
+
+M2MObservationHandler* Test_M2MBase::observation_handler() const
+{
+    return NULL;
+}
+
+void Test_M2MBase::set_observation_handler(M2MObservationHandler *handler)
+{
+}
+
 
 void Test_M2MBase::test_set_operation()
 {
@@ -170,7 +207,7 @@ void Test_M2MBase::test_set_under_observation()
     set_under_observation(test,NULL);
     set_under_observation(test,obsHandler);
 
-    CHECK(obsHandler == this->_observation_handler);
+    CHECK(obsHandler == observation_handler());
 
     set_under_observation(test,NULL);
 
@@ -220,6 +257,8 @@ void Test_M2MBase::test_mode()
 
 void Test_M2MBase::test_observation_number()
 {
+#if 0
+    // XXX: this can't be tested here anymore as the observation handler stuff is in inherited classes, not in M2MBase
     u_int8_t test = 1;
 
     CHECK(0 == observation_number());
@@ -228,6 +267,7 @@ void Test_M2MBase::test_observation_number()
     this->_report_handler = new M2MReportHandler(obs);
     m2mreporthandler_stub::int16_value = test;
     CHECK(test == observation_number());
+#endif
 }
 
 void Test_M2MBase::test_name()
@@ -266,6 +306,9 @@ void Test_M2MBase::test_handle_observation_attribute()
 
 void Test_M2MBase::test_observation_to_be_sent()
 {
+#if 0
+    // XXX: this can't be tested here anymore as the observation handler stuff is in inherited classes, not in M2MBase
+
     Vector<uint16_t> list;
     observation_to_be_sent(list, observation_number());
     CHECK(obsHandler->visited == false);
@@ -275,6 +318,7 @@ void Test_M2MBase::test_observation_to_be_sent()
     set_under_observation(test,obsHandler);
     observation_to_be_sent(list, observation_number());
     CHECK(obsHandler->visited == true);
+#endif
 }
 
 void Test_M2MBase::test_handle_get_request()
@@ -322,9 +366,10 @@ void Test_M2MBase::test_observation_handler()
 
 void Test_M2MBase::test_id_number()
 {
+// XXX: this test is not possible as the M2MBase is now abstract    
     char* path = (char*)malloc(3);
     strcpy(path, "10");
-    M2MBase* b = new M2MBase("10",
+    M2MBase* b = new Test_M2MBase("10",
                  M2MBase::Static,
 #ifndef DISABLE_RESOURCE_TYPE                 
                  "",
@@ -339,7 +384,7 @@ void Test_M2MBase::test_id_number()
     char* path1 = (char*)malloc(6);
     strcpy(path1, "66567");
 
-    M2MBase * test1 = new M2MBase("66567",
+    M2MBase * test1 = new Test_M2MBase("66567",
                       M2MBase::Static,
 #ifndef DISABLE_RESOURCE_TYPE 
                       "",
@@ -349,6 +394,7 @@ void Test_M2MBase::test_id_number()
                       false);
     CHECK(test1->name_id() == -1);
     delete test1;
+
 }
 
 void Test_M2MBase::test_set_register_uri()
@@ -411,8 +457,11 @@ void Test_M2MBase::test_build_path()
 
 void Test_M2MBase::test_set_observation_handler()
 {
+#if 0
+    // XXX: this can't be tested here anymore as the observation handler stuff is in inherited classes, not in M2MBase
     set_observation_handler(obsHandler);
     CHECK(observation_handler() == obsHandler);
+#endif
 }
 
 void Test_M2MBase::test_resource_type()
@@ -465,6 +514,7 @@ void Test_M2MBase::test_create_path()
 
     M2MResource* res = new M2MResource(*m2mresource_stub::object_instance,
                                        "resource",
+                                       M2MBase::Dynamic,
                                        "type",
                                        M2MBase::INTEGER,
                                        false,
@@ -571,7 +621,7 @@ void Test_M2MBase::test_ctor()
         false, // free_on_delete
         false  // identifier_int_type
     };
-    M2MBase* base = new M2MBase(&params);
+    M2MBase* base = new Test_M2MBase(&params);
     delete base;
 }
 

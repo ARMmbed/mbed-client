@@ -13,24 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef M2M_OBJECT_INSTANCE_STUB_H
-#define M2M_OBJECT_INSTANCE_STUB_H
+#ifndef M2M_RESOURCE_BASE_STUB_H
+#define M2M_RESOURCE_BASE_STUB_H
 
-#include "m2mobjectinstance.h"
+#include "m2mresourcebase.h"
 
 //some internal test related stuff
-namespace m2mobjectinstance_stub
+namespace m2mresourcebase_stub
 {
-    extern u_int8_t int_value;
+    extern uint32_t int_value;
+    extern uint8_t* value;
     extern bool bool_value;
-    extern M2MResource *resource;
-    extern M2MResource* create_resource;
-    extern M2MResourceBase* create_resource_instance;
-    extern sn_coap_hdr_s* header;
-    extern M2MResourceList resource_list;
+    extern String *string_value;
+    extern M2MResourceBase::ResourceType resource_type;
     extern M2MBase::BaseType base_type;
-    void clear();    
+    extern sn_coap_hdr_s *header;
+    void clear();
 }
 
-#endif // M2M_OBJECT_INSTANCE_STUB_H
+#endif // M2M_RESOURCE_BASE_STUB_H
 
