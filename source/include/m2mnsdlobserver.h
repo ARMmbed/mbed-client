@@ -56,7 +56,7 @@ public :
     virtual void registration_updated(const M2MServer &server_object) = 0;
 
     /**
-    * @brief Informs that some error occured during
+    * @brief Informs that some error occurred during
     * registration.
     * @param error_code, Error code for registration error
     * @param retry, Indicates state machine to re-establish connection
@@ -83,7 +83,7 @@ public :
     virtual void bootstrap_wait(M2MSecurity *security_object) = 0;
 
     /**
-    * @brief Informs that some error occured during
+    * @brief Informs that some error occurred during
     * bootstrapping.
     */
     virtual void bootstrap_error() = 0;

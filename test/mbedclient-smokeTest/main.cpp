@@ -262,7 +262,7 @@ public:
     // the callback.
     void error(M2MInterface::Error error){
         _error = true;
-        printf("\nError occured %d\n", error);
+        printf("\nError occurred %d\n", error);
     }
 
 private:

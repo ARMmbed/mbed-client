@@ -564,7 +564,7 @@ M2MBlockMessage* M2MResourceInstance::block_message() const
 
 void M2MResourceInstance::set_incoming_block_message_callback(incoming_block_message_callback callback)
 {
-    // copy the callback object. This will change on next version to be a direct pointer to a interface class,
+    // copy the callback object. This will change on next version to be a direct pointer to an interface class,
     // this FPn<> is just too heavy for this usage.
     delete _incoming_block_message_cb;
     _incoming_block_message_cb = new incoming_block_message_callback(callback);

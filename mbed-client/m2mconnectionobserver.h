@@ -60,7 +60,7 @@ public :
                                 const M2MConnectionObserver::SocketAddress &address) = 0;
 
     /**
-    * \brief Indicates an error occured in socket.
+    * \brief Indicates an error occurred in socket.
     * \param error_code The error code from socket, it cannot be used any further.
     * \param retry Indicates whether to re-establish the connection.
     */

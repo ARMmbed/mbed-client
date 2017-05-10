@@ -781,7 +781,7 @@ void M2MLWClient::registration_updated(M2MSecurity *security_object,
 void M2MLWClient::error(M2MInterface::Error error)
 {
     _error = true;
-    cmd_printf("\nError occured Error Code : %d\n", (int8_t)error);
+    cmd_printf("\nError occurred Error Code : %d\n", (int8_t)error);
     cmd_ready( CMDLINE_RETCODE_SUCCESS );
 }
 

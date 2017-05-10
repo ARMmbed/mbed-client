@@ -194,7 +194,7 @@ public:
      * @brief Callback when there is data received from server and needs to be processed.
      * @param data, data received from server.
      * @param data_size, data size received from server.
-     * @param addres, address structure of the server.
+     * @param address, address structure of the server.
      * @return true if successfully processed else false.
      */
     bool process_received_data(uint8_t *data,
@@ -344,14 +344,14 @@ private:
     /**
      * @brief Parse bootstrap TLV message.
      * @param coap_header, Received CoAP message
-     * @return True if parsing was succesful else false
+     * @return True if parsing was successful else false
     */
     bool parse_bootstrap_message(sn_coap_hdr_s *coap_header, bool is_security_object);
 
     /**
      * @brief Parse bootstrap TLV message.
      * @param coap_header, Received CoAP message
-     * @return True if parsing was succesful else false
+     * @return True if parsing was successful else false
     */
     bool validate_security_object();
 

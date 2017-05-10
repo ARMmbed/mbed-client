@@ -122,7 +122,7 @@ void Test_M2MInterfaceFactory::test_create_object()
     test = NULL;
 
     // Length 65, should fail
-    String max_lenght = "65656565656565656565656565656565656565656565656565656565656565656";
+    String max_length = "65656565656565656565656565656565656565656565656565656565656565656";
     CHECK(M2MInterfaceFactory::create_object("") == NULL);
-    CHECK(M2MInterfaceFactory::create_object(max_lenght) == NULL);
+    CHECK(M2MInterfaceFactory::create_object(max_length) == NULL);
 }
