@@ -1233,43 +1233,41 @@ M2MInterface::Error M2MNsdlInterface::interface_error(const sn_coap_hdr_s &coap_
 const char *M2MNsdlInterface::coap_error(sn_coap_hdr_s *coap_header)
 {
     if(coap_header) {
-        switch(coap_header->msg_code) {
-            case COAP_MSG_CODE_RESPONSE_BAD_REQUEST:
+        if(coap_header->msg_code == COAP_MSG_CODE_RESPONSE_BAD_REQUEST) {
             return COAP_ERROR_REASON_1;
-            case COAP_MSG_CODE_RESPONSE_BAD_OPTION:
+        } else if(coap_header->msg_code == COAP_MSG_CODE_RESPONSE_BAD_OPTION) {
             return COAP_ERROR_REASON_2;
-            case COAP_MSG_CODE_RESPONSE_REQUEST_ENTITY_INCOMPLETE:
+        } else if(coap_header->msg_code == COAP_MSG_CODE_RESPONSE_REQUEST_ENTITY_INCOMPLETE) {
             return COAP_ERROR_REASON_3;
-            case COAP_MSG_CODE_RESPONSE_PRECONDITION_FAILED:
+        }else if(coap_header->msg_code == COAP_MSG_CODE_RESPONSE_PRECONDITION_FAILED) {
             return COAP_ERROR_REASON_4;
-            case COAP_MSG_CODE_RESPONSE_REQUEST_ENTITY_TOO_LARGE:
+        } else if(coap_header->msg_code == COAP_MSG_CODE_RESPONSE_REQUEST_ENTITY_TOO_LARGE) {
             return COAP_ERROR_REASON_5;
-            case COAP_MSG_CODE_RESPONSE_UNSUPPORTED_CONTENT_FORMAT:
+        } else if(coap_header->msg_code == COAP_MSG_CODE_RESPONSE_UNSUPPORTED_CONTENT_FORMAT) {
             return COAP_ERROR_REASON_6;
-            case COAP_MSG_CODE_RESPONSE_UNAUTHORIZED:
+        } else if(coap_header->msg_code == COAP_MSG_CODE_RESPONSE_UNAUTHORIZED) {
             return COAP_ERROR_REASON_7;
-            case COAP_MSG_CODE_RESPONSE_FORBIDDEN:
+        } else if(coap_header->msg_code == COAP_MSG_CODE_RESPONSE_FORBIDDEN) {
             return COAP_ERROR_REASON_8;
-            case COAP_MSG_CODE_RESPONSE_NOT_ACCEPTABLE:
+        } else if(coap_header->msg_code == COAP_MSG_CODE_RESPONSE_NOT_ACCEPTABLE) {
             return COAP_ERROR_REASON_9;
-            case COAP_MSG_CODE_RESPONSE_NOT_FOUND:
+        } else if(coap_header->msg_code == COAP_MSG_CODE_RESPONSE_NOT_FOUND) {
             return COAP_ERROR_REASON_10;
-            case COAP_MSG_CODE_RESPONSE_METHOD_NOT_ALLOWED:
+        } else if(coap_header->msg_code == COAP_MSG_CODE_RESPONSE_METHOD_NOT_ALLOWED) {
             return COAP_ERROR_REASON_11;
-            case COAP_MSG_CODE_RESPONSE_SERVICE_UNAVAILABLE:
+        } else if(coap_header->msg_code == COAP_MSG_CODE_RESPONSE_SERVICE_UNAVAILABLE) {
             return COAP_ERROR_REASON_13;
-            case COAP_MSG_CODE_RESPONSE_INTERNAL_SERVER_ERROR:
+        } else if(coap_header->msg_code == COAP_MSG_CODE_RESPONSE_INTERNAL_SERVER_ERROR) {
             return COAP_ERROR_REASON_14;
-            case COAP_MSG_CODE_RESPONSE_BAD_GATEWAY:
+        } else if(coap_header->msg_code == COAP_MSG_CODE_RESPONSE_BAD_GATEWAY) {
             return COAP_ERROR_REASON_15;
-            case COAP_MSG_CODE_RESPONSE_GATEWAY_TIMEOUT:
+        } else if(coap_header->msg_code == COAP_MSG_CODE_RESPONSE_GATEWAY_TIMEOUT) {
             return COAP_ERROR_REASON_16;
-            case COAP_MSG_CODE_RESPONSE_PROXYING_NOT_SUPPORTED:
+        } else if(coap_header->msg_code == COAP_MSG_CODE_RESPONSE_PROXYING_NOT_SUPPORTED) {
             return COAP_ERROR_REASON_17;
+        } else if(coap_header->coap_status == COAP_STATUS_BUILDER_MESSAGE_SENDING_FAILED) {
+            return COAP_ERROR_REASON_12;
         }
-    }
-    if(coap_header->coap_status == COAP_STATUS_BUILDER_MESSAGE_SENDING_FAILED) {
-        return COAP_ERROR_REASON_12;
     }
     return "error";
 }
