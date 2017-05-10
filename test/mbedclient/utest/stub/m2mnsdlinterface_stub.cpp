@@ -30,7 +30,10 @@ void m2mnsdlinterface_stub::clear()
 }
 
 M2MNsdlInterface::M2MNsdlInterface(M2MNsdlObserver &observer, M2MConnectionHandler &connection_handler)
-: _observer(observer), _connection_handler(connection_handler)
+: _observer(observer),
+  _connection_handler(connection_handler),
+  _nsdl_exceution_timer(*this),
+  _registration_timer(*this)
 {
     //m2mnsdlinterface_stub::string_value = new String("");
 }
@@ -227,4 +230,9 @@ void M2MNsdlInterface::update_endpoint(const String &name)
 const String M2MNsdlInterface::internal_endpoint_name() const
 {
     return *m2mnsdlinterface_stub::string_value;
+}
+
+M2MTimer &M2MNsdlInterface::get_nsdl_execution_timer()
+{
+    return _nsdl_exceution_timer;
 }

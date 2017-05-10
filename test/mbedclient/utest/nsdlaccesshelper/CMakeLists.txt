@@ -14,6 +14,7 @@ add_executable(nsdlaccesshelper
         "../stub/m2mbase_stub.cpp"
         "../stub/m2mobject_stub.cpp"
         "../stub/m2mstringbufferbase_stub.cpp"
+        "../stub/m2mtimer_stub.cpp"
 )
 
 target_link_libraries(nsdlaccesshelper
