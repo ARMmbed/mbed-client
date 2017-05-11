@@ -183,6 +183,10 @@ extern const String EMPTY;
 #define COAP_ERROR_REASON_16 "gateway-timeout"
 #define COAP_ERROR_REASON_17 "proxying-not-supported"
 
+#define ERROR_SECURE_CONNECTION "SecureConnectionFailed"
+#define ERROR_DNS               "DnsResolvingFailed"
+#define ERROR_NETWORK           "NetworkError"
+
 // TLV serializer / deserializer
 const uint8_t TYPE_RESOURCE = 0xC0;
 const uint8_t TYPE_MULTIPLE_RESOURCE = 0x80;

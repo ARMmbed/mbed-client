@@ -24,7 +24,6 @@
 #include "include/m2mnsdlinterface.h"
 #include "include/nsdlaccesshelper.h"
 #include "mbed-client/m2msecurity.h"
-#include "mbed-client/m2mconstants.h"
 #include "mbed-client/m2mtimer.h"
 #include "mbed-trace/mbed_trace.h"
 
@@ -69,7 +68,8 @@ M2MInterfaceImpl::M2MInterfaceImpl(M2MInterfaceObserver& observer,
   _security_connection( new M2MConnectionSecurity( RESOLVE_SEC_MODE(mode) )),
   _connection_handler(*this, _security_connection, mode, stack),
   _nsdl_interface(*this, _connection_handler),
-  _security(NULL)
+  _security(NULL),
+  _error_description{0}
 {
     tr_debug("M2MInterfaceImpl::M2MInterfaceImpl() -IN");
     _nsdl_interface.create_endpoint(ep_name,
@@ -415,33 +415,32 @@ void M2MInterfaceImpl::socket_error(uint8_t error_code, bool retry)
     }
 #endif
 
-    char error_code_des[24];
-    memset(error_code_des, 0 , 24);
+    const char *error_code_des;
     M2MInterface::Error error = M2MInterface::ErrorNone;
     switch (error_code) {
     case M2MConnectionHandler::SSL_CONNECTION_ERROR:
         error = M2MInterface::SecureConnectionFailed;
-        memcpy(error_code_des,"SecureConnectionFailed", 23);
+        error_code_des = ERROR_SECURE_CONNECTION;
         break;
     case M2MConnectionHandler::DNS_RESOLVING_ERROR:
         error = M2MInterface::DnsResolvingFailed;
-        memcpy(error_code_des,"DnsResolvingFailed", 20);
+        error_code_des = ERROR_DNS;
         break;
     case M2MConnectionHandler::SOCKET_READ_ERROR:
         error = M2MInterface::NetworkError;
-        memcpy(error_code_des,"NetworkError", 12);
+        error_code_des = ERROR_NETWORK;
         break;
     case M2MConnectionHandler::SOCKET_SEND_ERROR:
         error = M2MInterface::NetworkError;
-        memcpy(error_code_des,"NetworkError", 12);
+        error_code_des = ERROR_NETWORK;
         break;
     case M2MConnectionHandler::SSL_HANDSHAKE_ERROR:
         error = M2MInterface::SecureConnectionFailed;
-        memcpy(error_code_des,"SecureConnectionFailed", 23);
+        error_code_des = ERROR_SECURE_CONNECTION;
         break;
     case M2MConnectionHandler::SOCKET_ABORT:
         error = M2MInterface::NetworkError;
-        memcpy(error_code_des,"NetworkError", 12);
+        error_code_des = ERROR_NETWORK;
         break;
     default:
         break;

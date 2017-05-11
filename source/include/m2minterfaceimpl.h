@@ -25,6 +25,7 @@
 #include "mbed-client/m2mtimerobserver.h"
 #include "mbed-client/m2mtimer.h"
 #include "mbed-client/m2mconnectionhandler.h"
+#include "mbed-client/m2mconstants.h"
 
 //FORWARD DECLARATION
 class M2MConnectionSecurity;
@@ -441,7 +442,7 @@ private:
     M2MConnectionHandler        _connection_handler;
     M2MNsdlInterface            _nsdl_interface;
     M2MSecurity                 *_security;
-    char                        _error_description[64];
+    char                        _error_description[MAX_ALLOWED_STRING_LENGTH];
 
     friend class Test_M2MInterfaceImpl;
 

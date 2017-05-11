@@ -1946,63 +1946,61 @@ void Test_M2MNsdlInterface::test_get_nsdl_execution_timer()
 
 void Test_M2MNsdlInterface::test_coap_error()
 {
-    sn_coap_hdr_s *coap_header = (sn_coap_hdr_s *)malloc(sizeof(sn_coap_hdr_s));
-    memset(coap_header, 0, sizeof(sn_coap_hdr_s));
-    coap_header->coap_status = COAP_STATUS_BUILDER_MESSAGE_SENDING_FAILED;
+    sn_coap_hdr_s coap_header;
+    coap_header.coap_status = COAP_STATUS_BUILDER_MESSAGE_SENDING_FAILED;
 
-    coap_header->msg_code = COAP_MSG_CODE_RESPONSE_BAD_REQUEST;
-    STRCMP_EQUAL(nsdl->coap_error(coap_header),COAP_ERROR_REASON_1);
+    coap_header.msg_code = COAP_MSG_CODE_RESPONSE_BAD_REQUEST;
+    STRCMP_EQUAL(nsdl->coap_error(&coap_header),COAP_ERROR_REASON_1);
 
-    coap_header->msg_code = COAP_MSG_CODE_RESPONSE_BAD_OPTION;
-    STRCMP_EQUAL(nsdl->coap_error(coap_header),COAP_ERROR_REASON_2);
+    coap_header.msg_code = COAP_MSG_CODE_RESPONSE_BAD_OPTION;
+    STRCMP_EQUAL(nsdl->coap_error(&coap_header),COAP_ERROR_REASON_2);
 
-    coap_header->msg_code = COAP_MSG_CODE_RESPONSE_REQUEST_ENTITY_INCOMPLETE;
-    STRCMP_EQUAL(nsdl->coap_error(coap_header),COAP_ERROR_REASON_3);
+    coap_header.msg_code = COAP_MSG_CODE_RESPONSE_REQUEST_ENTITY_INCOMPLETE;
+    STRCMP_EQUAL(nsdl->coap_error(&coap_header),COAP_ERROR_REASON_3);
 
-    coap_header->msg_code = COAP_MSG_CODE_RESPONSE_PRECONDITION_FAILED;
-    STRCMP_EQUAL(nsdl->coap_error(coap_header),COAP_ERROR_REASON_4);
+    coap_header.msg_code = COAP_MSG_CODE_RESPONSE_PRECONDITION_FAILED;
+    STRCMP_EQUAL(nsdl->coap_error(&coap_header),COAP_ERROR_REASON_4);
 
-    coap_header->msg_code = COAP_MSG_CODE_RESPONSE_REQUEST_ENTITY_TOO_LARGE;
-    STRCMP_EQUAL(nsdl->coap_error(coap_header),COAP_ERROR_REASON_5);
+    coap_header.msg_code = COAP_MSG_CODE_RESPONSE_REQUEST_ENTITY_TOO_LARGE;
+    STRCMP_EQUAL(nsdl->coap_error(&coap_header),COAP_ERROR_REASON_5);
 
-    coap_header->msg_code = COAP_MSG_CODE_RESPONSE_UNSUPPORTED_CONTENT_FORMAT;
-    STRCMP_EQUAL(nsdl->coap_error(coap_header),COAP_ERROR_REASON_6);
+    coap_header.msg_code = COAP_MSG_CODE_RESPONSE_UNSUPPORTED_CONTENT_FORMAT;
+    STRCMP_EQUAL(nsdl->coap_error(&coap_header),COAP_ERROR_REASON_6);
 
-    coap_header->msg_code = COAP_MSG_CODE_RESPONSE_UNAUTHORIZED;
-    STRCMP_EQUAL(nsdl->coap_error(coap_header),COAP_ERROR_REASON_7);
+    coap_header.msg_code = COAP_MSG_CODE_RESPONSE_UNAUTHORIZED;
+    STRCMP_EQUAL(nsdl->coap_error(&coap_header),COAP_ERROR_REASON_7);
 
-    coap_header->msg_code = COAP_MSG_CODE_RESPONSE_FORBIDDEN;
-    STRCMP_EQUAL(nsdl->coap_error(coap_header),COAP_ERROR_REASON_8);
+    coap_header.msg_code = COAP_MSG_CODE_RESPONSE_FORBIDDEN;
+    STRCMP_EQUAL(nsdl->coap_error(&coap_header),COAP_ERROR_REASON_8);
 
-    coap_header->msg_code = COAP_MSG_CODE_RESPONSE_NOT_ACCEPTABLE;
-    STRCMP_EQUAL(nsdl->coap_error(coap_header),COAP_ERROR_REASON_9);
+    coap_header.msg_code = COAP_MSG_CODE_RESPONSE_NOT_ACCEPTABLE;
+    STRCMP_EQUAL(nsdl->coap_error(&coap_header),COAP_ERROR_REASON_9);
 
-    coap_header->msg_code = COAP_MSG_CODE_RESPONSE_NOT_FOUND;
-    STRCMP_EQUAL(nsdl->coap_error(coap_header),COAP_ERROR_REASON_10);
+    coap_header.msg_code = COAP_MSG_CODE_RESPONSE_NOT_FOUND;
+    STRCMP_EQUAL(nsdl->coap_error(&coap_header),COAP_ERROR_REASON_10);
 
-    coap_header->msg_code = COAP_MSG_CODE_RESPONSE_METHOD_NOT_ALLOWED;
-    STRCMP_EQUAL(nsdl->coap_error(coap_header),COAP_ERROR_REASON_11);
+    coap_header.msg_code = COAP_MSG_CODE_RESPONSE_METHOD_NOT_ALLOWED;
+    STRCMP_EQUAL(nsdl->coap_error(&coap_header),COAP_ERROR_REASON_11);
 
-    coap_header->msg_code = COAP_MSG_CODE_RESPONSE_SERVICE_UNAVAILABLE;
-    STRCMP_EQUAL(nsdl->coap_error(coap_header),COAP_ERROR_REASON_13);
+    coap_header.msg_code = COAP_MSG_CODE_RESPONSE_SERVICE_UNAVAILABLE;
+    STRCMP_EQUAL(nsdl->coap_error(&coap_header),COAP_ERROR_REASON_13);
 
-    coap_header->msg_code = COAP_MSG_CODE_RESPONSE_INTERNAL_SERVER_ERROR;
-    STRCMP_EQUAL(nsdl->coap_error(coap_header),COAP_ERROR_REASON_14);
+    coap_header.msg_code = COAP_MSG_CODE_RESPONSE_INTERNAL_SERVER_ERROR;
+    STRCMP_EQUAL(nsdl->coap_error(&coap_header),COAP_ERROR_REASON_14);
 
-    coap_header->msg_code = COAP_MSG_CODE_RESPONSE_BAD_GATEWAY;
-    STRCMP_EQUAL(nsdl->coap_error(coap_header),COAP_ERROR_REASON_15);
+    coap_header.msg_code = COAP_MSG_CODE_RESPONSE_BAD_GATEWAY;
+    STRCMP_EQUAL(nsdl->coap_error(&coap_header),COAP_ERROR_REASON_15);
 
-    coap_header->msg_code = COAP_MSG_CODE_RESPONSE_GATEWAY_TIMEOUT;
-    STRCMP_EQUAL(nsdl->coap_error(coap_header),COAP_ERROR_REASON_16);
+    coap_header.msg_code = COAP_MSG_CODE_RESPONSE_GATEWAY_TIMEOUT;
+    STRCMP_EQUAL(nsdl->coap_error(&coap_header),COAP_ERROR_REASON_16);
 
-    coap_header->msg_code = COAP_MSG_CODE_RESPONSE_PROXYING_NOT_SUPPORTED;
-    STRCMP_EQUAL(nsdl->coap_error(coap_header),COAP_ERROR_REASON_17);
+    coap_header.msg_code = COAP_MSG_CODE_RESPONSE_PROXYING_NOT_SUPPORTED;
+    STRCMP_EQUAL(nsdl->coap_error(&coap_header),COAP_ERROR_REASON_17);
 
-    coap_header->msg_code = COAP_MSG_CODE_RESPONSE_CHANGED;
-    STRCMP_EQUAL(nsdl->coap_error(coap_header),COAP_ERROR_REASON_12);
+    coap_header.msg_code = COAP_MSG_CODE_RESPONSE_CHANGED;
+    STRCMP_EQUAL(nsdl->coap_error(&coap_header),COAP_ERROR_REASON_12);
 
-    coap_header->coap_status = COAP_STATUS_OK;
-    STRCMP_EQUAL(nsdl->coap_error(coap_header),"error");
+    coap_header.coap_status = COAP_STATUS_OK;
+    STRCMP_EQUAL(nsdl->coap_error(&coap_header),"error");
 
-    free(coap_header);
 }

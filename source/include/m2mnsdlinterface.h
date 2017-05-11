@@ -403,7 +403,7 @@ private:
      * @param coap_header, CoAP structure.
      * @return Error reason.
     */
-    const char *coap_error(sn_coap_hdr_s *coap_header);
+    static const char *coap_error(sn_coap_hdr_s *coap_header);
 
     /**
      * @brief Claim
