@@ -37,6 +37,7 @@ Test_M2MTLVDeserializer::~Test_M2MTLVDeserializer()
     m2mobjectinstance_stub::clear();
     m2mobject_stub::clear();
     m2mresource_stub::clear();
+    m2mresourcebase_stub::clear();
 }
 
 void Test_M2MTLVDeserializer::test_is_object_instance()
@@ -142,7 +143,7 @@ void Test_M2MTLVDeserializer::test_deserialise_object_instances()
 
     u_int8_t value[] = {"value"};
     m2mresourcebase_stub::value = value;
-    m2mresourceinstance_stub::int_value = sizeof(value);
+    m2mresourcebase_stub::int_value = sizeof(value);
 
     data = serializer->serialize( m2mobject_stub::instance_list,size);
 
@@ -229,8 +230,8 @@ void Test_M2MTLVDeserializer::test_deserialise_object_instances()
 
     m2mbase_stub::name_id_value = 300;
 
-    m2mresourceinstance_stub::int_value = 6;
-    m2mresourcebase_stub::value = (uint8_t*) malloc(m2mresourceinstance_stub::int_value);
+    m2mresourcebase_stub::int_value = 6;
+    m2mresourcebase_stub::value = (uint8_t*) malloc(m2mresourcebase_stub::int_value);
     serializer = new M2MTLVSerializer();
     data = serializer->serialize( m2mobject_stub::instance_list,size);
     delete serializer;
@@ -246,8 +247,8 @@ void Test_M2MTLVDeserializer::test_deserialise_object_instances()
     free(m2mresourcebase_stub::value);
     m2mresourcebase_stub::value = NULL;
 
-    m2mresourceinstance_stub::int_value = 256;
-    m2mresourcebase_stub::value = (uint8_t*) malloc(m2mresourceinstance_stub::int_value);
+    m2mresourcebase_stub::int_value = 256;
+    m2mresourcebase_stub::value = (uint8_t*) malloc(m2mresourcebase_stub::int_value);
     serializer = new M2MTLVSerializer();
     data = serializer->serialize( m2mobject_stub::instance_list,size);
     delete serializer;
@@ -263,14 +264,14 @@ void Test_M2MTLVDeserializer::test_deserialise_object_instances()
     free(m2mresourcebase_stub::value);
     m2mresourcebase_stub::value = NULL;
 
-    m2mresourceinstance_stub::int_value = 65536;
-    m2mresourcebase_stub::value = (uint8_t*) malloc(m2mresourceinstance_stub::int_value);
+    m2mresourcebase_stub::int_value = 65536;
+    m2mresourcebase_stub::value = (uint8_t*) malloc(m2mresourcebase_stub::int_value);
     serializer = new M2MTLVSerializer();
     data = serializer->serialize( m2mobject_stub::instance_list,size);
     delete serializer;
 
-   deserializer->deserialise_object_instances(data,size,*object,M2MTLVDeserializer::Post);
-   deserializer->deserialise_object_instances(data,size,*object,M2MTLVDeserializer::Put);
+    deserializer->deserialise_object_instances(data,size,*object,M2MTLVDeserializer::Post);
+    deserializer->deserialise_object_instances(data,size,*object,M2MTLVDeserializer::Put);
     size = 0;
 
     if(data) {
@@ -447,13 +448,12 @@ void Test_M2MTLVDeserializer::test_deserialize_resource_instance_1()
     M2MTLVSerializer *serializer = new M2MTLVSerializer();
 
     uint32_t size = 0;
-    uint8_t* data = serializer->serialize( resource,size);
+    uint8_t* data = serializer->serialize(resource,size);
 
     delete serializer;
 
     deserializer->deserialize_resource_instances(data,size,
                                                 *resource,M2MTLVDeserializer::Put);
-
 
     free(data);
 
@@ -594,8 +594,8 @@ void Test_M2MTLVDeserializer::test_deserialize_resource_instance()
 
     m2mbase_stub::name_id_value = 300;
 
-    m2mresourceinstance_stub::int_value = 6;
-    m2mresourcebase_stub::value = (uint8_t*) malloc(m2mresourceinstance_stub::int_value);
+    m2mresourcebase_stub::int_value = 6;
+    m2mresourcebase_stub::value = (uint8_t*) malloc(m2mresourcebase_stub::int_value);
     serializer = new M2MTLVSerializer();
     data = serializer->serialize( resource,size);
     delete serializer;
@@ -610,8 +610,8 @@ void Test_M2MTLVDeserializer::test_deserialize_resource_instance()
     free(m2mresourcebase_stub::value);
     m2mresourcebase_stub::value = NULL;
 
-    m2mresourceinstance_stub::int_value = 256;
-    m2mresourcebase_stub::value = (uint8_t*) malloc(m2mresourceinstance_stub::int_value);
+    m2mresourcebase_stub::int_value = 256;
+    m2mresourcebase_stub::value = (uint8_t*) malloc(m2mresourcebase_stub::int_value);
     serializer = new M2MTLVSerializer();
     data = serializer->serialize( resource,size);
     delete serializer;
@@ -626,8 +626,8 @@ void Test_M2MTLVDeserializer::test_deserialize_resource_instance()
     free(m2mresourcebase_stub::value);
     m2mresourcebase_stub::value = NULL;
 
-    m2mresourceinstance_stub::int_value = 65536;
-    m2mresourcebase_stub::value = (uint8_t*) malloc(m2mresourceinstance_stub::int_value);
+    m2mresourcebase_stub::int_value = 65536;
+    m2mresourcebase_stub::value = (uint8_t*) malloc(m2mresourcebase_stub::int_value);
     serializer = new M2MTLVSerializer();
     data = serializer->serialize( resource,size);
     delete serializer;

@@ -146,7 +146,7 @@ bool M2MTLVSerializer::serialize_multiple_resource(const M2MResource *resource, 
     uint8_t *nested_data = NULL;
     uint32_t nested_data_size = 0;
 
-    M2MResourceInstanceList instance_list = resource->resource_instances();
+    const M2MResourceInstanceList &instance_list = resource->resource_instances();
     if(!instance_list.empty()) {
         M2MResourceInstanceList::const_iterator it;
         it = instance_list.begin();
@@ -168,7 +168,6 @@ bool M2MTLVSerializer::serialize_multiple_resource(const M2MResource *resource, 
     }
 
     free(nested_data);
-    nested_data = NULL;
     return success;
 }
 
@@ -193,21 +192,20 @@ bool M2MTLVSerializer::serialize_resource_instance(uint16_t id, const M2MResourc
  * Yime, TLV Format */
 bool M2MTLVSerializer::serialize_TLV_binary_int(const M2MResourceBase *resource, uint8_t type, uint16_t id, uint8_t *&data, uint32_t &size)
 {
-        int64_t valueInt = resource->get_value_int();
-        uint32_t buffer_size;
-        /* max len 8 bytes */
-        uint8_t buffer[8];
+    int64_t valueInt = resource->get_value_int();
+    uint32_t buffer_size;
+    /* max len 8 bytes */
+    uint8_t buffer[8];
 
-        if (resource->resource_instance_type() == M2MResourceInstance::BOOLEAN) {
-            buffer_size = 1;
-            buffer[0] = valueInt;
-        }
-        else {
-            buffer_size = 8;
-            common_write_64_bit(valueInt, buffer);
-        }
+    if (resource->resource_instance_type() == M2MResourceInstance::BOOLEAN) {
+        buffer_size = 1;
+        buffer[0] = valueInt;
+    } else {
+        buffer_size = 8;
+        common_write_64_bit(valueInt, buffer);
+    }
 
-        return serialize_TILV(type, id, buffer, buffer_size, data, size);
+    return serialize_TILV(type, id, buffer, buffer_size, data, size);
 }
 
 
