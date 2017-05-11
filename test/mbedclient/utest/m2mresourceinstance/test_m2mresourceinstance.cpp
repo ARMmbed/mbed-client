@@ -26,6 +26,7 @@
 #include "m2mobjectinstance_stub.h"
 #include "m2mobject_stub.h"
 #include "m2mresource_stub.h"
+#include "m2mresourcebase_stub.h"
 
 
 static bool cb_visited = false;
@@ -247,7 +248,7 @@ void Test_M2MResourceInstance::test_set_value()
 {
     u_int8_t value[] = {"value2"};
   //  resource_instance->_value = (u_int8_t*)malloc(sizeof(u_int8_t));
-    m2mbase_stub::bool_value = true;
+    m2mresourcebase_stub::bool_value = true;
 
     sn_nsdl_dynamic_resource_parameters_s res_param;
     m2mbase_stub::nsdl_resource = &res_param;
@@ -370,6 +371,7 @@ void Test_M2MResourceInstance::test_clear_value()
     m2mbase_stub::sn_resource = (M2MBase::lwm2m_parameters_s*) malloc(sizeof(M2MBase::lwm2m_parameters_s));
     memset(m2mbase_stub::sn_resource,0,sizeof(M2MBase::lwm2m_parameters_s));
     m2mbase_stub::sn_resource->data_type = M2MBase::STRING;
+    m2mresourcebase_stub::bool_value = true;
 
     CHECK(resource_instance->set_value(value,(u_int32_t)sizeof(value)) == true);
     resource_instance->clear_value();

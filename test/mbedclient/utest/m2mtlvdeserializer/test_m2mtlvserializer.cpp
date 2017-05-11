@@ -18,6 +18,7 @@
 #include "m2mobject_stub.h"
 #include "m2mobjectinstance_stub.h"
 #include "m2mresource_stub.h"
+#include "m2mresourcebase_stub.h"
 #include "m2mresourceinstance_stub.h"
 #include "m2mbase_stub.h"
 
@@ -211,7 +212,7 @@ void Test_M2MTLVSerializer::test_serialize_object()
     m2mbase_stub::name_id_value = 256;
 
     m2mresourceinstance_stub::int_value = 6;
-    m2mresourceinstance_stub::value = (uint8_t*) malloc(m2mresourceinstance_stub::int_value);
+    m2mresourcebase_stub::value = (uint8_t*) malloc(m2mresourceinstance_stub::int_value);
     data = serializer->serialize( m2mobject_stub::instance_list,size);
     CHECK(data != NULL);
 
@@ -219,11 +220,11 @@ void Test_M2MTLVSerializer::test_serialize_object()
         free(data);
         data = 0;
     }
-    free(m2mresourceinstance_stub::value);
-    m2mresourceinstance_stub::value = NULL;
+    free(m2mresourcebase_stub::value);
+    m2mresourcebase_stub::value = NULL;
 
     m2mresourceinstance_stub::int_value = 256;
-    m2mresourceinstance_stub::value = (uint8_t*) malloc(m2mresourceinstance_stub::int_value);
+    m2mresourcebase_stub::value = (uint8_t*) malloc(m2mresourceinstance_stub::int_value);
     data = serializer->serialize( m2mobject_stub::instance_list,size);
     CHECK(data != NULL);
 
@@ -231,11 +232,11 @@ void Test_M2MTLVSerializer::test_serialize_object()
         free(data);
         data = 0;
     }
-    free(m2mresourceinstance_stub::value);
-    m2mresourceinstance_stub::value = NULL;
+    free(m2mresourcebase_stub::value);
+    m2mresourcebase_stub::value = NULL;
 
     m2mresourceinstance_stub::int_value = 65536;
-    m2mresourceinstance_stub::value = (uint8_t*) malloc(m2mresourceinstance_stub::int_value);
+    m2mresourcebase_stub::value = (uint8_t*) malloc(m2mresourceinstance_stub::int_value);
     data = serializer->serialize( m2mobject_stub::instance_list,size);
     CHECK(data != NULL);
 
@@ -254,7 +255,7 @@ void Test_M2MTLVSerializer::test_serialize_object()
     delete instance;
     delete object;
 
-    free(m2mresourceinstance_stub::value);
+    free(m2mresourcebase_stub::value);
 
     m2mresourceinstance_stub::clear();
     m2mresource_stub::clear();

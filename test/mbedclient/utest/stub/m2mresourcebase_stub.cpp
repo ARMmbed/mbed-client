@@ -143,7 +143,7 @@ void M2MResourceBase::get_value(uint8_t *&value, uint32_t &value_length)
 int64_t M2MResourceBase::get_value_int() const
 {
     // Note: this is a copy-paste from the original version, as the tests
-    // set only m2mresourcebase_stub::value.
+    // set only m2mresourceinstance_stub::value.
 
     int value_int = 0;
     uint8_t* buffer = m2mresourcebase_stub::value;

@@ -18,6 +18,7 @@
 #include "m2mobject_stub.h"
 #include "m2mobjectinstance_stub.h"
 #include "m2mresource_stub.h"
+#include "m2mresourcebase_stub.h"
 #include "m2mresourceinstance_stub.h"
 #include "m2mbase_stub.h"
 #include "nsdlaccesshelper_stub.h"
@@ -123,7 +124,7 @@ void Test_M2MServer::test_delete_resource()
 
 void Test_M2MServer::test_set_resource_value_int()
 {
-    m2mbase_stub::bool_value = true;
+    m2mresourcebase_stub::bool_value = true;
 
     m2mobjectinstance_stub::resource =  new M2MResource(*m2mobject_stub::inst,
                                                         "name",
@@ -150,7 +151,7 @@ void Test_M2MServer::test_set_resource_value_int()
 
 void Test_M2MServer::test_set_resource_value_string()
 {
-    m2mresourceinstance_stub::bool_value = true;
+    m2mresourcebase_stub::bool_value = true;
 
     m2mobjectinstance_stub::resource =  new M2MResource(*m2mobject_stub::inst,
                                                         "name",
@@ -178,9 +179,9 @@ void Test_M2MServer::test_set_resource_value_string()
 void Test_M2MServer::test_resource_value_int()
 {
     uint8_t value[] = {"10"};
-    m2mresourceinstance_stub::value = (uint8_t*)malloc((uint32_t)sizeof(value));
-    memset(m2mresourceinstance_stub::value,0,(uint32_t)sizeof(value));
-    memcpy(m2mresourceinstance_stub::value,value,sizeof(value));
+    m2mresourcebase_stub::value = (uint8_t*)malloc((uint32_t)sizeof(value));
+    memset(m2mresourcebase_stub::value,0,(uint32_t)sizeof(value));
+    memcpy(m2mresourcebase_stub::value,value,sizeof(value));
     m2mresourceinstance_stub::int_value = (uint32_t)sizeof(value);
 
     m2mobjectinstance_stub::resource =  new M2MResource(*m2mobject_stub::inst,
@@ -204,8 +205,8 @@ void Test_M2MServer::test_resource_value_int()
    delete m2mobjectinstance_stub::resource;
    m2mobjectinstance_stub::resource = NULL;
 
-   free(m2mresourceinstance_stub::value);
-   m2mresourceinstance_stub::value = NULL;
+   free(m2mresourcebase_stub::value);
+   m2mresourcebase_stub::value = NULL;
 }
 
 void Test_M2MServer::test_resource_value_string()
@@ -213,10 +214,9 @@ void Test_M2MServer::test_resource_value_string()
     String test = "string";
     uint8_t value[] = {"string"};
 
-    m2mresourceinstance_stub::value = (uint8_t*)malloc((uint32_t)sizeof(value));
-    memset(m2mresourceinstance_stub::value,0,(uint32_t)sizeof(value));
-    memcpy(m2mresourceinstance_stub::value,value,sizeof(value));
-    m2mresourceinstance_stub::int_value = (uint32_t)sizeof(value);
+    m2mresourcebase_stub::value = (uint8_t*)malloc((uint32_t)sizeof(value));
+    memcpy(m2mresourcebase_stub::value,value,sizeof(value));
+    m2mresourcebase_stub::int_value = (uint32_t)sizeof(value);
 
     m2mobjectinstance_stub::resource =  new M2MResource(*m2mobject_stub::inst,
                                                         "name",
@@ -240,8 +240,8 @@ void Test_M2MServer::test_resource_value_string()
     delete m2mobjectinstance_stub::resource;
     m2mobjectinstance_stub::resource = NULL;
 
-    free(m2mresourceinstance_stub::value);
-    m2mresourceinstance_stub::value = NULL;
+    free(m2mresourcebase_stub::value);
+    m2mresourcebase_stub::value = NULL;
 }
 
 void Test_M2MServer::test_is_resource_present()
