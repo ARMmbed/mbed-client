@@ -25,6 +25,7 @@
 #include "mbed-client/m2mtimerobserver.h"
 #include "mbed-client/m2mtimer.h"
 #include "mbed-client/m2mconnectionhandler.h"
+#include "mbed-client/m2mconstants.h"
 
 //FORWARD DECLARATION
 class M2MConnectionSecurity;
@@ -192,6 +193,12 @@ public:
      */
     virtual const String internal_endpoint_name() const;
 
+    /**
+     * @brief Return error description for the latest error code
+     * @return Error description string
+     */
+    virtual const char *error_description() const;
+
 protected: // From M2MNsdlObserver
 
     virtual void coap_message_ready(uint8_t *data_ptr,
@@ -210,7 +217,7 @@ protected: // From M2MNsdlObserver
 
     virtual void bootstrap_wait(M2MSecurity *security_object);
 
-    virtual void bootstrap_error();
+    virtual void bootstrap_error(const char *reason);
 
     virtual void coap_data_processed();
 
@@ -435,6 +442,7 @@ private:
     M2MConnectionHandler        _connection_handler;
     M2MNsdlInterface            _nsdl_interface;
     M2MSecurity                 *_security;
+    char                        _error_description[MAX_ALLOWED_STRING_LENGTH];
 
     friend class Test_M2MInterfaceImpl;
 

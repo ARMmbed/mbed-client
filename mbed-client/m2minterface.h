@@ -206,6 +206,13 @@ public:
      * @return internal endpoint name
      */
     virtual const String internal_endpoint_name() const = 0;
+
+    /**
+     * @brief Return error description for the latest error code
+     * @return Error description string
+     */
+    virtual const char *error_description() const = 0;
+
 };
 
 #endif // M2M_INTERFACE_H

@@ -110,6 +110,7 @@ public:
      * @return true if created and sent successfully else false.
     */
     bool create_bootstrap_resource(sn_nsdl_addr_s *address);
+                                   const String &bootstrap_endpoint_name);
 
     /**
      * @brief Sets the register message to the server.
@@ -268,6 +269,14 @@ private:
     }ObjectType;
 
     /**
+     * Enum defining an LWM2M object type.
+    */
+    typedef enum {
+        REGISTER  = 0x00,
+        BOOTSTRAP = 0x01
+    }MessageType;
+
+    /**
     * @brief Initializes all the nsdl library component to be usable.
     * @return true if initialization is successful else false.
     */
@@ -385,8 +394,16 @@ private:
 
     /**
      * @brief Handle bootstrap errors.
+     * @param reason, Reason for Bootstrap failure.
     */
-    void handle_bootstrap_error();
+    void handle_bootstrap_error(const char *reason);
+
+    /**
+     * @brief Handle different coap errors.
+     * @param coap_header, CoAP structure.
+     * @return Error reason.
+    */
+    static const char *coap_error(sn_coap_hdr_s *coap_header);
 
     /**
      * @brief Claim

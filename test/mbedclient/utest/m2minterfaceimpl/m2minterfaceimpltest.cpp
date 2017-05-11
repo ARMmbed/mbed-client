@@ -124,6 +124,11 @@ TEST(M2MInterfaceImpl, bootstrap_done)
     m2m_interface_impl->test_bootstrap_done();
 }
 
+TEST(M2MInterfaceImpl, bootstrap_error)
+{
+    m2m_interface_impl->test_bootstrap_error();
+}
+
 TEST(M2MInterfaceImpl, coap_data_processed)
 {
     m2m_interface_impl->test_coap_data_processed();
@@ -167,4 +172,9 @@ TEST(M2MInterfaceImpl, update_endpoint)
 TEST(M2MInterfaceImpl, internal_endpoint_name)
 {
     m2m_interface_impl->test_internal_endpoint_name();
+}
+
+TEST(M2MInterfaceImpl, error_description)
+{
+    m2m_interface_impl->test_error_description();
 }

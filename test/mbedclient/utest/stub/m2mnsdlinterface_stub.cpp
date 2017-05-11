@@ -200,7 +200,7 @@ bool M2MNsdlInterface::validate_security_object()
 
 }
 
-void M2MNsdlInterface::handle_bootstrap_error()
+void M2MNsdlInterface::handle_bootstrap_error(const char *reason)
 {
 
 }
@@ -215,6 +215,26 @@ void M2MNsdlInterface::release_mutex()
 const String& M2MNsdlInterface::endpoint_name() const
 {
     return *m2mnsdlinterface_stub::string_value;
+}
+
+void M2MNsdlInterface::set_server_address(const char* server_address)
+{
+
+}
+
+void M2MNsdlInterface::update_endpoint(const String &name)
+{
+
+}
+
+const String M2MNsdlInterface::internal_endpoint_name() const
+{
+    return *m2mnsdlinterface_stub::string_value;
+}
+
+M2MTimer &M2MNsdlInterface::get_nsdl_execution_timer()
+{
+    return _nsdl_exceution_timer;
 }
 
 void M2MNsdlInterface::set_server_address(const char* server_address)

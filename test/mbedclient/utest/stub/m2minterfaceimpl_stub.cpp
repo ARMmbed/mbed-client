@@ -126,7 +126,7 @@ void M2MInterfaceImpl::bootstrap_wait(M2MSecurity *)
 
 }
 
-void M2MInterfaceImpl::bootstrap_error()
+void M2MInterfaceImpl::bootstrap_error(const char *reason)
 {
 
 }
@@ -178,6 +178,11 @@ void M2MInterfaceImpl::update_endpoint(String &name) {
 }
 
 const String M2MInterfaceImpl::internal_endpoint_name() const
+{
+
+}
+
+const char *M2MInterfaceImpl::error_description() const
 {
 
 }

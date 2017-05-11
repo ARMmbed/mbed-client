@@ -557,6 +557,13 @@ void Test_M2MInterfaceImpl::test_bootstrap_wait()
     delete sec;
 }
 
+void Test_M2MInterfaceImpl::test_bootstrap_error()
+{
+    impl->bootstrap_error("server-internal-error");
+    CHECK(observer->error_occured == true);
+    CHECK(impl->_current_state == M2MInterfaceImpl::STATE_IDLE);
+}
+
 
 void Test_M2MInterfaceImpl::test_bootstrap_done()
 {
@@ -800,4 +807,12 @@ void Test_M2MInterfaceImpl::test_internal_endpoint_name()
     *m2mnsdlinterface_stub::string_value = "test";
     value = impl->internal_endpoint_name();
     STRCMP_EQUAL(value.c_str(),m2mnsdlinterface_stub::string_value->c_str());
+}
+
+void Test_M2MInterfaceImpl::test_error_description()
+{
+    char value[10];
+    strncpy(value, "error", 10);
+    strncpy(impl->_error_description, value, sizeof(impl->_error_description));
+    STRCMP_EQUAL(impl->error_description(), value);
 }

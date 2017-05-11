@@ -85,8 +85,9 @@ public :
     /**
     * @brief Informs that some error occured during
     * bootstrapping.
+    * @param reason, Error string explaining the failure reason
     */
-    virtual void bootstrap_error() = 0;
+    virtual void bootstrap_error(const char *reason) = 0;
 
     /**
     * @brief Informs that received data has been processed.

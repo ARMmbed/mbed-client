@@ -63,6 +63,8 @@ public:
 
     void test_bootstrap_wait();
 
+    void test_bootstrap_error();
+
     void test_coap_data_processed();
 
     void test_value_updated();
@@ -82,6 +84,8 @@ public:
     void test_update_endpoint();
 
     void test_internal_endpoint_name();
+
+    void test_error_description();
 
     M2MInterfaceImpl*   impl;
     TestObserver        *observer;
