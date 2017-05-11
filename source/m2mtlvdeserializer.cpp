@@ -166,24 +166,7 @@ M2MTLVDeserializer::Error M2MTLVDeserializer::deserialize_resources(const uint8_
                 if(update_value) {
                     if(til._length > 0) {
                         tr_debug("M2MTLVDeserializer::deserialize_resources() - Update value");
-                        int64_t value = 0;
-                        switch ((*it)->resource_instance_type()) {
-                            case M2MResourceInstance::INTEGER:
-                            case M2MResourceInstance::BOOLEAN:
-                                value = String::convert_array_to_integer(tlv+offset, til._length);
-                                (*it)->set_value(value);
-                                break;
-                            // Todo! implement support for other types as well
-                            case M2MResourceInstance::STRING:
-                            case M2MResourceInstance::FLOAT:
-                            case M2MResourceInstance::OPAQUE:
-                            case M2MResourceInstance::TIME:
-                            case M2MResourceInstance::OBJLINK:
-                                (*it)->set_value(tlv+offset, til._length);
-                                break;
-                            default:
-                                break;
-                        }
+                        set_resource_instance_value((*it), tlv+offset, til._length);
                     } else {
                         tr_debug("M2MTLVDeserializer::deserialize_resources() - Clear Value");
                         (*it)->clear_value();
@@ -394,14 +377,21 @@ void M2MTLVDeserializer::set_resource_instance_value(M2MResourceInstance *res, c
     switch (res->resource_instance_type()) {
         case M2MResourceInstance::INTEGER:
         case M2MResourceInstance::BOOLEAN:
-            value = String::convert_array_to_integer(tlv, size);
-            res->set_value(value);
+        case M2MResourceInstance::TIME:
+            if(size < 9) { 
+                value = String::convert_array_to_integer(tlv, size);
+                res->set_value(value);
+            }
+            /* size > 8 then handle value same way like 
+             * M2MResourceInstance::STRING */
+            else { 
+                res->set_value(tlv, size);
+            }
             break;
         // Todo! implement conversion for other types as well
         case M2MResourceInstance::STRING:
         case M2MResourceInstance::FLOAT:
         case M2MResourceInstance::OPAQUE:
-        case M2MResourceInstance::TIME:
         case M2MResourceInstance::OBJLINK:
             res->set_value(tlv, size);
             break;
