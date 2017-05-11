@@ -46,7 +46,7 @@ private: // Constructor and destructor are private which means
      * \brief Constructor
      * \param name Name of the object
      */
-    M2MObjectInstance(M2MObject& parent, const String &object_name,
+    M2MObjectInstance(M2MObject& parent,
                       const String &resource_type,
                       char *path,
                       bool external_blockwise_store = false);
@@ -171,14 +171,14 @@ public:
      * remove_resource(const char*) version instead.
      * \return True if removed, else false.
      */
-    virtual bool remove_resource(const String &name);
+    bool remove_resource(const String &name);
 
     /**
      * \brief Removes the resource with the given name.
      * \param name The name of the resource to be removed.
      * \return True if removed, else false.
      */
-    virtual bool remove_resource(const char *name);
+    bool remove_resource(const char *name);
 
     /**
      * \brief Removes the resource instance with the given name.
@@ -186,7 +186,7 @@ public:
      * \param instance_id The instance ID of the instance.
      * \return True if removed, else false.
      */
-    virtual bool remove_resource_instance(const String &resource_name,
+    bool remove_resource_instance(const String &resource_name,
                                           uint16_t instance_id);
 
     /**
@@ -194,21 +194,21 @@ public:
      * \param name The name of the requested resource.
      * \return Resource reference if found, else NULL.
      */
-    virtual M2MResource* resource(const String &name) const;
+    M2MResource* resource(const String &name) const;
 
-    virtual M2MResource* resource(const char *resource) const;
+    M2MResource* resource(const char *resource) const;
 
     /**
      * \brief Returns a list of M2MResourceBase objects.
      * \return A list of M2MResourceBase objects.
      */
-    virtual const M2MResourceList& resources() const;
+    const M2MResourceList& resources() const;
 
     /**
      * \brief Returns the total number of resources with the object.
      * \return Total number of the resources.
      */
-    virtual uint16_t resource_count() const;
+    uint16_t resource_count() const;
 
     /**
      * \brief Returns the total number of single resource instances.
@@ -217,20 +217,14 @@ public:
      * \param resource The name of the resource.
      * \return Total number of the resources.
      */
-    virtual uint16_t resource_count(const String& resource) const;
+    uint16_t resource_count(const String& resource) const;
 
     /**
      * \brief Returns the total number of single resource instances.
      * \param resource The name of the resource.
      * \return Total number of the resources.
      */
-    virtual uint16_t resource_count(const char *resource) const;
-
-    /**
-     * \brief Returns the object type.
-     * \return BaseType.
-     */
-    virtual M2MBase::BaseType base_type() const;
+    uint16_t resource_count(const char *resource) const;
 
     /**
      * \brief Adds the observation level for the object.
@@ -243,6 +237,18 @@ public:
      * \param observation_level The level of observation.
      */
     virtual void remove_observation_level(M2MBase::Observation observation_level);
+
+    /**
+     * \brief Returns the Observation Handler object.
+     * \return M2MObservationHandler object.
+    */
+    virtual M2MObservationHandler* observation_handler() const;
+
+    /**
+     * \brief Sets the observation handler
+     * \param handler Observation handler
+    */
+    virtual void set_observation_handler(M2MObservationHandler *handler);
 
     /**
      * \brief Handles GET request for the registered objects.
@@ -287,7 +293,17 @@ public:
     inline M2MObject& get_parent_object() const;
 
     // callback used from M2MResource/M2MResourceInstance
-    virtual void notification_update(M2MBase::Observation observation_level);
+    void notification_update(M2MBase::Observation observation_level);
+
+private:
+
+    /**
+     * \brief Utility function to map M2MResourceInstance ResourceType
+     * to M2MBase::DataType.
+     * \param resource_type M2MResourceInstance::ResourceType.
+     * \return M2MBase::DataType.
+     */
+    M2MBase::DataType convert_resource_type(M2MResourceInstance::ResourceType);
 
 private:
 

@@ -6,6 +6,7 @@ add_executable(m2mobjectinstance
         "test_m2mobjectinstance.cpp"
         "../stub/m2mbase_stub.cpp"
         "../stub/m2mbase_stub.cpp"
+        "../stub/m2mresourcebase_stub.cpp"
         "../stub/m2mresource_stub.cpp"
         "../stub/m2mresourceinstance_stub.cpp"
         "../stub/common_stub.cpp"

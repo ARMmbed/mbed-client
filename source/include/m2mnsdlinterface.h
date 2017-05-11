@@ -210,7 +210,7 @@ public:
      * @brief Returns nsdl handle.
      * @return ndsl handle
      */
-    nsdl_s* get_nsdl_handle();
+    nsdl_s* get_nsdl_handle() const;
 
     /**
      * @brief Get endpoint name
@@ -231,12 +231,12 @@ protected: // from M2MObservationHandler
 
     virtual void resource_to_be_deleted(M2MBase* base);
 
-    virtual void value_updated(M2MBase *base, const String &object_name);
+    virtual void value_updated(M2MBase *base);
 
     virtual void remove_object(M2MBase *object);
-
+#ifndef DISABLE_DELAYED_RESPONSE
     virtual void send_delayed_response(M2MBase *base);
-
+#endif
 private:
 
     /**
@@ -256,36 +256,36 @@ private:
 
     bool create_nsdl_resource(M2MBase *base);
 
-    String coap_to_string(uint8_t *coap_data_ptr,
+    static String coap_to_string(const uint8_t *coap_data_ptr,
                           int coap_data_ptr_length);
 
     void execute_nsdl_process_loop();
 
-    uint64_t registration_time();
+    uint64_t registration_time() const;
 
     M2MBase* find_resource(const String &object,
-                           uint8_t *token = NULL,
-                           uint8_t token_len = 0);
+                           const uint8_t *token = NULL,
+                           uint8_t token_len = 0) const;
 
     M2MBase* find_resource(const M2MObject *object,
                            const String &object_instance,
-                           uint8_t *token = NULL,
-                           uint8_t token_len = 0);
+                           const uint8_t *token = NULL,
+                           uint8_t token_len = 0) const;
 
     M2MBase* find_resource(const M2MObjectInstance *object_instance,
                            const String &resource_instance,
-                           uint8_t *token = NULL,
-                           uint8_t token_len = 0);
+                           const uint8_t *token = NULL,
+                           uint8_t token_len = 0) const;
 
     M2MBase* find_resource(const M2MResource *resource,
                            const String &object_name,
                            const String &resource_instance,
-                           uint8_t *token = NULL,
-                           uint8_t token_len = 0);
+                           const uint8_t *token = NULL,
+                           uint8_t token_len = 0) const;
 
     bool object_present(M2MObject * object) const;
 
-    M2MInterface::Error interface_error(sn_coap_hdr_s *coap_header);
+    static M2MInterface::Error interface_error(const sn_coap_hdr_s &coap_header);
 
     void send_object_observation(M2MObject *object,
                                  uint16_t obs_number,

@@ -30,7 +30,6 @@ void m2mobject_stub::clear()
 {
     int_value = 0;
     bool_value = false;
-    m2mobject_stub::base_type = M2MBase::Object;
     instance_list.clear();
     header = NULL;
 }
@@ -38,23 +37,25 @@ void m2mobject_stub::clear()
 M2MObject::M2MObject(const String &object_name, char *path, bool external_blockwise_store)
 : M2MBase(object_name,
           M2MBase::Dynamic,
+#ifndef DISABLE_RESOURCE_TYPE
           "",
+#endif          
           path,
-          external_blockwise_store),
-  _max_instance_count(65535)
+          external_blockwise_store,
+          false)
 {
-
+    set_base_type(M2MBase::Object);
 }
 
 M2MObject::M2MObject(const M2MBase::lwm2m_parameters_s* static_res)
-: M2MBase(static_res),
-  _max_instance_count(65535)
+: M2MBase(static_res)
 {
-
+    set_base_type(M2MBase::Object);
 }
 
 M2MObject::~M2MObject()
 {
+    free_resources();
 }
 
 M2MObjectInstance* M2MObject::create_object_instance(uint16_t instance_id)
@@ -82,9 +83,14 @@ uint16_t M2MObject::instance_count() const
     return m2mobject_stub::int_value;
 }
 
-M2MBase::BaseType M2MObject::base_type() const
+M2MObservationHandler* M2MObject::observation_handler() const
 {
-    return m2mobject_stub::base_type;
+    //return _parent.observation_handler();
+    return NULL;
+}
+
+void M2MObject::set_observation_handler(M2MObservationHandler *handler)
+{
 }
 
 void M2MObject::add_observation_level(M2MBase::Observation)

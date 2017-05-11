@@ -70,7 +70,17 @@ public:
 class M2MBaseTest : public M2MBase
 {
 public:
-    M2MBaseTest() : M2MBase("a", M2MBase::Static, "type","a",false){}
+    M2MBaseTest() : M2MBase("a",
+     M2MBase::Static,
+#ifndef DISABLE_RESOURCE_TYPE
+     "type",
+#endif
+     "a",
+     false,
+     false){}
+
+     virtual M2MObservationHandler* observation_handler() const {};
+     virtual void set_observation_handler(M2MObservationHandler*) {};
 };
 
 Test_M2MInterfaceImpl::Test_M2MInterfaceImpl()

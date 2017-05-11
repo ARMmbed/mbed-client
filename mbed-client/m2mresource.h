@@ -17,16 +17,12 @@
 #define M2M_RESOURCE_H
 
 #include "mbed-client/m2mvector.h"
+#include "mbed-client/m2mresourcebase.h"
 #include "mbed-client/m2mresourceinstance.h"
 
 //FORWARD DECLARATION
 class M2MObjectInstance;
 typedef Vector<M2MResourceInstance *> M2MResourceInstanceList;
-
-class M2MResourceCallback {
-public:
-    virtual void notification_update() = 0;
-};
 
 /*! \file m2mresource.h
  *  \brief M2MResource.
@@ -35,7 +31,7 @@ public:
  *  instances associated with the given object.
  */
 
-class M2MResource : public M2MResourceInstance, M2MResourceCallback {
+class M2MResource : public M2MResourceBase {
 
     friend class M2MObjectInstance;
 
@@ -48,8 +44,7 @@ private: // Constructor and destructor are private,
 
     M2MResource(M2MObjectInstance &_parent,
                  const lwm2m_parameters_s* s,
-                 M2MResourceInstance::ResourceType type,
-                 const uint16_t object_instance_id);
+                 M2MBase::DataType type);
     /**
      * \brief Constructor
      * \param resource_name The resource name of the object.
@@ -58,7 +53,6 @@ private: // Constructor and destructor are private,
      * \param value The value pointer of the object.
      * \param value_length The length of the value pointer.
      * \param path Full path of the resource, eg. 1/2/3. Ownership of the memory is transferred.
-     * \param object_instance_id The instance ID of the object where the resource exists.
      * \param object_name The name of the object where the resource exists.
      * \param multiple_instance True if the resource supports instances.
      * \param external_blockwise_store If true CoAP blocks are passed to application through callbacks
@@ -66,12 +60,12 @@ private: // Constructor and destructor are private,
      */
     M2MResource(M2MObjectInstance &_parent,
                 const String &resource_name,
+                M2MBase::Mode mode,
                 const String &resource_type,
-                M2MResourceInstance::ResourceType type,
+                M2MBase::DataType type,
                 const uint8_t *value,
                 const uint8_t value_length,
                 char *path,
-                const uint16_t object_instance_id = 0,
                 bool multiple_instance = false,
                 bool external_blockwise_store = false);
 
@@ -82,7 +76,6 @@ private: // Constructor and destructor are private,
      * \param type The resource data type of the object.
      * \param observable Indicates whether the resource is observable or not.
      * \param path Full path of the resource, eg. 1/2/3. Ownership of the memory is transferred.
-     * \param object_instance_id The ID of the object instance where the resource exists.
      * \param object_name The name of the object where the resource exists.
      * \param multiple_instance True if the resource supports instances.
      * \param external_blockwise_store If true CoAP blocks are passed to application through callbacks
@@ -90,11 +83,11 @@ private: // Constructor and destructor are private,
      */
     M2MResource(M2MObjectInstance &_parent,
                 const String &resource_name,
+                M2MBase::Mode mode,
                 const String &resource_type,
-                M2MResourceInstance::ResourceType type,
+                M2MBase::DataType type,
                 bool observable,
                 char *path,
-                const uint16_t object_instance_id = 0,
                 bool multiple_instance = false,
                 bool external_blockwise_store = false);
 
@@ -128,6 +121,7 @@ public:
      */
     bool supports_multiple_instances() const;
 
+#ifndef DISABLE_DELAYED_RESPONSE
     /**
      * \brief Sets whether the resource should send a delayed response for a POST request.
      * \param delayed_response A boolean value to set the delayed response.
@@ -148,6 +142,7 @@ public:
      * \param value_length[OUT] The length of the token pointer.
      */
     void get_delayed_token(uint8_t *&token, uint8_t &token_length);
+#endif
 
     /**
      * \brief Removes a resource with a given name.
@@ -155,32 +150,44 @@ public:
      * \param instance_id The instance ID of the resource to be removed, default is 0.
      * \return True if removed, else false.
      */
-    virtual bool remove_resource_instance(uint16_t instance_id = 0);
+    bool remove_resource_instance(uint16_t instance_id = 0);
 
     /**
      * \brief Returns a resource instance with a given name.
      * \param instance_id The instance ID of the requested resource, default is 0
      * \return M2MResourceInstance object if found, else NULL.
      */
-    virtual M2MResourceInstance* resource_instance(uint16_t instance_id = 0) const;
+    M2MResourceInstance* resource_instance(uint16_t instance_id = 0) const;
 
     /**
      * \brief Returns a list of resources.
      * \return A list of resources.
      */
-    virtual const M2MResourceInstanceList& resource_instances() const;
+    const M2MResourceInstanceList& resource_instances() const;
 
     /**
      * \brief Returns the total number of resources.
      * \return The total number of resources.
      */
-    virtual uint16_t resource_instance_count() const;
+    uint16_t resource_instance_count() const;
 
     /**
      * \brief Returns the value set for delayed response.
      * \return The value for delayed response.
      */
     bool delayed_response() const;
+
+    /**
+     * \brief Returns the Observation Handler object.
+     * \return M2MObservationHandler object.
+    */
+    virtual M2MObservationHandler* observation_handler() const;
+
+    /**
+     * \brief Sets the observation handler
+     * \param handler Observation handler
+    */
+    virtual void set_observation_handler(M2MObservationHandler *handler);
 
     /**
      * \brief Parses the received query for a notification
@@ -243,23 +250,27 @@ public:
     M2MObjectInstance& get_parent_object_instance() const;
 
     /**
+     * \brief Returns the instance ID of the object where the resource exists.
+     * \return Object instance ID.
+    */
+    virtual uint16_t object_instance_id() const;
+
+    /**
      * \brief Returns the name of the object where the resource exists.
      * \return Object name.
     */
     virtual const char* object_name() const;
 
-protected:
-    virtual void notification_update();
-
-
+    virtual M2MResource& get_parent_resource() const;
 private:
     M2MObjectInstance &_parent;
 
     M2MResourceInstanceList     _resource_instance_list; // owned
+#ifndef DISABLE_DELAYED_RESPONSE
     uint8_t                     *_delayed_token;
     uint8_t                     _delayed_token_len;
-    bool                        _has_multiple_instances;
     bool                        _delayed_response;
+#endif    
 
 friend class Test_M2MResource;
 friend class Test_M2MObjectInstance;

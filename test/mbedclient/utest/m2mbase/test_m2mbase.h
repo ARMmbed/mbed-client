@@ -30,7 +30,7 @@ public:
     void send_delayed_response(M2MBase *){}
     void resource_to_be_deleted(M2MBase *){visited=true;}
     void remove_object(M2MBase *){visited = true;}
-    void value_updated(M2MBase *,const String&){visited = true;}
+    void value_updated(M2MBase *){visited = true;}
 
     void clear() {visited = false;}
     bool visited;
@@ -40,8 +40,22 @@ class Test_M2MBase : M2MBase
 {
 public:
     Test_M2MBase(char* path, Handler *handler);
+    Test_M2MBase(const String &name,
+            M2MBase::Mode mode,
+#ifndef DISABLE_RESOURCE_TYPE
+            const String &resource_type,
+#endif
+            char *path,
+            bool external_blockwise_store,
+            bool multiple_instance,
+            M2MBase::DataType type = M2MBase::OBJLINK);
+
+    Test_M2MBase(const lwm2m_parameters_s* s);
 
     virtual ~Test_M2MBase();
+
+    virtual M2MObservationHandler* observation_handler() const;
+    virtual void set_observation_handler(M2MObservationHandler *handler);
 
     void test_copy_constructor();
 
@@ -107,8 +121,6 @@ public:
 
     void test_set_register_uri();
 
-    void test_set_observation_number();
-
     void test_set_max_age();
 
     void test_is_under_observation();
@@ -138,6 +150,8 @@ public:
     void test_alloc_string_copy();
 
     void test_ctor();
+
+    void test_get_lwm2m_parameter();
 
     Handler *obsHandler;
 };

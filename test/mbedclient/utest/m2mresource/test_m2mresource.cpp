@@ -29,7 +29,7 @@ class TestReportObserver :  public M2MReportObserver{
 public :
     TestReportObserver() {}
     ~TestReportObserver() {}
-    virtual void observation_to_be_sent(const m2m::Vector<uint16_t>&,bool){ }
+    virtual void observation_to_be_sent(const m2m::Vector<uint16_t>&, uint16_t, bool){ }
 };
 
 class Handler : public M2MObservationHandler {
@@ -44,7 +44,7 @@ public:
     void send_delayed_response(M2MBase *){}
     void resource_to_be_deleted(M2MBase *){visited=true;}
     void remove_object(M2MBase *){visited = true;}
-    void value_updated(M2MBase *,const String&){visited = true;}
+    void value_updated(M2MBase *){visited = true;}
 
     void clear() {visited = false;}
     bool visited;
@@ -56,8 +56,10 @@ Test_M2MResource::Test_M2MResource()
     object = new M2MObject("name", "name");
     object_instance = new M2MObjectInstance(*object, "name", "type", "");
     resource = new M2MResource(*object_instance,
-                               "name","resource_type",
-                               M2MResourceInstance::INTEGER,false, "name");
+                               "name",
+                               M2MBase::Dynamic,
+                               "resource_type",
+                               M2MBase::INTEGER,false, "name");
 }
 
 Test_M2MResource::~Test_M2MResource()
@@ -74,11 +76,11 @@ void Test_M2MResource::test_static_resource()
     u_int8_t value[] = {"value"};
     M2MResource *res = new M2MResource(*m2mobject_stub::inst,
                                        "name",
+                                      M2MBase::Dynamic,
                                       "resource_type",
-                                      M2MResourceInstance::INTEGER,
+                                      M2MBase::INTEGER,
                                       value,
-                                      (uint32_t)sizeof(value),"name");
-
+                                      (uint8_t)sizeof(value),"name");
     CHECK(res != NULL);
     delete res;
 
@@ -86,13 +88,27 @@ void Test_M2MResource::test_static_resource()
 
 void Test_M2MResource::test_base_type()
 {
-    m2mresourceinstance_stub::base_type = M2MBase::Resource;
-    CHECK(M2MBase::Resource == resource->base_type());
+    u_int8_t value[] = {"value"};
+    M2MResource resource(*m2mobject_stub::inst,
+                                       "name",
+                                      M2MBase::Dynamic,
+                                      "resource_type",
+                                      M2MBase::INTEGER,
+                                      value,
+                                      (uint8_t)sizeof(value),"name");
+
+    CHECK(M2MBase::Resource == resource.base_type());
 }
 
 void Test_M2MResource::test_muliptle_instances()
 {
+    M2MBase::lwm2m_parameters_s param;
+    m2mbase_stub::sn_resource = &param;
+    memset(m2mbase_stub::sn_resource,0,sizeof(M2MBase::lwm2m_parameters_s));
+    m2mbase_stub::sn_resource->multiple_instance = false;
+
     CHECK(false == resource->supports_multiple_instances());
+    m2mbase_stub::sn_resource = NULL;
 }
 
 void Test_M2MResource::test_handle_observation_attribute()
@@ -107,10 +123,11 @@ void Test_M2MResource::test_handle_observation_attribute()
 
     M2MResourceInstance *res = new M2MResourceInstance(*m2mobjectinstance_stub::resource,
                                                                               "name",
+                                                                              M2MBase::Dynamic,
                                                                               "type",
-                                                                              M2MResourceInstance::INTEGER,
-                                                                              0,
+                                                                              M2MBase::INTEGER,
                                                                               "name",
+                                                                              false,
                                                                               false);
 
     resource->add_resource_instance(res);
@@ -121,7 +138,6 @@ void Test_M2MResource::test_handle_observation_attribute()
     m2mbase_stub::bool_value = true;
     CHECK(false == resource->handle_observation_attribute(d));
 
-    resource->_resource_type = M2MResourceInstance::INTEGER;
     m2mreporthandler_stub::bool_return = true;
     CHECK(true == resource->handle_observation_attribute(d));
 
@@ -136,10 +152,11 @@ void Test_M2MResource::test_add_resource_instance()
 {
     M2MResourceInstance *res = new M2MResourceInstance(*m2mobjectinstance_stub::resource,
                                                                               "name",
+                                                                              M2MBase::Dynamic,
                                                                               "type",
-                                                                              M2MResourceInstance::INTEGER,
-                                                                              0,
+                                                                              M2MBase::INTEGER,
                                                                               "name",
+                                                                              false,
                                                                               false);
     resource->add_resource_instance(res);
     CHECK(resource->_resource_instance_list.size() == 1);
@@ -149,10 +166,11 @@ void Test_M2MResource::test_remove_resource_instance()
 {
     M2MResourceInstance *res = new M2MResourceInstance(*m2mobjectinstance_stub::resource,
                                                                               "name",
+                                                                              M2MBase::Dynamic,
                                                                               "type",
-                                                                              M2MResourceInstance::STRING,
-                                                                              0,
+                                                                              M2MBase::STRING,
                                                                               "name",
+                                                                              false,
                                                                               false);
     resource->_resource_instance_list.push_back(res);
     CHECK(resource->remove_resource_instance(0) == true);
@@ -162,10 +180,11 @@ void Test_M2MResource::test_resource_instance()
 {
     M2MResourceInstance *res = new M2MResourceInstance(*m2mobjectinstance_stub::resource,
                                                                               "name",
+                                                                              M2MBase::Dynamic,
                                                                               "type",
-                                                                              M2MResourceInstance::STRING,
-                                                                              0,
+                                                                              M2MBase::STRING,
                                                                               "name",
+                                                                              false,
                                                                               false);
     resource->_resource_instance_list.push_back(res);
     CHECK(resource->resource_instance(0) != NULL);
@@ -175,10 +194,11 @@ void Test_M2MResource::test_resource_instances()
 {
     M2MResourceInstance *res = new M2MResourceInstance(*m2mobjectinstance_stub::resource,
                                                                               "name",
+                                                                              M2MBase::Dynamic,
                                                                               "type",
-                                                                              M2MResourceInstance::STRING,
-                                                                              0,
+                                                                              M2MBase::STRING,
                                                                               "name",
+                                                                              false,
                                                                               false);
     resource->_resource_instance_list.push_back(res);
     M2MResourceInstanceList list = resource->resource_instances();
@@ -189,10 +209,11 @@ void Test_M2MResource::test_resource_instance_count()
 {
     M2MResourceInstance *res = new M2MResourceInstance(*m2mobjectinstance_stub::resource,
                                                                               "name",
+                                                                              M2MBase::Dynamic,
                                                                               "type",
-                                                                              M2MResourceInstance::STRING,
-                                                                              0,
+                                                                              M2MBase::STRING,
                                                                               "name",
+                                                                              false,
                                                                               false);
     resource->_resource_instance_list.push_back(res);
     CHECK(resource->resource_instance_count() ==1);
@@ -202,10 +223,11 @@ void Test_M2MResource::test_add_observation_level()
 {
     M2MResourceInstance *res = new M2MResourceInstance(*m2mobjectinstance_stub::resource,
                                                                               "name",
+                                                                              M2MBase::Dynamic,
                                                                               "type",
-                                                                              M2MResourceInstance::STRING,
-                                                                              0,
+                                                                              M2MBase::STRING,
                                                                               "name",
+                                                                              false,
                                                                               false);
     resource->_resource_instance_list.push_back(res);
 
@@ -218,10 +240,11 @@ void Test_M2MResource::test_remove_observation_level()
 {
     M2MResourceInstance *res = new M2MResourceInstance(*m2mobjectinstance_stub::resource,
                                                                               "name",
+                                                                              M2MBase::Dynamic,
                                                                               "type",
-                                                                              M2MResourceInstance::STRING,
-                                                                              0,
+                                                                              M2MBase::STRING,
                                                                               "name",
+                                                                              false,
                                                                               false);
     resource->_resource_instance_list.push_back(res);
 
@@ -247,6 +270,15 @@ void Test_M2MResource::test_handle_get_request()
     m2mbase_stub::operation = M2MBase::GET_ALLOWED;
     m2mbase_stub::uint8_value = 200;
 
+    M2MBase::lwm2m_parameters_s param;
+    m2mbase_stub::sn_resource = &param;
+    memset(m2mbase_stub::sn_resource,0,sizeof(M2MBase::lwm2m_parameters_s));
+    m2mbase_stub::sn_resource->data_type = M2MBase::STRING;
+
+    sn_nsdl_dynamic_resource_parameters_s res_param;
+    m2mbase_stub::nsdl_resource = &res_param;
+    memset(m2mbase_stub::nsdl_resource,0,sizeof(sn_nsdl_dynamic_resource_parameters_s));
+
     common_stub::coap_header = (sn_coap_hdr_ *)malloc(sizeof(sn_coap_hdr_));
     memset(common_stub::coap_header,0,sizeof(sn_coap_hdr_));
     common_stub::coap_header->options_list_ptr = (sn_coap_options_list_s*)malloc(sizeof(sn_coap_options_list_s));
@@ -263,22 +295,24 @@ void Test_M2MResource::test_handle_get_request()
 
     M2MResourceInstance *res_instance = new M2MResourceInstance(*m2mobjectinstance_stub::resource,
                                                                               "name",
+                                                                              M2MBase::Dynamic,
                                                                               "res2",
-                                                                              M2MResourceInstance::STRING,
-                                                                              0,
+                                                                              M2MBase::STRING,
                                                                               "name",
+                                                                              false,
                                                                               false);
 
     M2MResourceInstance *res_instance_1 = new M2MResourceInstance(*m2mobjectinstance_stub::resource,
                                                                               "name",
+                                                                              M2MBase::Dynamic,
                                                                               "res2",
-                                                                              M2MResourceInstance::STRING,
-                                                                              0,
+                                                                              M2MBase::STRING,
                                                                               "name",
+                                                                              false,
                                                                               false);
     CHECK(resource->handle_get_request(NULL,coap_header,handler) == NULL);
 
-    resource->_has_multiple_instances = true;
+    m2mbase_stub::sn_resource->multiple_instance = true;
     resource->add_resource_instance(res_instance);
     resource->add_resource_instance(res_instance_1);
 
@@ -359,6 +393,15 @@ void Test_M2MResource::test_handle_put_request()
     TestReportObserver obs;
     m2mbase_stub::report = new M2MReportHandler(obs);
 
+    M2MBase::lwm2m_parameters_s param;
+    m2mbase_stub::sn_resource = &param;
+    memset(m2mbase_stub::sn_resource,0,sizeof(M2MBase::lwm2m_parameters_s));
+    m2mbase_stub::sn_resource->data_type = M2MBase::STRING;
+
+    sn_nsdl_dynamic_resource_parameters_s res_param;
+    m2mbase_stub::nsdl_resource = &res_param;
+    memset(m2mbase_stub::nsdl_resource,0,sizeof(sn_nsdl_dynamic_resource_parameters_s));
+
     memset(coap_header, 0, sizeof(sn_coap_hdr_s));
 
     coap_header->uri_path_ptr = value;
@@ -383,7 +426,7 @@ void Test_M2MResource::test_handle_put_request()
 
     CHECK(resource->handle_put_request(NULL,coap_header,handler,execute_value_updated) == NULL);
 
-    resource->_has_multiple_instances = true;
+    m2mbase_stub::sn_resource->multiple_instance = true;
     m2mbase_stub::uint8_value = 99;
     coap_header->content_format = sn_coap_content_format_e(-1);
     coap_response = resource->handle_put_request(NULL,coap_header,handler,execute_value_updated);
@@ -461,6 +504,7 @@ void Test_M2MResource::test_handle_put_request()
     m2mbase_stub::report = NULL;
     m2mtlvdeserializer_stub::clear();
     common_stub::clear();
+    m2mbase_stub::sn_resource = NULL;
     m2mbase_stub::clear();
 }
 
@@ -482,6 +526,15 @@ void Test_M2MResource::test_handle_post_request()
 
     m2mbase_stub::operation = M2MBase::POST_ALLOWED;
     m2mbase_stub::uint8_value = 200;
+
+    M2MBase::lwm2m_parameters_s param;
+    m2mbase_stub::sn_resource = &param;
+    memset(m2mbase_stub::sn_resource,0,sizeof(M2MBase::lwm2m_parameters_s));
+    m2mbase_stub::sn_resource->data_type = M2MBase::STRING;
+
+    sn_nsdl_dynamic_resource_parameters_s res_param;
+    m2mbase_stub::nsdl_resource = &res_param;
+    memset(m2mbase_stub::nsdl_resource,0,sizeof(sn_nsdl_dynamic_resource_parameters_s));
 
     common_stub::coap_header = (sn_coap_hdr_ *)malloc(sizeof(sn_coap_hdr_));
     memset(common_stub::coap_header,0,sizeof(sn_coap_hdr_));
@@ -543,7 +596,7 @@ void Test_M2MResource::test_notification_update()
     m2mbase_stub::report = new M2MReportHandler(obs);
     m2mbase_stub::bool_value = true;
 
-    resource->notification_update();
+   // resource->notification_update();
 
     delete m2mbase_stub::report;
     m2mbase_stub::report = NULL;
@@ -617,13 +670,13 @@ void Test_M2MResource::test_execute_params()
 
 void Test_M2MResource::test_ctor()
 {
-    M2MResource* res = new M2MResource(*m2mobject_stub::inst,&params,M2MResourceInstance::INTEGER,0);
+    M2MResource* res = new M2MResource(*m2mobject_stub::inst,&params,M2MBase::INTEGER);
     delete res;
 }
 
 void Test_M2MResource::test_get_parent_object_instance()
 {
-    M2MResource* res = new M2MResource(*m2mobject_stub::inst,&params,M2MResourceInstance::INTEGER,0);
+    M2MResource* res = new M2MResource(*m2mobject_stub::inst,&params,M2MBase::INTEGER);
 
     // Only for the code coverage
     res->get_parent_object_instance();

@@ -12,7 +12,11 @@
         "sn-coap-duplication-max-msgs-count": null,
         "sn-coap-max-incoming-message-size": null,
         "sn-coap-resending-queue-size-msgs": null,
-        "sn-coap-resending-queue-size-bytes": null
+        "sn-coap-resending-queue-size-bytes": null,
+        "disable-interface-description": null,
+        "disable-resource-type": null,
+        "disable-delayed-response": null,
+        "disable-block-message": null
     },
     "macros" : [
         "MBED_CLIENT_C_NEW_API"

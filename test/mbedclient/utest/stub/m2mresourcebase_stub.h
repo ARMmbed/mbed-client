@@ -13,23 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef M2M_REPORT_HANDLER_STUB_H
-#define M2M_REPORT_HANDLER_STUB_H
+#ifndef M2M_RESOURCE_BASE_STUB_H
+#define M2M_RESOURCE_BASE_STUB_H
 
-#include "m2mreporthandler.h"
+#include "m2mresourcebase.h"
 
 //some internal test related stuff
-namespace m2mreporthandler_stub
+namespace m2mresourcebase_stub
 {
-    extern bool bool_return;
-    extern uint8_t int_value;
-    extern uint16_t int16_value;
-    extern M2MBase::Observation observation_level_value;
-    extern uint32_t token_len;
-    extern uint8_t* token;
-
+    extern uint32_t int_value;
+    extern uint8_t* value;
+    extern bool bool_value;
+    extern String *string_value;
+    extern M2MResourceBase::ResourceType resource_type;
+    extern M2MBase::BaseType base_type;
+    extern sn_coap_hdr_s *header;
     void clear();
 }
 
-#endif // M2M_REPORT_HANDLER_STUB_H
+#endif // M2M_RESOURCE_BASE_STUB_H
 

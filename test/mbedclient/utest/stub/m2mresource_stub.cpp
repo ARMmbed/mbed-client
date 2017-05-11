@@ -39,61 +39,65 @@ void m2mresource_stub::clear()
 
 M2MResource::M2MResource(M2MObjectInstance &parent,
                          const String &resource_name,
+                         M2MBase::Mode resource_mode,
                          const String &resource_type,
-                         M2MResourceInstance::ResourceType type,
+                         M2MBase::DataType type,
                          const uint8_t *value,
                          const uint8_t value_length,
-                         char* path,
-                         const uint16_t object_instance_id,
+                         char *path,
                          bool multiple_instance,
                          bool external_blockwise_store)
-: M2MResourceInstance(*this, resource_name, resource_type, type, value, value_length, object_instance_id,
-                      path, external_blockwise_store),
-  _parent(parent),
-  _delayed_token(NULL),
+: M2MResourceBase(resource_name, resource_mode, resource_type, type, value, value_length,
+                      path, external_blockwise_store, multiple_instance),
+  _parent(parent)
+#ifndef DISABLE_DELAYED_RESPONSE
+  ,_delayed_token(NULL),
   _delayed_token_len(0),
-  _has_multiple_instances(multiple_instance),
   _delayed_response(false)
+#endif
 {
-
+    set_base_type(M2MBase::Resource);
 }
 
 M2MResource::M2MResource(M2MObjectInstance &parent,
                          const lwm2m_parameters_s* s,
-                          M2MResourceInstance::ResourceType type,
-                         const uint16_t object_instance_id)
-: M2MResourceInstance(*this, s, type, object_instance_id),
-  _parent(parent),
-  _delayed_token(NULL),
+                          M2MBase::DataType type)
+: M2MResourceBase(s, type),
+  _parent(parent)
+#ifndef DISABLE_DELAYED_RESPONSE
+  ,_delayed_token(NULL),
   _delayed_token_len(0),
-  _has_multiple_instances(false),
   _delayed_response(false)
+#endif
 {
-    // tbd: _has_multiple_instances could be in flash, but no real benefit, because of current alignment.
+    set_base_type(M2MBase::Resource);
 }
 
 M2MResource::M2MResource(M2MObjectInstance &parent,
                          const String &resource_name,
+                         M2MBase::Mode resource_mode,
                          const String &resource_type,
-                         M2MResourceInstance::ResourceType type,
+                         M2MBase::DataType type,
                          bool observable,
                          char *path,
-                         const uint16_t object_instance_id,
                          bool multiple_instance,
                          bool external_blockwise_store)
-: M2MResourceInstance(*this, resource_name, resource_type, type,
-                      object_instance_id, path, external_blockwise_store),
-  _parent(parent),
-  _delayed_token(NULL),
+: M2MResourceBase(resource_name, resource_mode, resource_type, type,
+                      path,
+                      external_blockwise_store,multiple_instance),
+  _parent(parent)
+#ifndef DISABLE_DELAYED_RESPONSE
+  ,_delayed_token(NULL),
   _delayed_token_len(0),
-  _has_multiple_instances(multiple_instance),
   _delayed_response(false)
+#endif
 {
-
+    set_base_type(M2MBase::Resource);
 }
 
 M2MResource::~M2MResource()
 {
+    free_resources();
 }
 
 bool M2MResource::supports_multiple_instances() const
@@ -140,6 +144,15 @@ bool M2MResource::handle_observation_attribute(const char *query)
     return m2mresource_stub::bool_value;
 }
 
+M2MObservationHandler* M2MResource::observation_handler() const
+{
+    return NULL;
+}
+
+void M2MResource::set_observation_handler(M2MObservationHandler *handler)
+{
+}
+
 void M2MResource::add_resource_instance(M2MResourceInstance *)
 {
 }
@@ -149,10 +162,6 @@ void M2MResource::add_observation_level(M2MBase::Observation)
 }
 
 void M2MResource::remove_observation_level(M2MBase::Observation)
-{
-}
-
-void M2MResource::notification_update()
 {
 }
 
@@ -182,6 +191,16 @@ sn_coap_hdr_s* M2MResource::handle_post_request(nsdl_s *,
 M2MObjectInstance& M2MResource::get_parent_object_instance() const
 {
     return *m2mresource_stub::object_instance;
+}
+
+uint16_t M2MResource::object_instance_id() const
+{
+    return 0; // XXX
+}
+
+M2MResource& M2MResource::get_parent_resource() const
+{
+    return (M2MResource&)*this;
 }
 
 const char* M2MResource::object_name() const

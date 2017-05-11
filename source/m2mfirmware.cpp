@@ -69,12 +69,15 @@ M2MFirmware::~M2MFirmware()
 
 STATIC_PARAM_TYPE
 static sn_nsdl_static_resource_parameters_s firmware_package_params_static = {
+#ifndef DISABLE_RESOURCE_TYPE
     (char*)OMA_RESOURCE_TYPE,      // resource_type_ptr
+#endif
+#ifndef DISABLE_INTERFACE_DESCRIPTION
     (char*)"",                     // interface_description_ptr
-    (uint8_t*)PACKAGE_PATH,    // path
-    (uint8_t*)"",           // resource
-    5,                      // strlen("5/0/0")
-    0,                      // resourcelen
+#endif	
+    (char*)PACKAGE_PATH,    // path
+//    (uint8_t*)"",           // resource
+//    0,                      // resourcelen
     false,                  // external_memory_block
     SN_GRS_DYNAMIC,         // mode
     false                   // free_on_delete
@@ -84,12 +87,15 @@ static sn_nsdl_static_resource_parameters_s firmware_package_params_static = {
 
 STATIC_PARAM_TYPE
 static sn_nsdl_static_resource_parameters_s firmware_package_uri_params_static = {
+#ifndef DISABLE_RESOURCE_TYPE
     (char*)OMA_RESOURCE_TYPE,      // resource_type_ptr
+#endif
+#ifndef DISABLE_INTERFACE_DESCRIPTION
     (char*)"",                     // interface_description_ptr
-    (uint8_t*)PACKAGE_URI_PATH, // path
-    (uint8_t*)"",           // resource
-    5,                      // strlen("5/0/1")
-    0,                      // resourcelen
+#endif
+    (char*)PACKAGE_URI_PATH, // path
+//    (uint8_t*)"",           // resource
+//    0,                      // resourcelen
     false,                  // external_memory_block
     SN_GRS_DYNAMIC,         // mode
     false                   // free_on_delete
@@ -99,12 +105,15 @@ static sn_nsdl_static_resource_parameters_s firmware_package_uri_params_static =
 
 STATIC_PARAM_TYPE
 static sn_nsdl_static_resource_parameters_s firmware_update_params_static = {
+#ifndef DISABLE_RESOURCE_TYPE
     (char*)OMA_RESOURCE_TYPE,   // resource_type_ptr
+#endif
+#ifndef DISABLE_INTERFACE_DESCRIPTION
     (char*)"",                  // interface_description_ptr
-    (uint8_t*)UPDATE_PATH,  // path
-    (uint8_t*)"",           // resource
-    5,                      // strlen(5/0/2)
-    0,                      // resourcelen
+#endif
+    (char*)UPDATE_PATH,     // path
+//    (uint8_t*)"",           // resource
+//    0,                      // resourcelen
     false,                  // external_memory_block
     SN_GRS_DYNAMIC,         // mode
     false                   // free_on_delete
@@ -114,12 +123,13 @@ static sn_nsdl_static_resource_parameters_s firmware_update_params_static = {
 
 STATIC_PARAM_TYPE
 static sn_nsdl_static_resource_parameters_s firmware_state_params_static = {
+#ifndef DISABLE_RESOURCE_TYPE
     (char*)OMA_RESOURCE_TYPE,   // resource_type_ptr
+#endif
+#ifndef DISABLE_INTERFACE_DESCRIPTION
     (char*)"",                  // interface_description_ptr
-    (uint8_t*)STATE_URI_PATH,   // path
-    (uint8_t*)"0",          // resource
-    5,                      // strlen("5/0/3")
-    1,                      // resourcelen
+#endif
+    (char*)STATE_URI_PATH,   // path
     false,                  // external_memory_block
     SN_GRS_DYNAMIC,         // mode
     false                   // free_on_delete
@@ -129,12 +139,13 @@ static sn_nsdl_static_resource_parameters_s firmware_state_params_static = {
 
 STATIC_PARAM_TYPE
 static sn_nsdl_static_resource_parameters_s firmware_update_result_params_static = {
+#ifndef DISABLE_RESOURCE_TYPE
     (char*)OMA_RESOURCE_TYPE,      // resource_type_ptr
+#endif
+#ifndef DISABLE_INTERFACE_DESCRIPTION
     (char*)"",                     // interface_description_ptr
-    (uint8_t*)UPDATE_RESULT_PATH, // path
-    (uint8_t*)"0",          // resource
-    5,                      // strlen(5/0/5)
-    1,                      // resourcelen
+#endif
+    (char*)UPDATE_RESULT_PATH, // path
     false,                  // external_memory_block
     SN_GRS_DYNAMIC,         // mode
     false                   // free_on_delete
@@ -143,7 +154,9 @@ static sn_nsdl_static_resource_parameters_s firmware_update_result_params_static
 static sn_nsdl_dynamic_resource_parameters_s firmware_package_params_dynamic = {
     __nsdl_c_callback,
     &firmware_package_params_static,
+    NULL,
     {NULL, NULL},                     // link
+    0,
     COAP_CONTENT_OMA_PLAIN_TEXT_TYPE, // coap_content_type
     M2MBase::PUT_ALLOWED,   // access
     0,                      // registered
@@ -155,7 +168,9 @@ static sn_nsdl_dynamic_resource_parameters_s firmware_package_params_dynamic = {
 static sn_nsdl_dynamic_resource_parameters_s firmware_package_uri_params_dynamic = {
     __nsdl_c_callback,
     &firmware_package_uri_params_static,
+    NULL,
     {NULL, NULL},                     // link
+    0,
     COAP_CONTENT_OMA_PLAIN_TEXT_TYPE, // coap_content_type
     M2MBase::PUT_ALLOWED,   // access
     0,                      // registered
@@ -167,7 +182,9 @@ static sn_nsdl_dynamic_resource_parameters_s firmware_package_uri_params_dynamic
 static sn_nsdl_dynamic_resource_parameters_s firmware_update_params_dynamic = {
     __nsdl_c_callback,
     &firmware_update_params_static,
+    NULL,
     {NULL, NULL},                     // link
+    0,
     COAP_CONTENT_OMA_PLAIN_TEXT_TYPE, // coap_content_type
     M2MBase::NOT_ALLOWED,   // access
     0,                      // registered
@@ -179,7 +196,9 @@ static sn_nsdl_dynamic_resource_parameters_s firmware_update_params_dynamic = {
 static sn_nsdl_dynamic_resource_parameters_s firmware_state_params_dynamic = {
     __nsdl_c_callback,
     &firmware_state_params_static,
-    {NULL, NULL},                     // link
+    NULL,                   // resource
+    {NULL, NULL},           // link
+    0,                      // resourcelen
     COAP_CONTENT_OMA_PLAIN_TEXT_TYPE, // coap_content_type
     M2MBase::GET_ALLOWED,   // access
     0,                      // registered
@@ -191,7 +210,9 @@ static sn_nsdl_dynamic_resource_parameters_s firmware_state_params_dynamic = {
 static sn_nsdl_dynamic_resource_parameters_s firmware_update_result_params_dynamic = {
     __nsdl_c_callback,
     &firmware_update_result_params_static,
-    {NULL, NULL},                     // link
+    NULL,                   // resource
+    {NULL, NULL},           // link
+    0,                      // resourcelen
     COAP_CONTENT_OMA_PLAIN_TEXT_TYPE, // coap_content_type
     M2MBase::GET_ALLOWED,   // access
     0,                      // registered
@@ -199,54 +220,60 @@ static sn_nsdl_dynamic_resource_parameters_s firmware_update_result_params_dynam
     false,                  // free_on_delete
     true                    // observable
 };
+
 const static M2MBase::lwm2m_parameters firmware_package_params = {
     0, // max_age
-    0, // instance_id
-    0, // name_id
-    (char*)FIRMWARE_PACKAGE, // name
+    (char*)FIRMWARE_PACKAGE,
     &firmware_package_params_dynamic,
     M2MBase::Resource, // base_type
-    false // free_on_delete
+    M2MBase::OPAQUE,
+    false,
+    false, // free_on_delete
+    false  // identifier_int_type
 };
 
 const static M2MBase::lwm2m_parameters firmware_package_uri_params = {
     0, // max_age
-    0, // instance_id
-    0, // name_id
-    (char*)FIRMWARE_PACKAGE_URI, // name
+    (char*)FIRMWARE_PACKAGE_URI,
     &firmware_package_uri_params_dynamic,
     M2MBase::Resource, // base_type
-    false // free_on_delete
+    M2MBase::STRING,
+    false,
+    false, // free_on_delete
+    false  // identifier_int_type
 };
 
 const static M2MBase::lwm2m_parameters firmware_update_params = {
     0, // max_age
-    0, // instance_id
-    0, // name_id
-    (char*)FIRMWARE_UPDATE, // name
+    (char*)FIRMWARE_UPDATE,
     &firmware_update_params_dynamic,
     M2MBase::Resource, // base_type
-    false // free_on_delete
+    M2MBase::OPAQUE,
+    false,
+    false, // free_on_delete
+    false  // identifier_int_type
 };
 
 const static M2MBase::lwm2m_parameters firmware_state_params = {
     0, // max_age
-    0, // instance_id
-    0, // name_id
-    (char*)FIRMWARE_STATE, // name
+    (char*)FIRMWARE_STATE,
     &firmware_state_params_dynamic,
     M2MBase::Resource, // base_type
-    false // free_on_delete
+    M2MBase::INTEGER,
+    false,
+    false, // free_on_delete
+    false  // identifier_int_type
 };
 
 const static M2MBase::lwm2m_parameters firmware_update_result_params = {
     0, // max_age
-    0, // instance_id
-    0, // name_id
-    (char*)FIRMWARE_UPDATE_RESULT, // name
+    (char*)FIRMWARE_UPDATE_RESULT,
     &firmware_update_result_params_dynamic,
     M2MBase::Resource, // base_type
-    false // free_on_delete
+    M2MBase::INTEGER,
+    false,
+    false, // free_on_delete
+    false  // identifier_int_type
 };
 
 void M2MFirmware::create_mandatory_resources()
@@ -258,7 +285,6 @@ void M2MFirmware::create_mandatory_resources()
     // todo:
     // perhaps we should have a API for batch creation of objects by using a array
     // of lwm2m_parameters.
-
     res = _firmware_instance->create_dynamic_resource(&firmware_package_params,
                                                         M2MResourceInstance::OPAQUE,
                                                         false);
@@ -275,9 +301,19 @@ void M2MFirmware::create_mandatory_resources()
                                                     M2MResourceInstance::INTEGER,
                                                     true);
 
+    // XXX: some of the tests expect to have some value available here
+    if (res) {
+        res->set_value(0);
+    }
+
     res = _firmware_instance->create_dynamic_resource(&firmware_update_result_params,
                                                     M2MResourceInstance::INTEGER,
                                                     true);
+                                                    
+    // XXX: some of the tests expect to have some value available here
+    if (res) {
+        res->set_value(0);
+    }
 }
 
 M2MResource* M2MFirmware::create_resource(FirmwareResource resource, const String &value)
@@ -646,6 +682,7 @@ bool M2MFirmware::set_resource_notification_sent_callback(FirmwareResource resou
     return false;
 }
 
+#ifndef DISABLE_BLOCK_MESSAGE
 bool M2MFirmware::set_package_block_message_callback(incoming_block_message_callback callback)
 {
     M2MResource* m2mresource;
@@ -659,4 +696,4 @@ bool M2MFirmware::set_package_block_message_callback(incoming_block_message_call
 
     return false;
 }
-
+#endif // DISABLE_BLOCK_MESSAGE
