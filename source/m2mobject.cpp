@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 #include "mbed-client/m2mobject.h"
-#include "mbed-client/m2mobservationhandler.h"
 #include "mbed-client/m2mconstants.h"
 #include "include/m2mtlvserializer.h"
 #include "include/m2mtlvdeserializer.h"
@@ -79,15 +78,17 @@ M2MObjectInstance* M2MObject::create_object_instance(uint16_t instance_id)
     M2MObjectInstance *instance = NULL;
     if(!object_instance(instance_id)) {
         char* path = create_path(*this, instance_id);
-        // Note: the object instance's name contains actually object's name.
-        instance = new M2MObjectInstance(*this, "", path);
-        if(instance) {
-            instance->add_observation_level(observation_level());
-            instance->set_instance_id(instance_id);
-            if(M2MBase::name_id() != -1) {
-                instance->set_coap_content_type(COAP_CONTENT_OMA_TLV_TYPE);
+        if (path) {
+            // Note: the object instance's name contains actually object's name.
+            instance = new M2MObjectInstance(*this, "", path);
+            if(instance) {
+                instance->add_observation_level(observation_level());
+                instance->set_instance_id(instance_id);
+                if(M2MBase::name_id() != -1) {
+                    instance->set_coap_content_type(COAP_CONTENT_OMA_TLV_TYPE);
+                }
+                _instance_list.push_back(instance);
             }
-            _instance_list.push_back(instance);
         }
     }
     return instance;

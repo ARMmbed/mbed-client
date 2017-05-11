@@ -15,7 +15,6 @@
  */
 #include "include/m2mtlvdeserializer.h"
 #include "mbed-client/m2mconstants.h"
-#include "include/nsdllinker.h"
 #include "mbed-trace/mbed_trace.h"
 
 #define TRACE_GROUP "mClt"
