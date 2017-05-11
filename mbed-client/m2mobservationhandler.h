@@ -55,7 +55,7 @@ class M2MObservationHandler
      * \param base The object whose value is updated.
      * \param object_name The name of the updated resource, default is empty.
      */
-    virtual void value_updated(M2MBase *base, const String &object_name = "") = 0;
+    virtual void value_updated(M2MBase *base) = 0;
 
     /**
      * \brief A callback for removing an object from the list.
@@ -63,13 +63,14 @@ class M2MObservationHandler
      */
     virtual void remove_object(M2MBase *object) = 0;
 
+#ifndef DISABLE_DELAYED_RESPONSE
     /**
      * \brief A delayed response callback to be sent to the
      * server due to a changed response.
      * \param base The resource sending the response.
      */
     virtual void send_delayed_response(M2MBase *base) = 0;
-
+#endif
 };
 
 

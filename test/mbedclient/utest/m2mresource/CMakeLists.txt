@@ -4,6 +4,7 @@ add_executable(m2mresource
         "../../../../source/m2mresource.cpp"
         "main.cpp"
         "../stub/m2mbase_stub.cpp"
+        "../stub/m2mresourcebase_stub.cpp"
         "../stub/m2mstring_stub.cpp"
         "../stub/m2mtimer_stub.cpp"
         "../stub/m2mreporthandler_stub.cpp"

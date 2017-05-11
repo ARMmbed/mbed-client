@@ -18,6 +18,8 @@
 #include "mbed-client/m2mobjectinstance.h"
 #include "mbed-client/m2mresource.h"
 
+class M2MResourceBase;
+
 /**
  * @brief M2MTLVSerializer
  * TLV Serialiser constructs the binary representation of object instances,
@@ -96,5 +98,5 @@ private :
 
     static void serialize_length(uint32_t length, uint32_t &size, uint8_t *length_ptr);
 
-    static bool serialize_TLV_binary_int(const M2MResourceInstance *resource, uint8_t type, uint16_t id, uint8_t *&data, uint32_t &size);
+    static bool serialize_TLV_binary_int(const M2MResourceBase *resource, uint8_t type, uint16_t id, uint8_t *&data, uint32_t &size);
 };

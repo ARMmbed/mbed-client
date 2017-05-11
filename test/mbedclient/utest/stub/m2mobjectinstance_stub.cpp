@@ -24,9 +24,8 @@ M2MResource* m2mobjectinstance_stub::create_resource;
 // for all the tests, or the utest framework will complain for memory leak.
 M2MResourceList m2mobjectinstance_stub::resource_list(12);
 
-M2MResourceInstance* m2mobjectinstance_stub::create_resource_instance;
+M2MResourceBase* m2mobjectinstance_stub::create_resource_instance;
 sn_coap_hdr_s* m2mobjectinstance_stub::header;
-M2MBase::BaseType m2mobjectinstance_stub::base_type;
 
 
 void m2mobjectinstance_stub::clear()
@@ -37,31 +36,36 @@ void m2mobjectinstance_stub::clear()
     create_resource = NULL;
     create_resource_instance = NULL;
     header = NULL;
-    base_type = M2MBase::ObjectInstance;
     resource_list.clear();
 }
 
-M2MObjectInstance::M2MObjectInstance(M2MObject& parent, const String &object_name,
+M2MObjectInstance::M2MObjectInstance(M2MObject& parent,
                                      const String &resource_type,
                                      char *path,
                                      bool external_blockwise_store)
-: M2MBase(object_name,
+: M2MBase("",
           M2MBase::Dynamic,
+#ifndef DISABLE_RESOURCE_TYPE
           resource_type,
+#endif
           path,
-          external_blockwise_store),
+          external_blockwise_store,
+          false),
   _parent(parent)
 {
+    set_base_type(M2MBase::ObjectInstance);
 }
 
 M2MObjectInstance::M2MObjectInstance(M2MObject& parent, const lwm2m_parameters_s* static_res)
 : M2MBase(static_res), _parent(parent)
 {
 
+    set_base_type(M2MBase::ObjectInstance);
 }
 
 M2MObjectInstance::~M2MObjectInstance()
 {
+    free_resources();
 }
 
 M2MResource* M2MObjectInstance::create_static_resource(const lwm2m_parameters_s* static_res,
@@ -106,7 +110,7 @@ M2MResourceInstance* M2MObjectInstance::create_static_resource_instance(const St
                                                                         uint16_t instance_id,
                                                                         bool external_blockwise_store)
 {
-    return m2mobjectinstance_stub::create_resource_instance;
+    return (M2MResourceInstance*)m2mobjectinstance_stub::create_resource_instance;
 }
 
 
@@ -117,7 +121,7 @@ M2MResourceInstance* M2MObjectInstance::create_dynamic_resource_instance(const S
                                                                          uint16_t instance_id,
                                                                          bool external_blockwise_store)
 {
-    return m2mobjectinstance_stub::create_resource_instance;
+    return (M2MResourceInstance*)m2mobjectinstance_stub::create_resource_instance;
 }
 
 bool M2MObjectInstance::remove_resource(const String &)
@@ -165,9 +169,15 @@ uint16_t M2MObjectInstance::resource_count(const char* ) const
     return m2mobjectinstance_stub::int_value;
 }
 
-M2MBase::BaseType M2MObjectInstance::base_type() const
+M2MObservationHandler* M2MObjectInstance::observation_handler() const
 {
-    return m2mobjectinstance_stub::base_type;
+    //return _parent.observation_handler();
+    return NULL;
+}
+
+void M2MObjectInstance::set_observation_handler(M2MObservationHandler *handler)
+{
+    // _parent.set_observation_handler(handler);
 }
 
 void M2MObjectInstance::add_observation_level(M2MBase::Observation)

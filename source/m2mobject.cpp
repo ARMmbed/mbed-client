@@ -30,10 +30,13 @@
 M2MObject::M2MObject(const String &object_name, char *path, bool external_blockwise_store)
 : M2MBase(object_name,
           M2MBase::Dynamic,
+#ifndef DISABLE_RESOURCE_TYPE
           "",
+#endif
           path,
-          external_blockwise_store),
-  _max_instance_count(MAX_UNINT_16_COUNT)
+          external_blockwise_store,
+          false),
+          _observation_handler(NULL)
 {
     M2MBase::set_base_type(M2MBase::Object);
     if(M2MBase::name_id() != -1) {
@@ -43,9 +46,9 @@ M2MObject::M2MObject(const String &object_name, char *path, bool external_blockw
 
 M2MObject::M2MObject(const M2MBase::lwm2m_parameters_s* static_res)
 : M2MBase(static_res),
-  _max_instance_count(MAX_UNINT_16_COUNT)
+_observation_handler(NULL)
 {
-    if(static_res->name_id != -1) {
+    if(M2MBase::name_id() != -1) {
         M2MBase::set_coap_content_type(COAP_CONTENT_OMA_TLV_TYPE);
     }
 }
@@ -66,6 +69,8 @@ M2MObject::~M2MObject()
 
         _instance_list.clear();
     }
+
+    free_resources();
 }
 
 M2MObjectInstance* M2MObject::create_object_instance(uint16_t instance_id)
@@ -75,7 +80,7 @@ M2MObjectInstance* M2MObject::create_object_instance(uint16_t instance_id)
     if(!object_instance(instance_id)) {
         char* path = create_path(*this, instance_id);
         // Note: the object instance's name contains actually object's name.
-        instance = new M2MObjectInstance(*this, this->name(), "", path);
+        instance = new M2MObjectInstance(*this, "", path);
         if(instance) {
             instance->add_observation_level(observation_level());
             instance->set_instance_id(instance_id);
@@ -91,9 +96,9 @@ M2MObjectInstance* M2MObject::create_object_instance(uint16_t instance_id)
 // KS: is this needed for object instance?? TODO!
 M2MObjectInstance* M2MObject::create_object_instance(const lwm2m_parameters_s* s)
 {
-    tr_debug("M2MObject::create_object_instance - id: %d", s->instance_id);
+    tr_debug("M2MObject::create_object_instance - id: %d", s->identifier.instance_id);
     M2MObjectInstance *instance = NULL;
-    if(!object_instance(s->instance_id)) {
+    if(!object_instance(s->identifier.instance_id)) {
 
         instance = new M2MObjectInstance(*this, s);
         if(instance) {
@@ -160,9 +165,16 @@ uint16_t M2MObject::instance_count() const
     return (uint16_t)_instance_list.size();
 }
 
-M2MBase::BaseType M2MObject::base_type() const
+M2MObservationHandler* M2MObject::observation_handler() const
 {
-    return M2MBase::base_type();
+    // XXX: need to check the flag too
+    return _observation_handler;
+}
+
+void M2MObject::set_observation_handler(M2MObservationHandler *handler)
+{
+    tr_debug("M2MObject::set_observation_handler - handler: 0x%p", (void*)handler);
+    _observation_handler = handler;
 }
 
 void M2MObject::add_observation_level(M2MBase::Observation observation_level)
@@ -252,11 +264,6 @@ sn_coap_hdr_s* M2MObject::handle_get_request(nsdl_s *nsdl,
                                     if(received_coap_header->options_list_ptr->observe != -1) {
                                         number = received_coap_header->options_list_ptr->observe;
                                     }
-                                    if(received_coap_header->token_ptr) {
-                                        tr_debug("M2MObject::handle_get_request - Sets Observation Token to resource");
-                                        set_observation_token(received_coap_header->token_ptr,
-                                                              received_coap_header->token_len);
-                                    }
 
                                     // If the observe value is 0 means register for observation.
                                     if(number == 0) {
@@ -265,6 +272,12 @@ sn_coap_hdr_s* M2MObject::handle_get_request(nsdl_s *nsdl,
                                         add_observation_level(M2MBase::O_Attribute);
                                         tr_debug("M2MObject::handle_get_request - Observation Number %d", observation_number());
                                         coap_response->options_list_ptr->observe = observation_number();
+                                    }
+
+                                    if(received_coap_header->token_ptr) {
+                                        tr_debug("M2MObject::handle_get_request - Sets Observation Token to resource");
+                                        set_observation_token(received_coap_header->token_ptr,
+                                                              received_coap_header->token_len);
                                     }
                                 } else if (STOP_OBSERVATION == observe_option) {
                                     tr_debug("M2MObject::handle_get_request - Stops Observation");
@@ -368,13 +381,13 @@ sn_coap_hdr_s* M2MObject::handle_post_request(nsdl_s *nsdl,
                 tr_debug("M2MObject::handle_post_request() - Request Content-Type %d", coap_content_type);
 
                 if(COAP_CONTENT_OMA_TLV_TYPE == coap_content_type) {
-                    uint16_t instance_id = 0;
+                    uint32_t instance_id = 0;
                     // Check next free instance id
-                    for(instance_id = 0; instance_id <= _max_instance_count; instance_id++) {
+                    for(instance_id = 0; instance_id <= MAX_UNINT_16_COUNT; instance_id++) {
                         if(NULL == object_instance(instance_id)) {
                             break;
                         }
-                        if(instance_id == _max_instance_count) {
+                        if(instance_id == MAX_UNINT_16_COUNT) {
                             msg_code = COAP_MSG_CODE_RESPONSE_METHOD_NOT_ALLOWED;
                             break;
                         }

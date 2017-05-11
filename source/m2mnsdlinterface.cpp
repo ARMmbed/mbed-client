@@ -160,11 +160,10 @@ void M2MNsdlInterface::set_endpoint_lifetime_buffer(int lifetime)
     uint32_t size = m2m::itoa_c(lifetime, buffer);
 
     if (_endpoint && size <= sizeof(buffer)) {
+        _endpoint->lifetime_len = 0;
         _endpoint->lifetime_ptr = alloc_string_copy((uint8_t*)buffer, size);
         if(_endpoint->lifetime_ptr) {
             _endpoint->lifetime_len =  size;
-        } else {
-            _endpoint->lifetime_len = 0;
         }
     }
 }
@@ -406,7 +405,7 @@ uint8_t M2MNsdlInterface::received_from_server_callback(struct nsdl_s *nsdl_hand
                 _observer.client_unregistered();
             } else {
                 tr_error("M2MNsdlInterface::received_from_server_callback - unregistration error %d", coap_header->msg_code);
-                M2MInterface::Error error = interface_error(coap_header);
+                M2MInterface::Error error = interface_error(*coap_header);
                 _observer.registration_error(error);
             }
         } else if(coap_header->msg_id == nsdl_handle->update_register_msg_id) {
@@ -423,7 +422,7 @@ uint8_t M2MNsdlInterface::received_from_server_callback(struct nsdl_s *nsdl_hand
         else if(coap_header->msg_id == nsdl_handle->bootstrap_msg_id) {
             tr_debug("M2MNsdlInterface::received_from_server_callback - bootstrap");
             _bootstrap_id = 0;
-            M2MInterface::Error error = interface_error(coap_header);
+            M2MInterface::Error error = interface_error(*coap_header);
             if(error != M2MInterface::ErrorNone) {
                 handle_bootstrap_error();
             } else {
@@ -564,7 +563,7 @@ uint8_t M2MNsdlInterface::received_from_server_callback(struct nsdl_s *nsdl_hand
             }
 
             if (execute_value_updated) {
-                value_updated(obj_instance, resource_name);
+                value_updated(obj_instance);
             }
 
         }
@@ -610,15 +609,15 @@ uint8_t M2MNsdlInterface::resource_callback(struct nsdl_s */*nsdl_handle*/,
             tr_debug("M2MNsdlInterface::resource_callback() - DELETE the object instance");
             M2MBase::BaseType type = base->base_type();
             if(M2MBase::ObjectInstance == type) {
-                M2MBase* base_object = find_resource(base->name());
+                M2MBase* base_object = find_resource(base->uri_path());
                 if(base_object) {
-                    M2MObject *object = static_cast<M2MObject*> (base_object);
+                    M2MObject &object = ((M2MObjectInstance*)base_object)->get_parent_object();
                     int slash_found = resource_name.find_last_of('/');
                     // Object instance validty checks done in upper level, no need for error handling
                     if(slash_found != -1) {
                         String object_name;
                         object_name = resource_name.substr(slash_found + 1, resource_name.length());
-                        if (object->remove_object_instance(strtoul(
+                        if (object.remove_object_instance(strtoul(
                                 object_name.c_str(),
                                 NULL,
                                 10))) {
@@ -654,7 +653,7 @@ uint8_t M2MNsdlInterface::resource_callback(struct nsdl_s */*nsdl_handle*/,
     if (execute_value_updated &&
             coap_response &&
             coap_response->coap_status != COAP_STATUS_PARSER_BLOCKWISE_MSG_RECEIVING) {
-        value_updated(base,resource_name);
+        value_updated(base);
     }
 
     sn_nsdl_release_allocated_coap_msg_mem(_nsdl_handle, coap_response);
@@ -719,6 +718,7 @@ void M2MNsdlInterface::observation_to_be_sent(M2MBase *object,
     release_mutex();
 }
 
+#ifndef DISABLE_DELAYED_RESPONSE
 void M2MNsdlInterface::send_delayed_response(M2MBase *base)
 {
     claim_mutex();
@@ -729,70 +729,70 @@ void M2MNsdlInterface::send_delayed_response(M2MBase *base)
             resource = static_cast<M2MResource *> (base);
         }
         if(resource) {
-            sn_coap_hdr_s * coap_response = static_cast<sn_coap_hdr_s *>(malloc(sizeof(sn_coap_hdr_s)));
-            if(coap_response) {
-                memset(coap_response,0,sizeof(sn_coap_hdr_s));
+            sn_coap_hdr_s coap_response;
 
-                coap_response->msg_type = COAP_MSG_TYPE_CONFIRMABLE;
-                coap_response->msg_code = COAP_MSG_CODE_RESPONSE_CONTENT;
-                resource->get_delayed_token(coap_response->token_ptr,coap_response->token_len);
+            memset(&coap_response,0,sizeof(sn_coap_hdr_s));
 
-                uint32_t length = 0;
-                resource->get_value(coap_response->payload_ptr, length);
-                coap_response->payload_len = length;
+            coap_response.msg_type = COAP_MSG_TYPE_CONFIRMABLE;
+            coap_response.msg_code = COAP_MSG_CODE_RESPONSE_CONTENT;
+            resource->get_delayed_token(coap_response.token_ptr,coap_response.token_len);
 
-                sn_nsdl_send_coap_message(_nsdl_handle, _nsdl_handle->nsp_address_ptr->omalw_address_ptr, coap_response);
+            uint32_t length = 0;
+            resource->get_value(coap_response.payload_ptr, length);
+            coap_response.payload_len = length;
 
-                if(coap_response->payload_ptr) {
-                   free(coap_response->payload_ptr);
-                   coap_response->payload_ptr = NULL;
-                }
-                if(coap_response->token_ptr) {
-                    free(coap_response->token_ptr);
-                    coap_response->token_ptr = NULL;
-                }
-                free(coap_response);
-            }
+            sn_nsdl_send_coap_message(_nsdl_handle, _nsdl_handle->nsp_address_ptr->omalw_address_ptr, &coap_response);
+
+            free(coap_response.payload_ptr);
+            free(coap_response.token_ptr);
         }
     }
     release_mutex();
 }
+#endif
 
 void M2MNsdlInterface::resource_to_be_deleted(M2MBase *base)
 {
+    tr_debug("M2MNsdlInterface::resource_to_be_deleted()");
     claim_mutex();
     remove_nsdl_resource(base);
     release_mutex();
 }
 
-void M2MNsdlInterface::value_updated(M2MBase *base,
-                                     const String &object_name)
+void M2MNsdlInterface::value_updated(M2MBase *base)
 {
     tr_debug("M2MNsdlInterface::value_updated()");
+    String name;
     if(base) {
         switch(base->base_type()) {
             case M2MBase::Object:
                 create_nsdl_object_structure(static_cast<M2MObject*> (base));
+                name =  base->name();
             break;
             case M2MBase::ObjectInstance:
                 create_nsdl_object_instance_structure(static_cast<M2MObjectInstance*> (base));
+                name = static_cast<M2MObjectInstance*> (base)->get_parent_object().name();
+
             break;
             case M2MBase::Resource: {
-                    M2MResource* resource = static_cast<M2MResource*> (base);
-                    create_nsdl_resource_structure(resource,
-                                               resource->supports_multiple_instances());
+                M2MResource* resource = static_cast<M2MResource*> (base);
+                create_nsdl_resource_structure(resource,
+                                           resource->supports_multiple_instances());
+                name =  base->name();
             }
             break;
             case M2MBase::ResourceInstance: {
                 M2MResourceInstance* instance = static_cast<M2MResourceInstance*> (base);
                 create_nsdl_resource(instance);
+                name = static_cast<M2MResourceInstance*> (base)->get_parent_resource().name();
             }
             break;
         }
     }
 
     if (base && base->is_value_updated_function_set()) {
-        base->execute_value_updated(base->name());
+
+        base->execute_value_updated(name);
     }
     else {
         _observer.value_updated(base);
@@ -903,16 +903,15 @@ bool M2MNsdlInterface::create_nsdl_resource(M2MBase *base)
     bool success = false;
     if(base) {
         int8_t result = 0;
-        sn_nsdl_dynamic_resource_parameters_s* orig_resource = base->get_nsdl_resource();
-        tr_debug("M2MNsdlInterface::create_nsdl_resource - path (%.*s)", orig_resource->static_resource_parameters->pathlen,
-                 orig_resource->static_resource_parameters->path);
+        sn_nsdl_dynamic_resource_parameters_s* nsdl_resource = base->get_nsdl_resource();
+        tr_debug("M2MNsdlInterface::create_nsdl_resource - path (%s)", nsdl_resource->static_resource_parameters->path);
 
         // needed on deletion
         if (base->observation_handler() == NULL) {
             base->set_observation_handler(this);
         }
 
-        result = sn_nsdl_put_resource(_nsdl_handle, orig_resource);
+        result = sn_nsdl_put_resource(_nsdl_handle, nsdl_resource);
         tr_debug("M2MNsdlInterface::create_nsdl_resource - Creating in NSDL-C result %d", result);
 
         // Either the resource is created or it already
@@ -927,7 +926,7 @@ bool M2MNsdlInterface::create_nsdl_resource(M2MBase *base)
 }
 
 // convenience method to get the URI from its buffer field...
-String M2MNsdlInterface::coap_to_string(uint8_t *coap_data,int coap_data_length)
+String M2MNsdlInterface::coap_to_string(const uint8_t *coap_data, int coap_data_length)
 {
     String value = "";
     if (coap_data != NULL && coap_data_length > 0) {
@@ -936,7 +935,7 @@ String M2MNsdlInterface::coap_to_string(uint8_t *coap_data,int coap_data_length)
     return value;
 }
 
-uint64_t M2MNsdlInterface::registration_time()
+uint64_t M2MNsdlInterface::registration_time() const
 {
     uint64_t value = 0;
     if(_endpoint && _endpoint->lifetime_ptr) {
@@ -953,8 +952,8 @@ uint64_t M2MNsdlInterface::registration_time()
 }
 
 M2MBase* M2MNsdlInterface::find_resource(const String &object_name,
-                                         uint8_t *token,
-                                         uint8_t token_len)
+                                         const uint8_t *token,
+                                         uint8_t token_len) const
 {
     tr_debug("M2MNsdlInterface::find_resource(object level) - name (%s)", object_name.c_str());
     tr_debug("M2MNsdlInterface::find_resource - token (%s)", tr_array(token, token_len));
@@ -972,7 +971,7 @@ M2MBase* M2MNsdlInterface::find_resource(const String &object_name,
                     break;
                 }
             } else {
-                uint8_t *stored_token = 0;
+                const uint8_t *stored_token = 0;
                 uint32_t stored_token_length = 0;
                 (*it)->get_observation_token(stored_token, stored_token_length);
                 tr_debug("M2MNsdlInterface::find_resource(object level) - stored token (%s)", tr_array(stored_token, stored_token_length));
@@ -981,10 +980,7 @@ M2MBase* M2MNsdlInterface::find_resource(const String &object_name,
                             memcmp(token, stored_token, token_len) == 0) {
                         object = (*it);
                         tr_debug("M2MNsdlInterface::find_resource - token found");
-                        free(stored_token);
                         break;
-                    } else {
-                        free(stored_token);
                     }
                 }
             }
@@ -999,8 +995,8 @@ M2MBase* M2MNsdlInterface::find_resource(const String &object_name,
 
 M2MBase* M2MNsdlInterface::find_resource(const M2MObject *object,
                                          const String &object_instance,
-                                         uint8_t *token,
-                                         uint8_t token_len)
+                                         const uint8_t *token,
+                                         uint8_t token_len) const
 {
     tr_debug("M2MNsdlInterface::find_resource(object instance level) - name (%s)", object_instance.c_str());
     M2MBase *instance = NULL;
@@ -1018,7 +1014,7 @@ M2MBase* M2MNsdlInterface::find_resource(const M2MObject *object,
                         break;
                     }
                 } else {
-                    uint8_t *stored_token = 0;
+                    const uint8_t *stored_token = 0;
                     uint32_t stored_token_length = 0;
                     tr_debug("M2MNsdlInterface::find_resource(object instance level) - in token (%s)", tr_array(token, token_len));
                     (*it)->get_observation_token(stored_token, stored_token_length);
@@ -1027,10 +1023,7 @@ M2MBase* M2MNsdlInterface::find_resource(const M2MObject *object,
                         if (stored_token_length == token_len &&
                                 memcmp(token, stored_token, token_len) == 0) {
                             instance = (*it);
-                            free(stored_token);
                             break;
-                        } else {
-                            free(stored_token);
                         }
                     }
                 }
@@ -1046,8 +1039,8 @@ M2MBase* M2MNsdlInterface::find_resource(const M2MObject *object,
 
 M2MBase* M2MNsdlInterface::find_resource(const M2MObjectInstance *object_instance,
                                          const String &resource_instance,
-                                         uint8_t *token,
-                                         uint8_t token_len)
+                                         const uint8_t *token,
+                                         uint8_t token_len) const
 {
     tr_debug("M2MNsdlInterface::find_resource(resource level) - name (%s)", resource_instance.c_str());
     M2MBase *instance = NULL;
@@ -1070,7 +1063,7 @@ M2MBase* M2MNsdlInterface::find_resource(const M2MObjectInstance *object_instanc
                         }
                     }
                 } else {
-                    uint8_t *stored_token = 0;
+                    const uint8_t *stored_token = 0;
                     uint32_t stored_token_length = 0;
                     tr_debug("M2MNsdlInterface::find_resource(resource level) - in token (%s)", tr_array(token, token_len));
                     (*it)->get_observation_token(stored_token, stored_token_length);
@@ -1079,10 +1072,7 @@ M2MBase* M2MNsdlInterface::find_resource(const M2MObjectInstance *object_instanc
                         if (stored_token_length == token_len &&
                                 memcmp(token, stored_token, token_len) == 0) {
                             instance = *it;
-                            free(stored_token);
                             break;
-                        } else {
-                            free(stored_token);
                         }
                     }
                 }
@@ -1095,8 +1085,8 @@ M2MBase* M2MNsdlInterface::find_resource(const M2MObjectInstance *object_instanc
 M2MBase* M2MNsdlInterface::find_resource(const M2MResource *resource,
                                          const String &object_name,
                                          const String &resource_instance,
-                                         uint8_t */*token*/,
-                                         uint8_t /*token_len*/)
+                                         const uint8_t */*token*/,
+                                         uint8_t /*token_len*/) const
 {
     tr_debug("M2MNsdlInterface::find_resource(resource instance level)");
     M2MBase *res = NULL;
@@ -1144,40 +1134,38 @@ bool M2MNsdlInterface::add_object_to_list(M2MObject* object)
     return success;
 }
 
-M2MInterface::Error M2MNsdlInterface::interface_error(sn_coap_hdr_s *coap_header)
+M2MInterface::Error M2MNsdlInterface::interface_error(const sn_coap_hdr_s &coap_header)
 {
-    M2MInterface::Error error = M2MInterface::ErrorNone;
-    if(coap_header) {
-        switch(coap_header->msg_code) {
-            case COAP_MSG_CODE_RESPONSE_BAD_REQUEST:
-            case COAP_MSG_CODE_RESPONSE_BAD_OPTION:
-            case COAP_MSG_CODE_RESPONSE_REQUEST_ENTITY_INCOMPLETE:
-            case COAP_MSG_CODE_RESPONSE_PRECONDITION_FAILED:
-            case COAP_MSG_CODE_RESPONSE_REQUEST_ENTITY_TOO_LARGE:
-            case COAP_MSG_CODE_RESPONSE_UNSUPPORTED_CONTENT_FORMAT:
-                error = M2MInterface::InvalidParameters;
-                break;
-            case COAP_MSG_CODE_RESPONSE_UNAUTHORIZED:
-            case COAP_MSG_CODE_RESPONSE_FORBIDDEN:
-            case COAP_MSG_CODE_RESPONSE_NOT_ACCEPTABLE:
-            case COAP_MSG_CODE_RESPONSE_NOT_FOUND:
-            case COAP_MSG_CODE_RESPONSE_METHOD_NOT_ALLOWED:
-                error = M2MInterface::NotAllowed;
-                break;
-            case COAP_MSG_CODE_RESPONSE_CREATED:
-            case COAP_MSG_CODE_RESPONSE_DELETED:
-            case COAP_MSG_CODE_RESPONSE_VALID:
-            case COAP_MSG_CODE_RESPONSE_CHANGED:
-            case COAP_MSG_CODE_RESPONSE_CONTENT:
-                error = M2MInterface::ErrorNone;
-                break;
-            default:
-                error = M2MInterface::UnknownError;
-                break;
-        }
-        if(coap_header->coap_status == COAP_STATUS_BUILDER_MESSAGE_SENDING_FAILED) {
-            error = M2MInterface::NetworkError;
-        }
+    M2MInterface::Error error;
+    switch(coap_header.msg_code) {
+        case COAP_MSG_CODE_RESPONSE_BAD_REQUEST:
+        case COAP_MSG_CODE_RESPONSE_BAD_OPTION:
+        case COAP_MSG_CODE_RESPONSE_REQUEST_ENTITY_INCOMPLETE:
+        case COAP_MSG_CODE_RESPONSE_PRECONDITION_FAILED:
+        case COAP_MSG_CODE_RESPONSE_REQUEST_ENTITY_TOO_LARGE:
+        case COAP_MSG_CODE_RESPONSE_UNSUPPORTED_CONTENT_FORMAT:
+            error = M2MInterface::InvalidParameters;
+            break;
+        case COAP_MSG_CODE_RESPONSE_UNAUTHORIZED:
+        case COAP_MSG_CODE_RESPONSE_FORBIDDEN:
+        case COAP_MSG_CODE_RESPONSE_NOT_ACCEPTABLE:
+        case COAP_MSG_CODE_RESPONSE_NOT_FOUND:
+        case COAP_MSG_CODE_RESPONSE_METHOD_NOT_ALLOWED:
+            error = M2MInterface::NotAllowed;
+            break;
+        case COAP_MSG_CODE_RESPONSE_CREATED:
+        case COAP_MSG_CODE_RESPONSE_DELETED:
+        case COAP_MSG_CODE_RESPONSE_VALID:
+        case COAP_MSG_CODE_RESPONSE_CHANGED:
+        case COAP_MSG_CODE_RESPONSE_CONTENT:
+            error = M2MInterface::ErrorNone;
+            break;
+        default:
+            error = M2MInterface::UnknownError;
+            break;
+    }
+    if(coap_header.coap_status == COAP_STATUS_BUILDER_MESSAGE_SENDING_FAILED) {
+        error = M2MInterface::NetworkError;
     }
     return error;
 }
@@ -1341,7 +1329,7 @@ void M2MNsdlInterface::send_notification(uint8_t *token,
     }
 }
 
-nsdl_s * M2MNsdlInterface::get_nsdl_handle()
+nsdl_s * M2MNsdlInterface::get_nsdl_handle() const
 {
     return _nsdl_handle;
 }

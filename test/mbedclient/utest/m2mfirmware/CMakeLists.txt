@@ -7,6 +7,7 @@ add_executable(m2mfirmware
         "../stub/m2mobject_stub.cpp"
         "../stub/m2mobjectinstance_stub.cpp"
         "../stub/m2mresource_stub.cpp"
+        "../stub/m2mresourcebase_stub.cpp"
         "../stub/m2mresourceinstance_stub.cpp"
         "../stub/m2mbase_stub.cpp"
         "../stub/m2mstring_stub.cpp"

@@ -28,7 +28,7 @@ class TestReportObserver :  public M2MReportObserver{
 public :
     TestReportObserver() {}
     ~TestReportObserver() {}
-    virtual void observation_to_be_sent(const m2m::Vector<uint16_t>&,bool){ }
+    virtual void observation_to_be_sent(const m2m::Vector<uint16_t>&, uint16_t, bool){ }
 };
 
 class Handler : public M2MObservationHandler {
@@ -43,7 +43,7 @@ public:
     void send_delayed_response(M2MBase *){}
     void resource_to_be_deleted(M2MBase *){visited=true;}
     void remove_object(M2MBase *){visited = true;}
-    void value_updated(M2MBase *,const String&){visited = true;}
+    void value_updated(M2MBase *){visited = true;}
 
     void clear() {visited = false;}
     bool visited;
@@ -401,8 +401,6 @@ void Test_M2MObject::test_handle_post_request()
 
     m2mbase_stub::uint8_value = 99;
 
-    object->_max_instance_count = 0;
-
     M2MObjectInstance *ins = new M2MObjectInstance(*object, "name", "type", "");
     ins->set_instance_id(0);
     object->_instance_list.push_back(ins);
@@ -412,8 +410,6 @@ void Test_M2MObject::test_handle_post_request()
 
     object->remove_object_instance(0);
 
-
-    object->_max_instance_count = 65535;
 
     m2mbase_stub::uint8_value = 0;
 
@@ -431,10 +427,10 @@ void Test_M2MObject::test_handle_post_request()
 
     CHECK( coap_response != NULL);
     if(coap_response) {
-        if (coap_response->options_list_ptr->location_path_ptr) {
-            free(coap_response->options_list_ptr->location_path_ptr);
-            coap_response->options_list_ptr->location_path_ptr = NULL;
-        }
+//        if (coap_response->options_list_ptr->location_path_ptr) {
+//            free(coap_response->options_list_ptr->location_path_ptr);
+//            coap_response->options_list_ptr->location_path_ptr = NULL;
+//        }
 //        if (coap_response->options_list_ptr) {
 //            free(coap_response->options_list_ptr);
 //            coap_response->options_list_ptr = NULL;
@@ -454,10 +450,10 @@ void Test_M2MObject::test_handle_post_request()
     CHECK( coap_response != NULL);
     if(coap_response) {
         if (coap_response->options_list_ptr) {
-            if (coap_response->options_list_ptr->location_path_ptr) {
-                free(coap_response->options_list_ptr->location_path_ptr);
-                coap_response->options_list_ptr->location_path_ptr = NULL;
-            }
+//            if (coap_response->options_list_ptr->location_path_ptr) {
+//                free(coap_response->options_list_ptr->location_path_ptr);
+//                coap_response->options_list_ptr->location_path_ptr = NULL;
+//            }
 //            free(coap_response->options_list_ptr);
 //            coap_response->options_list_ptr = NULL;
         }

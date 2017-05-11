@@ -191,7 +191,7 @@ bool M2MTLVSerializer::serialize_resource_instance(uint16_t id, const M2MResourc
 /* See, OMA-TS-LightweightM2M-V1_0-20170208-A, Appendix C,
  * Data Types, Integer, Boolean and TY
  * Yime, TLV Format */
-bool M2MTLVSerializer::serialize_TLV_binary_int(const M2MResourceInstance *resource, uint8_t type, uint16_t id, uint8_t *&data, uint32_t &size)
+bool M2MTLVSerializer::serialize_TLV_binary_int(const M2MResourceBase *resource, uint8_t type, uint16_t id, uint8_t *&data, uint32_t &size)
 {
         int64_t valueInt = resource->get_value_int();
         uint32_t buffer_size;

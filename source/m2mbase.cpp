@@ -25,7 +25,9 @@
 
 #include "include/m2mreporthandler.h"
 #include "include/nsdlaccesshelper.h"
+#include "include/m2mcallbackstorage.h"
 #include "mbed-trace/mbed_trace.h"
+
 #include <assert.h>
 #include <ctype.h>
 #include <string.h>
@@ -35,20 +37,16 @@
 
 M2MBase::M2MBase(const String& resource_name,
                  M2MBase::Mode mode,
+#ifndef DISABLE_RESOURCE_TYPE
                  const String &resource_type,
+#endif
                  char *path,
-                 bool external_blockwise_store)
+                 bool external_blockwise_store,
+                 bool multiple_instance,
+                 M2MBase::DataType type)
 :
   _sn_resource(NULL),
-  _report_handler(NULL),
-  _observation_handler(NULL),
-  _token(NULL),
-  _function_pointer(NULL),
-  _value_updated_callback(NULL),
-  _observation_number(0),
-  _token_length(0),
-  _observation_level(M2MBase::None),
-  _is_under_observation(false)
+  _report_handler(NULL)
 {
     // Checking the name length properly, i.e returning error is impossible from constructor without exceptions
     assert(resource_name.length() <= MAX_ALLOWED_STRING_LENGTH);
@@ -57,6 +55,8 @@ M2MBase::M2MBase(const String& resource_name,
     if(_sn_resource) {
         memset(_sn_resource, 0, sizeof(lwm2m_parameters_s));
         _sn_resource->free_on_delete = true;
+        _sn_resource->multiple_instance = multiple_instance;
+        _sn_resource->data_type = type;
         _sn_resource->dynamic_resource_params =
                 (sn_nsdl_dynamic_resource_parameters_s*)memory_alloc(sizeof(sn_nsdl_dynamic_resource_parameters_s));
         if(_sn_resource->dynamic_resource_params) {
@@ -65,25 +65,22 @@ M2MBase::M2MBase(const String& resource_name,
             _sn_resource->dynamic_resource_params->static_resource_parameters =
                     (sn_nsdl_static_resource_parameters_s*)memory_alloc(sizeof(sn_nsdl_static_resource_parameters_s));
 
-            // Set callback function in case of dynamic resource
-            if (M2MBase::Dynamic == mode) {
-                _sn_resource->dynamic_resource_params->sn_grs_dyn_res_callback = __nsdl_c_callback;
-            }
+            // Set callback function in case of both dynamic and static resource
+            _sn_resource->dynamic_resource_params->sn_grs_dyn_res_callback = __nsdl_c_callback;
 
             if(_sn_resource->dynamic_resource_params->static_resource_parameters) {
                 // Cast const away to able to compile using MEMORY_OPTIMIZED_API flag
                 sn_nsdl_static_resource_parameters_s *params =
                         const_cast<sn_nsdl_static_resource_parameters_s *>(_sn_resource->dynamic_resource_params->static_resource_parameters);
                 memset(params, 0, sizeof(sn_nsdl_static_resource_parameters_s));
+#ifndef DISABLE_RESOURCE_TYPE
                 const size_t len = strlen(resource_type.c_str());
                 if (len > 0) {
                     params->resource_type_ptr = (char*)
                             alloc_string_copy((uint8_t*) resource_type.c_str(), len);
                 }
-                params->path = (uint8_t*)path;
-                params->pathlen = strlen(path);
-
-
+#endif
+                params->path = path;
                 params->mode = (const uint8_t)mode;
                 params->free_on_delete = true;
                 params->external_memory_block = external_blockwise_store;
@@ -91,46 +88,37 @@ M2MBase::M2MBase(const String& resource_name,
             }
         }
 
-        _sn_resource->name = stringdup((char*)resource_name.c_str());
+        if((!resource_name.empty())) {            
+            _sn_resource->identifier_int_type = false;
+            _sn_resource->identifier.name = stringdup((char*)resource_name.c_str());            
+        } else {
+            tr_debug("M2MBase::M2Mbase resource name is EMPTY ===========");
+            _sn_resource->identifier_int_type = true;
+            _sn_resource->identifier.instance_id = 0;
+        }        
         _sn_resource->dynamic_resource_params->publish_uri = true;
         _sn_resource->dynamic_resource_params->free_on_delete = true;
-
-        if(is_integer(resource_name) && resource_name.size() <= MAX_ALLOWED_STRING_LENGTH) {
-            _sn_resource->name_id = strtoul(resource_name.c_str(), NULL, 10);
-            if(_sn_resource->name_id > 65535){
-                _sn_resource->name_id = -1;
-            }
-        } else {
-            _sn_resource->name_id = -1;
-        }
     }
 }
 
 M2MBase::M2MBase(const lwm2m_parameters_s *s):
     _sn_resource((lwm2m_parameters_s*) s),
-    _report_handler(NULL),
-    _observation_handler(NULL),
-    _token(NULL),
-    _function_pointer(NULL),
-    _value_updated_callback(NULL),
-    _observation_number(0),
-    _token_length(0),
-    _observation_level(M2MBase::None),
-    _is_under_observation(false)
+    _report_handler(NULL)
 {
-    // Set callback function in case of dynamic resource
-    if (M2MBase::Dynamic == _sn_resource->dynamic_resource_params->static_resource_parameters->mode) {
-        _sn_resource->dynamic_resource_params->sn_grs_dyn_res_callback = __nsdl_c_callback;
-    }
+    tr_debug("M2MBase::M2MBase(const lwm2m_parameters_s *s)");
+    // Set callback function in case of both dynamic and static resource
+    _sn_resource->dynamic_resource_params->sn_grs_dyn_res_callback = __nsdl_c_callback;
 }
 
 M2MBase::~M2MBase()
 {
+    tr_debug("M2MBase::~M2MBase()");
     delete _report_handler;
-    free_resources();
-    free(_token);
-    delete _function_pointer;
-    delete _value_updated_callback;
+
+    value_updated_callback* callback = (value_updated_callback*)M2MCallbackStorage::remove_callback(*this, M2MCallbackAssociation::M2MBaseValueUpdatedCallback);
+    delete callback;
+
+    M2MCallbackStorage::remove_callback(*this, M2MCallbackAssociation::M2MBaseValueUpdatedCallback2);
 }
 
 char* M2MBase::create_path(const M2MObject &parent, uint16_t object_instance)
@@ -227,6 +215,7 @@ void M2MBase::set_operation(M2MBase::Operation opr)
 }
 
 #ifndef MEMORY_OPTIMIZED_API
+#ifndef DISABLE_INTERFACE_DESCRIPTION
 void M2MBase::set_interface_description(const char *desc)
 {
     assert(_sn_resource->dynamic_resource_params->static_resource_parameters->free_on_delete);
@@ -244,7 +233,9 @@ void M2MBase::set_interface_description(const String &desc)
     assert(_sn_resource->dynamic_resource_params->static_resource_parameters->free_on_delete);
     set_interface_description(desc.c_str());
 }
+#endif
 
+#ifndef DISABLE_RESOURCE_TYPE
 void M2MBase::set_resource_type(const String &res_type)
 {
     assert(_sn_resource->dynamic_resource_params->static_resource_parameters->free_on_delete);
@@ -263,6 +254,7 @@ void M2MBase::set_resource_type(const char *res_type)
     }
 }
 #endif
+#endif
 
 void M2MBase::set_coap_content_type(const uint8_t con_type)
 {
@@ -276,18 +268,17 @@ void M2MBase::set_observable(bool observable)
 
 void M2MBase::add_observation_level(M2MBase::Observation obs_level)
 {
-    _observation_level = (M2MBase::Observation)(_observation_level | obs_level);
+
+    if(_report_handler) {
+        _report_handler->add_observation_level(obs_level);
+    }
 }
 
 void M2MBase::remove_observation_level(M2MBase::Observation obs_level)
 {
-    _observation_level = (M2MBase::Observation)(_observation_level & ~obs_level);
-}
-
-void M2MBase::set_observation_handler(M2MObservationHandler *handler)
-{
-    tr_debug("M2MBase::set_observation_handler - handler: 0x%p", (void*)handler);
-    _observation_handler = handler;
+    if(_report_handler) {
+        _report_handler->remove_observation_level(obs_level);
+    }
 }
 
 
@@ -296,8 +287,12 @@ void M2MBase::set_under_observation(bool observed,
 {
     tr_debug("M2MBase::set_under_observation - observed: %d", observed);
     tr_debug("M2MBase::set_under_observation - base_type: %d", base_type());
-    _is_under_observation = observed;
-    _observation_handler = handler;
+    if(_report_handler) {
+        _report_handler->set_under_observation(observed);
+    }
+
+    set_observation_handler(handler);
+
     if (handler) {
         if (base_type() != M2MBase::ResourceInstance) {
             // Create report handler only if it does not exist and one wants observation
@@ -319,25 +314,15 @@ void M2MBase::set_under_observation(bool observed,
 
 void M2MBase::set_observation_token(const uint8_t *token, const uint8_t length)
 {
-     free(_token);
-     _token = NULL;
-     _token_length = 0;
-
-    if( token != NULL && length > 0 ) {
-        _token = alloc_string_copy((uint8_t *)token, length);
-        if(_token) {
-            _token_length = length;
-        }
+    if(_report_handler) {
+        _report_handler->set_observation_token(token, length);
     }
 }
 
 void M2MBase::set_instance_id(const uint16_t inst_id)
 {
-    _sn_resource->instance_id = inst_id;
-}
-
-void M2MBase::set_observation_number(const uint16_t /*observation_number*/)
-{
+    _sn_resource->identifier_int_type = true;
+    _sn_resource->identifier.instance_id = inst_id;
 }
 
 void M2MBase::set_max_age(const uint32_t max_age)
@@ -357,30 +342,44 @@ M2MBase::Operation M2MBase::operation() const
 
 const char* M2MBase::name() const
 {
-    return _sn_resource->name;
+    assert(_sn_resource->identifier_int_type == false);
+    return _sn_resource->identifier.name;
 }
 
 int32_t M2MBase::name_id() const
 {
-    return _sn_resource->name_id;
+    int32_t name_id = -1;
+    assert(_sn_resource->identifier_int_type == false);
+    if(is_integer(_sn_resource->identifier.name) && strlen(_sn_resource->identifier.name) <= MAX_ALLOWED_STRING_LENGTH) {
+        name_id = strtoul(_sn_resource->identifier.name, NULL, 10);
+        if(name_id > 65535){
+            name_id = -1;
+        }
+    }
+    return name_id;
 }
 
 uint16_t M2MBase::instance_id() const
 {
-    return _sn_resource->instance_id;
+    assert(_sn_resource->identifier_int_type == true);
+    return _sn_resource->identifier.instance_id;
 }
 
+#ifndef DISABLE_INTERFACE_DESCRIPTION
 const char* M2MBase::interface_description() const
 {
     return (reinterpret_cast<char*>(
         _sn_resource->dynamic_resource_params->static_resource_parameters->interface_description_ptr));
 }
+#endif
 
+#ifndef DISABLE_RESOURCE_TYPE
 const char* M2MBase::resource_type() const
 {
     return (reinterpret_cast<char*>(
         _sn_resource->dynamic_resource_params->static_resource_parameters->resource_type_ptr));
 }
+#endif
 
 const char* M2MBase::uri_path() const
 {
@@ -400,18 +399,24 @@ bool M2MBase::is_observable() const
 
 M2MBase::Observation M2MBase::observation_level() const
 {
-    return _observation_level;
+    M2MBase::Observation obs_level = M2MBase::None;
+    if(_report_handler) {
+        obs_level = _report_handler->observation_level();
+    }
+    return obs_level;
 }
 
-void M2MBase::get_observation_token(uint8_t *&token, uint32_t &token_length)
+void M2MBase::get_observation_token(uint8_t *&token, uint32_t &token_length) const
 {
-    token_length = 0;
-    free(token);
-    if (_token) {
-        token = alloc_string_copy((uint8_t *)_token, _token_length);
-        if(token) {
-            token_length = _token_length;
-        }
+    if(_report_handler) {
+        _report_handler->get_observation_token(token, token_length);
+    }
+}
+
+void M2MBase::get_observation_token(const uint8_t *&token, uint32_t &token_length) const
+{
+    if(_report_handler) {
+        _report_handler->get_observation_token(token, token_length);
     }
 }
 
@@ -422,7 +427,11 @@ M2MBase::Mode M2MBase::mode() const
 
 uint16_t M2MBase::observation_number() const
 {
-    return _observation_number;
+    uint16_t obs_number = 0;
+    if(_report_handler) {
+        obs_number = _report_handler->observation_number();
+    }
+    return obs_number;
 }
 
 uint32_t M2MBase::max_age() const
@@ -451,15 +460,17 @@ bool M2MBase::handle_observation_attribute(const char *query)
     return success;
 }
 
-void M2MBase::observation_to_be_sent(const m2m::Vector<uint16_t> &changed_instance_ids, bool send_object)
+void M2MBase::observation_to_be_sent(const m2m::Vector<uint16_t> &changed_instance_ids,
+                                     uint16_t obs_number,
+                                     bool send_object)
 {
     //TODO: Move this to M2MResourceInstance
-    if(_observation_handler) {
-        _observation_number++;
-        _observation_handler->observation_to_be_sent(this,
-                                                    _observation_number,
-                                                    changed_instance_ids,
-                                                    send_object);
+    M2MObservationHandler *obs_handler = observation_handler();
+    if (obs_handler) {
+        obs_handler->observation_to_be_sent(this,
+                                            obs_number,
+                                            changed_instance_ids,
+                                            send_object);
     }
 }
 
@@ -564,7 +575,6 @@ bool M2MBase::validate_string_length(const char* string, size_t min_length, size
             valid = true;
         }
     }
-
     return valid;
 }
 
@@ -576,14 +586,9 @@ M2MReportHandler* M2MBase::create_report_handler()
     return _report_handler;
 }
 
-M2MReportHandler* M2MBase::report_handler()
+M2MReportHandler* M2MBase::report_handler() const
 {
     return _report_handler;
-}
-
-M2MObservationHandler* M2MBase::observation_handler()
-{
-    return _observation_handler;
 }
 
 void M2MBase::set_register_uri(bool register_uri)
@@ -621,34 +626,54 @@ bool M2MBase::is_integer(const char *value)
 
 bool M2MBase::is_under_observation() const
 {
-    return _is_under_observation;
+   bool under_observation = false;
+    if(_report_handler) {
+        under_observation = _report_handler->is_under_observation();
+    }
+    return under_observation;
 }
 
-void M2MBase::set_value_updated_function(value_updated_callback callback)
+bool M2MBase::set_value_updated_function(value_updated_callback callback)
 {
-    delete _value_updated_callback;
+    value_updated_callback* old_callback = (value_updated_callback*)M2MCallbackStorage::remove_callback(*this, M2MCallbackAssociation::M2MBaseValueUpdatedCallback);
+    delete old_callback;
     // XXX: create a copy of the copy of callback object. Perhaps it would better to
     // give a reference as parameter and just store that, as it would save some memory.
-    _value_updated_callback = new value_updated_callback(callback);
+    value_updated_callback* new_callback = new value_updated_callback(callback);
+
+    return M2MCallbackStorage::add_callback(*this, new_callback, M2MCallbackAssociation::M2MBaseValueUpdatedCallback);
 }
 
-void M2MBase::set_value_updated_function(value_updated_callback2 callback)
+bool M2MBase::set_value_updated_function(value_updated_callback2 callback)
 {
-    delete _function_pointer;
-    _function_pointer = new FP1<void, const char*>(callback);
-    set_value_updated_function(value_updated_callback(_function_pointer,
-                                                      &FP1<void, const char*>::call));
+    M2MCallbackStorage::remove_callback(*this, M2MCallbackAssociation::M2MBaseValueUpdatedCallback2);
+
+    return M2MCallbackStorage::add_callback(*this, (void*)callback, M2MCallbackAssociation::M2MBaseValueUpdatedCallback2);
 }
 
-bool M2MBase::is_value_updated_function_set()
+bool M2MBase::is_value_updated_function_set() const
 {
-    return (_value_updated_callback) ? true : false;
+    bool func_set = false;
+    if ((M2MCallbackStorage::does_callback_exist(*this, M2MCallbackAssociation::M2MBaseValueUpdatedCallback) == true) ||
+        (M2MCallbackStorage::does_callback_exist(*this, M2MCallbackAssociation::M2MBaseValueUpdatedCallback2) == true)) {
+
+        func_set = true;
+    }
+    return func_set;
 }
 
 void M2MBase::execute_value_updated(const String& name)
 {
-    if(_value_updated_callback) {
-        (*_value_updated_callback)(name.c_str());
+    // Q: is there a point to call both callback types? Or should we call just one of them?
+
+    value_updated_callback* callback = (value_updated_callback*)M2MCallbackStorage::get_callback(*this, M2MCallbackAssociation::M2MBaseValueUpdatedCallback);
+    if (callback) {
+        (*callback)(name.c_str());
+    }
+
+    value_updated_callback2 callback2 = (value_updated_callback2)M2MCallbackStorage::get_callback(*this, M2MCallbackAssociation::M2MBaseValueUpdatedCallback2);
+    if (callback2) {
+        (*callback2)(name.c_str());
     }
 }
 
@@ -731,8 +756,10 @@ char* M2MBase::stringdup(const char* src)
 void M2MBase::free_resources()
 {
     // remove the nsdl structures from the nsdlinterface's lists.
-    if (_observation_handler) {
-        _observation_handler->resource_to_be_deleted(this);
+    M2MObservationHandler *obs_handler = observation_handler();
+    if (obs_handler) {
+        tr_debug("M2MBase::free_resources()");
+        obs_handler->resource_to_be_deleted(this);
     }
 
     if (_sn_resource->dynamic_resource_params->static_resource_parameters->free_on_delete) {
@@ -740,27 +767,41 @@ void M2MBase::free_resources()
                 const_cast<sn_nsdl_static_resource_parameters_s *>(_sn_resource->dynamic_resource_params->static_resource_parameters);
 
         free(params->path);
-        free(params->resource);
+        //free(params->resource);
+#ifndef DISABLE_RESOURCE_TYPE
         free(params->resource_type_ptr);
+#endif
+#ifndef DISABLE_INTERFACE_DESCRIPTION
         free(params->interface_description_ptr);
+#endif
         free(params);
     }
     if (_sn_resource->dynamic_resource_params->free_on_delete) {
+        free(_sn_resource->dynamic_resource_params->resource);
         free(_sn_resource->dynamic_resource_params);
     }
 
-    if (_sn_resource->free_on_delete) {
-        free(_sn_resource->name);
+    if(_sn_resource->free_on_delete && _sn_resource->identifier_int_type == false) {
+        tr_debug("M2MBase::free_resources()");
+        free(_sn_resource->identifier.name);
+    }
+    if(_sn_resource->free_on_delete) {
         free(_sn_resource);
     }
 }
 
 size_t M2MBase::resource_name_length() const
 {
-    return strlen(_sn_resource->name);
+    assert(_sn_resource->identifier_int_type == false);
+    return strlen(_sn_resource->identifier.name);
 }
 
-sn_nsdl_dynamic_resource_parameters_s* M2MBase::get_nsdl_resource()
+sn_nsdl_dynamic_resource_parameters_s* M2MBase::get_nsdl_resource() const
 {
     return _sn_resource->dynamic_resource_params;
+}
+
+M2MBase::lwm2m_parameters_s* M2MBase::get_lwm2m_parameters() const
+{
+    return _sn_resource;
 }

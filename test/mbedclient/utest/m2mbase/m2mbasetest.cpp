@@ -16,6 +16,7 @@
 //CppUTest includes should be after your and system includes
 #include "CppUTest/TestHarness.h"
 #include "test_m2mbase.h"
+#include "include/m2mcallbackstorage.h"
 
 TEST_GROUP(M2MBase)
 {
@@ -33,6 +34,7 @@ TEST_GROUP(M2MBase)
     void teardown() {
         delete m2m_base;
         delete obsHandler;
+        M2MCallbackStorage::delete_instance();
     }
 };
 
@@ -186,11 +188,6 @@ TEST(M2MBase, test_set_register_uri)
     m2m_base->test_set_register_uri();
 }
 
-TEST(M2MBase, test_set_observation_number)
-{
-    m2m_base->test_set_observation_number();
-}
-
 TEST(M2MBase, test_set_max_age)
 {
     m2m_base->test_set_max_age();
@@ -265,3 +262,9 @@ TEST(M2MBase, test_ctor)
 {
     m2m_base->test_ctor();
 }
+
+TEST(M2MBase, test_get_lwm2m_parameter)
+{
+    m2m_base->test_get_lwm2m_parameter();
+}
+

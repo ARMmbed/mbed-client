@@ -16,6 +16,7 @@
 //CppUTest includes should be after your and system includes
 #include "CppUTest/TestHarness.h"
 #include "test_m2mresourceinstance.h"
+#include "include/m2mcallbackstorage.h"
 
 TEST_GROUP(M2MResourceInstance)
 {
@@ -28,6 +29,7 @@ TEST_GROUP(M2MResourceInstance)
   void teardown()
   {
     delete m2m_resourceinstance;
+    M2MCallbackStorage::delete_instance();
   }
 };
 
@@ -44,11 +46,6 @@ TEST(M2MResourceInstance, test_static_resource_instance)
 TEST(M2MResourceInstance, base_type)
 {
     m2m_resourceinstance->test_base_type();
-}
-
-TEST(M2MResourceInstance, test_handle_observation_attribute)
-{
-    m2m_resourceinstance->test_handle_observation_attribute();
 }
 
 TEST(M2MResourceInstance, test_set_execute_function)
@@ -99,11 +96,6 @@ TEST(M2MResourceInstance, test_handle_get_request)
 TEST(M2MResourceInstance, test_handle_put_request)
 {
     m2m_resourceinstance->test_handle_put_request();
-}
-
-TEST(M2MResourceInstance, test_set_resource_observer)
-{
-    m2m_resourceinstance->test_set_resource_observer();
 }
 
 TEST(M2MResourceInstance, test_get_object_instance_id)
