@@ -202,6 +202,13 @@ public:
     virtual void update_endpoint(String &name) = 0;
 
     /**
+     * @brief Updates the domain name.
+     * @param domain New domain name
+     */
+    virtual void update_domain(String &domain) = 0;
+
+
+    /**
      * @brief Return internal endpoint name
      * @return internal endpoint name
      */

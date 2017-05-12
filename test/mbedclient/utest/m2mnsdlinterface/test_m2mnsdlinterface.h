@@ -94,6 +94,8 @@ public:
 
     void test_update_endpoint();
 
+    void test_update_domain();
+
     void test_internal_endpoint_name();
 
     void test_get_nsdl_execution_timer();

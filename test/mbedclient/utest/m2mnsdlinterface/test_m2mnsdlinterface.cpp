@@ -1910,6 +1910,17 @@ void Test_M2MNsdlInterface::test_update_endpoint()
 
 }
 
+void Test_M2MNsdlInterface::test_update_domain()
+{
+    nsdl->_endpoint->domain_name_ptr = (uint8_t *)malloc(2);
+    memset(nsdl->_endpoint->domain_name_ptr,0,2);
+    memcpy(nsdl->_endpoint->domain_name_ptr, "",1);
+    String name = "domain";
+    nsdl->update_domain(name);
+    STRCMP_EQUAL(name.c_str(), (const char*)nsdl->_endpoint->domain_name_ptr);
+
+}
+
 void Test_M2MNsdlInterface::test_internal_endpoint_name()
 {
     nsdl->_nsdl_handle = (nsdl_s*)malloc(sizeof(nsdl_s));

@@ -222,7 +222,7 @@ void M2MNsdlInterface::set_server_address(const char* server_address)
 
 }
 
-void M2MNsdlInterface::update_endpoint(const String &name)
+void M2MNsdlInterface::update_endpoint(const String &)
 {
 
 }
@@ -230,6 +230,11 @@ void M2MNsdlInterface::update_endpoint(const String &name)
 const String M2MNsdlInterface::internal_endpoint_name() const
 {
     return *m2mnsdlinterface_stub::string_value;
+}
+
+void M2MNsdlInterface::update_domain(const String &)
+{
+
 }
 
 M2MTimer &M2MNsdlInterface::get_nsdl_execution_timer()

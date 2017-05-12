@@ -177,6 +177,10 @@ void M2MInterfaceImpl::update_endpoint(String &name) {
 
 }
 
+void M2MInterfaceImpl::update_domain(String &domain) {
+
+}
+
 const String M2MInterfaceImpl::internal_endpoint_name() const
 {
 

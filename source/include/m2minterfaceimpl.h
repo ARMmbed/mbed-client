@@ -187,6 +187,12 @@ public:
     virtual void update_endpoint(String &name);
 
     /**
+     * @brief Updates the domain name.
+     * @param domain New domain name
+     */
+    virtual void update_domain(String &domain);
+
+    /**
      * @brief Return internal endpoint name
      * @return internal endpoint name
      */
@@ -411,10 +417,7 @@ private:
     M2MTimer                    *_registration_flow_timer;
     uint16_t                    _server_port;
     uint16_t                    _listen_port;
-    String                      _endpoint_type;
-    String                      _domain;
     int32_t                     _life_time;
-    String                      _context_address;
     String                      _server_ip_address;
     M2MSecurity                 *_register_server; //TODO: to be the list not owned
     M2MTimer                    _queue_sleep_timer;

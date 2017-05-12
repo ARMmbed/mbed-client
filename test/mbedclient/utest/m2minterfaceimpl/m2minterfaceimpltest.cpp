@@ -164,6 +164,11 @@ TEST(M2MInterfaceImpl, update_endpoint)
     m2m_interface_impl->test_update_endpoint();
 }
 
+TEST(M2MInterfaceImpl, update_domain)
+{
+    m2m_interface_impl->test_update_domain();
+}
+
 TEST(M2MInterfaceImpl, internal_endpoint_name)
 {
     m2m_interface_impl->test_internal_endpoint_name();

@@ -91,6 +91,11 @@ public:
     void update_endpoint(const String &name);
 
     /**
+     * @brief Updates domain.
+    */
+    void update_domain(const String &domain);
+
+    /**
      * @brief Creates the NSDL structure for the registered objectlist.
      * @param object_list, List of objects to be registered.
      * @return true if structure created successfully else false.
