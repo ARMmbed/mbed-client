@@ -528,24 +528,17 @@ sn_coap_hdr_s* M2MResource::handle_post_request(nsdl_s *nsdl,
     // process the POST if we have registered a callback for it
     if(received_coap_header) {
         if ((operation() & SN_GRS_POST_ALLOWED) != 0) {
-            M2MResource::M2MExecuteParameter *exec_params = new M2MResource::M2MExecuteParameter();
-            if (exec_params) {
-                exec_params->_object_name = object_name();
-                exec_params->_resource_name = name();
-                exec_params->_object_instance_id = object_instance_id();
-            }
+            M2MResource::M2MExecuteParameter exec_params(object_name(), name(), object_instance_id());
+
             uint16_t coap_content_type = 0;
             if(received_coap_header->payload_ptr) {
                 if(received_coap_header->content_format != COAP_CT_NONE) {
                     coap_content_type = received_coap_header->content_format;
                 }
                 if(coap_content_type == 0) {
-                    if (exec_params){
-                        exec_params->_value = alloc_string_copy(received_coap_header->payload_ptr,
-                                                                received_coap_header->payload_len);
-                        if (exec_params->_value) {
-                            exec_params->_value_length = received_coap_header->payload_len;
-                        }
+                    exec_params._value = received_coap_header->payload_ptr;
+                    if (exec_params._value) {
+                        exec_params._value_length = received_coap_header->payload_len;
                     }
                 } else {
                     msg_code = COAP_MSG_CODE_RESPONSE_UNSUPPORTED_CONTENT_FORMAT;
@@ -578,9 +571,9 @@ sn_coap_hdr_s* M2MResource::handle_post_request(nsdl_s *nsdl,
 #ifndef DISABLE_DELAYED_RESPONSE
                 }
 #endif
-                execute(exec_params);
+                execute(&exec_params);
             }
-            delete exec_params;
+
         } else { // if ((object->operation() & SN_GRS_POST_ALLOWED) != 0)
             tr_error("M2MResource::handle_post_request - COAP_MSG_CODE_RESPONSE_METHOD_NOT_ALLOWED");
             msg_code = COAP_MSG_CODE_RESPONSE_METHOD_NOT_ALLOWED; // 4.05
@@ -619,21 +612,32 @@ const char* M2MResource::object_name() const
     return parent_object.name();
 }
 
-M2MResource::M2MExecuteParameter::M2MExecuteParameter()
+#ifdef MEMORY_OPTIMIZED_API
+M2MResource::M2MExecuteParameter::M2MExecuteParameter(const char *object_name, const char *resource_name,
+                                                        uint16_t object_instance_id) :
+_object_name(object_name),
+_resource_name(resource_name),
+_value(NULL),
+_value_length(0),
+_object_instance_id(object_instance_id)
 {
-    _value = NULL;
-    _value_length = 0;
-    _object_name = "";
-    _resource_name = "";
-    _object_instance_id = 0;
 }
-
-M2MResource::M2MExecuteParameter::~M2MExecuteParameter()
+#else
+M2MResource::M2MExecuteParameter::M2MExecuteParameter(const String &object_name, const String &resource_name,
+                                                        uint16_t object_instance_id) :
+_object_name(object_name),
+_resource_name(resource_name),
+_value(NULL),
+_value_length(0),
+_object_instance_id(object_instance_id)
 {
-    free(_value);
 }
+#endif
 
-uint8_t *M2MResource::M2MExecuteParameter::get_argument_value() const
+// These could be actually changed to be inline ones, as it would likely generate
+// smaller code at application side.
+
+const uint8_t *M2MResource::M2MExecuteParameter::get_argument_value() const
 {
     return _value;
 }
@@ -643,6 +647,17 @@ uint16_t M2MResource::M2MExecuteParameter::get_argument_value_length() const
     return _value_length;
 }
 
+#ifdef MEMORY_OPTIMIZED_API
+const char* M2MResource::M2MExecuteParameter::get_argument_object_name() const
+{
+    return _object_name;
+}
+
+const char* M2MResource::M2MExecuteParameter::get_argument_resource_name() const
+{
+    return _resource_name;
+}
+#else
 const String& M2MResource::M2MExecuteParameter::get_argument_object_name() const
 {
     return _object_name;
@@ -652,6 +667,7 @@ const String& M2MResource::M2MExecuteParameter::get_argument_resource_name() con
 {
     return _resource_name;
 }
+#endif
 
 uint16_t M2MResource::M2MExecuteParameter::get_argument_object_instance_id() const
 {

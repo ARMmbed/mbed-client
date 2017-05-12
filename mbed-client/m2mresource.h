@@ -295,14 +295,16 @@ class M2MResource::M2MExecuteParameter {
 private:
 
     /**
-     * \brief Constructor
+     * \brief Constructor, since there is no implementation, it prevents invalid use of it
      */
     M2MExecuteParameter();
 
-    /**
-     * Destructor
-     */
-   ~M2MExecuteParameter();
+#ifdef MEMORY_OPTIMIZED_API
+    M2MExecuteParameter(const char *object_name, const char *resource_name, uint16_t object_instance_id);
+#else
+    // This is a deprecated constructor, to be removed on next release.
+    M2MExecuteParameter(const String &object_name, const String &resource_name, uint16_t object_instance_id);
+#endif
 
 public:
 
@@ -310,7 +312,7 @@ public:
      * \brief Returns the value of an argument.
      * \return uint8_t * The argument value.
      */
-    uint8_t *get_argument_value() const;
+    const uint8_t *get_argument_value() const;
 
     /**
      * \brief Returns the length of the value argument.
@@ -322,13 +324,21 @@ public:
      * \brief Returns the name of the object where the resource exists.
      * \return Object name.
     */
+#ifdef MEMORY_OPTIMIZED_API
+    const char* get_argument_object_name() const;
+#else
     const String& get_argument_object_name() const;
+#endif
 
     /**
      * \brief Returns the resource name.
      * \return Resource name.
     */
+#ifdef MEMORY_OPTIMIZED_API
+    const char* get_argument_resource_name() const;
+#else
     const String& get_argument_resource_name() const;
+#endif
 
     /**
      * \brief Returns the instance ID of the object where the resource exists.
@@ -337,13 +347,19 @@ public:
     uint16_t get_argument_object_instance_id() const;
 
 private:
+    // pointers to const data, not owned by this instance
 
-    String      _object_name;
-    String      _resource_name;
-    uint8_t *   _value;
-    uint16_t    _value_length;
-    uint16_t    _object_instance_id;
+#ifdef MEMORY_OPTIMIZED_API
+    const char      *_object_name;
+    const char      *_resource_name;
+#else
+    const String    &_object_name;
+    const String    &_resource_name;
+#endif
 
+    const uint8_t   *_value;
+    uint16_t        _value_length;
+    uint16_t        _object_instance_id;
 
 friend class Test_M2MResource;
 friend class M2MResource;
