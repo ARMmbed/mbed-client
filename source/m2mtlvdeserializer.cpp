@@ -184,7 +184,7 @@ M2MTLVDeserializer::Error M2MTLVDeserializer::deserialize_resources(const uint8_
                 //Create a new Resource
                 String id;
                 id.append_int(til._id);
-                M2MResource *resource = object_instance.create_dynamic_resource(id,"",M2MResourceInstance::INTEGER,true,false);
+                M2MResource *resource = object_instance.create_dynamic_resource(id,"",M2MResourceInstance::OPAQUE,true,false);
                 if(resource) {
                     resource->set_operation(M2MBase::GET_PUT_POST_DELETE_ALLOWED);
                 }
@@ -378,15 +378,8 @@ void M2MTLVDeserializer::set_resource_instance_value(M2MResourceInstance *res, c
         case M2MResourceInstance::INTEGER:
         case M2MResourceInstance::BOOLEAN:
         case M2MResourceInstance::TIME:
-            if(size < 9) { 
-                value = String::convert_array_to_integer(tlv, size);
-                res->set_value(value);
-            }
-            /* size > 8 then handle value same way like 
-             * M2MResourceInstance::STRING */
-            else { 
-                res->set_value(tlv, size);
-            }
+            value = String::convert_array_to_integer(tlv, size);
+            res->set_value(value);
             break;
         // Todo! implement conversion for other types as well
         case M2MResourceInstance::STRING:
