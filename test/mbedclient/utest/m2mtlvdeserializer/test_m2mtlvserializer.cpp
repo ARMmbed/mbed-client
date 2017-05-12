@@ -18,6 +18,7 @@
 #include "m2mobject_stub.h"
 #include "m2mobjectinstance_stub.h"
 #include "m2mresource_stub.h"
+#include "m2mresourcebase_stub.h"
 #include "m2mresourceinstance_stub.h"
 #include "m2mbase_stub.h"
 
@@ -119,8 +120,12 @@ void Test_M2MTLVSerializer::test_serialize_object_out_of_memory()
     memory_fail_counter=1; //apply for 1 time failing malloc
     memory_will_fail_counter=4; //after 4 successful ones
     data = serializer->serialize( m2mobject_stub::instance_list,size);
-    CHECK(data == NULL);
+    // the data was actually encoded 
+    CHECK(data != NULL);
 
+    free(data);
+
+    // just for safety, verify once more
     memory_fail_counter=1; //apply for 1 time failing malloc
     memory_will_fail_counter=5; //after 5 successful ones
     data = serializer->serialize( m2mobject_stub::instance_list,size);
@@ -211,7 +216,7 @@ void Test_M2MTLVSerializer::test_serialize_object()
     m2mbase_stub::name_id_value = 256;
 
     m2mresourceinstance_stub::int_value = 6;
-    m2mresourceinstance_stub::value = (uint8_t*) malloc(m2mresourceinstance_stub::int_value);
+    m2mresourcebase_stub::value = (uint8_t*) malloc(m2mresourceinstance_stub::int_value);
     data = serializer->serialize( m2mobject_stub::instance_list,size);
     CHECK(data != NULL);
 
@@ -219,11 +224,11 @@ void Test_M2MTLVSerializer::test_serialize_object()
         free(data);
         data = 0;
     }
-    free(m2mresourceinstance_stub::value);
-    m2mresourceinstance_stub::value = NULL;
+    free(m2mresourcebase_stub::value);
+    m2mresourcebase_stub::value = NULL;
 
     m2mresourceinstance_stub::int_value = 256;
-    m2mresourceinstance_stub::value = (uint8_t*) malloc(m2mresourceinstance_stub::int_value);
+    m2mresourcebase_stub::value = (uint8_t*) malloc(m2mresourceinstance_stub::int_value);
     data = serializer->serialize( m2mobject_stub::instance_list,size);
     CHECK(data != NULL);
 
@@ -231,11 +236,11 @@ void Test_M2MTLVSerializer::test_serialize_object()
         free(data);
         data = 0;
     }
-    free(m2mresourceinstance_stub::value);
-    m2mresourceinstance_stub::value = NULL;
+    free(m2mresourcebase_stub::value);
+    m2mresourcebase_stub::value = NULL;
 
     m2mresourceinstance_stub::int_value = 65536;
-    m2mresourceinstance_stub::value = (uint8_t*) malloc(m2mresourceinstance_stub::int_value);
+    m2mresourcebase_stub::value = (uint8_t*) malloc(m2mresourceinstance_stub::int_value);
     data = serializer->serialize( m2mobject_stub::instance_list,size);
     CHECK(data != NULL);
 
@@ -254,7 +259,7 @@ void Test_M2MTLVSerializer::test_serialize_object()
     delete instance;
     delete object;
 
-    free(m2mresourceinstance_stub::value);
+    free(m2mresourcebase_stub::value);
 
     m2mresourceinstance_stub::clear();
     m2mresource_stub::clear();
@@ -469,14 +474,20 @@ void Test_M2MTLVSerializer::test_serialize_resource_instance_out_of_memory()
     data = serializer->serialize( m2mobjectinstance_stub::resource_list,size);
     CHECK(data == NULL);
 
+    // there is now only one allocation in this sequence, so this shall pass
     memory_fail_counter=1; //apply for 1 time failing malloc
     memory_will_fail_counter=2; //after 2 successful ones
     data = serializer->serialize( m2mobjectinstance_stub::resource_list,size);
-    CHECK(data == NULL);
+    CHECK(data != NULL);
 
     m2mbase_stub::name_id_value = -1;
     data = serializer->serialize( m2mobject_stub::instance_list,size);
     CHECK(data == NULL);
+
+    // Disable the failures in allocator as the cpputest will otherwise panic 
+    // on its own cleanup which does allocation.
+    memory_fail_counter = 0;
+    memory_will_fail_counter = 0;
 
     delete res_instance;
     delete resource;

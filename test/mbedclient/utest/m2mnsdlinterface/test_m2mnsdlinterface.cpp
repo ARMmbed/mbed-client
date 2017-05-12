@@ -21,6 +21,7 @@
 #include "m2mobject_stub.h"
 #include "m2mobjectinstance_stub.h"
 #include "m2mresource_stub.h"
+#include "m2mresourcebase_stub.h"
 #include "m2mresourceinstance_stub.h"
 #include "m2mresource.h"
 #include "m2mbase_stub.h"
@@ -1433,9 +1434,9 @@ void Test_M2MNsdlInterface::test_observation_to_be_sent()
     instance_list_ids.push_back(0);
 
     uint8_t value[] = {"value"};
-    m2mresourceinstance_stub::value = (uint8_t *)malloc(sizeof(value));
-    memset( m2mresourceinstance_stub::value, 0, sizeof(value));
-    memcpy(m2mresourceinstance_stub::value,value,sizeof(value));
+    m2mresourcebase_stub::value = (uint8_t *)malloc(sizeof(value));
+    memset( m2mresourcebase_stub::value, 0, sizeof(value));
+    memcpy(m2mresourcebase_stub::value,value,sizeof(value));
     m2mresourceinstance_stub::int_value = sizeof(value);
 
     m2mbase_stub::uint16_value = 321;
@@ -1507,8 +1508,8 @@ void Test_M2MNsdlInterface::test_observation_to_be_sent()
     nsdl->observation_to_be_sent(object_instance, 500, instance_list_ids);
     free(common_stub::coap_header);
 
-    free(m2mresourceinstance_stub::value);
-    m2mresourceinstance_stub::value = NULL;
+    free(m2mresourcebase_stub::value);
+    m2mresourcebase_stub::value = NULL;
 
     m2mbase_stub::clear();
     m2mresourceinstance_stub::clear();
@@ -1600,7 +1601,7 @@ void Test_M2MNsdlInterface::test_value_updated()
 
     m2mresourceinstance_stub::int_value = 2;
     uint8_t value[] = "1";
-    m2mresourceinstance_stub::value = value;
+    m2mresourcebase_stub::value = value;
 
     m2mresourceinstance_stub::base_type = M2MBase::Resource;
 
@@ -1631,7 +1632,7 @@ void Test_M2MNsdlInterface::test_value_updated()
     m2mbase_stub::mode_value = M2MBase::Static;
 
     m2mresourceinstance_stub::int_value = 2;
-    m2mresourceinstance_stub::value = value;
+    m2mresourcebase_stub::value = value;
 
     nsdl->value_updated(resource_instance/*,"name/0/name/0"*/);
     CHECK(observer->value_update == true);

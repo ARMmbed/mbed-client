@@ -20,7 +20,6 @@ bool m2mresourceinstance_stub::bool_value;
 String *m2mresourceinstance_stub::string_value;
 M2MResourceInstance::ResourceType m2mresourceinstance_stub::resource_type;
 sn_coap_hdr_s *m2mresourceinstance_stub::header;
-uint8_t* m2mresourceinstance_stub::value;
 
 
 void m2mresourceinstance_stub::clear()
@@ -29,7 +28,6 @@ void m2mresourceinstance_stub::clear()
     bool_value = false;
     resource_type = M2MResourceInstance::STRING;
     header = NULL;
-    value = NULL;
     string_value = NULL;
 }
 

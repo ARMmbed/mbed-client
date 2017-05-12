@@ -17,6 +17,7 @@
 #include "test_m2mresource.h"
 #include "CppUTest/MemoryLeakDetectorMallocMacros.h"
 #include "m2mbase_stub.h"
+#include "m2mresourcebase_stub.h"
 #include "m2mresourceinstance_stub.h"
 #include "m2mobjectinstance_stub.h"
 #include "m2mtlvdeserializer_stub.h"
@@ -565,7 +566,7 @@ void Test_M2MResource::test_handle_post_request()
     CHECK(resource->handle_post_request(NULL,coap_header,handler,execute_value_updated) != NULL);
 
     m2mresourceinstance_stub::int_value = sizeof(value);
-    m2mresourceinstance_stub::value = value;
+    m2mresourcebase_stub::value = value;
 
     resource->_delayed_response = false;
     sn_coap_hdr_s *coap_response = resource->handle_post_request(NULL,coap_header,handler,execute_value_updated);
