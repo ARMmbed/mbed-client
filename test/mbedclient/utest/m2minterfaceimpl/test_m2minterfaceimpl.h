@@ -81,6 +81,8 @@ public:
 
     void test_update_endpoint();
 
+    void test_update_domain();
+
     void test_internal_endpoint_name();
 
     M2MInterfaceImpl*   impl;

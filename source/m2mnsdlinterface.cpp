@@ -90,6 +90,8 @@ M2MNsdlInterface::~M2MNsdlInterface()
     tr_debug("M2MNsdlInterface::~M2MNsdlInterface() - IN");
     if(_endpoint) {
          memory_free(_endpoint->endpoint_name_ptr);
+         memory_free(_endpoint->domain_name_ptr);
+         memory_free(_endpoint->type_ptr);
          memory_free(_endpoint->lifetime_ptr);
          memory_free(_endpoint);
     }
@@ -139,11 +141,11 @@ void M2MNsdlInterface::create_endpoint(const String &name,
             _endpoint->endpoint_name_len = _endpoint_name.length();
         }
         if(!type.empty()) {
-            _endpoint->type_ptr = (uint8_t*)type.c_str();
+            _endpoint->type_ptr = alloc_string_copy((uint8_t*)type.c_str(), type.length());
             _endpoint->type_len =  type.length();
         }
         if(!domain.empty()) {
-            _endpoint->domain_name_ptr = (uint8_t*)domain.c_str();
+            _endpoint->domain_name_ptr = alloc_string_copy((uint8_t*)domain.c_str(), domain.length());
             _endpoint->domain_name_len = domain.length();
         }
         _endpoint->binding_and_mode = (sn_nsdl_oma_binding_and_mode_t)mode;
@@ -163,6 +165,20 @@ void M2MNsdlInterface::update_endpoint(const String &name)
             memory_free(_endpoint->endpoint_name_ptr);
             _endpoint->endpoint_name_ptr = alloc_string_copy((uint8_t*)_endpoint_name.c_str(), _endpoint_name.length());
             _endpoint->endpoint_name_len = _endpoint_name.length();
+        }
+    }
+}
+
+void M2MNsdlInterface::update_domain(const String &domain)
+{
+    if(_endpoint){
+        if(_endpoint->domain_name_ptr) {
+            memory_free(_endpoint->domain_name_ptr);
+            _endpoint->domain_name_len = 0;
+        }
+        if(!domain.empty()) {
+            _endpoint->domain_name_ptr = alloc_string_copy((uint8_t*)domain.c_str(), domain.length());
+            _endpoint->domain_name_len = domain.length();
         }
     }
 }

@@ -794,6 +794,12 @@ void Test_M2MInterfaceImpl::test_update_endpoint()
     impl->update_endpoint(data);
 }
 
+void Test_M2MInterfaceImpl::test_update_domain()
+{
+    String data = "domain";
+    impl->update_domain(data);
+}
+
 void Test_M2MInterfaceImpl::test_internal_endpoint_name()
 {
     String value;

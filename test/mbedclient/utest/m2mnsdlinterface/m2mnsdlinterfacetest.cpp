@@ -192,6 +192,11 @@ TEST(M2MNsdlInterface, update_endpoint)
     m2m_nsdl_interface->test_update_endpoint();
 }
 
+TEST(M2MNsdlInterface, update_domain)
+{
+    m2m_nsdl_interface->test_update_domain();
+}
+
 TEST(M2MNsdlInterface, internal_endpoint_name)
 {
     m2m_nsdl_interface->test_internal_endpoint_name();

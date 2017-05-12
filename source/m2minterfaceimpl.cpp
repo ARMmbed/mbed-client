@@ -45,10 +45,7 @@ M2MInterfaceImpl::M2MInterfaceImpl(M2MInterfaceObserver& observer,
   _registration_flow_timer(NULL),
   _server_port(0),
   _listen_port(listen_port),
-  _endpoint_type(ep_type),
-  _domain( dmn),
   _life_time(l_time),
-  _context_address(con_addr),
   _register_server(NULL),
   _queue_sleep_timer(*this),
   _retry_timer(*this),
@@ -71,11 +68,11 @@ M2MInterfaceImpl::M2MInterfaceImpl(M2MInterfaceObserver& observer,
 {
     tr_debug("M2MInterfaceImpl::M2MInterfaceImpl() -IN");
     _nsdl_interface.create_endpoint(ep_name,
-                                     _endpoint_type,
+                                     ep_type,
                                      _life_time,
-                                     _domain,
+                                     dmn,
                                      (uint8_t)_binding_mode & 0x07, // nsdl binding mode is only 3 least significant bits
-                                     _context_address);
+                                     con_addr);
 
     //Here we must use TCP still
     _connection_handler.bind_connection(_listen_port);
@@ -1070,6 +1067,11 @@ void M2MInterfaceImpl::start_register_update(M2MUpdateRegisterData *data) {
 
 void M2MInterfaceImpl::update_endpoint(String &name) {
     _nsdl_interface.update_endpoint(name);
+}
+
+void M2MInterfaceImpl::update_domain(String &domain)
+{
+    _nsdl_interface.update_domain(domain);
 }
 
 const String M2MInterfaceImpl::internal_endpoint_name() const
