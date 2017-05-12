@@ -166,24 +166,7 @@ M2MTLVDeserializer::Error M2MTLVDeserializer::deserialize_resources(const uint8_
                 if(update_value) {
                     if(til._length > 0) {
                         tr_debug("M2MTLVDeserializer::deserialize_resources() - Update value");
-                        int64_t value = 0;
-                        switch ((*it)->resource_instance_type()) {
-                            case M2MResourceInstance::INTEGER:
-                            case M2MResourceInstance::BOOLEAN:
-                                value = String::convert_array_to_integer(tlv+offset, til._length);
-                                (*it)->set_value(value);
-                                break;
-                            // Todo! implement support for other types as well
-                            case M2MResourceInstance::STRING:
-                            case M2MResourceInstance::FLOAT:
-                            case M2MResourceInstance::OPAQUE:
-                            case M2MResourceInstance::TIME:
-                            case M2MResourceInstance::OBJLINK:
-                                (*it)->set_value(tlv+offset, til._length);
-                                break;
-                            default:
-                                break;
-                        }
+                        set_resource_instance_value((*it), tlv+offset, til._length);
                     } else {
                         tr_debug("M2MTLVDeserializer::deserialize_resources() - Clear Value");
                         (*it)->clear_value();
@@ -201,7 +184,7 @@ M2MTLVDeserializer::Error M2MTLVDeserializer::deserialize_resources(const uint8_
                 //Create a new Resource
                 String id;
                 id.append_int(til._id);
-                M2MResource *resource = object_instance.create_dynamic_resource(id,"",M2MResourceInstance::INTEGER,true,false);
+                M2MResource *resource = object_instance.create_dynamic_resource(id,"",M2MResourceInstance::OPAQUE,true,false);
                 if(resource) {
                     resource->set_operation(M2MBase::GET_PUT_POST_DELETE_ALLOWED);
                 }
@@ -394,6 +377,7 @@ void M2MTLVDeserializer::set_resource_instance_value(M2MResourceInstance *res, c
     switch (res->resource_instance_type()) {
         case M2MResourceInstance::INTEGER:
         case M2MResourceInstance::BOOLEAN:
+        case M2MResourceInstance::TIME:
             value = String::convert_array_to_integer(tlv, size);
             res->set_value(value);
             break;
@@ -401,7 +385,6 @@ void M2MTLVDeserializer::set_resource_instance_value(M2MResourceInstance *res, c
         case M2MResourceInstance::STRING:
         case M2MResourceInstance::FLOAT:
         case M2MResourceInstance::OPAQUE:
-        case M2MResourceInstance::TIME:
         case M2MResourceInstance::OBJLINK:
             res->set_value(tlv, size);
             break;
