@@ -1,6 +1,6 @@
-<span class="notes">**Note:** To port mbed Client, you need to [install yotta and its dependencies](https://github.com/ARMmbed/yotta/blob/master/docs/index.md).</span>
-
 ## mbed Client structure and build process
+
+<span class="notes">**Note:** To port mbed Client, you need to [install yotta and its dependencies](https://github.com/ARMmbed/yotta/blob/master/docs/index.md).</span>
 
 <span class="tips">**Tip:** Before embarking on your own port, you should build the core mbed Client for an existing compilation target to get an understanding of how the mbed Client builds.</span>
 
@@ -10,9 +10,9 @@ This is also the process to build applications for the mbed Client (including th
 
 In general, `yotta` downloads and installs the necessary modules over the internet from the public yotta Registry (which saves published versions of modules) or from a specified source control URL.
 
-## Components of mbed Client
+### Components of mbed Client
 
-### Component software modules
+#### Component software modules
 
 mbed Client consists of one main component. More major components will be added in future development phases:
 
@@ -46,13 +46,13 @@ mbed-client-linux-example x.x.x
    |_mbed-client-linux x.x.x
 ```
 
-### Compilation targets
+#### Compilation targets
 
 To compile for a target board, you need a [target description](http://docs.yottabuild.org/tutorial/targets.html) that describes how to compile for the target. 
 
 The `mbed-client` module uses the platform name that each target defines to choose which `mbed-client-<platform-name>` module to depend on to provide the platform-specific implementation.
 
-## Porting mbed Client to a different platform
+### Porting mbed Client to a different platform
 
 To port mbed Client to a new platform:
 
@@ -64,7 +64,7 @@ To port mbed Client to a new platform:
 
 The `yotta` build system is designed for easy reuse of generic modules. If you intend to support multiple platforms that share common features, we recommend moving the common functionality into a separate module and use it for each platform.
 
-### Requesting for a development repository
+#### Requesting for a development repository
 
 We provide private git repositories to our partners porting mbed Client. Only the members of the mbed Client team and relevant partner contacts and engineers have access to these repositories.
 
@@ -74,7 +74,7 @@ When you contact `support@mbed.org`, a repository will be created for your modul
 
 - **`target-<targetname>`** contains the yotta target description of the target you are porting to. This is usually your platform name.
 
-### Creating a yotta compilation target
+#### Creating a yotta compilation target
 
 An example on compiling for linux target can be found in the `yotta_targets` directory of [the example application] (https://github.com/ARMmbed/mbed-client-linux-example).
 
@@ -91,7 +91,7 @@ yotta link-target
 
 3.Use the `yotta target <targetname>` command to select your target for the compilation.
 
-### Implementing mbed-client-xxx
+#### Implementing mbed-client-xxx
 
 Clone your `mbed-client-<your-platform-name>` module and `mbed-client` modules from GitHub.
 
@@ -379,7 +379,7 @@ public :
 
 ```
 
-#### Implementing M2MTimer class for your platform
+##### Implementing M2MTimer class for your platform
 
 This class provides the periodic timer functionality for your platform.
 
@@ -504,7 +504,7 @@ public:
 #endif // M2M_TIMER_OBSERVER_H
 ```
 
-### Modifying the `json` file in the `mbed-client` module
+#### Modifying the `json` file in the `mbed-client` module
 
 You need to add your target name to `module.json` so that when you set `yt target <platform>`, yotta can resolve the dependency correctly and link the main library with your module.
 
@@ -542,7 +542,7 @@ Two platforms, mbed OS and Linux, are already supported. You just need to add yo
 }
 ```
 
-### Testing and verification
+#### Testing and verification
 
 You can build your mbed-client port immediately:
 
