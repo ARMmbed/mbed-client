@@ -1,4 +1,4 @@
-## mbed Client data types
+## Data types
 
 This chapter describes how the different data types are processed in the mbed Client and the REST API.
 
@@ -7,7 +7,7 @@ The following two aspects are considered:
 - How the different data types should be passed to API on mbed Client.
 - How the data is received on REST API side, and how it is converted into right data type.
 
-### Using mbed Client data types
+### Using the data types
 
 When data is transferred from mbed Client to mbed Device Server, the following need to be kept in mind:
 
