@@ -1,4 +1,6 @@
-## The Client Registration feature
+## Features
+
+### The Client Registration feature
 
 The client uses the Client Registration to register with mbed Device Server, update registration and deregister.
 
@@ -10,7 +12,7 @@ The Client Registration includes multiple sub-features. Currently supported:
 - [Update](#the-update-feature)
 - [Deregister](#the-deregister-feature)
 
-### The Register feature
+#### The Register feature
 
 This API enables the client registration functionality.
 
@@ -22,7 +24,7 @@ When registering, the client:
 
 * Provides information on the Objects the client supports and existing Object Instances in the client.
 
-#### Registering your client
+##### Registering your client
 
 To provide information to mbed Device Server and issue the register command:
 
@@ -102,7 +104,7 @@ void error(M2MInterface::Error error)
 
 You will get more information about the error from the `error` parameter passed with the callback; use it to fix the source of the error.
 
-### The Update feature
+#### The Update feature
 
 Periodically, or in response to events within the client or as initiated by mbed Device Server, the client updates its registration information with mbed Device Server by sending it an **Update** operation.
 
@@ -140,7 +142,7 @@ If the update operation fails for some reason, you will receive the following ca
 void error(M2MInterface::Error error)
 ```
 
-### The Deregister feature
+#### The Deregister feature
 
 The client can deregister from mbed Device Server when it no longer requires access to the server. When mbed Device Server receives the **Deregister** message it removes the device's registration information from its database. When the client needs mbed Device Server again, it has to register again.
 
