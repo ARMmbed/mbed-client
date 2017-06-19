@@ -1,4 +1,4 @@
-## How to use mbed Client API
+## Using mbed Client API
 
 This section explains how to use our C++ API to create and configure different types of Objects, Object Instances and Resources for mbed Client to comply with the OMA LWM2M specifications. These resources can then be communicated to mbed Device Server.
 
@@ -14,7 +14,7 @@ As per the OMA LWM2M specification:
 
 Read the API doxygen documentation [here](https://docs.mbed.com/docs/mbed-client-guide/en/latest/api/index.html).
 
-### How to create and configure Objects
+### Creating and configuring Objects
 
 With this API, you can create and configure the following Objects:
 
@@ -106,7 +106,7 @@ _object->set_coap_content_type(120);
 
 <span class="tips">**Tip:** In future releases, we will introduce support for the JSON content types.</span>
 
-### How to create and configure Object Instances
+### Creating and configuring Object Instances
 
 With this API, you can create and configure the following Object Instances:
 
@@ -198,7 +198,7 @@ object_instance->set_coap_content_type(120);
 
 There are additional APIs that provide getter and remove functions for Object Instances in the `M2MObjectInstance` class; [check the API documentation](https://docs.mbed.com/docs/mbed-client-guide/en/latest/api/m2mobjectinstance_8h.html) for their usage. 
 
-### How to create and configure Resources and Resource Instances
+### Creating and configuring Resources and Resource Instances
 
 With this API, you can create and configure the following Resources and Resource Instances:
 
@@ -362,7 +362,7 @@ When you have created a Resource or Resource Instance (whether OMA-specific or c
 
 Here, we present a few of the most important parameters that you must configure properly to work with the Resource and Resource Instance.
 
-###### Setting Operation Mode
+###### Setting the operation mode
 
 You can set the Resource or Resource Instance operation mode so that they can handle `GET`, `PUT`, `POST`, `DELETE` or a combination of these requests coming from mbed Device Server.
 
@@ -374,7 +374,7 @@ resource->set_operation(M2MBase::GET_PUT_POST_ALLOWED); // This defines the REST
 resource_instance->set_operation(M2MBase::GET_PUT_POST_ALLOWED); // This defines the REST operations that can be performed on this Resource Instance.
 ```
 
-###### Setting Observable Mode
+###### Setting observable mode
 
 To set the Resource or Resource Instance to be an observable resource:
 
