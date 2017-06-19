@@ -1,4 +1,4 @@
-## The Device Management and Service Enabler feature
+### The Device Management and Service Enabler feature
 
 mbed Device Server uses the Device Management and Service Enabler to access Object Instances and Resources available on the client. The interface provides this access through the following operations:
 
@@ -16,7 +16,7 @@ The Device Management and Service Enabler Interface supports the following data 
 - Text: for Resources.
 - TLV: for Object and Object Instances.
 
-### The Create operation
+#### The Create operation
 
 There are two types of resources you can create:
 
@@ -59,11 +59,11 @@ if(_object) {
 
 For more information on different resource functionalities, please check the [API documentation](https://docs.mbed.com/docs/mbed-client-guide/en/latest/api/annotated.html) for the M2MObject, M2MObjectInstance and M2MResource classes.
 
-### The Read operation
+#### The Read operation
 
 The Client API allows setting values to Resources, an array of Resource Instances, an Object Instance or all the Object Instances of an Object (TLV format supported). mbed Device Server can then read these values using the **Read** operation.
 
-### The Write operation
+#### The Write operation
 
 The **Write** operation is used to overwrite the value of a Resource, an array of Resource Instances or multiple Resources from an Object Instance. 
 
@@ -148,7 +148,7 @@ res2->set_value_updated_function(value_updated_callback2(&value_updated_global))
 
 ```
 
-### The Write Attributes operation
+#### The Write Attributes operation
 
 Any readable Resource can have attributes that are considered during the [**Observe** operation](info_reporting.md#the-observe-feature). The following attributes are used:
 
@@ -162,7 +162,7 @@ mbed Device Server sets the endpoint attribute values that are used to determine
 
 Check the [LWM2M Specification](http://technical.openmobilealliance.org/Technical/technical-information/release-program/current-releases/oma-lightweightm2m-v1-0) for details of all the possible **Write Attributes** defined for different types of Objects and Resources.
 
-### The Execute operation
+#### The Execute operation
 
 mbed Device Server uses the **Execute** operation to perform an action. This operation can only be performed on individual Resources. 
 
