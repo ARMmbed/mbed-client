@@ -1,4 +1,4 @@
-## Useful reading
+## Where to go next
 
 [Getting started with mbed Device Connector](link to doc) provides you:
 
