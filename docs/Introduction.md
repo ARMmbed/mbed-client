@@ -1,4 +1,4 @@
-# ARM mbed Client overview
+## mbed Client overview
 
 ARM mbed Client is a library that provides the means to connect constrained embedded devices to mbed Device Connector Service, mbed Device Server and to mbed-enabled cloud services from our partners.
 
@@ -10,7 +10,7 @@ The mbed Client high-level APIs allow mbed OS developers to create applications 
 
 The API is written in C++ to allow quick application development.
 
-## Managing devices on mbed Device Server
+### Managing devices on mbed Device Server
 
 mbed Client supports the following three features introduced in the subsequent chapters:
 
@@ -37,7 +37,7 @@ M2MInterface* interface = M2MInterfaceFactory::create_interface(*this,
                                                   "");
 ```
 
-### Setting up own random number generator function
+#### Setting up own random number generator function
 
 To provide a stronger security mechanism, mbed Client requires a random number generator to feed a random number into the underlying SSL library. There is a default PRNG seeded with RTC for security but some platforms do not have RTC, and for some, time value seeded PRNG is not secure enough. 
 
@@ -60,7 +60,7 @@ _interface->set_random_number_callback(&get_random_number);
 
 ```
 
-### Setting up own entropy function for additional secure connectivity 
+#### Setting up own entropy function for additional secure connectivity 
 
 mbed Client provides an API to add your own entropy source into the underlying SSL library.
 
@@ -90,7 +90,7 @@ _interface->set_entropy_callback(ent_cb);
 
 ```
 
-### Maximum UDP message size
+#### Maximum UDP message size
 
 The maximum single UDP message size that mbed Client can receive is 1152 bytes. The actual payload size is 1137 bytes, the header information using the remaining 15 bytes. 
 
@@ -119,7 +119,7 @@ To enable the Blockwise feature in yotta based builds, you need to create a `con
 Acceptable values for the `coap_max_blockwise_payload_size` flag are:
 0, 16, 32, 64, 128, 256, 512 and 1024. Value 0 means that the feature is not used.
 
-### CoAP message deduplication
+#### CoAP message deduplication
 
 By default, message deduplication is disabled. More information about deduplication in the [CoAP specification](https://tools.ietf.org/html/rfc7252#page-24).
 
@@ -143,7 +143,7 @@ For yotta based builds, to enable message deduplication, you need to create a `c
 ```
 Recommended values for the `coap_duplication_max_msgs_count` flag are 0 to 6. Value 0 means that the feature is not used. It is not recommended to use higher value than 6, because it increases the memory consumption.
 
-### Reconnectivity
+#### Reconnectivity
 
 Apart from standard CoAP features, mbed Client also handles reconnectivity logic on behalf of applications, thereby aiming to provide seamless connectivity experience and recovery from temporary network hiccups or service side disruptions.
 
@@ -190,14 +190,14 @@ For yotta  based builds, to overwrite the reconnection retry count and reconnect
 }
 ```
 
-## How to use the API
+### How to use the API
 More information on how to use the API effectively to create and configure Objects, Object Instances and Resources, can be found [here](Howto.md).
 
-## API documentation
+### API documentation
 
 The documentation for this API is [available here](https://docs.mbed.com/docs/mbed-client-guide/en/latest/api/annotated.html).
 
-## Example application
+### Example application
 
 We have an example application for
 
