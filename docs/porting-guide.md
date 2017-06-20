@@ -76,7 +76,7 @@ When you contact `support@mbed.org`, a repository will be created for your modul
 
 #### Creating a yotta compilation target
 
-An example on compiling for linux target can be found in the `yotta_targets` directory of [the example application] (https://github.com/ARMmbed/mbed-client-linux-example).
+An example on compiling for linux target can be found in the `yotta_targets` directory of [the example application](https://github.com/ARMmbed/mbed-client-linux-example).
 
 Please, refer to the [yotta documentation](http://yottadocs.mbed.com/tutorial/targets.html) for setting up your compilation target.
 
