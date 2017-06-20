@@ -14,14 +14,14 @@ Currently, support for the Create and Delete actions is limited to Object Instan
 The Device Management and Service Enabler Interface supports the following data types:
 
 - Text: for Resources.
-- TLV: for Object and Object Instances.
+- TLV: for Objects and Object Instances.
 
 #### The Create operation
 
 There are two types of resources you can create:
 
-- Static: you set the value of the resource once and it does not change during the course of operations.
-- Dynamic: the value is expected to change during the course of operations. Therefore, the value is fetched from setter APIs every time the server requests a read operation.
+- **Static**: you set the value of the resource once and it does not change during the course of operations.
+- **Dynamic**: the value is expected to change during the course of operations. Therefore, the value is fetched from setter APIs every time the server requests a read operation.
 
 Here is an example of creating a custom static Resource:
 
@@ -119,9 +119,10 @@ void value_updated(M2MBase *base, M2MBase::BaseType type) {
         }
     }
 ```
+
 By default, callbacks are handled in the `value_updated()` function but the application can also define a callback function for an individual resource.
 
-Check the code snippet below for usage.
+See the code snippet below for usage:
 
 ```
 static void value_updated_global(const char *name) {
@@ -150,7 +151,7 @@ res2->set_value_updated_function(value_updated_callback2(&value_updated_global))
 
 #### The Write Attributes operation
 
-Any readable Resource can have attributes that are considered during the [**Observe** operation](info_reporting.md#the-observe-feature). The following attributes are used:
+Any readable Resource can have attributes that are considered during the [**Observe** operation](/docs/v5.4/mbed-client/features.html#the-observe-feature). The following attributes are used:
 
 - Minimum Period (pmin)
 - Maximum Period (pmax)
@@ -160,7 +161,7 @@ Any readable Resource can have attributes that are considered during the [**Obse
 
 mbed Device Server sets the endpoint attribute values that are used to determine when the endpoint sends the Resource value to the server.
 
-Check the [LWM2M Specification](http://technical.openmobilealliance.org/Technical/technical-information/release-program/current-releases/oma-lightweightm2m-v1-0) for details of all the possible **Write Attributes** defined for different types of Objects and Resources.
+Read the [LWM2M Specification](http://technical.openmobilealliance.org/Technical/technical-information/release-program/current-releases/oma-lightweightm2m-v1-0) for details of all the possible **Write Attributes** defined for different types of Objects and Resources.
 
 #### The Execute operation
 
@@ -172,7 +173,7 @@ If you want to execute a piece of code in your application, you can pass a `POST
 When your Resource receives the `POST` request, mbed Client parses the payload from the request and wraps it in the `M2MResource::M2MExecuteParameter` class. The class object is passed through the execute callback function.
 You can then typecast the `void*` argument into the corresponding `M2MResource::M2MExecuteParameter` and access the passed payload and its length through the given API. M2MResource::M2MExecuteParameter contains also information which object and object instance resource belongs to. Make sure that the payload sent through POST request is in `plain/text` format and that the content-type is set as “plain/text” on the POST request call.
 
-Check the code snippet below for usage.
+See the code snippet below for usage:
 
 ```
 #include "mbed-client/m2mobject.h"
