@@ -14,9 +14,9 @@ The API is written in C++ to allow quick application development.
 
 mbed Client supports the following three features introduced in the subsequent chapters:
 
-- [Client Registration and Deregistration](client_reg_dereg.md)
-- [Device Management and Service Enablement](dev_man_serv_enable.md)
-- [Information Reporting](info_reporting.md)
+- [Client Registration and Deregistration](/docs/v5.4/mbed-client/features.html#the-client-registration-feature)
+- [Device Management and Service Enablement](/docs/v5.4/mbed-client/features.html#the-device-management-and-service-enabler-feature)
+- [Information Reporting](/docs/v5.4/mbed-client/features.html#the-information-reporting-feature)
 
 The API also provides an interface to define the application endpoint information. This information will be delivered to mbed Device Server during the registration operation.
 
@@ -94,7 +94,7 @@ _interface->set_entropy_callback(ent_cb);
 
 The maximum single UDP message size that mbed Client can receive is 1152 bytes. The actual payload size is 1137 bytes, the header information using the remaining 15 bytes. 
 
-For transferring larger amounts of data, the Blockwise feature must be deployed. When using this feature, mbed Client can handle messages up to 65KB by default. This feature is disabled by default. To receive more than 65KB, see [Setting an external handler for block-wise messages](Howto.md#setting-an-external-handler-for-block-wise-messages).
+For transferring larger amounts of data, the Blockwise feature must be deployed. When using this feature, mbed Client can handle messages up to 65KB by default. This feature is disabled by default. To receive more than 65KB, see [Setting an external handler for block-wise messages](/docs/v5.4/mbed-client/using-mbed-client-api.html#creating-oma-defined-resources).
 
 To enable the Blockwise feature in mbed OS, create a `mbed_app.json` file in the application level and overwrite Blockwise value as described below:
 
@@ -150,7 +150,7 @@ Apart from standard CoAP features, mbed Client also handles reconnectivity logic
 The reconnection logic handles the following:
 
  - Reconnection towards mDS; establishing the network connection and re-registration to mDS.
- - CoAP message resending logic. More information about resending in [CoAP specification](https://tools.ietf.org/html/rfc7252#section-4.8).
+ - CoAP message resending logic. More information about resending in the [CoAP specification](https://tools.ietf.org/html/rfc7252#section-4.8).
 
 There are two parameters in the reconnection logic, both configurable by the application:
 
@@ -191,7 +191,7 @@ For yotta  based builds, to overwrite the reconnection retry count and reconnect
 ```
 
 ### How to use the API
-More information on how to use the API effectively to create and configure Objects, Object Instances and Resources, can be found [here](Howto.md).
+More information on how to use the API effectively to [create and configure Objects, Object Instances and Resources](/docs/v5.4/mbed-client/using-mbed-client-api.html).
 
 ### API documentation
 
