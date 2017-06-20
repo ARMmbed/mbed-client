@@ -5,7 +5,7 @@
 This document introduces the mbed Client and the use of its API. The document is divided into the following chapters:
 
 - [**mbed Client overview**](/docs/v5.4/mbed-client/mbed-client-overview.html) is a brief introduction to the mbed Client and its features.
-- [**Features**] introduces the features of mbed Client.
+- [**Features**](/docs/v5.4/mbed-client/features.html) introduces the features of mbed Client.
   - [**The Client Registration feature**](/docs/v5.4/mbed-client/features.html#the-client-registration-feature) introduces the Client Registration feature in detail.
   - [**The Device Management and Service Enabler feature**](/docs/v5.4/mbed-client/features.html#the-device-management-and-service-enabler-feature) introduces the Device Management and Service Enabler feature in detail.
   - [**The Information Reporting feature**](/docs/v5.4/mbed-client/features.html#the-information-reporting-feature) introduces the Information Reporting feature in detail.
