@@ -195,7 +195,7 @@ More information on how to use the API effectively to [create and configure Obje
 
 ### API documentation
 
-The documentation for this API is [available here](https://docs.mbed.com/docs/mbed-client-guide/en/latest/api/annotated.html).
+The documentation for this API is [available here](/docs/v5.4/mbed-client-doxy/index.html).
 
 ### Example application
 
