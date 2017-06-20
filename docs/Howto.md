@@ -12,7 +12,7 @@ As per the OMA LWM2M specification:
 - The client must have created Resources under Object Instance. You can create M2MResource from the M2MObjectInstance class.
 - The client must have created Resource Instances under Resources. You can create M2MResourceInstance from the M2MObjectInstance class.
 
-Read the API doxygen documentation [here](https://docs.mbed.com/docs/mbed-client-guide/en/latest/api/index.html).
+Read the [API doxygen documentation](https://docs.mbed.com/docs/mbed-client-guide/en/latest/api/index.html).
 
 ### Creating and configuring Objects
 
@@ -69,7 +69,7 @@ M2MObject * _object = M2MInterfaceFactory::create_object("Test");
 
 Here, we discuss a few of the most important parameters, which you must configure properly to work with the Objects.
 
-###### Setting Operation Mode
+###### Setting the operation mode
 
 To set the operation mode of the Objects so that they can handle `GET`, `PUT`, `POST`, `DELETE` or a combination of these requests coming from mbed Device Server:
 
@@ -78,13 +78,13 @@ virtual void set_operation(M2MBase::Operation operation);
 _object->set_operation(M2MBase::GET_PUT_POST_ALLOWED); // This defines the REST operations that can be performed on this object.
 ```
 
-###### Setting Observable Mode
+###### Setting the observable mode
 
 To set the Object to be an observable resource:
 
 `virtual void set_observable(bool observable);` 
 
-By default, all the created objects are non-observable. You can set them to be observable or not observable using this API.
+By default, all the created objects are non-observable. You can set them to be observable or non-observable using this API.
 
 ```
 _object->set_observable(true); // The object can be observed from server.
@@ -156,7 +156,7 @@ When you have created an Object Instance (whether OMA-specific or custom), you c
 
 Here, we present a few of the most important parameters that you must configure properly to work with the object instances.
 
-###### Setting Operation Mode
+###### Setting the operation mode
 
 To set the operation mode of the Objects so that they can handle `GET`, `PUT`, `POST`, `DELETE` or a combination of these requests coming from mbed Device Server:
 
@@ -165,13 +165,13 @@ virtual void set_operation(M2MBase::Operation operation);
 object_instance->set_operation(M2MBase::GET_PUT_POST_ALLOWED); // This defines the REST operations that can be performed on this object instance.
 ```
 
-###### Setting Observable Mode
+###### Setting the observable mode
 
 To set the Object Instance to be an observing resource:
 
 `virtual void set_observable(bool observable);`
 
-By default, all the created Object Instances are non-observable. You can set them to be observable or not observable using this API.
+By default, all the created Object Instances are non-observable. You can set them to be observable or non-observable using this API.
 
 ```
 _object_instance->set_observable(true); // This defines that the Object Instance can be observed from server.
@@ -194,9 +194,9 @@ virtual void set_coap_content_type(const uint8_t content_type);
 object_instance->set_coap_content_type(120);
 ```
 
-<span class="tips">**Tip:** In future version, we will introduce support for the JSON content types.</span>
+<span class="tips">**Tip:** In future versions, we will introduce support for the JSON content types.</span>
 
-There are additional APIs that provide getter and remove functions for Object Instances in the `M2MObjectInstance` class; [check the API documentation](https://docs.mbed.com/docs/mbed-client-guide/en/latest/api/m2mobjectinstance_8h.html) for their usage. 
+There are additional APIs that provide getter and remove functions for Object Instances in the `M2MObjectInstance` class; read the [API documentation](https://docs.mbed.com/docs/mbed-client-guide/en/latest/api/m2mobjectinstance_8h.html) for their usage. 
 
 ### Creating and configuring Resources and Resource Instances
 
@@ -229,7 +229,7 @@ There are direct APIs to create and set values for the Device Resources. You can
 
 Where `instance_id` is the Resource Instance ID, for example `/3/0/11/0`.
 
-Check the [M2MDevice API documentation](https://docs.mbed.com/docs/mbed-client-guide/en/latest/api/m2mdevice_8h.html) to find which enums are supported for `integer` or `string` value types.
+Read the [M2MDevice API documentation](https://docs.mbed.com/docs/mbed-client-guide/en/latest/api/m2mdevice_8h.html) to find which enums are supported for `integer` or `string` value types.
 
 There are other APIs in the `M2MDevice` class that you can use to set, remove and modify new values for the resources.
 
@@ -290,7 +290,7 @@ To create and set values for the optional Resources that take an integer value:
 `security_object->create_resource(M2MSecurity::M2MServerSMSNumber, 123542323);`
 
 
-Check the [M2MSecurity API documentation](https://docs.mbed.com/docs/mbed-client-guide/en/latest/api/m2msecurity_8h.html) to find which enums are supported for `integer`, `string` or `uint8_t*` value types.
+Read the [M2MSecurity API documentation](https://docs.mbed.com/docs/mbed-client-guide/en/latest/api/m2msecurity_8h.html) to find which enums are supported for `integer`, `string` or `uint8_t*` value types.
 
 There are more APIs in the `M2MSecurity` class that you can use to set, remove and modify Resource values.
 
@@ -374,7 +374,7 @@ resource->set_operation(M2MBase::GET_PUT_POST_ALLOWED); // This defines the REST
 resource_instance->set_operation(M2MBase::GET_PUT_POST_ALLOWED); // This defines the REST operations that can be performed on this Resource Instance.
 ```
 
-###### Setting observable mode
+###### Setting the observable mode
 
 To set the Resource or Resource Instance to be an observable resource:
 
@@ -421,13 +421,14 @@ static void c_style_function(void *) {
 }
 resource->set_execute_function(&c_style_function);
 ```
-There are additional APIs that provide getter and remove functions for Resource and Resource Instances in the `M2MResource` and `M2MResourceInstance` classes. Check [the API documentation](https://docs.mbed.com/docs/mbed-client-guide/en/latest/api/annotated.html) for their usage.
+
+There are additional APIs that provide getter and remove functions for Resource and Resource Instances in the `M2MResource` and `M2MResourceInstance` classes. Read the [API documentation](https://docs.mbed.com/docs/mbed-client-guide/en/latest/api/annotated.html) for their usage.
 
 ###### Setting an external handler for block-wise messages
 
 For dynamic Resources, you can pass a function pointer to the Resource Instance. It will be executed when mbed Device Server calls a `PUT` method on that resource with large payload using block-wise operation. The Resource must support the `PUT` operation mode for this feature to work. If the callback is set, the application will be notified for every incoming block-wise message and the message is not stored in mbed Client side anymore. In such case, it is application's responsibility to store each block-wise message and combine them when the last block has arrived. 
 
-<span class="notes">**Note:** Due to a limitation in the mbed-client-c library, GET request can only contain data up to 65KB.</span>
+<span class="notes">**Note:** Due to a limitation in the mbed-client-c library, the GET request can only contain data up to 65KB.</span>
 
 To pass the function pointer for an incoming block-wise message:
 
