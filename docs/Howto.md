@@ -12,7 +12,7 @@ As per the OMA LWM2M specification:
 - The client must have created Resources under Object Instance. You can create M2MResource from the M2MObjectInstance class.
 - The client must have created Resource Instances under Resources. You can create M2MResourceInstance from the M2MObjectInstance class.
 
-Read the [API doxygen documentation](https://docs.mbed.com/docs/mbed-client-guide/en/latest/api/index.html).
+Read the [API doxygen documentation](/docs/v5.4/mbed-client-doxy/index.html).
 
 ### Creating and configuring Objects
 
@@ -36,7 +36,7 @@ Because there can be only one instance of M2MDevice, it is a static class and yo
 
 `M2MDevice::delete_instance();`
 
-Check the [M2MDevice class documentation](https://docs.mbed.com/docs/mbed-client-guide/en/latest/api/m2mdevice_8h.html) to see how to configure the Device Object.
+Check the [M2MDevice class documentation](/docs/v5.4/mbed-client-doxy/class_m2_m_device.html) to see how to configure the Device Object.
 
 ##### Security Object
 
@@ -46,7 +46,7 @@ To create a Security Object:
 
 You can create a Bootstrap or normal mbed Device Server by passing the appropriate `enum` value.
 
-Check the [M2MSecurity class documentation](https://docs.mbed.com/docs/mbed-client-guide/en/latest/api/m2msecurity_8h.html) to see how to configure the Security Object, as well as how to create appropriate Resources and assign values to them.
+Read the [M2MSecurity class documentation](/docs/v5.4/mbed-client-doxy/class_m2_m_security.html) to see how to configure the Security Object, as well as how to create appropriate Resources and assign values to them.
 
 ##### Custom Object
 
@@ -196,7 +196,7 @@ object_instance->set_coap_content_type(120);
 
 <span class="tips">**Tip:** In future versions, we will introduce support for the JSON content types.</span>
 
-There are additional APIs that provide getter and remove functions for Object Instances in the `M2MObjectInstance` class; read the [API documentation](https://docs.mbed.com/docs/mbed-client-guide/en/latest/api/m2mobjectinstance_8h.html) for their usage. 
+There are additional APIs that provide getter and remove functions for Object Instances in the `M2MObjectInstance` class; read the [M2MObjectInstance class documentation](/docs/v5.4/mbed-client-doxy/class_m2_m_object_instance.html) for their usage. 
 
 ### Creating and configuring Resources and Resource Instances
 
@@ -229,7 +229,7 @@ There are direct APIs to create and set values for the Device Resources. You can
 
 Where `instance_id` is the Resource Instance ID, for example `/3/0/11/0`.
 
-Read the [M2MDevice API documentation](https://docs.mbed.com/docs/mbed-client-guide/en/latest/api/m2mdevice_8h.html) to find which enums are supported for `integer` or `string` value types.
+Read the [M2MDevice class documentation](/docs/v5.4/mbed-client-doxy/class_m2_m_device.html) to find which enums are supported for `integer` or `string` value types.
 
 There are other APIs in the `M2MDevice` class that you can use to set, remove and modify new values for the resources.
 
@@ -290,7 +290,7 @@ To create and set values for the optional Resources that take an integer value:
 `security_object->create_resource(M2MSecurity::M2MServerSMSNumber, 123542323);`
 
 
-Read the [M2MSecurity API documentation](https://docs.mbed.com/docs/mbed-client-guide/en/latest/api/m2msecurity_8h.html) to find which enums are supported for `integer`, `string` or `uint8_t*` value types.
+Read the [M2MSecurity class documentation](/docs/v5.4/mbed-client-doxy/class_m2_m_security.html) to find which enums are supported for `integer`, `string` or `uint8_t*` value types.
 
 There are more APIs in the `M2MSecurity` class that you can use to set, remove and modify Resource values.
 
@@ -422,7 +422,7 @@ static void c_style_function(void *) {
 resource->set_execute_function(&c_style_function);
 ```
 
-There are additional APIs that provide getter and remove functions for Resource and Resource Instances in the `M2MResource` and `M2MResourceInstance` classes. Read the [API documentation](https://docs.mbed.com/docs/mbed-client-guide/en/latest/api/annotated.html) for their usage.
+There are additional APIs that provide getter and remove functions for Resource and Resource Instances in the `M2MResource` and `M2MResourceInstance` classes. Read the [API documentation](/docs/v5.4/mbed-client-doxy/files.html) for their usage.
 
 ###### Setting an external handler for block-wise messages
 
