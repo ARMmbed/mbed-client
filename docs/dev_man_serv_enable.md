@@ -57,7 +57,7 @@ if(_object) {
                                    (const uint32_t)size);
 ```
 
-For more information on different resource functionalities, please check the [API documentation](https://docs.mbed.com/docs/mbed-client-guide/en/latest/api/annotated.html) for the M2MObject, M2MObjectInstance and M2MResource classes.
+For more information on different resource functionalities, read the [API documentation](/docs/v5.4/mbed-client-doxy/index.html) for the M2MObject, M2MObjectInstance and M2MResource classes.
 
 #### The Read operation
 
