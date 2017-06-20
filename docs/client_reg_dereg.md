@@ -72,7 +72,7 @@ if(device) {
     }
 ```
 
-<span class="notes">**Note:** You can register other resources, including custom resources. Please check the [API documentation](https://docs.mbed.com/docs/mbed-client-guide/en/latest/api/annotated.html) for a detailed description of the M2MObject, M2MObjectInstance and M2MResource classes.</span>
+<span class="notes">**Note:** You can register other resources, including custom resources. Read the [API documentation](https://docs.mbed.com/docs/mbed-client-guide/en/latest/api/annotated.html) for a detailed description of the M2MObject, M2MObjectInstance and M2MResource classes.</span>
 
 **Step 4.** You have the registration server object and resources that you want to register. Now, you need to call the register API and pass the following objects as parameters:
 
