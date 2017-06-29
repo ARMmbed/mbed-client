@@ -524,41 +524,13 @@ uint32_t M2MFirmware::resource_value_buffer(FirmwareResource resource,
     return size;
 }
 
-M2MResource* M2MFirmware::get_resource(FirmwareResource res) const
+M2MResource* M2MFirmware::get_resource(FirmwareResource resource) const
 {
-    M2MResource* res_object = NULL;
+    M2MResource* resource_object = NULL;
     if(_firmware_instance) {
-        const char* res_name_ptr = "";
-        switch(res) {
-            case Package:
-                res_name_ptr = FIRMWARE_PACKAGE;
-                break;
-            case PackageUri:
-                res_name_ptr = FIRMWARE_PACKAGE_URI;
-                break;
-            case Update:
-                res_name_ptr = FIRMWARE_UPDATE;
-                break;
-            case State:
-                res_name_ptr = FIRMWARE_STATE;
-                break;
-            case UpdateSupportedObjects:
-                res_name_ptr = FIRMWARE_UPDATE_SUPPORTED_OBJECTS;
-                break;
-            case UpdateResult:
-                res_name_ptr = FIRMWARE_UPDATE_RESULT;
-                break;
-            case PackageName:
-                res_name_ptr = FIRMWARE_PACKAGE_NAME;
-                break;
-            case PackageVersion:
-                res_name_ptr = FIRMWARE_PACKAGE_VERSION;
-                break;
-        }
-
-        res_object = _firmware_instance->resource(res_name_ptr);
+        resource_object = _firmware_instance->resource(_firmware_instance->resource_name(resource));
     }
-    return res_object;
+    return resource_object;
 }
 
 bool M2MFirmware::delete_resource(FirmwareResource resource)
