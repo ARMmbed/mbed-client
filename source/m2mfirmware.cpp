@@ -528,7 +528,7 @@ M2MResource* M2MFirmware::get_resource(FirmwareResource resource) const
 {
     M2MResource* resource_object = NULL;
     if(_firmware_instance) {
-        resource_object = _firmware_instance->resource(_firmware_instance->resource_name(resource));
+        resource_object = _firmware_instance->resource(resource_name(resource));
     }
     return resource_object;
 }
