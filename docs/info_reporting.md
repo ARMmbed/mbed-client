@@ -8,7 +8,7 @@ The interface supports the following sub-features:
 
 mbed Device Server initiates an observation request to observe the changing value of either an Object, Object Instance or Resource.
 
-<span class="tips">**Tip:** Related parameters for the **Observe** operation are described in the [Write Attributes operation](/docs/v5.4/mbed-client/features.html#the-write-attributes-operation) section.</span>
+<span class="tips">**Tip:** Related parameters for the **Observe** operation are described in the [Write Attributes operation](/docs/restructure/legacy-products/features.html#the-device-management-and-service-enabler-feature) section.</span>
 
 #### The Notify feature
 
