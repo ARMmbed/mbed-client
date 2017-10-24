@@ -57,7 +57,7 @@ if(_object) {
                                    (const uint32_t)size);
 ```
 
-For more information on different resource functionalities, read the [API documentation](/docs/v5.4/mbed-client-doxy/index.html) for the M2MObject, M2MObjectInstance and M2MResource classes.
+For more information on different resource functionalities, read the [API documentation](/docs/v1.2/mbed-client/index.html) for the M2MObject, M2MObjectInstance and M2MResource classes.
 
 #### The Read operation
 
@@ -151,7 +151,7 @@ res2->set_value_updated_function(value_updated_callback2(&value_updated_global))
 
 #### The Write Attributes operation
 
-Any readable Resource can have attributes that are considered during the [**Observe** operation](/docs/v5.4/mbed-client/features.html#the-observe-feature). The following attributes are used:
+Any readable Resource can have attributes that are considered during the [**Observe** operation](/docs/restructure/legacy-products/features.html#the-information-reporting-feature). The following attributes are used:
 
 - Minimum Period (pmin)
 - Maximum Period (pmax)
@@ -161,7 +161,7 @@ Any readable Resource can have attributes that are considered during the [**Obse
 
 mbed Device Server sets the endpoint attribute values that are used to determine when the endpoint sends the Resource value to the server.
 
-Read the [LWM2M Specification](http://technical.openmobilealliance.org/Technical/technical-information/release-program/current-releases/oma-lightweightm2m-v1-0) for details of all the possible **Write Attributes** defined for different types of Objects and Resources.
+Read the [LwM2M Specification](http://technical.openmobilealliance.org/Technical/technical-information/release-program/current-releases/oma-lightweightm2m-v1-0) for details of all the possible **Write Attributes** defined for different types of Objects and Resources.
 
 #### The Execute operation
 
