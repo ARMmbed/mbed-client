@@ -151,7 +151,7 @@ res2->set_value_updated_function(value_updated_callback2(&value_updated_global))
 
 #### The Write Attributes operation
 
-Any readable Resource can have attributes that are considered during the [**Observe** operation](/docs/restructure/legacy-products/features.html#the-information-reporting-feature). The following attributes are used:
+Any readable Resource can have attributes that are considered during the [**Observe** operation](/docs/v1.2/legacy-products/features.html#the-information-reporting-feature). The following attributes are used:
 
 - Minimum Period (pmin)
 - Maximum Period (pmax)
