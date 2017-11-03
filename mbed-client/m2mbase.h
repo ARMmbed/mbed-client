@@ -600,6 +600,8 @@ private:
     lwm2m_parameters_s          *_sn_resource;
     M2MReportHandler            *_report_handler; // TODO: can be broken down to smaller classes with inheritance.
 
+friend class M2MInterfaceFactory; // calls protected stringdup
+
 friend class Test_M2MBase;
 friend class Test_M2MObject;
 };
