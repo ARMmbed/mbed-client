@@ -1,6 +1,6 @@
 ## mbed Client structure and build process
 
-<span class="notes">**Note:** To port mbed Client, you need to [install yotta and its dependencies](https://github.com/ARMmbed/yotta/blob/master/docs/index.md).</span>
+<span class="notes">**Note:** To port mbed Client, you need to [install yotta and its dependencies](https://github.com/ARMmbed/yotta/blob/master/docs/index.md). <br> You may need access permission to the private GitHub repos referenced in this section. Please [contact us](https://cloud.mbed.com/contact) to request access.</span>
 
 <span class="tips">**Tip:** Before embarking on your own port, you should build the core mbed Client for an existing compilation target to get an understanding of how the mbed Client builds.</span>
 
