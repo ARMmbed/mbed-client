@@ -1,18 +1,22 @@
-
-# Release note for mbed Client 16.03
+## Release note for mbed Client 16.03
  
 mbed Client is an OS-agnostic embedded software library that provides the means to connect and manage constrained embedded devices to web applications through mbed Device Server.
  
-## Release summary
+### Release summary
  
-This is an iterative release of mbed Client, which is available for mbed OS as well as for Ubuntu-like Linux distributions. We’re continuously maturing mbed Client and adding new features to mbed Client.. This release builds on the Technology Preview 15.11 release through the introduction of new APIs, enhanced functionalities and bug fixes.
-## Collaboration
+This is an iterative release of mbed Client, which is available for mbed OS as well as for Ubuntu-like Linux distributions. We’re continuously maturing mbed Client and adding new features to mbed Client. This release builds on the Technology Preview 15.11 release through the introduction of new APIs, enhanced functionalities and bug fixes.
+
+### Collaboration
+
 We’re building mbed Client as a collaborative project, bringing together industry and open source community contributions. If you’d like to work on mbed Client with us, we’d encourage you [to pitch in](https://github.com/ARMmbed/mbed-os/blob/master/CONTRIBUTING.md). With this technology preview we’re ready to start receiving contributions back from the community.
-## Documentation
-To get started with mbed Client, please visit our [getting started guide](https://docs.mbed.com/docs/mbed-client-guide/en/latest/). 
-# Changes since last release
+
+### Documentation
+
+To get started with mbed Client, please visit our [getting started guide](/docs/v1.2/legacy-products/index.html).
+
+## Changes since last release
  
-## New APIs and functions
+### New APIs and functions
 
 * New APIs:
  * Setting the max-age of a resource value. See [https://tools.ietf.org/html/draft-ietf-core-coap-09#section-5.10.6](https://tools.ietf.org/html/draft-ietf-core-coap-09#section-5.10.6).
@@ -24,7 +28,7 @@ To get started with mbed Client, please visit our [getting started guide](https:
 * Added support for handling observation cancellation through a RESET message from Device Connector Server.
 * Disabled Bootstrap API functionality from source code.
 
-## Bug fixes
+### Bug fixes
  
 1. Multiple fixes related to Object, Object Instance and Resource Observation.
 2. Multiple fixes related to Write Attributes parameter handling for Object, Object Instance and Resource.
@@ -35,11 +39,11 @@ To get started with mbed Client, please visit our [getting started guide](https:
 7. Memory handling in the ``m2mstring`` class.
 8. Fix for preventing the client from sending multiple confirmable messages on mbed OS.
  
-# Modules versions
+### Module versions
  
 mbed Client is available as part of mbed OS or as a standalone component for Ubuntu-like Linux distributions.
 
-The yotta modules & versions released for these different product configurations are listed below.
+The yotta modules and versions released for these different product configurations are listed below.
 
 mbed Client as part of mbed OS:
 
@@ -66,14 +70,7 @@ mbed Client as a standalone distribution for Ubuntu-like Linux distributions:
 1. target-x86-linux-native - 1.0.0
 1. target-linux-native - 1.0.0
  
- 
-### Known issues
- 
-The known issues list for this release is available as [a separate document](Known_Issues.md)
-
-### Other ways of accessing this release
-
+#### Other ways of accessing this release
 
 We prefer that you access and collaborate with mbed Client online. However, the release may also be downloaded as a [tar archive file](https://mbed-media.mbed.com/filer_public/7b/75/7b75d9fe-bf15-4818-b959-c54e11e767af/mbed-client-1603.zip).
  
-
