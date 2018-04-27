@@ -14,9 +14,9 @@ The API is written in C++ to allow quick application development.
 
 mbed Client supports the following three features introduced in the subsequent chapters:
 
-- [Client Registration and Deregistration](/docs/v1.2/legacy-products/features.html#the-client-registration-feature)
-- [Device Management and Service Enablement](/docs/v1.2/legacy-products/features.html#the-device-management-and-service-enabler-feature)
-- [Information Reporting](/docs/v1.2/legacy-products/features.html#the-information-reporting-feature)
+- [Client Registration and Deregistration](/docs/latest/legacy-products/features.html#the-client-registration-feature)
+- [Device Management and Service Enablement](/docs/latest/legacy-products/features.html#the-device-management-and-service-enabler-feature)
+- [Information Reporting](/docs/latest/legacy-products/features.html#the-information-reporting-feature)
 
 The API also provides an interface to define the application endpoint information. This information will be delivered to mbed Device Server during the registration operation.
 
@@ -94,7 +94,7 @@ _interface->set_entropy_callback(ent_cb);
 
 The maximum single UDP message size that mbed Client can receive is 1152 bytes. The actual payload size is 1137 bytes, the header information using the remaining 15 bytes. 
 
-For transferring larger amounts of data, the Blockwise feature must be deployed. When using this feature, mbed Client can handle messages up to 65KB by default. This feature is disabled by default. To receive more than 65KB, see [Setting an external handler for block-wise messages](/docs/v1.2/legacy-products/using-mbed-client-api.html#creating-and-configuring-resources-and-resource-instances).
+For transferring larger amounts of data, the Blockwise feature must be deployed. When using this feature, mbed Client can handle messages up to 65KB by default. This feature is disabled by default. To receive more than 65KB, see [Setting an external handler for block-wise messages](/docs/latest/legacy-products/using-mbed-client-api.html#creating-and-configuring-resources-and-resource-instances).
 
 To enable the Blockwise feature in mbed OS, create a `mbed_app.json` file in the application level and overwrite Blockwise value as described below:
 
@@ -192,11 +192,11 @@ For yotta  based builds, to overwrite the reconnection retry count and reconnect
 
 ### How to use the API
 
-More information on how to use the API effectively to [create and configure Objects, Object Instances and Resources](/docs/v1.2/legacy-products/using-mbed-client-api.html).
+More information on how to use the API effectively to [create and configure Objects, Object Instances and Resources](/docs/latest/legacy-products/using-mbed-client-api.html).
 
 ### API documentation
 
-The documentation for this API is [available here](/docs/v1.2/mbed-client/index.html).
+The documentation for this API is [available here](/docs/latest/mbed-client/index.html).
 
 ### Example application
 
