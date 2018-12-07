@@ -12,7 +12,7 @@ As per the OMA LWM2M specification:
 - The client must have created Resources under Object Instance. You can create M2MResource from the M2MObjectInstance class.
 - The client must have created Resource Instances under Resources. You can create M2MResourceInstance from the M2MObjectInstance class.
 
-Read the [API doxygen documentation](/docs/latest/mbed-client/index.html).
+Read the [API doxygen documentation](../mbed-client/index.html).
 
 ### Creating and configuring Objects
 
@@ -36,7 +36,7 @@ Because there can be only one instance of M2MDevice, it is a static class and yo
 
 `M2MDevice::delete_instance();`
 
-Check the [M2MDevice class documentation](/docs/latest/mbed-client/class_m2_m_device.html) to see how to configure the Device Object.
+Check the [M2MDevice class documentation](../mbed-client/class_m2_m_device.html) to see how to configure the Device Object.
 
 ##### Security Object
 
@@ -46,7 +46,7 @@ To create a Security Object:
 
 You can create a Bootstrap or normal mbed Device Server by passing the appropriate `enum` value.
 
-Read the [M2MSecurity class documentation](/docs/latest/mbed-client/class_m2_m_security.html) to see how to configure the Security Object, as well as how to create appropriate Resources and assign values to them.
+Read the [M2MSecurity class documentation](../mbed-client/class_m2_m_security.html) to see how to configure the Security Object, as well as how to create appropriate Resources and assign values to them.
 
 ##### Custom Object
 
@@ -196,7 +196,7 @@ object_instance->set_coap_content_type(120);
 
 <span class="tips">**Tip:** In future versions, we will introduce support for the JSON content types.</span>
 
-There are additional APIs that provide getter and remove functions for Object Instances in the `M2MObjectInstance` class; read the [M2MObjectInstance class documentation](/docs/latest/mbed-client/class_m2_m_object_instance.html) for their usage. 
+There are additional APIs that provide getter and remove functions for Object Instances in the `M2MObjectInstance` class; read the [M2MObjectInstance class documentation](../mbed-client/class_m2_m_object_instance.html) for their usage. 
 
 ### Creating and configuring Resources and Resource Instances
 
@@ -229,7 +229,7 @@ There are direct APIs to create and set values for the Device Resources. You can
 
 Where `instance_id` is the Resource Instance ID, for example `/3/0/11/0`.
 
-Read the [M2MDevice class documentation](/docs/latest/mbed-client/class_m2_m_device.html) to find which enums are supported for `integer` or `string` value types.
+Read the [M2MDevice class documentation](../mbed-client/class_m2_m_device.html) to find which enums are supported for `integer` or `string` value types.
 
 There are other APIs in the `M2MDevice` class that you can use to set, remove and modify new values for the resources.
 
@@ -290,7 +290,7 @@ To create and set values for the optional Resources that take an integer value:
 `security_object->create_resource(M2MSecurity::M2MServerSMSNumber, 123542323);`
 
 
-Read the [M2MSecurity class documentation](/docs/latest/mbed-client/class_m2_m_security.html) to find which enums are supported for `integer`, `string` or `uint8_t*` value types.
+Read the [M2MSecurity class documentation](../mbed-client/class_m2_m_security.html) to find which enums are supported for `integer`, `string` or `uint8_t*` value types.
 
 There are more APIs in the `M2MSecurity` class that you can use to set, remove and modify Resource values.
 
@@ -342,7 +342,6 @@ uint8_t value[] ={"value"};
 M2MResourceInstance* resource_instance = object_instance->create_static_resource_instance("Resource", "sensor",M2MResourceInstance::INTEGER,value,sizeof(value),0);
 ```
 
-
 - To create an observable Resource Instance (`/Test/0/Resource/0`) with a dynamic value that can be set later on: 
 
 ```
@@ -353,7 +352,6 @@ uint8_t value[] ={"value"};
 M2MResourceInstance* resource_instance = object_instance->create_dynamic_resource_instance("Resource", "sensor",M2MResourceInstance::INTEGER, true, 0);
 int64_t value = 1000;
 resource_instance->set_value(value);
-
 ```
 
 ##### Configuring the Resource and Resource Instance
@@ -414,6 +412,7 @@ resource->set_execute_function(execute_callback(this,&execute_function_example))
 ```
 
 In case execute callback function is defined as a global function and it's outside of your class scope you can use overloaded set_execute_function:
+
 ```
 virtual void set_execute_function(execute_callback_2 callback);
 static void c_style_function(void *) {
@@ -422,7 +421,7 @@ static void c_style_function(void *) {
 resource->set_execute_function(&c_style_function);
 ```
 
-There are additional APIs that provide getter and remove functions for Resource and Resource Instances in the `M2MResource` and `M2MResourceInstance` classes. Read the [API documentation](/docs/latest/mbed-client/index.html) for their usage.
+There are additional APIs that provide getter and remove functions for Resource and Resource Instances in the `M2MResource` and `M2MResourceInstance` classes. Read the [API documentation](../mbed-client/index.html) for their usage.
 
 ###### Setting an external handler for block-wise messages
 
