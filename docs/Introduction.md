@@ -14,9 +14,9 @@ The API is written in C++ to allow quick application development.
 
 mbed Client supports the following three features introduced in the subsequent chapters:
 
-- [Client Registration and Deregistration](/docs/latest/legacy-products/features.html#the-client-registration-feature)
-- [Device Management and Service Enablement](/docs/latest/legacy-products/features.html#the-device-management-and-service-enabler-feature)
-- [Information Reporting](/docs/latest/legacy-products/features.html#the-information-reporting-feature)
+- [Client Registration and Deregistration](../legacy-products/features.html#the-client-registration-feature)
+- [Device Management and Service Enablement](../legacy-products/features.html#the-device-management-and-service-enabler-feature)
+- [Information Reporting](../legacy-products/features.html#the-information-reporting-feature)
 
 The API also provides an interface to define the application endpoint information. This information will be delivered to mbed Device Server during the registration operation.
 
@@ -57,7 +57,6 @@ uint32_t get_random_number(void)
 }
 
 _interface->set_random_number_callback(&get_random_number);
-
 ```
 
 #### Setting up own entropy function for additional secure connectivity 
@@ -94,7 +93,7 @@ _interface->set_entropy_callback(ent_cb);
 
 The maximum single UDP message size that mbed Client can receive is 1152 bytes. The actual payload size is 1137 bytes, the header information using the remaining 15 bytes. 
 
-For transferring larger amounts of data, the Blockwise feature must be deployed. When using this feature, mbed Client can handle messages up to 65KB by default. This feature is disabled by default. To receive more than 65KB, see [Setting an external handler for block-wise messages](/docs/latest/legacy-products/using-mbed-client-api.html#creating-and-configuring-resources-and-resource-instances).
+For transferring larger amounts of data, the Blockwise feature must be deployed. When using this feature, mbed Client can handle messages up to 65KB by default. This feature is disabled by default. To receive more than 65KB, see [Setting an external handler for block-wise messages](../legacy-products/using-mbed-client-api.html#creating-and-configuring-resources-and-resource-instances).
 
 To enable the Blockwise feature in mbed OS, create a `mbed_app.json` file in the application level and overwrite Blockwise value as described below:
 
@@ -131,16 +130,18 @@ For mbed OS, to enable message deduplication, create a `mbed_app.json` file in t
         "*": {
             "mbed-client.sn-coap-duplication-max-msgs-count": 1
         }
-
 ```
+
 For yotta based builds, to enable message deduplication, you need to create a `config.json` file in the application level.
 
 *Example:*
+
 ```
 {
 "coap_duplication_max_msgs_count": 1
 }
 ```
+
 Recommended values for the `coap_duplication_max_msgs_count` flag are 0 to 6. Value 0 means that the feature is not used. It is not recommended to use higher value than 6, because it increases the memory consumption.
 
 #### Reconnectivity
@@ -172,6 +173,7 @@ Applications can define their own parameters for the reconnection logic.
 For mbed OS, to overwrite the reconnection retry count and reconnection time interval, create a `mbed_app.json` file in the application level and overwrite the values as described below:
 
 *Example:*
+
 ```
 "target_overrides": {
         "*": {
@@ -180,9 +182,11 @@ For mbed OS, to overwrite the reconnection retry count and reconnection time int
         }
 
 ```
-For yotta  based builds, to overwrite the reconnection retry count and reconnection time interval, you need to create a `config.json` file in the application level.
+
+For Yotta  based builds, to overwrite the reconnection retry count and reconnection time interval, you need to create a `config.json` file in the application level.
 
 *Example:*
+
 ```
 {
 "reconnection_count": 3,
@@ -192,11 +196,11 @@ For yotta  based builds, to overwrite the reconnection retry count and reconnect
 
 ### How to use the API
 
-More information on how to use the API effectively to [create and configure Objects, Object Instances and Resources](/docs/latest/legacy-products/using-mbed-client-api.html).
+More information on how to use the API effectively to [create and configure Objects, Object Instances and Resources](../legacy-products/using-mbed-client-api.html).
 
 ### API documentation
 
-The documentation for this API is [available here](/docs/latest/mbed-client/index.html).
+The documentation for this API is [available here](../mbed-client/index.html).
 
 ### Example application
 
