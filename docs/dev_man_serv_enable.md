@@ -57,7 +57,7 @@ if(_object) {
                                    (const uint32_t)size);
 ```
 
-For more information on different resource functionalities, read the [API documentation](/docs/latest/mbed-client/index.html) for the M2MObject, M2MObjectInstance and M2MResource classes.
+For more information on different resource functionalities, read the [API documentation](../mbed-client/index.html) for the M2MObject, M2MObjectInstance and M2MResource classes.
 
 #### The Read operation
 
@@ -151,7 +151,7 @@ res2->set_value_updated_function(value_updated_callback2(&value_updated_global))
 
 #### The Write Attributes operation
 
-Any readable Resource can have attributes that are considered during the [**Observe** operation](/docs/latest/legacy-products/features.html#the-information-reporting-feature). The following attributes are used:
+Any readable Resource can have attributes that are considered during the [**Observe** operation](../legacy-products/features.html#the-information-reporting-feature). The following attributes are used:
 
 - Minimum Period (pmin)
 - Maximum Period (pmax)
@@ -171,6 +171,7 @@ mbed Device Server uses the **Execute** operation to perform an action. This ope
 
 If you want to execute a piece of code in your application, you can pass a `POST` request from mbed Device Server.
 When your Resource receives the `POST` request, mbed Client parses the payload from the request and wraps it in the `M2MResource::M2MExecuteParameter` class. The class object is passed through the execute callback function.
+
 You can then typecast the `void*` argument into the corresponding `M2MResource::M2MExecuteParameter` and access the passed payload and its length through the given API. M2MResource::M2MExecuteParameter contains also information which object and object instance resource belongs to. Make sure that the payload sent through POST request is in `plain/text` format and that the content-type is set as “plain/text” on the POST request call.
 
 See the code snippet below for usage:
